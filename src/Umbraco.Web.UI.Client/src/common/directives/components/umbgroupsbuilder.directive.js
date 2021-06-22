@@ -23,12 +23,12 @@
                 if (newValue && newValue.length === 0) return;
 
                 scope.tabs = $filter("filter")(scope.model.groups, (group) => {
-                    return group.level === 0;
+                    return group.type === 1;
                 });
             });
 
             function getFirstTab () {
-                return scope.model.groups.find(group => group.level === 0);
+                return scope.model.groups.find(group => group.type === 1);
             }
 
             function activate() {
@@ -402,7 +402,7 @@
                     key: String.CreateGuid(),
                     name: "",
                     parentKey: null,
-                    level: 0,
+                    type: 1,
                     sortOrder,
                     icon: "icon-document color-black"
                 };
@@ -504,7 +504,7 @@
                     parentTabContentTypeNames: [],
                     name: "",
                     parentKey: tabKey || null,
-                    level: 1,
+                    type: 0,
                     sortOrder: lastGroupSortOrder
                 };
 

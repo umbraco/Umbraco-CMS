@@ -77,32 +77,29 @@ namespace Umbraco.Core.Models
                 //Note this is done to ensure existing groups can be renamed
                 if (item.HasIdentity && item.Id > 0)
                 {
-                    var exists = Contains(item.Id);
-                    if (exists)
+                    var index = IndexOfKey(item.Id);
+                    if (index != -1)
                     {
                         var keyExists = Contains(item.Name);
                         if (keyExists)
                             throw new Exception($"Naming conflict: Changing the name of PropertyGroup '{item.Name}' would result in duplicates");
 
                         //collection events will be raised in SetItem
-                        SetItem(IndexOfKey(item.Id), item);
+                        SetItem(index, item);
                         return;
                     }
                 }
                 else
                 {
-                    var key = GetKeyForItem(item);
-                    if (key != null)
+                    var index = IndexOfKey(item.Name);
+                    if (index != -1)
                     {
-                        var exists = Contains(key);
-                        if (exists)
-                        {
-                            //collection events will be raised in SetItem
-                            SetItem(IndexOfKey(key), item);
-                            return;
-                        }
+                        //collection events will be raised in SetItem
+                        SetItem(index, item);
+                        return;
                     }
                 }
+
                 //collection events will be raised in InsertItem
                 base.Add(item);
             }

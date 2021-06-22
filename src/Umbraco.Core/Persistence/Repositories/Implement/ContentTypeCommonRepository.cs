@@ -274,7 +274,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Id = dto.Id,
                 Key = dto.UniqueId,
                 ParentKey = dto.ParentKey,
-                Level = dto.Level,
+                Type = (PropertyGroupType)dto.Type,
                 Icon = dto.Icon,
                 Name = dto.Text,
                 SortOrder = dto.SortOrder

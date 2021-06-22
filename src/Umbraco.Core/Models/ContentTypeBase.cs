@@ -339,21 +339,19 @@ namespace Umbraco.Core.Models
         /// "generic properties" ie does not have a tab anymore.</remarks>
         public bool MovePropertyType(string propertyTypeAlias, string propertyGroupName)
         {
-            // note: not dealing with alias casing at all here?
-
             // get property, ensure it exists
-            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
+            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null) return false;
 
             // get new group, if required, and ensure it exists
             var newPropertyGroup = propertyGroupName == null
                 ? null
-                : PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName) && x.ParentKey == null && x.Level == 1);
+                : PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName));
             if (propertyGroupName != null && newPropertyGroup == null) return false;
 
             // get old group
             var oldPropertyGroup = PropertyGroups.FirstOrDefault(x =>
-                x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
+                x.PropertyTypes.Any(y => y.Alias.InvariantEquals(propertyTypeAlias)));
 
             // set new group
             propertyType.PropertyGroupId = newPropertyGroup == null ? null : new Lazy<int>(() => newPropertyGroup.Id, false);
@@ -403,7 +401,7 @@ namespace Umbraco.Core.Models
         public void RemovePropertyGroup(string propertyGroupName)
         {
             // if no group exists with that name, do nothing
-            var group = PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName) && x.ParentKey == null && x.Level == 1);
+            var group = PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName));
             if (group == null) return;
 
             // first remove the group

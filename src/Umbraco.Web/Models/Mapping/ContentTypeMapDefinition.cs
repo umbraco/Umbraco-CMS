@@ -303,7 +303,7 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Key = source.Key;
             target.ParentKey = source.ParentKey;
-            target.Level = source.Level;
+            target.Type = source.Type;
             target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
@@ -317,7 +317,7 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Key = source.Key;
             target.ParentKey = source.ParentKey;
-            target.Level = source.Level;
+            target.Type = source.Type;
             target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
@@ -331,7 +331,7 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Key = source.Key;
             target.ParentKey = source.ParentKey;
-            target.Level = source.Level;
+            target.Type = source.Type;
             target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
@@ -348,7 +348,7 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Key = source.Key;
             target.ParentKey = source.ParentKey;
-            target.Level = source.Level;
+            target.Type = source.Type;
             target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
@@ -670,7 +670,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var propertiesA = properties.ToArray();
             var distinctProperties = propertiesA
-                .Select(x => x.Alias.ToUpperInvariant())
+                .Select(x => x.Alias?.ToUpperInvariant())
                 .Distinct()
                 .Count();
             if (distinctProperties != propertiesA.Length)
@@ -681,7 +681,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var groupsA = groups.ToArray();
             var distinctProperties = groupsA
-                .Select(x => (x.Name?.ToUpperInvariant(), x.Level))
+                .Select(x => x.Name?.ToUpperInvariant())
                 .Distinct()
                 .Count();
             if (distinctProperties != groupsA.Length)

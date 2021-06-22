@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                     group.Key = groupDto.UniqueId;
                     group.ParentKey = groupDto.ParentKey;
-                    group.Level = groupDto.Level;
+                    group.Type = (PropertyGroupType)groupDto.Type;
                     group.Icon = groupDto.Icon;
                     group.Name = groupDto.Text;
                     group.SortOrder = groupDto.SortOrder;
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 UniqueId = propertyGroup.Key,
                 ParentKey = propertyGroup.ParentKey,
-                Level = propertyGroup.Level,
+                Type = (short)propertyGroup.Type,
                 ContentTypeNodeId = contentTypeId,
                 Icon = propertyGroup.Icon,
                 Text = propertyGroup.Name,

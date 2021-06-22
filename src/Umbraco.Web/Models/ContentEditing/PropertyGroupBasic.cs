@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -39,8 +40,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "parentKey")]
         public Guid? ParentKey { get; set; }
 
-        [DataMember(Name = "level")]
-        public short Level { get; set; }
+        [DataMember(Name = "type")]
+        public PropertyGroupType Type { get; set; }
 
         [DataMember(Name = "icon")]
         public string Icon { get; set; }

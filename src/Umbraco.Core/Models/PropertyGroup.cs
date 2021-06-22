@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -15,7 +17,7 @@ namespace Umbraco.Core.Models
     public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
         private Guid? _parentKey;
-        private short _level;
+        private PropertyGroupType _type;
         private string _name;
         private string _icon;
         private int _sortOrder;
@@ -28,7 +30,6 @@ namespace Umbraco.Core.Models
         public PropertyGroup(PropertyTypeCollection propertyTypeCollection)
         {
             PropertyTypes = propertyTypeCollection;
-            Level = 1; // TODO We default to 1 (property group) for backwards compatibility, but should use zero/no default at some point.
         }
 
         private void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -50,10 +51,10 @@ namespace Umbraco.Core.Models
         /// Gets or sets the Sort Order of the Group
         /// </summary>
         [DataMember]
-        public short Level
+        public PropertyGroupType Type
         {
-            get => _level;
-            set => SetPropertyValueAndDetectChanges(value, ref _level, nameof(Level));
+            get => _type;
+            set => SetPropertyValueAndDetectChanges(value, ref _type, nameof(Type));
         }
 
         /// <summary>
@@ -116,9 +117,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public bool Equals(PropertyGroup other) => other != null && base.Equals(other) && ParentKey == other.ParentKey && Level == other.Level && Icon == other.Icon && Name.InvariantEquals(other.Name);
+        public bool Equals(PropertyGroup other) => other != null && base.Equals(other) && ParentKey == other.ParentKey && Type == other.Type && Icon == other.Icon && Name.InvariantEquals(other.Name);
 
-        public override int GetHashCode() => (base.GetHashCode(), ParentKey, Level, Icon, Name.ToLowerInvariant()).GetHashCode();
+        public override int GetHashCode() => (base.GetHashCode(), ParentKey, Type, Icon, Name?.ToLowerInvariant()).GetHashCode();
 
         protected override void PerformDeepClone(object clone)
         {
@@ -132,6 +133,43 @@ namespace Umbraco.Core.Models
                 clonedEntity._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
                 clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;       //re-assign correct event handler
             }
+        }
+    }
+
+    internal static class PropertyGroupExtensions
+    {
+        /// <summary>
+        /// Orders the property groups by hierarchy (so child groups are after their parent group) and removes circular references.
+        /// </summary>
+        /// <param name="propertyGroups">The property groups.</param>
+        /// <returns>
+        /// The ordered property groups.
+        /// </returns>
+        public static IEnumerable<PropertyGroup> OrderByHierarchy(this IEnumerable<PropertyGroup> propertyGroups)
+        {
+            var groups = propertyGroups.ToList();
+            var visitedParentKeys = new HashSet<Guid>(groups.Count);
+
+            IEnumerable<PropertyGroup> OrderByHierarchy(Guid? parentKey)
+            {
+                if (parentKey.HasValue && visitedParentKeys.Add(parentKey.Value) == false)
+                {
+                    // We already visited this parent key, stop to prevent a circular reference
+                    yield break;
+                }
+
+                foreach (var group in groups.Where(x => x.ParentKey == parentKey).OrderBy(x => x.Type).ThenBy(x => x.SortOrder))
+                {
+                    yield return group;
+
+                    foreach (var childGroup in OrderByHierarchy(group.Key))
+                    {
+                        yield return childGroup;
+                    }
+                }
+            }
+
+            return OrderByHierarchy(null);
         }
     }
 }

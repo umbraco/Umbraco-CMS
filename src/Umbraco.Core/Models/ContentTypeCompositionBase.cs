@@ -218,7 +218,7 @@ namespace Umbraco.Core.Models
         private PropertyGroup AddAndReturnPropertyGroup(string name)
         {
             // ensure we don't have it already
-            if (PropertyGroups.Any(x => x.Name.InvariantEquals(name) && x.ParentKey == null && x.Level == 1))
+            if (PropertyGroups.Any(x => x.Name.InvariantEquals(name)))
                 return null;
 
             // create the new group
@@ -227,7 +227,7 @@ namespace Umbraco.Core.Models
             // check if it is inherited - there might be more than 1 but we want the 1st, to
             // reuse its sort order - if there are more than 1 and they have different sort
             // orders... there isn't much we can do anyways
-            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(name) && x.ParentKey == null && x.Level == 1);
+            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(name));
             if (inheritGroup == null)
             {
                 // no, just local, set sort order
@@ -260,8 +260,8 @@ namespace Umbraco.Core.Models
                 return false;
 
             // get and ensure a group local to this content type
-            var group = PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName) && x.ParentKey == null && x.Level == 1)
-                ??AddAndReturnPropertyGroup(propertyGroupName);
+            var group = PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName))
+                ?? AddAndReturnPropertyGroup(propertyGroupName);
             if (group == null)
                 return false;
 

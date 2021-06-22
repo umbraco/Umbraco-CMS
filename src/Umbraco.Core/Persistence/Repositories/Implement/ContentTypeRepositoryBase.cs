@@ -175,7 +175,7 @@ AND umbracoNode.nodeObjectType = @objectType",
             }
 
             //Insert Tabs
-            foreach (var propertyGroup in entity.PropertyGroups.OrderBy(x => x.Level).ToArray())
+            foreach (var propertyGroup in entity.PropertyGroups.OrderByHierarchy())
             {
                 var tabDto = PropertyGroupFactory.BuildGroupDto(propertyGroup, nodeDto.NodeId);
                 var primaryKey = Convert.ToInt32(Database.Insert(tabDto));
@@ -374,7 +374,7 @@ AND umbracoNode.id <> @id",
             }
 
             // insert or update groups, assign properties
-            foreach (var propertyGroup in entity.PropertyGroups.OrderBy(x => x.Level).ToArray())
+            foreach (var propertyGroup in entity.PropertyGroups.OrderByHierarchy())
             {
                 // insert or update group
                 var groupDto = PropertyGroupFactory.BuildGroupDto(propertyGroup, entity.Id);

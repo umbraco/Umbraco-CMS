@@ -28,9 +28,9 @@ namespace Umbraco.Core.Persistence.Dtos
         [ForeignKey(typeof(PropertyTypeGroupDto), Column = "uniqueID", Name = "FK_" + TableName + "_parentKey")]
         public Guid? ParentKey { get; set; }
 
-        [Column("level")]
-        [Constraint(Default = 1)] // TODO We default to 1 (property group) for backwards compatibility, but should use zero/no default at some point.
-        public short Level { get; set; } = 1;
+        [Column("type")]
+        [Constraint(Default = 0)]
+        public short Type { get; set; }
 
         [Column("contenttypeNodeId")]
         [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
