@@ -390,7 +390,7 @@ namespace Umbraco.Web.Editors
 
         private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
         {
-            var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
+            var emptyContent = Services.ContentService.Create("", parentId, contentType, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
             // translate the content type name if applicable
             mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
