@@ -14,33 +14,22 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-        private readonly ILogger _logger;
 
-        public MediaPickerWithCropsValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger)
+        public MediaPickerWithCropsValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
-        /// <summary>
-        /// Enusre this property value convertor is for the New Media Picker with Crops aka MediaPicker 3
-        /// </summary>
         public override bool IsConverter(IPublishedPropertyType propertyType) => propertyType.EditorAlias.Equals(Core.Constants.PropertyEditors.Aliases.MediaPicker3);
 
-        /// <summary>
-        /// Check if the raw JSON value is not an empty array
-        /// </summary>
         public override bool? IsValue(object value, PropertyValueLevel level)
             => value?.ToString() is string stringValue &&
                 stringValue != null &&
                 !string.IsNullOrEmpty(stringValue) &&
                 stringValue != "[]";
 
-        /// <summary>
-        /// What C# model type does the raw JSON return for Models & Views
-        /// </summary>
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => IsMultipleDataType(propertyType.DataType)
                 ? typeof(IEnumerable<MediaWithCrops>)
@@ -85,11 +74,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return isMultiple ? mediaItems : mediaItems.FirstOrDefault();
         }
 
-        /// <summary>
-        /// Is the media picker configured to pick multiple media items
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <returns></returns>
         private bool IsMultipleDataType(PublishedDataType dataType) => dataType.ConfigurationAs<MediaPicker3Configuration>().Multiple;
     }
 }
