@@ -135,9 +135,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public bool Equals(PropertyGroup other) => base.Equals(other) && Name.InvariantEquals(other.Name);
+        public bool Equals(PropertyGroup other) => base.Equals(other) || (other != null && Name.InvariantEquals(other.Name) && ParentKey == other.ParentKey && Type == other.Type);
 
-        public override int GetHashCode() => base.GetHashCode() ^ (Name?.ToLowerInvariant()).GetHashCode();
+        public override int GetHashCode() => (base.GetHashCode(), Name?.ToLowerInvariant(), ParentKey, Type).GetHashCode();
 
         protected override void PerformDeepClone(object clone)
         {
