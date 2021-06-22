@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration
 {
+
     /// <summary>
     /// Health check for the recommended production configuration for Notification Email.
     /// </summary>
