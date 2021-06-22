@@ -203,7 +203,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             // to 8.10.0
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
 
-            // t0 8.15.0 - Guess whos back, back again... TABS is back... tell a friend
+            // to 8.15.0
             To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
 
             //FINAL
