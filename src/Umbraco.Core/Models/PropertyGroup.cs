@@ -9,7 +9,7 @@ using Umbraco.Core.Models.Entities;
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// A group of property types, which corresponds to the properties grouped under a Tab.
+    /// Represents a group of property types.
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
@@ -40,6 +40,9 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the parent key of the group.
         /// </summary>
+        /// <value>
+        /// The parent key.
+        /// </value>
         [DataMember]
         public Guid? ParentKey
         {
@@ -48,8 +51,11 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Sort Order of the Group
+        /// Gets or sets the type of the group.
         /// </summary>
+        /// <value>
+        /// The type.
+        /// </value>
         [DataMember]
         public PropertyGroupType Type
         {
@@ -58,8 +64,11 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Name of the Group, which corresponds to the Tab-name in the UI
+        /// Gets or sets the name of the group.
         /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
         [DataMember]
         public string Name
         {
@@ -70,6 +79,9 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the icon of the group.
         /// </summary>
+        /// <value>
+        /// The icon.
+        /// </value>
         [DataMember]
         public string Icon
         {
@@ -78,8 +90,11 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Sort Order of the Group
+        /// Gets or sets the sort order of the group.
         /// </summary>
+        /// <value>
+        /// The sort order.
+        /// </value>
         [DataMember]
         public int SortOrder
         {
@@ -88,10 +103,13 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets a collection of PropertyTypes for this PropertyGroup
+        /// Gets or sets a collection of property types for the group.
         /// </summary>
+        /// <value>
+        /// The property types.
+        /// </value>
         /// <remarks>
-        /// Marked DoNotClone because we will manually deal with cloning and the event handlers
+        /// Marked with DoNotClone, because we will manually deal with cloning and the event handlers.
         /// </remarks>
         [DataMember]
         [DoNotClone]
@@ -117,9 +135,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public bool Equals(PropertyGroup other) => other != null && base.Equals(other) && ParentKey == other.ParentKey && Type == other.Type && Icon == other.Icon && Name.InvariantEquals(other.Name);
+        public bool Equals(PropertyGroup other) => base.Equals(other) && Name.InvariantEquals(other.Name);
 
-        public override int GetHashCode() => (base.GetHashCode(), ParentKey, Type, Icon, Name?.ToLowerInvariant()).GetHashCode();
+        public override int GetHashCode() => base.GetHashCode() ^ (Name?.ToLowerInvariant()).GetHashCode();
 
         protected override void PerformDeepClone(object clone)
         {

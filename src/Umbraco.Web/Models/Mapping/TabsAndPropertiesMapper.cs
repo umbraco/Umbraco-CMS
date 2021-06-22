@@ -129,9 +129,9 @@ namespace Umbraco.Web.Models.Mapping
             // need to aggregate the tabs, as content.PropertyGroups contains all the composition tabs,
             // and there might be duplicates (content does not work like contentType and there is no
             // content.CompositionPropertyGroups).
-            var groups = contentType.CompositionPropertyGroups.ToArray();
+            var groups = contentType.CompositionPropertyGroups.OrderByHierarchy().ToArray();
             var parentKeys = groups.Where(x => x.ParentKey.HasValue).Select(x => x.ParentKey.Value).Distinct().ToArray();
-            foreach (var groupsByHierarchy in groups.OrderByHierarchy().GroupBy(x => (x.Name, x.ParentKey)))
+            foreach (var groupsByHierarchy in groups.GroupBy(x => (x.Name, x.ParentKey, x.Type)))
             {
                 var properties = new List<Property>();
 
