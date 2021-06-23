@@ -53,12 +53,6 @@ namespace Umbraco.Web.PropertyEditors
                 return Deserialize(value);
             }
 
-            public override object FromEditor(ContentPropertyData editorValue, object currentValue)
-            {
-                // TODO: Remove unneeded JSON properties (empty crops/default focal point) and remove indentation
-                return base.FromEditor(editorValue, currentValue);
-            }
-
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
             {
                 foreach (var dto in Deserialize(value))
