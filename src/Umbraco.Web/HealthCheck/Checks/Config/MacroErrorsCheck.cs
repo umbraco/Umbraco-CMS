@@ -45,7 +45,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/macroErrorModeCheckSuccessMessage",
+                return TextService.Localize("healthcheck", "macroErrorModeCheckSuccessMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
@@ -54,7 +54,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/macroErrorModeCheckErrorMessage",
+                return TextService.Localize("healthcheck", "macroErrorModeCheckErrorMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
@@ -63,7 +63,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return TextService.Localize("healthcheck/macroErrorModeCheckRectifySuccessMessage",
+                return TextService.Localize("healthcheck", "macroErrorModeCheckRectifySuccessMessage",
                     new[] { Values.First(v => v.IsRecommended).Value });
             }
         }

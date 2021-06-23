@@ -28,8 +28,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 // TODO: We want to be able to intern the strings for aliases when deserializing like we do for Newtonsoft but I'm unsure exactly how
                 // to do that but it would seem to be with a custom message pack resolver but I haven't quite figured out based on the docs how
                 // to do that since that is part of the int key -> string mapping operation, might have to see the source code to figure that one out.
-
-                // resolver custom types first
+                // There are docs here on how to build one of these: https://github.com/neuecc/MessagePack-CSharp/blob/master/README.md#low-level-api-imessagepackformattert
+                // and there are a couple examples if you search on google for them but this will need to be a separate project.
+                // NOTE: resolver custom types first
                 // new ContentNestedDataResolver(),
 
                 // finally use standard resolver
@@ -122,87 +123,5 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
             }
         }
-
-       
-
-        //private class ContentNestedDataResolver : IFormatterResolver
-        //{
-        //    // GetFormatter<T>'s get cost should be minimized so use type cache.
-        //    public IMessagePackFormatter<T> GetFormatter<T>() => FormatterCache<T>.Formatter;
-
-        //    private static class FormatterCache<T>
-        //    {
-        //        public static readonly IMessagePackFormatter<T> Formatter;
-
-        //        // generic's static constructor should be minimized for reduce type generation size!
-        //        // use outer helper method.
-        //        static FormatterCache()
-        //        {
-        //            Formatter = (IMessagePackFormatter<T>)SampleCustomResolverGetFormatterHelper.GetFormatter(typeof(T));
-        //        }
-        //    }
-        //}
-
-        //internal static class SampleCustomResolverGetFormatterHelper
-        //{
-        //    // If type is concrete type, use type-formatter map
-        //    static readonly Dictionary<Type, object> _formatterMap = new Dictionary<Type, object>()
-        //    {
-        //        {typeof(ContentNestedData), new ContentNestedDataFormatter()}
-        //        // add more your own custom serializers.
-        //    };
-
-        //    internal static object GetFormatter(Type t)
-        //    {
-        //        object formatter;
-        //        if (_formatterMap.TryGetValue(t, out formatter))
-        //        {
-        //            return formatter;
-        //        }
-
-        //        // If target type is generics, use MakeGenericType.
-        //        if (t.IsGenericParameter && t.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
-        //        {
-        //            return Activator.CreateInstance(typeof(ValueTupleFormatter<,>).MakeGenericType(t.GenericTypeArguments));
-        //        }
-
-        //        // If type can not get, must return null for fallback mechanism.
-        //        return null;
-        //    }
-        //}
-
-        //public class ContentNestedDataFormatter : IMessagePackFormatter<ContentNestedData>
-        //{
-        //    public void Serialize(ref MessagePackWriter writer, ContentNestedData value, MessagePackSerializerOptions options)
-        //    {
-        //        if (value == null)
-        //        {
-        //            writer.WriteNil();
-        //            return;
-        //        }
-
-        //        writer.WriteArrayHeader(3);
-        //        writer.WriteString(value.UrlSegment);
-        //        writer.WriteString(value.FullName);
-        //        writer.WriteString(value.Age);
-
-        //        writer.WriteString(value.FullName);
-        //    }
-
-        //    public ContentNestedData Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
-        //    {
-        //        if (reader.TryReadNil())
-        //        {
-        //            return null;
-        //        }
-
-        //        options.Security.DepthStep(ref reader);
-
-        //        var path = reader.ReadString();
-
-        //        reader.Depth--;
-        //        return new FileInfo(path);
-        //    }
-        //}
     }
 }

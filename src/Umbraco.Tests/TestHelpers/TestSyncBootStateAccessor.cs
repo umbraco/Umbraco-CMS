@@ -15,6 +15,9 @@ namespace Umbraco.Tests.TestHelpers
         {
             _syncBootState = syncBootState;
         }
+
+        public event EventHandler<SyncBootState> Booting;
+
         public SyncBootState GetSyncBootState()
         {
             return _syncBootState;

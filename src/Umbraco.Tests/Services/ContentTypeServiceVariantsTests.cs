@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 segmentProvider,
-                new TestSyncBootStateAccessor(SyncBootState.HasSyncState),
+                new TestSyncBootStateAccessor(SyncBootState.WarmBoot),
                 nucacheRepositoryFactory.GetMediaRepository(),
                 nucacheRepositoryFactory.GetContentRepository());
         }

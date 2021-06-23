@@ -1527,9 +1527,9 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
       ]]></key>
     <key alias="sectionName">Nom de la section</key>
     <key alias="sectionMandatory">La section est obligatoire</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Si obligatoire, le modèle enfant doit contenir une définition <code>@section</code>, sinon une erreur est affichée.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Générateur de requêtes</key>
     <key alias="itemsReturned">éléments trouvés, en</key>
     <key alias="copyToClipboard">copier dans le clipboard</key>
@@ -1576,6 +1576,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="contentAllowed">Ce contenu est autorisé ici</key>
     <key alias="clickToEmbed">Cliquez pour intégrer</key>
     <key alias="clickToInsertImage">Cliquez pour insérer une image</key>
+    <key alias="clickToInsertMacro">Cliquez pour insérer une macro</key>
     <key alias="placeholderImageCaption">Légende de l'image...</key>
     <key alias="placeholderWriteHere">Ecrivez ici...</key>
     <key alias="gridLayouts">Mises en pages de la Grid</key>

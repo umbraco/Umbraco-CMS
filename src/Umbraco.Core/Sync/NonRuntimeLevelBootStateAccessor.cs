@@ -11,6 +11,8 @@ namespace Umbraco.Core.Sync
     /// </summary>
     public class NonRuntimeLevelBootStateAccessor : ISyncBootStateAccessor
     {
+        public event EventHandler<SyncBootState> Booting;
+
         public SyncBootState GetSyncBootState()
         {
             return SyncBootState.Unknown;

@@ -30,6 +30,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
     internal class PublishedSnapshotService : PublishedSnapshotServiceBase
     {
+        private readonly PublishedSnapshotServiceOptions _options;
+        private readonly IMainDom _mainDom;
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly IScopeProvider _scopeProvider;
@@ -40,12 +42,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
-        // volatile because we read it with no lock
-        private volatile bool _isReady;
+        private bool _isReady;
+        private bool _isReadSet;
+        private object _isReadyLock;
 
-        private readonly ContentStore _contentStore;
-        private readonly ContentStore _mediaStore;
-        private readonly SnapDictionary<int, Domain> _domainStore;
+        private ContentStore _contentStore;
+        private ContentStore _mediaStore;
+        private SnapDictionary<int, Domain> _domainStore;
         private readonly object _storesLock = new object();
         private readonly object _elementsLock = new object();
 
@@ -77,9 +80,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
             INucacheContentRepository nucacheContentRepository)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
+
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
             //    throw new Exception("Singleton must be instantiated only once!");
 
+            _options = options;
+            _mainDom = mainDom;
             _serviceContext = serviceContext;
             _publishedContentTypeFactory = publishedContentTypeFactory;
             _dataSource = dataSource;
@@ -89,6 +95,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _globalSettings = globalSettings;
             _documentRepository = nucacheContentRepository;
             _mediaRepository = nucacheMediaRepository;
+
+            _syncBootStateAccessor = syncBootStateAccessor;
 
             _syncBootStateAccessor = syncBootStateAccessor;
 
@@ -110,46 +118,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (runtime.Level != RuntimeLevel.Run)
                 return;
 
-            // lock this entire call, we only want a single thread to be accessing the stores at once and within
-            // the call below to mainDom.Register, a callback may occur on a threadpool thread to MainDomRelease
-            // at the same time as we are trying to write to the stores. MainDomRelease also locks on _storesLock so
-            // it will not be able to close the stores until we are done populating (if the store is empty)
-            lock (_storesLock)
-            {
-                if (options.IgnoreLocalDb == false)
-                {
-                    var registered = mainDom.Register(MainDomRegister, MainDomRelease);
-
-                    // stores are created with a db so they can write to it, but they do not read from it,
-                    // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
-                    // figure out whether it can read the databases or it should populate them from sql
-
-                    _logger.Info<PublishedSnapshotService,bool>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _documentRepository.IsPopulated());
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _documentRepository);
-                    _logger.Info<PublishedSnapshotService,bool>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _documentRepository.IsPopulated());
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _mediaRepository);
-                }
-                else
-                {
-                    _logger.Info<PublishedSnapshotService>("Creating the content store (local db ignored)");
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
-                    _logger.Info<PublishedSnapshotService>("Creating the media store (local db ignored)");
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
-                }
-
-                _domainStore = new SnapDictionary<int, Domain>();
-
-                LoadCachesOnStartup();
-            }
-
-            Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
-            int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? default;
-
             if (idkMap != null)
             {
                 idkMap.SetMapper(UmbracoObjectTypes.Document, id => GetUid(_contentStore, id), uid => GetId(_contentStore, uid));
                 idkMap.SetMapper(UmbracoObjectTypes.Media, id => GetUid(_mediaStore, id), uid => GetId(_mediaStore, uid));
             }
+        }
+
+        private int GetId(ContentStore store, Guid uid)
+        {
+            EnsureCaches();
+            return store.LiveSnapshot.Get(uid)?.Id ?? default;
+        }
+
+        private Guid GetUid(ContentStore store, int id)
+        {
+            EnsureCaches();
+            return store.LiveSnapshot.Get(id)?.Uid ?? default;
         }
 
         /// <summary>
@@ -195,52 +180,82 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <summary>
-        /// Populates the stores
+        /// Lazily populates the stores only when they are first requested
         /// </summary>
-        /// <remarks>This is called inside of a lock for _storesLock</remarks>
-        private void LoadCachesOnStartup()
-        {
-            var okContent = false;
-            var okMedia = false;
-            if (_syncBootStateAccessor.GetSyncBootState() == SyncBootState.ColdBoot)
+        internal void EnsureCaches() => LazyInitializer.EnsureInitialized(
+            ref _isReady,
+            ref _isReadSet,
+            ref _isReadyLock,
+            () =>
             {
-                _logger.Warn<PublishedSnapshotService>("Sync Service is in a Cold Boot state. Skip LoadCachesOnStartup as the Sync Service will trigger a full reload");
-                _isReady = true;
-                return;
-            }
-            try
-            {
-                if ((_documentRepository != null && _documentRepository.IsPopulated()))
+                // lock this entire call, we only want a single thread to be accessing the stores at once and within
+                // the call below to mainDom.Register, a callback may occur on a threadpool thread to MainDomRelease
+                // at the same time as we are trying to write to the stores. MainDomRelease also locks on _storesLock so
+                // it will not be able to close the stores until we are done populating (if the store is empty)
+                lock (_storesLock)
                 {
-                    okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
-                    if (!okContent)
-                        _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
-                }
+                    if (!_options.IgnoreLocalDb)
+                    {
+                        var registered = _mainDom.Register(MainDomRegister, MainDomRelease);
 
-                if ((_mediaRepository != null && _mediaRepository.IsPopulated()))
-                {
-                    okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
-                    if (!okMedia)
-                        _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
-                }
+                        // stores are created with a db so they can write to it, but they do not read from it,
+                        // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
+                        // figure out whether it can read the databases or it should populate them from sql
+
+                        _logger.Info<PublishedSnapshotService, bool>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
+                        _contentStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _logger, _documentRepository);
+                        _logger.Info<PublishedSnapshotService, bool>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
+                        _mediaStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _logger, _mediaRepository);
+                    }
+                    else
+                    {
+                        _logger.Info<PublishedSnapshotService>("Creating the content store (local db ignored)");
+                        _contentStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _logger);
+                        _logger.Info<PublishedSnapshotService>("Creating the media store (local db ignored)");
+                        _mediaStore = new ContentStore(PublishedSnapshotAccessor, VariationContextAccessor, _logger);
+                    }
+
+                    _domainStore = new SnapDictionary<int, Domain>();
+
+                    SyncBootState bootState = _syncBootStateAccessor.GetSyncBootState();
+
+                    var okContent = false;
+                    var okMedia = false;
+
+                    try
+                    {
+                        if (bootState != SyncBootState.ColdBoot && _documentRepository !=null && _documentRepository.IsPopulated())
+                        {
+                            okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
+                            if (!okContent)
+                                _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
+                        }
+
+                        if (bootState != SyncBootState.ColdBoot && _mediaRepository !=null && _mediaRepository.IsPopulated())
+                        {
+                            okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
+                            if (!okMedia)
+                                _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
+                        }
                 
-                if (!okContent)
-                    LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
+                        if (!okContent)
+                            LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
 
-                if (!okMedia)
-                    LockAndLoadMedia(scope => LoadMediaFromDatabaseLocked(scope, true));
+                        if (!okMedia)
+                            LockAndLoadMedia(scope => LoadMediaFromDatabaseLocked(scope, true));
 
-                LockAndLoadDomains();
-            }
-            catch (Exception ex)
-            {
-                _logger.Fatal<PublishedSnapshotService>(ex, "Panic, exception while loading cache data.");
-                throw;
-            }
+                        LockAndLoadDomains();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Fatal<PublishedSnapshotService>(ex, "Panic, exception while loading cache data.");
+                        throw;
+                    }
 
-            // finally, cache is ready!
-            _isReady = true;
-        }
+                    // finally, cache is ready!
+                    return true;
+                }
+            });
 
         private void InitializeRepositoryEvents()
         {
@@ -1119,9 +1134,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
+            EnsureCaches();
+
             // no cache, no joy
-            if (_isReady == false)
+            if (Volatile.Read(ref _isReady) == false)
+            {
                 throw new InvalidOperationException("The published snapshot service has not properly initialized.");
+            }   
 
             var preview = previewToken.IsNullOrWhiteSpace() == false;
             return new PublishedSnapshot(this, preview);
@@ -1132,6 +1151,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // even though the underlying elements may not change (store snapshots)
         public PublishedSnapshot.PublishedSnapshotElements GetElements(bool previewDefault)
         {
+            EnsureCaches();
+
             // note: using ObjectCacheAppCache for elements and snapshot caches
             // is not recommended because it creates an inner MemoryCache which is a heavy
             // thing - better use a dictionary-based cache which "just" creates a concurrent
@@ -1429,6 +1450,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public void Collect()
         {
+            EnsureCaches();
+
             var contentCollect = _contentStore.CollectAsync();
             var mediaCollect = _mediaStore.CollectAsync();
             System.Threading.Tasks.Task.WaitAll(contentCollect, mediaCollect);
@@ -1438,8 +1461,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Internals/Testing
 
-        internal ContentStore GetContentStore() => _contentStore;
-        internal ContentStore GetMediaStore() => _mediaStore;
+        internal ContentStore GetContentStore()
+        {
+            EnsureCaches();
+            return _contentStore;
+        }
+
+        internal ContentStore GetMediaStore()
+        {
+            EnsureCaches();
+            return _mediaStore;
+        }
 
         #endregion
     }

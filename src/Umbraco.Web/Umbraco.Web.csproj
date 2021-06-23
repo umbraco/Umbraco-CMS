@@ -67,7 +67,7 @@
     </PackageReference>
     <PackageReference Include="Examine" Version="1.0.2" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.1.0" />
+    <PackageReference Include="Examine" Version="1.2.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
@@ -142,6 +142,7 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Compose\BlockEditorComponent.cs" />
     <Compile Include="Compose\BlockEditorComposer.cs" />
+    <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Compose\NotificationsComposer.cs" />
     <Compile Include="Compose\PublicAccessComposer.cs" />
@@ -177,6 +178,7 @@
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ProvidedValueValidation.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
@@ -264,9 +266,17 @@
     <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfigItem.cs" />
+    <Compile Include="PropertyEditors\FileExtensionConfigItem.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfig.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
+    <Compile Include="PropertyEditors\FileUploadConfiguration.cs" />
+    <Compile Include="PropertyEditors\FileUploadConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3Configuration.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3ConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionarySerializerAdapter.cs" />
@@ -301,6 +311,7 @@
     <Compile Include="PublishedCache\NuCache\INucacheRepositoryBase.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheSerializerComponent.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheSerializerComposer.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MediaPickerWithCropsValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
@@ -320,6 +331,7 @@
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
+    <Compile Include="Search\IUmbracoTreeSearcherFields2.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrorMiddlware.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrors.cs" />
@@ -1175,9 +1187,7 @@
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
-    <Compile Include="FormlessPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="FormlessPage.cs" />
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="ModelStateExtensions.cs" />

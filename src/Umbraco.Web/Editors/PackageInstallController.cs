@@ -180,7 +180,7 @@ namespace Umbraco.Web.Editors
                     {
                         //this package is already installed
                         throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                            Services.TextService.Localize("packager/packageAlreadyInstalled")));
+                            Services.TextService.Localize("packager", "packageAlreadyInstalled")));
                     }
 
                     model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
@@ -189,8 +189,8 @@ namespace Umbraco.Web.Editors
                 else
                 {
                     model.Notifications.Add(new Notification(
-                        Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                        Services.TextService.Localize("media/disallowedFileType"),
+                        Services.TextService.Localize("speechBubbles", "operationFailedHeader"),
+                        Services.TextService.Localize("media", "disallowedFileType"),
                         NotificationStyle.Warning));
                 }
 
@@ -234,7 +234,7 @@ namespace Umbraco.Web.Editors
             if (installType == PackageInstallType.AlreadyInstalled)
             {
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                    Services.TextService.Localize("packager/packageAlreadyInstalled")));
+                    Services.TextService.Localize("packager", "packageAlreadyInstalled")));
             }
 
             model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
@@ -260,7 +260,7 @@ namespace Umbraco.Web.Editors
                 var packageMinVersion = packageInfo.UmbracoVersion;
                 if (UmbracoVersion.Current < packageMinVersion)
                     throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(
-                        Services.TextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()})));
+                        Services.TextService.Localize("packager", "targetVersionMismatch", new[] {packageMinVersion.ToString()})));
             }
 
             var installType = Services.PackagingService.GetPackageInstallType(packageInfo.Name, SemVersion.Parse(packageInfo.Version), out var alreadyInstalled);
