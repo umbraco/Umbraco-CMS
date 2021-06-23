@@ -477,9 +477,15 @@ angular.module("umbraco")
                 vm.loading = true;
                 entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
+
                         // update image data to work with image grid
                         if (data.items) {
-                            data.items.forEach(mediaItem => setMediaMetaData(mediaItem));
+                            var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
+
+                            data.items.forEach(function(mediaItem) {
+                                setMediaMetaData(mediaItem);
+                                mediaItem.filtered = allowedTypes && allowedTypes.indexOf(mediaItem.metaData.ContentTypeAlias) < 0;
+                            });
                         }
 
                         // update images

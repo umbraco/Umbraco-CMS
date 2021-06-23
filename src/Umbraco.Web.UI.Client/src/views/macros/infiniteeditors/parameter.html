@@ -49,7 +49,7 @@
 
                             <button type="button" class="btn-reset editor-info" ng-click="vm.openMacroParameterPicker(model.parameter)">
                                 <div class="editor-icon-wrapper">
-                                    <i class="icon {{ model.parameter.dataTypeIcon }}" ng-class="{'icon-autofill': model.parameter.dataTypeIcon == null}" aria-hidden="true"></i>
+                                    <umb-icon icon="{{model.parameter.dataTypeIcon || 'icon-autofill'}}" class="icon {{model.parameter.dataTypeIcon || 'icon-autofill'}}"></umb-icon>
                                 </div>
 
                                 <div class="editor-details">
