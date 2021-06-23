@@ -140,7 +140,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// Determines whether the value has a specified crop.
         /// </summary>
         public bool HasCrop(string alias)
-            => Crops.Any(x => x.Alias == alias);
+            => Crops != null && Crops.Any(x => x.Alias == alias);
 
         /// <summary>
         /// Determines whether the value has a source image.
@@ -188,6 +188,37 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // are not part of configuration anymore?
 
             Crops = crops;
+        }
+
+        internal ImageCropperValue Merge(ImageCropperValue imageCropperValue)
+        {
+            var crops = Crops?.ToList() ?? new List<ImageCropperCrop>();
+
+            var incomingCrops = imageCropperValue?.Crops;
+            if (incomingCrops != null)
+            {
+                foreach (var incomingCrop in incomingCrops)
+                {
+                    var crop = crops.FirstOrDefault(x => x.Alias == incomingCrop.Alias);
+                    if (crop == null)
+                    {
+                        // Add incoming crop
+                        crops.Add(incomingCrop);
+                    }
+                    else if (crop.Coordinates == null)
+                    {
+                        // Use incoming crop coordinates
+                        crop.Coordinates = incomingCrop.Coordinates;
+                    }
+                }
+            }
+
+            return new ImageCropperValue()
+            {
+                Src = !string.IsNullOrWhiteSpace(Src) ? Src : imageCropperValue?.Src,
+                Crops = crops,
+                FocalPoint = FocalPoint ?? imageCropperValue?.FocalPoint
+            };
         }
 
         #region IEquatable

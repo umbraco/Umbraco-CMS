@@ -28,6 +28,12 @@ namespace Umbraco.Web
             return mediaItem.GetCropUrl(imageUrlGenerator, cropAlias: cropAlias, useCropDimensions: true);
         }
 
+        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias, IImageUrlGenerator imageUrlGenerator)
+        {
+            return mediaWithCrops.GetCropUrl(imageUrlGenerator, cropAlias: cropAlias, useCropDimensions: true);
+        }
+
+        [Obsolete("This method does not get the crops or cache buster value from the media item.")]
         public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, IImageUrlGenerator imageUrlGenerator, ImageCropperValue imageCropperValue)
         {
             return mediaItem.Url().GetCropUrl(imageUrlGenerator, imageCropperValue, cropAlias: cropAlias, useCropDimensions: true);
@@ -51,6 +57,11 @@ namespace Umbraco.Web
         public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias, IImageUrlGenerator imageUrlGenerator)
         {
             return mediaItem.GetCropUrl(imageUrlGenerator, propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
+        }
+
+        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias, IImageUrlGenerator imageUrlGenerator)
+        {
+            return mediaWithCrops.GetCropUrl(imageUrlGenerator, propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
         }
 
         /// <summary>
@@ -123,6 +134,47 @@ namespace Umbraco.Web
              ImageCropRatioMode? ratioMode = null,
              bool upScale = true)
         {
+            return mediaItem.GetCropUrl(imageUrlGenerator, null, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
+        }
+
+        public static string GetCropUrl(
+             this MediaWithCrops mediaWithCrops,
+             IImageUrlGenerator imageUrlGenerator,
+             int? width = null,
+             int? height = null,
+             string propertyAlias = Constants.Conventions.Media.File,
+             string cropAlias = null,
+             int? quality = null,
+             ImageCropMode? imageCropMode = null,
+             ImageCropAnchor? imageCropAnchor = null,
+             bool preferFocalPoint = false,
+             bool useCropDimensions = false,
+             bool cacheBuster = true,
+             string furtherOptions = null,
+             ImageCropRatioMode? ratioMode = null,
+             bool upScale = true)
+        {
+            return mediaWithCrops.MediaItem.GetCropUrl(imageUrlGenerator, mediaWithCrops.LocalCrops, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
+        }
+
+        private static string GetCropUrl(
+             this IPublishedContent mediaItem,
+             IImageUrlGenerator imageUrlGenerator,
+             ImageCropperValue localCrops,
+             int? width,
+             int? height,
+             string propertyAlias,
+             string cropAlias,
+             int? quality,
+             ImageCropMode? imageCropMode,
+             ImageCropAnchor? imageCropAnchor,
+             bool preferFocalPoint,
+             bool useCropDimensions,
+             bool cacheBuster,
+             string furtherOptions,
+             ImageCropRatioMode? ratioMode,
+             bool upScale)
+        {
             if (mediaItem == null) throw new ArgumentNullException("mediaItem");
 
             var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
@@ -132,31 +184,38 @@ namespace Umbraco.Web
 
             var mediaItemUrl = mediaItem.MediaUrl(propertyAlias: propertyAlias);
 
-            //get the default obj from the value converter
-            var cropperValue = mediaItem.Value(propertyAlias);
-
-            //is it strongly typed?
-            var stronglyTyped = cropperValue as ImageCropperValue;
-            if (stronglyTyped != null)
+            // Only get crops when used
+            if (imageCropMode == ImageCropMode.Crop || imageCropMode == null)
             {
-                return GetCropUrl(
-                    mediaItemUrl, imageUrlGenerator, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                    cacheBusterValue, furtherOptions, ratioMode, upScale);
+                // Get the default cropper value from the value converter
+                var cropperValue = mediaItem.Value(propertyAlias);
+
+                var mediaCrops = cropperValue as ImageCropperValue;
+
+                if (mediaCrops == null && cropperValue is JObject jobj)
+                {
+                    mediaCrops = jobj.ToObject<ImageCropperValue>();
+                }
+
+                if (mediaCrops == null && cropperValue is string imageCropperValue &&
+                    string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson())
+                {
+                    mediaCrops = imageCropperValue.DeserializeImageCropperValue();
+                }
+
+                // Merge crops
+                if (localCrops == null)
+                {
+                    localCrops = mediaCrops;
+                }
+                else if (mediaCrops != null)
+                {
+                    localCrops = localCrops.Merge(mediaCrops);
+                }
             }
 
-            //this shouldn't be the case but we'll check
-            var jobj = cropperValue as JObject;
-            if (jobj != null)
-            {
-                stronglyTyped = jobj.ToObject<ImageCropperValue>();
-                return GetCropUrl(
-                    mediaItemUrl, imageUrlGenerator, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                    cacheBusterValue, furtherOptions, ratioMode, upScale);
-            }
-
-            //it's a single string
             return GetCropUrl(
-                mediaItemUrl, imageUrlGenerator, width, height, mediaItemUrl, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
+                mediaItemUrl, imageUrlGenerator, localCrops, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
                 cacheBusterValue, furtherOptions, ratioMode, upScale);
         }
 
@@ -237,6 +296,7 @@ namespace Umbraco.Web
             {
                 cropDataSet = imageCropperValue.DeserializeImageCropperValue();
             }
+
             return GetCropUrl(
                 imageUrl, imageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
@@ -381,10 +441,10 @@ namespace Umbraco.Web
             return imageUrlGenerator.GetImageUrl(options);
         }
 
+        [Obsolete("Use GetCrop to merge local and media crops, get automatic cache buster value and have more parameters.")]
         public static string GetLocalCropUrl(this MediaWithCrops mediaWithCrops, string alias, IImageUrlGenerator imageUrlGenerator, string cacheBusterValue)
         {
             return mediaWithCrops.LocalCrops.Src + mediaWithCrops.LocalCrops.GetCropUrl(alias, imageUrlGenerator, cacheBusterValue: cacheBusterValue);
-
         }
     }
 }

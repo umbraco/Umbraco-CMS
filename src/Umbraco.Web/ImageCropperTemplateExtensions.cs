@@ -30,6 +30,9 @@ namespace Umbraco.Web
         /// </returns>
         public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator);
 
+        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, cropAlias, Current.ImageUrlGenerator);
+
+        [Obsolete("This method does not get the crops or cache buster value from the media item.")]
         public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, ImageCropperValue imageCropperValue) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator, imageCropperValue);
 
         /// <summary>
@@ -48,6 +51,8 @@ namespace Umbraco.Web
         /// The ImageProcessor.Web URL.
         /// </returns>
         public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, propertyAlias, cropAlias, Current.ImageUrlGenerator);
+
+        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, propertyAlias, cropAlias, Current.ImageUrlGenerator);
 
         /// <summary>
         /// Gets the ImageProcessor URL from the IPublishedContent item.
@@ -118,12 +123,21 @@ namespace Umbraco.Web
              ImageCropRatioMode? ratioMode = null,
              bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, Current.ImageUrlGenerator, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
 
-        public static string GetLocalCropUrl(this MediaWithCrops mediaWithCrops,
-            string alias,
-            string cacheBusterValue = null)
-            => ImageCropperTemplateCoreExtensions.GetLocalCropUrl(mediaWithCrops, alias, Current.ImageUrlGenerator,  cacheBusterValue);
-
-
+        public static string GetCropUrl(
+             this MediaWithCrops mediaWithCrops,
+             int? width = null,
+             int? height = null,
+             string propertyAlias = Constants.Conventions.Media.File,
+             string cropAlias = null,
+             int? quality = null,
+             ImageCropMode? imageCropMode = null,
+             ImageCropAnchor? imageCropAnchor = null,
+             bool preferFocalPoint = false,
+             bool useCropDimensions = false,
+             bool cacheBuster = true,
+             string furtherOptions = null,
+             ImageCropRatioMode? ratioMode = null,
+             bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, Current.ImageUrlGenerator, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
 
         /// <summary>
         /// Gets the ImageProcessor URL from the image path.
@@ -260,6 +274,12 @@ namespace Umbraco.Web
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(imageUrl, Current.ImageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
+
+        [Obsolete("Use GetCrop to merge local and media crops, get automatic cache buster value and have more parameters.")]
+        public static string GetLocalCropUrl(this MediaWithCrops mediaWithCrops,
+            string alias,
+            string cacheBusterValue = null)
+            => ImageCropperTemplateCoreExtensions.GetLocalCropUrl(mediaWithCrops, alias, Current.ImageUrlGenerator, cacheBusterValue);
 
         private static readonly JsonSerializerSettings ImageCropperValueJsonSerializerSettings = new JsonSerializerSettings
         {
