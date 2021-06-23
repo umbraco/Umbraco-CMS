@@ -79,20 +79,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         {
             using (IScope scope = ScopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
             {
-                if (contentTypeIds != null)
-                {
-                    scope.ReadLock(Constants.Locks.ContentTree);
-                }
 
-                if (mediaTypeIds != null)
-                {
-                    scope.ReadLock(Constants.Locks.MediaTree);
-                }
-
-                if (memberTypeIds != null)
-                {
-                    scope.ReadLock(Constants.Locks.MemberTree);
-                }
+                scope.ReadLock(Constants.Locks.ContentTree);
+                scope.ReadLock(Constants.Locks.MediaTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
 
                 _repository.Rebuild(groupSize, contentTypeIds, mediaTypeIds, memberTypeIds);
                 scope.Complete();
