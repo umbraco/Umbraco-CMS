@@ -90,6 +90,11 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             imageCropperValue.Crops = crops;
+
+            if (!configuration.EnableLocalFocalPoint)
+            {
+                imageCropperValue.FocalPoint = null;
+            }
         }
     }
 }
