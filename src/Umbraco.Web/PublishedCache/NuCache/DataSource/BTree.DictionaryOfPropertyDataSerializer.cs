@@ -34,7 +34,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 for (var j = 0; j < vcount; j++)
                 {
                     var pdata = new PropertyData();
-                    pdatas[j] =pdata;
+                    pdatas[j] = pdata;
 
                     // everything that can be null is read/written as object
                     //  even though - culture and segment should never be null here, as 'null' represents
