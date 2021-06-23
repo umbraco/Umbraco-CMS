@@ -51,6 +51,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var mediaItems = new List<MediaWithCrops>();
             var dtos = MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(inter);
+            var configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
 
             foreach (var dto in dtos)
             {
@@ -63,6 +64,8 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         FocalPoint = dto.FocalPoint,
                         Src = mediaItem.Url()
                     };
+
+                    localCrops.ApplyConfiguration(configuration);
 
                     mediaItems.Add(new MediaWithCrops(mediaItem, localCrops));
 
