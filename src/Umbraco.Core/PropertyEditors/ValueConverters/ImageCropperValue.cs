@@ -148,48 +148,6 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public bool HasImage()
             => !string.IsNullOrWhiteSpace(Src);
 
-        /// <summary>
-        /// Applies a configuration.
-        /// </summary>
-        /// <remarks>Ensures that all crops defined in the configuration exists in the value.</remarks>
-        internal void ApplyConfiguration(ImageCropperConfiguration configuration)
-        {
-            // merge the crop values - the alias + width + height comes from
-            // configuration, but each crop can store its own coordinates
-
-            var configuredCrops = configuration?.Crops;
-            if (configuredCrops == null) return;
-
-            //Use Crops if it's not null, otherwise create a new list
-            var crops = Crops?.ToList() ?? new List<ImageCropperCrop>();
-
-            foreach (var configuredCrop in configuredCrops)
-            {
-                var crop = crops.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
-                if (crop != null)
-                {
-                    // found, apply the height & width
-                    crop.Width = configuredCrop.Width;
-                    crop.Height = configuredCrop.Height;
-                }
-                else
-                {
-                    // not found, add
-                    crops.Add(new ImageCropperCrop
-                    {
-                        Alias = configuredCrop.Alias,
-                        Width = configuredCrop.Width,
-                        Height = configuredCrop.Height
-                    });
-                }
-            }
-
-            // assume we don't have to remove the crops in value, that
-            // are not part of configuration anymore?
-
-            Crops = crops;
-        }
-
         internal ImageCropperValue Merge(ImageCropperValue imageCropperValue)
         {
             var crops = Crops?.ToList() ?? new List<ImageCropperCrop>();
