@@ -1562,11 +1562,18 @@ WHERE cmsContentNu.nodeId IN (
 
             long pageIndex = 0;
             long processed = 0;
-            long total;
+            long total =0;
+            bool totalCounted = false;
             do
             {
                 // the tree is locked, counting and comparing to total is safe
-                var descendants = _documentRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                IEnumerable<IContent> descendants;
+                    if (!totalCounted)
+                    {
+                        total = _documentRepository.Count(query, null);
+                    }
+                    descendants = _documentRepository.GetPage(query, pageIndex, groupSize, Ordering.By("Path"),null);
+              
                 var items = new List<ContentNuDto>();
                 var count = 0;
                 foreach (var c in descendants)
@@ -1632,13 +1639,22 @@ WHERE cmsContentNu.nodeId IN (
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
+            
             long pageIndex = 0;
             long processed = 0;
-            long total;
+            long total = 0;
+            bool totalCounted = false;
             do
             {
                 // the tree is locked, counting and comparing to total is safe
-                var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                IEnumerable<IMedia> descendants;
+
+                    if (!totalCounted)
+                    {
+                        total = _mediaRepository.Count(query, null);
+                    }
+                    descendants = _mediaRepository.GetPage(query, pageIndex, groupSize, Ordering.By("Path"), null);
+              
                 var items = descendants.Select(m => GetDto(m, false)).ToList();
                 db.BulkInsertRecords(items);
                 processed += items.Count;
@@ -1691,12 +1707,22 @@ WHERE cmsContentNu.nodeId IN (
             if (contentTypeIds != null && contentTypeIdsA.Length > 0)
                 query = query.WhereIn(x => x.ContentTypeId, contentTypeIdsA); // assume number of ctypes won't blow IN(...)
 
+           
             long pageIndex = 0;
             long processed = 0;
-            long total;
+            long total = 0;
+            bool totalCounted = false;
             do
             {
-                var descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
+                IEnumerable<IMember> descendants;
+                
+                    if (!totalCounted)
+                    {
+                        total = _memberRepository.Count(query, null);
+                    }
+                    descendants = _memberRepository.GetPage(query, pageIndex, groupSize, Ordering.By("Path"), null);
+               
+
                 var items = descendants.Select(m => GetDto(m, false)).ToArray();
                 db.BulkInsertRecords(items);
                 processed += items.Length;
