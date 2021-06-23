@@ -101,20 +101,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
             IReadOnlyCollection<int> mediaTypeIds = null,
             IReadOnlyCollection<int> memberTypeIds = null)
         {
-            if (contentTypeIds != null)
-            {
-                RebuildContentDbCache(groupSize, contentTypeIds);
-            }
-
-            if (mediaTypeIds != null)
-            {
-                RebuildContentDbCache(groupSize, mediaTypeIds);
-            }
-
-            if (memberTypeIds != null)
-            {
-                RebuildContentDbCache(groupSize, memberTypeIds);
-            }
+            RebuildContentDbCache(groupSize, contentTypeIds);
+            RebuildContentDbCache(groupSize, mediaTypeIds);
+            RebuildContentDbCache(groupSize, memberTypeIds);
         }
 
         // assumes content tree lock
