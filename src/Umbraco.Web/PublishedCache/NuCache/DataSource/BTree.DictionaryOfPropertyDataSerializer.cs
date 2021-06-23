@@ -13,12 +13,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
         {
-
             // read properties count
-            var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+            var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);            
             var dict = new Dictionary<string, PropertyData[]>(pcount,StringComparer.InvariantCultureIgnoreCase);
 
-            var dict = new Dictionary<string, PropertyData[]>(pcount,StringComparer.InvariantCultureIgnoreCase);
             // read each property
             for (var i = 0; i < pcount; i++)
             {
