@@ -457,7 +457,7 @@ namespace Umbraco.Web.Editors
                     // Since the permissions depend on current user and path, we add both of these to context as well,
                     // that way we can compare the path and current user when mapping, if they're the same just take permissions
                     // and skip getting them again, in theory they should always be the same, but better safe than sorry.
-                    context.Items["CurrentUser"] = Security.CurrentUser;
+                    context.Items["CurrentUser"] = currentUser;
                     context.Items["Path"] = path;
                     context.Items["Permissions"] = permissions;
                 });
