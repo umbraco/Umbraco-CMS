@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -9,8 +8,6 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Services.Implement
 {
-    // TODO: Convert all of this over to Niels K's localization framework one day
-
     public class LocalizedTextService : ILocalizedTextService2
     {
         private readonly ILogger _logger;
@@ -27,9 +24,9 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="logger"></param>
         public LocalizedTextService(Lazy<LocalizedTextServiceFileSources> fileSources, ILogger logger)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
             _logger = logger;
-            if (fileSources == null) throw new ArgumentNullException("fileSources");
+            if (fileSources == null) throw new ArgumentNullException(nameof(fileSources));
             _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(() => FileSourcesToAreaDictionarySources(fileSources.Value));
             _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => FileSourcesToNoAreaDictionarySources(fileSources.Value));
             _fileSources = fileSources;
@@ -78,9 +75,9 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="logger"></param>
         public LocalizedTextService(IDictionary<CultureInfo, Lazy<XDocument>> source, ILogger logger)
         {
-            if (source == null) throw new ArgumentNullException("source");
-            if (logger == null) throw new ArgumentNullException("logger");
-            _logger = logger;
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
             _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(() => XmlSourcesToAreaDictionary(source));
             _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => XmlSourceToNoAreaDictionary(source));
 
@@ -150,7 +147,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public IDictionary<string, string> GetAllStoredValues(CultureInfo culture)
         {
-            if (culture == null) throw new ArgumentNullException("culture");
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
 
             // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
             culture = ConvertToSupportedCultureWithRegionCode(culture);

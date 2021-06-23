@@ -1,9 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
 namespace Umbraco.Core.Services
 {
+    // TODO: This needs to be merged into one interface in v9, but better yet
+    // the Localize method should just the based on area + alias and we should remove
+    // the one with the 'key' (the concatenated area/alias) to ensure that we never use that again.
 
     public interface ILocalizedTextService2 : ILocalizedTextService
     {
@@ -41,6 +45,7 @@ namespace Umbraco.Core.Services
         /// <param name="culture"></param>
         /// <param name="tokens">This can be null</param>
         /// <returns></returns>
+        [Obsolete("Use LocalizedTextServiceExtensions.Localize or ILocalizedTextService2.Localize instead")]
         string Localize(string key, CultureInfo culture, IDictionary<string, string> tokens = null);
 
         /// <summary>

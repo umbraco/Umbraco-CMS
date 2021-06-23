@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
                     : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
                 : CultureInfo.GetCultureInfo(culture);
 
-
+            // TODO: Remove this check in v9 when these interfaces merge
             if(Services.TextService is ILocalizedTextService2 localizedText2)
             {
                 var nestedDictionary2 = localizedText2.GetAllStoredValuesByAreaAndAlias(cultureInfo);
