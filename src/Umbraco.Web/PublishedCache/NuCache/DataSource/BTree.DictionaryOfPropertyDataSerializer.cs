@@ -16,6 +16,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
             // read properties count
             var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+            var dict = new Dictionary<string, PropertyData[]>(pcount,StringComparer.InvariantCultureIgnoreCase);
 
             var dict = new Dictionary<string, PropertyData[]>(pcount,StringComparer.InvariantCultureIgnoreCase);
             // read each property
