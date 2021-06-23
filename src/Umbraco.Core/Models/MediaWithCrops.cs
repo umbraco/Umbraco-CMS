@@ -8,14 +8,13 @@ namespace Umbraco.Core.Models
     /// </summary>
     public class MediaWithCrops : PublishedContentWrapped
     {
-        public IPublishedContent MediaItem { get; }
+        public IPublishedContent MediaItem => Unwrap();
 
         public ImageCropperValue LocalCrops { get; }
 
         public MediaWithCrops(IPublishedContent content, ImageCropperValue localCrops)
             : base(content)
         {
-            MediaItem = content;
             LocalCrops = localCrops;
         }
     }
