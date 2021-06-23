@@ -180,7 +180,7 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
 
-            var culture = context.GetCulture();
+            var culture = context.GetCulture()?.ToLowerInvariant();
             if(culture.IsNullOrWhiteSpace() == false)
             {
                 target.Name = source.Values.ContainsKey($"nodeName_{culture}") ? source.Values[$"nodeName_{culture}"] : target.Name;

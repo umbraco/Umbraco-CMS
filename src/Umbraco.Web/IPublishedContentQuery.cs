@@ -8,7 +8,7 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web
 {
-    using Examine = global::Examine;
+    // TODO: Merge this into IPublishedContentQuery for v9!
     public interface IPublishedContentQuery2 : IPublishedContentQuery
     {
         /// <summary>
@@ -32,7 +32,7 @@ namespace Umbraco.Web
         /// </para>
         /// <para>While enumerating results, the ambient culture is changed to be the searched culture.</para>
         /// </remarks>
-        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Umbraco.Core.Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null);
+        IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null);
     }
 
     /// <summary>
