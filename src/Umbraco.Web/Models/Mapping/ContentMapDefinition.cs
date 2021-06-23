@@ -86,6 +86,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
         private void Map(IContent source, ContentItemDisplay target, MapperContext context)
         {
+            // Both GetActions and DetermineIsChildOfListView use parent, so get it once here
             var parent = _contentService.GetParent(source);
 
             target.AllowedActions = GetActions(source, parent, context);

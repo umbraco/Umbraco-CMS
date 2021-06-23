@@ -408,7 +408,14 @@ namespace Umbraco.Web.Editors
             return CleanContentItemDisplay(mapped);
         }
 
-        private IEnumerable<ContentItemDisplay> GetEmpties(IList<IContentType> contentTypes, int parentId)
+        /// <summary>
+        /// Gets an empty <see cref="ContentItemDisplay"/> for each content type in the IEnumerable, all with the same parent ID
+        /// </summary>
+        /// <remarks>Will attempt to re-use the same permissions for every content as long as the path and user are the same</remarks>
+        /// <param name="contentTypes"></param>
+        /// <param name="parentId"></param>
+        /// <returns></returns>
+        private IEnumerable<ContentItemDisplay> GetEmpties(IEnumerable<IContentType> contentTypes, int parentId)
         {
             var result = new List<ContentItemDisplay>();
             var userId = Security.GetUserId().ResultOr(0);
@@ -2325,6 +2332,13 @@ namespace Umbraco.Web.Editors
                 context.Items["CurrentUser"] = Security.CurrentUser;
             });
 
+        /// <summary>
+        /// Used to map an <see cref="IContent"/> instance to a <see cref="ContentItemDisplay"/> and ensuring AllowPreview is set correctly.
+        /// Also allows you to pass in an action for the mapper context where you can pass additional information on to the mapper.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="contextOptions"></param>
+        /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content, Action<MapperContext> contextOptions)
         {
             var display = Mapper.Map<ContentItemDisplay>(content, contextOptions);
