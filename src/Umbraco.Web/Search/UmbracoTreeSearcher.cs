@@ -101,6 +101,8 @@ namespace Umbraco.Web.Search
             string type;
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = _umbracoTreeSearcherFields.GetBackOfficeFields().ToList();
+
+            // TODO: Remove these checks in v9 when these interfaces merge
             ISet<string> fieldsToLoad = _umbracoTreeSearcherFields is IUmbracoTreeSearcherFields2 searcherFields2
                 ? new HashSet<string>(searcherFields2.GetBackOfficeFieldsToLoad())
                 : null;

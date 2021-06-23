@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(ISection source, Section target, MapperContext context)
         {
             target.Alias = source.Alias;
-            target.Name = _textService.Localize("sections/" + source.Alias);
+            target.Name = _textService.Localize("sections", source.Alias);
         }
 
         // Umbraco.Code.MapAll
