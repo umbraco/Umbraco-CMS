@@ -68,6 +68,7 @@
     <Compile Include="ContentIndexPopulator.cs" />
     <Compile Include="ContentValueSetBuilder.cs" />
     <Compile Include="ExamineExtensions.cs" />
+    <Compile Include="UmbracoExamineLoggingService.cs" />
     <Compile Include="IContentValueSetBuilder.cs" />
     <Compile Include="IContentValueSetValidator.cs" />
     <Compile Include="IUmbracoContentIndex.cs" />

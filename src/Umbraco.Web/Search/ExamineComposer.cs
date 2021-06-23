@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 using Examine;
+using Examine.Logging;
+using Examine.LuceneEngine.Directories;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
@@ -32,6 +37,12 @@ namespace Umbraco.Web.Search
             composition.Register<IndexRebuilder>(Lifetime.Singleton);
             composition.RegisterUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
             composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
+            composition.RegisterUnique<ILoggingService, UmbracoExamineLoggingService>();
+            foreach (Type factory in composition.TypeLoader.GetTypes<IDirectoryFactory>())
+            {
+                composition.Register(factory);
+            }
+
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
                 new ContentValueSetBuilder(
                     factory.GetInstance<PropertyEditorCollection>(),
