@@ -57,16 +57,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 var mediaItem = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(preview, dto.MediaKey);
                 if (mediaItem != null)
                 {
-                    mediaItems.Add(new MediaWithCrops
+                    var localCrops = new ImageCropperValue
                     {
-                        MediaItem = mediaItem,
-                        LocalCrops = new ImageCropperValue
-                        {
-                            Crops = dto.Crops,
-                            FocalPoint = dto.FocalPoint,
-                            Src = mediaItem.Url()
-                        }
-                    });
+                        Crops = dto.Crops,
+                        FocalPoint = dto.FocalPoint,
+                        Src = mediaItem.Url()
+                    };
+
+                    mediaItems.Add(new MediaWithCrops(mediaItem, localCrops));
 
                     if (!isMultiple)
                     {

@@ -6,10 +6,17 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Model used in Razor Views for rendering
     /// </summary>
-    public class MediaWithCrops
+    public class MediaWithCrops : PublishedContentWrapped
     {
-        public IPublishedContent MediaItem { get; set; }
+        public IPublishedContent MediaItem { get; }
 
-        public ImageCropperValue LocalCrops { get; set; }
+        public ImageCropperValue LocalCrops { get; }
+
+        public MediaWithCrops(IPublishedContent content, ImageCropperValue localCrops)
+            : base(content)
+        {
+            MediaItem = content;
+            LocalCrops = localCrops;
+        }
     }
 }
