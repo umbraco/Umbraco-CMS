@@ -4,7 +4,7 @@ using Umbraco.Examine;
 
 namespace Umbraco.Web.Search
 {
-    public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
+    public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields2
     {
         private IReadOnlyList<string> _backOfficeFields = new List<string> {"id", "__NodeId", "__Key"};
         public IEnumerable<string> GetBackOfficeFields()
@@ -26,6 +26,30 @@ namespace Umbraco.Web.Search
         public IEnumerable<string> GetBackOfficeDocumentFields()
         {
             return Enumerable.Empty<string>();
+        }
+
+        private readonly ISet<string> _backOfficeFieldsToLoad = new HashSet<string> { "id", "__NodeId", "__Key" };
+        public ISet<string> GetBackOfficeFieldsToLoad()
+        {
+            return _backOfficeFieldsToLoad;
+        }
+
+        private readonly ISet<string> _backOfficeMembersFieldsToLoad = new HashSet<string> { "id", "__NodeId", "__Key", "email", "loginName" };
+        public ISet<string> GetBackOfficeMembersFieldsToLoad()
+        {
+            return _backOfficeMembersFieldsToLoad;
+        }
+
+        private readonly ISet<string> _backOfficeMediaFieldsToLoad = new HashSet<string> { "id", "__NodeId", "__Key", UmbracoExamineIndex.UmbracoFileFieldName };
+        public ISet<string> GetBackOfficeMediaFieldsToLoad()
+        {
+            return _backOfficeMediaFieldsToLoad;
+        }
+        private readonly ISet<string> _backOfficeDocumentFieldsToLoad = new HashSet<string> { "id", "__NodeId", "__Key" };
+
+        public ISet<string> GetBackOfficeDocumentFieldsToLoad()
+        {
+            return _backOfficeDocumentFieldsToLoad;
         }
     }
 }
