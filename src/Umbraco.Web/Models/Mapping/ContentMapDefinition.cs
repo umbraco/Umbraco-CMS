@@ -88,7 +88,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var parent = _contentService.GetParent(source);
 
-            target.AllowedActions = GetActions(source, parent);
+            target.AllowedActions = GetActions(source, parent, context);
             target.AllowedTemplates = GetAllowedTemplates(source);
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
@@ -158,7 +158,7 @@ namespace Umbraco.Web.Models.Mapping
             target.VariesByCulture = source.ContentType.VariesByCulture();
         }
 
-        private IEnumerable<string> GetActions(IContent source, IContent parent)
+        private IEnumerable<string> GetActions(IContent source, IContent parent, MapperContext context)
         {
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
@@ -172,6 +172,21 @@ namespace Umbraco.Web.Models.Mapping
             else
             {
                 path = parent == null ? "-1" : parent.Path;
+            }
+
+            // A bit of a mess, but we need to ensure that all the required values are here AND that they're the right type.
+            if (context.Items.TryGetValue("CurrentUser", out var userObject) &&
+                context.Items.TryGetValue("Path", out var pathObject) &&
+                context.Items.TryGetValue("Permissions", out var permissionsObject) &&
+                userObject is IUser currentUser &&
+                pathObject is string contextPath &&
+                permissionsObject is EntityPermissionSet permissions)
+            {
+                // Both the path and the user is the same, it's safe to assume that the permissions are the same as well.
+                if (contextPath.Equals(path) && umbracoContext.Security.CurrentUser.Id == currentUser.Id)
+                {
+                    return permissions.GetAllPermissions();
+                }
             }
 
             // TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is

@@ -37,7 +37,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Collections;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web.Editors
@@ -388,20 +388,76 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        private ContentItemDisplay CleanContentItemDisplay(ContentItemDisplay display)
+        {
+            // translate the content type name if applicable
+            display.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(display.ContentTypeName);
+            // if your user type doesn't have access to the Settings section it would not get this property mapped
+            if (display.DocumentType != null)
+                display.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(display.DocumentType.Name);
+
+            //remove the listview app if it exists
+            display.ContentApps = display.ContentApps.Where(x => x.Alias != "umbListView").ToList();
+            return display;
+        }
+
         private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
         {
             var emptyContent = Services.ContentService.Create("", parentId, contentType, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
-            // translate the content type name if applicable
-            mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
-            // if your user type doesn't have access to the Settings section it would not get this property mapped
-            if (mapped.DocumentType != null)
-                mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
+            return CleanContentItemDisplay(mapped);
+        }
 
-            //remove the listview app if it exists
-            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
+        private IEnumerable<ContentItemDisplay> GetEmpties(IList<IContentType> contentTypes, int parentId)
+        {
+            var result = new List<ContentItemDisplay>();
+            var userId = Security.GetUserId().ResultOr(0);
+            var currentUser = Security.CurrentUser;
+            // We know that if the ID is less than 0 the parent is null.
+            // Since this is called with parent ID it's safe to assume that the parent is the same for all the content types.
+            var parent = parentId > 0 ? Services.ContentService.GetById(parentId) : null;
+            EntityPermissionSet permissions = null;
 
-            return mapped;
+            foreach (var contentType in contentTypes)
+            {
+                var emptyContent = Services.ContentService.Create("", parentId, contentType, userId);
+
+                if (emptyContent is null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+
+                // Get the path for the content, we get this for each just in case some content has Identity and a different path
+                // Since if that's the case we might not be able to re-use the permissions.
+                string path;
+                if (emptyContent.HasIdentity)
+                {
+                    path = emptyContent.Path;
+                }
+                else
+                {
+                    path = parent == null ? "-1" : parent.Path;
+                }
+
+                // Only assign permissions once, the idea is that we'll be able to re-use the same permissions most of the time.
+                if (permissions is null)
+                {
+                    permissions = Services.UserService.GetPermissionsForPath(currentUser, path);
+                }
+
+                var mapped = MapToDisplay(emptyContent, context =>
+                {
+                    // Since the permissions depend on current user and path, we add both of these to context as well,
+                    // that way we can compare the path and current user when mapping, if they're the same just take permissions
+                    // and skip getting them again, in theory they should always be the same, but better safe than sorry.
+                    context.Items["CurrentUser"] = Security.CurrentUser;
+                    context.Items["Path"] = path;
+                    context.Items["Permissions"] = permissions;
+                });
+                result.Add(CleanContentItemDisplay(mapped));
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -412,22 +468,11 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public IDictionary<Guid, ContentItemDisplay> GetEmptyByKeys([FromUri] Guid[] contentTypeKeys, [FromUri] int parentId)
         {
-            var result = new Dictionary<Guid, ContentItemDisplay>();
-
             using var scope = _scopeProvider.CreateScope(autoComplete: true);
             var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
 
-            foreach (var contentType in contentTypes)
-            {
-                if (contentType is null)
-                {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-
-                result.Add(contentType.Key, GetEmpty(contentType, parentId));
-            }
-
-            return result;
+            var displays = GetEmpties(contentTypes, parentId);
+            return displays.ToDictionary(x => x.ContentTypeKey);
         }
 
         [OutgoingEditorModelEvent]
@@ -2274,12 +2319,15 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        private ContentItemDisplay MapToDisplay(IContent content)
-        {
-            var display = Mapper.Map<ContentItemDisplay>(content, context =>
+        private ContentItemDisplay MapToDisplay(IContent content) =>
+            MapToDisplay(content, context =>
             {
                 context.Items["CurrentUser"] = Security.CurrentUser;
             });
+
+        private ContentItemDisplay MapToDisplay(IContent content, Action<MapperContext> contextOptions)
+        {
+            var display = Mapper.Map<ContentItemDisplay>(content, contextOptions);
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }
