@@ -77,7 +77,7 @@ namespace Umbraco.Web.PropertyEditors
             {
                 foreach (var configuredCrop in configuredCrops)
                 {
-                    var crop = imageCropperValue.Crops.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
+                    var crop = imageCropperValue.Crops?.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
 
                     crops.Add(new ImageCropperCrop
                     {
@@ -91,7 +91,7 @@ namespace Umbraco.Web.PropertyEditors
 
             imageCropperValue.Crops = crops;
 
-            if (!configuration.EnableLocalFocalPoint)
+            if (configuration?.EnableLocalFocalPoint == false)
             {
                 imageCropperValue.FocalPoint = null;
             }

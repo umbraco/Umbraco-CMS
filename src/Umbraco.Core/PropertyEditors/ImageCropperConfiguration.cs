@@ -42,7 +42,7 @@ namespace Umbraco.Core.PropertyEditors
             {
                 foreach (var configuredCrop in configuredCrops)
                 {
-                    var crop = imageCropperValue.Crops.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
+                    var crop = imageCropperValue.Crops?.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
 
                     crops.Add(new ImageCropperCrop
                     {
