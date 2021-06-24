@@ -1,9 +1,23 @@
+/* ---------- TOOLBAR --------- */
+.umb-group-builder__toolbar {
+  display: flex;
+  align-items: center;
+
+  .left {
+    flex: 1 1 auto;
+    width: 50%;
+    display: block;
+  }
+
+  .right {
+    flex: 0 0 auto;
+  }
+}
+
 /* ---------- TABS ----------  */
 
 .umb-group-builder__tabs {
-  background-color: @white;
-  height: 70px;
-  margin-bottom: 20px;
+  height: 60px;
   position: relative;
 }
 
@@ -20,6 +34,10 @@
 
   li {
     height: 100%;
+
+    &:nth-last-child(2) {
+      background: blue;
+    }
   }
 }
 
@@ -29,9 +47,7 @@
 
 .umb-group-builder__tabs-overflow {
   height: 100%;
-  background: @white;
   width: 30px;
-  background-color: @white;
   position: absolute;
   top: 0;
   display: flex;
@@ -57,6 +73,7 @@
 }
 
 .umb-group-builder__tab {
+  background-color: @white;
   position: relative;
   padding: 0 40px 0 10px;
   display: flex;
@@ -201,10 +218,11 @@
 
 .umb-group-builder__tab--placeholder {
   border: 1px dashed @gray-7;
-  border-bottom: none;
-  border-top: none;
   padding-right: 10px;
   min-width: 100px;
+  background: transparent;
+  border-radius: @baseBorderRadius;
+  margin-left: 10px;
 }
 
 .umb-group-builder__tab-inherited-label {
