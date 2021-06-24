@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -7,16 +6,25 @@ using NJsonSchema.Generation;
 
 namespace JsonSchema
 {
+    /// <summary>
+    /// Generator of the JsonSchema for AppSettings.json including A specific Umbraco version.
+    /// </summary>
     public class UmbracoJsonSchemaGenerator
     {
         private readonly JsonSchemaGenerator _innerGenerator;
         private static readonly HttpClient s_client = new HttpClient();
 
-        public UmbracoJsonSchemaGenerator()
-        {
-            _innerGenerator = new JsonSchemaGenerator(new UmbracoJsonSchemaGeneratorSettings());
-        }
+        /// <summary>
+        /// Creates a new instance of <see cref="UmbracoJsonSchemaGenerator"/>.
+        /// </summary>
+        /// <param name="definitionPrefix">The prefix to use for definitions generated.</param>
+        public UmbracoJsonSchemaGenerator(string definitionPrefix)
+            => _innerGenerator = new JsonSchemaGenerator(new UmbracoJsonSchemaGeneratorSettings(definitionPrefix));
 
+
+        /// <summary>
+        /// Generates a json representing the JsonSchema for AppSettings.json including A specific Umbraco version..
+        /// </summary>
         public async Task<string> Generate()
         {
             var umbracoSchema = GenerateUmbracoSchema();
