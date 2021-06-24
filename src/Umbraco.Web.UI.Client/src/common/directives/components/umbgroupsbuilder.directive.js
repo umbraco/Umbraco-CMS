@@ -441,6 +441,10 @@
                 tab.icon = color ? icon + ' ' + color : icon;
             };
 
+            scope.onChangeTabName = function () {
+                scope.$broadcast('umbOverflowChecker.checkOverflow');
+            };
+
             scope.getTabServerFieldName = function (tab) {
                 if (!tab) {
                     return;

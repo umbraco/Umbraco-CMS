@@ -22,6 +22,7 @@
                     ng-model="vm.tab.name"
                     ng-class="{'-placeholder': vm.tab.name == ''}"
                     ng-disabled="!vm.isOpen"
+                    ng-change="vm.changeName()"
                     umb-auto-focus
                     umb-auto-resize
                     val-server-field="{{ vm.valServerFieldName }}"

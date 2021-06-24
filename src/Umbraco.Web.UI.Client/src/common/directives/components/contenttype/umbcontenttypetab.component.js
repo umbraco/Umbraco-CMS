@@ -18,6 +18,7 @@
     vm.whenFocusName = whenFocusName;
     vm.whenFocus = whenFocus;
     vm.changeSortOrderValue = changeSortOrderValue;
+    vm.changeName = changeName;
 
     function togglePrompt () {
       vm.removePromptIsVisible = !vm.removePromptIsVisible;
@@ -58,6 +59,12 @@
       }
     }
 
+    function changeName () {
+      if (vm.onChangeName) {
+        vm.onChangeName({ name: vm.tab.name });
+      }
+    }
+
   }
 
   const umbContentTypeTabComponent = {
@@ -66,14 +73,15 @@
     transclude: true,
     bindings: {
       tab: '<',
-      onClick: '&',
-      isOpen: '<',
-      allowRemove: '<',
-      onRemove: '&',
-      sorting: '<',
-      onFocusName: '&',
-      onFocus: '&',
-      onChangeSortOrderValue: '&'
+      onClick: '&?',
+      isOpen: '<?',
+      allowRemove: '<?',
+      onRemove: '&?',
+      sorting: '<?',
+      onFocusName: '&?',
+      onFocus: '&?',
+      onChangeSortOrderValue: '&?',
+      onChangeName: '&?'
     },
     controller: umbContentTypeTabController
   };
