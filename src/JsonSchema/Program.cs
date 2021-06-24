@@ -9,7 +9,7 @@ namespace JsonSchema
     {
         private class Options
         {
-            [Option('o', "outputFile", Required = false, HelpText = "Set path of the output file.", Default = "../../../../Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json")]
+            [Option('o', "outputFile", Required = false, HelpText = "Set path of the output file.", Default = "../Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json")]
             public string OutputFile { get; set; }
 
             [Option('d', "definitionPrefix", Required = false, HelpText = "Set prefix used for all definisions.", Default = "umbraco")]

@@ -10,6 +10,7 @@
       <PackageReference Include="CommandLineParser" Version="2.8.0" />
       <PackageReference Include="NJsonSchema" Version="10.4.4" />
       <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
+      <PackageReference Include="Umbraco.Forms" Version="9.0.0-preview20210614.65556" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,6 @@
 ﻿using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Forms.Core.Configuration;
+using SecuritySettings = Umbraco.Cms.Core.Configuration.Models.SecuritySettings;
 
 namespace JsonSchema
 {
@@ -52,7 +54,17 @@ namespace JsonSchema
             /// </summary>
             public class FormsDefinition
             {
+                public FormDesignSettings FormDesign { get; set; }
+                public PackageOptionSettings Options { get; set; }
+                public SecuritySettings Security { get; set; }
+                public FieldTypesDefinition FieldTypes { get; set; }
 
+                public class FieldTypesDefinition
+                {
+                    public DatePickerSettings DatePicker { get; set; }
+                    public Recaptcha2Settings Recaptcha2 { get; set; }
+                    public Recaptcha3Settings Recaptcha3 { get; set; }
+                }
             }
 
             /// <summary>
