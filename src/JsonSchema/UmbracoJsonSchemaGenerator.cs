@@ -20,7 +20,7 @@ namespace JsonSchema
         public async Task<string> Generate()
         {
             var umbracoSchema = GenerateUmbracoSchema();
-            var officialSchema = await GetOfficialAppSettingsSchema().ConfigureAwait(false);;
+            var officialSchema = await GetOfficialAppSettingsSchema();
 
             officialSchema.Merge(umbracoSchema);
 
@@ -30,7 +30,7 @@ namespace JsonSchema
         private async Task<JObject> GetOfficialAppSettingsSchema()
         {
 
-            var response = s_client.GetAsync(new Uri("https://json.schemastore.org/appsettings.json")).GetAwaiter().GetResult();
+            var response = await s_client.GetAsync("https://json.schemastore.org/appsettings.json");
 
 
             var result =  await response.Content.ReadAsStringAsync();

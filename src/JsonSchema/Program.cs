@@ -24,7 +24,7 @@ namespace JsonSchema
         {
             try
             {
-                Parser.Default.ParseArguments<Options>(args)
+                await Parser.Default.ParseArguments<Options>(args)
                     .WithParsedAsync<Options>(Execute);
             }
             catch (Exception e)
