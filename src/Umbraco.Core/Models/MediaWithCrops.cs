@@ -1,3 +1,4 @@
+using System;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 
@@ -15,7 +16,16 @@ namespace Umbraco.Core.Models
         /// <value>
         /// The media item.
         /// </value>
-        public IPublishedContent MediaItem => Unwrap();
+        [Obsolete("This instance now implements IPublishedContent by wrapping the media item, use the extension methods directly on MediaWithCrops or use the Content property to get the media item instead.")]
+        public IPublishedContent MediaItem => Content;
+
+        /// <summary>
+        /// Gets the content/media item.
+        /// </summary>
+        /// <value>
+        /// The content/media item.
+        /// </value>
+        public IPublishedContent Content => Unwrap();
 
         /// <summary>
         /// Gets the local crops.
@@ -51,7 +61,7 @@ namespace Umbraco.Core.Models
         /// <value>
         /// The media item.
         /// </value>
-        public new T MediaItem { get; }
+        public new T Content { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaWithCrops{T}" /> class.
@@ -61,7 +71,7 @@ namespace Umbraco.Core.Models
         public MediaWithCrops(T content, ImageCropperValue localCrops)
             : base(content, localCrops)
         {
-            MediaItem = content;
+            Content = content;
         }
 
         /// <summary>
@@ -71,6 +81,6 @@ namespace Umbraco.Core.Models
         /// <returns>
         /// The result of the conversion.
         /// </returns>
-        public static implicit operator T(MediaWithCrops<T> mediaWithCrops) => mediaWithCrops.MediaItem;
+        public static implicit operator T(MediaWithCrops<T> mediaWithCrops) => mediaWithCrops.Content;
     }
 }
