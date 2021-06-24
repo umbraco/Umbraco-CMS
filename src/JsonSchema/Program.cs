@@ -49,7 +49,7 @@ namespace JsonSchema
 
             var generator = new JsonSchemaGenerator(settings);
 
-            var schema = generator.Generate(typeof(UmbracoCmsConfigRoot));
+            var schema = generator.Generate(typeof(AppSettings));
 
             return schema.ToJson(Formatting.Indented);
         }
