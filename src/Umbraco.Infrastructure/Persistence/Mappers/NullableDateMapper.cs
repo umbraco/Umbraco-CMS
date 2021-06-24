@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using NPoco;
 
@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
     /// <summary>
     /// Extends NPoco default mapper and ensures that nullable dates are not saved to the database.
     /// </summary>
-    public class PocoMapper : DefaultMapper
+    public class NullableDateMapper : DefaultMapper
     {
         public override Func<object, object> GetToDbConverter(Type destType, MemberInfo sourceMemberInfo)
         {
@@ -19,7 +19,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
                 {
                     var datetime = datetimeVal as DateTime?;
                     if (datetime.HasValue && datetime.Value > DateTime.MinValue)
+                    {
                         return datetime.Value;
+                    }
 
                     return null;
                 };

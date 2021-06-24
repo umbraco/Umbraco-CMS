@@ -12,7 +12,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
     {
         private readonly INuCacheContentRepository _repository;
 
-        public NuCacheContentService(INuCacheContentRepository repository, IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory)
+        public NuCacheContentService(
+            INuCacheContentRepository repository,
+            IScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _repository = repository;
@@ -67,12 +71,15 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
             => _repository.RefreshContent(content);
 
         /// <inheritdoc/>
-        public void RefreshEntity(IContentBase content)
-            => _repository.RefreshEntity(content);
+        public void RefreshMedia(IMedia media)
+            => _repository.RefreshMedia(media);
+
+        /// <inheritdoc/>
+        public void RefreshMember(IMember member)
+            => _repository.RefreshMember(member);
 
         /// <inheritdoc/>
         public void Rebuild(
-            int groupSize = 5000,
             IReadOnlyCollection<int> contentTypeIds = null,
             IReadOnlyCollection<int> mediaTypeIds = null,
             IReadOnlyCollection<int> memberTypeIds = null)
@@ -84,7 +91,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
                 scope.ReadLock(Constants.Locks.MediaTree);
                 scope.ReadLock(Constants.Locks.MemberTree);
 
-                _repository.Rebuild(groupSize, contentTypeIds, mediaTypeIds, memberTypeIds);
+                _repository.Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds);
                 scope.Complete();
             }
         }

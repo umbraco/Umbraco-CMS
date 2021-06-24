@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models
 {
+
     /// <summary>
     /// Provides a base class for content items.
     /// </summary>

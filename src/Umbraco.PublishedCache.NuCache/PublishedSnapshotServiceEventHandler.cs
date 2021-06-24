@@ -83,9 +83,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public void Handle(MemberDeletingNotification notification) => _publishedContentService.DeleteContentItems(notification.DeletedEntities);
 
-        public void Handle(MemberRefreshNotification notification) => _publishedContentService.RefreshEntity(notification.Entity);
+        public void Handle(MemberRefreshNotification notification) => _publishedContentService.RefreshMember(notification.Entity);
 
-        public void Handle(MediaRefreshNotification notification) => _publishedContentService.RefreshEntity(notification.Entity);
+        public void Handle(MediaRefreshNotification notification) => _publishedContentService.RefreshMedia(notification.Entity);
 
         public void Handle(ContentRefreshNotification notification) => _publishedContentService.RefreshContent(notification.Entity);
 

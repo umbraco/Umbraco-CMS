@@ -21,19 +21,22 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         void RefreshContent(IContent content);
 
         /// <summary>
-        /// Refreshes the nucache database row for the <see cref="IContentBase"/> (used for media/members)
+        /// Refreshes the nucache database row for the <see cref="IMedia"/>
         /// </summary>
-        void RefreshEntity(IContentBase content);
+        void RefreshMedia(IMedia content);
+
+        /// <summary>
+        /// Refreshes the nucache database row for the <see cref="IMember"/>
+        /// </summary>
+        void RefreshMember(IMember content);
 
         /// <summary>
         /// Rebuilds the caches for content, media and/or members based on the content type ids specified
         /// </summary>
-        /// <param name="groupSize">The operation batch size to process the items</param>
         /// <param name="contentTypeIds">If not null will process content for the matching content types, if empty will process all content</param>
         /// <param name="mediaTypeIds">If not null will process content for the matching media types, if empty will process all media</param>
         /// <param name="memberTypeIds">If not null will process content for the matching members types, if empty will process all members</param>
         void Rebuild(
-            int groupSize = 5000,
             IReadOnlyCollection<int> contentTypeIds = null,
             IReadOnlyCollection<int> mediaTypeIds = null,
             IReadOnlyCollection<int> memberTypeIds = null);

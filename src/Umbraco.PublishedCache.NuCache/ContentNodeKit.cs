@@ -16,6 +16,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public bool IsNull => ContentTypeId < 0;
 
+        public static ContentNodeKit Empty { get; } = new ContentNodeKit();
         public static ContentNodeKit Null { get; } = new ContentNodeKit { ContentTypeId = -1 };
 
         public void Build(

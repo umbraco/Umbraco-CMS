@@ -23,6 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+        private readonly NPocoMapperCollection _npocoMappers;
 
         public TestUmbracoDatabaseFactoryProvider(
             ILoggerFactory loggerFactory,
@@ -30,7 +31,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             IOptions<ConnectionStrings> connectionStrings,
             Lazy<IMapperCollection> mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            NPocoMapperCollection npocoMappers)
         {
             _loggerFactory = loggerFactory;
             _globalSettings = globalSettings;
@@ -38,19 +40,18 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             _mappers = mappers;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
+            _npocoMappers = npocoMappers;
         }
 
         public IUmbracoDatabaseFactory Create()
-        {
-            // ReSharper disable once ArrangeMethodOrOperatorBody
-            return new UmbracoDatabaseFactory(
+            => new UmbracoDatabaseFactory(
                 _loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 _loggerFactory,
                 _globalSettings,
                 _connectionStrings,
                 _mappers,
                 _dbProviderFactoryCreator,
-                _databaseSchemaCreatorFactory);
-        }
+                _databaseSchemaCreatorFactory,
+                _npocoMappers);
     }
 }
