@@ -18,7 +18,6 @@
     vm.whenFocusName = whenFocusName;
     vm.whenFocus = whenFocus;
     vm.changeSortOrderValue = changeSortOrderValue;
-    vm.openIconPicker = openIconPicker;
 
     function togglePrompt () {
       vm.removePromptIsVisible = !vm.removePromptIsVisible;
@@ -59,24 +58,6 @@
       }
     }
 
-    function openIconPicker () {
-      const iconPicker = {
-        icon: vm.tab.icon && vm.tab.icon.split(' ')[0],
-        color: vm.tab.icon && vm.tab.icon.split(' ')[1],
-        submit: function (model) {
-          if (vm.onChangeIcon) {
-            vm.onChangeIcon( {icon: model.icon, color: model.color});
-          }
-          vm.tabIconForm.$setDirty();
-          editorService.close();
-        },
-        close: function () {
-          editorService.close();
-        }
-      };
-
-      editorService.iconPicker(iconPicker);
-    }
   }
 
   const umbContentTypeTabComponent = {
@@ -92,8 +73,7 @@
       sorting: '<',
       onFocusName: '&',
       onFocus: '&',
-      onChangeSortOrderValue: '&',
-      onChangeIcon: '&'
+      onChangeSortOrderValue: '&'
     },
     controller: umbContentTypeTabController
   };
