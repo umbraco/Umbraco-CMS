@@ -237,6 +237,14 @@ namespace Umbraco.Web
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
 
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, ImageCropperValue imageCropperValue, string cropAlias, bool htmlEncode = true)
+        {
+            if (imageCropperValue == null) return EmptyHtmlString;
+
+            var url = imageCropperValue.Src.GetCropUrl(imageCropperValue, cropAlias: cropAlias, useCropDimensions: true);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+        }
+
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
             ImageCropperValue imageCropperValue,
             int? width = null,
