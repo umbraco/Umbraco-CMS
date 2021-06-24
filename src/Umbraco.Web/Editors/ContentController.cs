@@ -431,15 +431,7 @@ namespace Umbraco.Web.Editors
 
                 // Get the path for the content, we get this for each just in case some content has Identity and a different path
                 // Since if that's the case we might not be able to re-use the permissions.
-                string path;
-                if (emptyContent.HasIdentity)
-                {
-                    path = emptyContent.Path;
-                }
-                else
-                {
-                    path = parent == null ? "-1" : parent.Path;
-                }
+                string path = parent == null ? "-1" : parent.Path;
 
                 // Only assign permissions once, the idea is that we'll be able to re-use the same permissions most of the time.
                 if (permissions is null)
