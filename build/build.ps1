@@ -216,11 +216,12 @@
     Write-Host "Generating JSON Schema for AppSettings"
     Write-Host "Logging to $($this.BuildTemp)\json.schema.log"
 
-    ## NOTE: We do not specify the --output switch
-    ## As by default we generate the file from the console app in the correct location
+    ## NOTE: Need to specify the outputfile
+    ## As this path is now relative to the 'build' folder we are in and not from the JsonSchema project
     ##
     ## src/Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json
     &dotnet run --project "$($this.SolutionRoot)\src\JsonSchema\JsonSchema.csproj" `
+        --outputFile "../src/Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json"`
         --verbosity detailed `
         -c Release > "$($this.BuildTemp)\json.schema.log"
 
