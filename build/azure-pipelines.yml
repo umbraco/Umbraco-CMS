@@ -401,6 +401,15 @@ stages:
                       publishJUnitResults: true
                       testResultsFiles: '**\TESTS-*.xml'
                 - task: PowerShell@1
+                  displayName: Prepare JSON Schema
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: |
+                          Write-Host "Working folder: $pwd"
+                          $ubuild = build\build.ps1 -get -continue
+
+                          $ubuild.CompileJsonSchema()
+                - task: PowerShell@1
                   displayName: Prepare Packages
                   inputs:
                       scriptType: inlineScript
