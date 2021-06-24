@@ -477,9 +477,7 @@ namespace Umbraco.Web.Editors
         {
             using var scope = _scopeProvider.CreateScope(autoComplete: true);
             var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
-
-            var displays = GetEmpties(contentTypes, parentId);
-            return displays.ToDictionary(x => x.ContentTypeKey);
+            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
         }
 
         [OutgoingEditorModelEvent]
