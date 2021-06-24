@@ -429,11 +429,6 @@ namespace Umbraco.Web.Editors
             {
                 var emptyContent = Services.ContentService.Create("", parentId, contentType, userId);
 
-                if (emptyContent is null)
-                {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-
                 // Get the path for the content, we get this for each just in case some content has Identity and a different path
                 // Since if that's the case we might not be able to re-use the permissions.
                 string path;
