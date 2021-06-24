@@ -22,38 +22,28 @@ namespace JsonSchema
 
         static async Task Main(string[] args)
         {
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsedAsync<Options>(Execute);
+            try
+            {
+                Parser.Default.ParseArguments<Options>(args)
+                    .WithParsedAsync<Options>(Execute);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
         }
 
         private static async Task Execute(Options options)
         {
-            var result = GenerateJsonSchema();
+            var generator = new UmbracoJsonSchemaGenerator();
+            var schema = await generator.Generate();
 
             var path = Path.Combine(Environment.CurrentDirectory, options.OutputFile);
-            await File.WriteAllTextAsync(path, result);
-
+            await File.WriteAllTextAsync(path, schema);
 
             Console.WriteLine("File written at " + path);
-        }
-
-        private static string GenerateJsonSchema()
-        {
-            var settings = new JsonSchemaGeneratorSettings()
-            {
-                SchemaType = SchemaType.JsonSchema,
-                AlwaysAllowAdditionalObjectProperties = true,
-                SerializerSettings = new JsonSerializerSettings(),
-                TypeNameGenerator = new UmbracoPrefixedTypeNameGenerator(),
-                DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull
-            };
-            settings.SerializerSettings.Converters.Add(new StringEnumConverter());
-
-            var generator = new JsonSchemaGenerator(settings);
-
-            var schema = generator.Generate(typeof(AppSettings));
-
-            return schema.ToJson(Formatting.Indented);
         }
     }
 }
