@@ -1,9 +1,14 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
@@ -11,15 +16,45 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
     public class NuCacheContentService : RepositoryService, INuCacheContentService
     {
         private readonly INuCacheContentRepository _repository;
+        private readonly IKeyValueService _keyValueService;
+        private readonly IProfilingLogger _profilingLogger;
+        private readonly IOptions<NuCacheSettings> _nucacheSettings;
+        private readonly ILogger<NuCacheContentService> _logger;
+        private const string NuCacheSerializerKey = "Umbraco.Web.PublishedCache.NuCache.Serializer";
 
         public NuCacheContentService(
             INuCacheContentRepository repository,
+            IKeyValueService keyValueService,
             IScopeProvider provider,
             ILoggerFactory loggerFactory,
-            IEventMessagesFactory eventMessagesFactory)
+            IProfilingLogger profilingLogger,
+            IEventMessagesFactory eventMessagesFactory,
+            IOptions<NuCacheSettings> nucacheSettings)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _repository = repository;
+            _keyValueService = keyValueService;
+            _profilingLogger = profilingLogger;
+            _nucacheSettings = nucacheSettings;
+            _logger = loggerFactory.CreateLogger<NuCacheContentService>();
+        }
+
+        public void RebuildDatabaseCacheIfSerializerChanged()
+        {
+            NuCacheSerializerType serializer = _nucacheSettings.Value.NuCacheSerializerType;
+            var currentSerializerValue = _keyValueService.GetValue(NuCacheSerializerKey);
+
+            if (!Enum.TryParse(currentSerializerValue, out NuCacheSerializerType currentSerializer)
+                || serializer != currentSerializer)
+            {
+                _logger.LogWarning("Database NuCache was serialized using {CurrentSerializer}. Currently configured NuCache serializer {Serializer}. Rebuilding Nucache", currentSerializer, serializer);
+
+                using (_profilingLogger.TraceDuration<NuCacheContentService>($"Rebuilding NuCache database with {serializer} serializer"))
+                {
+                    Rebuild();
+                    _keyValueService.SetValue(NuCacheSerializerKey, serializer.ToString());
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -92,6 +127,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
                 scope.ReadLock(Constants.Locks.MemberTree);
 
                 _repository.Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds);
+
+                // Save a key/value of the serialized type. This is used during startup to see
+                // if the serialized type changed and if so it will rebuild with the correct type.
+                _keyValueService.SetValue(NuCacheSerializerKey, _nucacheSettings.Value.NuCacheSerializerType.ToString());
+
                 scope.Complete();
             }
         }

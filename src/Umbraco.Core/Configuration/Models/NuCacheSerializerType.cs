@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 namespace Umbraco.Cms.Core.Configuration.Models
@@ -8,8 +8,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// </summary>
     public enum NuCacheSerializerType
     {
-        JSON,
-
-        MessagePack
+        MessagePack = 1, // Default
+        JSON = 2
     }
 }

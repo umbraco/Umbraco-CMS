@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             var stub = new DropForeignKeyMigrationStub(context);
 
             // Act
-            stub.Migrate();
+            stub.Run();
 
             foreach (TestDatabase.Operation op in database.Operations)
             {
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             var context = new MigrationContext(database, _logger);
             var migration = new CreateColumnMigration(context);
 
-            migration.Migrate();
+            migration.Run();
 
             foreach (TestDatabase.Operation op in database.Operations)
             {
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate() => Alter.Table("bar").AddColumn("foo").AsGuid().Do();
+            protected override void Migrate() => Alter.Table("bar").AddColumn("foo").AsGuid().Do();
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             var context = new MigrationContext(database, _logger);
             var migration = new AlterColumnMigration(context);
 
-            migration.Migrate();
+            migration.Run();
 
             foreach (TestDatabase.Operation op in database.Operations)
             {
@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate() =>
+            protected override void Migrate() =>
 
                 // bad/good syntax...
                 //// Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             var stub = new AlterUserTableMigrationStub(context);
 
             // Act
-            stub.Migrate();
+            stub.Run();
 
             // Assert
             Assert.That(database.Operations.Any(), Is.True);

@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using Umbraco.Cms.Core.Migrations;
 
 namespace Umbraco.Cms.Infrastructure.Migrations
 {
@@ -32,7 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// Adds a transition to a target state through a migration.
         /// </summary>
         public MergeBuilder To<TMigration>(string targetState)
-            where TMigration : IMigration
+            where TMigration : MigrationBase
             => To(targetState, typeof(TMigration));
 
         /// <summary>
@@ -71,16 +70,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         public MigrationPlan As(string targetState)
         {
             if (!_with)
+            {
                 throw new InvalidOperationException("Cannot invoke As() without invoking With() first.");
+            }
 
             // reach final state
             _plan.To(targetState);
 
             // restart at former end of branch2
             _plan.From(_withLast);
+
             // and replay all branch1 migrations
             foreach (var migration in _migrations)
+            {
                 _plan.To(_plan.CreateRandomState(), migration);
+            }
             // reaching final state
             _plan.To(targetState);
 

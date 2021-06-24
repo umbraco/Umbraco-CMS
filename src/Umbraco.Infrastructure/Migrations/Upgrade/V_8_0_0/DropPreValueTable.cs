@@ -5,7 +5,7 @@
         public DropPreValueTable(IMigrationContext context) : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // drop preValues table
             if (TableExists("cmsDataTypePreValues"))

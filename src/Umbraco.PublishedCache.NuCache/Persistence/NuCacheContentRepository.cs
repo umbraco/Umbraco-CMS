@@ -128,6 +128,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
             RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
             RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
             RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
+
+
         }
 
         // assumes content tree lock

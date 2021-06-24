@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             Database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Cms.Core.Constants.Locks.MainDom, Name = "MainDom" });
         }

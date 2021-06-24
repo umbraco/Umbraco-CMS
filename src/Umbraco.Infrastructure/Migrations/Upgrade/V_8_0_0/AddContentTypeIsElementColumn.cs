@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         public AddContentTypeIsElementColumn(IMigrationContext context) : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             AddColumn<ContentTypeDto>("isElement");
         }

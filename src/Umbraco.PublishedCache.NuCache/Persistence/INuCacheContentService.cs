@@ -8,6 +8,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
     /// </summary>
     public interface INuCacheContentService
     {
+        /// <summary>
+        /// Used during startup to see if the configured serialized is different from the persisted serialize type.
+        /// If they are different, this will rebuild the nucache DB table with the configured serializer.
+        /// </summary>
+        void RebuildDatabaseCacheIfSerializerChanged();
+
         // TODO: For these required sort orders, would sorting on Path 'just work'?
         ContentNodeKit GetContentSource(int id);
 

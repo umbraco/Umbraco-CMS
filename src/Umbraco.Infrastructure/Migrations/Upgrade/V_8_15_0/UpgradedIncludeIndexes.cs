@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_15_0
 
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // Need to drop the FK for the redirect table before modifying the unique id index
             Delete.ForeignKey()

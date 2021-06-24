@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             var refreshCache = false;
 

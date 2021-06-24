@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         public UpdatePickerIntegerValuesToUdi(IMigrationContext context) : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             var sqlDataTypes = Sql()
                 .Select<DataTypeDto>()
