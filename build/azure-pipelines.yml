@@ -383,6 +383,15 @@ stages:
                           $ubuild = build\build.ps1 -get
 
                           $ubuild.PrepareBuild("vso")
+                - task: PowerShell@1
+                  displayName: Prepare JSON Schema
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: |
+                          Write-Host "Working folder: $pwd"
+                          $ubuild = build\build.ps1 -get -continue
+
+                          $ubuild.CompileJsonSchema()
                 - task: NodeTool@0
                   displayName: Use Node 11.x
                   inputs:
@@ -400,15 +409,6 @@ stages:
                       workingDirectory: src\Umbraco.Web.UI.Client
                       publishJUnitResults: true
                       testResultsFiles: '**\TESTS-*.xml'
-                - task: PowerShell@1
-                  displayName: Prepare JSON Schema
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: |
-                          Write-Host "Working folder: $pwd"
-                          $ubuild = build\build.ps1 -get -continue
-
-                          $ubuild.CompileJsonSchema()
                 - task: PowerShell@1
                   displayName: Prepare Packages
                   inputs:
