@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Mvc;
@@ -26,13 +26,13 @@ namespace Umbraco.Web
         /// <param name="routeVals"></param>
         /// <returns></returns>
         public static string GetUmbracoApiService<T>(this UrlHelper url, string actionName, RouteValueDictionary routeVals = null)
-            where T : UmbracoApiController
+            where T : UmbracoApiControllerBase
         {
             return url.GetUmbracoApiService(actionName, typeof(T), routeVals);
         }
 
         public static string GetUmbracoApiServiceBaseUrl<T>(this UrlHelper url, Expression<Func<T, object>> methodSelector)
-            where T : UmbracoApiController
+            where T : UmbracoApiControllerBase
         {
             var method = ExpressionHelper.GetMethodInfo(methodSelector);
             if (method == null)
@@ -43,7 +43,7 @@ namespace Umbraco.Web
         }
 
         public static string GetUmbracoApiService<T>(this UrlHelper url, Expression<Func<T, object>> methodSelector)
-            where T : UmbracoApiController
+            where T : UmbracoApiControllerBase
         {
             var method = ExpressionHelper.GetMethodInfo(methodSelector);
             if (method == null)
