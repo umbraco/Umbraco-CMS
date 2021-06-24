@@ -67,7 +67,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
                     localCrops.ApplyConfiguration(configuration);
 
-                    mediaItems.Add(new MediaWithCrops(mediaItem, localCrops));
+                    // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
+                    var mediaWithCropsType = typeof(MediaWithCrops<>).MakeGenericType(mediaItem.GetType());
+                    var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem, localCrops);
+
+                    mediaItems.Add(mediaWithCrops);
 
                     if (!isMultiple)
                     {
