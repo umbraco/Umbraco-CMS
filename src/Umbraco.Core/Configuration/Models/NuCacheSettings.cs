@@ -13,6 +13,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         public int? BTreeBlockSize { get; set; }
 
+        // TODO: Set default to MessagePack
+
         /// <summary>
         /// The serializer type that nucache uses to persist documents in the database.
         /// </summary>

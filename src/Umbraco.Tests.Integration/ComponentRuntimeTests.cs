@@ -21,7 +21,6 @@ namespace Umbraco.Cms.Tests.Integration
         // ensure composers are added
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
-            builder.AddNuCache();
             builder.AddComposers();
         }
 

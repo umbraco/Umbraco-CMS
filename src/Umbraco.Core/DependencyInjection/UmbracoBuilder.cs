@@ -29,6 +29,8 @@ using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Security;
@@ -229,6 +231,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
 
             Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
+
+            // register a basic/noop published snapshot service to be replaced
+            Services.AddSingleton<IPublishedSnapshotService, InternalPublishedSnapshotService>();
         }
     }
 }

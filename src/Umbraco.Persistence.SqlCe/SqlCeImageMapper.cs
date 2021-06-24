@@ -17,9 +17,9 @@ namespace Umbraco.Cms.Persistence.SqlCe
     /// </remarks>
     public class SqlCeImageMapper : DefaultMapper
     {
-        private readonly IUmbracoDatabaseFactory _dbFactory;
+        //private readonly IUmbracoDatabaseFactory _dbFactory;
 
-        public SqlCeImageMapper(IUmbracoDatabaseFactory dbFactory) => _dbFactory = dbFactory;
+        //public SqlCeImageMapper(IUmbracoDatabaseFactory dbFactory) => _dbFactory = dbFactory;
 
         public override Func<object, object> GetToDbConverter(Type destType, MemberInfo sourceMemberInfo)
         {
@@ -27,10 +27,17 @@ namespace Umbraco.Cms.Persistence.SqlCe
             {
                 return x =>
                 {
-                    var pd = _dbFactory.SqlContext.PocoDataFactory.ForType(sourceMemberInfo.DeclaringType);
-                    if (pd == null) return null;
-                    var col = pd.AllColumns.FirstOrDefault(x => x.MemberInfoData.MemberInfo == sourceMemberInfo);
-                    if (col == null) return null;
+                    //PocoData pd = _dbFactory.SqlContext.PocoDataFactory.ForType(sourceMemberInfo.DeclaringType);
+                    //if (pd == null)
+                    //{
+                    //    return null;
+                    //}
+
+                    //PocoColumn col = pd.AllColumns.FirstOrDefault(x => x.MemberInfoData.MemberInfo == sourceMemberInfo);
+                    //if (col == null)
+                    //{
+                    //    return null;
+                    //}
 
                     return new SqlCeParameter
                     {
