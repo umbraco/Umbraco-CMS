@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Composing;
@@ -262,8 +263,8 @@ namespace Umbraco.Web
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
 
-        public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
-            ImageCropperValue imageCropperValue,
+        public static IHtmlString GetLocalCropUrl(this UrlHelper urlHelper,
+            MediaWithCrops mediaWithCrops,
             string cropAlias,
             int? width = null,
             int? height = null,
@@ -278,6 +279,7 @@ namespace Umbraco.Web
             bool upScale = true,
             bool htmlEncode = true)
         {
+            var imageCropperValue = mediaWithCrops.LocalCrops;
             if (imageCropperValue == null) return EmptyHtmlString;
 
             var imageUrl = imageCropperValue.Src;
