@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for web routing settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigWebRouting)]
     public class WebRoutingSettings
     {
         /// <summary>

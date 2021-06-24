@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
+    [UmbracoOptions(Constants.Configuration.ConfigRichTextEditor)]
     public class RichTextEditorSettings
     {
         private static readonly string[] s_default_plugins = new[]

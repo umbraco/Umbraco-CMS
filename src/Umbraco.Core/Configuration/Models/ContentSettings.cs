@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for content settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigContent)]
     public class ContentSettings
     {
         private const string DefaultPreviewBadge =

@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for the plugins.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigPlugins)]
     public class UmbracoPluginSettings
     {
         /// <summary>

@@ -1,11 +1,14 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Configuration.Models;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for connection strings.
     /// </summary>
+    [UmbracoOptions("ConnectionStrings", BindNonPublicProperties = true)]
     public class ConnectionStrings
     {
         // Backing field for UmbracoConnectionString to load from configuration value with key umbracoDbDSN.

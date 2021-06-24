@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for unattended settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigUnattended)]
     public class UnattendedSettings
     {
         /// <summary>

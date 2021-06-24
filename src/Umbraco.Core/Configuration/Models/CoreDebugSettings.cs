@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for core debug settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigCoreDebug)]
     public class CoreDebugSettings
     {
         /// <summary>

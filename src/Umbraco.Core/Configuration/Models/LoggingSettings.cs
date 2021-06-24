@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for logging settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigLogging)]
     public class LoggingSettings
     {
         /// <summary>

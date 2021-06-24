@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Configuration.Models
@@ -8,6 +9,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for models builder settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigModelsBuilder, BindNonPublicProperties = true)]
     public class ModelsBuilderSettings
     {
         private bool _flagOutOfDateModels = true;

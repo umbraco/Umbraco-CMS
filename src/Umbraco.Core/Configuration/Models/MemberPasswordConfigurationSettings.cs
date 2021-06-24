@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for member password settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigMemberPassword)]
     public class MemberPasswordConfigurationSettings : IPasswordConfiguration
     {
         /// <inheritdoc/>

@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for imaging settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigImaging)]
     public class ImagingSettings
     {
         /// <summary>

@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for request handler settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigRequestHandler)]
     public class RequestHandlerSettings
     {
         internal static readonly CharItem[] DefaultCharCollection =

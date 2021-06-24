@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
+    [UmbracoOptions(Constants.Configuration.ConfigRuntimeMinification)]
     public class RuntimeMinificationSettings
     {
         public bool UseInMemoryCache { get; set; } = false;

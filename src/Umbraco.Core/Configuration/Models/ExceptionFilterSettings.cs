@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for exception filter settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigExceptionFilter)]
     public class ExceptionFilterSettings
     {
         /// <summary>

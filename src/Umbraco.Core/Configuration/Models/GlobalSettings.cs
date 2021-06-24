@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for global settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigGlobal)]
     public class GlobalSettings
     {
         internal const string

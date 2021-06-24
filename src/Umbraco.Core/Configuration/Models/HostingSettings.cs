@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for hosting settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigHosting)]
     public class HostingSettings
     {
         /// <summary>

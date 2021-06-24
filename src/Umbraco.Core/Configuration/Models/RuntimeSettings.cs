@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for runtime settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigRuntime)]
     public class RuntimeSettings
     {
         /// <summary>

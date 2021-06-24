@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for tour settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigTours)]
     public class TourSettings
     {
         /// <summary>

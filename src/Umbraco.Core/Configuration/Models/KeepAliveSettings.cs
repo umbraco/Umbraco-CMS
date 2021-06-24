@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for keep alive settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigKeepAlive)]
     public class KeepAliveSettings
     {
         /// <summary>

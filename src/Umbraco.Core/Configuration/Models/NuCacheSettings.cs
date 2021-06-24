@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for NuCache settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigNuCache)]
     public class NuCacheSettings
     {
         /// <summary>

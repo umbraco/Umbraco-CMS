@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for security settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigSecurity)]
     public class SecuritySettings
     {
         /// <summary>
