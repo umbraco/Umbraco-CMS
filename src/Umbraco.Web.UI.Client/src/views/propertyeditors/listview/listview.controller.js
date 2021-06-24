@@ -188,7 +188,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         if (e.isSystem && $scope.entityType == "member") {
             e.allowSorting = e.alias == 'username' ||
                              e.alias == 'email' ||
-                             e.alias == 'updateDate';
+                             e.alias == 'updateDate' ||
+                             e.alias == 'createDate';
         }
 
         if (e.isSystem) {
