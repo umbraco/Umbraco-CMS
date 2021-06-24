@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using CommandLine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -12,7 +16,7 @@ namespace JsonSchema
     {
         public class Options
         {
-            [Option('o', "outputFile", Required = false, HelpText = "Set path of the output file.")]
+            [Option('o', "outputFile", Required = false, HelpText = "Set path of the output file.", Default = "../../../../Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json")]
             public string OutputFile { get; set; }
         }
 
@@ -26,14 +30,11 @@ namespace JsonSchema
         {
             var result = GenerateJsonSchema();
 
-            if (string.IsNullOrEmpty(options.OutputFile))
-            {
-                Console.WriteLine(result);
-            }
-            else
-            {
-                await System.IO.File.WriteAllTextAsync(options.OutputFile, result);
-            }
+            var path = Path.Combine(Environment.CurrentDirectory, options.OutputFile);
+            await File.WriteAllTextAsync(path, result);
+
+
+            Console.WriteLine("File written at " + path);
         }
 
         private static string GenerateJsonSchema()
