@@ -44,7 +44,8 @@ namespace JsonSchema
                 SchemaType = SchemaType.JsonSchema,
                 AlwaysAllowAdditionalObjectProperties = true,
                 SerializerSettings = new JsonSerializerSettings(),
-                TypeNameGenerator = new UmbracoPrefixedTypeNameGenerator()
+                TypeNameGenerator = new UmbracoPrefixedTypeNameGenerator(),
+                DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull
             };
             settings.SerializerSettings.Converters.Add(new StringEnumConverter());
 
