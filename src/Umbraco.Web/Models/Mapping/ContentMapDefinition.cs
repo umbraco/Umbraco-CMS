@@ -87,7 +87,17 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(IContent source, ContentItemDisplay target, MapperContext context)
         {
             // Both GetActions and DetermineIsChildOfListView use parent, so get it once here
-            var parent = _contentService.GetParent(source);
+            // Parent might already be in context, so check there before using content service
+            IContent parent;
+            if (context.Items.TryGetValue("Parent", out var parentObj) &&
+                parentObj is IContent typedParent)
+            {
+                parent = typedParent;
+            }
+            else
+            {
+                parent = _contentService.GetParent(source);
+            }
 
             target.AllowedActions = GetActions(source, parent, context);
             target.AllowedTemplates = GetAllowedTemplates(source);
