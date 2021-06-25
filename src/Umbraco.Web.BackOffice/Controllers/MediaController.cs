@@ -616,7 +616,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             _mediaService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
-            return new UmbracoNotificationSuccessResponse(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
+            return Ok(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
 
         /// <summary>

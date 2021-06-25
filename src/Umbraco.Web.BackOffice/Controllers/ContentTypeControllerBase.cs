@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [PrefixlessBodyModelValidator]
-    public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
+    public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotificationsController
         where TContentType : class, IContentTypeComposition
     {
         private readonly EditorValidatorCollection _editorValidatorCollection;
@@ -417,9 +417,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case MoveOperationStatusType.FailedCancelledByEvent:
                     return ValidationProblem();
                 case MoveOperationStatusType.FailedNotAllowedByPath:
-                    var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    return ValidationProblem(notificationModel);
+                    return ValidationProblem(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -455,10 +453,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return NotFound();
                 case MoveOperationStatusType.FailedCancelledByEvent:
                     return ValidationProblem();
-                case MoveOperationStatusType.FailedNotAllowedByPath:
-                    var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    return ValidationProblem(notificationModel);
+                case MoveOperationStatusType.FailedNotAllowedByPath:                    
+                    return ValidationProblem(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"));
                 default:
                     throw new ArgumentOutOfRangeException();
             }

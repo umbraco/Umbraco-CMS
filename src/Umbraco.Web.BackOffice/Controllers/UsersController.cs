@@ -733,12 +733,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (users.Length > 1)
             {
-                return new UmbracoNotificationSuccessResponse(
-                    _localizedTextService.Localize("speechBubbles/disableUsersSuccess", new[] {userIds.Length.ToString()}));
+                return Ok(_localizedTextService.Localize("speechBubbles/disableUsersSuccess", new[] {userIds.Length.ToString()}));
             }
 
-            return new UmbracoNotificationSuccessResponse(
-                _localizedTextService.Localize("speechBubbles/disableUserSuccess", new[] { users[0].Name }));
+            return Ok(_localizedTextService.Localize("speechBubbles/disableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
@@ -757,11 +755,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (users.Length > 1)
             {
-                return new UmbracoNotificationSuccessResponse(
+                return Ok(
                     _localizedTextService.Localize("speechBubbles/enableUsersSuccess", new[] { userIds.Length.ToString() }));
             }
 
-            return new UmbracoNotificationSuccessResponse(
+            return Ok(
                 _localizedTextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));
         }
 
@@ -793,12 +791,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 if (userIds.Length == 1)
                 {
-                    return new UmbracoNotificationSuccessResponse(
+                    return Ok(
                         _localizedTextService.Localize("speechBubbles/unlockUserSuccess", new[] {user.Name}));
                 }
             }
 
-            return new UmbracoNotificationSuccessResponse(
+            return Ok(
                 _localizedTextService.Localize("speechBubbles/unlockUsersSuccess", new[] {(userIds.Length - notFound.Count).ToString()}));
         }
 
@@ -816,7 +814,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
             _userService.Save(users);
-            return new UmbracoNotificationSuccessResponse(
+            return Ok(
                 _localizedTextService.Localize("speechBubbles/setUserGroupOnUsersSuccess"));
         }
 
@@ -847,7 +845,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var userName = user.Name;
             _userService.Delete(user, true);
 
-            return new UmbracoNotificationSuccessResponse(
+            return Ok(
                 _localizedTextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));
         }
 

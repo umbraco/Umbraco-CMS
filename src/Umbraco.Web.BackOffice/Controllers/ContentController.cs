@@ -1550,7 +1550,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             _contentService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
-            return new UmbracoNotificationSuccessResponse(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
+            return Ok(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
 
         /// <summary>
@@ -2362,8 +2362,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (rollbackResult.Success)
                 return Ok();
 
-            var notificationModel = new SimpleNotificationModel();
-
             switch (rollbackResult.Result)
             {
                 case OperationResultType.Failed:
@@ -2371,22 +2369,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case OperationResultType.FailedExceptionThrown:
                 case OperationResultType.NoOperation:
                 default:
-                    notificationModel.AddErrorNotification(
-                                    _localizedTextService.Localize("speechBubbles/operationFailedHeader"),
-                                    null); // TODO: There is no specific failed to save error message AFAIK
-                    break;
+                    return ValidationProblem(_localizedTextService.Localize("speechBubbles/operationFailedHeader"));
                 case OperationResultType.FailedCancelledByEvent:
-                    notificationModel.AddErrorNotification(
-                                    _localizedTextService.Localize("speechBubbles/operationCancelledHeader"),
-                                    _localizedTextService.Localize("speechBubbles/operationCancelledText"));
-                    break;
+                    return ValidationProblem(
+                        _localizedTextService.Localize("speechBubbles/operationCancelledHeader"),
+                        _localizedTextService.Localize("speechBubbles/operationCancelledText"));
             }
-
-            return ValidationProblem(notificationModel);
         }
-
-
-
-
     }
 }
