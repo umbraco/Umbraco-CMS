@@ -32,8 +32,19 @@ namespace Umbraco.Web
 
         public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, cropAlias, Current.ImageUrlGenerator);
 
-        [Obsolete("This method does not get the crops or cache buster value from the media item.")]
-        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, ImageCropperValue imageCropperValue) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator, imageCropperValue);
+        [Obsolete("Use the GetCropUrl overload with the updated parameter order and note this implementation has changed to get the URL from the media item.")]
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, ImageCropperValue imageCropperValue) => mediaItem.GetCropUrl(imageCropperValue, cropAlias);
+
+        /// <summary>
+        /// Gets the crop URL by using only the specified <paramref name="imageCropperValue" />.
+        /// </summary>
+        /// <param name="mediaItem">The media item.</param>
+        /// <param name="imageCropperValue">The image cropper value.</param>
+        /// <param name="cropAlias">The crop alias.</param>
+        /// <returns>
+        /// The image crop URL.
+        /// </returns>
+        public static string GetCropUrl(this IPublishedContent mediaItem, ImageCropperValue imageCropperValue, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, imageCropperValue, cropAlias, Current.ImageUrlGenerator);
 
         /// <summary>
         /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.

@@ -283,7 +283,7 @@ namespace Umbraco.Web
 
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper, ImageCropperValue imageCropperValue, string cropAlias, bool htmlEncode = true)
         {
-            if (imageCropperValue == null) return EmptyHtmlString;
+            if (imageCropperValue == null || string.IsNullOrEmpty(imageCropperValue.Src)) return EmptyHtmlString;
 
             var url = imageCropperValue.Src.GetCropUrl(imageCropperValue, cropAlias: cropAlias, useCropDimensions: true);
 
@@ -306,7 +306,7 @@ namespace Umbraco.Web
             bool upScale = true,
             bool htmlEncode = true)
         {
-            if (imageCropperValue == null) return EmptyHtmlString;
+            if (imageCropperValue == null || string.IsNullOrEmpty(imageCropperValue.Src)) return EmptyHtmlString;
 
             var url = imageCropperValue.Src.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
 
