@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using StackExchange.Profiling;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 using Umbraco.Extensions;
@@ -28,6 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
+        //private readonly IEnumerable<IMapper> _mapperCollection;
         private readonly Guid _instanceGuid = Guid.NewGuid();
         private List<CommandInfo> _commands;
 
@@ -40,36 +42,53 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <para>Used by UmbracoDatabaseFactory to create databases.</para>
         /// <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
         /// </remarks>
-        public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger<UmbracoDatabase> logger, IBulkSqlInsertProvider bulkSqlInsertProvider, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
+        public UmbracoDatabase(
+            string connectionString,
+            ISqlContext sqlContext,
+            DbProviderFactory provider,
+            ILogger<UmbracoDatabase> logger,
+            IBulkSqlInsertProvider bulkSqlInsertProvider,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            RetryPolicy connectionRetryPolicy = null,
+            RetryPolicy commandRetryPolicy = null
+            /*IEnumerable<IMapper> mapperCollection = null*/)
             : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
-
             _logger = logger;
             _bulkSqlInsertProvider = bulkSqlInsertProvider;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
             _connectionRetryPolicy = connectionRetryPolicy;
             _commandRetryPolicy = commandRetryPolicy;
-
-            EnableSqlTrace = EnableSqlTraceDefault;
-
-            NPocoDatabaseExtensions.ConfigureNPocoBulkExtensions();
+            //_mapperCollection = mapperCollection;
+            Init();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoDatabase"/> class.
         /// </summary>
         /// <remarks>Internal for unit tests only.</remarks>
-        internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger<UmbracoDatabase> logger, IBulkSqlInsertProvider bulkSqlInsertProvider)
+        internal UmbracoDatabase(
+            DbConnection connection,
+            ISqlContext sqlContext,
+            ILogger<UmbracoDatabase> logger,
+            IBulkSqlInsertProvider bulkSqlInsertProvider)
             : base(connection, sqlContext.DatabaseType, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
             _logger = logger;
             _bulkSqlInsertProvider = bulkSqlInsertProvider;
+            Init();
+        }
 
+        private void Init()
+        {
             EnableSqlTrace = EnableSqlTraceDefault;
-
             NPocoDatabaseExtensions.ConfigureNPocoBulkExtensions();
+            //if (_mapperCollection != null)
+            //{
+            //    Mappers.AddRange(_mapperCollection);
+            //}
         }
 
         #endregion

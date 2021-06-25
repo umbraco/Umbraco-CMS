@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate() =>
+            protected override void Migrate() =>
 
                 // Create User table with keys, indexes, etc.
                 Create.Table<UserDto>().Do();
@@ -217,7 +217,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate()
+            protected override void Migrate()
             {
                 // drops User table keys and indexes
                 // Execute.DropKeysAndIndexes("umbracoUser");
@@ -243,7 +243,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate() =>
+            protected override void Migrate() =>
 
                 // Create User table keys and indexes.
                 Create.KeysAndIndexes<UserDto>().Do();
@@ -256,7 +256,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate()
+            protected override void Migrate()
             {
                 // Creates *all* tables keys and indexes
                 foreach (Type x in DatabaseSchemaCreator.OrderedTables)
@@ -279,7 +279,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate()
+            protected override void Migrate()
             {
                 // cannot delete the column without this, of course
                 Delete.KeysAndIndexes("umbracoUser").Do();

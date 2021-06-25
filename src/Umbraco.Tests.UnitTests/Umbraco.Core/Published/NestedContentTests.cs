@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -179,7 +180,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
 
             var key = Guid.NewGuid();
             var keyA = Guid.NewGuid();
-            var content = new SolidPublishedContent(contentType1)
+            var content = new InternalPublishedContent(contentType1)
             {
                 Key = key,
                 Properties = new[]
@@ -211,7 +212,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             var key = Guid.NewGuid();
             var keyA = Guid.NewGuid();
             var keyB = Guid.NewGuid();
-            var content = new SolidPublishedContent(contentType2)
+            var content = new InternalPublishedContent(contentType2)
             {
                 Key = key,
                 Properties = new[]

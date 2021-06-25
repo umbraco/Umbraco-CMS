@@ -1,12 +1,17 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 
 namespace Umbraco.Extensions
@@ -49,6 +54,23 @@ namespace Umbraco.Extensions
 
             builder.AddNuCacheNotifications();
 
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, NuCacheStartupHandler>();
+            builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
+            {
+                IOptions<NuCacheSettings> options = s.GetRequiredService<IOptions<NuCacheSettings>>();
+                switch (options.Value.NuCacheSerializerType)
+                {
+                    case NuCacheSerializerType.JSON:
+                        return new JsonContentNestedDataSerializerFactory();
+                    case NuCacheSerializerType.MessagePack:
+                        return ActivatorUtilities.CreateInstance<MsgPackContentNestedDataSerializerFactory>(s);
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+            });
+            builder.Services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
+            builder.Services.AddSingleton(s => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
+
             // add the NuCache health check (hidden from type finder)
             // TODO: no NuCache health check yet
             // composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
@@ -61,6 +83,7 @@ namespace Umbraco.Extensions
             builder
                 .AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MemberDeletingNotification, PublishedSnapshotServiceEventHandler>()
+#pragma warning disable CS0618 // Type or member is obsolete
                 .AddNotificationHandler<ContentRefreshNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MediaRefreshNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MemberRefreshNotification, PublishedSnapshotServiceEventHandler>()
@@ -68,6 +91,7 @@ namespace Umbraco.Extensions
                 .AddNotificationHandler<MediaTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MemberTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<ScopedEntityRemoveNotification, PublishedSnapshotServiceEventHandler>()
+#pragma warning restore CS0618 // Type or member is obsolete
                 ;
 
             return builder;

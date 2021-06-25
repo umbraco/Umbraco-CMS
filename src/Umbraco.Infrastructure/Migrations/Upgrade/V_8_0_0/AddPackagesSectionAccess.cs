@@ -6,7 +6,7 @@
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // Any user group which had access to the Developer section should have access to Packages
             Database.Execute($@"

@@ -8,6 +8,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
     /// </summary>
     public interface INuCacheContentService
     {
+        /// <summary>
+        /// Used during startup to see if the configured serialized is different from the persisted serialize type.
+        /// If they are different, this will rebuild the nucache DB table with the configured serializer.
+        /// </summary>
+        void RebuildDatabaseCacheIfSerializerChanged();
+
         // TODO: For these required sort orders, would sorting on Path 'just work'?
         ContentNodeKit GetContentSource(int id);
 
@@ -71,19 +77,22 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         void RefreshContent(IContent content);
 
         /// <summary>
-        /// Refreshes the nucache database row for the <see cref="IContentBase"/> (used for media/members)
+        /// Refreshes the nucache database row for the <see cref="IMedia"/>
         /// </summary>
-        void RefreshEntity(IContentBase content);
+        void RefreshMedia(IMedia media);
+
+        /// <summary>
+        /// Refreshes the nucache database row for the <see cref="IMember"/>
+        /// </summary>
+        void RefreshMember(IMember member);
 
         /// <summary>
         /// Rebuilds the database caches for content, media and/or members based on the content type ids specified
         /// </summary>
-        /// <param name="groupSize">The operation batch size to process the items</param>
         /// <param name="contentTypeIds">If not null will process content for the matching content types, if empty will process all content</param>
         /// <param name="mediaTypeIds">If not null will process content for the matching media types, if empty will process all media</param>
         /// <param name="memberTypeIds">If not null will process content for the matching members types, if empty will process all members</param>
         void Rebuild(
-            int groupSize = 5000,
             IReadOnlyCollection<int> contentTypeIds = null,
             IReadOnlyCollection<int> mediaTypeIds = null,
             IReadOnlyCollection<int> memberTypeIds = null);

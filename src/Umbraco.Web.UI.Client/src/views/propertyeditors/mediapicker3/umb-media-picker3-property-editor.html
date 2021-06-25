@@ -42,7 +42,7 @@
                 id="{{vm.model.alias}}"
                 type="button"
                 class="btn-reset umb-media-card-grid__create-button umb-outline"
-                disbled="!vm.allowAdd"
+                ng-disabled="!vm.allowAdd"
                 ng-click="vm.addMediaAt(vm.model.value.length, $event)">
                 <div>
                     <i class="icon icon-add large" aria-hidden="true"></i>

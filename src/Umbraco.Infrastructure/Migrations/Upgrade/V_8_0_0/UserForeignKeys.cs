@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // first allow NULL-able
             Alter.Table(ContentVersionCultureVariationDto.TableName).AlterColumn("availableUserId").AsInt32().Nullable().Do();

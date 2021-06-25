@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -64,8 +63,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         {
             var migrationContext =
                 new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
-            IMigration migration = new GoodMigration(migrationContext);
-            migration.Migrate();
+            MigrationBase migration = new GoodMigration(migrationContext);
+            migration.Run();
         }
 
         [Test]
@@ -73,8 +72,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         {
             var migrationContext =
                 new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
-            IMigration migration = new BadMigration1(migrationContext);
-            Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
+            MigrationBase migration = new BadMigration1(migrationContext);
+            Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Run());
         }
 
         [Test]
@@ -82,8 +81,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         {
             var migrationContext =
                 new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
-            IMigration migration = new BadMigration2(migrationContext);
-            Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Migrate());
+            MigrationBase migration = new BadMigration2(migrationContext);
+            Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Run());
         }
 
         public class GoodMigration : MigrationBase
@@ -93,7 +92,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate() => Execute.Sql(string.Empty).Do();
+            protected override void Migrate() => Execute.Sql(string.Empty).Do();
         }
 
         public class BadMigration1 : MigrationBase
@@ -103,7 +102,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate() => Alter.Table("foo"); // stop here, don't Do it
+            protected override void Migrate() => Alter.Table("foo"); // stop here, don't Do it
         }
 
         public class BadMigration2 : MigrationBase
@@ -113,7 +112,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate()
+            protected override void Migrate()
             {
                 Alter.Table("foo"); // stop here, don't Do it
 

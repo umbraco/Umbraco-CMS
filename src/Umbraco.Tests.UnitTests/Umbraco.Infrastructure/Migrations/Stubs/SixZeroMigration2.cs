@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs
         {
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             Alter.Table("umbracoUser").AddColumn("secondEmail").AsString(255);
         }

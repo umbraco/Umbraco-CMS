@@ -6,7 +6,7 @@
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             Rename.Table("umbracoDomains").To(Cms.Core.Constants.DatabaseSchema.Tables.Domain).Do();
         }

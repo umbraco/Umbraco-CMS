@@ -6,7 +6,7 @@
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             if (TableExists("cmsTask"))
                 Delete.Table("cmsTask").Do();

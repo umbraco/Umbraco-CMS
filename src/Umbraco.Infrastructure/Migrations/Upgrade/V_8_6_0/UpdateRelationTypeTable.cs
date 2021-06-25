@@ -7,7 +7,7 @@
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
 
             Alter.Table(Cms.Core.Constants.DatabaseSchema.Tables.RelationType).AlterColumn("parentObjectType").AsGuid().Nullable().Do();

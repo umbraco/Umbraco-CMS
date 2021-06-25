@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Cms.Core.Migrations;
+using System;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations
@@ -13,9 +12,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations
             _container = container;
         }
 
-        public IMigration Build(Type migrationType, IMigrationContext context)
+        public MigrationBase Build(Type migrationType, IMigrationContext context)
         {
-            return (IMigration) _container.CreateInstance(migrationType, context);
+            return (MigrationBase) _container.CreateInstance(migrationType, context);
         }
     }
 }

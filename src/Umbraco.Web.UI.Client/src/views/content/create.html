@@ -14,7 +14,7 @@
                     <p class="abstract">
                         <localize key="create_noDocumentTypes" />
                     </p>
-                    <button class="btn umb-outline" ng-click="editContentType()">
+                    <button type="button" class="btn umb-outline" ng-click="editContentType()">
                         <localize key="create_noDocumentTypesEditPermissions" />
                     </button>
                 </div>
@@ -28,7 +28,7 @@
                     <p class="abstract" ng-if="countTypes === 0">
                         <localize key="create_noDocumentTypesAtRoot" />
                     </p>
-                    <button class="btn umb-outline" ng-click="createContentType()" ng-if="countTypes === 0">
+                    <button type="button" class="btn umb-outline" ng-click="createContentType()" ng-if="countTypes === 0">
                         <localize key="create_noDocumentTypesCreateNew" />
                     </button>
                 </div>
@@ -37,8 +37,8 @@
             <ul class="umb-actions umb-actions-child" ng-if="selectContentType && allowedTypes.length > 0" aria-labelledby="selectContentType">
 
                 <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes">
-                    <button class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" umb-auto-focus ng-if="$index === 0">
-                        <i class="large icon {{docType.icon}}"></i>
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" umb-auto-focus ng-if="$index === 0">
+                        <umb-icon icon="{{docType.icon}}" class="{{docType.icon}} icon large"></umb-icon>
                         <span class="menu-label">
                             {{docType.name}}
                             <small>
@@ -46,8 +46,8 @@
                             </small>
                         </span>
                     </button>
-                    <button class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" ng-if="$index !== 0">
-                        <i class="large icon {{docType.icon}}"></i>
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" ng-if="$index !== 0">
+                        <umb-icon icon="{{docType.icon}}" class="{{docType.icon}} icon large"></umb-icon>
                         <span class="menu-label">
                             {{docType.name}}
                             <small>
@@ -62,8 +62,8 @@
             <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint">
 
                 <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false track by $index">
-                    <button class="umb-action-link umb-outline btn-reset" ng-click="createFromBlueprint(blueprint.id)">
-                        <i class="large icon {{docType.icon}}"></i>
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createFromBlueprint(blueprint.id)">
+                        <umb-icon icon="{{docType.icon}}" class="{{docType.icon}} icon large"></umb-icon>
                         <span class="menu-label">
                             {{blueprint.name}}
                         </span>
@@ -71,8 +71,8 @@
                 </li>
 
                 <li class="umb-action sep" ng-show="allowBlank">
-                    <button class="umb-action-link umb-outline btn-reset" ng-click="createBlank(docType)">
-                        <i class="large icon {{docType.icon}}"></i>
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createBlank(docType)">
+                        <umb-icon icon="{{docType.icon}}" class="{{docType.icon}} icon large"></umb-icon>
                         <span class="menu-label">
                             <localize key="blueprints_blankBlueprint">Blank</localize>
                         </span>
@@ -85,7 +85,7 @@
     </div>
 
     <div ng-if="!loading" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-        <button class="btn btn-info umb-outline" ng-click="closeDialog(true)">
+        <button type="button" class="btn btn-info umb-outline" ng-click="closeDialog(true)">
             <localize key="buttons_somethingElse">All Actions</localize>
         </button>
     </div>

@@ -11,7 +11,6 @@ using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
@@ -51,7 +50,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                         case "DeleteRedirectUrlTable":
                             return new DeleteRedirectUrlTable(c);
                         case "NoopMigration":
-                            return new NoopMigration();
+                            return new NoopMigration(c);
                         default:
                             throw new NotSupportedException();
                     }
@@ -227,7 +226,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             {
             }
 
-            public override void Migrate() => Delete.Table("umbracoRedirectUrl").Do();
+            protected override void Migrate() => Delete.Table("umbracoRedirectUrl").Do();
         }
     }
 }

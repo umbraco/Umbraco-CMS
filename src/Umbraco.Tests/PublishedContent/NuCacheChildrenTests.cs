@@ -43,6 +43,7 @@ namespace Umbraco.Tests.PublishedContent
         private ContentType _contentTypeInvariant;
         private ContentType _contentTypeVariant;
         private TestDataSource _source;
+        private IContentCacheDataSerializerFactory _contentNestedDataSerializerFactory;
 
         [TearDown]
         public void Teardown()
@@ -135,6 +136,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // create a data source for NuCache
             _source = new TestDataSource(kits());
+            _contentNestedDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
 
             var typeFinder = TestHelper.GetTypeFinder();
 
@@ -159,7 +161,9 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 PublishedModelFactory,
                 hostingEnvironment,
-                Options.Create(nuCacheSettings));
+                Options.Create(nuCacheSettings),
+                _contentNestedDataSerializerFactory);
+                
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

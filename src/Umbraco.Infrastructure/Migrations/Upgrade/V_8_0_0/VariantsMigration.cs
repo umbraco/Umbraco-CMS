@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         // notes
         // do NOT use Rename.Column as it's borked on SQLCE - use ReplaceColumn instead
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             MigratePropertyData();
             CreatePropertyDataIndexes();
