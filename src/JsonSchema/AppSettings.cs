@@ -59,6 +59,9 @@ namespace JsonSchema
                 public Umbraco.Forms.Core.Configuration.SecuritySettings Security { get; set; }
                 public FieldTypesDefinition FieldTypes { get; set; }
 
+                /// <summary>
+                /// Configurations for the Umbraco Forms Field Types
+                /// </summary>
                 public class FieldTypesDefinition
                 {
                     public DatePickerSettings DatePicker { get; set; }
