@@ -432,7 +432,7 @@ namespace Umbraco.Web.Editors
 
             foreach (var contentType in contentTypes)
             {
-                var emptyContent = Services.ContentService.Create("", parent, contentType, userId);
+                var emptyContent = Services.ContentService.Create("", parentId, contentType, userId);
 
                 var mapped = MapToDisplay(emptyContent, context =>
                 {
