@@ -187,7 +187,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (installType == PackageInstallType.AlreadyInstalled)
                     {
                         //this package is already installed
-                        return ValidationErrorResult.CreateNotificationValidationErrorResult(
+                        return ValidationProblem(
                             _localizedTextService.Localize("packager/packageAlreadyInstalled"));
                     }
 
@@ -241,7 +241,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (installType == PackageInstallType.AlreadyInstalled)
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult(
+                return ValidationProblem(
                     _localizedTextService.Localize("packager/packageAlreadyInstalled"));
             }
 
@@ -267,7 +267,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 var packageMinVersion = packageInfo.UmbracoVersion;
                 if (_umbracoVersion.Version < packageMinVersion)
-                    return ValidationErrorResult.CreateNotificationValidationErrorResult(
+                    return ValidationProblem(
                         _localizedTextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()}));
             }
 
@@ -286,7 +286,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     //save to the installedPackages.config, this will create a new entry with a new Id
                     if (!_packagingService.SaveInstalledPackage(packageDefinition))
-                        return ValidationErrorResult.CreateNotificationValidationErrorResult("Could not save the package");
+                        return ValidationProblem("Could not save the package");
 
                     model.Id = packageDefinition.Id;
                     break;

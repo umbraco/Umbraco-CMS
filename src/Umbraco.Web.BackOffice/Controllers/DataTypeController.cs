@@ -16,9 +16,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -267,7 +265,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (result.Success)
                 return Ok(result.Result); //return the id
             else
-                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
+                return ValidationProblem(result.Exception.Message);
         }
 
         /// <summary>
@@ -302,7 +300,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             catch (DuplicateNameException ex)
             {
                 ModelState.AddModelError("Name", ex.Message);
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             // map back to display model, and return
@@ -335,13 +333,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case MoveOperationStatusType.FailedParentNotFound:
                     return NotFound();
                 case MoveOperationStatusType.FailedCancelledByEvent:
-                    //returning an object of INotificationModel will ensure that any pending
-                    // notification messages are added to the response.
-                    return new ValidationErrorResult(new SimpleNotificationModel());
+                    return ValidationProblem();
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
                     notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    return new ValidationErrorResult(notificationModel);
+                    return ValidationProblem(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -355,7 +351,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (result.Success)
                 return Ok(result.Result);
             else
-                return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
+                return ValidationProblem(result.Exception.Message);
         }
 
         /// <summary>

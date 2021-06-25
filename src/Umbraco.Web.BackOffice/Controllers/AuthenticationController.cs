@@ -209,7 +209,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else
             {
                 AddModelErrors(result);
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return new ValidationErrorResult(ModelState);
             }
         }
 
@@ -474,7 +474,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return new ValidationErrorResult(ModelState);
             }
 
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
