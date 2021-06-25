@@ -423,21 +423,16 @@ namespace Umbraco.Web.Editors
             // We know that if the ID is less than 0 the parent is null.
             // Since this is called with parent ID it's safe to assume that the parent is the same for all the content types.
             var parent = parentId > 0 ? Services.ContentService.GetById(parentId) : null;
-            EntityPermissionSet permissions = null;
+            // Since the parent is the same and the path used to get permissions is based on the parent we only have to do it once
+            var path = parent == null ? "-1" : parent.Path;
+            var permissions = new Dictionary<string, EntityPermissionSet>
+            {
+                [path] = Services.UserService.GetPermissionsForPath(currentUser, path)
+            };
 
             foreach (var contentType in contentTypes)
             {
                 var emptyContent = Services.ContentService.Create("", parent, contentType, userId);
-
-                // Get the path for the content, we get this for each just in case some content has Identity and a different path
-                // Since if that's the case we might not be able to re-use the permissions.
-                string path = parent == null ? "-1" : parent.Path;
-
-                // Only assign permissions once, the idea is that we'll be able to re-use the same permissions most of the time.
-                if (permissions is null)
-                {
-                    permissions = Services.UserService.GetPermissionsForPath(currentUser, path);
-                }
 
                 var mapped = MapToDisplay(emptyContent, context =>
                 {
@@ -446,7 +441,6 @@ namespace Umbraco.Web.Editors
                     // and skip getting them again, in theory they should always be the same, but better safe than sorry.,
                     context.Items["Parent"] = parent;
                     context.Items["CurrentUser"] = currentUser;
-                    context.Items["Path"] = path;
                     context.Items["Permissions"] = permissions;
                 });
                 result.Add(CleanContentItemDisplay(mapped));

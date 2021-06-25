@@ -187,14 +187,14 @@ namespace Umbraco.Web.Models.Mapping
 
             // A bit of a mess, but we need to ensure that all the required values are here AND that they're the right type.
             if (context.Items.TryGetValue("CurrentUser", out var userObject) &&
-                context.Items.TryGetValue("Path", out var pathObject) &&
                 context.Items.TryGetValue("Permissions", out var permissionsObject) &&
                 userObject is IUser currentUser &&
-                pathObject is string contextPath &&
-                permissionsObject is EntityPermissionSet permissions)
+                permissionsObject is Dictionary<string, EntityPermissionSet> permissionsDict)
             {
-                // Both the path and the user is the same, it's safe to assume that the permissions are the same as well.
-                if (contextPath.Equals(path) && umbracoContext.Security.CurrentUser.Id == currentUser.Id)
+                // If we already have permissions for a given path,
+                // and the current user is the same as was used to generate the permissions, return the stored permissions.
+                if (umbracoContext.Security.CurrentUser.Id == currentUser.Id &&
+                    permissionsDict.TryGetValue(path, out var permissions))
                 {
                     return permissions.GetAllPermissions();
                 }
