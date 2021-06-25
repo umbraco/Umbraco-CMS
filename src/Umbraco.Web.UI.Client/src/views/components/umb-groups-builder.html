@@ -79,6 +79,34 @@
         <localize key="contentTypeEditor_noGroups"></localize>
     </div>
 
+    <!-- Properties added directly to a tab -->
+    <umb-box ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-show="ungroupedPropertiesAreVisible(tab)">
+        <umb-box-content>
+            <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties">
+                <li ng-repeat="(propertyIndex, property) in tab.properties track by property.alias" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
+                    <umb-content-type-property
+                        ng-if="property.propertyState !== 'init'"
+                        property="property"
+                        sortable="sortingMode"
+                        on-edit="editPropertyTypeSettings(property)"
+                        on-remove="deleteProperty(tab.properties, property)"
+                        val-server-field-alias="{{'Groups[' + tabIndex + '].Properties[' + propertyIndex + '].Alias'}}"
+                        val-server-field-label="{{'Groups[' + tabIndex + '].Properties[' + propertyIndex + '].Label'}}"
+                        on-change-sort-order-value="onChangePropertySortOrderValue(tab)">
+                    </umb-content-type-property>
+                </li>
+            </ul>
+            <button
+                ng-if="!sortingMode"
+                type="button"
+                data-element="property-add"
+                class="umb-group-builder__group-add-property"
+                ng-click="addNewProperty(tab)">
+                <localize key="contentTypeEditor_addProperty"></localize>
+            </button>
+        </umb-box-content>
+    </umb-box>
+    
     <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
         <div ng-repeat="(groupIndex, group) in model.groups track by group.key" ng-show="group.parentKey === openTabKey" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-key="{{group.key}}">
             <umb-content-type-group
@@ -111,7 +139,7 @@
                     type="button"
                     data-element="property-add"
                     class="umb-group-builder__group-add-property"
-                    ng-click="addNewProperty(group, group.id)">
+                    ng-click="addNewProperty(group)">
                     <localize key="contentTypeEditor_addProperty"></localize>
                 </button>
             </umb-content-type-group>

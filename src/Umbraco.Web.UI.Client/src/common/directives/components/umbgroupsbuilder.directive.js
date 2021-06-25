@@ -7,6 +7,9 @@
 
         function link(scope, el, attr, ctrl) {
 
+            const TYPE_TAB = 1;
+            const TYPE_GROUP = 2;
+
             var eventBindings = [];
             var validationTranslated = "";
             var tabNoSortOrderTranslated = "";
@@ -23,12 +26,12 @@
                 if (newValue && newValue.length === 0) return;
 
                 scope.tabs = $filter("filter")(scope.model.groups, (group) => {
-                    return group.type === 1;
+                    return group.type === TYPE_TAB;
                 });
             });
 
             function getFirstTab () {
-                return scope.model.groups.find(group => group.type === 1);
+                return scope.model.groups.find(group => group.type === TYPE_TAB);
             }
 
             function activate() {
@@ -389,7 +392,7 @@
             };
 
             /* ---------- TABS ---------- */
-            scope.changeTab = function ({ key }) {
+            scope.changeTab = function ({key}) {
                 scope.openTabKey = key;
             };
 
@@ -402,9 +405,10 @@
                     key: String.CreateGuid(),
                     name: "",
                     parentKey: null,
-                    type: 1,
+                    type: TYPE_TAB,
                     sortOrder,
-                    icon: "icon-document color-black"
+                    icon: "icon-document color-black",
+                    properties: []
                 };
 
                 if (newTabIndex === 0) {
@@ -453,6 +457,26 @@
                 const indexInGroup = scope.model.groups.findIndex(group => group.key === tab.key);
                 return `Groups[${indexInGroup}].Name`;
             };
+
+            scope.ungroupedPropertiesAreVisible = function({key, properties}) {
+                const isOpenTab = key === scope.openTabKey;
+
+                if (isOpenTab && properties.length > 0) {
+                    return true;
+                }
+
+                if (isOpenTab && scope.sortingMode) {
+                    return true;
+                }
+
+                const tabHasGroups = scope.model.groups.filter(group => group.parentKey === key).length > 0;
+
+                if (isOpenTab && !tabHasGroups) {
+                    return true;
+                }
+            };
+
+            /* Properties */
 
             scope.addNewProperty = function (group) {
                 let newProperty = {
@@ -508,7 +532,7 @@
                     parentTabContentTypeNames: [],
                     name: "",
                     parentKey: tabKey || null,
-                    type: 0,
+                    type: TYPE_GROUP,
                     sortOrder: lastGroupSortOrder
                 };
 
