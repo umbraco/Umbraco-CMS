@@ -427,7 +427,7 @@ namespace Umbraco.Web.Editors
 
             foreach (var contentType in contentTypes)
             {
-                var emptyContent = Services.ContentService.Create("", parentId, contentType, userId);
+                var emptyContent = Services.ContentService.Create("", parent, contentType, userId);
 
                 // Get the path for the content, we get this for each just in case some content has Identity and a different path
                 // Since if that's the case we might not be able to re-use the permissions.

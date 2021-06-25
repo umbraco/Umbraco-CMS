@@ -186,7 +186,6 @@ namespace Umbraco.Core.Services.Implement
         public IContent Create(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
         {
             // TODO: what about culture?
-
             var contentType = GetContentType(contentTypeAlias);
             return Create(name, parentId, contentType, userId);
         }
@@ -200,24 +199,40 @@ namespace Umbraco.Core.Services.Implement
         /// </remarks>
         /// <param name="name">The name of the content object.</param>
         /// <param name="parentId">The identifier of the parent, or -1.</param>
-        /// <param name="contentType">The content type of the content</param>
+        /// <param name="contentType">The content type.</param>
         /// <param name="userId">The optional id of the user creating the content.</param>
         /// <returns>The content object.</returns>
-        public IContent Create(string name, int parentId, IContentType contentType,
-            int userId = Constants.Security.SuperUserId)
+        public IContent Create(string name, int parentId, IContentType contentType, int userId = Constants.Security.SuperUserId)
         {
-            if (contentType is null)
-            {
-                throw new ArgumentException("Content type must be specified", nameof(contentType));
-            }
-
             var parent = parentId > 0 ? GetById(parentId) : null;
             if (parentId > 0 && parent is null)
             {
                 throw new ArgumentException("No content with that id.", nameof(parentId));
             }
 
-            var content = new Content(name, parentId, contentType);
+            return Create(name, parent, contentType, userId);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object of a specified content type.
+        /// </summary>
+        /// <remarks>This method simply returns a new, non-persisted, IContent without any identity. It
+        /// is intended as a shortcut to creating new content objects that does not invoke a save
+        /// operation against the database.
+        /// </remarks>
+        /// <param name="name">The name of the content object.</param>
+        /// <param name="parent">The parent of the content</param>
+        /// <param name="contentType">The content type of the content</param>
+        /// <param name="userId">The optional id of the user creating the content.</param>
+        /// <returns>The content object.</returns>
+        public IContent Create(string name, IContent parent, IContentType contentType, int userId = Constants.Security.SuperUserId)
+        {
+            if (contentType is null)
+            {
+                throw new ArgumentException("Content type must be specified", nameof(contentType));
+            }
+
+            var content = new Content(name, parent, contentType);
             using (var scope = ScopeProvider.CreateScope())
             {
                 CreateContent(scope, content, userId, false);
