@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     /// <summary>
     /// The exception that is thrown when a migration expression is not executed.
@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Migrations
     /// Migration expressions such as Alter.Table(...).Do() must end with Do(), else they are not executed.
     /// When a non-executed expression is detected, an IncompleteMigrationExpressionException is thrown.
     /// </remarks>
-    /// <seealso cref="System.Exception" />
+    /// <seealso cref="Exception" />
     [Serializable]
     public class IncompleteMigrationExpressionException : Exception
     {

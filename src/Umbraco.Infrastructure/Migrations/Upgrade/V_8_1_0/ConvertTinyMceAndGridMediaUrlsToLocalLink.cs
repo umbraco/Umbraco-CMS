@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             var mediaLinkPattern = new Regex(
                 @"(<a[^>]*href="")(\/ media[^""\?]*)([^>]*>)",

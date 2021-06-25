@@ -1,11 +1,9 @@
-﻿using Umbraco.Cms.Core.Migrations;
-
 namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
 {
     /// <summary>
     /// Rebuilds the published snapshot.
     /// </summary>
-    public class RebuildPublishedSnapshot : IMigration
+    public class RebuildPublishedSnapshot : MigrationBase
     {
         private readonly IPublishedSnapshotRebuilder _rebuilder;
 
@@ -13,14 +11,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
         /// Initializes a new instance of the <see cref="RebuildPublishedSnapshot"/> class.
         /// </summary>
         public RebuildPublishedSnapshot(IMigrationContext context, IPublishedSnapshotRebuilder rebuilder)
-        {
-            _rebuilder = rebuilder;
-        }
+            : base(context)
+            => _rebuilder = rebuilder;
 
         /// <inheritdoc />
-        public void Migrate()
-        {
-            _rebuilder.Rebuild();
-        }
+        protected override void Migrate() => _rebuilder.Rebuild();
     }
 }

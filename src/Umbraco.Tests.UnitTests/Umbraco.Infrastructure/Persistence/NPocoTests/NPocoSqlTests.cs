@@ -86,9 +86,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTe
             Sql<ISqlContext> sql = Sql().SelectAll().From<NodeDto>()
                 .Where<NodeDto>(x => x.Trashed == false);
 
-            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (NOT ([umbracoNode].[trashed] = @0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[trashed] = @0)", sql.SQL.Replace("\n", " "));
             Assert.AreEqual(1, sql.Arguments.Length);
-            Assert.AreEqual(true, sql.Arguments[0]);
+            Assert.AreEqual(false, sql.Arguments[0]);
         }
 
         [Test]
@@ -96,9 +96,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTe
         {
             Sql<ISqlContext> sql = Sql().SelectAll().From<NodeDto>().Where<NodeDto>(x => x.Trashed == false);
 
-            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (NOT ([umbracoNode].[trashed] = @0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[trashed] = @0)", sql.SQL.Replace("\n", " "));
             Assert.AreEqual(1, sql.Arguments.Length);
-            Assert.AreEqual(true, sql.Arguments[0]);
+            Assert.AreEqual(false, sql.Arguments[0]);
         }
 
         [Test]

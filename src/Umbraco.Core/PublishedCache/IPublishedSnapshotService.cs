@@ -36,7 +36,6 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <summary>
         /// Rebuilds internal database caches (but does not reload).
         /// </summary>
-        /// <param name="groupSize">The operation batch size to process the items</param>
         /// <param name="contentTypeIds">If not null will process content for the matching content types, if empty will process all content</param>
         /// <param name="mediaTypeIds">If not null will process content for the matching media types, if empty will process all media</param>
         /// <param name="memberTypeIds">If not null will process content for the matching members types, if empty will process all members</param>
@@ -47,7 +46,6 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <see cref="DistributedCache" /> RefreshAllPublishedSnapshot method.</para>
         /// </remarks>
         void Rebuild(
-            int groupSize = 5000,
             IReadOnlyCollection<int> contentTypeIds = null,
             IReadOnlyCollection<int> mediaTypeIds = null,
             IReadOnlyCollection<int> memberTypeIds = null);

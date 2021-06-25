@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             Delete.KeysAndIndexes<ContentNuDto>().Do();
             Create.KeysAndIndexes<ContentNuDto>().Do();

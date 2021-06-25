@@ -46,6 +46,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
+        private readonly ContentDataSerializer _contentDataSerializer;
         private readonly NuCacheSettings _config;
 
         private bool _isReady;
@@ -90,7 +92,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             IOptions<GlobalSettings> globalSettings,
             IPublishedModelFactory publishedModelFactory,
             IHostingEnvironment hostingEnvironment,
-            IOptions<NuCacheSettings> config)
+            IOptions<NuCacheSettings> config,
+            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory,
+            ContentDataSerializer contentDataSerializer)
         {
             _options = options;
             _syncBootStateAccessor = syncBootStateAccessor;
@@ -107,6 +111,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
+            _contentCacheDataSerializerFactory = contentCacheDataSerializerFactory;
+            _contentDataSerializer = contentDataSerializer;
             _config = config.Value;
             _publishedModelFactory = publishedModelFactory;
         }
@@ -164,8 +170,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _localMediaDbExists = File.Exists(localMediaDbPath);
 
             // if both local databases exist then GetTree will open them, else new databases will be created
-            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists, _config);
-            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists, _config);
+            _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists, _config, _contentDataSerializer);
+            _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists, _config, _contentDataSerializer);
 
             _logger.LogInformation("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
         }
@@ -345,10 +351,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // contentStore is wlocked (1 thread)
             // content (and types) are read-locked
 
-            var contentTypes = _serviceContext.ContentTypeService.GetAll()
-                .Select(x => _publishedContentTypeFactory.CreateContentType(x));
+            var contentTypes = _serviceContext.ContentTypeService.GetAll().ToList();
 
-            _contentStore.SetAllContentTypesLocked(contentTypes);
+            _contentStore.SetAllContentTypesLocked(contentTypes.Select(x => _publishedContentTypeFactory.CreateContentType(x)));
 
             using (_profilingLogger.TraceDuration<PublishedSnapshotService>("Loading content from database"))
             {
@@ -1117,11 +1122,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         /// <inheritdoc />
         public void Rebuild(
-            int groupSize = 5000,
             IReadOnlyCollection<int> contentTypeIds = null,
             IReadOnlyCollection<int> mediaTypeIds = null,
             IReadOnlyCollection<int> memberTypeIds = null)
-            => _publishedContentService.Rebuild(groupSize, contentTypeIds, mediaTypeIds, memberTypeIds);
+            => _publishedContentService.Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds);
 
         public async Task CollectAsync()
         {

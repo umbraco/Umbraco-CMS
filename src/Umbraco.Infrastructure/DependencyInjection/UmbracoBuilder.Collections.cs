@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -14,5 +15,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         /// <param name="builder">The builder.</param>
         public static MapperCollectionBuilder Mappers(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<MapperCollectionBuilder>();
+
+        public static NPocoMapperCollectionBuilder NPocoMappers(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<NPocoMapperCollectionBuilder>();
     }
 }

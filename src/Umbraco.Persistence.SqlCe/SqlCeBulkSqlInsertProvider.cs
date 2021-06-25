@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlServerCe;
+using System.Data.SqlTypes;
 using System.Linq;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -64,6 +65,17 @@ namespace Umbraco.Cms.Persistence.SqlCe
                             if (NPocoDatabaseExtensions.IncludeColumn(pocoData, columns[i]))
                             {
                                 var val = columns[i].Value.GetValue(record);
+
+                                if (val is byte[])
+                                {
+                                    var bytes = val as byte[];
+                                    updatableRecord.SetSqlBinary(i, new SqlBinary(bytes));
+                                }
+                                else
+                                {
+                                    updatableRecord.SetValue(i, val);
+                                }
+
                                 updatableRecord.SetValue(i, val);
                             }
                         }

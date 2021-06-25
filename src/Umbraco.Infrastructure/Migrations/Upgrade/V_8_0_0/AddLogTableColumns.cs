@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
 

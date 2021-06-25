@@ -6,7 +6,7 @@
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             var exists = Database.Fetch<int>("select id from umbracoUser where id=-1;").Count > 0;
             if (exists) return;

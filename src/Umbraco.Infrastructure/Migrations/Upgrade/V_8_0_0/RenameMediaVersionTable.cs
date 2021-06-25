@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             Rename.Table("cmsMedia").To(Cms.Core.Constants.DatabaseSchema.Tables.MediaVersion).Do();
 

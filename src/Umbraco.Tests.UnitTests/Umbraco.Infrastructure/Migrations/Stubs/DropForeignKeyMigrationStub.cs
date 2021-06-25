@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs
         {
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user").ToTable("umbracoUser").PrimaryColumn("id").Do();
         }

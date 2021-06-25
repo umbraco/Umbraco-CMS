@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
         /// <summary>
         /// Adds new columns to members table
         /// </summary>
-        public override void Migrate()
+        protected override void Migrate()
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
 
