@@ -18,8 +18,8 @@ namespace JsonSchema
         /// Creates a new instance of <see cref="UmbracoJsonSchemaGenerator"/>.
         /// </summary>
         /// <param name="definitionPrefix">The prefix to use for definitions generated.</param>
-        public UmbracoJsonSchemaGenerator(string definitionPrefix)
-            => _innerGenerator = new JsonSchemaGenerator(new UmbracoJsonSchemaGeneratorSettings(definitionPrefix));
+        public UmbracoJsonSchemaGenerator()
+            => _innerGenerator = new JsonSchemaGenerator(new UmbracoJsonSchemaGeneratorSettings());
 
 
         /// <summary>

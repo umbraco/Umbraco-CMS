@@ -221,9 +221,10 @@
     ##
     ## src/Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json
     &dotnet run --project "$($this.SolutionRoot)\src\JsonSchema\JsonSchema.csproj" `
-        --outputFile "../src/Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json"`
         --verbosity detailed `
-        -c Release > "$($this.BuildTemp)\json.schema.log"
+        -c Release > "$($this.BuildTemp)\json.schema.log" `
+        -- `
+        --outputFile "$($this.BuildTemp)\WebApp\umbraco\config\appsettings-schema.json"
 
   })
 

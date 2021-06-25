@@ -11,13 +11,12 @@ namespace JsonSchema
         /// Creates a new instance of <see cref="UmbracoJsonSchemaGeneratorSettings"/>.
         /// </summary>
         /// <param name="definitionPrefix">The prefix to use for definitions generated.</param>
-        public UmbracoJsonSchemaGeneratorSettings(string definitionPrefix)
+        public UmbracoJsonSchemaGeneratorSettings()
         {
             AlwaysAllowAdditionalObjectProperties = true;
             SerializerSettings = new JsonSerializerSettings();
-            TypeNameGenerator = new PrefixedTypeNameGenerator(definitionPrefix);
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
-
+            SchemaNameGenerator = new NamespacePrefixedSchemaNameGenerator();
             SerializerSettings.Converters.Add(new StringEnumConverter());
         }
     }

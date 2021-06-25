@@ -56,7 +56,7 @@ namespace JsonSchema
             {
                 public FormDesignSettings FormDesign { get; set; }
                 public PackageOptionSettings Options { get; set; }
-                public SecuritySettings Security { get; set; }
+                public Umbraco.Forms.Core.Configuration.SecuritySettings Security { get; set; }
                 public FieldTypesDefinition FieldTypes { get; set; }
 
                 public class FieldTypesDefinition

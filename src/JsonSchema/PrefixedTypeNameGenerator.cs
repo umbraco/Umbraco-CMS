@@ -16,6 +16,7 @@ namespace JsonSchema
         /// <param name="definitionPrefix">The prefix to use.</param>
         public PrefixedTypeNameGenerator(string definitionPrefix) => _definitionPrefix = definitionPrefix;
 
+
         /// <inheritdoc />
         public override string Generate(NJsonSchema.JsonSchema schema, string typeNameHint, IEnumerable<string> reservedTypeNames)
             => $"{_definitionPrefix}{base.Generate(schema, typeNameHint, reservedTypeNames)}";
