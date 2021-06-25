@@ -2,6 +2,7 @@ name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd
 variables:
     buildConfiguration: Release
     SA_PASSWORD: UmbracoIntegration123!
+    UmbracoBuild: AzurePipeline
 resources:
     containers:
         - container: mssql
