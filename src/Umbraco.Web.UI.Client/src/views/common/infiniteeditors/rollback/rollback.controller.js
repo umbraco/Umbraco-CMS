@@ -114,45 +114,56 @@
         function createDiff(currentVersion, previousVersion) {
             vm.diff = {};
             vm.diff.properties = [];
+
             // find diff in name
             vm.diff.name = JsDiff.diffWords(currentVersion.name, previousVersion.name);
+
             // extract all properties from the tabs and create new object for the diff
-            currentVersion.tabs.forEach(function (tab, tabIndex) {
-                tab.properties.forEach(function (property, propertyIndex) {
-                    var oldTabIndex = -1;
-                    var oldTabPropertyIndex = -1;
-                    var pvt = previousVersion.tabs;
-                    for (var oti = 0; oti < pvt.length; oti++) {
-                        for (var opi = 0; opi < pvt[oti].properties.length; opi++) {
-                            if (previousVersion.tabs[oti].properties[opi].alias === property.alias) {
-                                oldTabIndex = oti;
-                                oldTabPropertyIndex = opi;
-                            }
+            currentVersion.tabs.forEach(function (tab) {
+                tab.properties.forEach(function (property) {
+                    let oldTabIndex = -1;
+                    let oldTabPropertyIndex = -1;
+                    const previousVersionTabs = previousVersion.tabs;
+
+                    // find the property by alias, but only search until we find it
+                    for (var oti = 0, length = previousVersionTabs.length; oti < length; oti++) {
+                        const opi = previousVersionTabs[oti].properties.findIndex(p => p.alias === property.alias);
+                        if (opi !== -1) {
+                            oldTabIndex = oti;
+                            oldTabPropertyIndex = opi;
+                            break;
                         }
                     }
-                    if (!(oldTabIndex < 0 || oldTabPropertyIndex < 0)) {
-                        var oldProperty = previousVersion.tabs[oldTabIndex].properties[oldTabPropertyIndex];
+
+                    if (oldTabIndex !== -1 && oldTabPropertyIndex !== -1) {
+                        let oldProperty = previousVersion.tabs[oldTabIndex].properties[oldTabPropertyIndex];
+
                         // copy existing properties, so it doesn't manipulate existing properties on page
                         oldProperty = Utilities.copy(oldProperty);
                         property = Utilities.copy(property);
+                        
                         // we have to make properties storing values as object into strings (Grid, nested content, etc.)
                         if (property.value instanceof Object) {
                             property.value = JSON.stringify(property.value, null, 1);
                             property.isObject = true;
                         }
+
                         if (oldProperty.value instanceof Object) {
                             oldProperty.value = JSON.stringify(oldProperty.value, null, 1);
                             oldProperty.isObject = true;
                         }
+
                         // diff requires a string
                         property.value = property.value ? property.value + '' : '';
                         oldProperty.value = oldProperty.value ? oldProperty.value + '' : '';
-                        var diffProperty = {
+                        
+                        const diffProperty = {
                             'alias': property.alias,
                             'label': property.label,
                             'diff': property.isObject ? JsDiff.diffJson(property.value, oldProperty.value) : JsDiff.diffWords(property.value, oldProperty.value),
-                            'isObject': property.isObject || oldProperty.isObject ? true : false
+                            'isObject': property.isObject || oldProperty.isObject
                         };
+                        
                         vm.diff.properties.push(diffProperty);
                     }
                 });
