@@ -1,3 +1,4 @@
+﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
@@ -35,7 +36,7 @@ namespace Umbraco.Web
             {
                 // we have a value
                 // try to cast or convert it
-                var value =  property.GetValue(culture, segment);
+                var value = property.GetValue(culture, segment);
                 if (value is T valueAsT)
                 {
                     return valueAsT;
@@ -61,11 +62,6 @@ namespace Umbraco.Web
             // we don't have a value - neither direct nor fallback
             // give a chance to the converter to return something (eg empty enumerable)
             var noValue = property.GetValue(culture, segment);
-            if (noValue == null)
-            {
-                return default;
-            }
-
             if (noValue is T noValueAsT)
             {
                 return noValueAsT;

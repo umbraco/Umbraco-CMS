@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Ganss.XSS;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -15,13 +14,11 @@ namespace Umbraco.Web.Services
     public class IconService : IIconService
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly IHtmlSanitizer _htmlSanitizer;
         private readonly IAppPolicyCache _cache;
 
-        public IconService(IGlobalSettings globalSettings, IHtmlSanitizer htmlSanitizer, AppCaches appCaches)
+        public IconService(IGlobalSettings globalSettings, AppCaches appCaches)
         {
             _globalSettings = globalSettings;
-            _htmlSanitizer = htmlSanitizer;
             _cache = appCaches.RuntimeCache;
         }
 
@@ -78,12 +75,11 @@ namespace Umbraco.Web.Services
             try
             {
                 var svgContent = System.IO.File.ReadAllText(iconPath);
-                var sanitizedString = _htmlSanitizer.Sanitize(svgContent);
 
                 var svg = new IconModel
                 {
                     Name = iconName,
-                    SvgString = sanitizedString
+                    SvgString = svgContent
                 };
 
                 return svg;

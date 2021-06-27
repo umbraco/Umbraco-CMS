@@ -368,7 +368,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.DropDownListFlexible, ValueStorageType.Integer) { Alias = "ddl", Name = "Dropdown List", Mandatory = false, SortOrder = 14, DataTypeId = -42 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.CheckBoxList, ValueStorageType.Nvarchar) { Alias = "chklist", Name = "Checkbox List", Mandatory = false, SortOrder = 15, DataTypeId = -43 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.ContentPicker, ValueStorageType.Integer) { Alias = "contentPicker", Name = "Content Picker", Mandatory = false, SortOrder = 16, DataTypeId = 1046 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MediaPicker, ValueStorageType.Integer) { Alias = "mediaPicker", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeId = 1048 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MediaPicker3, ValueStorageType.Integer) { Alias = "mediapicker3", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeId = 1051 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MemberPicker, ValueStorageType.Integer) { Alias = "memberPicker", Name = "Member Picker", Mandatory = false, SortOrder = 18, DataTypeId = 1047 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MultiUrlPicker, ValueStorageType.Nvarchar) { Alias = "multiUrlPicker", Name = "Multi URL Picker", Mandatory = false, SortOrder = 21, DataTypeId = 1050 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Ntext) { Alias = "tags", Name = "Tags", Mandatory = false, SortOrder = 22, DataTypeId = 1041 });
@@ -378,13 +378,13 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-        public static MediaType CreateVideoMediaType()
+        public static MediaType CreateNewMediaType()
         {
             var mediaType = new MediaType(-1)
                                 {
-                                    Alias = "video",
-                                    Name = "Video",
-                                    Description = "ContentType used for videos",
+                                    Alias = "newMediaType",
+                                    Name = "New Media Type",
+                                    Description = "ContentType used for a new format",
                                     Icon = ".sprTreeDoc3",
                                     Thumbnail = "doc.png",
                                     SortOrder = 1,
