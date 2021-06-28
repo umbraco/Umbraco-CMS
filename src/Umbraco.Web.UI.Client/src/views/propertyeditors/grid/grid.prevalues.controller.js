@@ -107,7 +107,7 @@ angular.module("umbraco")
                     currentLayout: Utilities.copy(template),
                     rows: $scope.model.value.layouts,
                     columns: $scope.model.value.columns,
-                    view: "views/propertyEditors/grid/dialogs/layoutconfig.html",
+                    view: "views/propertyeditors/grid/dialogs/layoutconfig.html",
                     size: "small",
                     submit: function (model) {
                         if (index === -1) {
@@ -148,7 +148,7 @@ angular.module("umbraco")
                     currentRow: Utilities.copy(layout),
                     editors: $scope.editors,
                     columns: $scope.model.value.columns,
-                    view: "views/propertyEditors/grid/dialogs/rowconfig.html",
+                    view: "views/propertyeditors/grid/dialogs/rowconfig.html",
                     size: "small",
                     submit: function (model) {
                         if (index === -1) {
@@ -169,7 +169,7 @@ angular.module("umbraco")
             function deleteLayout(layout, index, event) {
 
                 const dialog = {
-                    view: "views/propertyEditors/grid/overlays/rowdeleteconfirm.html",
+                    view: "views/propertyeditors/grid/overlays/rowdeleteconfirm.html",
                     layout: layout,
                     submitButtonLabelKey: "contentTypeEditor_yesDelete",
                     submitButtonStyle: "danger",
