@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    // represents everything that is specific to edited or published version
+    /// <summary>
+    /// Represents everything that is specific to an edited or published content version
+    /// </summary>
     internal class ContentData
     {
         public string Name { get; set; }

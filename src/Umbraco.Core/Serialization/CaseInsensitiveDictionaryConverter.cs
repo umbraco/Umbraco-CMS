@@ -14,12 +14,24 @@ namespace Umbraco.Core.Serialization
     /// </example>
     public class CaseInsensitiveDictionaryConverter<T> : CustomCreationConverter<IDictionary>
     {
+        private readonly StringComparer _comparer;
+
+        public CaseInsensitiveDictionaryConverter()
+            : this(StringComparer.OrdinalIgnoreCase)
+        {
+        }
+
+        public CaseInsensitiveDictionaryConverter(StringComparer comparer)
+        {
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+        }
+
         public override bool CanWrite => false;
 
         public override bool CanRead => true;
 
         public override bool CanConvert(Type objectType) => typeof(IDictionary<string,T>).IsAssignableFrom(objectType);
 
-        public override IDictionary Create(Type objectType) => new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
+        public override IDictionary Create(Type objectType) => new Dictionary<string, T>(_comparer);
     }
 }

@@ -630,6 +630,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             if (versions.Count == 0) return new Dictionary<int, PropertyCollection>();
 
+            // TODO: This is a bugger of a query and I believe is the main issue with regards to SQL performance drain when querying content
+            // which is done when rebuilding caches/indexes/etc... in bulk. We are using an "IN" query on umbracoPropertyData.VersionId
+            // which then performs a Clustered Index Scan on PK_umbracoPropertyData which means it iterates the entire table which can be enormous!
+            // especially if there are both a lot of content but worse if there is a lot of versions of that content.
+            // So is it possible to return this property data without doing an index scan on PK_umbracoPropertyData and without iterating every row
+            // in the table?
+
             // get all PropertyDataDto for all definitions / versions
             var allPropertyDataDtos = Database.FetchByGroups<PropertyDataDto, int>(versions, 2000, batch =>
                 SqlContext.Sql()

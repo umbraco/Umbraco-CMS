@@ -12,8 +12,8 @@
            ng-href="{{'#' + item.editPath}}"
            ng-click="clickItemName(item, $event, $index)"
            ng-class="{'-light': !item.published && item.updater != null}">
-            <i class="umb-content-grid__icon {{ item.icon }}" aria-hidden="true"></i>
-            <span>{{ item.name }}</span>
+            <umb-icon icon="{{item.icon}}" class="{{item.icon}} umb-content-grid__icon"></umb-icon>
+            <span>{{item.name}}</span>
         </a>
 
         <ul class="umb-content-grid__details-list" ng-class="{'-light': !item.published && item.updater != null}">

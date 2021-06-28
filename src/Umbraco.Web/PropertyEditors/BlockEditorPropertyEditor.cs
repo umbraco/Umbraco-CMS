@@ -255,7 +255,7 @@ namespace Umbraco.Web.PropertyEditors
                     || (blockEditorData != null && validationLimit.Min.HasValue && blockEditorData.Layout.Count() < validationLimit.Min))
                 {
                     yield return new ValidationResult(
-                        _textService.Localize("validation/entriesShort", new[]
+                        _textService.Localize("validation", "entriesShort", new[]
                         {
                             validationLimit.Min.ToString(),
                             (validationLimit.Min - blockEditorData.Layout.Count()).ToString()
@@ -266,7 +266,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (blockEditorData != null && validationLimit.Max.HasValue && blockEditorData.Layout.Count() > validationLimit.Max)
                 {
                     yield return new ValidationResult(
-                        _textService.Localize("validation/entriesExceed", new[]
+                        _textService.Localize("validation", "entriesExceed", new[]
                         {
                             validationLimit.Max.ToString(),
                             (blockEditorData.Layout.Count() - validationLimit.Max).ToString()

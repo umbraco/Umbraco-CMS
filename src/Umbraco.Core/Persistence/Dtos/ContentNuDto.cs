@@ -25,9 +25,16 @@ namespace Umbraco.Core.Persistence.Dtos
         /// </remarks>
         [Column("data")]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public string Data { get; set; }
 
         [Column("rv")]
         public long Rv { get; set; }
+
+        [Column("dataRaw")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public byte[] RawData { get; set; }
+
+       
     }
 }

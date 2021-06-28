@@ -6,10 +6,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     internal class BTree
     {
-        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists)
+        public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, ContentDataSerializer contentDataSerializer = null)
         {
             var keySerializer = new PrimitiveSerializer();
-            var valueSerializer = new ContentNodeKitSerializer();
+            var valueSerializer = new ContentNodeKitSerializer(contentDataSerializer);
             var options = new BPlusTree<int, ContentNodeKit>.OptionsV2(keySerializer, valueSerializer)
             {
                 CreateFile = exists ? CreatePolicy.IfNeeded : CreatePolicy.Always,
@@ -30,6 +30,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             //btree.
 
             return tree;
+
         }
 
         private static int GetBlockSize()

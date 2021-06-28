@@ -3,6 +3,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Examine;
 using Umbraco.Core.Composing;
 using Umbraco.Core;
+using Umbraco.Core.Sync;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Search
 {
@@ -16,23 +18,50 @@ namespace Umbraco.Web.Search
         private readonly IExamineManager _examineManager;
         BackgroundIndexRebuilder _indexRebuilder;
         private readonly IMainDom _mainDom;
-        
-        public ExamineFinalComponent(IProfilingLogger logger, IExamineManager examineManager, BackgroundIndexRebuilder indexRebuilder, IMainDom mainDom)
+        private readonly ISyncBootStateAccessor _syncBootStateAccessor;
+        private readonly object _locker = new object();
+        private bool _initialized = false;
+
+        public ExamineFinalComponent(IProfilingLogger logger, IExamineManager examineManager, BackgroundIndexRebuilder indexRebuilder, IMainDom mainDom, ISyncBootStateAccessor syncBootStateAccessor)
         {
             _logger = logger;
             _examineManager = examineManager;
             _indexRebuilder = indexRebuilder;
             _mainDom = mainDom;
+            _syncBootStateAccessor = syncBootStateAccessor;
+        }
+
+        private void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
+        {
+            if (!_initialized)
+            {
+                lock (_locker)
+                {
+                    // double check lock, we must only do this once
+                    if (!_initialized)
+                    {
+                        _initialized = true;
+
+                        UmbracoModule.RouteAttempt -= UmbracoModule_RouteAttempt;
+
+                        if (!_mainDom.IsMainDom) return;
+
+                        var bootState = _syncBootStateAccessor.GetSyncBootState();
+
+                        _examineManager.ConfigureIndexes(_mainDom, _logger);
+
+                        // if it's a cold boot, rebuild all indexes including non-empty ones
+                        // delay one minute since a cold boot also triggers nucache rebuilds
+                        _indexRebuilder.RebuildIndexes(bootState != SyncBootState.ColdBoot, 60000);
+                    }
+                }
+            }
+            
         }
 
         public void Initialize()
         {
-            if (!_mainDom.IsMainDom) return;
-
-            _examineManager.ConfigureIndexes(_mainDom, _logger);
-
-            // TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
-            _indexRebuilder.RebuildIndexes(true, 5000);
+            UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
         }
 
         public void Terminate()

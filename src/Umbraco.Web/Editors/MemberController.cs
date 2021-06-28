@@ -377,7 +377,7 @@ namespace Umbraco.Web.Editors
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    display.AddSuccessNotification(localizedTextService.Localize("speechBubbles/editMemberSaved"), localizedTextService.Localize("speechBubbles/editMemberSaved"));
+                    display.AddSuccessNotification(localizedTextService.Localize("speechBubbles", "editMemberSaved"), localizedTextService.Localize("speechBubbles", "editMemberSaved"));
                     break;
             }
 
