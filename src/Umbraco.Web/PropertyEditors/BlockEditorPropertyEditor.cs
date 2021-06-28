@@ -46,7 +46,7 @@ namespace Umbraco.Web.PropertyEditors
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
-            private readonly IDataTypeService _dataTypeService; 
+            private readonly IDataTypeService _dataTypeService;
             private readonly ILogger _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
@@ -148,7 +148,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.PropertyValues.Remove(prop.Key);
-                            _logger.Warn<BlockEditorPropertyValueEditor>(
+                            _logger.Warn<BlockEditorPropertyValueEditor,string,Guid,string>(
                                 "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Key, property.PropertyType.Alias);
                             continue;
@@ -249,7 +249,7 @@ namespace Umbraco.Web.PropertyEditors
                     || (blockEditorData != null && validationLimit.Min.HasValue && blockEditorData.Layout.Count() < validationLimit.Min))
                 {
                     yield return new ValidationResult(
-                        _textService.Localize("validation/entriesShort", new[]
+                        _textService.Localize("validation", "entriesShort", new[]
                         {
                             validationLimit.Min.ToString(),
                             (validationLimit.Min - blockEditorData.Layout.Count()).ToString()
@@ -260,7 +260,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (blockEditorData != null && validationLimit.Max.HasValue && blockEditorData.Layout.Count() > validationLimit.Max)
                 {
                     yield return new ValidationResult(
-                        _textService.Localize("validation/entriesExceed", new[]
+                        _textService.Localize("validation", "entriesExceed", new[]
                         {
                             validationLimit.Max.ToString(),
                             (blockEditorData.Layout.Count() - validationLimit.Max).ToString()

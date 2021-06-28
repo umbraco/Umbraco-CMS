@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// All Sql Syntax provider implementations should derive from this abstract class.
     /// </remarks>
     /// <typeparam name="TSyntax"></typeparam>
-    public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
+    public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider2
         where TSyntax : ISqlSyntaxProvider
     {
         protected SqlSyntaxProviderBase()
@@ -235,6 +235,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public abstract void ReadLock(IDatabase db, params int[] lockIds);
         public abstract void WriteLock(IDatabase db, params int[] lockIds);
+        public abstract void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
+
+        public abstract void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
 
         public virtual bool DoesTableExist(IDatabase db, string tableName)
         {
@@ -403,7 +406,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                 ? GetQuotedColumnName(columnDefinition.Name)
                 : string.Join(", ", columnDefinition.PrimaryKeyColumns
-                                                    .Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                    .Split(Constants.CharArrays.CommaSpace, StringSplitOptions.RemoveEmptyEntries)
                                                     .Select(GetQuotedColumnName));
 
             var primaryKeyPart = string.Concat("PRIMARY KEY", columnDefinition.IsIndexed ? " CLUSTERED" : " NONCLUSTERED");
@@ -568,7 +571,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string CreateDefaultConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} DEFAULT ({2}) FOR {3}";
 
         public virtual string ConvertIntegerToOrderableString => "REPLACE(STR({0}, 8), SPACE(1), '0')";
-        public virtual string ConvertDateToOrderableString => "CONVERT(nvarchar, {0}, 102)";
+        public virtual string ConvertDateToOrderableString => "CONVERT(nvarchar, {0}, 120)";
         public virtual string ConvertDecimalToOrderableString => "REPLACE(STR({0}, 20, 9), SPACE(1), '0')";
     }
 }

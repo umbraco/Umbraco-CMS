@@ -33,6 +33,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "hideLabel")]
         public bool HideLabel { get; set; }
 
+        [DataMember(Name = "labelOnTop")]
+        public bool LabelOnTop { get; set; }
+
         [DataMember(Name = "validation")]
         public PropertyTypeValidation Validation { get; set; }
 

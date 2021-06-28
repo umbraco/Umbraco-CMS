@@ -30,12 +30,21 @@ namespace Umbraco.Web.Composing
 
                 try
                 {
-                    runtimeState = Current.Factory.GetInstance<IRuntimeState>();
+                    runtimeState = Current.RuntimeState;
                 }
                 catch { /* don't make it worse */ }
 
                 if (runtimeState?.BootFailedException != null)
-                    BootFailedException.Rethrow(runtimeState.BootFailedException);
+                {
+                    // if we throw the exception here the HttpApplication.Application_Error method will never be hit
+                    // and our custom error page will not be shown, so we need to wait for the request to begin
+                    // before we throw the exception.
+                    context.BeginRequest += (sender, args) =>
+                    {
+                        BootFailedException.Rethrow(runtimeState.BootFailedException);
+                    };
+                    return;
+                }
 
                 // else... throw what we have
                 throw;

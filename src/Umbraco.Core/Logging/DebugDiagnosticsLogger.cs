@@ -129,5 +129,65 @@ namespace Umbraco.Core.Logging
         {
             System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
         }
+        /// <inheritdoc/>
+        public void Fatal<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0,
+            T1 propertyValue1, T2 propertyValue2)
+                => Fatal(reporting, exception, messageTemplate, new object[] { propertyValue0, propertyValue1, propertyValue2 });
+        /// <inheritdoc/>
+        public void Fatal<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Fatal(reporting, exception, messageTemplate, new object[] { propertyValue0, propertyValue1 });
+        /// <inheritdoc/>
+        public void Fatal<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0)
+            => Fatal(reporting, exception, messageTemplate, new object[] { propertyValue0 });
+        /// <inheritdoc/>
+        public void Error<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0,
+            T1 propertyValue1, T2 propertyValue2)
+                => Error(reporting, exception, messageTemplate, new object[] { propertyValue0, propertyValue1, propertyValue2 });
+        /// <inheritdoc/>
+        public void Error<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Error(reporting, exception, messageTemplate, new object[] { propertyValue0, propertyValue1 });
+        /// <inheritdoc/>
+        public void Error<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0)
+            => Error(reporting, exception, messageTemplate, new object[] { propertyValue0 });
+        /// <inheritdoc/>
+        public void Warn<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0,
+            T1 propertyValue1, T2 propertyValue2)
+                => Warn(reporting, exception, messageTemplate, new object[] { propertyValue0, propertyValue1,propertyValue2 });
+        /// <inheritdoc/>
+        public void Warn<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+                => Warn(reporting, exception, messageTemplate, new object[] { propertyValue0, propertyValue1 });
+
+        public void Warn<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0)
+            => Warn(reporting, exception, messageTemplate, new object[] { propertyValue0 });
+
+        public void Warn<T0>(Type reporting, string message, T0 propertyValue0)
+            => Warn(reporting, message, new object[] { propertyValue0 });
+
+        public void Info<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+            => Info(reporting, messageTemplate, new object[] { propertyValue0, propertyValue1, propertyValue2 });
+
+        public void Info<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Info(reporting, messageTemplate, new object[] { propertyValue0, propertyValue1 });
+
+        public void Info<T0>(Type reporting, string messageTemplate, T0 propertyValue0)
+            => Info(reporting, messageTemplate, new object[] { propertyValue0 });
+
+        public void Debug<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+            => Debug(reporting, messageTemplate, new object[] { propertyValue0, propertyValue1, propertyValue2 });
+
+        public void Debug<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Debug(reporting, messageTemplate, new object[] { propertyValue0, propertyValue1 });
+
+        public void Debug<T0>(Type reporting, string messageTemplate, T0 propertyValue0)
+            => Debug(reporting, messageTemplate, new object[] { propertyValue0 });
+
+        public void Verbose<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+            => Verbose(reporting, messageTemplate, new object[] { propertyValue0, propertyValue1,propertyValue2 });
+
+        public void Verbose<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Verbose(reporting, messageTemplate, new object[] { propertyValue0, propertyValue1 });
+
+        public void Verbose<T0>(Type reporting, string messageTemplate, T0 propertyValue0)
+            => Verbose(reporting, messageTemplate, new object[] { propertyValue0 });
     }
 }

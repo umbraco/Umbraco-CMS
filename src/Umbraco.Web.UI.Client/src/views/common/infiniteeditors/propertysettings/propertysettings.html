@@ -136,6 +136,21 @@
                                    ng-keypress="vm.submitOnEnter($event)" />
 
                         </div>
+                        <div class="umb-control-group clearfix" ng-if="!model.property.locked">
+
+                            <h5><localize key="contentTypeEditor_displaySettingsHeadline"></localize></h5>
+
+                            <umb-toggle data-element="displaySettings_labelOnTop"
+                                        checked="model.property.labelOnTop"
+                                        on-click="vm.toggleLabelOnTop()"
+                                        label-on="{{vm.labels.displaySettingsLabelOnTop}}"
+                                        label-off="{{vm.labels.displaySettingsLabelOnTop}}"
+                                        show-labels="true"
+                                        label-position="right"
+                                        class="mb1">
+                            </umb-toggle>
+
+                        </div>
                         <div class="umb-control-group clearfix -no-border" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
 
                             <h5><localize key="contentTypeEditor_cultureVariantHeading" /></h5>

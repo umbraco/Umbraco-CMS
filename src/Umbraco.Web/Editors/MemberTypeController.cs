@@ -231,12 +231,24 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<MemberTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/memberTypeSavedHeader"),
+                            Services.TextService.Localize("speechBubbles", "memberTypeSavedHeader"),
                             string.Empty);
 
             return display;
         }
 
+        /// <summary>
+        /// Copy the member type
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostCopy(MoveOrCopy copy)
+        {
+            return PerformCopy(
+                copy,
+                getContentType: i => Services.MemberTypeService.Get(i),
+                doCopy: (type, i) => Services.MemberTypeService.Copy(type, i));
+        }
 
     }
 }

@@ -477,7 +477,7 @@ namespace Umbraco.Core.Services.Implement
             if (media.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IMedia>();
 
             var rootId = Constants.System.RootString;
-            var ids = media.Path.Split(',')
+            var ids = media.Path.Split(Constants.CharArrays.Comma)
                 .Where(x => x != rootId && x != media.Id.ToString(CultureInfo.InvariantCulture))
                 .Select(int.Parse)
                 .ToArray();
@@ -1088,6 +1088,15 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Succeed(evtMsgs);
         }
 
+        public bool RecycleBinSmells()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                return _mediaRepository.RecycleBinSmells();
+            }
+        }
+
         #endregion
 
         #region Others
@@ -1279,7 +1288,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs after change.
         /// </summary>
-        internal static event TypedEventHandler<IMediaService, TreeChange<IMedia>.EventArgs> TreeChanged;
+        public static event TypedEventHandler<IMediaService, TreeChange<IMedia>.EventArgs> TreeChanged;
 
         #endregion
 

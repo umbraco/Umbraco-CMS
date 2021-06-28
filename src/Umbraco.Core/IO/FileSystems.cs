@@ -225,7 +225,7 @@ namespace Umbraco.Core.IO
 
                 _shadowCurrentId = id;
 
-                _logger.Debug<ShadowFileSystems>("Shadow '{ShadowId}'", _shadowCurrentId);
+                _logger.Debug<ShadowFileSystems, string>("Shadow '{ShadowId}'", _shadowCurrentId);
 
                 foreach (var wrapper in _shadowWrappers)
                     wrapper.Shadow(_shadowCurrentId);
@@ -242,7 +242,7 @@ namespace Umbraco.Core.IO
                 if (id != _shadowCurrentId)
                     throw new InvalidOperationException("Not the current shadow.");
 
-                _logger.Debug<ShadowFileSystems>("UnShadow '{ShadowId}' {Status}", id, completed ? "complete" : "abort");
+                _logger.Debug<ShadowFileSystems, string, string>("UnShadow '{ShadowId}' {Status}", id, completed ? "complete" : "abort");
 
                 var exceptions = new List<Exception>();
                 foreach (var wrapper in _shadowWrappers)

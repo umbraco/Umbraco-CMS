@@ -22,8 +22,7 @@
                         text="Type to search"
                         on-change="vm.searchTermChanged()"
                         css-class="w-100"
-                        auto-focus="true"
-                    >
+                        auto-focus="true">
                     </umb-search-filter>
 
                     <umb-load-indicator ng-if="vm.loading === true"></umb-load-indicator>
@@ -33,14 +32,13 @@
                             <h2 class="h5">{{key | umbCmsTitleCase}}</h2>
                             <ul class="umb-card-grid -six-in-row">
                                 <li ng-repeat="dataType in value | orderBy:'name'" data-element="datatype-{{dataType.name}}">
-                                    <button
-                                        type="button"
-                                        class="btn-reset umb-card-grid-item"
-                                        ng-click="vm.viewOptionsForEditor(dataType)"
-                                        title="{{ dataType.name }}">
+                                    <button type="button"
+                                            class="btn-reset umb-card-grid-item"
+                                            ng-click="vm.viewOptionsForEditor(dataType)"
+                                            title="{{dataType.name}}">
                                         <span>
-                                            <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}" aria-hidden="true"></i>
-                                            {{ dataType.name }}
+                                            <umb-icon icon="{{dataType.icon || 'icon-autofill'}}" class="{{dataType.icon || 'icon-autofill'}}"></umb-icon>
+                                            {{dataType.name}}
                                         </span>
                                     </button>
                                 </li>
@@ -62,14 +60,13 @@
                                         <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
                                             <div class="umb-button__progress"></div>
                                         </div>
-                                        <button
-                                            type="button"
-                                            class="btn-reset umb-card-grid-item"
-                                            ng-click="vm.pickDataType(dataType)"
-                                            title="{{ dataType.name }}">
+                                        <button type="button"
+                                                class="btn-reset umb-card-grid-item"
+                                                ng-click="vm.pickDataType(dataType)"
+                                                title="{{dataType.name}}">
                                             <span>
-                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}" aria-hidden="true"></i>
-                                                {{ dataType.name }}
+                                                <umb-icon icon="{{dataType.icon || 'icon-autofill'}}" class="{{dataType.icon || 'icon-autofill'}}"></umb-icon>
+                                                {{dataType.name}}
                                             </span>
                                         </button>
                                     </li>
@@ -84,14 +81,13 @@
                                 <h3 class="h5">{{result.group | umbCmsTitleCase}}</h3>
                                 <ul class="umb-card-grid -six-in-row">
                                     <li ng-repeat="dataType in result.entries | orderBy:'name'">
-                                        <button
-                                            type="button"
-                                            class="btn-reset umb-card-grid-item"
-                                            ng-click="vm.pickEditor(dataType)"
-                                            title="{{ dataType.name }}">
+                                        <button type="button"
+                                                class="btn-reset umb-card-grid-item"
+                                                ng-click="vm.pickEditor(dataType)"
+                                                title="{{dataType.name}}">
                                             <span>
-                                                <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}" aria-hidden="true"></i>
-                                                {{ dataType.name }}
+                                                <umb-icon icon="{{dataType.icon || 'icon-autofill'}}" class="{{dataType.icon || 'icon-autofill'}}"></umb-icon>
+                                                {{dataType.name}}
                                             </span>
                                         </button>
                                     </li>

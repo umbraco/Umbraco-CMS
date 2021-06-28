@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlServerCe;
+using System.Data.SqlTypes;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -210,7 +211,15 @@ namespace Umbraco.Core.Persistence
                             if (IncludeColumn(pocoData, columns[i]))
                             {
                                 var val = columns[i].Value.GetValue(record);
-                                updatableRecord.SetValue(i, val);
+                                if (val is byte[])
+                                {
+                                    var bytes = val as byte[];
+                                    updatableRecord.SetSqlBinary(i, new SqlBinary(bytes));
+                                }
+                                else
+                                {
+                                    updatableRecord.SetValue(i, val);
+                                }
                             }
                         }
                         resultSet.Insert(updatableRecord);

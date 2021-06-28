@@ -879,7 +879,7 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<EntityContainer> GetContainers(TItem item)
         {
-            var ancestorIds = item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();

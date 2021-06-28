@@ -343,7 +343,7 @@ namespace Umbraco.Tests.Services
             }
 
             // Assert
-            Assert.AreEqual(24, contentService.Count());
+            Assert.AreEqual(25, contentService.Count());
         }
 
         [Test]
@@ -1415,7 +1415,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.GetById(NodeDto.NodeIdSeed + 5);
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 6);
 
             // Act
             var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
@@ -1687,7 +1687,7 @@ namespace Umbraco.Tests.Services
 
             Assert.AreNotEqual(-20, content.ParentId);
             Assert.IsFalse(content.Trashed);
-            Assert.AreEqual(3, descendants.Count);
+            Assert.AreEqual(4, descendants.Count);
             Assert.IsFalse(descendants.Any(x => x.Path.StartsWith("-1,-20,")));
             Assert.IsFalse(descendants.Any(x => x.Trashed));
 
@@ -1700,7 +1700,7 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual(-20, content.ParentId);
             Assert.IsTrue(content.Trashed);
-            Assert.AreEqual(3, descendants.Count);
+            Assert.AreEqual(4, descendants.Count);
             Assert.IsTrue(descendants.All(x => x.Path.StartsWith("-1,-20,")));
             Assert.True(descendants.All(x => x.Trashed));
 
@@ -1987,7 +1987,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, contentService.CountChildren(temp.Id));
+            Assert.AreEqual(3, contentService.CountChildren(temp.Id));
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, true, Constants.Security.SuperUserId);
@@ -1997,7 +1997,7 @@ namespace Umbraco.Tests.Services
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
-            Assert.AreEqual(2, contentService.CountChildren(copy.Id));
+            Assert.AreEqual(3, contentService.CountChildren(copy.Id));
 
             var child = contentService.GetById(NodeDto.NodeIdSeed + 3);
             var childCopy = contentService.GetPagedChildren(copy.Id, 0, 500, out var total).First();
@@ -2013,7 +2013,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, contentService.CountChildren(temp.Id));
+            Assert.AreEqual(3, contentService.CountChildren(temp.Id));
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, false, Constants.Security.SuperUserId);
@@ -2470,7 +2470,7 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
             Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
             Assert.That(sut.GetValue<Udi>("contentPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
-            Assert.That(sut.GetValue<Udi>("mediaPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691"))));
+            Assert.That(sut.GetValue("mediapicker3"), Is.EqualTo("[{\"key\": \"8f78ce9e-8fe0-4500-a52d-4c4f35566ba9\",\"mediaKey\": \"44CB39C8-01E5-45EB-9CF8-E70AAF2D1691\",\"crops\": [],\"focalPoint\": {\"left\": 0.5,\"top\": 0.5}}]"));
             Assert.That(sut.GetValue<Udi>("memberPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
             Assert.That(sut.GetValue<string>("multiUrlPicker"), Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
             Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));

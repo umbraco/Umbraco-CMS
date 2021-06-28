@@ -85,7 +85,11 @@ namespace Umbraco.Web.Logging
         public override MiniProfiler Start(string profilerName, MiniProfilerBaseOptions options)
         {
             var first = Interlocked.Exchange(ref _first, 1) == 0;
-            if (first == false) return base.Start(profilerName, options);
+            if (first == false)
+            {
+                var profiler = base.Start(profilerName, options);
+                return profiler;
+            }
 
             _startupProfiler = new MiniProfiler("StartupProfiler", options);
             CurrentProfiler = _startupProfiler;

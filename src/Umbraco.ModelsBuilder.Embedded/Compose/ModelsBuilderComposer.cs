@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -20,14 +21,11 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
     {
         public void Compose(Composition composition)
         {
-            var isLegacyModelsBuilderInstalled = IsLegacyModelsBuilderInstalled();
-
-
             composition.Configs.Add<IModelsBuilderConfig>(() => new ModelsBuilderConfig());
 
-            if (isLegacyModelsBuilderInstalled)
+            if (IsExternalModelsBuilderInstalled() == true)
             {
-                ComposeForLegacyModelsBuilder(composition);
+                ComposeForExternalModelsBuilder(composition);
                 return;
             }
 
@@ -45,22 +43,35 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
                 ComposeForDefaultModelsFactory(composition);
         }
 
-        private static bool IsLegacyModelsBuilderInstalled()
+        private static bool IsExternalModelsBuilderInstalled()
         {
-            Assembly legacyMbAssembly = null;
+            var assemblyNames = new[]
+            {
+                "Umbraco.ModelsBuilder",
+                "ModelsBuilder.Umbraco"
+            };
+
             try
             {
-                legacyMbAssembly = Assembly.Load("Umbraco.ModelsBuilder");
+                foreach (var name in assemblyNames)
+                {
+                    var assembly = Assembly.Load(name);
+
+                    if (assembly != null)
+                    {
+                        return true;
+                    }
+                }
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 //swallow exception, DLL must not be there
             }
 
-            return legacyMbAssembly != null;
+            return false;
         }
 
-        private void ComposeForLegacyModelsBuilder(Composition composition)
+        private void ComposeForExternalModelsBuilder(Composition composition)
         {
             composition.Logger.Info<ModelsBuilderComposer>("ModelsBuilder.Embedded is disabled, the external ModelsBuilder was detected.");
             composition.Components().Append<DisabledModelsBuilderComponent>();
