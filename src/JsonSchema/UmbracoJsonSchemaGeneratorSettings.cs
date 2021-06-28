@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NJsonSchema.Generation;
 
@@ -18,6 +18,8 @@ namespace JsonSchema
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
             SchemaNameGenerator = new NamespacePrefixedSchemaNameGenerator();
             SerializerSettings.Converters.Add(new StringEnumConverter());
+            IgnoreObsoleteProperties = true;
+            GenerateExamples = true;
         }
     }
 }
