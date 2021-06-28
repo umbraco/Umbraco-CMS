@@ -1,5 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using NJsonSchema.Generation;
 
 namespace JsonSchema
@@ -14,10 +18,23 @@ namespace JsonSchema
         public UmbracoJsonSchemaGeneratorSettings()
         {
             AlwaysAllowAdditionalObjectProperties = true;
-            SerializerSettings = new JsonSerializerSettings();
+            SerializerSettings = new JsonSerializerSettings()
+            {
+                ContractResolver =  new WritablePropertiesOnlyResolver()
+            };
             DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
             SchemaNameGenerator = new NamespacePrefixedSchemaNameGenerator();
             SerializerSettings.Converters.Add(new StringEnumConverter());
+
+        }
+
+        private class WritablePropertiesOnlyResolver : DefaultContractResolver
+        {
+            protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+            {
+                IList<JsonProperty> props = base.CreateProperties(type, memberSerialization);
+                return props.Where(p => p.Writable).ToList();
+            }
         }
     }
 }
