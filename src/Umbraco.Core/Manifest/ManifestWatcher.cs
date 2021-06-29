@@ -54,7 +54,7 @@ namespace Umbraco.Core.Manifest
                 if (_isRestarting) return;
 
                 _isRestarting = true;
-                _logger.Info<ManifestWatcher>("Manifest has changed, app pool is restarting ({Path})", e.FullPath);
+                _logger.Info<ManifestWatcher, string>("Manifest has changed, app pool is restarting ({Path})", e.FullPath);
                 HttpRuntime.UnloadAppDomain();
                 Dispose(); // uh? if the app restarts then this should be disposed anyways?
             }

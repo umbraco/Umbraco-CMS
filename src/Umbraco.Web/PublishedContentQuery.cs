@@ -16,7 +16,7 @@ namespace Umbraco.Web
     /// <summary>
     /// A class used to query for published content, media items
     /// </summary>
-    public class PublishedContentQuery : IPublishedContentQuery
+    public class PublishedContentQuery : IPublishedContentQuery2
     {
         private readonly IPublishedSnapshot _publishedSnapshot;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -190,6 +190,10 @@ namespace Umbraco.Web
 
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
+            => Search(term, skip, take, out totalRecords, culture, indexName, null);
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null)
         {
             if (skip < 0)
             {
@@ -212,7 +216,7 @@ namespace Umbraco.Web
             }
 
             var query = umbIndex.GetSearcher().CreateQuery(IndexTypes.Content);
-
+            
             IQueryExecutor queryExecutor;
             if (culture == "*")
             {
@@ -230,6 +234,10 @@ namespace Umbraco.Web
                 // Only search the specified culture
                 var fields = umbIndex.GetCultureAndInvariantFields(culture).ToArray(); // Get all index fields suffixed with the culture name supplied
                 queryExecutor = query.ManagedQuery(term, fields);
+            }
+            if (loadedFields != null && queryExecutor is IBooleanOperation booleanOperation)
+            {
+                queryExecutor = booleanOperation.SelectFields(loadedFields);
             }
 
             var results = skip == 0 && take == 0

@@ -59,12 +59,12 @@
                     <style>
                     @import "${model.stylesheet}"
                     </style>
-                    <div ng-include="'${model.view}'"></div>
+                    <div class="umb-block-list__block--view" ng-include="'${model.view}'"></div>
                 `;
                 $compile(shadowRoot)($scope);
             }
             else {
-                $element.append($compile('<div ng-include="model.view"></div>')($scope));
+                $element.append($compile('<div class="umb-block-list__block--view" ng-include="model.view"></div>')($scope));
             }
         };
 
@@ -78,7 +78,7 @@
                 model.block.index = index;
                 model.block.updateLabel();
             }
-        }
+        };
     }
 
 

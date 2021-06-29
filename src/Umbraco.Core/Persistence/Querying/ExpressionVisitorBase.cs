@@ -328,8 +328,11 @@ namespace Umbraco.Core.Persistence.Querying
             {
                 case ExpressionType.MemberAccess:
                     // false property , i.e. x => !Trashed
-                    SqlParameters.Add(true);
-                    return Visited ? string.Empty : $"NOT ({o} = @{SqlParameters.Count - 1})";
+                    // BUT we don't want to do a NOT SQL statement since this generally results in indexes not being used
+                    // so we want to do an == false
+                    SqlParameters.Add(false);
+                    return Visited ? string.Empty : $"{o} = @{SqlParameters.Count - 1}";
+                    //return Visited ? string.Empty : $"NOT ({o} = @{SqlParameters.Count - 1})";
                 default:
                     // could be anything else, such as: x => !x.Path.StartsWith("-20")
                     return Visited ? string.Empty : string.Concat("NOT (", o, ")");

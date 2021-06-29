@@ -98,7 +98,7 @@ namespace Umbraco.Core.Runtime
                     HostingEnvironment.ApplicationID,
                     HostingEnvironment.ApplicationPhysicalPath,
                     NetworkHelper.MachineName);
-                logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+                logger.Debug<CoreRuntime, string>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
                 ConfigureUnhandledException();
@@ -227,7 +227,13 @@ namespace Umbraco.Core.Runtime
                     {
                         _factory = Current.Factory = composition?.CreateFactory();
                     }
-                    catch { /* yea */ }
+                    catch
+                    {
+                        // In this case we are basically dead, we do not have a factory but we need
+                        // to report on the state so we need to manually set that, this is the only time
+                        // we ever do this.
+                        Current.RuntimeState = _state;
+                    }
                 }
 
                 Debugger.Break();
@@ -359,7 +365,7 @@ namespace Umbraco.Core.Runtime
                 {
                     _state.DetermineRuntimeLevel(databaseFactory);
 
-                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
+                    profilingLogger.Debug<CoreRuntime,RuntimeLevel,RuntimeLevelReason>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
 
                     if (_state.Level == RuntimeLevel.Upgrade)
                     {

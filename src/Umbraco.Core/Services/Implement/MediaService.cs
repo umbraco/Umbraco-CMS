@@ -1088,6 +1088,15 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Succeed(evtMsgs);
         }
 
+        public bool RecycleBinSmells()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                return _mediaRepository.RecycleBinSmells();
+            }
+        }
+
         #endregion
 
         #region Others
@@ -1279,7 +1288,7 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Occurs after change.
         /// </summary>
-        internal static event TypedEventHandler<IMediaService, TreeChange<IMedia>.EventArgs> TreeChanged;
+        public static event TypedEventHandler<IMediaService, TreeChange<IMedia>.EventArgs> TreeChanged;
 
         #endregion
 

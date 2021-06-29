@@ -39,7 +39,8 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
 
             //if sections were added we need to check that the current user has access to that section
-            isAuthorized = authHelper.AuthorizeSectionChanges(Security.CurrentUser,
+            isAuthorized = authHelper.AuthorizeSectionChanges(
+                Security.CurrentUser,
                 userGroupSave.PersistedUserGroup.AllowedSections,
                 userGroupSave.Sections);
             if (isAuthorized == false)
@@ -56,6 +57,9 @@ namespace Umbraco.Web.Editors
 
             //need to ensure current user is in a group if not an admin to avoid a 401
             EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
+
+            //map the model to the persisted instance
+            Mapper.Map(userGroupSave, userGroupSave.PersistedUserGroup);
 
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
@@ -82,7 +86,7 @@ namespace Umbraco.Web.Editors
 
             var display = Mapper.Map<UserGroupDisplay>(userGroupSave.PersistedUserGroup);
 
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserGroupSaved"));
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", "operationSavedHeader"), Services.TextService.Localize("speechBubbles", "editUserGroupSaved"));
             return display;
         }
 
@@ -167,9 +171,9 @@ namespace Umbraco.Web.Editors
             }
             if (userGroups.Length > 1)
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
+                    Services.TextService.Localize("speechBubbles", "deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/deleteUserGroupSuccess", new[] {userGroups[0].Name}));
+                Services.TextService.Localize("speechBubbles", "deleteUserGroupSuccess", new[] {userGroups[0].Name}));
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Web.Compilation;
 using System.Web.Hosting;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
-
+using Umbraco.Core.Logging;
 namespace Umbraco.Core.Composing
 {
     /// <summary>
@@ -441,7 +441,7 @@ namespace Umbraco.Core.Composing
                     }
                     catch (TypeLoadException ex)
                     {
-                        Current.Logger.Error(typeof(TypeFinder), ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
+                        Current.Logger.Error<Assembly>(typeof(TypeFinder), ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
                         continue;
                     }
 
@@ -507,7 +507,7 @@ namespace Umbraco.Core.Composing
                     }
                     catch (TypeLoadException ex)
                     {
-                        Current.Logger.Error(typeof(TypeFinder), ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
+                        Current.Logger.Error<Assembly>(typeof(TypeFinder), ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
                         continue;
                     }
 

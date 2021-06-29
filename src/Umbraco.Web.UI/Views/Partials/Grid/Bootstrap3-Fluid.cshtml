@@ -6,7 +6,7 @@
     Razor helpers located at the bottom of this file
 *@
 
-@if (Model != null && Model.sections != null)
+@if (Model != null && Model.GetType() == typeof(JObject) && Model.sections != null)
 {
     var oneColumn = ((System.Collections.ICollection)Model.sections).Count == 1;
 

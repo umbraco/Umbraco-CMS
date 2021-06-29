@@ -56,11 +56,11 @@ namespace Umbraco.Web.Routing
 
             if (template == null)
             {
-                Logger.Debug<ContentFinderByUrlAndTemplate>("Not a valid template: '{TemplateAlias}'", templateAlias);
+                Logger.Debug<ContentFinderByUrlAndTemplate, string>("Not a valid template: '{TemplateAlias}'", templateAlias);
                 return false;
             }
 
-            Logger.Debug<ContentFinderByUrlAndTemplate>("Valid template: '{TemplateAlias}'", templateAlias);
+            Logger.Debug<ContentFinderByUrlAndTemplate, string>("Valid template: '{TemplateAlias}'", templateAlias);
 
             // look for node corresponding to the rest of the route
             var route = frequest.HasDomain ? (frequest.Domain.ContentId + path) : path;
@@ -68,14 +68,14 @@ namespace Umbraco.Web.Routing
 
             if (node == null)
             {
-                Logger.Debug<ContentFinderByUrlAndTemplate>("Not a valid route to node: '{Route}'", route);
+                Logger.Debug<ContentFinderByUrlAndTemplate, string>("Not a valid route to node: '{Route}'", route);
                 return false;
             }
 
             // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
             if (!node.IsAllowedTemplate(template.Id))
             {
-                Logger.Warn<ContentFinderByUrlAndTemplate>("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
+                Logger.Warn<ContentFinderByUrlAndTemplate, string,int>("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
                 frequest.PublishedContent = null; // clear
                 return false;
             }
