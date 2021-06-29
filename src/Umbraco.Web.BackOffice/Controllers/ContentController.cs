@@ -22,6 +22,7 @@ using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -66,6 +67,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
         private readonly ILogger<ContentController> _logger;
+        private readonly IScopeProvider _scopeProvider;
 
         public object Domains { get; private set; }
 
@@ -90,6 +92,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ActionCollection actionCollection,
             ISqlContext sqlContext,
             IJsonSerializer serializer,
+            IScopeProvider scopeProvider,
             IAuthorizationService authorizationService)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
@@ -110,7 +113,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _sqlContext = sqlContext;
             _authorizationService = authorizationService;
             _logger = loggerFactory.CreateLogger<ContentController>();
-
+            _scopeProvider = scopeProvider;
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
         }
 
@@ -395,13 +398,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         public ActionResult<ContentItemDisplay> GetEmptyByKey(Guid contentTypeKey, int parentId)
         {
-            var contentType = _contentTypeService.Get(contentTypeKey);
-            if (contentType == null)
+            using (var scope = _scopeProvider.CreateScope())
             {
-                return NotFound();
-            }
+                var contentType = _contentTypeService.Get(contentTypeKey);
+                if (contentType == null)
+                {
+                    return NotFound();
+                }
 
-            return GetEmptyInner(contentType, parentId);
+                var contentItem = GetEmptyInner(contentType, parentId);
+                scope.Complete();
+
+                return contentItem;
+            }
         }
 
         private ContentItemDisplay GetEmptyInner(IContentType contentType, int parentId)
@@ -418,6 +427,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
 
             return mapped;
+        }
+
+        /// <summary>
+        /// Gets a collection of empty content items for all document types.
+        /// </summary>
+        /// <param name="contentTypeKeys"></param>
+        /// <param name="parentId"></param>
+        [OutgoingEditorModelEvent]
+        public ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeys([FromQuery] Guid[] contentTypeKeys, [FromQuery] int parentId)
+        {
+            var result = new Dictionary<Guid, ContentItemDisplay>();
+
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = _contentTypeService.GetAll(contentTypeKeys).ToList();
+
+            foreach (var contentType in contentTypes)
+            {
+                if (contentType is null)
+                {
+                    return NotFound();
+                }
+
+                result.Add(contentType.Key, GetEmptyInner(contentType, parentId));
+            }
+
+            return result;
         }
 
         [OutgoingEditorModelEvent]

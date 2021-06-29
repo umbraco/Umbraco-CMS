@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
         /// <summary>
         /// Adds new External Login token table
         /// </summary>
-        public override void Migrate()
+        protected override void Migrate()
         {
             IEnumerable<string> tables = SqlSyntax.GetTablesInSchema(Context.Database);
             if (tables.InvariantContains(ExternalLoginTokenDto.TableName))

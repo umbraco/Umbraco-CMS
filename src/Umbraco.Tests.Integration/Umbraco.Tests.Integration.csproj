@@ -12,11 +12,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="App_Data\**" />
       <Compile Remove="TEMP\**" />
+      <Compile Remove="Umbraco\**" />
+      <EmbeddedResource Remove="App_Data\**" />
       <EmbeddedResource Remove="TEMP\**" />
+      <EmbeddedResource Remove="Umbraco\**" />
+      <None Remove="App_Data\**" />
       <None Remove="TEMP\**" />
       <Compile Remove="Views\**" />
       <EmbeddedResource Remove="Views\**" />
+      <None Remove="Umbraco\**" />
       <None Remove="Views\**" />
       <None Remove="create_slicing_filter_condition.sh" />
       <None Remove="Umbraco.Examine.Lucene\UmbracoExamine\TestFiles\media.xml" />
@@ -66,10 +72,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Examine.Lucene" Version="2.0.0-beta.150" />
+        <PackageReference Include="Examine.Lucene" Version="2.0.0-beta.154" />
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.6" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.7" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
         <PackageReference Include="Moq" Version="4.16.1" />
         <PackageReference Include="NUnit" Version="3.13.1" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">
@@ -78,10 +84,6 @@
         </PackageReference>
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
         <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Umbraco\logs" />
     </ItemGroup>
 
     <ItemGroup>

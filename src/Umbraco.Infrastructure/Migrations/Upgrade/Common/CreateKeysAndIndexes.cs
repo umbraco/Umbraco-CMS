@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common
 {
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // remove those that may already have keys
             Delete.KeysAndIndexes(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue).Do();

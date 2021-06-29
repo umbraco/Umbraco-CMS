@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 using Type = System.Type;
 
@@ -68,7 +70,7 @@ namespace Umbraco.Cms.Core.Migrations
                 throw new ArgumentException("Source and target state cannot be identical.");
             if (migration == null)
                 throw new ArgumentNullException(nameof(migration));
-            if (!migration.Implements<IMigration>())
+            if (!migration.Implements<MigrationBase>())
                 throw new ArgumentException($"Type {migration.Name} does not implement IMigration.", nameof(migration));
 
             sourceState = sourceState.Trim();
@@ -108,7 +110,7 @@ namespace Umbraco.Cms.Core.Migrations
         /// Adds a transition to a target state through a migration.
         /// </summary>
         public MigrationPlan To<TMigration>(string targetState)
-            where TMigration : IMigration
+            where TMigration : MigrationBase
             => To(targetState, typeof(TMigration));
 
         public MigrationPlan To<TMigration>(Guid targetState)
@@ -141,8 +143,8 @@ namespace Umbraco.Cms.Core.Migrations
         /// <param name="recoverState">The previous target state, which we need to recover from through <typeparamref name="TMigrationRecover"/>.</param>
         /// <param name="targetState">The new target state.</param>
         public MigrationPlan ToWithReplace<TMigrationNew, TMigrationRecover>(string recoverState, string targetState)
-            where TMigrationNew : IMigration
-            where TMigrationRecover : IMigration
+            where TMigrationNew : MigrationBase
+            where TMigrationRecover : MigrationBase
         {
             To<TMigrationNew>(targetState);
             From(recoverState).To<TMigrationRecover>(targetState);
@@ -156,7 +158,7 @@ namespace Umbraco.Cms.Core.Migrations
         /// <param name="recoverState">The previous target state, which we can recover from directly.</param>
         /// <param name="targetState">The new target state.</param>
         public MigrationPlan ToWithReplace<TMigrationNew>(string recoverState, string targetState)
-            where TMigrationNew : IMigration
+            where TMigrationNew : MigrationBase
         {
             To<TMigrationNew>(targetState);
             From(recoverState).To(targetState);
@@ -213,7 +215,7 @@ namespace Umbraco.Cms.Core.Migrations
         /// Adds a post-migration to the plan.
         /// </summary>
         public virtual MigrationPlan AddPostMigration<TMigration>()
-            where TMigration : IMigration
+            where TMigration : MigrationBase
         {
             _postMigrationTypes.Add(typeof(TMigration));
             return this;

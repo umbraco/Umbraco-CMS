@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     // no matter what the level is run for package migrations.
                     // they either run unattended, or only manually via the back office.
                     Level = RuntimeLevel.Run;
-                    
+
                     if (_unattendedSettings.Value.PackageMigrationsUnattended)
                     {
                         _logger.LogDebug("Package migrations need to execute.");
@@ -163,9 +163,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 case UmbracoDatabaseState.Ok:
                 default:
                 {
-                    // if we already know we want to upgrade, exit here
-                    if (Level == RuntimeLevel.Upgrade)
-                        return;
+
 
                     // the database version matches the code & files version, all clear, can run
                     Level = RuntimeLevel.Run;

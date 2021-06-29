@@ -6,7 +6,7 @@
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // all v7.14 tables
             var tables = new[]

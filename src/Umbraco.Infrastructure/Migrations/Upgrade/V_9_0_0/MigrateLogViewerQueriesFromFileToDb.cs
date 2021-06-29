@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             CreateDatabaseTable();
             MigrateFileContentToDB();

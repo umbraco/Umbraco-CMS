@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Benchmarks
 
         public SqlTemplatesBenchmark()
         {
-            var mappers = new NPoco.MapperCollection { new PocoMapper() };
+            var mappers = new NPoco.MapperCollection( );
             var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
 
             SqlContext = new SqlContext(new SqlCeSyntaxProvider(Options.Create(new GlobalSettings())), DatabaseType.SQLCe, factory);

@@ -290,6 +290,8 @@ namespace Umbraco.Web
         {
             var exception = Server.GetLastError();
 
+            if (exception == null) return;
+
             // ignore HTTP errors
             if (exception.GetType() == typeof(HttpException)) return;
 

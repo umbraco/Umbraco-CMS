@@ -47,6 +47,7 @@ using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -68,6 +69,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
             builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
             builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
+            builder.NPocoMappers().Add<NullableDateMapper>();
+
             builder.Services.AddUnique<IRuntimeState, RuntimeState>();
             builder.Services.AddUnique<IRuntime, CoreRuntime>();
             builder.Services.AddUnique<PendingPackageMigrations>();
@@ -212,9 +215,18 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 var databaseSchemaCreatorFactory = factory.GetRequiredService<DatabaseSchemaCreatorFactory>();
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
+                var npocoMappers = factory.GetRequiredService<NPocoMapperCollection>();
 
                 return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
-                    ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment, databaseSchemaCreatorFactory)
+                    ? (IMainDomLock)new SqlMainDomLock(
+                            loggerFactory.CreateLogger<SqlMainDomLock>(),
+                            loggerFactory,
+                            globalSettings,
+                            connectionStrings,
+                            dbCreator,
+                            hostingEnvironment,
+                            databaseSchemaCreatorFactory,
+                            npocoMappers)
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
             });
 

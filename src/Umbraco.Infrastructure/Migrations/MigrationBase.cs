@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete;
@@ -16,16 +16,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations
     /// <summary>
     /// Provides a base class to all migrations.
     /// </summary>
-    public abstract partial class MigrationBase : IMigration
+    public abstract partial class MigrationBase : IDiscoverable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationBase"/> class.
         /// </summary>
         /// <param name="context">A migration context.</param>
         protected MigrationBase(IMigrationContext context)
-        {
-            Context = context;
-        }
+            => Context = context;
 
         /// <summary>
         /// Gets the migration context.
@@ -65,17 +63,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// <summary>
         /// Executes the migration.
         /// </summary>
-        public abstract void Migrate();
+        protected abstract void Migrate();
 
-        /// <inheritdoc />
-        void IMigration.Migrate()
+        /// <summary>
+        /// Runs the migration.
+        /// </summary>
+        public void Run()
         {
             Migrate();
 
             // ensure there is no building expression
             // ie we did not forget to .Do() an expression
             if (Context.BuildingExpression)
+            {
                 throw new IncompleteMigrationExpressionException("The migration has run, but leaves an expression that has not run.");
+            }
         }
 
         // ensures we are not already building,

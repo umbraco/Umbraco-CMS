@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q, packageResource, localStorageService, localizationService) {
+    function PackagesRepoController($scope, $timeout, ourPackageRepositoryResource, $q, packageResource, localStorageService, localizationService) {
 
         var vm = this;
 
@@ -50,7 +50,9 @@
             $q.all([
                 ourPackageRepositoryResource.getCategories()
                     .then(function (cats) {
-                        vm.categories = cats;
+                        vm.categories = cats.filter(function (cat) {
+                            return cat.name !== "Umbraco Pro";
+                        });
                     }),
                 ourPackageRepositoryResource.getPopular(8)
                     .then(function (pack) {

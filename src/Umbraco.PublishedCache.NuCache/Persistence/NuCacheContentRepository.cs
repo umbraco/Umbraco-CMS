@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NPoco;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -16,7 +18,6 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
-using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -25,13 +26,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 {
     public class NuCacheContentRepository : RepositoryBase, INuCacheContentRepository
     {
-        private const int PageSize = 500;
         private readonly ILogger<NuCacheContentRepository> _logger;
         private readonly IMemberRepository _memberRepository;
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
+        private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
+        private readonly IOptions<NuCacheSettings> _nucacheSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NuCacheContentRepository"/> class.
@@ -44,7 +46,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
             IDocumentRepository documentRepository,
             IMediaRepository mediaRepository,
             IShortStringHelper shortStringHelper,
-            UrlSegmentProviderCollection urlSegmentProviders)
+            UrlSegmentProviderCollection urlSegmentProviders,
+            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory,
+            IOptions<NuCacheSettings> nucacheSettings)
             : base(scopeAccessor, appCaches)
         {
             _logger = logger;
@@ -53,6 +57,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
             _mediaRepository = mediaRepository;
             _shortStringHelper = shortStringHelper;
             _urlSegmentProviders = urlSegmentProviders;
+            _contentCacheDataSerializerFactory = contentCacheDataSerializerFactory;
+            _nucacheSettings = nucacheSettings;
         }
 
         public void DeleteContentItem(IContentBase item)
@@ -60,8 +66,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 
         public void RefreshContent(IContent content)
         {
+            IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+
             // always refresh the edited data
-            OnRepositoryRefreshed(content, false);
+            OnRepositoryRefreshed(serializer, content, false);
 
             if (content.PublishedState == PublishedState.Unpublishing)
             {
@@ -71,24 +79,36 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
             else if (content.PublishedState == PublishedState.Publishing)
             {
                 // if publishing, refresh the published data
-                OnRepositoryRefreshed(content, true);
+                OnRepositoryRefreshed(serializer, content, true);
             }
         }
 
-        public void RefreshEntity(IContentBase content)
-            => OnRepositoryRefreshed(content, false);
+        public void RefreshMedia(IMedia media)
+        {
+            IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
-        private void OnRepositoryRefreshed(IContentBase content, bool published)
+            OnRepositoryRefreshed(serializer, media, false);
+        }
+
+        public void RefreshMember(IMember member)
+        {
+            IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Member);
+
+            OnRepositoryRefreshed(serializer, member, false);
+        }
+
+        private void OnRepositoryRefreshed(IContentCacheDataSerializer serializer, IContentBase content, bool published)
         {
             // use a custom SQL to update row version on each update
             // db.InsertOrUpdate(dto);
-            ContentNuDto dto = GetDto(content, published);
+            ContentNuDto dto = GetDto(content, published, serializer);
 
             Database.InsertOrUpdate(
                 dto,
-                "SET data=@data, rv=rv+1 WHERE nodeId=@id AND published=@published",
+                "SET data=@data, dataRaw=@dataRaw, rv=rv+1 WHERE nodeId=@id AND published=@published",
                 new
                 {
+                    dataRaw = dto.RawData ?? Array.Empty<byte>(),
                     data = dto.Data,
                     id = dto.NodeId,
                     published = dto.Published
@@ -96,29 +116,24 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         }
 
         public void Rebuild(
-            int groupSize = 5000,
             IReadOnlyCollection<int> contentTypeIds = null,
             IReadOnlyCollection<int> mediaTypeIds = null,
             IReadOnlyCollection<int> memberTypeIds = null)
         {
-            if (contentTypeIds != null)
-            {
-                RebuildContentDbCache(groupSize, contentTypeIds);
-            }
+            IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(
+                ContentCacheDataSerializerEntityType.Document
+                | ContentCacheDataSerializerEntityType.Media
+                | ContentCacheDataSerializerEntityType.Member);
 
-            if (mediaTypeIds != null)
-            {
-                RebuildContentDbCache(groupSize, mediaTypeIds);
-            }
+            RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
+            RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
+            RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
 
-            if (memberTypeIds != null)
-            {
-                RebuildContentDbCache(groupSize, memberTypeIds);
-            }
+
         }
 
         // assumes content tree lock
-        private void RebuildContentDbCache(int groupSize, IReadOnlyCollection<int> contentTypeIds)
+        private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int> contentTypeIds)
         {
             Guid contentObjectType = Constants.ObjectTypes.Document;
 
@@ -167,12 +182,12 @@ WHERE cmsContentNu.nodeId IN (
                 foreach (IContent c in descendants)
                 {
                     // always the edited version
-                    items.Add(GetDto(c, false));
+                    items.Add(GetDto(c, false, serializer));
 
                     // and also the published version if it makes any sense
                     if (c.Published)
                     {
-                        items.Add(GetDto(c, true));
+                        items.Add(GetDto(c, true, serializer));
                     }
 
                     count++;
@@ -184,7 +199,7 @@ WHERE cmsContentNu.nodeId IN (
         }
 
         // assumes media tree lock
-        private void RebuildMediaDbCache(int groupSize, IReadOnlyCollection<int> contentTypeIds)
+        private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int> contentTypeIds)
         {
             var mediaObjectType = Constants.ObjectTypes.Media;
 
@@ -228,14 +243,14 @@ WHERE cmsContentNu.nodeId IN (
             {
                 // the tree is locked, counting and comparing to total is safe
                 var descendants = _mediaRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                var items = descendants.Select(m => GetDto(m, false)).ToList();
+                var items = descendants.Select(m => GetDto(m, false, serializer)).ToList();
                 Database.BulkInsertRecords(items);
                 processed += items.Count;
             } while (processed < total);
         }
 
         // assumes member tree lock
-        private void RebuildMemberDbCache(int groupSize, IReadOnlyCollection<int> contentTypeIds)
+        private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int> contentTypeIds)
         {
             Guid memberObjectType = Constants.ObjectTypes.Member;
 
@@ -278,7 +293,7 @@ WHERE cmsContentNu.nodeId IN (
             do
             {
                 IEnumerable<IMember> descendants = _memberRepository.GetPage(query, pageIndex++, groupSize, out total, null, Ordering.By("Path"));
-                ContentNuDto[] items = descendants.Select(m => GetDto(m, false)).ToArray();
+                ContentNuDto[] items = descendants.Select(m => GetDto(m, false, serializer)).ToArray();
                 Database.BulkInsertRecords(items);
                 processed += items.Length;
             } while (processed < total);
@@ -338,7 +353,7 @@ AND cmsContentNu.nodeId IS NULL
             return count == 0;
         }
 
-        private ContentNuDto GetDto(IContentBase content, bool published)
+        private ContentNuDto GetDto(IContentBase content, bool published, IContentCacheDataSerializer serializer)
         {
             // should inject these in ctor
             // BUT for the time being we decide not to support ConvertDbToXml/String
@@ -393,32 +408,31 @@ AND cmsContentNu.nodeId IS NULL
             }
 
             // the dictionary that will be serialized
-            var nestedData = new ContentNestedData
+            var contentCacheData = new ContentCacheDataModel
             {
                 PropertyData = propertyData,
                 CultureData = cultureData,
                 UrlSegment = content.GetUrlSegment(_shortStringHelper, _urlSegmentProviders)
             };
 
+            var serialized = serializer.Serialize(ReadOnlyContentBaseAdapter.Create(content), contentCacheData);
+
             var dto = new ContentNuDto
             {
                 NodeId = content.Id,
                 Published = published,
-
-                // note that numeric values (which are Int32) are serialized without their
-                // type (eg "value":1234) and JsonConvert by default deserializes them as Int64
-                Data = JsonConvert.SerializeObject(nestedData)
+                Data = serialized.StringData,
+                RawData = serialized.ByteData
             };
 
             return dto;
         }
 
         // we want arrays, we want them all loaded, not an enumerable
-        private Sql<ISqlContext> ContentSourcesSelect(Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
+        private Sql<ISqlContext> SqlContentSourcesSelect(Func<ISqlContext, Sql<ISqlContext>> joins = null)
         {
-            var sql = Sql()
-
-                .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
+            var sqlTemplate = SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesSelect, tsql =>
+                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Key"),
                     x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
                     x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
@@ -433,12 +447,17 @@ AND cmsContentNu.nodeId IS NULL
                 .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
                 .AndSelect<ContentNuDto>("nuPub", x => Alias(x.Data, "PubData"))
 
-                .From<NodeDto>();
+                .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
+                .AndSelect<ContentNuDto>("nuPub", x => Alias(x.RawData, "PubDataRaw"))
+
+                .From<NodeDto>());
+
+            var sql = sqlTemplate.Sql();
+
+            // TODO: I'm unsure how we can format the below into SQL templates also because right.Current and right.Published end up being parameters
 
             if (joins != null)
-            {
-                sql = joins(sql);
-            }
+                sql = sql.Append(joins(sql.SqlContext));
 
             sql = sql
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
@@ -448,94 +467,118 @@ AND cmsContentNu.nodeId IS NULL
                 .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
 
                 .LeftJoin<ContentVersionDto>(j =>
-                    j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcver", "pdver"), "pcver")
+                    j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"), "pcver")
                 .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
 
-                .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && !right.Published, aliasRight: "nuEdit")
-                .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published, aliasRight: "nuPub");
+                .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
+                .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub");
 
             return sql;
         }
 
-        public ContentNodeKit GetContentSource(int id)
+        private Sql<ISqlContext> SqlContentSourcesSelectUmbracoNodeJoin(ISqlContext sqlContext)
         {
-            var sql = ContentSourcesSelect()
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && x.NodeId == id && !x.Trashed)
-                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            var syntax = sqlContext.SqlSyntax;
 
-            var dto = Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
-            return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
+            var sqlTemplate = sqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.SourcesSelectUmbracoNodeJoin, builder =>
+                builder.InnerJoin<NodeDto>("x")
+                    .On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"));
+
+            var sql = sqlTemplate.Sql();
+            return sql;
         }
 
-        public IEnumerable<ContentNodeKit> GetAllContentSources()
+        private Sql<ISqlContext> SqlWhereNodeId(ISqlContext sqlContext, int id)
         {
-            var sql = ContentSourcesSelect()
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
-                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            var syntax = sqlContext.SqlSyntax;
 
-            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
-            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+            var sqlTemplate = sqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeId, builder =>
+                builder.Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("id")));
 
-            foreach (var row in Database.QueryPaged<ContentSourceDto>(PageSize, sql))
-            {
-                yield return CreateContentNodeKit(row);
-            }
+            var sql = sqlTemplate.Sql(id);
+            return sql;
         }
 
-        public IEnumerable<ContentNodeKit> GetBranchContentSources(int id)
+        private Sql<ISqlContext> SqlWhereNodeIdX(ISqlContext sqlContext, int id)
         {
-            var syntax = SqlSyntax;
-            var sql = ContentSourcesSelect(
-                s => s.InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
-                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
-                    .Where<NodeDto>(x => x.NodeId == id, "x")
-                    .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            var syntax = sqlContext.SqlSyntax;
 
-            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
-            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+            var sqlTemplate = sqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.WhereNodeIdX, s =>
+                s.Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("id"), "x"));
 
-            foreach (var row in Database.QueryPaged<ContentSourceDto>(PageSize, sql))
-            {
-                yield return CreateContentNodeKit(row);
-            }
+            var sql = sqlTemplate.Sql(id);
+            return sql;
         }
 
-        public IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int> ids)
+        private Sql<ISqlContext> SqlOrderByLevelIdSortOrder(ISqlContext sqlContext)
         {
-            if (!ids.Any())
-                yield break;
+            var syntax = sqlContext.SqlSyntax;
 
-            var sql = ContentSourcesSelect()
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document && !x.Trashed)
-                .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
-                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            var sqlTemplate = sqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.OrderByLevelIdSortOrder, s =>
+                s.OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder));
 
-            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
-            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
-
-            foreach (var row in Database.QueryPaged<ContentSourceDto>(PageSize, sql))
-            {
-                yield return CreateContentNodeKit(row);
-            }
+            var sql = sqlTemplate.Sql();
+            return sql;
         }
 
-        private Sql<ISqlContext> MediaSourcesSelect(Func<Sql<ISqlContext>, Sql<ISqlContext>> joins = null)
+        private Sql<ISqlContext> SqlObjectTypeNotTrashed(ISqlContext sqlContext, Guid nodeObjectType)
         {
-            var sql = Sql()
+            var syntax = sqlContext.SqlSyntax;
 
-                .Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Uid"),
+            var sqlTemplate = sqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ObjectTypeNotTrashedFilter, s =>
+                s.Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid?>("nodeObjectType") && x.Trashed == SqlTemplate.Arg<bool>("trashed")));
+
+            var sql = sqlTemplate.Sql(nodeObjectType, false);
+            return sql;
+        }
+
+        /// <summary>
+        /// Returns a slightly more optimized query to use for the document counting when paging over the content sources
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <returns></returns>
+        private Sql<ISqlContext> SqlContentSourcesCount(Func<ISqlContext, Sql<ISqlContext>> joins = null)
+        {
+            var sqlTemplate = SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.ContentSourcesCount, tsql =>
+                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"))
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                    .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId));
+
+            var sql = sqlTemplate.Sql();
+
+            if (joins != null)
+                sql = sql.Append(joins(sql.SqlContext));
+
+            // TODO: We can't use a template with this one because of the 'right.Current' and 'right.Published' ends up being a parameter so not sure how we can do that
+            sql = sql
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+                .LeftJoin<ContentVersionDto>(j =>
+                        j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcver", "pdver"), "pcver")
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver");
+
+            return sql;
+        }
+
+        private Sql<ISqlContext> SqlMediaSourcesSelect(Func<ISqlContext, Sql<ISqlContext>> joins = null)
+        {
+            var sqlTemplate = SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.MediaSourcesSelect, tsql =>
+                tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id"), x => Alias(x.UniqueId, "Key"),
                     x => Alias(x.Level, "Level"), x => Alias(x.Path, "Path"), x => Alias(x.SortOrder, "SortOrder"), x => Alias(x.ParentId, "ParentId"),
                     x => Alias(x.CreateDate, "CreateDate"), x => Alias(x.UserId, "CreatorId"))
                 .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
                 .AndSelect<ContentVersionDto>(x => Alias(x.Id, "VersionId"), x => Alias(x.Text, "EditName"), x => Alias(x.VersionDate, "EditVersionDate"), x => Alias(x.UserId, "EditWriterId"))
                 .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
-                .From<NodeDto>();
+                .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
+                .From<NodeDto>());
+
+            var sql = sqlTemplate.Sql();
 
             if (joins != null)
-            {
-                sql = joins(sql);
-            }
+                sql = sql.Append(joins(sql.SqlContext));
 
+            // TODO: We can't use a template with this one because of the 'right.Published' ends up being a parameter so not sure how we can do that
             sql = sql
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                 .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
@@ -544,78 +587,226 @@ AND cmsContentNu.nodeId IS NULL
             return sql;
         }
 
-        public ContentNodeKit GetMediaSource(int id)
+        private Sql<ISqlContext> SqlMediaSourcesCount(Func<ISqlContext, Sql<ISqlContext>> joins = null)
         {
-            var sql = MediaSourcesSelect()
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && x.NodeId == id && !x.Trashed)
-                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            var sqlTemplate = SqlContext.Templates.Get(Constants.SqlTemplates.NuCacheDatabaseDataSource.MediaSourcesCount, tsql =>
+               tsql.Select<NodeDto>(x => Alias(x.NodeId, "Id")).From<NodeDto>());
 
-            var dto = Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
-            return dto == null ? new ContentNodeKit() : CreateMediaNodeKit(dto);
+            var sql = sqlTemplate.Sql();
+
+            if (joins != null)
+                sql = sql.Append(joins(sql.SqlContext));
+
+            // TODO: We can't use a template with this one because of the 'right.Current' ends up being a parameter so not sure how we can do that
+            sql = sql
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current);
+
+            return sql;
         }
 
-        public IEnumerable<ContentNodeKit> GetAllMediaSources()
+        public ContentNodeKit GetContentSource(int id)
         {
-            var sql = MediaSourcesSelect()
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
-                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            var sql = SqlContentSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+                .Append(SqlWhereNodeId(SqlContext, id))
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+            var dto = Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
+
+            if (dto == null) return ContentNodeKit.Empty;
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+            return CreateContentNodeKit(dto, serializer);
+        }
+
+        public IEnumerable<ContentNodeKit> GetAllContentSources()
+        {
+            var sql = SqlContentSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+            // Use a more efficient COUNT query
+            var sqlCountQuery = SqlContentSourcesCount()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document));
+
+            var sqlCount = SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            foreach (var row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
             {
-                yield return CreateMediaNodeKit(row);
+                yield return CreateContentNodeKit(row, serializer);
+            }
+        }
+
+        public IEnumerable<ContentNodeKit> GetBranchContentSources(int id)
+        {
+            var sql = SqlContentSourcesSelect(SqlContentSourcesSelectUmbracoNodeJoin)
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+                .Append(SqlWhereNodeIdX(SqlContext, id))
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+            // Use a more efficient COUNT query
+            var sqlCountQuery = SqlContentSourcesCount(SqlContentSourcesSelectUmbracoNodeJoin)
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+                .Append(SqlWhereNodeIdX(SqlContext, id));
+            var sqlCount = SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+
+            foreach (var row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
+            {
+                yield return CreateContentNodeKit(row, serializer);
+            }
+        }
+
+        public IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int> ids)
+        {
+            if (!ids.Any())
+                yield break;
+
+            var sql = SqlContentSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+                .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+            // Use a more efficient COUNT query
+            var sqlCountQuery = SqlContentSourcesCount()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
+                .WhereIn<ContentDto>(x => x.ContentTypeId, ids);
+            var sqlCount = SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
+
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+
+            foreach (var row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
+            {
+                yield return CreateContentNodeKit(row, serializer);
+            }
+        }
+
+        public ContentNodeKit GetMediaSource(IScope scope, int id)
+        {
+            var sql = SqlMediaSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+                .Append(SqlWhereNodeId(SqlContext, id))
+                .Append(SqlOrderByLevelIdSortOrder(scope.SqlContext));
+
+            var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
+
+            if (dto == null)
+                return ContentNodeKit.Empty;
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+            return CreateMediaNodeKit(dto, serializer);
+        }
+
+        public ContentNodeKit GetMediaSource(int id)
+        {
+            var sql = SqlMediaSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+                .Append(SqlWhereNodeId(SqlContext, id))
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+            var dto = Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
+
+            if (dto == null)
+                return ContentNodeKit.Empty;
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+            return CreateMediaNodeKit(dto, serializer);
+        }
+
+        public IEnumerable<ContentNodeKit> GetAllMediaSources()
+        {
+            var sql = SqlMediaSourcesSelect()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+            // Use a more efficient COUNT query
+            var sqlCountQuery = SqlMediaSourcesCount()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media));
+            var sqlCount = SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
+
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+
+            foreach (var row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
+            {
+                yield return CreateMediaNodeKit(row, serializer);
             }
         }
 
         public IEnumerable<ContentNodeKit> GetBranchMediaSources(int id)
         {
-            var syntax = SqlSyntax;
-            var sql = MediaSourcesSelect(
-                s => s.InnerJoin<NodeDto>("x").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.NodeId || SqlText<bool>(left.Path, right.Path, (lp, rp) => $"({lp} LIKE {syntax.GetConcat(rp, "',%'")})"), aliasRight: "x"))
-                .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
-                .Where<NodeDto>(x => x.NodeId == id, "x")
-                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+            var sql = SqlMediaSourcesSelect(SqlContentSourcesSelectUmbracoNodeJoin)
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+                .Append(SqlWhereNodeIdX(SqlContext, id))
+                .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+            // Use a more efficient COUNT query
+            var sqlCountQuery = SqlMediaSourcesCount(SqlContentSourcesSelectUmbracoNodeJoin)
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+                .Append(SqlWhereNodeIdX(SqlContext, id));
+            var sqlCount = SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            foreach (var row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
             {
-                yield return CreateMediaNodeKit(row);
+                yield return CreateMediaNodeKit(row, serializer);
             }
         }
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids)
         {
             if (!ids.Any())
-            {
                 yield break;
-            }
 
-            var sql = MediaSourcesSelect()
-                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Media && !x.Trashed)
+            var sql = SqlMediaSourcesSelect()
+                    .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
                     .WhereIn<ContentDto>(x => x.ContentTypeId, ids)
-                    .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+                    .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+            // Use a more efficient COUNT query
+            var sqlCountQuery = SqlMediaSourcesCount()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media))
+                .WhereIn<ContentDto>(x => x.ContentTypeId, ids);
+            var sqlCount = SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+            var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in Database.QueryPaged<ContentSourceDto>(PageSize, sql))
+            foreach (var row in Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount))
             {
-                yield return CreateMediaNodeKit(row);
+                yield return CreateMediaNodeKit(row, serializer);
             }
         }
 
-        private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto)
+        private ContentNodeKit CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
         {
             ContentData d = null;
             ContentData p = null;
 
             if (dto.Edited)
             {
-                if (dto.EditData == null)
+                if (dto.EditData == null && dto.EditDataRaw == null)
                 {
                     if (Debugger.IsAttached)
                     {
@@ -626,7 +817,7 @@ AND cmsContentNu.nodeId IS NULL
                 }
                 else
                 {
-                    var nested = DeserializeNestedData(dto.EditData);
+                    var deserializedContent = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw);
 
                     d = new ContentData
                     {
@@ -636,16 +827,16 @@ AND cmsContentNu.nodeId IS NULL
                         VersionId = dto.VersionId,
                         VersionDate = dto.EditVersionDate,
                         WriterId = dto.EditWriterId,
-                        Properties = nested.PropertyData,
-                        CultureInfos = nested.CultureData,
-                        UrlSegment = nested.UrlSegment
+                        Properties = deserializedContent.PropertyData, // TODO: We don't want to allocate empty arrays
+                        CultureInfos = deserializedContent.CultureData,
+                        UrlSegment = deserializedContent.UrlSegment
                     };
                 }
             }
 
             if (dto.Published)
             {
-                if (dto.PubData == null)
+                if (dto.PubData == null && dto.PubDataRaw == null)
                 {
                     if (Debugger.IsAttached)
                     {
@@ -656,24 +847,24 @@ AND cmsContentNu.nodeId IS NULL
                 }
                 else
                 {
-                    var nested = DeserializeNestedData(dto.PubData);
+                    var deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw);
 
                     p = new ContentData
                     {
                         Name = dto.PubName,
-                        UrlSegment = nested.UrlSegment,
+                        UrlSegment = deserializedContent.UrlSegment,
                         Published = true,
                         TemplateId = dto.PubTemplateId,
                         VersionId = dto.VersionId,
                         VersionDate = dto.PubVersionDate,
                         WriterId = dto.PubWriterId,
-                        Properties = nested.PropertyData,
-                        CultureInfos = nested.CultureData
+                        Properties = deserializedContent.PropertyData, // TODO: We don't want to allocate empty arrays
+                        CultureInfos = deserializedContent.CultureData
                     };
                 }
             }
 
-            var n = new ContentNode(dto.Id, dto.Uid,
+            var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
             var s = new ContentNodeKit
@@ -687,12 +878,12 @@ AND cmsContentNu.nodeId IS NULL
             return s;
         }
 
-        private static ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto)
+        private ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer)
         {
-            if (dto.EditData == null)
+            if (dto.EditData == null && dto.EditDataRaw == null)
                 throw new InvalidOperationException("No data for media " + dto.Id);
 
-            var nested = DeserializeNestedData(dto.EditData);
+            var deserializedMedia = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw);
 
             var p = new ContentData
             {
@@ -702,11 +893,11 @@ AND cmsContentNu.nodeId IS NULL
                 VersionId = dto.VersionId,
                 VersionDate = dto.EditVersionDate,
                 WriterId = dto.CreatorId, // what-else?
-                Properties = nested.PropertyData,
-                CultureInfos = nested.CultureData
+                Properties = deserializedMedia.PropertyData, // TODO: We don't want to allocate empty arrays
+                CultureInfos = deserializedMedia.CultureData
             };
 
-            var n = new ContentNode(dto.Id, dto.Uid,
+            var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
             var s = new ContentNodeKit
@@ -717,20 +908,6 @@ AND cmsContentNu.nodeId IS NULL
             };
 
             return s;
-        }
-
-        private static readonly JsonSerializerSettings NestedContentDataJsonSerializerSettings = new JsonSerializerSettings
-        {
-            Converters = new List<JsonConverter> { new ForceInt32Converter() }
-        };
-
-        private static ContentNestedData DeserializeNestedData(string data)
-        {
-            // by default JsonConvert will deserialize our numeric values as Int64
-            // which is bad, because they were Int32 in the database - take care
-
-            return JsonConvert.DeserializeObject<ContentNestedData>(data, NestedContentDataJsonSerializerSettings
-            );
         }
     }
 }

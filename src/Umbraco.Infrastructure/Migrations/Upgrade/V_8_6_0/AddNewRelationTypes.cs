@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             CreateRelation(
                 Cms.Core.Constants.Conventions.RelationTypes.RelatedMediaAlias,

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         {
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             MigratePropertyEditorAlias("Umbraco.TinyMCEv3", Cms.Core.Constants.PropertyEditors.Aliases.TinyMce);
             MigratePropertyEditorAlias("Umbraco.NoEdit", Cms.Core.Constants.PropertyEditors.Aliases.Label);

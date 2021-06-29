@@ -18,8 +18,8 @@
 
 
     <ItemGroup>
-      <PackageReference Include="HtmlAgilityPack" Version="1.11.33" />
-      <PackageReference Include="MailKit" Version="2.12.0" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
+      <PackageReference Include="MailKit" Version="2.13.0" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -27,7 +27,7 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.6" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.7" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
       <PackageReference Include="MiniProfiler.Shared" Version="4.2.22" />
       <PackageReference Include="ncrontab" Version="3.3.1" />
@@ -48,8 +48,9 @@
       <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
       <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
+      <PackageReference Include="System.Text.Encodings.Web" Version="5.0.1" /> <!-- Explicit updated this nested dependency due to this https://github.com/dotnet/announcements/issues/178-->
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
-      <PackageReference Include="Examine.Core" Version="2.0.0-beta.136" />
+      <PackageReference Include="Examine.Core" Version="2.0.0-beta.154" />
       <PackageReference Include="Umbraco.Code" Version="1.1.1">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>

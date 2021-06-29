@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations
@@ -46,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
         /// <inheritdoc />
         public void AddPostMigration<TMigration>()
-            where TMigration : IMigration
+            where TMigration : MigrationBase
         {
             // just adding - will be de-duplicated when executing
             _postMigrations.Add(typeof(TMigration));

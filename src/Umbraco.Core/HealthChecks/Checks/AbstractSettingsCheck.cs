@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -85,10 +85,13 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks
             }
 
             string resultMessage = string.Format(CheckErrorMessage, ItemPath, Values, CurrentValue);
-            return Task.FromResult(new HealthCheckStatus(resultMessage)
+            var healthCheckStatus = new HealthCheckStatus(resultMessage)
             {
-                ResultType = StatusResultType.Error, ReadMoreLink = ReadMoreLink
-            }.Yield());
+                ResultType = StatusResultType.Error,
+                ReadMoreLink = ReadMoreLink
+            };
+
+            return Task.FromResult(healthCheckStatus.Yield());
         }
 
         /// <inheritdoc/>
