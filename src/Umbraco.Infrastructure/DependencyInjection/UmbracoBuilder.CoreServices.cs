@@ -154,11 +154,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<ITagQuery, TagQuery>();
 
             builder.Services.AddUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
-            builder.Services.AddScoped<IPublishedContentQuery>(factory =>
-            {
-                var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
-                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
-            });
+            builder.Services.AddUnique<IPublishedContentQuery, PublishedContentQuery>();
 
             // register accessors for cultures
             builder.Services.AddUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();

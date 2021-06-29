@@ -309,7 +309,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddSingleton<ContentModelBinder>();
 
-            builder.Services.AddScoped<UmbracoHelper>();
+            builder.Services.AddSingleton<UmbracoHelper>();
             builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
 
             builder.AddHttpClients();

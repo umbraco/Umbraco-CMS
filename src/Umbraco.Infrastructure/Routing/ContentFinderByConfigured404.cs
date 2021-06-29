@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure;
@@ -19,8 +20,8 @@ namespace Umbraco.Cms.Core.Routing
         private readonly ILogger<ContentFinderByConfigured404> _logger;
         private readonly IEntityService _entityService;
         private readonly ContentSettings _contentSettings;
-        private readonly IExamineManager _examineManager;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IPublishedContentQuery _publishedContentQuery;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByConfigured404"/> class.
@@ -29,14 +30,14 @@ namespace Umbraco.Cms.Core.Routing
             ILogger<ContentFinderByConfigured404> logger,
             IEntityService entityService,
             IOptions<ContentSettings> contentConfigSettings,
-            IExamineManager examineManager,
-            IUmbracoContextAccessor umbracoContextAccessor)
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedContentQuery publishedContentQuery)
         {
             _logger = logger;
             _entityService = entityService;
             _contentSettings = contentConfigSettings.Value;
-            _examineManager = examineManager;
             _umbracoContextAccessor = umbracoContextAccessor;
+            _publishedContentQuery = publishedContentQuery;
         }
 
         /// <summary>
@@ -90,7 +91,7 @@ namespace Umbraco.Cms.Core.Routing
             var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentSettings.Error404Collection.ToArray(),
                 _entityService,
-                new PublishedContentQuery(umbCtx.PublishedSnapshot, umbCtx.VariationContextAccessor, _examineManager),
+                _publishedContentQuery,
                 errorCulture);
 
             IPublishedContent content = null;

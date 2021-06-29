@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,16 +22,16 @@ namespace Umbraco.Cms.Infrastructure
     public class PublishedContentQuery : IPublishedContentQuery
     {
         private readonly IExamineManager _examineManager;
-        private readonly IPublishedSnapshot _publishedSnapshot;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="PublishedContentQuery" /> class.
         /// </summary>
-        public PublishedContentQuery(IPublishedSnapshot publishedSnapshot,
+        public PublishedContentQuery(IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IVariationContextAccessor variationContextAccessor, IExamineManager examineManager)
         {
-            _publishedSnapshot = publishedSnapshot ?? throw new ArgumentNullException(nameof(publishedSnapshot));
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _variationContextAccessor = variationContextAccessor ??
                                         throw new ArgumentNullException(nameof(variationContextAccessor));
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
@@ -93,14 +93,14 @@ namespace Umbraco.Cms.Infrastructure
 
         #region Content
 
-        public IPublishedContent Content(int id) => ItemById(id, _publishedSnapshot.Content);
+        public IPublishedContent Content(int id) => ItemById(id, _publishedSnapshotAccessor.PublishedSnapshot.Content);
 
-        public IPublishedContent Content(Guid id) => ItemById(id, _publishedSnapshot.Content);
+        public IPublishedContent Content(Guid id) => ItemById(id, _publishedSnapshotAccessor.PublishedSnapshot.Content);
 
         public IPublishedContent Content(Udi id)
         {
             if (!(id is GuidUdi udi)) return null;
-            return ItemById(udi.Guid, _publishedSnapshot.Content);
+            return ItemById(udi.Guid, _publishedSnapshotAccessor.PublishedSnapshot.Content);
         }
 
         public IPublishedContent Content(object id)
@@ -115,38 +115,38 @@ namespace Umbraco.Cms.Infrastructure
         }
 
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars) =>
-            ItemByXPath(xpath, vars, _publishedSnapshot.Content);
+            ItemByXPath(xpath, vars, _publishedSnapshotAccessor.PublishedSnapshot.Content);
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids) =>
-            ItemsByIds(_publishedSnapshot.Content, ids);
+            ItemsByIds(_publishedSnapshotAccessor.PublishedSnapshot.Content, ids);
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids) =>
-            ItemsByIds(_publishedSnapshot.Content, ids);
+            ItemsByIds(_publishedSnapshotAccessor.PublishedSnapshot.Content, ids);
 
         public IEnumerable<IPublishedContent> Content(IEnumerable<object> ids)
         {
             return ids.Select(Content).WhereNotNull();
         }
         public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars) =>
-            ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
+            ItemsByXPath(xpath, vars, _publishedSnapshotAccessor.PublishedSnapshot.Content);
 
         public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars) =>
-            ItemsByXPath(xpath, vars, _publishedSnapshot.Content);
+            ItemsByXPath(xpath, vars, _publishedSnapshotAccessor.PublishedSnapshot.Content);
 
-        public IEnumerable<IPublishedContent> ContentAtRoot() => ItemsAtRoot(_publishedSnapshot.Content);
+        public IEnumerable<IPublishedContent> ContentAtRoot() => ItemsAtRoot(_publishedSnapshotAccessor.PublishedSnapshot.Content);
 
         #endregion
 
         #region Media
 
-        public IPublishedContent Media(int id) => ItemById(id, _publishedSnapshot.Media);
+        public IPublishedContent Media(int id) => ItemById(id, _publishedSnapshotAccessor.PublishedSnapshot.Media);
 
-        public IPublishedContent Media(Guid id) => ItemById(id, _publishedSnapshot.Media);
+        public IPublishedContent Media(Guid id) => ItemById(id, _publishedSnapshotAccessor.PublishedSnapshot.Media);
 
         public IPublishedContent Media(Udi id)
         {
             if (!(id is GuidUdi udi)) return null;
-            return ItemById(udi.Guid, _publishedSnapshot.Media);
+            return ItemById(udi.Guid, _publishedSnapshotAccessor.PublishedSnapshot.Media);
         }
 
         public IPublishedContent Media(object id)
@@ -160,15 +160,15 @@ namespace Umbraco.Cms.Infrastructure
             return null;
         }
 
-        public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids) => ItemsByIds(_publishedSnapshot.Media, ids);
+        public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids) => ItemsByIds(_publishedSnapshotAccessor.PublishedSnapshot.Media, ids);
         public IEnumerable<IPublishedContent> Media(IEnumerable<object> ids)
         {
             return ids.Select(Media).WhereNotNull();
         }
 
-        public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids) => ItemsByIds(_publishedSnapshot.Media, ids);
+        public IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids) => ItemsByIds(_publishedSnapshotAccessor.PublishedSnapshot.Media, ids);
 
-        public IEnumerable<IPublishedContent> MediaAtRoot() => ItemsAtRoot(_publishedSnapshot.Media);
+        public IEnumerable<IPublishedContent> MediaAtRoot() => ItemsAtRoot(_publishedSnapshotAccessor.PublishedSnapshot.Media);
 
         #endregion
 
@@ -292,7 +292,7 @@ namespace Umbraco.Cms.Infrastructure
             totalRecords = results.TotalItemCount;
 
             return new CultureContextualSearchResults(
-                results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor,
+                results.Skip(skip).ToPublishedSearchResults(_publishedSnapshotAccessor.PublishedSnapshot.Content), _variationContextAccessor,
                 culture);
         }
 
@@ -321,7 +321,7 @@ namespace Umbraco.Cms.Infrastructure
 
             totalRecords = results.TotalItemCount;
 
-            return results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot);
+            return results.Skip(skip).ToPublishedSearchResults(_publishedSnapshotAccessor.PublishedSnapshot);
         }
 
         /// <summary>
