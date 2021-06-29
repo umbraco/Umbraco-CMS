@@ -23,7 +23,9 @@
         vm.openContentPicker = openContentPicker;
         vm.openMediaPicker = openMediaPicker;
         vm.openUserPicker = openUserPicker;
-        vm.removeSelectedItem = removeSelectedItem;
+        vm.removeSection = removeSection;
+        vm.removeAssignedPermissions = removeAssignedPermissions;
+        vm.removeUser = removeUser;
         vm.clearStartNode = clearStartNode;
         vm.save = save;
         vm.openGranularPermissionsPicker = openGranularPermissionsPicker;
@@ -281,28 +283,33 @@
 
         }
 
-        function removeSelectedItem(index, selection) {
-            if (selection && selection.length > 0) {
+        function removeSection(index) {
+            vm.userGroup.sections.splice(index, 1);
+        }
 
-                const dialog = {
-                    view: "views/users/views/overlays/remove.html",
-                    username: selection[index].username,
-                    userGroupName: vm.userGroup.name.toLowerCase(),
-                    submitButtonLabelKey: "defaultdialogs_yesRemove",
-                    submitButtonStyle: "danger",
+        function removeAssignedPermissions(index) {
+            vm.userGroup.assignedPermissions.splice(index, 1);
+        }
 
-                    submit: function () {
-                        selection.splice(index, 1);
+        function removeUser(index) {
+            const dialog = {
+                view: "views/users/views/overlays/remove.html",
+                username: vm.userGroup.users[index].username,
+                userGroupName: vm.userGroup.name.toLowerCase(),
+                submitButtonLabelKey: "defaultdialogs_yesRemove",
+                submitButtonStyle: "danger",
 
-                        overlayService.close();
-                    },
-                    close: function () {
-                        overlayService.close();
-                    }
-                };
+                submit: function () {
+                    vm.userGroup.users.splice(index, 1);
 
-                overlayService.open(dialog);
-            }
+                    overlayService.close();
+                },
+                close: function () {
+                    overlayService.close();
+                }
+            };
+
+            overlayService.open(dialog);
         }
 
         function clearStartNode(type) {

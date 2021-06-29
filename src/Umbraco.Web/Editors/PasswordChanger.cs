@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http.ModelBinding;
@@ -84,6 +85,11 @@ namespace Umbraco.Web.Editors
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "resetPassword" }) });
                 }
 
+                if (!currentUser.IsAdmin() && savingUser.IsAdmin())
+                {
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user cannot change the password for the specified user", new[] { "resetPassword" }) });
+                }
+
                 //ok, we should be able to reset it
                 var resetToken = await userMgr.GeneratePasswordResetTokenAsync(savingUser.Id);
                 var newPass = passwordModel.NewPassword.IsNullOrWhiteSpace()
@@ -95,7 +101,7 @@ namespace Umbraco.Web.Editors
                 if (resetResult.Succeeded == false)
                 {
                     var errors = string.Join(". ", resetResult.Errors);
-                    _logger.Warn<PasswordChanger>("Could not reset user password {PasswordErrors}", errors);
+                    _logger.Warn<PasswordChanger, string>("Could not reset user password {PasswordErrors}", errors);
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "resetPassword" }) });
                 }
 
@@ -136,7 +142,7 @@ namespace Umbraco.Web.Editors
             {
                 //no, fail with error messages for "password"
                 var errors = string.Join(". ", changeResult.Errors);
-                _logger.Warn<PasswordChanger>("Could not change user password {PasswordErrors}", errors);
+                _logger.Warn<PasswordChanger, string>("Could not change user password {PasswordErrors}", errors);
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "password" }) });
             }
             return Attempt.Succeed(new PasswordChangedModel());
@@ -197,7 +203,7 @@ namespace Umbraco.Web.Editors
                         }
                         catch (Exception ex)
                         {
-                            _logger.Warn<PasswordChanger>("Could not change member password", ex);
+                            _logger.Warn<PasswordChanger>(ex,"Could not change member password");
                             return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
                         }
                     }
@@ -246,7 +252,7 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
             }
 
-            //without being able to retrieve the original password, 
+            //without being able to retrieve the original password,
             //we cannot arbitrarily change the password without knowing the old one and no old password was supplied - need to return an error
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
             {

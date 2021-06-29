@@ -2,6 +2,7 @@
 using System.Web.Http;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Web.Controllers
             var userService = userServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent);
+            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent);
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
@@ -62,7 +63,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent, new[] { 'F' });
+            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent, new[] { 'F' });
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.NotFound, result);
@@ -93,7 +94,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent, new[] { 'F' });
+            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent, new[] { 'F' });
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
@@ -124,7 +125,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent, new[] { 'F' });
+            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent, new[] { 'F' });
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
@@ -156,7 +157,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, out var foundContent, new[] { 'F' });
+            var result = ContentPermissionsHelper.CheckPermissions(1234, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent, new[] { 'F' });
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
@@ -178,7 +179,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, out var foundContent);
+            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent);
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
@@ -200,7 +201,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, out var foundContent);
+            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent);
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
@@ -224,7 +225,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, out var foundContent);
+            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent);
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
@@ -248,7 +249,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, out var foundContent);
+            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent);
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
@@ -278,7 +279,7 @@ namespace Umbraco.Tests.Web.Controllers
 
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, out var foundContent, new[] { 'A' });
+            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent, new[] { 'A' });
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
@@ -306,7 +307,7 @@ namespace Umbraco.Tests.Web.Controllers
             var contentService = contentServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, out var foundContent, new[] { 'B' });
+            var result = ContentPermissionsHelper.CheckPermissions(-1, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent, new[] { 'B' });
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);
@@ -336,7 +337,7 @@ namespace Umbraco.Tests.Web.Controllers
             var contentService = contentServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, out var foundContent, new[] { 'A' });
+            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent, new[] { 'A' });
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Granted, result);
@@ -364,7 +365,7 @@ namespace Umbraco.Tests.Web.Controllers
             var contentService = contentServiceMock.Object;
 
             //act
-            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, out var foundContent, new[] { 'B' });
+            var result = ContentPermissionsHelper.CheckPermissions(-20, user, userService, contentService, entityService, AppCaches.Disabled, out var foundContent, new[] { 'B' });
 
             //assert
             Assert.AreEqual(ContentPermissionsHelper.ContentAccess.Denied, result);

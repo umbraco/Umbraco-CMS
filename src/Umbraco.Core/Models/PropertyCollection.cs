@@ -169,6 +169,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
+        public void ClearCollectionChangedEvents() => CollectionChanged = null;
+
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
             CollectionChanged?.Invoke(this, args);

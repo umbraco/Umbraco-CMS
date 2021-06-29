@@ -69,7 +69,7 @@ namespace Umbraco.Web.WebApi.Filters
             int nodeId;
             if (_nodeId.HasValue == false)
             {
-                var parts = _paramName.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+                var parts = _paramName.Split(Constants.CharArrays.Period, StringSplitOptions.RemoveEmptyEntries);
 
                 if (actionContext.ActionArguments[parts[0]] == null)
                 {
@@ -115,11 +115,13 @@ namespace Umbraco.Web.WebApi.Filters
                 nodeId = _nodeId.Value;
             }
 
-            var permissionResult = ContentPermissionsHelper.CheckPermissions(nodeId,
+            var permissionResult = ContentPermissionsHelper.CheckPermissions(
+                nodeId,
                 Current.UmbracoContext.Security.CurrentUser,
                 Current.Services.UserService,
                 Current.Services.ContentService,
                 Current.Services.EntityService,
+                Current.AppCaches,
                 out var contentItem,
                 _permissionToCheck.HasValue ? new[] { _permissionToCheck.Value } : null);
 

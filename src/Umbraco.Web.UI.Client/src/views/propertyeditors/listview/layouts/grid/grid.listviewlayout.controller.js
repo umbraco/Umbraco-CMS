@@ -15,10 +15,10 @@
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
 
         vm.nodeId = $scope.contentId;
-        // Use whitelist of allowed file types if provided
+        // Use list of allowed file types if provided
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
         if (vm.acceptedFileTypes === '') {
-            // If not provided, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
+            // If not provided, we pass in a disallowed list by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
             vm.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
         }
 
@@ -115,9 +115,9 @@
         function selectFolder(folder, $event, $index) {
             listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
         }
-        
+
         function goToItem(item, $event, $index) {
-            listViewHelper.editItem(item);
+            listViewHelper.editItem(item, $scope);
         }
 
         activate();

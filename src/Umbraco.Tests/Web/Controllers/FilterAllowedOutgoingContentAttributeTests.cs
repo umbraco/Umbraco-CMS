@@ -6,6 +6,8 @@ using System.Net.Http.Headers;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -26,7 +28,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
 
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService);
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService, AppCaches.Disabled);
             var val = new List<ContentItemBasic>() {new ContentItemBasic()};
             var result = att.GetValueFromResponse(
                 new ObjectContent(typeof (IEnumerable<ContentItemBasic>),
@@ -46,7 +48,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
 
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), "MyList", userService, entityService);
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), "MyList", userService, entityService, AppCaches.Disabled);
             var val = new List<ContentItemBasic>() { new ContentItemBasic() };
             var container = new MyTestClass() {MyList = val};
 
@@ -68,7 +70,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
 
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), "DontFind", userService, entityService);
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), "DontFind", userService, entityService, AppCaches.Disabled);
             var val = new List<ContentItemBasic>() { new ContentItemBasic() };
             var container = new MyTestClass() { MyList = val };
 
@@ -96,7 +98,7 @@ namespace Umbraco.Tests.Web.Controllers
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 5 && entity.Path == "-1,5") });
             var entityService = entityServiceMock.Object;
 
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService);
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService, AppCaches.Disabled);
             var list = new List<dynamic>();
             var path = "";
             for (var i = 0; i < 10; i++)
@@ -144,7 +146,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityServiceMock = new Mock<IEntityService>();
             var entityService = entityServiceMock.Object;
 
-            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService);
+            var att = new FilterAllowedOutgoingContentAttribute(typeof(IEnumerable<ContentItemBasic>), userService, entityService, AppCaches.Disabled);
             att.FilterBasedOnPermissions(list, user);
 
             Assert.AreEqual(3, list.Count);

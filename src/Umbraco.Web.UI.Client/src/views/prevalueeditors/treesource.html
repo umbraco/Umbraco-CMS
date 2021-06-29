@@ -41,9 +41,9 @@
             <ul class="unstyled list-icons mt3">
                 <li style="max-width: 600px">
                     <i class="icon icon-help-alt" aria-hidden="true"></i>
-                    <button type="button" class="btn-link" ng-click="showHelp = 1">Show xpath query help</button>
+                    <button type="button" class="btn-link" ng-click="showHelp = !showHelp">{{showHelp ? 'Hide' : 'Show'}} xpath query help</button>
 
-                    <div class="small" ng-if="showHelp">
+                    <div class="small" ng-show="showHelp">
                         <p>
                             Use Xpath query to set a root node on the tree, either based on a search from the root of the content tree, or by using a context-aware placeholder.
                         </p>

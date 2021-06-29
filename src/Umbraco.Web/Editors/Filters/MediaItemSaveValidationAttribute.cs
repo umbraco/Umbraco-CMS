@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -23,18 +24,20 @@ namespace Umbraco.Web.Editors.Filters
         private readonly ILocalizedTextService _textService;
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
+        private readonly AppCaches _appCaches;
 
-        public MediaItemSaveValidationAttribute() : this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.MediaService, Current.Services.EntityService)
+        public MediaItemSaveValidationAttribute() : this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.MediaService, Current.Services.EntityService, Current.AppCaches)
         {
         }
 
-        public MediaItemSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IMediaService mediaService, IEntityService entityService)
+        public MediaItemSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IMediaService mediaService, IEntityService entityService, AppCaches appCaches)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _appCaches = appCaches;
         }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
@@ -91,7 +94,7 @@ namespace Umbraco.Web.Editors.Filters
             if (MediaController.CheckPermissions(
                     actionContext.Request.Properties,
                     _umbracoContextAccessor.UmbracoContext.Security.CurrentUser,
-                    _mediaService, _entityService,
+                    _mediaService, _entityService, _appCaches,
                     contentIdToCheck, contentToCheck) == false)
             {
                 actionContext.Response = actionContext.Request.CreateUserNoAccessResponse();

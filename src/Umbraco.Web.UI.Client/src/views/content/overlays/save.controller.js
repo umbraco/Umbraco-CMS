@@ -85,25 +85,7 @@
                     active.save = true;
                 }
 
-                vm.availableVariants.sort((a, b) => {
-                    if (a.language && b.language) {
-                        if (a.language.name < b.language.name) {
-                            return -1;
-                        }
-                        if (a.language.name > b.language.name) {
-                            return 1;
-                        }
-                    }
-                    if (a.segment && b.segment) {
-                        if (a.segment < b.segment) {
-                            return -1;
-                        }
-                        if (a.segment > b.segment) {
-                            return 1;
-                        }
-                    }
-                    return 0;
-                });
+                vm.availableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.availableVariants);
 
             } else {
                 //disable save button if we have nothing to save

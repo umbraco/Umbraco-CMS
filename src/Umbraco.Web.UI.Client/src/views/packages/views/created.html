@@ -5,7 +5,7 @@
         <umb-editor-sub-header-content-left>
             <umb-button
                 button-style="action"
-                type="button" 
+                type="button"
                 action="vm.createPackage()"
                 label="Create package"
                 label-key="packager_createPackage">
@@ -20,7 +20,7 @@
                 <td class="flex items-center">
                     <div class="umb-package-list__item-icon">
                         <i ng-if="!createdPackage.iconUrl" class="icon-box"></i>
-                        <img ng-if="createdPackage.iconUrl" ng-src="{{createdPackage.iconUrl}}" />
+                        <img ng-if="createdPackage.iconUrl" ng-src="{{createdPackage.iconUrl}}" alt="" />
                     </div>
                     <div class="umb-package-list__item-content">
                         <div class="umb-package-list__item-name">{{ createdPackage.name }}</div>

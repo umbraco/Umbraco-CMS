@@ -1,6 +1,7 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.BlockEditorController",
         function ($scope, localizationService, formHelper, overlayService) {
+
             var vm = this;
 
             vm.model = $scope.model;
@@ -52,7 +53,7 @@ angular.module("umbraco")
                         vm.saveButtonState = "error";
                     }
                 }
-            }
+            };
 
             vm.close = function () {
                 if (vm.model && vm.model.close) {
@@ -93,7 +94,7 @@ angular.module("umbraco")
                     }
 
                 }
-            }
+            };
 
         }
     );

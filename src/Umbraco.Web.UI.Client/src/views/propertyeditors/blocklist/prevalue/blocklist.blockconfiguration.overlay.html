@@ -157,7 +157,11 @@
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="backgroundColor"><localize key="blockEditor_labelBackgroundColor">Background Color</localize></label>
                                     <div class="controls">
-                                        <input type="text" name="backgroundColor" ng-model="vm.block.backgroundColor"/>
+                                        <umb-color-picker
+                                            ng-model="vm.block.backgroundColor"
+                                            options="vm.colorPickerOptions"
+                                            on-change="vm.changeBackgroundColor(color)">
+                                        </umb-color-picker>
                                     </div>
                                 </div>
                             </div>
@@ -167,7 +171,11 @@
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="iconColor"><localize key="blockEditor_labelIconColor">Icon Color</localize></label>
                                     <div class="controls">
-                                        <input type="text" name="iconColor" ng-model="vm.block.iconColor"/>
+                                        <umb-color-picker
+                                            ng-model="vm.block.iconColor"
+                                            options="vm.colorPickerOptions"
+                                            on-change="vm.changeIconColor(color)">
+                                        </umb-color-picker>
                                     </div>
                                 </div>
                             </div>

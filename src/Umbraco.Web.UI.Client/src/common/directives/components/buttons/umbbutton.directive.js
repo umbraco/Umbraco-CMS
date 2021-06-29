@@ -61,15 +61,15 @@ Use this directive to render an umbraco button. The directive can be used to gen
 @param {string=} state Set a progress state on the button ("init", "busy", "success", "error").
 @param {string=} shortcut Set a keyboard shortcut for the button ("ctrl+c").
 @param {string=} label Set the button label.
-@param {string=} labelKey Set a localization key to make a multi lingual button ("general_buttonText").
+@param {string=} labelKey Set a localization key to make a multi-lingual button ("general_buttonText").
 @param {string=} icon Set a button icon.
-@param {string=} size Set a button icon ("xs", "m", "l", "xl").
+@param {string=} size Set a button size ("xs", "m", "l", "xl").
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
-@param {string=} addEllipsis Adds an ellipsis character (…) to the button label which means the button will open a dialog or prompt the user for more information.
-@param {string=} showCaret Shows a caret on the right side of the button label
-@param {string=} autoFocus add autoFocus to the button
-@param {string=} hasPopup Used to expose to the accessibility API whether the button will trigger a popup or not
-@param {string=]} isExpanded Used to add an aria-expanded attribute and expose whether the button has expanded a popup or not
+@param {boolean=} addEllipsis Adds an ellipsis character (…) to the button label which means the button will open a dialog or prompt the user for more information.
+@param {boolean=} showCaret Shows a caret on the right side of the button label
+@param {boolean=} autoFocus add autoFocus to the button
+@param {boolean=} hasPopup Used to expose to the accessibility API whether the button will trigger a popup or not
+@param {boolean=} isExpanded Used to add an aria-expanded attribute and expose whether the button controls collapsible content
 
 **/
 

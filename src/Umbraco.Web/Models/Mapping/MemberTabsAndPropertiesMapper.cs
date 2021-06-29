@@ -61,7 +61,7 @@ namespace Umbraco.Web.Models.Mapping
                 if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
                 {
                     isLockedOutProperty.View = "readonlyvalue";
-                    isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
+                    isLockedOutProperty.Value = _localizedTextService.Localize("general", "no");
                 }
             }
             else
@@ -75,7 +75,7 @@ namespace Umbraco.Web.Models.Mapping
                 if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
                 {
                     isLockedOutProperty.View = "readonlyvalue";
-                    isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
+                    isLockedOutProperty.Value = _localizedTextService.Localize("general", "no");
                 }
             }
 
@@ -115,14 +115,14 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}id",
-                    Label = _localizedTextService.Localize("general/id"),
+                    Label = _localizedTextService.Localize("general","id"),
                     Value = new List<string> {member.Id.ToString(), member.Key.ToString()},
                     View = "idwithguid"
                 },
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
-                    Label = _localizedTextService.Localize("content/membertype"),
+                    Label = _localizedTextService.Localize("content","membertype"),
                     Value = _localizedTextService.UmbracoDictionaryTranslate(member.ContentType.Name),
                     View = Current.PropertyEditors[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
                 },
@@ -130,7 +130,7 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
-                    Label = _localizedTextService.Localize("general/email"),
+                    Label = _localizedTextService.Localize("general","email"),
                     Value = member.Email,
                     View = "email",
                     Validation = {Mandatory = true}
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
-                    Label = _localizedTextService.Localize("password"),
+                    Label = _localizedTextService.Localize(null,"password"),
                     // NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
                     // only when creating a new member and we want to have a generated password pre-filled.
                     Value = new Dictionary<string, object>
@@ -159,7 +159,7 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
-                    Label = _localizedTextService.Localize("content/membergroup"),
+                    Label = _localizedTextService.Localize("content","membergroup"),
                     Value = GetMemberGroupValue(member.Username),
                     View = "membergroups",
                     Config = new Dictionary<string, object> {{"IsRequired", true}}
@@ -223,7 +223,7 @@ namespace Umbraco.Web.Models.Mapping
             var prop = new ContentPropertyDisplay
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login",
-                Label = localizedText.Localize("login"),
+                Label = localizedText.Localize(null,"login"),
                 Value = member.Username
             };
 

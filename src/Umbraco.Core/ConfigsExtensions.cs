@@ -1,10 +1,10 @@
 ﻿using System.IO;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Dashboards;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
@@ -48,6 +48,8 @@ namespace Umbraco.Core
                 configDir,
                 factory.GetInstance<ManifestParser>(),
                 factory.GetInstance<IRuntimeState>().Debug));
+
+            configs.Add<IContentDashboardSettings>(() => new ContentDashboardSettings());
         }
     }
 }

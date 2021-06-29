@@ -82,7 +82,7 @@
             if (Utilities.isDefined(opts.firstLineNumber)) {
                 if (Utilities.isNumber(opts.firstLineNumber)) {
                     session.setOption('firstLineNumber', opts.firstLineNumber);
-                } else if (angular.isFunction(opts.firstLineNumber)) {
+                } else if (Utilities.isFunction(opts.firstLineNumber)) {
                     session.setOption('firstLineNumber', opts.firstLineNumber());
                 }
             }
@@ -116,7 +116,7 @@
 
             // onLoad callbacks
             angular.forEach(opts.callbacks, function(cb) {
-                if (angular.isFunction(cb)) {
+                if (Utilities.isFunction(cb)) {
                     cb(acee);
                 }
             });
@@ -126,7 +126,7 @@
 
             // Load in ace library
             assetsService.load(['lib/ace-builds/src-min-noconflict/ace.js', 'lib/ace-builds/src-min-noconflict/ext-language_tools.js'], scope).then(function () {
-                if (angular.isUndefined(window.ace)) {
+                if (Utilities.isUndefined(window.ace)) {
                     throw new Error('ui-ace need ace to work... (o rly?)');
                 } else {
                     // init editor
@@ -146,8 +146,7 @@
                  * umbAceEditorConfig merged with user options via json in attribute or data binding
                  * @type object
                  */
-                var opts = angular.extend({}, options, scope.umbAceEditor);
-
+                var opts = Utilities.extend({}, options, scope.umbAceEditor);
 
                 //load ace libraries here... 
 
@@ -208,7 +207,7 @@
 
                     if (Utilities.isDefined(callback)) {
                         scope.$evalAsync(function() {
-                            if (angular.isFunction(callback)) {
+                            if (Utilities.isFunction(callback)) {
                                 callback(args);
                             } else {
                                 throw new Error('ui-ace use a function as callback.');
@@ -273,7 +272,7 @@
                         return;
                     }
 
-                    opts = angular.extend({}, options, scope.umbAceEditor);
+                    opts = Utilities.extend({}, options, scope.umbAceEditor);
 
                     opts.callbacks = [opts.onLoad];
                     if (opts.onLoad !== options.onLoad) {

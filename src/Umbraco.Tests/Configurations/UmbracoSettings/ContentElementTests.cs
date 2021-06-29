@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void DisallowedUploadFiles()
         {
-            Assert.IsTrue(SettingsSection.Content.DisallowedUploadFiles.All(x => "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd".Split(',').Contains(x)));
+            Assert.IsTrue(SettingsSection.Content.DisallowedUploadFiles.All(x => "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx".Split(',').Contains(x)));
         }
 
         [Test]
