@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Blocks
         [JsonConverter(typeof(UdiJsonConverter))]
         public Udi ContentUdi { get; set; }
 
-        [JsonProperty("settingsUdi")]
+        [JsonProperty("settingsUdi", NullValueHandling = NullValueHandling.Ignore)]
         [JsonConverter(typeof(UdiJsonConverter))]
         public Udi SettingsUdi { get; set; }
     }

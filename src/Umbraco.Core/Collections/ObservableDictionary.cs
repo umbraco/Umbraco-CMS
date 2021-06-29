@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Collections
 {
+
     /// <summary>
     /// An ObservableDictionary
     /// </summary>
@@ -15,7 +18,7 @@ namespace Umbraco.Core.Collections
     /// </remarks>
     /// <typeparam name="TValue">The type of elements contained in the BindableCollection</typeparam>
     /// <typeparam name="TKey">The type of the indexing key</typeparam>
-    public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, IReadOnlyDictionary<TKey, TValue>, IDictionary<TKey, TValue>
+    public class ObservableDictionary<TKey, TValue> : ObservableCollection<TValue>, IReadOnlyDictionary<TKey, TValue>, IDictionary<TKey, TValue>, INotifyCollectionChanged
     {
         protected Dictionary<TKey, int> Indecies { get; }
         protected Func<TValue, TKey> KeySelector { get; }
@@ -73,6 +76,22 @@ namespace Umbraco.Core.Collections
         }
 
         #endregion
+
+        // need to explicitly implement with event accessor syntax in order to override in order to to clear
+        // c# events are weird, they do not behave the same way as other c# things that are 'virtual',
+        // a good article is here: https://medium.com/@unicorn_dev/virtual-events-in-c-something-went-wrong-c6f6f5fbe252
+        // and https://stackoverflow.com/questions/2268065/c-sharp-language-design-explicit-interface-implementation-of-an-event
+        private NotifyCollectionChangedEventHandler _changed;
+        event NotifyCollectionChangedEventHandler INotifyCollectionChanged.CollectionChanged
+        {
+            add { _changed += value; }
+            remove { _changed -= value; }
+        }
+
+        /// <summary>
+        /// Clears all <see cref="CollectionChanged"/> event handlers
+        /// </summary>
+        public void ClearCollectionChangedEvents() => _changed = null;
 
         public bool ContainsKey(TKey key)
         {

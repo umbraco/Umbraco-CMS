@@ -108,5 +108,15 @@ namespace Umbraco.Core.Services.Implement
                 return _redirectUrlRepository.SearchUrls(searchTerm, pageIndex, pageSize, out total);
             }
         }
+
+        public IRedirectUrl GetMostRecentRedirectUrl(string url, string culture)
+        {
+            if (string.IsNullOrWhiteSpace(culture)) return GetMostRecentRedirectUrl(url);
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _redirectUrlRepository.GetMostRecentUrl(url, culture);
+            }
+
+        }
     }
 }

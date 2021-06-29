@@ -8,7 +8,8 @@
         <ng-form name="contentHeaderForm" ng-if="vm.content.apps.length > 0">
             <umb-editor-content-header
                 menu="vm.page.menu"
-                hide-menu="vm.page.hideActionsMenu"
+                hide-actions-menu="vm.page.hideActionsMenu"
+                disable-actions-menu="vm.disableActionsMenu"
                 name="vm.editor.content.name"
                 name-disabled="vm.nameDisabled"
                 editor="vm.editor"
@@ -35,7 +36,8 @@
 
             <div class="umb-editor-sub-views">
                 <div ng-repeat="app in vm.editor.variantApps track by app.alias">
-                    <umb-editor-sub-view model="app" content="vm.content" variant-content="vm.editor.content"/>
+                    <umb-editor-sub-view model="app" content="vm.content" variant-content="vm.editor.content">
+                    </umb-editor-sub-view>
                 </div>
             </div>
         </umb-editor-container>

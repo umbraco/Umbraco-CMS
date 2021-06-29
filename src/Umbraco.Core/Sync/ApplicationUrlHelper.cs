@@ -9,7 +9,7 @@ using Umbraco.Core.Logging;
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// A helper used to determine the current server umbraco application url.
+    /// A helper used to determine the current server umbraco application URL.
     /// </summary>
     public static class ApplicationUrlHelper
     {
@@ -17,12 +17,12 @@ namespace Umbraco.Core.Sync
         private static readonly Type TypeOfApplicationUrlHelper = typeof(ApplicationUrlHelper);
 
         /// <summary>
-        /// Gets or sets a custom provider for the umbraco application url.
+        /// Gets or sets a custom provider for the umbraco application URL.
         /// </summary>
         /// <remarks>
         /// <para>Receives the current request as a parameter, and it may be null. Must return a properly
-        /// formatted url with scheme and umbraco dir and no trailing slash eg "http://www.mysite.com/umbraco",
-        /// or <c>null</c>. To be used in auto-load-balancing scenarios where the application url is not
+        /// formatted URL with scheme and umbraco dir and no trailing slash eg "http://www.mysite.com/umbraco",
+        /// or <c>null</c>. To be used in auto-load-balancing scenarios where the application URL is not
         /// in config files but is determined programmatically.</para>
         /// <para>Must be assigned before resolution is frozen.</para>
         /// </remarks>
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Sync
             umbracoApplicationUrl = ApplicationUrlProvider?.Invoke(request);
             if (string.IsNullOrWhiteSpace(umbracoApplicationUrl) == false)
             {
-                umbracoApplicationUrl = umbracoApplicationUrl.TrimEnd('/');
+                umbracoApplicationUrl = umbracoApplicationUrl.TrimEnd(Constants.CharArrays.ForwardSlash);
                 logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (provider)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
@@ -61,13 +61,13 @@ namespace Umbraco.Core.Sync
             var url = settings.WebRouting.UmbracoApplicationUrl;
             if (url.IsNullOrWhiteSpace() == false)
             {
-                var umbracoApplicationUrl = url.TrimEnd('/');
+                var umbracoApplicationUrl = url.TrimEnd(Constants.CharArrays.ForwardSlash);
                 logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (using web.routing/@umbracoApplicationUrl)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
 
             // try the server registrar
-            // which is assumed to return a url that:
+            // which is assumed to return a URL that:
             // - end with SystemDirectories.Umbraco
             // - contain a scheme
             // - end or not with a slash, it will be taken care of
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Sync
             url = serverRegistrar.GetCurrentServerUmbracoApplicationUrl();
             if (url.IsNullOrWhiteSpace() == false)
             {
-                var umbracoApplicationUrl = url.TrimEnd('/');
+                var umbracoApplicationUrl = url.TrimEnd(Constants.CharArrays.ForwardSlash);
                 logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (IServerRegistrar)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Sync
             var ssl = globalSettings.UseHttps ? "s" : ""; // force, whatever the first request
             var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
-            return url.TrimEnd('/');
+            return url.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Umbraco.Web
     {
 
         /// <summary>
-        /// Return the Url for a Web Api service
+        /// Return the URL for a Web Api service
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url"></param>
@@ -58,7 +58,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Return the Url for a Web Api service
+        /// Return the URL for a Web Api service
         /// </summary>
         /// <param name="url"></param>
         /// <param name="actionName"></param>
@@ -87,7 +87,7 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Return the Url for a Web Api service
+        /// Return the URL for a Web Api service
         /// </summary>
         /// <param name="url"></param>
         /// <param name="actionName"></param>
@@ -119,7 +119,7 @@ namespace Umbraco.Web
 
 
         /// <summary>
-        /// Return the Url for an action with a cache-busting hash appended
+        /// Return the URL for an action with a cache-busting hash appended
         /// </summary>
         /// <param name="url"></param>
         /// <param name="actionName"></param>

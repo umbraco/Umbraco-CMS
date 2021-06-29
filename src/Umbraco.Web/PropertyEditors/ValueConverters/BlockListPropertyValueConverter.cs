@@ -123,16 +123,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     }
 
                     // Get settings type from configuration
-                    Type settingsType;
-                    if (blockConfig.SettingsElementTypeKey.HasValue)
-                    {
-                        settingsType = _blockConverter.GetModelType(blockConfig.SettingsElementTypeKey.Value);
-                    }
-                    else
-                    {
-                        settingsType = typeof(IPublishedElement);
-                    }
+                    var settingsType = blockConfig.SettingsElementTypeKey.HasValue
+                        ? _blockConverter.GetModelType(blockConfig.SettingsElementTypeKey.Value)
+                        : typeof(IPublishedElement);
 
+                    // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
                     var layoutType = typeof(BlockListItem<,>).MakeGenericType(contentData.GetType(), settingsType);
                     var layoutRef = (BlockListItem)Activator.CreateInstance(layoutType, contentGuidUdi, contentData, settingGuidUdi, settingsData);
 

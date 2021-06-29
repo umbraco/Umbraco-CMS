@@ -146,6 +146,9 @@ namespace Umbraco.Web.Composing
         public static ISectionService SectionService
             => Factory.GetInstance<ISectionService>();
 
+        public static IIconService IconService
+            => Factory.GetInstance<IIconService>();
+
         #endregion
 
         #region Web Constants

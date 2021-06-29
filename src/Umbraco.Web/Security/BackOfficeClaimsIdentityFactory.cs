@@ -26,7 +26,7 @@ namespace Umbraco.Web.Security
         public override async Task<ClaimsIdentity> CreateAsync(UserManager<T, int> manager, T user, string authenticationType)
         {
             var baseIdentity = await base.CreateAsync(manager, user, authenticationType);
-            
+
             var umbracoIdentity = new UmbracoBackOfficeIdentity(baseIdentity,
                 user.Id,
                 user.UserName,
@@ -34,11 +34,15 @@ namespace Umbraco.Web.Security
                 user.CalculatedContentStartNodeIds,
                 user.CalculatedMediaStartNodeIds,
                 user.Culture,
-                //NOTE - there is no session id assigned here, this is just creating the identity, a session id will be generated when the cookie is written
+                // NOTE - there is no session id assigned here, this is just creating the identity, a session id will be generated when the cookie is written
                 Guid.NewGuid().ToString(),
                 user.SecurityStamp,
                 user.AllowedSections,
                 user.Roles.Select(x => x.RoleId).ToArray());
+
+            // now we can flow any custom claims that the actual user has currently
+            // assigned which could be done in the OnExternalLogin callback
+            umbracoIdentity.MergeClaimsFromBackOfficeIdentity(user);
 
             return umbracoIdentity;
         }

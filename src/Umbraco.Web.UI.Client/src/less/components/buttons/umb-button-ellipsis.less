@@ -4,10 +4,10 @@
     margin: 0 auto;
     cursor: pointer;
     border-radius: @baseBorderRadius;
-    color: black;
+    color: @ui-action-discreet-type;
     position: relative;
     opacity: 0.8;
-    transition: opacity .3s ease-out;
+    transition: opacity 120ms, color 120ms;
 
     &--absolute {
         position: absolute;
@@ -21,6 +21,10 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
+    }
+
+    &:hover {
+        color: @ui-action-discreet-type-hover;
     }
 
     .umb-button-ellipsis--tab,
@@ -47,6 +51,7 @@
     &__icon {
         color: inherit;
         flex-basis: 100%;
+        font-size: 12px;
 
         .umb-button-ellipsis--tab & {
             margin: 0 0 7px;

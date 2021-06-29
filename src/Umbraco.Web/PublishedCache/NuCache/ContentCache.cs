@@ -79,7 +79,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
             var startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
-            var parts = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = path.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
 
             IPublishedContent content;
 
@@ -109,8 +109,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 content = FollowRoute(content, parts, 1, culture);
             }
 
-            // if hideTopLevelNodePath is true then for url /foo we looked for /*/foo
-            // but maybe that was the url of a non-default top-level node, so we also
+            // if hideTopLevelNodePath is true then for URL /foo we looked for /*/foo
+            // but maybe that was the URL of a non-default top-level node, so we also
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
@@ -141,7 +141,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             hideTopLevelNode = hideTopLevelNode ?? HideTopLevelNodeFromPath; // default = settings
 
             // walk up from that node until we hit a node with a domain,
-            // or we reach the content root, collecting urls in the way
+            // or we reach the content root, collecting URLs in the way
             var pathParts = new List<string>();
             var n = node;
             var urlSegment = n.UrlSegment(culture);

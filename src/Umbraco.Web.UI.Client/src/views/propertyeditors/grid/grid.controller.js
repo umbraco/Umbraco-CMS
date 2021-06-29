@@ -141,9 +141,9 @@ angular.module("umbraco")
                 over: function (event, ui) {
 
                     var area = event.target.getScope_HackForSortable().area;
-                    var allowedEditors = area.allowed;
+                    var allowedEditors = area.$allowedEditors.map(e => e.alias);
 
-                    if (($.inArray(ui.item[0].getScope_HackForSortable().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
+                    if (($.inArray(ui.item[0].getScope_HackForSortable().control.editor.alias, allowedEditors) < 0) ||
                         (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                         $scope.$apply(function () {
@@ -318,7 +318,6 @@ angular.module("umbraco")
             // Add items overlay menu
             // *********************************************
             $scope.openEditorOverlay = function (event, area, index, key) {
-
                 const dialog = {
                     view: "itempicker",
                     filter: area.$allowedEditors.length > 15,
@@ -627,21 +626,8 @@ angular.module("umbraco")
 
             }
 
-
-            var guid = (function () {
-                function s4() {
-                    return Math.floor((1 + Math.random()) * 0x10000)
-                        .toString(16)
-                        .substring(1);
-                }
-                return function () {
-                    return s4() + s4() + "-" + s4() + "-" + s4() + "-" +
-                        s4() + "-" + s4() + s4() + s4();
-                };
-            })();
-
-            $scope.setUniqueId = function (cell, index) {
-                return guid();
+            $scope.setUniqueId = function () {
+                return String.CreateGuid();
             };
 
             $scope.addControl = function (editor, cell, index, initialize) {
@@ -766,7 +752,7 @@ angular.module("umbraco")
                             // allowed for this template based on the current config.
 
                             _.each(found.sections, function (templateSection, index) {
-                                angular.extend($scope.model.value.sections[index], Utilities.copy(templateSection));
+                                Utilities.extend($scope.model.value.sections[index], Utilities.copy(templateSection));
                             });
 
                         }

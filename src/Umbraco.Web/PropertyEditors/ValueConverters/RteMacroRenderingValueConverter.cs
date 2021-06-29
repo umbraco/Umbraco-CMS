@@ -87,7 +87,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var sourceString = source.ToString();
 
-            // ensures string is parsed for {localLink} and urls and media are resolved correctly
+            // ensures string is parsed for {localLink} and URLs and media are resolved correctly
             sourceString = _linkParser.EnsureInternalLinks(sourceString, preview);
             sourceString = _urlParser.EnsureUrls(sourceString);
             sourceString = _imageSourceParser.EnsureImageSources(sourceString);

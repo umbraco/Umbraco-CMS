@@ -45,7 +45,7 @@ namespace Umbraco.Web
             var maybeDoc = true;
             var lpath = uri.AbsolutePath.ToLowerInvariant();
 
-            // handle directory-urls used for asmx
+            // handle directory-URLs used for asmx
             // TODO: legacy - what's the point really?
             var asmxPos = lpath.IndexOf(".asmx/", StringComparison.OrdinalIgnoreCase);
             if (asmxPos >= 0)
@@ -53,7 +53,7 @@ namespace Umbraco.Web
                 // use uri.AbsolutePath, not path, 'cos path has been lowercased
                 httpContext.RewritePath(uri.AbsolutePath.Substring(0, asmxPos + 5), // filePath
                     uri.AbsolutePath.Substring(asmxPos + 5), // pathInfo
-                    uri.Query.TrimStart('?'));
+                    uri.Query.TrimStart(Constants.CharArrays.QuestionMark));
                 maybeDoc = false;
             }
 
@@ -101,7 +101,7 @@ namespace Umbraco.Web
                 // add URLs and paths to a new list
                 var newReservedList = new HashSet<string>();
                 foreach (var reservedUrlTrimmed in reservedUrlsCache
-                    .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Trim().ToLowerInvariant())
                     .Where(x => x.IsNullOrWhiteSpace() == false)
                     .Select(reservedUrl => IOHelper.ResolveUrl(reservedUrl).Trim().EnsureStartsWith("/"))
@@ -110,7 +110,7 @@ namespace Umbraco.Web
                     newReservedList.Add(reservedUrlTrimmed);
                 }
 
-                foreach (var reservedPathTrimmed in NormalizePaths(reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)))
+                foreach (var reservedPathTrimmed in NormalizePaths(reservedPathsCache.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)))
                 {
                     newReservedList.Add(reservedPathTrimmed);
                 }
@@ -124,16 +124,16 @@ namespace Umbraco.Web
                 return newReservedList;
             });
 
-            //The url should be cleaned up before checking:
+            //The URL should be cleaned up before checking:
             // * If it doesn't contain an '.' in the path then we assume it is a path based URL, if that is the case we should add an trailing '/' because all of our reservedPaths use a trailing '/'
             // * We shouldn't be comparing the query at all
-            var pathPart = url.Split(new[] { '?' }, StringSplitOptions.RemoveEmptyEntries)[0].ToLowerInvariant();
+            var pathPart = url.Split(Constants.CharArrays.QuestionMark, StringSplitOptions.RemoveEmptyEntries)[0].ToLowerInvariant();
             if (pathPart.Contains(".") == false)
             {
                 pathPart = pathPart.EnsureEndsWith('/');
             }
 
-            // return true if url starts with an element of the reserved list
+            // return true if URL starts with an element of the reserved list
             return _reservedList.Any(x => pathPart.InvariantStartsWith(x));
         }
 

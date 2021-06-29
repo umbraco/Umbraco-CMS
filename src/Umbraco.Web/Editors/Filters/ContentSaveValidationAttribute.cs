@@ -7,6 +7,7 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
@@ -29,11 +30,12 @@ namespace Umbraco.Web.Editors.Filters
         private readonly IContentService _contentService;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
+        private readonly AppCaches _appCaches;
 
-        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService)
+        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService, Current.AppCaches)
         { }
 
-        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IContentService contentService, IUserService userService, IEntityService entityService)
+        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IContentService contentService, IUserService userService, IEntityService entityService, AppCaches appCaches)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -41,6 +43,7 @@ namespace Umbraco.Web.Editors.Filters
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _appCaches = appCaches;
         }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
@@ -195,13 +198,13 @@ namespace Umbraco.Web.Editors.Filters
 
                 accessResult = ContentPermissionsHelper.CheckPermissions(
                     contentToCheck, webSecurity.CurrentUser,
-                    _userService, _entityService, permissionToCheck.ToArray());
+                    _userService, _entityService, _appCaches, permissionToCheck.ToArray());
             }
             else
             {
                 accessResult = ContentPermissionsHelper.CheckPermissions(
                        contentIdToCheck, webSecurity.CurrentUser,
-                       _userService, _contentService, _entityService,
+                       _userService, _contentService, _entityService, _appCaches,
                        out contentToCheck,
                        permissionToCheck.ToArray());
                 if (contentToCheck != null)

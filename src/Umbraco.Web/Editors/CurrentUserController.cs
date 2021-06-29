@@ -183,7 +183,7 @@ namespace Umbraco.Web.Editors
 
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
-                result.AddSuccessNotification(Services.TextService.Localize("user/password"), Services.TextService.Localize("user/passwordChanged"));
+                result.AddSuccessNotification(Services.TextService.Localize("user", "password"), Services.TextService.Localize("user", "passwordChanged"));
                 return result;
             }
 

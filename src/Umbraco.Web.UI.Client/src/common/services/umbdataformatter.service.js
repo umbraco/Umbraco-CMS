@@ -83,7 +83,7 @@
                     });
 
                     var saveProperties = _.map(realProperties, function (p) {
-                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData', 'allowCultureVariant', 'allowSegmentVariant');
+                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData', 'allowCultureVariant', 'allowSegmentVariant', 'labelOnTop');
                         return saveProperty;
                     });
 
@@ -404,7 +404,7 @@
                 if (displayModel.variants && displayModel.variants.length > 1) {
                     // Collect all invariant properties from the variants that are either the
                     // default language variant or the default segment variant.
-                    var defaultVariants = _.filter(displayModel.variants, function (variant) {                      
+                    var defaultVariants = _.filter(displayModel.variants, function (variant) {
                         var isDefaultLanguage = variant.language && variant.language.isDefault;
                         var isDefaultSegment = variant.segment == null;
 
@@ -433,7 +433,7 @@
                                 return variant !== defaultVariant;
                             });
 
-                            // now assign this same invariant property instance to the same index of the other variants property array                            
+                            // now assign this same invariant property instance to the same index of the other variants property array
                             _.each(otherVariants, function (variant) {
                                 _.each(invariantProps, function (invProp) {
                                     var tab = variant.tabs[invProp.tabIndex];

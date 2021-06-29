@@ -30,6 +30,7 @@ module.exports = {
         // js files for backoffice
         // processed in the js task
         js: {
+            websitepreview: { files: "./src/websitepreview/**/*.js", out: "umbraco.websitepreview.js" },
             preview: { files: "./src/preview/**/*.js", out: "umbraco.preview.js" },
             installer: { files: "./src/installer/**/*.js", out: "umbraco.installer.js" },
             filters: { files: "./src/common/filters/**/*.js", out: "umbraco.filters.js" },
@@ -56,7 +57,7 @@ module.exports = {
                 ],
                 out: "umbraco.directives.js"
             }
-            
+
         },
 
         //selectors for copying all views into the build

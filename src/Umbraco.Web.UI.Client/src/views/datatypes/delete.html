@@ -111,7 +111,7 @@
                     </div>
 
 
-                <umb-confirm ng-if="vm.confirmed || vm.hasReferences === false"
+                <umb-confirm confirm-disabled="!(vm.confirmed || vm.hasReferences === false)"
                              on-confirm="vm.performDelete"
                              on-cancel="vm.cancel"
                              confirm-button-style="danger"

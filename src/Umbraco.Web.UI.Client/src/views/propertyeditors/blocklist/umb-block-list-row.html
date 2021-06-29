@@ -1,9 +1,9 @@
 <ng-form name="vm.blockRowForm" val-server-match="{ 'contains' : { 'valServerMatchContent': vm.layout.$block.content.key, 'valServerMatchSettings': vm.layout.$block.settings.key } }">
-    <div class="umb-block-list__block" ng-class="{'--active':vm.layout.$block.active}">
+    <div class="umb-block-list__block" ng-class="{'--active':vm.layout.$block.active, '--show-validation': vm.layout.$block.showValidation === true}">
 
         <umb-block-list-block stylesheet="{{::vm.layout.$block.config.stylesheet}}"
                               class="umb-block-list__block--content"
-                              ng-class="{'blockelement__draggable-element': vm.layout.$block.config.stylesheet, '--show-validation': vm.layout.$block.showValidation === true}"
+                              ng-class="{'blockelement__draggable-element': vm.layout.$block.config.stylesheet}"
                               view="{{vm.layout.$block.view}}"
                               api="vm.blockEditorApi"
                               block="vm.layout.$block"

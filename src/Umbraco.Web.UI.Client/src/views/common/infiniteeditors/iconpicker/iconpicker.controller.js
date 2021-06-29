@@ -6,9 +6,13 @@
  * @description
  * The controller for the content type editor icon picker
  */
-function IconPickerController($scope, $http, $sce, localizationService, iconHelper) {
+function IconPickerController($scope, localizationService, iconHelper) {
 
     var vm = this;
+
+    vm.filter = {
+        searchTerm: ''
+    };
 
     vm.selectIcon = selectIcon;
     vm.selectColor = selectColor;
@@ -42,17 +46,23 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
         vm.loading = true;
 
         setTitle();
-    
+
         iconHelper.getAllIcons()
             .then(icons => {
                 vm.icons = icons;
-                vm.loading = false;
 
-                iconHelper.getLegacyIcons()
+                // Get's legacy icons, removes duplicates then maps them to IconModel
+                iconHelper.getIcons()
                     .then(icons => {
-                        if(icons && icons.length > 0) {
-                            vm.icons = icons.concat(vm.icons);
+                        if (icons && icons.length > 0) {
+                            let legacyIcons = icons
+                                .filter(icon => !vm.icons.find(x => x.name == icon))
+                                .map(icon => { return { name: icon, svgString: null }; });
+
+                            vm.icons = legacyIcons.concat(vm.icons);
                         }
+
+                        vm.loading = false;
                     });
             });
 
@@ -96,7 +106,7 @@ function IconPickerController($scope, $http, $sce, localizationService, iconHelp
     }
 
     function submit() {
-        if ($scope.model && $scope.model.submit) {            
+        if ($scope.model && $scope.model.submit) {
             $scope.model.submit($scope.model);
         }
     }

@@ -9,6 +9,7 @@
 
     <a ng-if="vm.type === 'link'"
         ng-href="{{vm.href}}"
+        ng-attr-target="{{(vm.hrefTarget) ? vm.hrefTarget : undefined}}"
         class="btn umb-button__button {{vm.style}} umb-button--{{vm.size}} umb-outline"
         ng-click="vm.clickButton($event)"
         hotkey="{{vm.shortcut}}"

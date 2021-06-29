@@ -24,7 +24,7 @@
 @param {boolean} model Set to <code>true</code> or <code>false</code> to set the checkbox to checked or unchecked.
 @param {string} inputId Set the <code>id</code> of the checkbox.
 @param {string} text Set the text for the checkbox label.
-@param {string} labelKey Set a dictinary/localization string for the checkbox label
+@param {string} labelKey Set a dictionary/localization string for the checkbox label
 @param {callback} onChange Callback when the value of the checkbox change by interaction.
 @param {boolean} autoFocus Add autofocus to the input field
 @param {boolean} preventSubmitOnEnter Set the enter prevent directive or not
@@ -42,13 +42,15 @@
         vm.change = change;
 
         function onInit() {
-            vm.inputId = vm.inputId || "umb-check_" + String.CreateGuid();
+            vm.inputId = vm.inputId || "umb-search-filter_" + String.CreateGuid();
+            vm.autoFocus = Object.toBoolean(vm.autoFocus) === true;
+            vm.preventSubmitOnEnter = Object.toBoolean(vm.preventSubmitOnEnter) === true;
 
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
             if (vm.labelKey) {
                  localizationService.localize(vm.labelKey).then(function (data) {
-                      if(data.indexOf('[') === -1){
-                        vm.text = data;
+                      if (data.indexOf('[') === -1){
+                         vm.text = data;
                       }
                  });
             }
@@ -75,7 +77,8 @@
             labelKey: "@?",
             onChange: "&?",
             autoFocus: "<?",
-            preventSubmitOnEnter: "<?"
+            preventSubmitOnEnter: "<?",
+            cssClass: "@?"
         }
     };
 

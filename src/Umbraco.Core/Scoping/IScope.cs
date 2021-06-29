@@ -5,6 +5,24 @@ using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Scoping
 {
+    // TODO: This is for backward compat - Merge this in netcore
+    public interface IScope2 : IScope
+    {
+        /// <summary>
+        /// Write-locks some lock objects.
+        /// </summary>
+        /// <param name="timeout">The database timeout in milliseconds</param>
+        /// <param name="lockId">The lock object identifier.</param>
+        void WriteLock(TimeSpan timeout, int lockId);
+
+        /// <summary>
+        /// Read-locks some lock objects.
+        /// </summary>
+        /// <param name="timeout">The database timeout in milliseconds</param>
+        /// <param name="lockId">The lock object identifier.</param>
+        void ReadLock(TimeSpan timeout, int lockId);
+    }
+
     /// <summary>
     /// Represents a scope.
     /// </summary>

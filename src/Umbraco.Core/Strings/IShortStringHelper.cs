@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Core.Strings
 {
     /// <summary>
-    /// Provides string functions for short strings such as aliases or url segments.
+    /// Provides string functions for short strings such as aliases or URL segments.
     /// </summary>
     /// <remarks>Not necessarily optimized to work on large bodies of text.</remarks>
     public interface IShortStringHelper
@@ -26,24 +26,24 @@
         string CleanStringForSafeAlias(string text, string culture);
 
         /// <summary>
-        /// Cleans a string to produce a string that can safely be used in an url segment.
+        /// Cleans a string to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         /// <remarks>The string will be cleaned in the context of the IShortStringHelper default culture.</remarks>
         string CleanStringForUrlSegment(string text);
 
         /// <summary>
-        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url segment.
+        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         string CleanStringForUrlSegment(string text, string culture);
 
         /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <returns>The safe filename.</returns>
@@ -52,7 +52,7 @@
 
         /// <summary>
         /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>

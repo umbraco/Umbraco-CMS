@@ -1,0 +1,9 @@
+﻿<div class="umb-checkboxlist-preval" ng-controller="Umbraco.PrevalueEditors.CheckboxListController as vm">
+
+    <ul class="unstyled">
+        <li ng-repeat="item in vm.viewItems track by $id(item)">
+            <umb-checkbox value="{{item.value}}" model="item.checked" text="{{item.label}}" on-change="vm.change(model, value)"></umb-checkbox>
+        </li>
+    </ul>
+
+</div>
