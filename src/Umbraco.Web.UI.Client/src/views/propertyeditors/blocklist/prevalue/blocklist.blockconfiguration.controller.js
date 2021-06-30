@@ -50,9 +50,6 @@
             deleteAllBlocksAction
         ];
 
-        console.log("vm.umbProperty", vm.umbProperty);
-        console.log("vm", vm);
-
         if (vm.umbProperty) {
             vm.umbProperty.setPropertyActions(propertyActions);
         }
