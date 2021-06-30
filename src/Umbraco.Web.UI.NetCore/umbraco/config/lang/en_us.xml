@@ -1237,6 +1237,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="installed">Installed</key>
     <key alias="installedPackages">Installed packages</key>
     <key alias="installFinish">Finish</key>
+    <key alias="installInstructions">Install instructions</key>
     <key alias="noConfigurationView">This package has no configuration view</key>
     <key alias="noPackagesCreated">No packages have been created yet</key>
     <key alias="noPackages">You don’t have any packages installed</key>
