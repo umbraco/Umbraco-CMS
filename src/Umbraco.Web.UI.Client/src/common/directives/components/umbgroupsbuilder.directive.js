@@ -7,8 +7,8 @@
 
         function link(scope, el, attr, ctrl) {
 
+            const TYPE_GROUP = 0;
             const TYPE_TAB = 1;
-            const TYPE_GROUP = 2;
 
             var eventBindings = [];
             var validationTranslated = "";
@@ -407,7 +407,6 @@
                     parentKey: null,
                     type: TYPE_TAB,
                     sortOrder,
-                    icon: "icon-document color-black",
                     properties: []
                 };
 
@@ -439,10 +438,6 @@
 
             scope.onChangeTabSortOrderValue = function () {
                 scope.tabs = $filter('orderBy')(scope.tabs, 'sortOrder');
-            };
-
-            scope.onChangeTabIcon = function (icon, color, tab) {
-                tab.icon = color ? icon + ' ' + color : icon;
             };
 
             scope.onChangeTabName = function () {
