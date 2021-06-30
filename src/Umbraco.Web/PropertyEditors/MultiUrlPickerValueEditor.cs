@@ -79,7 +79,9 @@ namespace Umbraco.Web.PropertyEditors
                         if (entity is IDocumentEntitySlim documentEntity)
                         {
                             icon = documentEntity.ContentTypeIcon;
-                            published = culture == null ? documentEntity.Published : documentEntity.PublishedCultures.Contains(culture);
+                            published = culture == null || documentEntity.Variations.VariesByCulture() == false
+                                ? documentEntity.Published
+                                : documentEntity.PublishedCultures.Contains(culture);
                             udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
                             url = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(entity.Key)?.Url() ?? "#";
                             trashed = documentEntity.Trashed;
