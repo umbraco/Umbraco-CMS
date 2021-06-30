@@ -1261,20 +1261,26 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 errorPageId: errorPageId
             };
             if (Utilities.isArray(groups) && groups.length) {
-                publicAccess.groups = groups;
+                return umbRequestHelper.resourcePromise(
+                    $http.post(
+                        umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostPublicAccess", publicAccess),
+                        groups
+                    ),
+                    "Failed to update public access for content item with id " + contentId
+                );
             }
             else if (Utilities.isArray(usernames) && usernames.length) {
                 publicAccess.usernames = usernames;
+                return umbRequestHelper.resourcePromise(
+                    $http.post(
+                        umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostPublicAccess", publicAccess)
+                    ),
+                    "Failed to update public access for content item with id " + contentId
+                );
             }
             else {
                 throw "must supply either userName/password or roles";
             }
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostPublicAccess", publicAccess)
-                ),
-                "Failed to update public access for content item with id " + contentId
-            );
         },
 
         /**
