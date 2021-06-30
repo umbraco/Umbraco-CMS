@@ -20,10 +20,42 @@
 
         var unsubscribe = [];
 
+        // Property actions:
+        var copyAllBlocksAction = null;
+        var deleteAllBlocksAction = null;
+
         var vm = this;
         vm.openBlock = null;
 
         vm.supportCopy = clipboardService.isSupported();
+
+        copyAllBlocksAction = {
+            labelKey: "clipboard_labelForCopyAllEntries",
+            labelTokens: [],
+            icon: "documents",
+            method: requestCopyAllBlocks,
+            isDisabled: true
+        };
+
+        deleteAllBlocksAction = {
+            labelKey: 'clipboard_labelForRemoveAllEntries',
+            labelTokens: [],
+            icon: 'trash',
+            method: requestDeleteAllBlocks,
+            isDisabled: true
+        };
+
+        var propertyActions = [
+            copyAllBlocksAction,
+            deleteAllBlocksAction
+        ];
+
+        console.log("vm.umbProperty", vm.umbProperty);
+        console.log("vm", vm);
+
+        if (vm.umbProperty) {
+            vm.umbProperty.setPropertyActions(propertyActions);
+        }
 
         function onInit() {
 
@@ -32,7 +64,6 @@
             }
 
             loadElementTypes();
-
         }
 
         function loadElementTypes() {
@@ -52,8 +83,12 @@
 
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
-        vm.copyBlock = function () {
-            clipboardService.copy(clipboardService.TYPES.RAW, block.content.contentTypeAlias, { "layout": block.layout, "data": block.data, "settingsData": block.settingsData }, block.label, block.content.icon, block.content.udi);
+        vm.copyBlock = function (block) {
+
+            var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
+            var clonedBlockData = Utilities.copy(block);
+
+            clipboardService.copy(clipboardService.TYPES.RAW, elementType.alias, clonedBlockData, block.label, block.icon, block.contentElementTypeKey);
         };
 
         vm.requestRemoveBlockByIndex = function (index) {
@@ -186,18 +221,13 @@
             $scope.model.value.push(blockType);
 
             vm.openBlockOverlay(blockType);
-
         };
-
-
-
-
 
         vm.openBlockOverlay = function (block) {
 
             var elementType = vm.getElementTypeByKey(block.contentElementTypeKey);
 
-            if(elementType) {
+            if (elementType) {
                 localizationService.localize("blockEditor_blockConfigurationOverlayTitle", [elementType.name]).then(function (data) {
 
                     var clonedBlockData = Utilities.copy(block);
@@ -228,6 +258,32 @@
             }
 
         };
+
+        function requestCopyAllBlocks() {
+
+        }
+
+        function requestDeleteAllBlocks() {
+            localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+                overlayService.confirmDelete({
+                    title: data[1],
+                    content: data[0],
+                    close: function () {
+                        overlayService.close();
+                    },
+                    submit: function () {
+                        deleteAllBlocks();
+                        overlayService.close();
+                    }
+                });
+            });
+        }
+
+        function deleteAllBlocks() {
+            while ($scope.model.value.length) {
+                vm.removeBlockByIndex($scope.model.value[0]);
+            };
+        }
 
         $scope.$on('$destroy', function () {
             unsubscribe.forEach(u => { u(); });

@@ -1,13 +1,6 @@
-<div
-    class="umb-block-list-block-configuration"
-    ng-controller="Umbraco.PropertyEditors.BlockList.BlockConfigurationController as vm"
-    >
-
-    <div
-        class="umb-block-card-grid"
-        ui-sortable="vm.sortableOptions"
-        ng-model="model.value"
-        >
+<div class="umb-block-list-block-configuration" ng-controller="Umbraco.PropertyEditors.BlockList.BlockConfigurationController as vm">
+    
+    <div class="umb-block-card-grid" ui-sortable="vm.sortableOptions" ng-model="model.value">
 
         <umb-block-card
             block-config-model="block"
@@ -20,7 +13,7 @@
                 <button type="button"
                         class="btn-reset __action umb-outline"
                         ng-if="vm.supportCopy"
-                        ng-click="vm.copyBlock(block)">
+                        ng-click="vm.copyBlock(block); $event.stopPropagation();">
                     <i class="icon icon-documents" aria-hidden="true"></i>
                     <span class="sr-only">
                         <localize key="general_copy">Copy</localize>
@@ -42,4 +35,5 @@
             <localize key="general_add">Add</localize>
         </button>
     </div>
+
 </div>
