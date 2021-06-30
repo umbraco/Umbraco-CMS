@@ -571,7 +571,7 @@
          */
          function ensureCultureData(content) {
 
-            if (!content) return;
+            if (!content || !vm.umbVariantContent || !vm.umbProperty) return;
 
             if (vm.umbVariantContent.editor.content.language) {
                 // set the scaffolded content's language to the language of the current editor
