@@ -254,9 +254,9 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetByIds",
                        query),
-                   {
-                       ids: ids
-                   }),
+                       {
+                           ids: ids
+                       }),
                'Failed to retrieve entity data for ids ' + ids);
         },
 
