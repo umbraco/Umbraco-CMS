@@ -1,8 +1,7 @@
 ﻿using System.Linq;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_15_0
+namespace Umbraco.Core.Migrations.Upgrade.V_8_16_0
 {
     public class AddPropertyTypeGroupColumns : MigrationBase
     {

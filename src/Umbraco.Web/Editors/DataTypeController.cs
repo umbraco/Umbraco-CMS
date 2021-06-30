@@ -281,7 +281,7 @@ namespace Umbraco.Web.Editors
 
             // map back to display model, and return
             var display = Mapper.Map<IDataType, DataTypeDisplay>(dataType.PersistedDataType);
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/dataTypeSaved"), "");
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", "dataTypeSaved"), "");
             return display;
         }
 
@@ -316,7 +316,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy", "notAllowedByPath"), "");
                     return Request.CreateValidationErrorResponse(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();

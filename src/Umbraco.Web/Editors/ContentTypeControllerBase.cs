@@ -256,7 +256,7 @@ namespace Umbraco.Web.Editors
             var exists = allAliases.InvariantContains(contentTypeSave.Alias);
             if (exists && (ctId == 0 || !ct.Alias.InvariantEquals(contentTypeSave.Alias)))
             {
-                ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype/aliasAlreadyExists"));
+                ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype", "aliasAlreadyExists"));
             }
 
             // execute the external validators
@@ -388,7 +388,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy", "notAllowedByPath"), "");
                     return Request.CreateValidationErrorResponse(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -432,7 +432,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy", "notAllowedByPath"), "");
                     return Request.CreateValidationErrorResponse(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();

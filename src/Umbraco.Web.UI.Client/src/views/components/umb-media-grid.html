@@ -59,8 +59,7 @@
                         <div class="umb-table-cell  umb-table__name">
                             <button type="button"
                                     class="umb-table-head__link sortable"
-                                    ng-click="setSort('name')"
-                                    prevent-default>
+                                    ng-click="setSort('name')">
                                 <localize key="general_name">Name</localize>
                                 <i class="umb-table-head__icon icon" aria-hidden="true" ng-class="{'icon-navigation-up': isSortDirection('name', 'asc'), 'icon-navigation-down': isSortDirection('name', 'desc')}"></i>
                             </button>
@@ -68,8 +67,7 @@
                         <div class="umb-table-cell">
                             <button type="button"
                                     class="umb-table-head__link sortable"
-                                    ng-click="setSort('updateDate')"
-                                    prevent-default>
+                                    ng-click="setSort('updateDate')">
                                 Last Updated
                                 <i class="umb-table-head__icon icon"  aria-hidden="true" ng-class="{'icon-navigation-up': isSortDirection('updateDate', 'asc'), 'icon-navigation-down': isSortDirection('updateDate', 'desc')}"></i>
                             </button>
@@ -79,13 +77,12 @@
                 </div>
                 <div class="umb-table-body">
                     <div class="umb-table-row umb-media-grid__list-item -selectable" ng-click="clickItem(item, $event, $index)" ng-repeat="item in items | filter:filterBy | orderBy:sortBy:sortReverse" ng-class="{'-selected': item.selected}">
-
                         <div class="umb-table-cell">
-                            <i ng-show="item.selected" class="umb-table-body__icon umb-table-body__checkicon icon-check" aria-hidden="true"></i>
-                            <i class="{{item.icon}}" class="umb-table-body__icon" aria-hidden="true" ng-if="!item.thumbnail && item.extension != 'svg' && !item.selected"></i><i class="icon-picture"  aria-hidden="true" ng-if="item.thumbnail && !item.selected"></i>
+                            <umb-icon icon="icon-check" class="icon-check umb-table-body__icon umb-table-body__checkicon" ng-if="item.selected"></umb-icon>
+                            <umb-icon icon="{{item.icon}}" class="{{item.icon}} umb-table-body__icon" ng-if="!item.thumbnail && item.extension != 'svg' && !item.selected"></umb-icon>
+                            <umb-icon icon="icon-picture" class="icon-picture" ng-if="item.thumbnail && !item.selected"></umb-icon>
                         </div>
                         <div class="umb-table-cell  umb-table__name">
-
                             <ins ng-show="item.isFolder" ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}" ng-click="clickItemName(item, $event, $index)" class="icon-navigation-right"></ins> <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
                         </div>
                         <div class="umb-table-cell">

@@ -58,7 +58,7 @@ namespace Umbraco.Web.Models.Mapping
             tabs.Add(new Tab<ContentPropertyDisplay>
             {
                 Id = 0,
-                Label = LocalizedTextService.Localize("general/properties"),
+                Label = LocalizedTextService.Localize("general", "properties"),
                 Alias = "Generic properties",
                 Properties = genericproperties
             });
