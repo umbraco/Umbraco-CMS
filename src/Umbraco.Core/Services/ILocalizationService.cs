@@ -97,12 +97,20 @@ namespace Umbraco.Core.Services
         void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
+        /// Move a <see cref="IDictionaryItem"/> to a new parent
+        /// </summary>
+        /// <param name="toMove"></param>
+        /// <param name="parentId"></param>
+        /// <returns></returns>
+        Attempt<OperationResult<MoveOperationStatusType>> Move(IDictionaryItem toMove, int parentId);
+
+        /// <summary>
         /// Gets a <see cref="ILanguage"/> by its id
         /// </summary>
         /// <param name="id">Id of the <see cref="ILanguage"/></param>
         /// <returns><see cref="ILanguage"/></returns>
         ILanguage GetLanguageById(int id);
-        
+
         /// <summary>
         /// Gets a <see cref="Language"/> by its iso code
         /// </summary>

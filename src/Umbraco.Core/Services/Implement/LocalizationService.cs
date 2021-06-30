@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -278,6 +279,45 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
+        /// Move a <see cref="IDictionaryItem"/> to a new parent
+        /// </summary>
+        /// <param name="toMove"></param>
+        /// <param name="parentId"></param>
+        /// <returns></returns>
+        public Attempt<OperationResult<MoveOperationStatusType>> Move(IDictionaryItem toMove, int parentId)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+            var moveInfo = new List<MoveEventInfo<IDictionaryItem>>();
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var moveEventInfo = new MoveEventInfo<IDictionaryItem>(toMove, null, parentId);
+                var moveEventArgs = new MoveEventArgs<IDictionaryItem>(moveEventInfo);
+                if (scope.Events.DispatchCancelable(MovingDictionaryItem, this, moveEventArgs, nameof(MovingDictionaryItem)))
+                {
+                    scope.Complete();
+                    return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
+                }
+                IDictionaryItem parent = null;
+                if (parentId > 0)
+                {
+                    parent = GetDictionaryItemById(parentId);
+                    if (parent == null)
+                        throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
+                }
+
+                moveInfo.AddRange(_dictionaryRepository.Move(toMove, parent));
+
+                moveEventArgs.MoveInfoCollection = moveInfo;
+                moveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(MovedDictionaryItem, this, moveEventArgs);
+                scope.Complete();
+            }
+
+            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
+        }
+
+        /// <summary>
         /// Gets a <see cref="Language"/> by its id
         /// </summary>
         /// <param name="id">Id of the <see cref="Language"/></param>
@@ -493,6 +533,16 @@ namespace Umbraco.Core.Services.Implement
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<ILocalizationService, SaveEventArgs<IDictionaryItem>> SavedDictionaryItem;
+
+        /// <summary>
+        /// Occurs before Move
+        /// </summary>
+        public static event TypedEventHandler<ILocalizationService, MoveEventArgs<IDictionaryItem>> MovingDictionaryItem;
+
+        /// <summary>
+        /// Occurs after Move
+        /// </summary>
+        public static event TypedEventHandler<ILocalizationService, MoveEventArgs<IDictionaryItem>> MovedDictionaryItem;
 
         /// <summary>
         /// Occurs before Save

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -10,5 +11,6 @@ namespace Umbraco.Core.Persistence.Repositories
         IDictionaryItem Get(string key);
         IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId);
         Dictionary<string, Guid> GetDictionaryItemKeyMap();
+        IEnumerable<MoveEventInfo<IDictionaryItem>> Move(IDictionaryItem toMove, IDictionaryItem parent);
     }
 }

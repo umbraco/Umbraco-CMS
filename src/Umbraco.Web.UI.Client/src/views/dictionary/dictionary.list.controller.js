@@ -6,7 +6,7 @@
  * @description
  * The controller for listting dictionary items
  */
-function DictionaryListController($scope, $location, dictionaryResource, localizationService, appState) {
+function DictionaryListController($scope, $location, dictionaryResource, localizationService, appState, eventsService) {
     var vm = this;
     vm.title = "Dictionary overview";
     vm.loading = false;
@@ -40,6 +40,14 @@ function DictionaryListController($scope, $location, dictionaryResource, localiz
 
         loadList();
     }
+
+    var unsubscribe = eventsService.on("editors.dictionary.reload", function() {
+        loadList();
+    });
+
+    $scope.$on('$destroy', function() {
+        unsubscribe();
+    });
 
     onInit();
 }
