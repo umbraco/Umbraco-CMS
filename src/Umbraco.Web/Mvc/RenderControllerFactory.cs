@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Umbraco.Web.Mvc
@@ -10,6 +11,10 @@ namespace Umbraco.Web.Mvc
     /// <remarks></remarks>
     public class RenderControllerFactory : UmbracoControllerFactory
     {
+        public RenderControllerFactory(IEnumerable<IRenderController> renderControllers)
+            : base(renderControllers)
+        { }
+
         /// <summary>
         /// Determines whether this instance can handle the specified request.
         /// </summary>

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
@@ -13,12 +16,27 @@ namespace Umbraco.Web.Mvc
     public abstract class UmbracoControllerFactory : IFilteredControllerFactory
     {
         private readonly OverridenDefaultControllerFactory _innerFactory = new OverridenDefaultControllerFactory();
+        private readonly IEnumerable<IRenderController> _renderControllers;
+
+        public UmbracoControllerFactory(IEnumerable<IRenderController> renderControllers)
+        {
+            _renderControllers = renderControllers;
+        }
 
         public abstract bool CanHandle(RequestContext request);
 
         public virtual Type GetControllerType(RequestContext requestContext, string controllerName)
         {
-            return _innerFactory.GetControllerType(requestContext, controllerName);
+            var controllerType = _innerFactory.GetControllerType(requestContext, controllerName);
+            if (controllerType == null)
+            {
+                controllerType = _renderControllers
+                    .Select(x => x.GetType())
+                    .FirstOrDefault(x => x.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                        .Any(m => m.GetCustomAttributes<HijackRouteAttribute>(true)
+                            .Any(y => y.ContentTypeAlias.InvariantEquals(controllerName))));
+            }
+            return controllerType;
         }
 
         /// <summary>
