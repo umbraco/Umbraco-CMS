@@ -1,5 +1,7 @@
+using System;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
@@ -10,7 +12,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
+using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Website.Controllers;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
 {
@@ -44,6 +48,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
             // Assert
             Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
         }
+
+        [Test]
+        public async Task Plugin_Controller_Routes_By_Area()
+        {
+            // Create URL manually, because PrepareSurfaceController URl will prepare whatever the controller is routed as
+            Type controllerType = typeof(TestPluginController);
+            var pluginAttribute = CustomAttributeExtensions.GetCustomAttribute<PluginControllerAttribute>(controllerType, false);
+            var controllerName = ControllerExtensions.GetControllerName(controllerType);
+            string url = $"/umbraco/{pluginAttribute?.AreaName}/{controllerName}";
+            PrepareUrl(url);
+
+            HttpResponseMessage response = await Client.GetAsync(url);
+
+            string body = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+        }
     }
 
     // Test controllers must be non-nested, else we need to jump through some hoops with custom
@@ -60,5 +82,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
         public IActionResult Index() => Ok();
 
         public IActionResult News() => NoContent();
+    }
+
+    [PluginController("TestArea")]
+    public class TestPluginController : SurfaceController
+    {
+        public TestPluginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider) : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
+        {
+        }
+
+        public IActionResult Index() => Ok();
     }
 }
