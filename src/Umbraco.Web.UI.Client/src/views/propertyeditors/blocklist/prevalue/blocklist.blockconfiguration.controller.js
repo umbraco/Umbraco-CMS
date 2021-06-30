@@ -16,12 +16,14 @@
         }
     }
 
-    function BlockConfigurationController($scope, elementTypeResource, overlayService, localizationService, editorService, eventsService, udiService) {
+    function BlockConfigurationController($scope, elementTypeResource, overlayService, localizationService, editorService, eventsService, clipboardService, udiService) {
 
         var unsubscribe = [];
 
         var vm = this;
         vm.openBlock = null;
+
+        vm.supportCopy = clipboardService.isSupported();
 
         function onInit() {
 
@@ -47,7 +49,12 @@
                 }
             }
         }
+
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
+
+        vm.copyBlock = function () {
+            clipboardService.copy(clipboardService.TYPES.RAW, block.content.contentTypeAlias, { "layout": block.layout, "data": block.data, "settingsData": block.settingsData }, block.label, block.content.icon, block.content.udi);
+        };
 
         vm.requestRemoveBlockByIndex = function (index) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockTypeMessage", "blockEditor_confirmDeleteBlockTypeNotice"]).then(function (data) {
@@ -65,7 +72,7 @@
                     }
                 });
             });
-        }
+        };
 
         vm.removeBlockByIndex = function (index) {
             $scope.model.value.splice(index, 1);
@@ -77,7 +84,6 @@
             cursor: "grabbing",
             placeholder: 'umb-block-card --sortable-placeholder'
         };
-
 
         vm.getAvailableElementTypes = function () {
             return vm.elementTypes.filter(function (type) {

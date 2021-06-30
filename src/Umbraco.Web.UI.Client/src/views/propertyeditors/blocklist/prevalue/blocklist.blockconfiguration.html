@@ -16,9 +16,24 @@
             ng-class="{'--isOpen':vm.openBlock === block}"
             ng-click="vm.openBlockOverlay(block)">
             <div class="__actions">
-                <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index); $event.stopPropagation();">
+
+                <button type="button"
+                        class="btn-reset __action umb-outline"
+                        ng-if="vm.supportCopy"
+                        ng-click="vm.copyBlock(block)">
+                    <i class="icon icon-documents" aria-hidden="true"></i>
+                    <span class="sr-only">
+                        <localize key="general_copy">Copy</localize>
+                    </span>
+                </button>
+
+                <button type="button"
+                        class="btn-reset __action umb-outline"
+                        ng-click="vm.requestRemoveBlockByIndex($index); $event.stopPropagation();">
                     <i class="icon icon-trash" aria-hidden="true"></i>
-                    <localize key="general_delete" class="sr-only">Delete</localize>
+                    <span class="sr-only">
+                        <localize key="general_delete">Delete</localize>
+                    </span>
                 </button>
             </div>
         </umb-block-card>
