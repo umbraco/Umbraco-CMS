@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 using Type = System.Type;
 
-namespace Umbraco.Cms.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
 
     /// <summary>
@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Core.Migrations
             => To(targetState, typeof(TMigration));
 
         public MigrationPlan To<TMigration>(Guid targetState)
-            where TMigration : IMigration
+            where TMigration : MigrationBase
             => To(targetState, typeof(TMigration));
 
         /// <summary>

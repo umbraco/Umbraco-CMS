@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                     _logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
 
                     var migration = _migrationBuilder.Build(transition.MigrationType, context);
-                    migration.Migrate();
+                    migration.Run();
 
                     var nextState = transition.TargetState;
                     origState = nextState;
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 {
                     _logger.LogInformation($"PostMigration: {postMigrationType.FullName}.");
                     var postMigration = _migrationBuilder.Build(postMigrationType, context);
-                    postMigration.Migrate();
+                    postMigration.Run();
                 }
             }
 

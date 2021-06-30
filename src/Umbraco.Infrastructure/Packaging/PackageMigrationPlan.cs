@@ -1,7 +1,6 @@
 using System;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.Migrations;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Core.Packaging
 {

@@ -1,8 +1,9 @@
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
-namespace Umbraco.Cms.Infrastructure.DependencyInjection
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.
@@ -18,5 +19,14 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         public static NPocoMapperCollectionBuilder NPocoMappers(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<NPocoMapperCollectionBuilder>();
+
+
+        /// <summary>
+        /// Gets the package migration plans collection builder.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        public static PackageMigrationPlanCollectionBuilder PackageMigrationPlans(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<PackageMigrationPlanCollectionBuilder>();
+
     }
 }

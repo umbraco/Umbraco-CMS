@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -22,13 +22,6 @@ namespace Umbraco.Extensions
         /// Gets all types implementing ICacheRefresher.
         /// </summary>
         public static IEnumerable<Type> GetCacheRefreshers(this TypeLoader mgr) => mgr.GetTypes<ICacheRefresher>();
-
-        /// <summary>
-        /// Gets all types implementing <see cref="PackageMigrationPlan"/>
-        /// </summary>
-        /// <param name="mgr"></param>
-        /// <returns></returns>
-        public static IEnumerable<Type> GetPackageMigrationPlans(this TypeLoader mgr) => mgr.GetTypes<PackageMigrationPlan>();
 
         /// <summary>
         /// Gets all types implementing <see cref="IAction"/>

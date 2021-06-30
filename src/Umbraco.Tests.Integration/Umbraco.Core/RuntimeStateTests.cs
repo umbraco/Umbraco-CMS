@@ -12,6 +12,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core
 {
@@ -93,7 +94,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core
             {
             }
 
-            public override void Migrate()
+            protected override void Migrate()
             {
                 ImportPackage.FromEmbeddedResource<TestMigration>().Do();
             }

@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         protected sealed override void DefinePlan()
         {
-            // calculate the final state based on the hash value of the embedded resource            
+            // calculate the final state based on the hash value of the embedded resource
             var finalId = PackageDataManifest.ToString(SaveOptions.DisableFormatting).ToGuid();
             To<MigrateToPackageData>(finalId);
         }
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
             }
 
-            public override void Migrate()
+            protected override void Migrate()
             {
                 var plan = (AutomaticPackageMigrationPlan)Context.Plan;
                 XDocument xml = plan.PackageDataManifest;
