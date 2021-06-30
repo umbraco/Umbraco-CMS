@@ -6,14 +6,12 @@
     public enum PropertyGroupType : short
     {
         /// <summary>
-        /// Display as a group (using a header).
+        /// Display property types in a group.
         /// </summary>
         Group = 0,
         /// <summary>
-        /// Display as an app (using a name and icon).
+        /// Display property types in a tab.
         /// </summary>
-        App = 1,
-        //Tab = 2,
-        //Fieldset = 3
+        Tab = 1
     }
 }
