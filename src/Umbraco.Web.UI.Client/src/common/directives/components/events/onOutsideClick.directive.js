@@ -56,18 +56,18 @@
                         return attrs.bindClickOn;
                     }, function (newValue) {
                         if (newValue === "true") {
-                            $(document).on("click", oneTimeClick);
+                            $(document).on("mousedown", oneTimeClick);
                         } else {
-                            $(document).off("click", oneTimeClick);
+                            $(document).off("mousedown", oneTimeClick);
                         }
                     }));
 
                 } else {
-                    $(document).on("click", oneTimeClick);
+                    $(document).on("mousedown", oneTimeClick);
                 }
 
                 scope.$on("$destroy", function () {
-                    $(document).off("click", oneTimeClick);
+                    $(document).off("mousedown", oneTimeClick);
 
                     // unbind watchers
                     for (var e in eventBindings) {
