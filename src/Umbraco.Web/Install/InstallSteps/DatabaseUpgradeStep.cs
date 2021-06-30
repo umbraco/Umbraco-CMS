@@ -19,12 +19,14 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
         private readonly ILogger _logger;
+        private readonly UmbracoPlan _umbracoPlan;
 
-        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger)
+        public DatabaseUpgradeStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, ILogger logger, UmbracoPlan umbracoPlan)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
+            _umbracoPlan = umbracoPlan;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -37,10 +39,15 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 _logger.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var plan = new UmbracoPlan();
-                plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
+                var standardPlan = new UmbracoPlan();
+                if (_umbracoPlan.FinalState != standardPlan.FinalState)
+                {
+                    throw new InstallException("Unable to upgrade database: final state of the upgrade plan is incorrect (" + _umbracoPlan.GetType().AssemblyQualifiedName + ")");
+                }
 
-                var result = _databaseBuilder.UpgradeSchemaAndData(plan);
+                _umbracoPlan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
+
+                var result = _databaseBuilder.UpgradeSchemaAndData(_umbracoPlan);
 
                 if (result.Success == false)
                 {

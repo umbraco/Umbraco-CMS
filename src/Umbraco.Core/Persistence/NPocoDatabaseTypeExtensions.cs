@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence
 {
-    internal static class NPocoDatabaseTypeExtensions
+    public static class NPocoDatabaseTypeExtensions
     {
         public static bool IsSqlServer(this DatabaseType databaseType)
         {

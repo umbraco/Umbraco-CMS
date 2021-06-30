@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
 {
-    class DefaultPreValueMigrator : IPreValueMigrator
+    public class DefaultPreValueMigrator : IPreValueMigrator
     {
         public virtual bool CanMigrate(string editorAlias)
             => true;
