@@ -84,7 +84,7 @@ namespace Umbraco.Web.Trees
 
                 if (!documentEntity.Variations.VariesByCulture())
                 {
-                    if (!documentEntity.Published)
+                    if (!documentEntity.Published || HasUnpublishedAncestors(documentEntity.Path))
                         node.SetNotPublishedStyle();
                     else if (documentEntity.Edited)
                         node.SetHasPendingVersionStyle();
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Trees
                 {
                     if (!culture.IsNullOrWhiteSpace())
                     {
-                        if (!documentEntity.Published || !documentEntity.PublishedCultures.Contains(culture))
+                        if (!documentEntity.Published || !documentEntity.PublishedCultures.Contains(culture) || HasUnpublishedAncestors(documentEntity.Path, culture))
                             node.SetNotPublishedStyle();
                         else if (documentEntity.EditedCultures.Contains(culture))
                             node.SetHasPendingVersionStyle();
@@ -110,6 +110,24 @@ namespace Umbraco.Web.Trees
             }
 
             return null;
+        }
+
+        private bool HasUnpublishedAncestors(string contentPath, string culture = null)
+        {
+            var ids = contentPath.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => x != Constants.System.RootString)
+                .ToList();
+
+            ids.Reverse();
+
+            foreach (var id in ids)
+            {
+                var doc = Umbraco.Content(id);
+                if (doc == null || !doc.IsPublished(culture))
+                    return true;
+            }
+
+            return false;
         }
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)
