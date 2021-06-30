@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
@@ -12,10 +13,12 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Trees
 {
@@ -409,6 +412,16 @@ namespace Umbraco.Web.Trees
         {
             var handler = MenuRendering;
             handler?.Invoke(instance, e);
+        }
+
+        protected IEnumerable<SearchResultEntity> Search(UmbracoTreeSearcher treeSearcher, UmbracoObjectTypes objectType, string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null, Action<SearchResultEntity> enrichResult = null)
+        {
+            var results = treeSearcher.EntitySearch(objectType, query, pageSize, pageIndex, out totalFound, searchFrom)?.ToArray();
+            if(results != null && enrichResult != null)
+            {
+                Array.ForEach(results, enrichResult);
+            }
+            return results;
         }
     }
 }

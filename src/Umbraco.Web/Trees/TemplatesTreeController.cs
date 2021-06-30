@@ -132,6 +132,6 @@ namespace Umbraco.Web.Trees
         }
 
         public IEnumerable<SearchResultEntity> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
-            => _treeSearcher.EntitySearch(UmbracoObjectTypes.Template, query, pageSize, pageIndex, out totalFound, searchFrom);
+            => Search(_treeSearcher, UmbracoObjectTypes.Template, query, pageSize, pageIndex, out totalFound, searchFrom, result => result.Icon = Constants.Icons.Template);
     }
 }
