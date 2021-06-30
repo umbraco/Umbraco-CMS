@@ -1294,6 +1294,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="installStateComplete">All done, your browser will now refresh, please wait...</key>
     <key alias="installStateCompleted">Please click 'Finish' to complete installation and reload the page.</key>
     <key alias="installStateUploading">Uploading package...</key>
+    <key alias="verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>
