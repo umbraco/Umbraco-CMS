@@ -9,6 +9,7 @@ namespace Umbraco.Core.Models
     {
         new int Id { get; }
         new string Name { get; }
+        string Description { get; set; }
 
         /// <summary>
         /// Gets the alias of the content type.

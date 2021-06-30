@@ -81,6 +81,12 @@ namespace Umbraco.Web.Models.ContentEditing
         public string ContentTypeName { get; set; }
 
         /// <summary>
+        /// The description of the content type
+        /// </summary>
+        [DataMember(Name = "contentTypeDescription")]
+        public string ContentTypeDescription { get; set; }
+
+        /// <summary>
         /// Indicates if the content is configured as a list view container
         /// </summary>
         [DataMember(Name = "isContainer")]

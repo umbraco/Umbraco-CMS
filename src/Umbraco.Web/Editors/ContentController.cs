@@ -382,9 +382,14 @@ namespace Umbraco.Web.Editors
             var mapped = MapToDisplay(emptyContent);
             // translate the content type name if applicable
             mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
+            mapped.ContentTypeDescription = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeDescription);
             // if your user type doesn't have access to the Settings section it would not get this property mapped
             if (mapped.DocumentType != null)
+            {
                 mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
+                mapped.DocumentType.Description = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Description);
+            }
+                
 
             //remove the listview app if it exists
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
