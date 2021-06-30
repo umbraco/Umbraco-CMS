@@ -22,7 +22,6 @@ namespace Umbraco.Core.Persistence.Mappers
             DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Key), nameof(PropertyTypeGroupDto.UniqueId));
             DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.ParentKey), nameof(PropertyTypeGroupDto.ParentKey));
             DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Type), nameof(PropertyTypeGroupDto.Type));
-            DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Icon), nameof(PropertyTypeGroupDto.Icon));
             DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.Name), nameof(PropertyTypeGroupDto.Text));
             DefineMap<PropertyGroup, PropertyTypeGroupDto>(nameof(PropertyGroup.SortOrder), nameof(PropertyTypeGroupDto.SortOrder));
         }

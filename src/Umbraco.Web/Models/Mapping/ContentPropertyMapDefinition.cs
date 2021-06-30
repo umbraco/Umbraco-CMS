@@ -39,7 +39,6 @@ namespace Umbraco.Web.Models.Mapping
             target.Key = source.Key;
             target.ParentKey = source.ParentKey;
             target.Type = source.Type;
-            target.Icon = source.Icon;
             target.IsActive = true;
             target.Label = source.Name;
         }

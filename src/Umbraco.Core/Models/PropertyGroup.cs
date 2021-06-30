@@ -19,7 +19,6 @@ namespace Umbraco.Core.Models
         private Guid? _parentKey;
         private PropertyGroupType _type;
         private string _name;
-        private string _icon;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;
 
@@ -74,19 +73,6 @@ namespace Umbraco.Core.Models
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
-        }
-
-        /// <summary>
-        /// Gets or sets the icon of the group.
-        /// </summary>
-        /// <value>
-        /// The icon.
-        /// </value>
-        [DataMember]
-        public string Icon
-        {
-            get => _icon;
-            set => SetPropertyValueAndDetectChanges(value, ref _icon, nameof(Icon));
         }
 
         /// <summary>

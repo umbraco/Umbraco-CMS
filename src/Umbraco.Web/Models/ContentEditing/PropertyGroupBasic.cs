@@ -43,9 +43,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "type")]
         public PropertyGroupType Type { get; set; }
 
-        [DataMember(Name = "icon")]
-        public string Icon { get; set; }
-
         [Required]
         [DataMember(Name = "name")]
         public string Name { get; set; }

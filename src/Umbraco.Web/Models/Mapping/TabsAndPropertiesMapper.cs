@@ -161,7 +161,6 @@ namespace Umbraco.Web.Models.Mapping
                     Key = g.Key,
                     ParentKey = g.ParentKey,
                     Type = g.Type,
-                    Icon = g.Icon,
                     Alias = g.Name,
                     Label = LocalizedTextService.UmbracoDictionaryTranslate(g.Name),
                     Properties = mappedProperties,

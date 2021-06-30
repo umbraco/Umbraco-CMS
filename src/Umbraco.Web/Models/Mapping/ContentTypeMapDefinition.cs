@@ -304,7 +304,6 @@ namespace Umbraco.Web.Models.Mapping
             target.Key = source.Key;
             target.ParentKey = source.ParentKey;
             target.Type = source.Type;
-            target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
         }
@@ -318,7 +317,6 @@ namespace Umbraco.Web.Models.Mapping
             target.Key = source.Key;
             target.ParentKey = source.ParentKey;
             target.Type = source.Type;
-            target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
         }
@@ -332,7 +330,6 @@ namespace Umbraco.Web.Models.Mapping
             target.Key = source.Key;
             target.ParentKey = source.ParentKey;
             target.Type = source.Type;
-            target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
 
@@ -349,7 +346,6 @@ namespace Umbraco.Web.Models.Mapping
             target.Key = source.Key;
             target.ParentKey = source.ParentKey;
             target.Type = source.Type;
-            target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
 

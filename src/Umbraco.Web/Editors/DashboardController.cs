@@ -218,7 +218,6 @@ namespace Umbraco.Web.Editors
                 Key = x.Key,
                 ParentKey = x.ParentKey,
                 Type = x.Type,
-                Icon = x.Icon,
                 Alias = x.Alias,
                 Label = x.Label,
                 Expanded = x.Expanded,

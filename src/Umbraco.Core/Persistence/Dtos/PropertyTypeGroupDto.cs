@@ -36,10 +36,6 @@ namespace Umbraco.Core.Persistence.Dtos
         [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
         public int ContentTypeNodeId { get; set; }
 
-        [Column("icon")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string Icon { get; set; }
-
         [Column("text")]
         public string Text { get; set; }
 

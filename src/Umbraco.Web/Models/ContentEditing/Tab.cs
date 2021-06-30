@@ -23,9 +23,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "type")]
         public PropertyGroupType Type { get; set; }
 
-        [DataMember(Name = "icon")]
-        public string Icon { get; set; }
-
         [DataMember(Name = "active")]
         public bool IsActive { get; set; }
 

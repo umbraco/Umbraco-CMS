@@ -16,7 +16,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_16_0
             // Add new columns
             AddColumnIfNotExists<PropertyTypeGroupDto>(columns, "parentKey");
             AddColumnIfNotExists<PropertyTypeGroupDto>(columns, "type");
-            AddColumnIfNotExists<PropertyTypeGroupDto>(columns, "icon");
 
             // Create self-referencing foreign key
             var foreignKeyName = "FK_" + PropertyTypeGroupDto.TableName + "_parentKey";
