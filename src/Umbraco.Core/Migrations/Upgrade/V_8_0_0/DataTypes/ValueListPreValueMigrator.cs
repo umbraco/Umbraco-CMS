@@ -20,7 +20,16 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
             => _editors.Contains(editorAlias);
 
         public virtual string GetNewAlias(string editorAlias)
-            => null;
+        {
+            switch (editorAlias)
+            {
+                case "Umbraco.RadioButtonList":
+                case "Umbraco.CheckBoxList":
+                    return editorAlias;
+                default:
+                    return "Umbraco.DropDown.Flexible";
+            }
+        }            
 
         public object GetConfiguration(int dataTypeId, string editorAlias, Dictionary<string, PreValueDto> preValues)
         {

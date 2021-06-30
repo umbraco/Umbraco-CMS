@@ -20,6 +20,7 @@ namespace Umbraco.Core
                 {
                     public const string Textbox = "Umbraco.Textbox";
                     public const string Date = "Umbraco.Date";
+                    public const string ContentPicker = "Umbraco.ContentPickerAlias";
                     public const string ContentPicker2 = "Umbraco.ContentPicker2";
                     public const string MediaPicker2 = "Umbraco.MediaPicker2";
                     public const string MemberPicker2 = "Umbraco.MemberPicker2";
