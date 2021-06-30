@@ -14,7 +14,7 @@ function dataTypeHelper() {
             for (var i = 0; i < preVals.length; i++) {
                 preValues.push({
                     hideLabel: preVals[i].hideLabel,
-                    alias: preVals[i].key,
+                    alias: preVals[i].key != undefined ? preVals[i].key : preVals[i].alias,
                     description: preVals[i].description,
                     label: preVals[i].label,
                     view: preVals[i].view,
