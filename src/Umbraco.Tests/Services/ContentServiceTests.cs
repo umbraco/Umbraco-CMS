@@ -59,6 +59,46 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Template_Assigned_When_Saved_After_Default_Template_Assigned()
+        {
+            var contentService = ServiceContext.ContentService;
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            contentTypeService.Save(contentType);
+
+            IContent root = MockedContent.CreateSimpleContent(contentType, "root", -1);
+            contentService.Save(root);
+            Assert.AreEqual(null, root.TemplateId);
+
+            for (int i = 0; i < 10; i++)
+            {
+                var content = MockedContent.CreateSimpleContent(contentType, "c" + i, root.Id);
+                contentService.Save(content);
+                Assert.AreEqual(null, content.TemplateId);
+            }
+
+            // set a default template - this does not automatically assign a template
+            // to all content for this content type
+            contentType.SetDefaultTemplate(new Template("Textpage", "textpage"));
+            ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate);
+            contentTypeService.Save(contentType);
+
+            //re-get
+            root = contentService.GetById(root.Id);
+            Assert.AreEqual(null, root.TemplateId);
+
+            contentService.SaveAndPublish(root);
+            //re-get
+            root = contentService.GetById(root.Id);
+
+            // just because we saved, doesn't mean that it suddenly has a template assigned because we
+            // assigned a default template to the content type ... but should it?
+            Assert.AreEqual(null, root.TemplateId);
+
+        }
+
+        [Test]
         public void Create_Blueprint()
         {
             var contentService = ServiceContext.ContentService;
