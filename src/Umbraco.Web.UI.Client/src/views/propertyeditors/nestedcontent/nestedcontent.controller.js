@@ -190,7 +190,7 @@
         };
 
         vm.openNodeTypePicker = function ($event) {
-            
+
             if (vm.nodes.length >= vm.maxItems) {
                 return;
             }
@@ -537,14 +537,19 @@
                     if (tab) {
                         scaffold.variants[0].tabs.push(tab);
 
-                        tab.properties.forEach(function (property) {
+                        tab.properties.forEach(
+                            function (property) {
                                 if (_.find(notSupported, function (x) { return x === property.editor; })) {
                                     property.notSupported = true;
                                     // TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
                                     property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
                                 }
-                            });
+                            }
+                        );
                     }
+
+                    // Ensure Culture Data for Complex Validation.
+                    ensureCultureData(scaffold);
 
                     // Store the scaffold object
                     vm.scaffolds.push(scaffold);
@@ -557,6 +562,29 @@
                 initIfAllScaffoldsHaveLoaded();
             });
         });
+
+        /**
+         * Ensure that the containing content variant language and current property culture is transferred along
+         * to the scaffolded content object representing this block.
+         * This is required for validation along with ensuring that the umb-property inheritance is constantly maintained.
+         * @param {any} content
+         */
+         function ensureCultureData(content) {
+
+            if (!content) return;
+
+            if (vm.umbVariantContent.editor.content.language) {
+                // set the scaffolded content's language to the language of the current editor
+                content.language = vm.umbVariantContent.editor.content.language;
+            }
+            // currently we only ever deal with invariant content for blocks so there's only one
+            content.variants[0].tabs.forEach(tab => {
+                tab.properties.forEach(prop => {
+                    // set the scaffolded property to the culture of the containing property
+                    prop.culture = vm.umbProperty.property.culture;
+                });
+            });
+        }
 
         var initIfAllScaffoldsHaveLoaded = function () {
             // Initialize when all scaffolds have loaded
