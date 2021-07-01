@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (language.IsDefault)
             {
                 var message = $"Language '{language.IsoCode}' is currently set to 'default' and can not be deleted.";
-                return ValidationErrorResult.CreateNotificationValidationErrorResult(message);
+                return ValidationProblem(message);
             }
 
             // service is happy deleting a language that's fallback for another language,
@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public ActionResult<Language> SaveLanguage(Language language)
         {
             if (!ModelState.IsValid)
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
 
             // this is prone to race conditions but the service will not let us proceed anyways
             var existingByCulture = _localizationService.GetLanguageByIsoCode(language.IsoCode);
@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 //someone is trying to create a language that already exist
                 ModelState.AddModelError("IsoCode", "The language " + language.IsoCode + " already exists");
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             var existingById = language.Id != default ? _localizationService.GetLanguageById(language.Id) : null;
@@ -149,7 +149,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 catch (CultureNotFoundException)
                 {
                     ModelState.AddModelError("IsoCode", "No Culture found with name " + language.IsoCode);
-                    return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                    return ValidationProblem(ModelState);
                 }
 
                 // create it (creating a new language cannot create a fallback cycle)
@@ -172,7 +172,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (existingById.IsDefault && !language.IsDefault)
             {
                 ModelState.AddModelError("IsDefault", "Cannot un-default the default language.");
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             existingById.IsDefault = language.IsDefault;
@@ -187,12 +187,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (!languages.ContainsKey(existingById.FallbackLanguageId.Value))
                 {
                     ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
-                    return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                    return ValidationProblem(ModelState);
                 }
                 if (CreatesCycle(existingById, languages))
                 {
                     ModelState.AddModelError("FallbackLanguage", $"The selected fall back language {languages[existingById.FallbackLanguageId.Value].IsoCode} would create a circular path.");
-                    return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                    return ValidationProblem(ModelState);
                 }
             }
 

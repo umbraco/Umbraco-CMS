@@ -607,7 +607,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (!EnsureUniqueName(name, content, nameof(name)))
             {
-                return new ValidationErrorResult(ModelState.ToErrorDictionary());
+                return ValidationProblem(ModelState);
             }
 
             var blueprint = _contentService.CreateContentFromBlueprint(content, name, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
@@ -714,8 +714,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     // ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the model state to the outgoing object and throw a validation message
                     var forDisplay = mapToDisplay(contentItem.PersistedContent);
-                    forDisplay.Errors = ModelState.ToErrorDictionary();
-                    return new ValidationErrorResult(forDisplay);
+                    return ValidationProblem(forDisplay, ModelState);
                 }
 
                 // if there's only one variant and the model state is not valid we cannot publish so change it to save
@@ -866,8 +865,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
             if (!ModelState.IsValid)
             {
-                display.Errors = ModelState.ToErrorDictionary();
-                return new ValidationErrorResult(display);
+                return ValidationProblem(display, ModelState);
             }
 
             if (wasCancelled)
@@ -878,7 +876,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     //If the item is new and the operation was cancelled, we need to return a different
                     // status code so the UI can handle it since it won't be able to redirect since there
                     // is no Id to redirect to!
-                    return new ValidationErrorResult(display);
+                    return ValidationProblem(display);
                 }
             }
 
@@ -1508,7 +1506,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 var notificationModel = new SimpleNotificationModel();
                 AddMessageForPublishStatus(new[] { publishResult }, notificationModel);
-                return new ValidationErrorResult(notificationModel);
+                return ValidationProblem(notificationModel);
             }
 
             return Ok();
@@ -1558,9 +1556,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var moveResult = _contentService.MoveToRecycleBin(foundContent, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
                 if (moveResult.Success == false)
                 {
-                    //returning an object of INotificationModel will ensure that any pending
-                    // notification messages are added to the response.
-                    return new ValidationErrorResult(new SimpleNotificationModel());
+                    return ValidationProblem();
                 }
             }
             else
@@ -1568,9 +1564,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var deleteResult = _contentService.Delete(foundContent, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
                 if (deleteResult.Success == false)
                 {
-                    //returning an object of INotificationModel will ensure that any pending
-                    // notification messages are added to the response.
-                    return new ValidationErrorResult(new SimpleNotificationModel());
+                    return ValidationProblem();
                 }
             }
 
@@ -1591,7 +1585,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             _contentService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
-            return new UmbracoNotificationSuccessResponse(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
+            return Ok(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
         }
 
         /// <summary>
@@ -1628,7 +1622,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
                     _logger.LogWarning("Content sorting failed, this was probably caused by an event being cancelled");
                     // TODO: Now you can cancel sorting, does the event messages bubble up automatically?
-                    return new ValidationErrorResult("Content sorting failed, this was probably caused by an event being cancelled");
+                    return ValidationProblem("Content sorting failed, this was probably caused by an event being cancelled");
                 }
 
                 return Ok();
@@ -1727,7 +1721,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (!unpublishResult.Success)
                 {
                     AddCancelMessage(content);
-                    return new ValidationErrorResult(content);
+                    return ValidationProblem(content);
                 }
                 else
                 {
@@ -1799,7 +1793,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
                 catch (UriFormatException)
                 {
-                    return new ValidationErrorResult(_localizedTextService.Localize("assignDomain/invalidDomain"));
+                    return ValidationProblem(_localizedTextService.Localize("assignDomain/invalidDomain"));
                 }
             }
 
@@ -2069,7 +2063,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 //cannot move if the content item is not allowed at the root
                 if (toMove.ContentType.AllowedAsRoot == false)
                 {
-                    return ValidationErrorResult.CreateNotificationValidationErrorResult(
+                    return ValidationProblem(
                                     _localizedTextService.Localize("moveOrCopy/notAllowedAtRoot"));
                 }
             }
@@ -2086,14 +2080,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (parentContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                         .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
-                    return ValidationErrorResult.CreateNotificationValidationErrorResult(
+                    return ValidationProblem(
                                     _localizedTextService.Localize("moveOrCopy/notAllowedByContentType"));
                 }
 
                 // Check on paths
                 if ($",{parent.Path},".IndexOf($",{toMove.Id},", StringComparison.Ordinal) > -1)
                 {
-                    return ValidationErrorResult.CreateNotificationValidationErrorResult(
+                    return ValidationProblem(
                                     _localizedTextService.Localize("moveOrCopy/notAllowedByPath"));
                 }
             }
@@ -2403,8 +2397,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (rollbackResult.Success)
                 return Ok();
 
-            var notificationModel = new SimpleNotificationModel();
-
             switch (rollbackResult.Result)
             {
                 case OperationResultType.Failed:
@@ -2412,22 +2404,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case OperationResultType.FailedExceptionThrown:
                 case OperationResultType.NoOperation:
                 default:
-                    notificationModel.AddErrorNotification(
-                                    _localizedTextService.Localize("speechBubbles/operationFailedHeader"),
-                                    null); // TODO: There is no specific failed to save error message AFAIK
-                    break;
+                    return ValidationProblem(_localizedTextService.Localize("speechBubbles/operationFailedHeader"));
                 case OperationResultType.FailedCancelledByEvent:
-                    notificationModel.AddErrorNotification(
-                                    _localizedTextService.Localize("speechBubbles/operationCancelledHeader"),
-                                    _localizedTextService.Localize("speechBubbles/operationCancelledText"));
-                    break;
+                    return ValidationProblem(
+                        _localizedTextService.Localize("speechBubbles/operationCancelledHeader"),
+                        _localizedTextService.Localize("speechBubbles/operationCancelledText"));
             }
-
-            return new ValidationErrorResult(notificationModel);
         }
-
-
-
-
     }
 }

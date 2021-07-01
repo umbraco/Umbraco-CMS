@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating relation type with {Name}", relationType.Name);
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Error creating relation type.");
+                return ValidationProblem("Error creating relation type.");
             }
         }
 
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (relationTypePersisted == null)
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Relation type does not exist");
+                return ValidationProblem("Relation type does not exist");
             }
 
             _umbracoMapper.Map(relationType, relationTypePersisted);
@@ -185,7 +185,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error saving relation type with {Id}", relationType.Id);
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Something went wrong when saving the relation type");
+                return ValidationProblem("Something went wrong when saving the relation type");
             }
         }
 

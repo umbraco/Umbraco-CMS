@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // so that is why it is being used here.
                 ModelState.AddModelError("value", result.Errors.ToErrorMessage());
 
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             //They've successfully set their password, we can now update their user account to be approved
@@ -242,7 +242,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
 
-            return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            return ValidationProblem(ModelState);
         }
 
         // TODO: Why is this necessary? This inherits from UmbracoAuthorizedApiController

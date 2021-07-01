@@ -13,9 +13,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -27,7 +25,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [PrefixlessBodyModelValidator]
-    public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
+    public abstract class ContentTypeControllerBase<TContentType> : BackOfficeNotificationsController
         where TContentType : class, IContentTypeComposition
     {
         private readonly EditorValidatorCollection _editorValidatorCollection;
@@ -283,7 +281,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (ModelState.IsValid == false)
             {
                 var err = CreateModelStateValidationEror<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
-                return new ValidationErrorResult(err);
+                return ValidationProblem(err);
             }
 
             //filter out empty properties
@@ -305,11 +303,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 catch (Exception ex)
                 {
                     var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
-                    if (responseEx != null) return new ValidationErrorResult(responseEx);
+                    if (responseEx != null) return ValidationProblem(responseEx);
                 }
 
                 var exResult = CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(contentTypeSave, ct);
-                if (exResult != null) return new ValidationErrorResult(exResult);
+                if (exResult != null) return ValidationProblem(exResult);
 
                 saveContentType(ct);
 
@@ -348,11 +346,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (responseEx is null)
                         throw ex;
 
-                    return new ValidationErrorResult(responseEx);
+                    return ValidationProblem(responseEx);
                 }
 
                 var exResult = CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(contentTypeSave, newCt);
-                if (exResult != null) return new ValidationErrorResult(exResult);
+                if (exResult != null) return ValidationProblem(exResult);
 
                 //set id to null to ensure its handled as a new type
                 contentTypeSave.Id = null;
@@ -417,13 +415,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case MoveOperationStatusType.FailedParentNotFound:
                     return NotFound();
                 case MoveOperationStatusType.FailedCancelledByEvent:
-                    //returning an object of INotificationModel will ensure that any pending
-                    // notification messages are added to the response.
-                    return new ValidationErrorResult(new SimpleNotificationModel());
+                    return ValidationProblem();
                 case MoveOperationStatusType.FailedNotAllowedByPath:
-                    var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    return new ValidationErrorResult(notificationModel);
+                    return ValidationProblem(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -458,13 +452,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case MoveOperationStatusType.FailedParentNotFound:
                     return NotFound();
                 case MoveOperationStatusType.FailedCancelledByEvent:
-                    //returning an object of INotificationModel will ensure that any pending
-                    // notification messages are added to the response.
-                    return new ValidationErrorResult(new SimpleNotificationModel());
-                case MoveOperationStatusType.FailedNotAllowedByPath:
-                    var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    return new ValidationErrorResult(notificationModel);
+                    return ValidationProblem();
+                case MoveOperationStatusType.FailedNotAllowedByPath:                    
+                    return ValidationProblem(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
