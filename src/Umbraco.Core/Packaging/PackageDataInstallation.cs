@@ -690,7 +690,7 @@ namespace Umbraco.Core.Packaging
             }
 
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
-            UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
+            UpdateContentTypesPropertyGroups(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
 
             return contentType;
@@ -734,28 +734,41 @@ namespace Umbraco.Core.Packaging
             }
         }
 
-        private void UpdateContentTypesTabs(IContentType contentType, XElement tabElement)
+        private void UpdateContentTypesPropertyGroups(IContentType contentType, XElement propertyGroupsContainer)
         {
-            if (tabElement == null)
+            if (propertyGroupsContainer == null)
                 return;
 
-            var tabs = tabElement.Elements("Tab");
-            foreach (var tab in tabs)
+            var propertyGroupElements = propertyGroupsContainer.Elements("Tab");
+            foreach (var propertyGroupElement in propertyGroupElements)
             {
-                var id = tab.Element("Id").Value;//Do we need to use this for tracking?
-                var caption = tab.Element("Caption").Value;
+                var caption = propertyGroupElement.Element("Caption").Value;
 
-                if (contentType.PropertyGroups.Contains(caption) == false)
+                if (Guid.TryParse(propertyGroupElement.Element("Key")?.Value, out var key))
+                {
+                    contentType.AddPropertyGroup(key, caption);
+                }
+                else
                 {
                     contentType.AddPropertyGroup(caption);
-
                 }
 
-                int sortOrder;
-                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                var propertyGroup = contentType.PropertyGroups[caption];
+
+                if (Enum.TryParse<PropertyGroupType>(propertyGroupElement.Element("Type")?.Value, out var type))
+                {
+                    propertyGroup.Type = type;
+                }
+
+                if (Guid.TryParse(propertyGroupElement.Element("ParentKey")?.Value, out var parentKey))
+                {
+                    propertyGroup.ParentKey = parentKey;
+                }
+
+                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, out var sortOrder))
                 {
                     // Override the sort order with the imported value
-                    contentType.PropertyGroups[caption].SortOrder = sortOrder;
+                    propertyGroup.SortOrder = sortOrder;
                 }
             }
         }
