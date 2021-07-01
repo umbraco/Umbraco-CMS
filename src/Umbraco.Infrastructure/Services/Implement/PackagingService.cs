@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             XDocument xml;
             using (StreamReader streamReader = System.IO.File.OpenText(packageXmlFile.FullName))
             {
-                xml = XDocument.Load(streamReader);                
+                xml = XDocument.Load(streamReader);
             }
             return InstallCompiledPackageData(xml, userId);
         }
@@ -124,11 +124,11 @@ namespace Umbraco.Cms.Core.Services.Implement
                     {
                         PackageName = plan.PackageName
                     };
-                    installedPackages.Add(plan.PackageName, installedPackage);                    
+                    installedPackages.Add(plan.PackageName, installedPackage);
                 }
 
                 var currentPlans = installedPackage.PackageMigrationPlans.ToList();
-                keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.PackageName, out var currentState);
+                keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.Name, out var currentState);
                 currentPlans.Add(new InstalledPackageMigrationPlans
                 {
                     CurrentMigrationId = currentState,
