@@ -10,6 +10,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -202,6 +203,56 @@ namespace Umbraco.Extensions
 
             var version = umbracoVersion.SemanticVersion.ToSemanticString();
             return $"{version}.{runtimeMinifier.CacheBuster}".GenerateHash();
+        }
+
+        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string cropAlias, bool htmlEncode = true)
+        {
+            if (mediaItem == null)
+            {
+                return HtmlString.Empty;
+            }
+
+            var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+        }
+
+        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true)
+        {
+            if (mediaItem == null)
+            {
+                return HtmlString.Empty;
+            }
+
+            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+        }
+
+        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper,
+            IPublishedContent mediaItem,
+            int? width = null,
+            int? height = null,
+            string propertyAlias = Constants.Conventions.Media.File,
+            string cropAlias = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = false,
+            bool cacheBuster = true,
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true,
+            bool htmlEncode = true)
+        {
+            if (mediaItem == null)
+            {
+                return HtmlString.Empty;
+            }
+
+            var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
+                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
+                upScale);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
 
         public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper,
