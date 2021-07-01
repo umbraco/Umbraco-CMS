@@ -81,7 +81,8 @@
       onFocusName: '&?',
       onFocus: '&?',
       onChangeSortOrderValue: '&?',
-      onChangeName: '&?'
+      onChangeName: '&?',
+      valServerFieldName: '@'
     },
     controller: umbContentTypeTabController
   };

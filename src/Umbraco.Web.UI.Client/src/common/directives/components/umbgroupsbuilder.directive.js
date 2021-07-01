@@ -28,6 +28,10 @@
                 scope.tabs = $filter("filter")(scope.model.groups, (group) => {
                     return group.type === TYPE_TAB;
                 });
+
+                scope.tabs.forEach(tab => {
+                    tab.indexInGroups = scope.model.groups.findIndex(group => group.key === tab.key);
+                });
             });
 
             function getFirstTab () {
@@ -391,7 +395,7 @@
 
             };
 
-            /* ---------- TABS ---------- */
+            /* ---------- TABS ---------- */            
             scope.changeTab = function ({key}) {
                 scope.openTabKey = key;
             };
@@ -447,15 +451,6 @@
 
             scope.onChangeTabName = function () {
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
-            };
-
-            scope.getTabServerFieldName = function (tab) {
-                if (!tab) {
-                    return;
-                }
-
-                const indexInGroup = scope.model.groups.findIndex(group => group.key === tab.key);
-                return `Groups[${indexInGroup}].Name`;
             };
 
             scope.ungroupedPropertiesAreVisible = function({key, properties}) {
