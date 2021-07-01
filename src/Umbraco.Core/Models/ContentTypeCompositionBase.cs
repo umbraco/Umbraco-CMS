@@ -212,17 +212,41 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
         public override bool AddPropertyGroup(string groupName)
         {
-            return AddAndReturnPropertyGroup(groupName) != null;
+            return AddAndReturnPropertyGroup(null, groupName) != null;
         }
 
-        private PropertyGroup AddAndReturnPropertyGroup(string name)
+        public override bool AddPropertyGroup(Guid key, string groupName)
         {
-            // ensure we don't have it already
-            if (PropertyGroups.Any(x => x.Name.InvariantEquals(name)))
+            return AddAndReturnPropertyGroup(key, groupName) != null;
+        }
+
+        private PropertyGroup AddAndReturnPropertyGroup(Guid? key, string name)
+        {
+            // Ensure we don't have it already
+            if (PropertyGroups.Contains(name))
                 return null;
 
-            // create the new group
-            var group = new PropertyGroup(SupportsPublishing) { Name = name, SortOrder = 0 };
+            // Only update name if key already exists
+            if (key.HasValue)
+            {
+                var existingGroup = PropertyGroups.FirstOrDefault(x => x.Key == key.Value);
+                if (existingGroup != null)
+                {
+                    existingGroup.Name = name;
+                    return null;
+                }
+            }
+
+            // Add new group
+            var group = new PropertyGroup(SupportsPublishing)
+            {
+                Name = name
+            };
+
+            if (key.HasValue)
+            {
+                group.Key = key.Value;
+            }
 
             // check if it is inherited - there might be more than 1 but we want the 1st, to
             // reuse its sort order - if there are more than 1 and they have different sort
@@ -261,7 +285,7 @@ namespace Umbraco.Core.Models
 
             // get and ensure a group local to this content type
             var group = PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName))
-                ?? AddAndReturnPropertyGroup(propertyGroupName);
+                ?? AddAndReturnPropertyGroup(null, propertyGroupName);
             if (group == null)
                 return false;
 
