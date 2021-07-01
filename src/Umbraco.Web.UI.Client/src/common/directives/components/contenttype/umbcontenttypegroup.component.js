@@ -11,12 +11,8 @@
 
     vm.$onInit = onInit;
 
-    vm.removePromptIsVisible = false;
-
     vm.updateName = updateName;
     vm.removeGroup = removeGroup;
-    vm.togglePrompt = togglePrompt;
-    vm.hidePrompt = hidePrompt;
     vm.whenNameFocus = whenNameFocus;
     vm.whenFocus = whenFocus;
     vm.changeSortOrderValue = changeSortOrderValue;
@@ -28,14 +24,6 @@
       vm.formName = `groupForm${identifier}`;
     }
 
-    function togglePrompt () {
-      vm.removePromptIsVisible = !vm.removePromptIsVisible;
-    }
-
-    function hidePrompt () {
-      vm.removePromptIsVisible = false;
-    }
-
     function updateName (group) {
       if (vm.onUpdateName) {
         vm.onUpdateName({ group });
@@ -45,7 +33,6 @@
     function removeGroup () {
       if (vm.onRemove) {
         vm.onRemove({ group: vm.group });
-        vm.removePromptIsVisible = false;
       }
     }
 

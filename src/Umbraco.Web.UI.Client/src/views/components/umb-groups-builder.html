@@ -19,7 +19,6 @@
                             on-remove="removeTab(tab, tabIndex)"
                             val-server-field-name="{{'Groups[' + tab.indexInGroups + '].Name'}}"
                             on-change-sort-order-value="onChangeTabSortOrderValue(tab)"
-                            on-change-icon="onChangeTabIcon(icon, color, tab)"
                             on-change-name="onChangeTabName(name)">
                         </umb-content-type-tab>
                     </li>
@@ -116,7 +115,7 @@
                 allow-name="true"
                 group="group"
                 allow-remove="canRemoveGroup(group) && !sortingMode"
-                on-remove="removeGroup(group.key)"
+                on-remove="removeGroup(group)"
                 sorting="sortingMode"
                 val-server-field-name="{{'Groups[' + $index + '].Name'}}"
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)">

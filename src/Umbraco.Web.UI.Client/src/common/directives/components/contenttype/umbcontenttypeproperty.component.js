@@ -9,11 +9,7 @@
 
     const vm = this;
 
-    vm.removePromptIsVisible = false;
-
     vm.edit = edit;
-    vm.togglePrompt = togglePrompt;
-    vm.hidePrompt = hidePrompt;
     vm.remove = remove;
     vm.changeSortOrderValue = changeSortOrderValue;
 
@@ -23,18 +19,9 @@
       }
     }
 
-    function togglePrompt () {
-      vm.removePromptIsVisible = !vm.removePromptIsVisible;
-    }
-
-    function hidePrompt () {
-      vm.removePromptIsVisible = false;
-    }
-
     function remove () {
       if (vm.onRemove) {
         vm.onRemove({ property: vm.property });
-        vm.removePromptIsVisible = false;
       }
     }
 
