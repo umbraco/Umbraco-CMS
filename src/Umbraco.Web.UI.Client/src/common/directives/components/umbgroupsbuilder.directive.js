@@ -23,8 +23,6 @@
             scope.openTabKey = getFirstTab() ? getFirstTab().key : null;
             
             scope.$watchCollection('model.groups', (newValue) => {
-                if (newValue && newValue.length === 0) return;
-
                 scope.tabs = $filter("filter")(scope.model.groups, (group) => {
                     return group.type === TYPE_TAB;
                 });
@@ -427,9 +425,17 @@
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
-            scope.removeTab = function (tab) {
-                const index = scope.model.groups.findIndex(group => group.key === tab.key)
-                scope.model.groups.splice(index, 1);
+            scope.removeTab = function (tab, indexInTabs) {
+                scope.model.groups.splice(tab.indexInGroups, 1);
+
+                // remove all child groups
+                scope.model.groups = scope.model.groups.filter(group => group.parentKey !== tab.key);
+
+                // we need a timeout because the filter hasn't updated the tabs collection
+                $timeout(() => {
+                    scope.openTabKey = indexInTabs > 0 ? scope.tabs[indexInTabs - 1].key : scope.tabs[0].key;
+                });
+
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
@@ -554,10 +560,11 @@
 
             scope.canRemoveGroup = function (group) {
                 return group.inherited !== true && _.find(group.properties, function (property) { return property.locked === true; }) == null;
-            }
+            };
 
-            scope.removeGroup = function (groupIndex) {
-                scope.model.groups.splice(groupIndex, 1);
+            scope.removeGroup = function (key) {
+                const index = scope.model.groups.findIndex(group => group.key === key);
+                scope.model.groups.splice(index, 1);
             };
 
             scope.addGroupToActiveTab = function () {

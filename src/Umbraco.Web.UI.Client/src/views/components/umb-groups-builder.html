@@ -16,7 +16,7 @@
                             on-click="changeTab(tab)"
                             sorting="sortingMode"
                             allow-remove="canRemoveTab(tab) && !sortingMode"
-                            on-remove="removeTab(tab)"
+                            on-remove="removeTab(tab, tabIndex)"
                             val-server-field-name="{{'Groups[' + tab.indexInGroups + '].Name'}}"
                             on-change-sort-order-value="onChangeTabSortOrderValue(tab)"
                             on-change-icon="onChangeTabIcon(icon, color, tab)"
@@ -116,7 +116,7 @@
                 allow-name="true"
                 group="group"
                 allow-remove="canRemoveGroup(group) && !sortingMode"
-                on-remove="removeGroup(groupIndex)"
+                on-remove="removeGroup(group.key)"
                 sorting="sortingMode"
                 val-server-field-name="{{'Groups[' + $index + '].Name'}}"
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)">
