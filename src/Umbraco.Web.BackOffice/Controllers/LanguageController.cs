@@ -53,8 +53,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return CultureInfo.GetCultures(CultureTypes.AllCultures)
                 .Where(x => !x.Name.IsNullOrWhiteSpace())
                 .Select(x => new CultureInfo(x.Name)) // important!
-                .OrderBy(x => x.DisplayName)
-                .ToDictionary(x => x.Name, x => x.DisplayName);
+                .OrderBy(x => x.EnglishName)
+                .ToDictionary(x => x.Name, x => x.EnglishName);
         }
 
         /// <summary>
