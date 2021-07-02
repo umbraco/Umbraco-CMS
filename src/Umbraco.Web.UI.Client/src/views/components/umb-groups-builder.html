@@ -16,8 +16,8 @@
                             on-click="changeTab(tab)"
                             sorting="sortingMode"
                             allow-remove="canRemoveTab(tab) && !sortingMode"
-                            on-remove="removeTab(tab)"
-                            val-server-field-name="{{ getTabServerFieldName(tab) }}"
+                            on-remove="removeTab(tab, tabIndex)"
+                            val-server-field-name="{{'Groups[' + tab.indexInGroups + '].Name'}}"
                             on-change-sort-order-value="onChangeTabSortOrderValue(tab)"
                             on-change-name="onChangeTabName(name)">
                         </umb-content-type-tab>
@@ -89,8 +89,8 @@
                         sortable="sortingMode"
                         on-edit="editPropertyTypeSettings(property)"
                         on-remove="deleteProperty(tab.properties, property)"
-                        val-server-field-alias="{{'Groups[' + tabIndex + '].Properties[' + propertyIndex + '].Alias'}}"
-                        val-server-field-label="{{'Groups[' + tabIndex + '].Properties[' + propertyIndex + '].Label'}}"
+                        val-server-field-alias="{{'Groups[' + tab.indexInGroups + '].Properties[' + propertyIndex + '].Alias'}}"
+                        val-server-field-label="{{'Groups[' + tab.indexInGroups + '].Properties[' + propertyIndex + '].Label'}}"
                         on-change-sort-order-value="onChangePropertySortOrderValue(tab)">
                     </umb-content-type-property>
                 </li>
@@ -115,7 +115,7 @@
                 allow-name="true"
                 group="group"
                 allow-remove="canRemoveGroup(group) && !sortingMode"
-                on-remove="removeGroup(groupIndex)"
+                on-remove="removeGroup(group)"
                 sorting="sortingMode"
                 val-server-field-name="{{'Groups[' + $index + '].Name'}}"
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)">

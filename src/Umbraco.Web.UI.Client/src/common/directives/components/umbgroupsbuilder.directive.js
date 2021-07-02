@@ -23,10 +23,12 @@
             scope.openTabKey = getFirstTab() ? getFirstTab().key : null;
             
             scope.$watchCollection('model.groups', (newValue) => {
-                if (newValue && newValue.length === 0) return;
-
                 scope.tabs = $filter("filter")(scope.model.groups, (group) => {
                     return group.type === TYPE_TAB;
+                });
+
+                scope.tabs.forEach(tab => {
+                    tab.indexInGroups = scope.model.groups.findIndex(group => group.key === tab.key);
                 });
             });
 
@@ -391,7 +393,7 @@
 
             };
 
-            /* ---------- TABS ---------- */
+            /* ---------- TABS ---------- */            
             scope.changeTab = function ({key}) {
                 scope.openTabKey = key;
             };
@@ -422,10 +424,41 @@
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
-            scope.removeTab = function (tab) {
-                const index = scope.model.groups.findIndex(group => group.key === tab.key)
-                scope.model.groups.splice(index, 1);
-                scope.$broadcast('umbOverflowChecker.checkOverflow');
+            scope.removeTab = function (tab, indexInTabs) {
+                $q.all([
+                    localizationService.localize('contentTypeEditor_removeTabPromptTitle', [tab.name]),
+                    localizationService.localize('contentTypeEditor_removeTabPromptContent', [tab.name])
+                ]).then((localizations) => {
+
+                    const confirm = {
+                        title: localizations[0],
+                        view: "default",
+                        content: localizations[1],
+                        submitButtonLabelKey: "general_remove",
+                        submitButtonStyle: "danger",
+                        closeButtonLabelKey: "general_cancel",
+                        submit: function () {
+                            scope.model.groups.splice(tab.indexInGroups, 1);
+            
+                            // remove all child groups
+                            scope.model.groups = scope.model.groups.filter(group => group.parentKey !== tab.key);
+            
+                            // we need a timeout because the filter hasn't updated the tabs collection
+                            $timeout(() => {
+                                scope.openTabKey = indexInTabs > 0 ? scope.tabs[indexInTabs - 1].key : scope.tabs[0].key;
+                            });
+            
+                            scope.$broadcast('umbOverflowChecker.checkOverflow');
+
+                            overlayService.close();
+                        },
+                        close: function () {
+                            overlayService.close();
+                        }
+                    };
+
+                    overlayService.open(confirm);
+                });
             };
 
             scope.canRemoveTab = function (tab) {
@@ -442,15 +475,6 @@
 
             scope.onChangeTabName = function () {
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
-            };
-
-            scope.getTabServerFieldName = function (tab) {
-                if (!tab) {
-                    return;
-                }
-
-                const indexInGroup = scope.model.groups.findIndex(group => group.key === tab.key);
-                return `Groups[${indexInGroup}].Name`;
             };
 
             scope.ungroupedPropertiesAreVisible = function({key, properties}) {
@@ -554,10 +578,35 @@
 
             scope.canRemoveGroup = function (group) {
                 return group.inherited !== true && _.find(group.properties, function (property) { return property.locked === true; }) == null;
-            }
+            };
 
-            scope.removeGroup = function (groupIndex) {
-                scope.model.groups.splice(groupIndex, 1);
+            scope.removeGroup = function (selectedGroup) {
+                $q.all([
+                    localizationService.localize('contentTypeEditor_removeGroupPromptTitle', [selectedGroup.name]),
+                    localizationService.localize('contentTypeEditor_removeGroupPromptContent', [selectedGroup.name])
+                ]).then((localizations) => {
+
+                    const confirm = {
+                        title: localizations[0],
+                        view: "default",
+                        content: localizations[1],
+                        submitButtonLabelKey: "general_remove",
+                        submitButtonStyle: "danger",
+                        closeButtonLabelKey: "general_cancel",
+                        submit: function () {
+
+                            const index = scope.model.groups.findIndex(group => group.key === selectedGroup.key);
+                            scope.model.groups.splice(index, 1);
+
+                            overlayService.close();
+                        },
+                        close: function () {
+                            overlayService.close();
+                        }
+                    };
+
+                    overlayService.open(confirm);
+                });
             };
 
             scope.addGroupToActiveTab = function () {
@@ -718,10 +767,35 @@
                 }
             };
 
-            scope.deleteProperty = function (properties, { id }) {
-                const index = properties.map(property => property.id).findIndex(propertyId => propertyId === id);
-                properties.splice(index, 1);
-                notifyChanged();
+            scope.deleteProperty = function (properties, { id, label }) {
+
+                $q.all([
+                    localizationService.localize('contentTypeEditor_removePropertyPromptTitle', [label]),
+                    localizationService.localize('contentTypeEditor_removePropertyPromptContent', [label])
+                ]).then((localizations) => {
+
+                    const confirm = {
+                        title: localizations[0],
+                        view: "default",
+                        content: localizations[1],
+                        submitButtonLabelKey: "general_remove",
+                        submitButtonStyle: "danger",
+                        closeButtonLabelKey: "general_cancel",
+                        submit: function () {
+                            
+                            const index = properties.findIndex(property => property.id === id);
+                            properties.splice(index, 1);
+                            notifyChanged();
+
+                            overlayService.close();
+                        },
+                        close: function () {
+                            overlayService.close();
+                        }
+                    };
+
+                    overlayService.open(confirm);
+                });
             };
 
             scope.onChangePropertySortOrderValue = function (group) {

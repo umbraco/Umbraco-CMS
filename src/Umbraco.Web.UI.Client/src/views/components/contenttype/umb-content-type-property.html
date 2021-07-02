@@ -137,15 +137,9 @@
 
           <!-- delete property -->
           <div ng-if="!vm.property.locked" class="umb-group-builder__property-action">
-              <button aria-label="Delete property" class="btn-icon" ng-click="vm.togglePrompt()">
+              <button aria-label="Delete property" class="btn-icon" ng-click="vm.remove()">
                   <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
               </button>
-              <umb-confirm-action
-                  ng-if="vm.removePromptIsVisible"
-                  direction="left"
-                  on-confirm="vm.remove()"
-                  on-cancel="vm.hidePrompt()">
-              </umb-confirm-action>
           </div>
 
       </div>

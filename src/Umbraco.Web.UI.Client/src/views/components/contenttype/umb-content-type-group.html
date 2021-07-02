@@ -50,13 +50,7 @@
             </ng-form>
 
             <div class="umb-group-builder__group-remove" ng-if="vm.allowRemove">
-                <i class="icon-trash" ng-click="vm.togglePrompt()"></i>
-                <umb-confirm-action
-                    ng-if="vm.removePromptIsVisible"
-                    direction="left"
-                    on-confirm="vm.removeGroup()"
-                    on-cancel="vm.hidePrompt()">
-                </umb-confirm-action>
+                <i class="icon-trash" ng-click="vm.removeGroup()"></i>
             </div>
         </div>
 

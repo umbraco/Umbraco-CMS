@@ -51,14 +51,8 @@
       </div>
   </div>
   <div class="umb-group-builder__tab-remove" ng-if="vm.allowRemove">
-      <button type="button" class="btn-reset" ng-click="vm.togglePrompt()">
+      <button type="button" class="btn-reset" ng-click="vm.removeTab()">
           <i class="icon-trash"></i>
       </button>
-      <umb-confirm-action
-          ng-if="vm.removePromptIsVisible"
-          direction="left"
-          on-confirm="vm.removeTab()"
-          on-cancel="vm.hidePrompt()">
-      </umb-confirm-action>
   </div>
 </div>

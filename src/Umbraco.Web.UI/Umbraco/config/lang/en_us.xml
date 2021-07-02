@@ -1754,6 +1754,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
     <key alias="displaySettingsHeadline">Appearance</key>
     <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
+    <key alias="removeTabPromptTitle">Remove the tab "%0%?"</key>
+    <key alias="removeTabPromptContent">Are you sure you want to remove "%0%" and all groups and properties underneath?</key>
+    <key alias="removeGroupPromptTitle">Remove the group "%0%?"</key>
+    <key alias="removeGroupPromptContent">Are you sure you want to remove "%0%" and all properties underneath?</key>
+    <key alias="removePropertyPromptTitle">Remove the property "%0%"?</key>
+    <key alias="removePropertyPromptContent">Are you sure you want to remove "%0%"?</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

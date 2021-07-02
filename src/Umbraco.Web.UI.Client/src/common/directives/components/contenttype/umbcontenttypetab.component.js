@@ -5,28 +5,16 @@
    * A component to render the content type tab
    */
   
-  function umbContentTypeTabController(editorService) {
+  function umbContentTypeTabController() {
 
     const vm = this;
 
-    vm.removePromptIsVisible = false;
-
     vm.click = click;
     vm.removeTab = removeTab;
-    vm.togglePrompt = togglePrompt;
-    vm.hidePrompt = hidePrompt;
     vm.whenFocusName = whenFocusName;
     vm.whenFocus = whenFocus;
     vm.changeSortOrderValue = changeSortOrderValue;
     vm.changeName = changeName;
-
-    function togglePrompt () {
-      vm.removePromptIsVisible = !vm.removePromptIsVisible;
-    }
-
-    function hidePrompt () {
-      vm.removePromptIsVisible = false;
-    }
 
     function click () {
       if (vm.onClick) {
@@ -37,7 +25,6 @@
     function removeTab () {
       if (vm.onRemove) {
         vm.onRemove({ tab: vm.tab });
-        vm.removePromptIsVisible = false;
       }
     }
 
@@ -81,7 +68,8 @@
       onFocusName: '&?',
       onFocus: '&?',
       onChangeSortOrderValue: '&?',
-      onChangeName: '&?'
+      onChangeName: '&?',
+      valServerFieldName: '@'
     },
     controller: umbContentTypeTabController
   };
