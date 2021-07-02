@@ -17,6 +17,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
@@ -53,6 +54,8 @@ namespace Umbraco.Tests.Services
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
 
+            var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
+
             return new PublishedSnapshotService(
                 options,
                 null,
@@ -66,11 +69,13 @@ namespace Umbraco.Tests.Services
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(),
+                new DatabaseDataSource(nestedContentDataSerializerFactory),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                new TestSyncBootStateAccessor(SyncBootState.WarmBoot),
+                nestedContentDataSerializerFactory);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

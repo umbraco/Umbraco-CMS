@@ -10,6 +10,12 @@
         return selected;
     };
 
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
+
     $scope.pickGroup = function() {
         editorService.memberGroupPicker({
             multiPicker: true,
@@ -24,6 +30,7 @@
                         $scope.model.value[group.name] = true;
                     });
                 });
+                setDirty();
                 editorService.close();
             },
             close: function () {
@@ -34,6 +41,7 @@
 
     $scope.removeGroup = function (group) {
         $scope.model.value[group] = false;
+        setDirty();
     }
 }
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MemberGroupController", memberGroupController);

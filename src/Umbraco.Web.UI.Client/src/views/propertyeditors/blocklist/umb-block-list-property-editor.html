@@ -10,7 +10,7 @@
 
                 <button type="button"
                         class="btn-reset umb-block-list__block--create-button"
-                        ng-click="vm.showCreateDialog($index, $event)"
+                        ng-click="vm.requestShowCreate($index, $event)"
                         ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
                         ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
                     <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
@@ -26,14 +26,30 @@
             </div>
         </div>
 
-        <button ng-if="vm.loading !== true"
-                id="{{vm.model.alias}}"
+        <div class="umb-block-list__actions" ng-if="vm.loading !== true">
+            <button
+                    id="{{vm.model.alias}}"
+                    type="button"
+                    class="btn-reset umb-block-list__create-button umb-outline"
+                    ng-disabled="vm.availableBlockTypes.length === 0"
+                    ng-click="vm.requestShowCreate(vm.layout.length, $event)">
+                <localize ng-if="vm.availableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
+                <localize ng-if="vm.availableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.availableBlockTypes[0].elementTypeModel.name]">Add content</localize>
+            </button>
+            <button
                 type="button"
-                class="btn-reset umb-block-list__create-button umb-outline"
-                ng-class="{ '--disabled': vm.availableBlockTypes.length === 0 }"
-                ng-click="vm.showCreateDialog(vm.layout.length, $event)">
-            <localize key="grid_addElement">Add content</localize>
-        </button>
+                class="btn-reset umb-block-list__clipboard-button umb-outline"
+                ng-class="{'--jump': vm.jumpClipboardButton}"
+                ng-disabled="vm.clipboardItems.length === 0"
+                ng-click="vm.requestShowClipboard(vm.layout.length, $event)"
+                localize="title"
+                title="@blockEditor_tabClipboard">
+                <i class="icon icon-paste-in" aria-hidden="true"></i>
+                <span class="sr-only">
+                    <localize key="blockEditor_tabClipboard">Clipboard</localize>
+                </span>
+            </button>
+        </div>
 
         <input type="hidden" name="minCount" ng-model="vm.layout" val-server="minCount" />
         <input type="hidden" name="maxCount" ng-model="vm.layout" val-server="maxCount" />
@@ -60,6 +76,5 @@
         view="vm.blockTypePicker.view"
         model="vm.blockTypePicker">
     </umb-overlay>
-
 
 </div>

@@ -21,7 +21,7 @@ angular.module('umbraco')
 
         //combine the config with any values returned from the server
         if ($scope.model.config) {
-            angular.extend(config, $scope.model.config);
+            Utilities.extend(config, $scope.model.config);
         }
 
         if ($scope.model.value) {

@@ -328,7 +328,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<UmbracoModule>("Could not dispose item with key " + k, ex);
+                    _logger.Error<UmbracoModule>(ex, "Could not dispose item with key {Key}", k);
                 }
                 try
                 {
@@ -336,7 +336,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<UmbracoModule>("Could not dispose item key " + k, ex);
+                    _logger.Error<UmbracoModule>(ex, "Could not dispose item key {Key}", k);
                 }
             }
         }

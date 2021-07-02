@@ -175,7 +175,7 @@ namespace Umbraco.Web.Trees
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
                 if (ignoreUserStartNodes == false && HasPathAccess(id, queryStrings) == false)
                 {
-                    Logger.Warn<ContentTreeControllerBase>("User {Username} does not have access to node with id {Id}", Security.CurrentUser.Username, id);
+                    Logger.Warn<ContentTreeControllerBase, string, string>("User {Username} does not have access to node with id {Id}", Security.CurrentUser.Username, id);
                     return nodes;
                 }
 
@@ -331,11 +331,10 @@ namespace Umbraco.Web.Trees
                         RecycleBinId.ToInvariantString(),
                         id,
                         queryStrings,
-                        Services.TextService.Localize("general/recycleBin"),
+                        Services.TextService.Localize("general", "recycleBin"),
                         "icon-trash",
                         RecycleBinSmells,
                         queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
-
                 }
 
                 return nodes;

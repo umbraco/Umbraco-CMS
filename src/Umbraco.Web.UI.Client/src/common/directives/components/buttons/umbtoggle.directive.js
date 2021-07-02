@@ -129,6 +129,8 @@
             replace: true,
             templateUrl: 'views/components/buttons/umb-toggle.html',
             scope: {
+                // TODO: This should have required ngModel so we can track and validate user input correctly
+                // https://docs.angularjs.org/api/ng/type/ngModel.NgModelController#custom-control-example
                 checked: "=",
                 disabled: "=",
                 inputId: "@",

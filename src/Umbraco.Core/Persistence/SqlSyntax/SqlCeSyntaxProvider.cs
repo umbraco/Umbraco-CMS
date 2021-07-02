@@ -16,6 +16,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
+        public SqlCeSyntaxProvider()
+        {
+            BlobColumnDefinition = "IMAGE";
+            // This is silly to have to do this but the way these inherited classes are structured it's the easiest
+            // way without an overhaul in type map initialization
+            DbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
+        }
+
         public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
             return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
@@ -158,6 +166,16 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             return result > 0;
         }
 
+        public override void WriteLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            ObtainWriteLock(db, timeout, lockId);
+        }
+
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
             // soon as we get Database, a transaction is started
@@ -165,15 +183,30 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
 
-            var timeOut = Current.Configs.Global().SqlWriteLockTimeOut;
-            db.Execute(@"SET LOCK_TIMEOUT " + timeOut  + ";");
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            var timeout = TimeSpan.FromMilliseconds(Current.Configs.Global().SqlWriteLockTimeOut);
+
             foreach (var lockId in lockIds)
             {
-                var i = db.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
-                if (i == 0) // ensure we are actually locking!
-                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+                ObtainWriteLock(db, timeout, lockId);
             }
+        }
+
+        private static void ObtainWriteLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            db.Execute(@"SET LOCK_TIMEOUT " + timeout.TotalMilliseconds  + ";");
+            var i = db.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+            if (i == 0) // ensure we are actually locking!
+                throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+        }
+
+        public override void ReadLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            ObtainReadLock(db, timeout, lockId);
         }
 
         public override void ReadLock(IDatabase db, params int[] lockIds)
@@ -183,13 +216,23 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
 
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
             {
-                var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
-                if (i == null) // ensure we are actually locking!
-                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+                ObtainReadLock(db, null, lockId);
             }
+        }
+
+        private static void ObtainReadLock(IDatabase db, TimeSpan? timeout, int lockId)
+        {
+            if (timeout.HasValue)
+            {
+                db.Execute(@"SET LOCK_TIMEOUT " + timeout.Value.TotalMilliseconds + ";");
+            }
+
+            var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new {id = lockId});
+
+            if (i == null) // ensure we are actually locking!
+                throw new ArgumentException($"LockObject with id={lockId} does not exist.");
         }
 
         protected override string FormatIdentity(ColumnDefinition column)
@@ -230,15 +273,36 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             }
         }
 
-
-
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
+        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4})";
+        public override string Format(IndexDefinition index)
+        {
+            var name = string.IsNullOrEmpty(index.Name)
+                ? $"IX_{index.TableName}_{index.ColumnName}"
+                : index.Name;
 
+            var columns = index.Columns.Any()
+                ? string.Join(",", index.Columns.Select(x => GetQuotedColumnName(x.Name)))
+                : GetQuotedColumnName(index.ColumnName);
+
+
+            return string.Format(CreateIndex, GetIndexType(index.IndexType), " ", GetQuotedName(name),
+                                 GetQuotedTableName(index.TableName), columns);
+        }
+        
         public override string GetSpecialDbType(SpecialDbTypes dbTypes)
         {
             if (dbTypes == SpecialDbTypes.NVARCHARMAX) // SqlCE does not have nvarchar(max) for now
                 return "NTEXT";
             return base.GetSpecialDbType(dbTypes);
+        }
+        public override SqlDbType GetSqlDbType(DbType dbType)
+        {
+            if (DbType.Binary == dbType)
+            {
+                return SqlDbType.Image;
+            }
+            return base.GetSqlDbType(dbType);
         }
     }
 }

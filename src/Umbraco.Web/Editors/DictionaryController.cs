@@ -101,7 +101,7 @@ namespace Umbraco.Web.Editors
             if (Services.LocalizationService.DictionaryItemExists(key))
             {
                 var message = Services.TextService.Localize(
-                     "dictionaryItem/changeKeyError",
+                     "dictionaryItem","changeKeyError",
                      Security.CurrentUser.GetUserCulture(Services.TextService, GlobalSettings),
                      new Dictionary<string, string> { { "0", key } });
                 return Request.CreateNotificationValidationErrorResponse(message);
@@ -124,7 +124,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error(GetType(), ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
+                Logger.Error<string,int>(GetType(), ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
                 return Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
             }
         }
@@ -224,7 +224,7 @@ namespace Umbraco.Web.Editors
                 {
 
                     var message = Services.TextService.Localize(
-                        "dictionaryItem/changeKeyError",
+                        "dictionaryItem","changeKeyError",
                         userCulture,
                         new Dictionary<string, string> { { "0", dictionary.Name } });
                     ModelState.AddModelError("Name", message);
@@ -247,14 +247,14 @@ namespace Umbraco.Web.Editors
                 var model = Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
                 model.Notifications.Add(new Notification(
-                    Services.TextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty,
+                    Services.TextService.Localize("speechBubbles","dictionaryItemSaved", userCulture), string.Empty,
                     NotificationStyle.Success));
 
                 return model;
             }
             catch (Exception ex)
             {
-                Logger.Error(GetType(), ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
+                Logger.Error<string,Guid>(GetType(), ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary"));
             }
         }

@@ -94,7 +94,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 {
                     if (!LegacyAliases.Contains(dataType.EditorAlias))
                     {
-                        _logger.Warn<DataTypeMigration>(
+                        _logger.Warn<DataTypeMigration,int,string>(
                             "Skipping validation of configuration for data type {NodeId} : {EditorAlias}."
                             + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
                             dataType.NodeId, dataType.EditorAlias);
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 {
                     if (!LegacyAliases.Contains(newAlias))
                     {
-                        _logger.Warn<DataTypeMigration>("Skipping validation of configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})"
+                        _logger.Warn<DataTypeMigration,int,string,string>("Skipping validation of configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})"
                                                         + " because no property editor with that alias was found."
                                                         + " Please ensure that the configuration is valid. The site may fail to start and / or load data types and run.",
                             dataType.NodeId, newAlias, dataType.EditorAlias);
@@ -119,7 +119,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     }
                     catch (Exception e)
                     {
-                        _logger.Warn<DataTypeMigration>(e, "Failed to validate configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})."
+                        _logger.Warn<DataTypeMigration,int,string,string>(e, "Failed to validate configuration for data type {NodeId} : {NewEditorAlias} (was: {EditorAlias})."
                                                         + " Please fix the configuration and ensure it is valid. The site may fail to start and / or load data types and run.",
                                                         dataType.NodeId, newAlias, dataType.EditorAlias);
                     }
