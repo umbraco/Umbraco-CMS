@@ -11,7 +11,8 @@
                 model: "=",
                 onStartTyping: "&?",
                 onSearch: "&?",
-                onBlur: "&?"
+                onBlur: "&?",
+                label: "@"
             }
         });
 
@@ -21,6 +22,7 @@
 
         vm.onKeyDown = onKeyDown;
         vm.onChange = onChange;
+        vm.randomUniquId = randomUniquId();
         
         var searchDelay = _.debounce(function () {
             $scope.$apply(function () {
@@ -29,7 +31,7 @@
                 }
             });
         }, 500);
-    
+
         function onKeyDown(evt) {
             //13: enter
             switch (evt.keyCode) {
@@ -46,6 +48,12 @@
                 vm.onStartTyping();
             }
             searchDelay();
+        }
+
+        function randomUniquId() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
         }
 
     }
