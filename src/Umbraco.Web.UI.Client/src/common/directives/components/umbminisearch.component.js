@@ -12,18 +12,20 @@
                 onStartTyping: "&?",
                 onSearch: "&?",
                 onBlur: "&?",
-                label: "@"
+                labelKey: "@?"
             }
         });
 
-    function UmbMiniSearchController($scope) {
+    function UmbMiniSearchController($scope, localizationService) {
         
         var vm = this;
 
         vm.onKeyDown = onKeyDown;
         vm.onChange = onChange;
-        vm.randomUniquId = randomUniquId();
+        vm.inputId = randomUniquId();
         
+        init();
+
         var searchDelay = _.debounce(function () {
             $scope.$apply(function () {
                 if (vm.onSearch) {
@@ -56,6 +58,20 @@
                 .substring(1);
         }
 
+        function init() {
+            setText();
+        }
+
+        function setText() {
+            var keyToLocalize = vm.labelKey ? vm.labelKey : 'general_search';
+
+            localizationService.localize(keyToLocalize).then(function (data) {
+                // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
+                    if(data.indexOf('[') === -1){
+                    vm.text = data;
+                    }
+            });
+        }
     }
 
 })();
