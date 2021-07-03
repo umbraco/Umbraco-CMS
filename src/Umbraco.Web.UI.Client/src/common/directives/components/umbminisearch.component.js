@@ -12,7 +12,8 @@
                 onStartTyping: "&?",
                 onSearch: "&?",
                 onBlur: "&?",
-                labelKey: "@?"
+                labelKey: "@?",
+                inputId: "@?"
             }
         });
 
@@ -22,9 +23,7 @@
 
         vm.onKeyDown = onKeyDown;
         vm.onChange = onChange;
-        vm.inputId = randomUniquId();
-        
-        init();
+        vm.$onInit = onInit;
 
         var searchDelay = _.debounce(function () {
             $scope.$apply(function () {
@@ -52,18 +51,13 @@
             searchDelay();
         }
 
-        function randomUniquId() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-        }
-
-        function init() {
+        function onInit() {
+            vm.inputId = vm.inputId || "search_" + String.CreateGuid();
             setText();
         }
 
         function setText() {
-            var keyToLocalize = vm.labelKey ? vm.labelKey : 'general_search';
+            var keyToLocalize = vm.labelKey || 'general_search';
 
             localizationService.localize(keyToLocalize).then(function (data) {
                 // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
