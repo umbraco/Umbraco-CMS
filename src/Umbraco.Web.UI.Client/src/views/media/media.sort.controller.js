@@ -11,6 +11,8 @@
         vm.saveButtonState = "init";
         vm.sortOrder = {};
         vm.sortableOptions = {
+            axis: "y",
+            containment: "parent",
             distance: 10,
             tolerance: "pointer",
             opacity: 0.7,

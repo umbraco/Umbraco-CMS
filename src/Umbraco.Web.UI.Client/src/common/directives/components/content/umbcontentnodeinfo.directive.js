@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     'use strict';
 
     function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService, entityResource) {
@@ -159,7 +159,7 @@
             }
 
             scope.openTemplate = function () {
-                var template = _.findWhere(scope.allTemplates, {alias: scope.node.template})
+                var template = _.findWhere(scope.allTemplates, { alias: scope.node.template })
                 if (!template) {
                     return;
                 }
@@ -200,7 +200,7 @@
 
                 //don't load this if it's already done
                 if (auditTrailLoaded && !forceReload) {
-                    return; 
+                    return;
                 }
 
                 scope.loadingAuditTrail = true;
@@ -251,7 +251,7 @@
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
-                    
+
                     switch (item.logType) {
                         case "Save":
                             item.logTypeColor = "primary";
@@ -263,7 +263,7 @@
                         case "Unpublish":
                         case "UnpublishVariant":
                             item.logTypeColor = "warning";
-                        break;
+                            break;
                         case "Delete":
                             item.logTypeColor = "danger";
                             break;
@@ -318,14 +318,9 @@
                     return;
                 }
 
-                // find the URLs for the currently selected language
-                if (scope.node.variants.length > 1) {
-                    // nodes with variants
-                    scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language && scope.currentVariant.language.culture === url.culture));
-                } else {
-                    // invariant nodes
-                    scope.currentUrls = scope.node.urls;
-                }
+                // find the urls for the currently selected language
+                // when there is no selected language (allow vary by culture == false), show all urls of the node.
+                scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language == null || scope.currentVariant.language.culture === url.culture));
 
                 // figure out if multiple cultures apply across the content URLs
                 scope.currentUrlsHaveMultipleCultures = _.keys(_.groupBy(scope.currentUrls, url => url.culture)).length > 1;

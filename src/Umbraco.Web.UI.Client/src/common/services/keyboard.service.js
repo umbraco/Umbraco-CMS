@@ -264,7 +264,7 @@ function keyboardService($window, $timeout) {
 
         var elt;
         // Initialize opt object
-        opt   = angular.extend({}, defaultOpt, opt);
+        opt   = Utilities.extend({}, defaultOpt, opt);
         label = label.toLowerCase();
         elt   = opt.target;
         if(typeof opt.target === 'string'){

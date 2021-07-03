@@ -36,13 +36,15 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <h5><localize key="contentTypeEditor_configuration"></localize></h5>
-                    
-                    <umb-property property="preValue" ng-repeat="preValue in vm.dataType.preValues">
-                        <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
-                    </umb-property>
-                        
+
+                    <div ng-if="vm.dataType.preValues.length > 0">
+                        <h5><localize key="contentTypeEditor_configuration"></localize></h5>
+
+                        <umb-property property="preValue" ng-repeat="preValue in vm.dataType.preValues">
+                            <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+                        </umb-property>
+                    </div>
+
                 </umb-box-content>
             </umb-box>
         </umb-editor-container>

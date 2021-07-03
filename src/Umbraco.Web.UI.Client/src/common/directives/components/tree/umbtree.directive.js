@@ -348,7 +348,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             };
 
             $scope.selectEnabledNodeClass = node =>
-                node && node.selected ? 'icon umb-tree-icon sprTree icon-check green temporary' : '';            
+                node && node.selected ? 'icon sprTree icon-check green temporary' : '-hidden';
 
             /* helper to force reloading children of a tree node */
             $scope.loadChildren = (node, forceReload) => loadChildren(node, forceReload);

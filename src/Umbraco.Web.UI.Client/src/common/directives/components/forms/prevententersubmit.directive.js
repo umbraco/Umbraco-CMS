@@ -17,7 +17,7 @@ angular.module("umbraco.directives")
             }
 
             $(element).on("keypress", function (event) {
-                if (event.which === 13) {
+                if (event.which === 13 && enabled === true) {
                     event.preventDefault();
                 }
             });

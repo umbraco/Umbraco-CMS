@@ -101,14 +101,14 @@ namespace Umbraco.Core.Runtime
 
             lock (_locko)
             {
-                _logger.Debug<MainDom>("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
+                _logger.Debug<MainDom, string, string>("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
 
                 try
                 {
-                    _logger.Info<MainDom>("Stopping ({SignalSource})", source);
+                    _logger.Info<MainDom, string>("Stopping ({SignalSource})", source);
                     foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                     {
                         try
@@ -122,14 +122,14 @@ namespace Umbraco.Core.Runtime
                         }
                     }
                         
-                    _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
+                    _logger.Debug<MainDom, string>("Stopped ({SignalSource})", source);
                 }
                 finally
                 {
                     // in any case...
                     _isMainDom = false;
                     _mainDomLock.Dispose();
-                    _logger.Info<MainDom>("Released ({SignalSource})", source);
+                    _logger.Info<MainDom, string>("Released ({SignalSource})", source);
                 }
 
             }
@@ -179,7 +179,14 @@ namespace Umbraco.Core.Runtime
                 _listenTask = _mainDomLock.ListenAsync();
                 _listenCompleteTask = _listenTask.ContinueWith(t =>
                 {
-                    _logger.Debug<MainDom>("Listening task completed with {TaskStatus}", _listenTask.Status);
+                    if (_listenTask.Exception != null)
+                    {
+                        _logger.Warn<MainDom>("Listening task completed with {TaskStatus}, Exception: {Exception}", _listenTask.Status, _listenTask.Exception);
+                    }
+                    else
+                    {
+                        _logger.Debug<MainDom>("Listening task completed with {TaskStatus}", _listenTask.Status);
+                    }
 
                     OnSignal("signal");
                 }, TaskScheduler.Default); // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html

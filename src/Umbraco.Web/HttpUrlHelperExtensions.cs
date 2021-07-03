@@ -103,7 +103,7 @@ namespace Umbraco.Web
             string routeName;
             if (area.IsNullOrWhiteSpace())
             {
-                routeName = string.Format("umbraco-{0}-{1}", "api", controllerName);
+                routeName = $"umbraco-{"api"}-{controllerName}";
                 if (id == null)
                 {
                     return url.Route(routeName, new { controller = controllerName, action = actionName, httproute = "" });
@@ -115,7 +115,7 @@ namespace Umbraco.Web
             }
             else
             {
-                routeName = string.Format("umbraco-{0}-{1}-{2}", "api", area, controllerName);
+                routeName = $"umbraco-{"api"}-{area}-{controllerName}";
                 if (id == null)
                 {
                     return url.Route(routeName, new { controller = controllerName, action = actionName, httproute = "" });

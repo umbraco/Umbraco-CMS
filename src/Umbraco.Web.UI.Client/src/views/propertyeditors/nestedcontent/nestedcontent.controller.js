@@ -8,7 +8,7 @@
 
     angular.module('umbraco').run(['clipboardService', function (clipboardService) {
 
-        function clearNestedContentPropertiesForStorage(prop, propClearingMethod) {
+        function resolveNestedContentPropertiesForPaste(prop, propClearingMethod) {
 
             // if prop.editor is "Umbraco.NestedContent"
             if ((typeof prop === 'object' && prop.editor === "Umbraco.NestedContent")) {
@@ -17,8 +17,8 @@
                 for (var i = 0; i < value.length; i++) {
                     var obj = value[i];
 
-                    // remove the key
-                    delete obj.key;
+                    // generate a new key.
+                    obj.key = String.CreateGuid();
 
                     // Loop through all inner properties:
                     for (var k in obj) {
@@ -28,10 +28,10 @@
             }
         }
 
-        clipboardService.registerClearPropertyResolver(clearNestedContentPropertiesForStorage, clipboardService.TYPES.ELEMENT_TYPE)
+        clipboardService.registerPastePropertyResolver(resolveNestedContentPropertiesForPaste, clipboardService.TYPES.ELEMENT_TYPE)
 
 
-        function clearInnerNestedContentPropertiesForStorage(prop, propClearingMethod) {
+        function resolveInnerNestedContentPropertiesForPaste(prop, propClearingMethod) {
 
             // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property data.
             if ((Array.isArray(prop) && prop.length > 0 && prop[0].ncContentTypeAlias !== undefined)) {
@@ -39,8 +39,8 @@
                 for (var i = 0; i < prop.length; i++) {
                     var obj = prop[i];
 
-                    // remove the key
-                    delete obj.key;
+                    // generate a new key.
+                    obj.key = String.CreateGuid();
 
                     // Loop through all inner properties:
                     for (var k in obj) {
@@ -50,7 +50,7 @@
             }
         }
 
-        clipboardService.registerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage, clipboardService.TYPES.RAW)
+        clipboardService.registerPastePropertyResolver(resolveInnerNestedContentPropertiesForPaste, clipboardService.TYPES.RAW)
     }]);
 
     angular
@@ -105,12 +105,13 @@
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "actions_copy"]).then(function (data) {
             labels.grid_addElement = data[0];
             labels.content_createEmpty = data[1];
-            labels.copy_icon_title = data[2]
+            labels.copy_icon_title = data[2];
         });
 
-        function setCurrentNode(node) {
+        function setCurrentNode(node, focusNode) {
             updateModel();
             vm.currentNode = node;
+            vm.focusOnNode = focusNode;
         }
 
         var copyAllEntries = function () {
@@ -168,11 +169,14 @@
             method: removeAllEntries,
             isDisabled: true
         };
+
         // helper to force the current form into the dirty state
         function setDirty() {
-            if ($scope.$parent.$parent.propertyForm) {
-                $scope.$parent.$parent.propertyForm.$setDirty();
+
+            if (vm.umbProperty) {
+                vm.umbProperty.setDirty();
             }
+
         };
 
         function addNode(alias) {
@@ -180,13 +184,13 @@
 
             var newNode = createNode(scaffold, null);
 
-            setCurrentNode(newNode);
+            setCurrentNode(newNode, true);
             setDirty();
             validate();
         };
 
         vm.openNodeTypePicker = function ($event) {
-            
+
             if (vm.nodes.length >= vm.maxItems) {
                 return;
             }
@@ -202,7 +206,6 @@
             });
 
             const dialog = {
-                view: "itempicker",
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
@@ -277,9 +280,9 @@
 
         vm.editNode = function (idx) {
             if (vm.currentNode && vm.currentNode.key === vm.nodes[idx].key) {
-                setCurrentNode(null);
+                setCurrentNode(null, false);
             } else {
-                setCurrentNode(vm.nodes[idx]);
+                setCurrentNode(vm.nodes[idx], true);
             }
         };
 
@@ -500,15 +503,17 @@
             setDirty();
             //updateModel();// done by setting current node...
 
-            setCurrentNode(newNode);
+            setCurrentNode(newNode, true);
         }
 
         function checkAbilityToPasteContent() {
             vm.showPaste = clipboardService.hasEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
         }
 
-        eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
-
+        var storageUpdate = eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
+        $scope.$on('$destroy', function () {
+            storageUpdate();
+        });
         var notSupported = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
@@ -532,14 +537,19 @@
                     if (tab) {
                         scaffold.variants[0].tabs.push(tab);
 
-                        tab.properties.forEach(function (property) {
+                        tab.properties.forEach(
+                            function (property) {
                                 if (_.find(notSupported, function (x) { return x === property.editor; })) {
                                     property.notSupported = true;
                                     // TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
                                     property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
                                 }
-                            });
+                            }
+                        );
                     }
+
+                    // Ensure Culture Data for Complex Validation.
+                    ensureCultureData(scaffold);
 
                     // Store the scaffold object
                     vm.scaffolds.push(scaffold);
@@ -552,6 +562,29 @@
                 initIfAllScaffoldsHaveLoaded();
             });
         });
+
+        /**
+         * Ensure that the containing content variant language and current property culture is transferred along
+         * to the scaffolded content object representing this block.
+         * This is required for validation along with ensuring that the umb-property inheritance is constantly maintained.
+         * @param {any} content
+         */
+         function ensureCultureData(content) {
+
+            if (!content || !vm.umbVariantContent || !vm.umbProperty) return;
+
+            if (vm.umbVariantContent.editor.content.language) {
+                // set the scaffolded content's language to the language of the current editor
+                content.language = vm.umbVariantContent.editor.content.language;
+            }
+            // currently we only ever deal with invariant content for blocks so there's only one
+            content.variants[0].tabs.forEach(tab => {
+                tab.properties.forEach(prop => {
+                    // set the scaffolded property to the culture of the containing property
+                    prop.culture = vm.umbProperty.property.culture;
+                });
+            });
+        }
 
         var initIfAllScaffoldsHaveLoaded = function () {
             // Initialize when all scaffolds have loaded
@@ -590,7 +623,7 @@
 
                 // If there is only one item, set it as current node
                 if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
-                    setCurrentNode(vm.nodes[0]);
+                    setCurrentNode(vm.nodes[0], false);
                 }
 
                 validate();

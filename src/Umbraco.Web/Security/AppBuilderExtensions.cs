@@ -169,11 +169,31 @@ namespace Umbraco.Web.Security
                 // Enables the application to validate the security stamp when the user
                 // logs in. This is a security feature which is used when you
                 // change a password or add an external login to your account.
-                OnValidateIdentity = SecurityStampValidator
-                    .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                OnValidateIdentity = context =>
+                {
+                    // capture the current ticket for the request
+                    var identity = context.Identity;
+
+                    return SecurityStampValidator
+                        .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                        // This will re-verify the security stamp at a throttled 30 mins
+                        // (the standard/default set in aspnet identity).
+                        // This ensures that if the security stamp has changed - i.e. passwords,
+                        // external logins, or other security profile data changed behind the
+                        // scenes while being logged in, that they are logged out and have
+                        // to re-verify their identity.
                         TimeSpan.FromMinutes(30),
-                        (manager, user) => manager.GenerateUserIdentityAsync(user),
-                        identity => identity.GetUserId<int>()),
+                        async (manager, user) =>
+                        {
+                            var regenerated = await manager.GenerateUserIdentityAsync(user);
+
+                            // Keep any custom claims from the original identity
+                            regenerated.MergeClaimsFromBackOfficeIdentity(identity);
+
+                            return regenerated;
+                        },
+                        identity => identity.GetUserId<int>())(context);
+                }
 
             };
 

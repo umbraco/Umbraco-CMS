@@ -179,8 +179,7 @@ When building a custom infinite editor view you can use the same components as a
             } else {
                 focus();
             }
-        });
-
+        });      
 
         /**
          * @ngdoc method
@@ -188,7 +187,7 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Method to return all open editors
+         * Method to return all open editors.
          */
         function getEditors() {
             return editors;
@@ -200,7 +199,7 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Method to return the number of open editors
+         * Method to return the number of open editors.
          */
         function getNumberOfEditors() {
             return editors.length;
@@ -251,8 +250,8 @@ When building a custom infinite editor view you can use the same components as a
          * Method to open a new editor in infinite editing.
          *
          * @param {object} editor rendering options.
-         * @param {string} editor.view Path to view.
-         * @param {string} editor.size Sets the size of the editor ("small" || "medium"). If nothing is set it will use full width.
+         * @param {string} editor.view URL to view.
+         * @param {string} editor.size Sets the size of the editor (`small` or `medium`). If nothing is set it will use full width.
          */
         function open(editor) {
 
@@ -287,7 +286,7 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Method to close the latest opened editor
+         * Method to close the latest opened editor.
          */
         function close() {
 
@@ -322,7 +321,7 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Method to close all open editors
+         * Method to close all open editors.
          */
         function closeAll() {
 
@@ -343,6 +342,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a content editor in infinite editing, the submit callback returns the updated content item.
+         *
          * @param {object} editor rendering options.
          * @param {string} editor.id The id of the content item.
          * @param {boolean} editor.create Create new content item.
@@ -352,7 +352,6 @@ When building a custom infinite editor view you can use the same components as a
          * @param {string} editor.documentTypeAlias If editor.create is true, provide document type alias for the creation of the content item.
          * @param {boolean} editor.allowSaveAndClose If editor is being used in infinite editing allows the editor to close when the save action is performed.
          * @param {boolean} editor.allowPublishAndClose If editor is being used in infinite editing allows the editor to close when the publish action is performed.
-         * 
          * @returns {object} editor object
          */
         function contentEditor(editor) {
@@ -396,7 +395,6 @@ When building a custom infinite editor view you can use the same components as a
          * @param {boolean} editor.multiPicker Pick one or multiple items.
          * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
          * @param {function} editor.close Callback function when the close button is clicked.
-         *
          * @returns {object} editor object
          */
         function contentTypePicker(editor) {
@@ -419,7 +417,6 @@ When building a custom infinite editor view you can use the same components as a
          * @param {boolean} editor.multiPicker Pick one or multiple items.
          * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
          * @param {function} editor.close Callback function when the close button is clicked.
-         *
          * @returns {object} editor object.
          */
         function mediaTypePicker(editor) {
@@ -459,13 +456,14 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a copy editor in infinite editing, the submit callback returns an array of selected items.
+         *
+         * @param {object} editor rendering options.
          * @param {string} editor.section The node entity type.
          * @param {string} editor.currentNode The current node id.
-         * @param {function} editor.submit Saves, submits, and closes the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
-
         function copy(editor) {
             editor.view = "views/common/infiniteeditors/copy/copy.html";
             if (!editor.size) editor.size = "small";
@@ -479,13 +477,14 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a move editor in infinite editing.
+         *
+         * @param {object} editor rendering options.
          * @param {string} editor.section The node entity type.
          * @param {string} editor.currentNode The current node id.
-         * @param {function} editor.submit Saves, submits, and closes the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
-
         function move(editor) {
             editor.view = "views/common/infiniteeditors/move/move.html";
             if (!editor.size) editor.size = "small";
@@ -499,11 +498,12 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens an embed editor in infinite editing.
-         * @param {function} editor.submit Saves, submits, and closes the editor.
-         * @param {function} editor.close Closes the editor.
+         *
+         * @param {object} editor rendering options.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
-
         function embed(editor) {
             editor.view = "views/common/infiniteeditors/embed/embed.html";
             if (!editor.size) editor.size = "small";
@@ -517,12 +517,13 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a rollback editor in infinite editing.
+         *
+         * @param {object} editor rendering options.
          * @param {string} editor.node The node to rollback.
-         * @param {function} editor.submit Saves, submits, and closes the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
-
         function rollback(editor) {
             editor.view = "views/common/infiniteeditors/rollback/rollback.html";
             if (!editor.size) editor.size = "medium";
@@ -536,11 +537,12 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens an embed editor in infinite editing.
+         *
          * @param {object} editor rendering options.
          * @param {string} editor.icon The icon class.
          * @param {string} editor.color The color class.
-         * @param {function} editor.submit Saves, submits, and closes the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function linkPicker(editor) {
@@ -556,11 +558,12 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a media editor in infinite editing, the submit callback returns the updated media item.
+         *
          * @param {object} editor rendering options.
          * @param {string} editor.id The id of the media item.
          * @param {boolean} editor.create Create new media item.
-         * @param {function} editor.submit Saves, submits, and closes the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function mediaEditor(editor) {
@@ -575,6 +578,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a media picker in infinite editing, the submit callback returns an array of selected media items.
+         *
          * @param {object} editor rendering options.
          * @param {number} editor.startNodeId Set the startnode of the picker (optional).
          * @param {boolean} editor.multiPicker Pick one or multiple items.
@@ -582,8 +586,8 @@ When building a custom infinite editor view you can use the same components as a
          * @param {boolean} editor.disableFolderSelect Disable folder selection.
          * @param {boolean} editor.disableFocalPoint Disable focal point editor for selected media.
          * @param {array} editor.updatedMediaNodes A list of ids for media items that have been updated through the media picker.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function mediaPicker(editor) {
@@ -595,16 +599,35 @@ When building a custom infinite editor view you can use the same components as a
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#mediaCropDetails
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the media crop details editor in infinite editing, the submit callback returns the updated media object.
+         *
+         * @param {object} editor rendering options.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
+         * @returns {object} editor object.
+         */
+        function mediaCropDetails(editor) {
+            editor.view = "views/common/infiniteeditors/mediapicker/overlays/mediacropdetails.html";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#iconPicker
          * @methodOf umbraco.services.editorService
          *
          * @description
          * Opens an icon picker in infinite editing, the submit callback returns the selected icon.
+         *
          * @param {object} editor rendering options.
-         * @param {string} editor.icon The CSS class representing the icon - eg. "icon-autofill".
-         * @param {string} editor.color The CSS class representing the color - eg. "color-red".
-         * @param {callback} editor.submit Submits the editor.
-         * @param {callback} editor.close Closes the editor.
+         * @param {string} editor.icon The CSS class representing the icon - eg. `icon-autofill.
+         * @param {string} editor.color The CSS class representing the color - eg. color-red.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function iconPicker(editor) {
@@ -620,14 +643,15 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the document type editor in infinite editing, the submit callback returns the alias of the saved document type.
+         *
          * @param {object} editor rendering options.
          * @param {number} editor.id Indicates the ID of the document type to be edited. Alternatively the ID may be set to `-1` in combination with `create` being set to `true` to open the document type editor for creating a new document type.
          * @param {boolean} editor.create Set to `true` to open the document type editor for creating a new document type.
          * @param {boolean} editor.noTemplate If `true` and in combination with `create` being set to `true`, the document type editor will not create a corresponding template by default. This is similar to selecting the "Document Type without a template" in the Create dialog.
          * @param {boolean} editor.isElement If `true` and in combination with `create` being set to `true`, the "Is an Element type" option will be selected by default in the document type editor.
          * @param {boolean} editor.allowVaryByCulture If `true` and in combination with `create`, the "Allow varying by culture" option will be selected by default in the document type editor.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function documentTypeEditor(editor) {
@@ -642,10 +666,11 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the media type editor in infinite editing, the submit callback returns the saved media type.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
-         * @returns {object} editor object
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
+         * @returns {object} editor object.
          */
         function mediaTypeEditor(editor) {
             editor.view = "views/mediatypes/edit.html";
@@ -659,9 +684,10 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the member type editor in infinite editing, the submit callback returns the saved member type.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function memberTypeEditor(editor) {
@@ -676,9 +702,10 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the query builder in infinite editing, the submit callback returns the generated query.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function queryBuilder(editor) {
@@ -693,12 +720,13 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the query builder in infinite editing, the submit callback returns the generted query.
+         *
          * @param {object} editor rendering options.
          * @param {string} options.section tree section to display.
          * @param {string} options.treeAlias specific tree to display.
          * @param {boolean} options.multiPicker should the tree pick one or multiple items before returning.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function treePicker(editor) {
@@ -714,9 +742,10 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the an editor to set node permissions.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function nodePermissions(editor) {
@@ -732,9 +761,10 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Open an editor to insert code snippets into the code editor.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function insertCodeSnippet(editor) {
@@ -750,6 +780,7 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the user group picker in infinite editing, the submit callback returns an array of the selected user groups.
+         *
          * @param {object} editor rendering options.
          * @param {function} editor.submit Submits the editor.
          * @param {function} editor.close Closes the editor.
@@ -767,10 +798,11 @@ When building a custom infinite editor view you can use the same components as a
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Opens the user group picker in infinite editing, the submit callback returns the saved user group
+         * Opens the user group picker in infinite editing, the submit callback returns the saved user group.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function userGroupEditor(editor) {
@@ -785,10 +817,11 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the template editor in infinite editing, the submit callback returns the saved template.
+         *
          * @param {object} editor rendering options.
          * @param {string} editor.id The template id.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function templateEditor(editor) {
@@ -803,9 +836,10 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the section picker in infinite editing, the submit callback returns an array of the selected sections.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function sectionPicker(editor) {
@@ -821,9 +855,10 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the insert field editor in infinite editing, the submit callback returns the code snippet.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function insertField(editor) {
@@ -839,9 +874,10 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the template sections editor in infinite editing, the submit callback returns the type to insert.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function templateSections(editor) {
@@ -857,9 +893,10 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens the section picker in infinite editing, the submit callback returns an array of the selected users.
+         *
          * @param {object} editor rendering options.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function userPicker(editor) {
@@ -880,8 +917,8 @@ When building a custom infinite editor view you can use the same components as a
          * @param {array} editor.availableItems Array of available items.
          * @param {array} editor.selectedItems Array of selected items. When passed in the selected items will be filtered from the available items.
          * @param {boolean} editor.filter Set to false to hide the filter.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function itemPicker(editor) {
@@ -898,8 +935,9 @@ When building a custom infinite editor view you can use the same components as a
          * @description
          * Opens a macro picker in infinite editing, the submit callback returns an array of the selected items.
          *
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {object} editor rendering options.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function macroPicker(editor) {
@@ -918,8 +956,8 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @param {object} editor rendering options.
          * @param {object} editor.multiPicker Pick one or multiple items.
-         * @param {function} editor.submit Submits the editor.
-         * @param {function} editor.close Closes the editor.
+         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+         * @param {function} editor.close Callback function when the close button is clicked.
          * @returns {object} editor object.
          */
         function memberGroupPicker(editor) {
@@ -940,7 +978,6 @@ When building a custom infinite editor view you can use the same components as a
         * @param {boolean} editor.multiPicker Pick one or multiple items.
         * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
         * @param {function} editor.close Callback function when the close button is clicked.
-        * 
         * @returns {object} editor object.
         */
         function memberPicker(editor) {
@@ -958,13 +995,13 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Opens a member editor in infinite editing, the submit callback returns the updated member.
+         *
          * @param {object} editor rendering options.
          * @param {string} editor.id The id (GUID) of the member.
          * @param {boolean} editor.create Create new member.
          * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
          * @param {function} editor.close Callback function when the close button is clicked.
-         * @param {string} editor.doctype If editor.create is true, provide member type for the creation of the member.
-         * 
+         * @param {string} editor.doctype If `editor.create` is `true`, provide member type for the creation of the member.
          * @returns {object} editor object.
          */
         function memberEditor(editor) {
@@ -982,7 +1019,6 @@ When building a custom infinite editor view you can use the same components as a
          * @description
          * Internal method to keep track of keyboard shortcuts registered
          * to each editor so they can be rebound when an editor closes.
-         *
          */
         function unbindKeyboardShortcuts() {
             const shortcuts = Utilities.copy(keyboardService.keyboardEvent);
@@ -1002,7 +1038,6 @@ When building a custom infinite editor view you can use the same components as a
          *
          * @description
          * Internal method to rebind keyboard shortcuts for the editor in focus.
-         *
          */
         function rebindKeyboardShortcuts() {
             // find the shortcuts from the previous editor
@@ -1055,7 +1090,8 @@ When building a custom infinite editor view you can use the same components as a
             macroPicker: macroPicker,
             memberGroupPicker: memberGroupPicker,
             memberPicker: memberPicker,
-            memberEditor: memberEditor
+            memberEditor: memberEditor,
+            mediaCropDetails
         };
 
         return service;

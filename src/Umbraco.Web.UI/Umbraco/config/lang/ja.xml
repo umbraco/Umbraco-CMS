@@ -246,7 +246,7 @@
     <key alias="recycleBinDeleting">ごみ箱を空にしています。実行中はウィンドウを閉じないでください。</key>
     <key alias="recycleBinIsEmpty">ごみ箱は空です</key>
     <key alias="recycleBinWarning">ごみ箱から削除すると復活させることはできません</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>のウェブサービスに現在問題が起きているかもしれず、操作できませんでした。大変申し訳ありませんがこの機能は使用できません。]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>のウェブサービスに現在問題が起きているかもしれず、操作できませんでした。大変申し訳ありませんがこの機能は使用できません。]]></key>
     <key alias="regexSearchHelp">フォームのフィールドを正規表現で検証できます。例: 'email, 'zip-code' 'URL'</key>
     <key alias="removeMacro">マクロを削除</key>
     <key alias="requiredField">必須フィールド</key>
@@ -608,7 +608,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="greeting6">ハッピー土曜日</key>
     <key alias="instruction">ウェブサイトにログインします。</key>
     <key alias="timeout">セッションタイムアウトしました。</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">ダッシュボード</key>
@@ -804,7 +804,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="tabs">タブ</key>
     <key alias="contentTypeEnabled">マスターコンテンツタイプが有効</key>
     <key alias="contentTypeUses">このコンテンツタイプの使用</key>
-    <key alias="asAContentMasterType">マスターコンテンツタイプについては、マスターコンテンツタイプからのタブは表示されず、マスターコンテンツタイプでのみ編集することができます。</key>
     <key alias="noPropertiesDefinedOnTab">このタブにはプロパティが定義されていません、上部のリンクから新しいプロパティを作成してください</key>
     <key alias="addIcon">アイコンの追加</key>
   </area>

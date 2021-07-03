@@ -670,9 +670,9 @@ namespace Umbraco.Web.Editors
             switch (type)
             {
                 case UmbracoEntityTypes.Document:
-                    return Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                    return Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
                 case UmbracoEntityTypes.Media:
-                    return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                    return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
                 default:
                     return  Array.Empty<int>();
             }
@@ -811,10 +811,10 @@ namespace Umbraco.Web.Editors
                     switch (entityType)
                     {
                         case UmbracoEntityTypes.Document:
-                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
                             break;
                         case UmbracoEntityTypes.Media:
-                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
                             break;
                     }
 

@@ -24,8 +24,7 @@
                         text="Type to filter..."
                         css-class="w-100"
                         on-change="vm.filterItems()"
-                        auto-focus="true"
-                    >
+                        auto-focus="true">
                     </umb-search-filter>
 
                     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
@@ -36,14 +35,13 @@
                             <ul class="umb-card-grid -four-in-row" ng-mouseleave="vm.hideDetailsOverlay()">
                                 <li ng-repeat="parameterEditor in value | orderBy:'name'"
                                     data-element="editor-{{parameterEditor.name}}">
-                                    <button
-                                        type="button"
-                                        ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
-                                        ng-click="vm.pickParameterEditor(parameterEditor)"
-                                        class="btn-reset umb-card-grid-item"
-                                        title="{{parameterEditor.name}}">
+                                    <button type="button"
+                                            ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
+                                            ng-click="vm.pickParameterEditor(parameterEditor)"
+                                            class="btn-reset umb-card-grid-item"
+                                            title="{{parameterEditor.name}}">
                                         <span>
-                                            <i class="{{parameterEditor.icon}}" ng-class="{'icon-autofill': parameterEditor.icon == null}" aria-hidden="true"></i>
+                                            <umb-icon icon="{{parameterEditor.icon || 'icon-autofill'}}" class="{{parameterEditor.icon || 'icon-autofill'}}"></umb-icon>
                                             {{parameterEditor.name}}
                                         </span>
                                     </button>
@@ -63,17 +61,16 @@
                                             <div ng-if="parameterEditor.loading" class="umb-card-grid-item__loading">
                                                 <div class="umb-button__progress"></div>
                                             </div>
-                                            <button
-                                                type="button"
-                                                ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
-                                                ng-click="vm.pickParameterEditor(parameterEditor)"
-                                                class="btn-reset umb-card-grid-item"
-                                                title="{{parameterEditor.name}}">
+                                            <button type="button"
+                                                    ng-mouseover="vm.showDetailsOverlay(parameterEditor)"
+                                                    ng-click="vm.pickParameterEditor(parameterEditor)"
+                                                    class="btn-reset umb-card-grid-item"
+                                                    title="{{parameterEditor.name}}">
                                                 <span>
-                                                    <i class="{{parameterEditor.icon}}" ng-class="{'icon-autofill': parameterEditor.icon == null}" aria-hidden="true"></i>
+                                                    <umb-icon icon="{{parameterEditor.icon || 'icon-autofill'}}" class="{{parameterEditor.icon || 'icon-autofill'}}"></umb-icon>
                                                     {{parameterEditor.name}}
                                                 </span>
-                                            </a>
+                                            </button>
                                         </li>
                                     </ul>
                                 </div>

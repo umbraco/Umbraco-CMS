@@ -124,6 +124,7 @@ namespace Umbraco.Web.WebApi.Filters
                 Current.UmbracoContext.Security.CurrentUser,
                 Current.Services.MediaService,
                 Current.Services.EntityService,
+                Current.AppCaches,
                 nodeId))
             {
                 base.OnActionExecuting(actionContext);

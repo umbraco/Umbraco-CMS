@@ -71,6 +71,18 @@ namespace Umbraco.Web.HealthCheck
         public bool ValueRequired { get; set; }
 
         /// <summary>
+        /// Indicates if a value required, how it is validated
+        /// </summary>
+        [DataMember(Name = "providedValueValidation")]
+        public string ProvidedValueValidation { get; set; }
+
+        /// <summary>
+        /// Indicates if a value required, and is validated by a regex, what the regex to use is
+        /// </summary>
+        [DataMember(Name = "providedValueValidationRegex")]
+        public string ProvidedValueValidationRegex { get; set; }
+
+        /// <summary>
         /// Provides a value to rectify the issue
         /// </summary>
         [DataMember(Name = "providedValue")]

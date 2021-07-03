@@ -36,7 +36,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="language in vm.languages | orderBy:'name' track by language.id" ng-click="vm.editLanguage(language)" style="cursor: pointer;">
+                    <tr ng-repeat="language in vm.languages track by language.id" ng-click="vm.editLanguage(language)" style="cursor: pointer;">
                         <td>
                            <umb-icon icon="icon-globe" class="language-icon"></umb-icon>
                             <span>{{ language.name }}</span>

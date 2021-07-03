@@ -401,14 +401,15 @@
     text-align: center;
     text-align: -moz-center;
     width: 100%;
+    box-sizing: border-box;
 }
 
-.umb-grid .umb-editor-placeholder i {
+.umb-grid .umb-editor-placeholder .icon {
     color: @gray-8;
     font-size: 85px;
-    line-height: 85px;
+    line-height: 1;
     display: block;
-    margin-bottom: 10px;
+    margin: 10px auto;
 }
 
 .umb-grid .umb-editor-preview {
@@ -475,9 +476,19 @@
     }
 }
 
+// Control states 
+.umb-grid-media--controls {
+    display:none;
+    position: absolute;
+    top:0.5rem;
+    right:0.5rem;    
+}
 
-
-
+.umb-grid .umb-row .umb-control.-active {
+    .umb-grid-media--controls {
+        display:flex;
+    }
+}
 
 // Title bar and tools
 .umb-grid .umb-row-title-bar {
