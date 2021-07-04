@@ -224,7 +224,7 @@ namespace Umbraco.Web.Security.Providers
         }
 
         /// <summary>
-        /// Gets a collection of membership users where the user name contains the specified user name to match.
+        /// Gets a collection of membership users where the user name matches the specified user name.
         /// </summary>
         /// <param name="usernameToMatch">The user name to search for.</param>
         /// <param name="pageIndex">The index of the page of results to return. pageIndex is zero-based.</param>
@@ -236,7 +236,7 @@ namespace Umbraco.Web.Security.Providers
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
             long totalRecords2;
-            var byEmail = MemberService.FindByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords2, StringPropertyMatchType.Wildcard).ToArray();
+            var byEmail = MemberService.FindByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords2, StringPropertyMatchType.Exact).ToArray();
             totalRecords = Convert.ToInt32(totalRecords2);
 
             var collection = new MembershipUserCollection();
