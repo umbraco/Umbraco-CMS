@@ -491,7 +491,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //send the email
             await SendUserInviteEmailAsync(display, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
 
-            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/resendInviteHeader"), _localizedTextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
+            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles","resendInviteHeader"), _localizedTextService.Localize("speechBubbles","resendInviteSuccess", new[] { user.Name }));
             return display;
         }
 
@@ -543,10 +543,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var applicationUri = _hostingEnvironment.ApplicationMainUrl;
             var inviteUri = new Uri(applicationUri, action);
 
-            var emailSubject = _localizedTextService.Localize("user/inviteEmailCopySubject",
+            var emailSubject = _localizedTextService.Localize("user","inviteEmailCopySubject",
                 //Ensure the culture of the found user is used for the email!
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings));
-            var emailBody = _localizedTextService.Localize("user/inviteEmailCopyFormat",
+            var emailBody = _localizedTextService.Localize("user","inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
@@ -645,11 +645,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var userHasChangedOwnLanguage =
                 user.Id == currentUser.Id && currentUser.Language != user.Language;
 
-            var textToLocalise = userHasChangedOwnLanguage ? "speechBubbles/operationSavedHeaderReloadUser" : "speechBubbles/operationSavedHeader";
+            var textToLocalise = userHasChangedOwnLanguage ? "operationSavedHeaderReloadUser" : "operationSavedHeader";
             var culture = userHasChangedOwnLanguage
                 ? CultureInfo.GetCultureInfo(user.Language)
                 : Thread.CurrentThread.CurrentUICulture;
-            display.AddSuccessNotification(_localizedTextService.Localize(textToLocalise, culture), _localizedTextService.Localize("speechBubbles/editUserSaved", culture));
+            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles", textToLocalise, culture), _localizedTextService.Localize("speechBubbles","editUserSaved", culture));
             return display;
         }
 
@@ -697,7 +697,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (passwordChangeResult.Success)
             {
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
-                result.AddSuccessNotification(_localizedTextService.Localize("general/success"), _localizedTextService.Localize("user/passwordChangedGeneric"));
+                result.AddSuccessNotification(_localizedTextService.Localize("general","success"), _localizedTextService.Localize("user","passwordChangedGeneric"));
                 return result;
             }
 
@@ -733,10 +733,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (users.Length > 1)
             {
-                return Ok(_localizedTextService.Localize("speechBubbles/disableUsersSuccess", new[] {userIds.Length.ToString()}));
+                return Ok(_localizedTextService.Localize("speechBubbles","disableUsersSuccess", new[] {userIds.Length.ToString()}));
             }
 
-            return Ok(_localizedTextService.Localize("speechBubbles/disableUserSuccess", new[] { users[0].Name }));
+            return Ok(_localizedTextService.Localize("speechBubbles","disableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
@@ -756,11 +756,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (users.Length > 1)
             {
                 return Ok(
-                    _localizedTextService.Localize("speechBubbles/enableUsersSuccess", new[] { userIds.Length.ToString() }));
+                    _localizedTextService.Localize("speechBubbles","enableUsersSuccess", new[] { userIds.Length.ToString() }));
             }
 
             return Ok(
-                _localizedTextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));
+                _localizedTextService.Localize("speechBubbles","enableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
@@ -792,12 +792,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (userIds.Length == 1)
                 {
                     return Ok(
-                        _localizedTextService.Localize("speechBubbles/unlockUserSuccess", new[] {user.Name}));
+                        _localizedTextService.Localize("speechBubbles","unlockUserSuccess", new[] {user.Name}));
                 }
             }
 
             return Ok(
-                _localizedTextService.Localize("speechBubbles/unlockUsersSuccess", new[] {(userIds.Length - notFound.Count).ToString()}));
+                _localizedTextService.Localize("speechBubbles","unlockUsersSuccess", new[] {(userIds.Length - notFound.Count).ToString()}));
         }
 
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
@@ -815,7 +815,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             _userService.Save(users);
             return Ok(
-                _localizedTextService.Localize("speechBubbles/setUserGroupOnUsersSuccess"));
+                _localizedTextService.Localize("speechBubbles","setUserGroupOnUsersSuccess"));
         }
 
         /// <summary>
@@ -846,7 +846,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _userService.Delete(user, true);
 
             return Ok(
-                _localizedTextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));
+                _localizedTextService.Localize("speechBubbles","deleteUserSuccess", new[] { userName }));
         }
 
         public class PagedUserResult : PagedResult<UserBasic>

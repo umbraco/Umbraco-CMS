@@ -297,7 +297,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
 
             display.AddSuccessNotification(
-                _localizedTextService.Localize("speechBubbles/mediaTypeSavedHeader"),
+                _localizedTextService.Localize("speechBubbles","mediaTypeSavedHeader"),
                 string.Empty);
 
             return display;

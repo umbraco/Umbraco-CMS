@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Core
+﻿namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core
                 public const string WhereNodeId = "Umbraco.Web.PublishedCache.NuCache.DataSource.WhereNodeId";
                 public const string WhereNodeIdX = "Umbraco.Web.PublishedCache.NuCache.DataSource.WhereNodeIdX";
                 public const string SourcesSelectUmbracoNodeJoin = "Umbraco.Web.PublishedCache.NuCache.DataSource.SourcesSelectUmbracoNodeJoin";
-                public const string ContentSourcesSelect = "Umbraco.Web.PublishedCache.NuCache.DataSource.ContentSourcesSelect";                
+                public const string ContentSourcesSelect = "Umbraco.Web.PublishedCache.NuCache.DataSource.ContentSourcesSelect";
                 public const string ContentSourcesCount = "Umbraco.Web.PublishedCache.NuCache.DataSource.ContentSourcesCount";
                 public const string MediaSourcesSelect = "Umbraco.Web.PublishedCache.NuCache.DataSource.MediaSourcesSelect";
                 public const string MediaSourcesCount = "Umbraco.Web.PublishedCache.NuCache.DataSource.MediaSourcesCount";

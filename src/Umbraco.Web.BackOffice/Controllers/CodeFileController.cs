@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (string.IsNullOrWhiteSpace(parentId)) throw new ArgumentException("Value cannot be null or whitespace.", "parentId");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (name.ContainsAny(Path.GetInvalidPathChars())) {
-                return ValidationProblem(_localizedTextService.Localize("codefile/createFolderIllegalChars"));
+                return ValidationProblem(_localizedTextService.Localize("codefile", "createFolderIllegalChars"));
             }
 
             // if the parentId is root (-1) then we just need an empty string as we are
@@ -422,8 +422,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
 
                     display.AddErrorNotification(
-                        _localizedTextService.Localize("speechBubbles/partialViewErrorHeader"),
-                        _localizedTextService.Localize("speechBubbles/partialViewErrorText"));
+                        _localizedTextService.Localize("speechBubbles", "partialViewErrorHeader"),
+                        _localizedTextService.Localize("speechBubbles", "partialViewErrorText"));
                     break;
 
                 case Constants.Trees.PartialViewMacros:
@@ -437,8 +437,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
 
                     display.AddErrorNotification(
-                        _localizedTextService.Localize("speechBubbles/partialViewErrorHeader"),
-                        _localizedTextService.Localize("speechBubbles/partialViewErrorText"));
+                        _localizedTextService.Localize("speechBubbles", "partialViewErrorHeader"),
+                        _localizedTextService.Localize("speechBubbles", "partialViewErrorText"));
                     break;
 
                 case Constants.Trees.Scripts:

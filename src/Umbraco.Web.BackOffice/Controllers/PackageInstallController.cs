@@ -188,7 +188,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     {
                         //this package is already installed
                         return ValidationProblem(
-                            _localizedTextService.Localize("packager/packageAlreadyInstalled"));
+                            _localizedTextService.Localize("packager", "packageAlreadyInstalled"));
                     }
 
                     model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
@@ -197,8 +197,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 else
                 {
                     model.Notifications.Add(new BackOfficeNotification(
-                        _localizedTextService.Localize("speechBubbles/operationFailedHeader"),
-                        _localizedTextService.Localize("media/disallowedFileType"),
+                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        _localizedTextService.Localize("media", "disallowedFileType"),
                         NotificationStyle.Warning));
                 }
 
@@ -242,7 +242,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (installType == PackageInstallType.AlreadyInstalled)
             {
                 return ValidationProblem(
-                    _localizedTextService.Localize("packager/packageAlreadyInstalled"));
+                    _localizedTextService.Localize("packager", "packageAlreadyInstalled"));
             }
 
             model.OriginalVersion = installType == PackageInstallType.Upgrade ? alreadyInstalled.Version : null;
@@ -268,7 +268,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var packageMinVersion = packageInfo.UmbracoVersion;
                 if (_umbracoVersion.Version < packageMinVersion)
                     return ValidationProblem(
-                        _localizedTextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()}));
+                        _localizedTextService.Localize("packager", "targetVersionMismatch", new[] {packageMinVersion.ToString()}));
             }
 
             var installType = _packagingService.GetPackageInstallType(packageInfo.Name, SemVersion.Parse(packageInfo.Version), out var alreadyInstalled);

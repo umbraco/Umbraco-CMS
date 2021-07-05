@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Cms.Core;
+using Umbraco.Core.Models;
 using Umbraco.Extensions;
 using Umbraco.Web.Composing;
 

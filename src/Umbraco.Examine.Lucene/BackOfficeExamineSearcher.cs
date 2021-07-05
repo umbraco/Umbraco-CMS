@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Examine;
 using Examine.Search;
+using Examine.Search;
 using Lucene.Net.QueryParsers.Classic;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -61,6 +62,15 @@ namespace Umbraco.Cms.Infrastructure.Examine
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = _treeSearcherFields.GetBackOfficeFields().ToList();
 
+            ISet<string> fieldsToLoad = new HashSet<string>(_treeSearcherFields.GetBackOfficeFieldsToLoad());
+
+            // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
+            // manipulation for things like start paths, member types, etc...
+            //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
+            //{
+
+            //}
+
             //special GUID check since if a user searches on one specifically we need to escape it
             if (Guid.TryParse(query, out var g))
             {
@@ -75,6 +85,11 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
                     fields.AddRange(_treeSearcherFields.GetBackOfficeMembersFields());
+                    foreach(var field in _treeSearcherFields.GetBackOfficeMembersFieldsToLoad())
+                    {
+                        fieldsToLoad.Add(field);
+                    }
+
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
@@ -85,6 +100,11 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 case UmbracoEntityTypes.Media:
                     type = "media";
                     fields.AddRange(_treeSearcherFields.GetBackOfficeMediaFields());
+                    foreach (var field in _treeSearcherFields.GetBackOfficeMediaFieldsToLoad())
+                    {
+                        fieldsToLoad.Add(field);
+                    }
+
                     var allMediaStartNodes = currentUser != null
                         ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
                         : Array.Empty<int>();
@@ -93,6 +113,10 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 case UmbracoEntityTypes.Document:
                     type = "content";
                     fields.AddRange(_treeSearcherFields.GetBackOfficeDocumentFields());
+                    foreach (var field in _treeSearcherFields.GetBackOfficeDocumentFieldsToLoad())
+                    {
+                        fieldsToLoad.Add(field);
+                    }
                     var allContentStartNodes = currentUser != null
                         ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
                         : Array.Empty<int>();
@@ -113,7 +137,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
             var result = index.Searcher
                 .CreateQuery()
-                .NativeQuery(sb.ToString())                
+                .NativeQuery(sb.ToString())
+                .SelectFields(fieldsToLoad)
+                //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
                 .Execute(QueryOptions.SkipTake(Convert.ToInt32(pageSize * pageIndex), pageSize));
 
             totalFound = result.TotalItemCount;

@@ -135,7 +135,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             MemberGroupDisplay display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
 
             display.AddSuccessNotification(
-                            _localizedTextService.Localize("speechBubbles/memberGroupSavedHeader"),
+                            _localizedTextService.Localize("speechBubbles","memberGroupSavedHeader"),
                             string.Empty);
 
             return display;

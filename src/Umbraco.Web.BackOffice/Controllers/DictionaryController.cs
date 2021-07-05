@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (_localizationService.DictionaryItemExists(key))
             {
                 var message = _localizedTextService.Localize(
-                     "dictionaryItem/changeKeyError",
+                     "dictionaryItem","changeKeyError",
                      _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings),
                      new Dictionary<string, string> { { "0", key } });
                 return ValidationProblem(message);
@@ -218,7 +218,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
 
                     var message = _localizedTextService.Localize(
-                        "dictionaryItem/changeKeyError",
+                        "dictionaryItem","changeKeyError",
                         userCulture,
                         new Dictionary<string, string> { { "0", dictionary.Name } });
                     ModelState.AddModelError("Name", message);
@@ -241,7 +241,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
                 model.Notifications.Add(new BackOfficeNotification(
-                    _localizedTextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty,
+                    _localizedTextService.Localize("speechBubbles","dictionaryItemSaved", userCulture), string.Empty,
                     NotificationStyle.Success));
 
                 return model;

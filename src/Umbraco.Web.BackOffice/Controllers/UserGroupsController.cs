@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var display = _umbracoMapper.Map<UserGroupDisplay>(userGroupSave.PersistedUserGroup);
 
-            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/operationSavedHeader"), _localizedTextService.Localize("speechBubbles/editUserGroupSaved"));
+            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles","operationSavedHeader"), _localizedTextService.Localize("speechBubbles","editUserGroupSaved"));
             return display;
         }
 
@@ -202,10 +202,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             if (userGroups.Length > 1)
             {
-                return Ok(_localizedTextService.Localize("speechBubbles/deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
+                return Ok(_localizedTextService.Localize("speechBubbles","deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
             }
 
-            return Ok(_localizedTextService.Localize("speechBubbles/deleteUserGroupSuccess", new[] {userGroups[0].Name}));
+            return Ok(_localizedTextService.Localize("speechBubbles","deleteUserGroupSuccess", new[] {userGroups[0].Name}));
         }
     }
 }

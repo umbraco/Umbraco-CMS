@@ -14,6 +14,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
 {
+
     /// <summary>
     /// Extends NPoco Database for Umbraco.
     /// </summary>

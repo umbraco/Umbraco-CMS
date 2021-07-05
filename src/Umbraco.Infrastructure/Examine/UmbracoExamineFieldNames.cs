@@ -21,5 +21,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public const string VariesByCultureFieldName = ExamineFieldNames.SpecialFieldPrefix + "VariesByCulture";
 
         public const string NodeNameFieldName = "nodeName";
+        public const string ItemIdFieldName ="__NodeId";
+        public const string CategoryFieldName = "__IndexType";
+        public const string ItemTypeFieldName = "__NodeTypeAlias";
     }
 }

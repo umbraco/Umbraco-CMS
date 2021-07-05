@@ -305,8 +305,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
                     display.AddSuccessNotification(
-                        _localizedTextService.Localize("speechBubbles/editMemberSaved"),
-                        _localizedTextService.Localize("speechBubbles/editMemberSaved"));
+                        _localizedTextService.Localize("speechBubbles","editMemberSaved"),
+                        _localizedTextService.Localize("speechBubbles","editMemberSaved"));
                     break;
             }
 

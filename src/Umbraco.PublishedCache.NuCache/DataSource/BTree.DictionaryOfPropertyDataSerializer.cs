@@ -16,8 +16,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
             // read properties count
             var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);
-
             var dict = new Dictionary<string, PropertyData[]>(pcount,StringComparer.InvariantCultureIgnoreCase);
+
             // read each property
             for (var i = 0; i < pcount; i++)
             {
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
                 for (var j = 0; j < vcount; j++)
                 {
                     var pdata = new PropertyData();
-                    pdatas[j] =pdata;
+                    pdatas[j] = pdata;
 
                     // everything that can be null is read/written as object
                     //  even though - culture and segment should never be null here, as 'null' represents

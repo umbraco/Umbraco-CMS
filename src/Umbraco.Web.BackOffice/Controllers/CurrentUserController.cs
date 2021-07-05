@@ -233,7 +233,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 // even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
-                result.AddSuccessNotification(_localizedTextService.Localize("user/password"), _localizedTextService.Localize("user/passwordChanged"));
+                result.AddSuccessNotification(_localizedTextService.Localize("user","password"), _localizedTextService.Localize("user","passwordChanged"));
                 return result;
             }
 

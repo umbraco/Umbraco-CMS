@@ -190,15 +190,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Adds a cancelled message to the display
         /// </summary>
         /// <param name="display"></param>
-        /// <param name="header"></param>
-        /// <param name="message"></param>
-        /// <param name="localizeHeader"></param>
-        /// <param name="localizeMessage"></param>
-        /// <param name="headerParams"></param>
+        /// <param name="messageArea"></param>
+        /// <param name="messageAlias"></param>
         /// <param name="messageParams"></param>
-        protected void AddCancelMessage(INotificationModel display, string header = "speechBubbles/operationCancelledHeader", string message = "speechBubbles/operationCancelledText", bool localizeHeader = true,
-            bool localizeMessage = true,
-            string[] headerParams = null,
+        protected void AddCancelMessage(
+            INotificationModel display,
+            string messageArea = "speechBubbles",
+            string messageAlias ="operationCancelledText",
             string[] messageParams = null)
         {
             // if there's already a default event message, don't add our default one
@@ -209,8 +207,29 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             display.AddWarningNotification(
-                localizeHeader ? LocalizedTextService.Localize(header, headerParams) : header,
-                localizeMessage ? LocalizedTextService.Localize(message, messageParams) : message);
+                LocalizedTextService.Localize("speechBubbles", "operationCancelledHeader"),
+                LocalizedTextService.Localize(messageArea, messageAlias, messageParams));
+        }
+
+        /// <summary>
+        /// Adds a cancelled message to the display
+        /// </summary>
+        /// <param name="display"></param>
+        /// <param name="header"></param>
+        /// <param name="message"></param>
+        /// <param name="headerArea"></param>
+        /// <param name="headerAlias"></param>
+        /// <param name="headerParams"></param>
+        protected void AddCancelMessage(INotificationModel display, string message)
+        {
+            // if there's already a default event message, don't add our default one
+            IEventMessagesFactory messages = EventMessages;
+            if (messages != null && messages.GetOrDefault().GetAll().Any(x => x.IsDefaultEventMessage))
+            {
+                return;
+            }
+
+            display.AddWarningNotification(LocalizedTextService.Localize("speechBubbles", "operationCancelledHeader"), message);
         }
     }
 }

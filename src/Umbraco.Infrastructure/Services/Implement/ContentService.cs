@@ -194,11 +194,34 @@ namespace Umbraco.Cms.Core.Services.Implement
             // TODO: what about culture?
 
             var contentType = GetContentType(contentTypeAlias);
-            if (contentType == null)
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+            return Create(name, parentId, contentType, userId);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object of a specified content type.
+        /// </summary>
+        /// <remarks>This method simply returns a new, non-persisted, IContent without any identity. It
+        /// is intended as a shortcut to creating new content objects that does not invoke a save
+        /// operation against the database.
+        /// </remarks>
+        /// <param name="name">The name of the content object.</param>
+        /// <param name="parentId">The identifier of the parent, or -1.</param>
+        /// <param name="contentType">The content type of the content</param>
+        /// <param name="userId">The optional id of the user creating the content.</param>
+        /// <returns>The content object.</returns>
+        public IContent Create(string name, int parentId, IContentType contentType,
+            int userId = Constants.Security.SuperUserId)
+        {
+            if (contentType is null)
+            {
+                throw new ArgumentException("Content type must be specified", nameof(contentType));
+            }
+
             var parent = parentId > 0 ? GetById(parentId) : null;
-            if (parentId > 0 && parent == null)
+            if (parentId > 0 && parent is null)
+            {
                 throw new ArgumentException("No content with that id.", nameof(parentId));
+            }
 
             var content = new Content(name, parentId, contentType, userId);
 

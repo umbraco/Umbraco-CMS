@@ -305,7 +305,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // map back to display model, and return
             var display = _umbracoMapper.Map<IDataType, DataTypeDisplay>(dataType.PersistedDataType);
-            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/dataTypeSaved"), "");
+            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles", "dataTypeSaved"), "");
             return display;
         }
 
@@ -336,7 +336,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return ValidationProblem();
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"), "");
                     return ValidationProblem(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();

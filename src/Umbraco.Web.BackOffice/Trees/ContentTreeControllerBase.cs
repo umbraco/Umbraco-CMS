@@ -372,7 +372,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                         RecycleBinId.ToInvariantString(),
                         id,
                         queryStrings,
-                        LocalizedTextService.Localize("general/recycleBin"),
+                        LocalizedTextService.Localize("general", "recycleBin"),
                         "icon-trash",
                         RecycleBinSmells,
                         queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));

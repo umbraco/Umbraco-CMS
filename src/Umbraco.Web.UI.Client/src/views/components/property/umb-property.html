@@ -16,7 +16,7 @@
 
                         {{vm.property.label}}
 
-                        <span ng-if="vm.property.validation.mandatory">
+                        <span ng-if="vm.property.validation.mandatory || vm.property.ncMandatory">
                             <strong class="umb-control-required">*</strong>
                         </span>
 
