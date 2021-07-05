@@ -2,6 +2,7 @@ using System;
 using System.Data.Common;
 using System.Data.SqlServerCe;
 using Microsoft.Extensions.Options;
+using NPoco;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -57,5 +58,7 @@ namespace Umbraco.Web
             var engine = new SqlCeEngine(DatabaseBuilder.EmbeddedDatabaseConnectionString);
             engine.CreateDatabase();
         }
+
+        public NPocoMapperCollection ProviderSpecificMappers(string providerName) => new NPocoMapperCollection(Array.Empty<IMapper>());
     }
 }

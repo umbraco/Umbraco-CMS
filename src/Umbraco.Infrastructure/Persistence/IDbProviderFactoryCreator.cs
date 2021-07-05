@@ -10,5 +10,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         ISqlSyntaxProvider GetSqlSyntaxProvider(string providerName);
         IBulkSqlInsertProvider CreateBulkSqlInsertProvider(string providerName);
         void CreateDatabase(string providerName);
+        NPocoMapperCollection ProviderSpecificMappers(string providerName);
     }
 }
