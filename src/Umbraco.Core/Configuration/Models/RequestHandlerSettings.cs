@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 
@@ -13,6 +14,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigRequestHandler)]
     public class RequestHandlerSettings
     {
+        internal const bool StaticAddTrailingSlash = true;
+        internal const string StaticConvertUrlsToAscii = "try";
+
         internal static readonly CharItem[] DefaultCharCollection =
         {
             new CharItem { Char = " ", Replacement = "-" },
@@ -44,12 +48,14 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value indicating whether to add a trailing slash to URLs.
         /// </summary>
-        public bool AddTrailingSlash { get; set; } = true;
+        [DefaultValue(StaticAddTrailingSlash)]
+        public bool AddTrailingSlash { get; set; } = StaticAddTrailingSlash;
 
         /// <summary>
         /// Gets or sets a value indicating whether to convert URLs to ASCII (valid values: "true", "try" or "false").
         /// </summary>
-        public string ConvertUrlsToAscii { get; set; } = "try";
+        [DefaultValue(StaticConvertUrlsToAscii)]
+        public string ConvertUrlsToAscii { get; set; } = StaticConvertUrlsToAscii;
 
         /// <summary>
         /// Gets a value indicating whether URLs should be converted to ASCII.
@@ -83,6 +89,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the default character collection for replacements.
         /// </summary>
+        /// WB-TODO
         public IEnumerable<IChar> CharCollection { get; set; } = DefaultCharCollection;
 
         /// <summary>

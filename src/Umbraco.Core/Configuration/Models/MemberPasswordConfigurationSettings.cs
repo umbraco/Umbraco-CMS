@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -9,25 +11,39 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigMemberPassword)]
     public class MemberPasswordConfigurationSettings : IPasswordConfiguration
     {
-        /// <inheritdoc/>
-        public int RequiredLength { get; set; } = 10;
+        internal const int StaticRequiredLength = 10;
+        internal const bool StaticRequireNonLetterOrDigit = false;
+        internal const bool StaticRequireDigit = false;
+        internal const bool StaticRequireLowercase = false;
+        internal const bool StaticRequireUppercase = false;
+        internal const int StaticMaxFailedAccessAttemptsBeforeLockout = 5;
 
         /// <inheritdoc/>
-        public bool RequireNonLetterOrDigit { get; set; } = false;
+        [DefaultValue(StaticRequiredLength)]
+        public int RequiredLength { get; set; } = StaticRequiredLength;
 
         /// <inheritdoc/>
-        public bool RequireDigit { get; set; } = false;
+        [DefaultValue(StaticRequireNonLetterOrDigit)]
+        public bool RequireNonLetterOrDigit { get; set; } = StaticRequireNonLetterOrDigit;
 
         /// <inheritdoc/>
-        public bool RequireLowercase { get; set; } = false;
+        [DefaultValue(StaticRequireDigit)]
+        public bool RequireDigit { get; set; } = StaticRequireDigit;
 
         /// <inheritdoc/>
-        public bool RequireUppercase { get; set; } = false;
+        [DefaultValue(StaticRequireLowercase)]
+        public bool RequireLowercase { get; set; } = StaticRequireLowercase;
 
         /// <inheritdoc/>
+        [DefaultValue(StaticRequireUppercase)]
+        public bool RequireUppercase { get; set; } = StaticRequireUppercase;
+
+        /// <inheritdoc/>
+        [DefaultValue(Constants.Security.AspNetCoreV3PasswordHashAlgorithmName)]
         public string HashAlgorithmType { get; set; } = Constants.Security.AspNetCoreV3PasswordHashAlgorithmName;
 
         /// <inheritdoc/>
-        public int MaxFailedAccessAttemptsBeforeLockout { get; set; } = 5;
+        [DefaultValue(StaticMaxFailedAccessAttemptsBeforeLockout)]
+        public int MaxFailedAccessAttemptsBeforeLockout { get; set; } = StaticMaxFailedAccessAttemptsBeforeLockout;
     }
 }

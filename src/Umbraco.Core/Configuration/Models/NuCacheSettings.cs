@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -9,6 +11,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigNuCache)]
     public class NuCacheSettings
     {
+        internal const string StaticNuCacheSerializerType = "MessagePack";
+        internal const int StaticSqlPageSize = 1000;
+
         /// <summary>
         /// Gets or sets a value defining the BTree block size.
         /// </summary>
@@ -17,11 +22,13 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// The serializer type that nucache uses to persist documents in the database.
         /// </summary>
-        public NuCacheSerializerType NuCacheSerializerType { get; set; } = NuCacheSerializerType.MessagePack;
+        [DefaultValue(StaticNuCacheSerializerType)]
+        public NuCacheSerializerType NuCacheSerializerType { get; set; } = Enum<NuCacheSerializerType>.Parse(StaticNuCacheSerializerType);
 
         /// <summary>
         /// The paging size to use for nucache SQL queries.
         /// </summary>
-        public int SqlPageSize { get; set; } = 1000;
+        [DefaultValue(StaticSqlPageSize)]
+        public int SqlPageSize { get; set; } = StaticSqlPageSize;
     }
 }

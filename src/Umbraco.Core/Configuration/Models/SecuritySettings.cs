@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -9,25 +11,34 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigSecurity)]
     public class SecuritySettings
     {
+        internal const bool StaticKeepUserLoggedIn = false;
+        internal const bool StaticHideDisabledUsersInBackOffice = false;
+        internal const bool StaticAllowPasswordReset = true;
+        internal const string StaticAuthCookieName = "UMB_UCONTEXT";
+
         /// <summary>
         /// Gets or sets a value indicating whether to keep the user logged in.
         /// </summary>
-        public bool KeepUserLoggedIn { get; set; } = false;
+        [DefaultValue(StaticKeepUserLoggedIn)]
+        public bool KeepUserLoggedIn { get; set; } = StaticKeepUserLoggedIn;
 
         /// <summary>
         /// Gets or sets a value indicating whether to hide disabled users in the back-office.
         /// </summary>
-        public bool HideDisabledUsersInBackOffice { get; set; } = false;
+        [DefaultValue(StaticHideDisabledUsersInBackOffice)]
+        public bool HideDisabledUsersInBackOffice { get; set; } = StaticHideDisabledUsersInBackOffice;
 
         /// <summary>
         /// Gets or sets a value indicating whether to allow user password reset.
         /// </summary>
-        public bool AllowPasswordReset { get; set; } = true;
+        [DefaultValue(StaticAllowPasswordReset)]
+        public bool AllowPasswordReset { get; set; } = StaticAllowPasswordReset;
 
         /// <summary>
         /// Gets or sets a value for the authorization cookie name.
         /// </summary>
-        public string AuthCookieName { get; set; } = "UMB_UCONTEXT";
+        [DefaultValue(StaticAuthCookieName)]
+        public string AuthCookieName { get; set; } = StaticAuthCookieName;
 
         /// <summary>
         /// Gets or sets a value for the authorization cookie domain.

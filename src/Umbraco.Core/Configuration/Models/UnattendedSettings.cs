@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
@@ -9,6 +10,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigUnattended)]
     public class UnattendedSettings
     {
+        internal const bool StaticInstallUnattended = false;
+        internal const bool StaticUpgradeUnattended = false;
+
         /// <summary>
         /// Gets or sets a value indicating whether unattended installs are enabled.
         /// </summary>
@@ -18,12 +22,14 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// If this option is set to <c>true</c> an unattended install will be performed and the runtime enters
         /// the <c>Run</c> level.</para>
         /// </remarks>
-        public bool InstallUnattended { get; set; } = false;
+        [DefaultValue(StaticInstallUnattended)]
+        public bool InstallUnattended { get; set; } = StaticInstallUnattended;
 
         /// <summary>
         /// Gets or sets a value indicating whether unattended upgrades are enabled.
         /// </summary>
-        public bool UpgradeUnattended { get; set; } = false;
+        [DefaultValue(StaticUpgradeUnattended)]
+        public bool UpgradeUnattended { get; set; } = StaticUpgradeUnattended;
 
 
         /// <summary>

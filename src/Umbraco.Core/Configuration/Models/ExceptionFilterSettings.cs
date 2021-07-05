@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -9,9 +11,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigExceptionFilter)]
     public class ExceptionFilterSettings
     {
+        internal const bool StaticDisabled = false;
+
         /// <summary>
         /// Gets or sets a value indicating whether the exception filter is disabled.
         /// </summary>
-        public bool Disabled { get; set; } = false;
+        [DefaultValue(StaticDisabled)]
+        public bool Disabled { get; set; } = StaticDisabled;
     }
 }

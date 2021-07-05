@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -11,9 +11,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigPlugins)]
     public class UmbracoPluginSettings
     {
+        
+
         /// <summary>
         /// Gets or sets the allowed file extensions (including the period ".") that should be accessible from the browser.
         /// </summary>
+        /// WB-TODO
         public ISet<string> BrowsableFileExtensions { get; set; } = new HashSet<string>(new[]
         {
             ".html", // markup

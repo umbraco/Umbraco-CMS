@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
 
@@ -13,18 +14,22 @@ namespace Umbraco.Cms.Core.Configuration.Models
     public class ModelsBuilderSettings
     {
         private bool _flagOutOfDateModels = true;
-
-        private static string DefaultModelsDirectory => "~/umbraco/models";
+        internal const string StaticModelsMode = "InMemoryAuto";
+        internal const string StaticModelsDirectory = "~/umbraco/models";
+        internal const bool StaticAcceptUnsafeModelsDirectory = false;
+        internal const int StaticDebugLevel = 0;
 
         /// <summary>
         /// Gets or sets a value for the models mode.
         /// </summary>
-        public ModelsMode ModelsMode { get; set; } = ModelsMode.InMemoryAuto;
+        [DefaultValue(StaticModelsMode)]
+        public ModelsMode ModelsMode { get; set; } = Enum<ModelsMode>.Parse(StaticModelsMode);
 
         /// <summary>
         /// Gets or sets a value for models namespace.
         /// </summary>
         /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
+        [DefaultValue(Constants.ModelsBuilder.DefaultModelsNamespace)]
         public string ModelsNamespace { get; set; } = Constants.ModelsBuilder.DefaultModelsNamespace;
 
         /// <summary>
@@ -54,7 +59,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets or sets a value for the models directory.
         /// </summary>
         /// <remarks>Default is ~/umbraco/models but that can be changed.</remarks>
-        public string ModelsDirectory { get; set; } = DefaultModelsDirectory;
+        [DefaultValue(StaticModelsDirectory)]
+        public string ModelsDirectory { get; set; } = StaticModelsDirectory;
 
 
         /// <summary>
@@ -64,12 +70,14 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// An unsafe value is an absolute path, or a relative path pointing outside
         /// of the website root.
         /// </remarks>
-        public bool AcceptUnsafeModelsDirectory { get; set; } = false;
+        [DefaultValue(StaticAcceptUnsafeModelsDirectory)]
+        public bool AcceptUnsafeModelsDirectory { get; set; } = StaticAcceptUnsafeModelsDirectory;
 
         /// <summary>
         /// Gets or sets a value indicating the debug log level.
         /// </summary>
         /// <remarks>0 means minimal (safe on live site), anything else means more and more details (maybe not safe).</remarks>
-        public int DebugLevel { get; set; } = 0;
+        [DefaultValue(StaticDebugLevel)]
+        public int DebugLevel { get; set; } = StaticDebugLevel;
     }
 }

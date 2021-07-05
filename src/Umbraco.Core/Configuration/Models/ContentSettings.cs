@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Cms.Core.Macros;
 
 namespace Umbraco.Cms.Core.Configuration.Models
@@ -13,7 +14,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigContent)]
     public class ContentSettings
     {
-        private const string DefaultPreviewBadge =
+
+        internal const bool StaticResolveUrlsFromTextString = false;
+        internal const string StaticDefaultPreviewBadge =
             @"
             <div id=""umbracoPreviewBadge"" class=""umbraco-preview-badge"">
                 <span class=""umbraco-preview-badge__header"">Preview mode</span>
@@ -148,6 +151,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
             </style>
             <script type=""text/javascript"" data-umbraco-path=""{0}"" src=""{0}/js/umbraco.websitepreview.min.js""></script>";
 
+        internal const string StaticMacroErrors = "Inline";
+        internal const string StaticDisallowedUploadFiles = "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx";
+        internal const bool StaticShowDeprecatedPropertyEditors = false;
+        internal const string StaticLoginBackgroundImage = "assets/img/login.jpg";
+        internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_white.svg";
+
         /// <summary>
         /// Gets or sets a value for the content notification settings.
         /// </summary>
@@ -161,7 +170,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value indicating whether URLs should be resolved from text strings.
         /// </summary>
-        public bool ResolveUrlsFromTextString { get; set; } = false;
+        [DefaultValue(StaticResolveUrlsFromTextString)]
+        public bool ResolveUrlsFromTextString { get; set; } = StaticResolveUrlsFromTextString;
 
         /// <summary>
         /// Gets or sets a value for the collection of error pages.
@@ -171,17 +181,20 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the preview badge mark-up.
         /// </summary>
-        public string PreviewBadge { get; set; } = DefaultPreviewBadge;
+        [DefaultValue(StaticDefaultPreviewBadge)]
+        public string PreviewBadge { get; set; } = StaticDefaultPreviewBadge;
 
         /// <summary>
         /// Gets or sets a value for the macro error behaviour.
         /// </summary>
-        public MacroErrorBehaviour MacroErrors { get; set; } = MacroErrorBehaviour.Inline;
+        [DefaultValue(StaticMacroErrors)]
+        public MacroErrorBehaviour MacroErrors { get; set; } = Enum<MacroErrorBehaviour>.Parse(StaticMacroErrors);
 
         /// <summary>
         /// Gets or sets a value for the collection of file extensions that are disallowed for upload.
         /// </summary>
-        public IEnumerable<string> DisallowedUploadFiles { get; set; } = new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd", "xamlx" };
+        [DefaultValue(StaticDisallowedUploadFiles)]
+        public IEnumerable<string> DisallowedUploadFiles { get; set; } = StaticDisallowedUploadFiles.Split(',');
 
         /// <summary>
         /// Gets or sets a value for the collection of file extensions that are allowed for upload.
@@ -191,17 +204,20 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value indicating whether deprecated property editors should be shown.
         /// </summary>
-        public bool ShowDeprecatedPropertyEditors { get; set; } = false;
+        [DefaultValue(StaticShowDeprecatedPropertyEditors)]
+        public bool ShowDeprecatedPropertyEditors { get; set; } = StaticShowDeprecatedPropertyEditors;
 
         /// <summary>
         /// Gets or sets a value for the path to the login screen background image.
         /// </summary>
-        public string LoginBackgroundImage { get; set; } = "assets/img/login.jpg";
+        [DefaultValue(StaticLoginBackgroundImage)]
+        public string LoginBackgroundImage { get; set; } = StaticLoginBackgroundImage;
 
         /// <summary>
         /// Gets or sets a value for the path to the login screen logo image.
         /// </summary>
-        public string LoginLogoImage { get; set; } = "assets/img/application/umbraco_logo_white.svg";
+        [DefaultValue(StaticLoginLogoImage)]
+        public string LoginLogoImage { get; set; } = StaticLoginLogoImage;
 
 
     }
