@@ -2,7 +2,7 @@
     'use strict';
 
     /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
-    function tabbedContentDirective($timeout) {
+    function tabbedContentDirective($timeout, $filter) {
 
         function link($scope, $element) {
             
@@ -15,7 +15,8 @@
             scrollableNode.addEventListener("scroll", onScroll);
             scrollableNode.addEventListener("mousewheel", cancelScrollTween);
 
-            $scope.activeAppId = '1';
+            $scope.activeTabKey = '';
+            $scope.tabs = []; 
             
             function onScroll(event) {
                 
@@ -97,6 +98,22 @@
             $scope.registerPropertyGroup = function(element, appAnchor) {
                 propertyGroupNodesDictionary[appAnchor] = element;
             };
+
+            $scope.setActiveTab = function(tab) {
+                $scope.activeTabKey = tab.key;
+                $scope.content.tabs.forEach(tab => tab.active = false);
+                tab.active = true;
+            };
+
+            $scope.$watchCollection('content.tabs', () => {
+                $scope.tabs = $filter("filter")($scope.content.tabs, (tab) => {
+                    return tab.type === 1;
+                });
+
+                if ($scope.tabs.length > 0 && !$scope.activeTabKey) {
+                    $scope.activeTabKey = $scope.tabs[0].key;
+                }
+            });
             
             $scope.$on("editors.apps.appChanged", function($event, $args) {
                 // if app changed to this app, then we want to scroll to the current anchor
@@ -104,9 +121,6 @@
                     var activeAnchor = getActiveAnchor();
                     $timeout(jumpTo.bind(null, [activeAnchor.id]));
                 }
-
-                $scope.activeAppId = $args.app.id;
-                $scope.$evalAsync();
             });
             
             $scope.$on("editors.apps.appAnchorChanged", function($event, $args) {
