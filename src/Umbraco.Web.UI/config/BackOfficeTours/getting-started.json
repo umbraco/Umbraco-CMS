@@ -51,6 +51,14 @@
                 "backdropOpacity": 0.6
             },
             {
+                "element": "[data-element='section-content']",
+                "skipStepIfVisible": "[data-element='dashboard']",
+                "title": "Content section",
+                "content": "Try clicking <b>Content</b> to enter the content section.",
+                "event": "click",
+                "backdropOpacity": 0.6
+            },
+            {
                 "element": "#tree",
                 "elementPreventClick": true,
                 "title": "The Tree",
