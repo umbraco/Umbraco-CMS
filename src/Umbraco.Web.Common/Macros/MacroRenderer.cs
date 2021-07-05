@@ -362,7 +362,7 @@ namespace Umbraco.Cms.Web.Common.Macros
                           $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
                           "Executed PartialView.",
                           () => _partialViewMacroEngine.Execute(model, content),
-                          () => _textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
+                          () => _textService.Localize("errors", "macroErrorLoadingPartialView", new[] { model.MacroSource }));
         }
 
 

@@ -491,6 +491,11 @@ namespace Umbraco.Cms.Core.Services
         IContent Create(string name, int parentId, string documentTypeAlias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
+        /// Creates a document
+        /// </summary>
+        IContent Create(string name, int parentId, IContentType contentType, int userId = Constants.Security.SuperUserId);
+
+        /// <summary>
         /// Creates a document.
         /// </summary>
         IContent Create(string name, IContent parent, string documentTypeAlias, int userId = Constants.Security.SuperUserId);

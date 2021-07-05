@@ -246,7 +246,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var display =_umbracoMapper.Map<MemberTypeDisplay>(savedCt.Value);
 
             display.AddSuccessNotification(
-                _localizedTextService.Localize("speechBubbles/memberTypeSavedHeader"),
+                _localizedTextService.Localize("speechBubbles","memberTypeSavedHeader"),
                             string.Empty);
 
             return display;

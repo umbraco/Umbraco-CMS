@@ -47,28 +47,28 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private IEnumerable<OperatorTerm> Terms => new List<OperatorTerm>
         {
-                new OperatorTerm(_localizedTextService.Localize("template/is"), Operator.Equals, new [] {"string"}),
-                new OperatorTerm(_localizedTextService.Localize("template/isNot"), Operator.NotEquals, new [] {"string"}),
-                new OperatorTerm(_localizedTextService.Localize("template/before"), Operator.LessThan, new [] {"datetime"}),
-                new OperatorTerm(_localizedTextService.Localize("template/beforeIncDate"), Operator.LessThanEqualTo, new [] {"datetime"}),
-                new OperatorTerm(_localizedTextService.Localize("template/after"), Operator.GreaterThan, new [] {"datetime"}),
-                new OperatorTerm(_localizedTextService.Localize("template/afterIncDate"), Operator.GreaterThanEqualTo, new [] {"datetime"}),
-                new OperatorTerm(_localizedTextService.Localize("template/equals"), Operator.Equals, new [] {"int"}),
-                new OperatorTerm(_localizedTextService.Localize("template/doesNotEqual"), Operator.NotEquals, new [] {"int"}),
-                new OperatorTerm(_localizedTextService.Localize("template/contains"), Operator.Contains, new [] {"string"}),
-                new OperatorTerm(_localizedTextService.Localize("template/doesNotContain"), Operator.NotContains, new [] {"string"}),
-                new OperatorTerm(_localizedTextService.Localize("template/greaterThan"), Operator.GreaterThan, new [] {"int"}),
-                new OperatorTerm(_localizedTextService.Localize("template/greaterThanEqual"), Operator.GreaterThanEqualTo, new [] {"int"}),
-                new OperatorTerm(_localizedTextService.Localize("template/lessThan"), Operator.LessThan, new [] {"int"}),
-                new OperatorTerm(_localizedTextService.Localize("template/lessThanEqual"), Operator.LessThanEqualTo, new [] {"int"})
+                new OperatorTerm(_localizedTextService.Localize("template","is"), Operator.Equals, new [] {"string"}),
+                new OperatorTerm(_localizedTextService.Localize("template","isNot"), Operator.NotEquals, new [] {"string"}),
+                new OperatorTerm(_localizedTextService.Localize("template","before"), Operator.LessThan, new [] {"datetime"}),
+                new OperatorTerm(_localizedTextService.Localize("template","beforeIncDate"), Operator.LessThanEqualTo, new [] {"datetime"}),
+                new OperatorTerm(_localizedTextService.Localize("template","after"), Operator.GreaterThan, new [] {"datetime"}),
+                new OperatorTerm(_localizedTextService.Localize("template","afterIncDate"), Operator.GreaterThanEqualTo, new [] {"datetime"}),
+                new OperatorTerm(_localizedTextService.Localize("template","equals"), Operator.Equals, new [] {"int"}),
+                new OperatorTerm(_localizedTextService.Localize("template","doesNotEqual"), Operator.NotEquals, new [] {"int"}),
+                new OperatorTerm(_localizedTextService.Localize("template","contains"), Operator.Contains, new [] {"string"}),
+                new OperatorTerm(_localizedTextService.Localize("template","doesNotContain"), Operator.NotContains, new [] {"string"}),
+                new OperatorTerm(_localizedTextService.Localize("template","greaterThan"), Operator.GreaterThan, new [] {"int"}),
+                new OperatorTerm(_localizedTextService.Localize("template","greaterThanEqual"), Operator.GreaterThanEqualTo, new [] {"int"}),
+                new OperatorTerm(_localizedTextService.Localize("template","lessThan"), Operator.LessThan, new [] {"int"}),
+                new OperatorTerm(_localizedTextService.Localize("template","lessThanEqual"), Operator.LessThanEqualTo, new [] {"int"})
             };
 
         private IEnumerable<PropertyModel> Properties => new List<PropertyModel>
             {
-                new PropertyModel { Name = _localizedTextService.Localize("template/id"), Alias = "Id", Type = "int" },
-                new PropertyModel { Name = _localizedTextService.Localize("template/name"), Alias = "Name", Type = "string" },
-                new PropertyModel { Name = _localizedTextService.Localize("template/createdDate"), Alias = "CreateDate", Type = "datetime" },
-                new PropertyModel { Name = _localizedTextService.Localize("template/lastUpdatedDate"), Alias = "UpdateDate", Type = "datetime" }
+                new PropertyModel { Name = _localizedTextService.Localize("template","id"), Alias = "Id", Type = "int" },
+                new PropertyModel { Name = _localizedTextService.Localize("template","name"), Alias = "Name", Type = "string" },
+                new PropertyModel { Name = _localizedTextService.Localize("template","createdDate"), Alias = "CreateDate", Type = "datetime" },
+                new PropertyModel { Name = _localizedTextService.Localize("template","lastUpdatedDate"), Alias = "UpdateDate", Type = "datetime" }
             };
 
         public QueryResultModel PostTemplateQuery(QueryModel model)
@@ -232,10 +232,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
             var contentTypes = _contentTypeService.GetAll()
-                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = _localizedTextService.Localize("template/contentOfType", tokens: new string[] { x.Name }) })
+                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = _localizedTextService.Localize("template", "contentOfType", tokens: new string[] { x.Name }) })
                 .OrderBy(x => x.Name).ToList();
 
-            contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = _localizedTextService.Localize("template/allContent") });
+            contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = _localizedTextService.Localize("template", "allContent") });
 
             return contentTypes;
         }

@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             var items = Fields.First(x => x.Key == "items");
 
             // customize the items field
-            items.Name = textService.Localize("editdatatype/addPrevalue");
+            items.Name = textService.Localize("editdatatype", "addPrevalue");
             items.Validators.Add(new ValueListUniqueValueValidator());
         }
 

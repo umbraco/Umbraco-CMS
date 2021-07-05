@@ -364,7 +364,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
 
             display.AddSuccessNotification(
-                            _localizedTextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            _localizedTextService.Localize("speechBubbles","contentTypeSavedHeader"),
                             string.Empty);
 
             return display;
@@ -612,8 +612,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 else
                 {
                     model.Notifications.Add(new BackOfficeNotification(
-                        _localizedTextService.Localize("speechBubbles/operationFailedHeader"),
-                        _localizedTextService.Localize("media/disallowedFileType"),
+                        _localizedTextService.Localize("speechBubbles","operationFailedHeader"),
+                        _localizedTextService.Localize("media","disallowedFileType"),
                         NotificationStyle.Warning));
                 }
             }

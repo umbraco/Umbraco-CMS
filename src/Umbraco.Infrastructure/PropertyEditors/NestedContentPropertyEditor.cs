@@ -158,6 +158,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public override object ToEditor(IProperty property, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
+                var valEditors = new Dictionary<int, IDataValueEditor>();
 
                 var rows = _nestedContentValues.GetPropertyValues(val);
 
@@ -186,8 +187,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
                                 continue;
                             }
 
-                            var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
-                            var valEditor = propEditor.GetValueEditor(tempConfig);
+                            var dataTypeId = prop.Value.PropertyType.DataTypeId;
+                            if (!valEditors.TryGetValue(dataTypeId, out var valEditor))
+                            {
+                                var tempConfig = _dataTypeService.GetDataType(dataTypeId).Configuration;
+                                valEditor = propEditor.GetValueEditor(tempConfig);
+
+                                valEditors.Add(dataTypeId, valEditor);
+                            }
+
                             var convValue = valEditor.ToEditor(tempProp);
 
                             // update the raw value since this is what will get serialized out

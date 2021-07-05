@@ -17,43 +17,43 @@ namespace Umbraco.Cms.Core.Security
         public override IdentityError DuplicateRoleName(string role) => new IdentityError
         {
             Code = nameof(DuplicateRoleName),
-            Description = _textService.Localize("validation/duplicateUserGroupName", new[] { role })
+            Description = _textService.Localize("validation", "duplicateUserGroupName", new[] { role })
         };
 
         public override IdentityError InvalidRoleName(string role) => new IdentityError
         {
             Code = nameof(InvalidRoleName),
-            Description = _textService.Localize("validation/invalidUserGroupName")
+            Description = _textService.Localize("validation", "invalidUserGroupName")
         };
 
         public override IdentityError LoginAlreadyAssociated() => new IdentityError
         {
             Code = nameof(LoginAlreadyAssociated),
-            Description = _textService.Localize("user/duplicateLogin")
+            Description = _textService.Localize("user", "duplicateLogin")
         };
 
         public override IdentityError UserAlreadyHasPassword() => new IdentityError
         {
             Code = nameof(UserAlreadyHasPassword),
-            Description = _textService.Localize("user/userHasPassword")
+            Description = _textService.Localize("user", "userHasPassword")
         };
 
         public override IdentityError UserAlreadyInRole(string role) => new IdentityError
         {
             Code = nameof(UserAlreadyInRole),
-            Description = _textService.Localize("user/userHasGroup", new[] { role })
+            Description = _textService.Localize("user", "userHasGroup", new[] { role })
         };
 
         public override IdentityError UserLockoutNotEnabled() => new IdentityError
         {
             Code = nameof(UserLockoutNotEnabled),
-            Description = _textService.Localize("user/userLockoutNotEnabled")
+            Description = _textService.Localize("user", "userLockoutNotEnabled")
         };
 
         public override IdentityError UserNotInRole(string role) => new IdentityError
         {
             Code = nameof(UserNotInRole),
-            Description = _textService.Localize("user/userNotInGroup", new[] { role })
+            Description = _textService.Localize("user", "userNotInGroup", new[] { role })
         };
     }
 
@@ -67,43 +67,43 @@ namespace Umbraco.Cms.Core.Security
         public override IdentityError DuplicateRoleName(string role) => new IdentityError
         {
             Code = nameof(DuplicateRoleName),
-            Description = _textService.Localize("validation/duplicateMemberGroupName", new[] { role })
+            Description = _textService.Localize("validation", "duplicateMemberGroupName", new[] { role })
         };
 
         public override IdentityError InvalidRoleName(string role) => new IdentityError
         {
             Code = nameof(InvalidRoleName),
-            Description = _textService.Localize("validation/invalidMemberGroupName")
+            Description = _textService.Localize("validation", "invalidMemberGroupName")
         };
 
         public override IdentityError LoginAlreadyAssociated() => new IdentityError
         {
             Code = nameof(LoginAlreadyAssociated),
-            Description = _textService.Localize("member/duplicateMemberLogin")
+            Description = _textService.Localize("member", "duplicateMemberLogin")
         };
 
         public override IdentityError UserAlreadyHasPassword() => new IdentityError
         {
             Code = nameof(UserAlreadyHasPassword),
-            Description = _textService.Localize("member/memberHasPassword")
+            Description = _textService.Localize("member", "memberHasPassword")
         };
 
         public override IdentityError UserAlreadyInRole(string role) => new IdentityError
         {
             Code = nameof(UserAlreadyInRole),
-            Description = _textService.Localize("member/memberHasGroup", new[] { role })
+            Description = _textService.Localize("member", "memberHasGroup", new[] { role })
         };
 
         public override IdentityError UserLockoutNotEnabled() => new IdentityError
         {
             Code = nameof(UserLockoutNotEnabled),
-            Description = _textService.Localize("member/memberLockoutNotEnabled")
+            Description = _textService.Localize("member", "memberLockoutNotEnabled")
         };
 
         public override IdentityError UserNotInRole(string role) => new IdentityError
         {
             Code = nameof(UserNotInRole),
-            Description = _textService.Localize("member/memberNotInGroup", new[] { role })
+            Description = _textService.Localize("member", "memberNotInGroup", new[] { role })
         };
     }
 }

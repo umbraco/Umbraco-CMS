@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
     public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex, IDisposable
     {
         private readonly ILogger<UmbracoContentIndex> _logger;
-
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
         public UmbracoContentIndex(
             ILoggerFactory loggerFactory,
             string name,
@@ -133,7 +133,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 var rawQuery = $"{UmbracoExamineFieldNames.IndexPathFieldName}:{descendantPath}";
                 var c = Searcher.CreateQuery();
                 var filtered = c.NativeQuery(rawQuery);
-                var results = filtered.Execute();
+                var selectedFields = filtered.SelectFields(_idOnlyFieldSet);
+                var results = selectedFields.Execute();
 
                 _logger.
                     LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);

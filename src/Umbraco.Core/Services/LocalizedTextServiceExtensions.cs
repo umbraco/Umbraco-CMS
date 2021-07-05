@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -15,88 +16,81 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class LocalizedTextServiceExtensions
     {
-        public static string Localize<T>(this ILocalizedTextService manager, string area, T key)
-        where T: System.Enum
-        {
-            var fullKey = string.Join("/", area, key);
-            return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture);
-        }
+         public static string Localize<T>(this ILocalizedTextService manager, string area, T key)
+         where T: System.Enum =>
+             manager.Localize(area, key.ToString(), Thread.CurrentThread.CurrentUICulture);
 
-        public static string Localize(this ILocalizedTextService manager, string area, string key)
-        {
-            var fullKey = string.Join("/", area, key);
-            return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture);
-        }
+        public static string Localize(this ILocalizedTextService manager, string area, string alias)
+            => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture);
 
         /// <summary>
         /// Localize using the current thread culture
         /// </summary>
         /// <param name="manager"></param>
-        /// <param name="key"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
         /// <param name="tokens"></param>
         /// <returns></returns>
-        public static string Localize(this ILocalizedTextService manager, string key, string[] tokens)
-        {
-            return manager.Localize(key, Thread.CurrentThread.CurrentUICulture, tokens);
-        }
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, string[] tokens)
+                    => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, ConvertToDictionaryVars(tokens));
 
         /// <summary>
         /// Localize using the current thread culture
         /// </summary>
         /// <param name="manager"></param>
-        /// <param name="key"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
         /// <param name="tokens"></param>
         /// <returns></returns>
-        public static string Localize(this ILocalizedTextService manager, string key, IDictionary<string, string> tokens = null)
-        {
-            return manager.Localize(key, Thread.CurrentThread.CurrentUICulture, tokens);
-        }
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, IDictionary<string, string> tokens = null)
+            => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, tokens);
 
         /// <summary>
         /// Localize a key without any variables
         /// </summary>
         /// <param name="manager"></param>
-        /// <param name="key"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
         /// <param name="culture"></param>
         /// <param name="tokens"></param>
         /// <returns></returns>
-        public static string Localize(this ILocalizedTextService manager, string key, CultureInfo culture, string[] tokens)
-        {
-            return manager.Localize(key, culture, ConvertToDictionaryVars(tokens));
-        }
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture, string[] tokens)
+            => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, tokens);
 
-        /// <summary>
-        /// Convert an array of strings to a dictionary of indices -> values
-        /// </summary>
-        /// <param name="variables"></param>
-        /// <returns></returns>
-        internal static IDictionary<string, string> ConvertToDictionaryVars(string[] variables)
-        {
-            if (variables == null) return null;
-            if (variables.Any() == false) return null;
+         /// <summary>
+         /// Convert an array of strings to a dictionary of indices -> values
+         /// </summary>
+         /// <param name="variables"></param>
+         /// <returns></returns>
+         internal static IDictionary<string, string> ConvertToDictionaryVars(string[] variables)
+         {
+             if (variables == null) return null;
+             if (variables.Any() == false) return null;
 
-            return variables.Select((s, i) => new { index = i.ToString(CultureInfo.InvariantCulture), value = s })
-                .ToDictionary(keyvals => keyvals.index, keyvals => keyvals.value);
-        }
+             return variables.Select((s, i) => new { index = i.ToString(CultureInfo.InvariantCulture), value = s })
+                 .ToDictionary(keyvals => keyvals.index, keyvals => keyvals.value);
+         }
 
-        public static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, ICultureDictionary cultureDictionary, string text)
-        {
-            if (text == null)
-                return null;
+         public static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, ICultureDictionary cultureDictionary, string text)
+         {
+             if (text == null)
+                 return null;
 
-            if (text.StartsWith("#") == false)
-                return text;
+             if (text.StartsWith("#") == false)
+                 return text;
 
-            text = text.Substring(1);
-            var value = cultureDictionary[text];
-            if (value.IsNullOrWhiteSpace() == false)
-            {
-                return value;
-            }
+             text = text.Substring(1);
+             var value = cultureDictionary[text];
+             if (value.IsNullOrWhiteSpace() == false)
+             {
+                 return value;
+             }
 
-            value = manager.Localize(text.Replace('_', '/'));
-            return value.StartsWith("[") ? text : value;
-        }
+             var areaAndKey = text.Split('_');
+
+             value = manager.Localize(areaAndKey[0], areaAndKey[1]);
+             return value.StartsWith("[") ? text : value;
+         }
 
     }
 }

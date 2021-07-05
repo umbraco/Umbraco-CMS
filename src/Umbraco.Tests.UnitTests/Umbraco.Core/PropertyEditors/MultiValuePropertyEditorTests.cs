@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
             // editor wants ApplicationContext.Current.Services.TextService
             // (that should be fixed with proper injection)
             var textService = new Mock<ILocalizedTextService>();
-            textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("blah");
+            textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<string>(),It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("blah");
 
             //// var appContext = new ApplicationContext(
             ////    new DatabaseContext(TestObjects.GetIDatabaseFactoryMock(), logger, Mock.Of<IRuntimeState>(), Mock.Of<IMigrationEntryService>()),

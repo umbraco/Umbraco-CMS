@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// Determines if a property type's value should be compressed in memory
     /// </summary>
     /// <remarks>
-    /// 
+    ///
     /// </remarks>
     public interface IPropertyCacheCompression
     {

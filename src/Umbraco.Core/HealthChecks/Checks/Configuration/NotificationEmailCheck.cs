@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -50,11 +50,11 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration
 
         /// <inheritdoc/>
         public override string CheckSuccessMessage =>
-            LocalizedTextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage",
+            LocalizedTextService.Localize("healthcheck","notificationEmailsCheckSuccessMessage",
                 new[] { CurrentValue ?? "&lt;null&gt;" });
 
         /// <inheritdoc/>
-        public override string CheckErrorMessage => LocalizedTextService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
+        public override string CheckErrorMessage => LocalizedTextService.Localize("healthcheck","notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
 
         /// <inheritdoc/>
         public override string ReadMoreLink => Constants.HealthChecks.DocumentationLinks.Configuration.NotificationEmailCheck;

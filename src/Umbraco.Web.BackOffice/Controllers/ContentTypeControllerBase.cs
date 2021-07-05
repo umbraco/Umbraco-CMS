@@ -272,7 +272,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var exists = allAliases.InvariantContains(contentTypeSave.Alias);
             if (exists && (ctId == 0 || !ct.Alias.InvariantEquals(contentTypeSave.Alias)))
             {
-                ModelState.AddModelError("Alias", LocalizedTextService.Localize("editcontenttype/aliasAlreadyExists"));
+                ModelState.AddModelError("Alias", LocalizedTextService.Localize("editcontenttype", "aliasAlreadyExists"));
             }
 
             // execute the external validators
@@ -417,7 +417,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case MoveOperationStatusType.FailedCancelledByEvent:
                     return ValidationProblem();
                 case MoveOperationStatusType.FailedNotAllowedByPath:
-                    return ValidationProblem(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"));
+                    return ValidationProblem(LocalizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -453,8 +453,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return NotFound();
                 case MoveOperationStatusType.FailedCancelledByEvent:
                     return ValidationProblem();
-                case MoveOperationStatusType.FailedNotAllowedByPath:                    
-                    return ValidationProblem(LocalizedTextService.Localize("moveOrCopy/notAllowedByPath"));
+                case MoveOperationStatusType.FailedNotAllowedByPath:
+                    return ValidationProblem(LocalizedTextService.Localize("moveOrCopy", "notAllowedByPath"));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
