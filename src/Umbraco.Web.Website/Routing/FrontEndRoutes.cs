@@ -65,11 +65,10 @@ namespace Umbraco.Cms.Web.Website.Routing
                 // exclude front-end api controllers
                 PluginControllerMetadata meta = PluginController.GetMetadata(controller);
 
-                endpoints.MapUmbracoRoute(
+                endpoints.MapUmbracoSurfaceRoute(
                     meta.ControllerType,
                     _umbracoPathSegment,
-                    meta.AreaName,
-                    "Surface");
+                    meta.AreaName);
             }
         }
 

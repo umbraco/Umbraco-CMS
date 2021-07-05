@@ -51,9 +51,9 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.LiveEnvironment
         public override string CurrentValue => _hostingSettings.CurrentValue.Debug.ToString();
 
         /// <inheritdoc/>
-        public override string CheckSuccessMessage => LocalizedTextService.Localize("healthcheck/compilationDebugCheckSuccessMessage");
+        public override string CheckSuccessMessage => LocalizedTextService.Localize("healthcheck","compilationDebugCheckSuccessMessage");
 
         /// <inheritdoc/>
-        public override string CheckErrorMessage => LocalizedTextService.Localize("healthcheck/compilationDebugCheckErrorMessage");
+        public override string CheckErrorMessage => LocalizedTextService.Localize("healthcheck","compilationDebugCheckErrorMessage");
     }
 }

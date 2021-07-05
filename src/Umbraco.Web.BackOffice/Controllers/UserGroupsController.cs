@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -22,7 +21,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
     [PrefixlessBodyModelValidator]
-    public class UserGroupsController : UmbracoAuthorizedJsonController
+    public class UserGroupsController : BackOfficeNotificationsController
     {
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
@@ -118,7 +117,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var display = _umbracoMapper.Map<UserGroupDisplay>(userGroupSave.PersistedUserGroup);
 
-            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/operationSavedHeader"), _localizedTextService.Localize("speechBubbles/editUserGroupSaved"));
+            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles","operationSavedHeader"), _localizedTextService.Localize("speechBubbles","editUserGroupSaved"));
             return display;
         }
 
@@ -202,10 +201,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 _userService.DeleteUserGroup(userGroup);
             }
             if (userGroups.Length > 1)
-                return new UmbracoNotificationSuccessResponse(
-                    _localizedTextService.Localize("speechBubbles/deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
-            return new UmbracoNotificationSuccessResponse(
-                _localizedTextService.Localize("speechBubbles/deleteUserGroupSuccess", new[] {userGroups[0].Name}));
+            {
+                return Ok(_localizedTextService.Localize("speechBubbles","deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
+            }
+
+            return Ok(_localizedTextService.Localize("speechBubbles","deleteUserGroupSuccess", new[] {userGroups[0].Name}));
         }
     }
 }

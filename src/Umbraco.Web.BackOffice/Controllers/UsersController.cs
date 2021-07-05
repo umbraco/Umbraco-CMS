@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
     [PrefixlessBodyModelValidator]
     [IsCurrentUserModelFilter]
-    public class UsersController : UmbracoAuthorizedJsonController
+    public class UsersController : BackOfficeNotificationsController
     {
         private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
@@ -128,7 +128,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
             if (urls == null)
-                return new ValidationErrorResult("Could not access Gravatar endpoint");
+                return ValidationProblem("Could not access Gravatar endpoint");
 
             return urls;
         }
@@ -345,7 +345,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             if (_securitySettings.UsernameIsEmail)
@@ -362,7 +362,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
@@ -380,7 +380,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var created = await _userManager.CreateAsync(identityUser);
             if (created.Succeeded == false)
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult(created.Errors.ToErrorMessage());
+                return ValidationProblem(created.Errors.ToErrorMessage());
             }
 
             string resetPassword;
@@ -389,7 +389,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var result = await _userManager.AddPasswordAsync(identityUser, password);
             if (result.Succeeded == false)
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult(created.Errors.ToErrorMessage());
+                return ValidationProblem(created.Errors.ToErrorMessage());
             }
 
             resetPassword = password;
@@ -446,19 +446,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             if (!_emailSender.CanSendRequiredEmail())
             {
-                return new ValidationErrorResult("No Email server is configured");
+                return ValidationProblem("No Email server is configured");
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
             var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
-                return new ValidationErrorResult(canSaveUser.Result, StatusCodes.Status401Unauthorized);
+                return ValidationProblem(canSaveUser.Result, StatusCodes.Status401Unauthorized);
             }
 
             if (user == null)
@@ -471,7 +471,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var created = await _userManager.CreateAsync(identityUser);
                 if (created.Succeeded == false)
                 {
-                    return ValidationErrorResult.CreateNotificationValidationErrorResult(created.Errors.ToErrorMessage());
+                    return ValidationProblem(created.Errors.ToErrorMessage());
                 }
 
                 //now re-look the user back up
@@ -491,7 +491,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //send the email
             await SendUserInviteEmailAsync(display, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
 
-            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/resendInviteHeader"), _localizedTextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
+            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles","resendInviteHeader"), _localizedTextService.Localize("speechBubbles","resendInviteSuccess", new[] { user.Name }));
             return display;
         }
 
@@ -513,7 +513,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ModelState.AddModelError(
                     _securitySettings.UsernameIsEmail ? "Email" : "Username",
                     "A user with the username already exists");
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             return new ActionResult<IUser>(user);
@@ -543,10 +543,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var applicationUri = _hostingEnvironment.ApplicationMainUrl;
             var inviteUri = new Uri(applicationUri, action);
 
-            var emailSubject = _localizedTextService.Localize("user/inviteEmailCopySubject",
+            var emailSubject = _localizedTextService.Localize("user","inviteEmailCopySubject",
                 //Ensure the culture of the found user is used for the email!
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings));
-            var emailBody = _localizedTextService.Localize("user/inviteEmailCopyFormat",
+            var emailBody = _localizedTextService.Localize("user","inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
@@ -568,7 +568,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             var intId = userSave.Id.TryConvertTo<int>();
@@ -631,7 +631,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             if (hasErrors)
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
 
             //merge the save data onto the user
             var user = _umbracoMapper.Map(userSave, found);
@@ -645,11 +645,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var userHasChangedOwnLanguage =
                 user.Id == currentUser.Id && currentUser.Language != user.Language;
 
-            var textToLocalise = userHasChangedOwnLanguage ? "speechBubbles/operationSavedHeaderReloadUser" : "speechBubbles/operationSavedHeader";
+            var textToLocalise = userHasChangedOwnLanguage ? "operationSavedHeaderReloadUser" : "operationSavedHeader";
             var culture = userHasChangedOwnLanguage
                 ? CultureInfo.GetCultureInfo(user.Language)
                 : Thread.CurrentThread.CurrentUICulture;
-            display.AddSuccessNotification(_localizedTextService.Localize(textToLocalise, culture), _localizedTextService.Localize("speechBubbles/editUserSaved", culture));
+            display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles", textToLocalise, culture), _localizedTextService.Localize("speechBubbles","editUserSaved", culture));
             return display;
         }
 
@@ -664,7 +664,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             Attempt<int> intId = changingPasswordModel.Id.TryConvertTo<int>();
@@ -684,12 +684,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // if it's the current user, the current user cannot reset their own password without providing their old password
             if (currentUser.Username == found.Username && string.IsNullOrEmpty(changingPasswordModel.OldPassword))
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Password reset is not allowed without providing old password");
+                return ValidationProblem("Password reset is not allowed without providing old password");
             }
 
             if (!currentUser.IsAdmin() && found.IsAdmin())
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("The current user cannot change the password for the specified user");
+                return ValidationProblem("The current user cannot change the password for the specified user");
             }
 
             Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
@@ -697,7 +697,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (passwordChangeResult.Success)
             {
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
-                result.AddSuccessNotification(_localizedTextService.Localize("general/success"), _localizedTextService.Localize("user/passwordChangedGeneric"));
+                result.AddSuccessNotification(_localizedTextService.Localize("general","success"), _localizedTextService.Localize("user","passwordChangedGeneric"));
                 return result;
             }
 
@@ -706,7 +706,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
 
-            return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            return ValidationProblem(ModelState);
         }
 
 
@@ -720,7 +720,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var tryGetCurrentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
             if (tryGetCurrentUserId && userIds.Contains(tryGetCurrentUserId.Result))
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("The current user cannot disable itself");
+                return ValidationProblem("The current user cannot disable itself");
             }
 
             var users = _userService.GetUsersById(userIds).ToArray();
@@ -733,12 +733,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (users.Length > 1)
             {
-                return new UmbracoNotificationSuccessResponse(
-                    _localizedTextService.Localize("speechBubbles/disableUsersSuccess", new[] {userIds.Length.ToString()}));
+                return Ok(_localizedTextService.Localize("speechBubbles","disableUsersSuccess", new[] {userIds.Length.ToString()}));
             }
 
-            return new UmbracoNotificationSuccessResponse(
-                _localizedTextService.Localize("speechBubbles/disableUserSuccess", new[] { users[0].Name }));
+            return Ok(_localizedTextService.Localize("speechBubbles","disableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
@@ -757,12 +755,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (users.Length > 1)
             {
-                return new UmbracoNotificationSuccessResponse(
-                    _localizedTextService.Localize("speechBubbles/enableUsersSuccess", new[] { userIds.Length.ToString() }));
+                return Ok(
+                    _localizedTextService.Localize("speechBubbles","enableUsersSuccess", new[] { userIds.Length.ToString() }));
             }
 
-            return new UmbracoNotificationSuccessResponse(
-                _localizedTextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));
+            return Ok(
+                _localizedTextService.Localize("speechBubbles","enableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
@@ -787,19 +785,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var unlockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now.AddMinutes(-1));
                 if (unlockResult.Succeeded == false)
                 {
-                    return new ValidationErrorResult(
+                    return ValidationProblem(
                         $"Could not unlock for user {u} - error {unlockResult.Errors.ToErrorMessage()}");
                 }
 
                 if (userIds.Length == 1)
                 {
-                    return new UmbracoNotificationSuccessResponse(
-                        _localizedTextService.Localize("speechBubbles/unlockUserSuccess", new[] {user.Name}));
+                    return Ok(
+                        _localizedTextService.Localize("speechBubbles","unlockUserSuccess", new[] {user.Name}));
                 }
             }
 
-            return new UmbracoNotificationSuccessResponse(
-                _localizedTextService.Localize("speechBubbles/unlockUsersSuccess", new[] {(userIds.Length - notFound.Count).ToString()}));
+            return Ok(
+                _localizedTextService.Localize("speechBubbles","unlockUsersSuccess", new[] {(userIds.Length - notFound.Count).ToString()}));
         }
 
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
@@ -816,8 +814,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
             _userService.Save(users);
-            return new UmbracoNotificationSuccessResponse(
-                _localizedTextService.Localize("speechBubbles/setUserGroupOnUsersSuccess"));
+            return Ok(
+                _localizedTextService.Localize("speechBubbles","setUserGroupOnUsersSuccess"));
         }
 
         /// <summary>
@@ -847,8 +845,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var userName = user.Name;
             _userService.Delete(user, true);
 
-            return new UmbracoNotificationSuccessResponse(
-                _localizedTextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));
+            return Ok(
+                _localizedTextService.Localize("speechBubbles","deleteUserSuccess", new[] { userName }));
         }
 
         public class PagedUserResult : PagedResult<UserBasic>

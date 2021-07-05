@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
                 return;
             }
 
-            var message = _textService.Localize("healthcheck/scheduledHealthCheckEmailBody", new[]
+            var message = _textService.Localize("healthcheck","scheduledHealthCheckEmailBody", new[]
             {
                 DateTime.Now.ToShortDateString(),
                 DateTime.Now.ToShortTimeString(),
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
             // you can identify the site that these results are for.
             var host = _hostingEnvironment.ApplicationMainUrl?.ToString();
 
-            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host });
+            var subject = _textService.Localize("healthcheck","scheduledHealthCheckEmailSubject", new[] { host });
 
 
             var mailMessage = CreateMailMessage(subject, message);

@@ -88,14 +88,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public ActionResult<PackageDefinition> PostSavePackage(PackageDefinition model)
         {
             if (ModelState.IsValid == false)
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
 
             //save it
             if (!_packagingService.SaveCreatedPackage(model))
-                return ValidationErrorResult.CreateNotificationValidationErrorResult(
+            {
+                return ValidationProblem(
                         model.Id == default
                             ? $"A package with the name {model.Name} already exists"
                             : $"The package with id {model.Id} was not found");
+            }
 
             _packagingService.ExportCreatedPackage(model);
 
@@ -153,7 +155,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
 
             if (!System.IO.File.Exists(package.PackagePath))
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("No file found for path " + package.PackagePath);
+                return ValidationProblem("No file found for path " + package.PackagePath);
 
             var fileName = Path.GetFileName(package.PackagePath);
 
@@ -161,7 +163,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var cd = new System.Net.Mime.ContentDisposition
             {
-                FileName =  WebUtility.UrlEncode(fileName),
+                FileName = WebUtility.UrlEncode(fileName),
                 Inline = false  // false = prompt the user for downloading;  true = browser to try to show the file inline
             };
             Response.Headers.Add("Content-Disposition", cd.ToString());

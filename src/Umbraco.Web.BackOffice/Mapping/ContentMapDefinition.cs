@@ -113,7 +113,20 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
         private void Map(IContent source, ContentItemDisplay target, MapperContext context)
         {
-            target.AllowedActions = GetActions(source);
+            // Both GetActions and DetermineIsChildOfListView use parent, so get it once here
+            // Parent might already be in context, so check there before using content service
+            IContent parent;
+            if (context.Items.TryGetValue("Parent", out var parentObj) &&
+                parentObj is IContent typedParent)
+            {
+                parent = typedParent;
+            }
+            else
+            {
+                parent = _contentService.GetParent(source);
+            }
+
+            target.AllowedActions = GetActions(source, parent, context);
             target.AllowedTemplates = GetAllowedTemplates(source);
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
@@ -124,7 +137,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
             target.IsBlueprint = source.Blueprint;
-            target.IsChildOfListView = DetermineIsChildOfListView(source, context);
+            target.IsChildOfListView = DetermineIsChildOfListView(source, parent, context);
             target.IsContainer = source.ContentType.IsContainer;
             target.IsElement = source.ContentType.IsElement;
             target.Key = source.Key;
@@ -183,7 +196,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.VariesByCulture = source.ContentType.VariesByCulture();
         }
 
-        private IEnumerable<string> GetActions(IContent source)
+        private IEnumerable<string> GetActions(IContent source, IContent parent, MapperContext context)
         {
             var backOfficeSecurity = _backOfficeSecurityAccessor.BackOfficeSecurity;
 
@@ -196,9 +209,27 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
                 path = source.Path;
             else
             {
-                var parent = _contentService.GetById(source.ParentId);
                 path = parent == null ? "-1" : parent.Path;
             }
+
+            // A bit of a mess, but we need to ensure that all the required values are here AND that they're the right type.
+            if (context.Items.TryGetValue("CurrentUser", out var userObject) &&
+                context.Items.TryGetValue("Permissions", out var permissionsObject) &&
+                userObject is IUser currentUser &&
+                permissionsObject is Dictionary<string, EntityPermissionSet> permissionsDict)
+            {
+                // If we already have permissions for a given path,
+                // and the current user is the same as was used to generate the permissions, return the stored permissions.
+                if (backOfficeSecurity.CurrentUser.Id == currentUser.Id &&
+                    permissionsDict.TryGetValue(path, out var permissions))
+                {
+                    return permissions.GetAllPermissions();
+                }
+            }
+
+            // TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
+            // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
+            // reference exception :(
 
             return _userService.GetPermissionsForPath(backOfficeSecurity.CurrentUser, path).GetAllPermissions();
         }
@@ -266,6 +297,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         /// Checks if the content item is a descendant of a list view
         /// </summary>
         /// <param name="source"></param>
+        /// <param name="parent"></param>
         /// <param name="context"></param>
         /// <returns>
         /// Returns true if the content item is a descendant of a list view and where the content is
@@ -277,7 +309,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         /// false because the item is technically not being rendered as part of a list view but instead as a
         /// real tree node. If we didn't perform this check then tree syncing wouldn't work correctly.
         /// </remarks>
-        private bool DetermineIsChildOfListView(IContent source, MapperContext context)
+        private bool DetermineIsChildOfListView(IContent source, IContent parent, MapperContext context)
         {
             var userStartNodes = Array.Empty<int>();
 
@@ -295,8 +327,6 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
                         return false;
                 }
             }
-
-            var parent = _contentService.GetParent(source);
 
             if (parent == null)
                 return false;
@@ -331,6 +361,12 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
         private IDictionary<string, string> GetAllowedTemplates(IContent source)
         {
+            // Element types can't have templates, so no need to query to get the content type
+            if (source.ContentType.IsElement)
+            {
+                return new Dictionary<string, string>();
+            }
+
             var contentType = _contentTypeService.Get(source.ContentTypeId);
 
             return contentType.AllowedTemplates

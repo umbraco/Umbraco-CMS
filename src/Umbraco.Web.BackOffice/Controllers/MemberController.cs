@@ -26,11 +26,8 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
-using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Filters;
@@ -260,8 +257,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (ModelState.IsValid == false)
             {
                 MemberDisplay forDisplay = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
-                forDisplay.Errors = ModelState.ToErrorDictionary();
-                return new ValidationErrorResult(forDisplay);
+                return ValidationProblem(forDisplay, ModelState);
             }
 
             // Create a scope here which will wrap all child data operations in a single transaction.
@@ -300,8 +296,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // lastly, if it is not valid, add the model state to the outgoing object and throw a 403
             if (!ModelState.IsValid)
             {
-                display.Errors = ModelState.ToErrorDictionary();
-                return new ValidationErrorResult(display, StatusCodes.Status403Forbidden);
+                return ValidationProblem(display, ModelState, StatusCodes.Status403Forbidden);
             }
 
             // put the correct messages in
@@ -310,8 +305,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
                     display.AddSuccessNotification(
-                        _localizedTextService.Localize("speechBubbles/editMemberSaved"),
-                        _localizedTextService.Localize("speechBubbles/editMemberSaved"));
+                        _localizedTextService.Localize("speechBubbles","editMemberSaved"),
+                        _localizedTextService.Localize("speechBubbles","editMemberSaved"));
                     break;
             }
 
@@ -373,7 +368,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (created.Succeeded == false)
             {
-                return new ValidationErrorResult(created.Errors.ToErrorMessage());
+                return ValidationProblem(created.Errors.ToErrorMessage());
             }
 
             // now re-look up the member, which will now exist
@@ -460,7 +455,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             MemberIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
             if (identityMember == null)
             {
-                return new ValidationErrorResult("Member was not found");
+                return ValidationProblem("Member was not found");
             }
 
             // Handle unlocking with the member manager (takes care of other nuances)
@@ -469,7 +464,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 IdentityResult unlockResult = await _memberManager.SetLockoutEndDateAsync(identityMember, DateTimeOffset.Now.AddMinutes(-1));
                 if (unlockResult.Succeeded == false)
                 {
-                    return new ValidationErrorResult(
+                    return ValidationProblem(
                         $"Could not unlock for member {contentItem.Id} - error {unlockResult.Errors.ToErrorMessage()}");
                 }
                 needsResync = true;
@@ -478,7 +473,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 // NOTE: This should not ever happen unless someone is mucking around with the request data.
                 // An admin cannot simply lock a user, they get locked out by password attempts, but an admin can unlock them
-                return new ValidationErrorResult("An admin cannot lock a member");
+                return ValidationProblem("An admin cannot lock a member");
             }
 
             // If we're changing the password...
@@ -488,13 +483,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 IdentityResult validatePassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
                 if (validatePassword.Succeeded == false)
                 {
-                    return new ValidationErrorResult(validatePassword.Errors.ToErrorMessage());
+                    return ValidationProblem(validatePassword.Errors.ToErrorMessage());
                 }
 
                 Attempt<int> intId = identityMember.Id.TryConvertTo<int>();
                 if (intId.Success == false)
                 {
-                    return new ValidationErrorResult("Member ID was not valid");
+                    return ValidationProblem("Member ID was not valid");
                 }
 
                 var changingPasswordModel = new ChangingPasswordModel
@@ -513,7 +508,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     {
                         ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError?.ErrorMessage ?? string.Empty);
                     }
-                    return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                    return ValidationProblem(ModelState);
                 }
 
                 needsResync = true;
@@ -622,7 +617,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 IdentityResult identityResult = await _memberManager.RemoveFromRolesAsync(identityMember, rolesToRemove);
                 if (!identityResult.Succeeded)
                 {
-                    return ValidationErrorResult.CreateNotificationValidationErrorResult(identityResult.Errors.ToErrorMessage());
+                    return ValidationProblem(identityResult.Errors.ToErrorMessage());
                 }
                 hasChanges = true;
             }
@@ -635,7 +630,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 IdentityResult identityResult = await _memberManager.AddToRolesAsync(identityMember, toAdd);
                 if (!identityResult.Succeeded)
                 {
-                    return ValidationErrorResult.CreateNotificationValidationErrorResult(identityResult.Errors.ToErrorMessage());
+                    return ValidationProblem(identityResult.Errors.ToErrorMessage());
                 }
                 hasChanges = true;
             }

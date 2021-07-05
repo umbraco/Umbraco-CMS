@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.Options;
@@ -9,7 +9,6 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Cms.Persistence.SqlCe;
 
 namespace Umbraco.Tests.Benchmarks
 {
@@ -19,7 +18,7 @@ namespace Umbraco.Tests.Benchmarks
         protected Lazy<ISqlContext> MockSqlContext()
         {
             var sqlContext = Mock.Of<ISqlContext>();
-            var syntax = new SqlCeSyntaxProvider(Options.Create(new GlobalSettings()));
+            var syntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
             Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(syntax);
             return new Lazy<ISqlContext>(() => sqlContext);
         }
@@ -36,7 +35,7 @@ namespace Umbraco.Tests.Benchmarks
             _mapperCollection = mapperCollection.Object;
         }
 
-        private readonly ISqlSyntaxProvider _syntaxProvider = new SqlCeSyntaxProvider(Options.Create(new GlobalSettings()));
+        private readonly ISqlSyntaxProvider _syntaxProvider = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
         private readonly CachedExpression _cachedExpression;
         private readonly IMapperCollection _mapperCollection;
 

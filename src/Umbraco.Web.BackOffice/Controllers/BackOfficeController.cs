@@ -335,7 +335,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //Add error and redirect for it to be displayed
-            TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { _textService.Localize("login/resetCodeExpired") };
+            TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { _textService.Localize("login","resetCodeExpired") };
             return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
         }
 
@@ -431,7 +431,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // Sign in the user with this external login provider (which auto links, etc...)
             var result = await _signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false);
-            
+
             var errors = new List<string>();
 
             if (result == Microsoft.AspNetCore.Identity.SignInResult.Success)

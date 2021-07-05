@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                 menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
 
-                menu.Items.Add(new MenuItem("rename", LocalizedTextService.Localize("actions/rename"))
+                menu.Items.Add(new MenuItem("rename", LocalizedTextService.Localize("actions", "rename"))
                 {
                     Icon = "icon icon-edit"
                 });

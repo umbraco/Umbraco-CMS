@@ -56,21 +56,21 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Services
             string message;
             if (smtpSettings == null)
             {
-                message = _textService.Localize("healthcheck/smtpMailSettingsNotFound");
+                message = _textService.Localize("healthcheck", "smtpMailSettingsNotFound");
             }
             else
             {
                 if (string.IsNullOrEmpty(smtpSettings.Host))
                 {
-                    message = _textService.Localize("healthcheck/smtpMailSettingsHostNotConfigured");
+                    message = _textService.Localize("healthcheck", "smtpMailSettingsHostNotConfigured");
                 }
                 else
                 {
                     success = CanMakeSmtpConnection(smtpSettings.Host, smtpSettings.Port);
                     message = success
-                        ? _textService.Localize("healthcheck/smtpMailSettingsConnectionSuccess")
+                        ? _textService.Localize("healthcheck", "smtpMailSettingsConnectionSuccess")
                         : _textService.Localize(
-                            "healthcheck/smtpMailSettingsConnectionFail",
+                            "healthcheck", "smtpMailSettingsConnectionFail",
                             new[] { smtpSettings.Host, smtpSettings.Port.ToString() });
                 }
             }

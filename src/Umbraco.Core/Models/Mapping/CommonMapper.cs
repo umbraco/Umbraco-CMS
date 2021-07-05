@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             // localize content app names
             foreach (var app in apps)
             {
-                var localizedAppName = _localizedTextService.Localize($"apps/{app.Alias}");
+                var localizedAppName = _localizedTextService.Localize("apps", app.Alias);
                 if (localizedAppName.Equals($"[{app.Alias}]", StringComparison.OrdinalIgnoreCase) == false)
                 {
                     app.Name = localizedAppName;

@@ -142,7 +142,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var globalSettings = new GlobalSettings();
             var nuCacheSettings = new NuCacheSettings();
-
+            
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(

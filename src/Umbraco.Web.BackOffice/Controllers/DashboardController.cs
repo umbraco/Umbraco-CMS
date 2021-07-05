@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
@@ -20,6 +21,7 @@ using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Core.Dashboards;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -39,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IDashboardService _dashboardService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IShortStringHelper _shortStringHelper;
-
+        private readonly IOptions<ContentDashboardSettings> _dashboardSettings;
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
@@ -49,7 +51,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILogger<DashboardController> logger,
             IDashboardService dashboardService,
             IUmbracoVersion umbracoVersion,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IOptions<ContentDashboardSettings> dashboardSettings)
 
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -58,6 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _dashboardService = dashboardService;
             _umbracoVersion = umbracoVersion;
             _shortStringHelper = shortStringHelper;
+            _dashboardSettings = dashboardSettings;
         }
 
         //we have just one instance of HttpClient shared for the entire application
@@ -65,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
-        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.com/")
         {
             var user = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
@@ -73,7 +77,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
             var isAdmin = user.IsAdmin();
 
-            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}&admin={4}", section, allowedSections, language, version, isAdmin);
+            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}",
+                baseUrl,
+                _dashboardSettings.Value.ContentDashboardPath,
+                section,
+                allowedSections,
+                language,
+                version,
+                isAdmin);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = _appCaches.RuntimeCache.GetCacheItem<JObject>(key);
