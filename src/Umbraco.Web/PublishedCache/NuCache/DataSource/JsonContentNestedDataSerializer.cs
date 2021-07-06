@@ -3,8 +3,10 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Cms.Infrastructure.Serialization;
+
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
@@ -24,6 +26,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             DateFormatString = "o"
         };
         private readonly JsonNameTable _propertyNameTable = new DefaultJsonNameTable();
+
         public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData)
         {
             if (stringData == null && byteData != null)
@@ -38,6 +41,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 return serializer.Deserialize<ContentCacheDataModel>(reader);
             }
         }
+
 
         public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model)
         {
