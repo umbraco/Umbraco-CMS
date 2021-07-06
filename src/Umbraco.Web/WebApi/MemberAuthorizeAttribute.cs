@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Web.Security;
 using Umbraco.Core.Composing;
