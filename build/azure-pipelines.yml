@@ -477,11 +477,11 @@ stages:
     - stage: Artifacts_Docs
       displayName: 'Static Code Documentation'
       dependsOn: [Determine_build_type]
-      condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
       jobs:
           - job: Generate_Docs_CSharp
             timeoutInMinutes: 60
             displayName: Generate C# Docs
+            condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
             pool:
                 vmImage: windows-latest
             steps:
@@ -522,10 +522,10 @@ stages:
                       targetPath: $(Build.ArtifactStagingDirectory)\docs\csharp-docs.zip
                       artifact: docs-cs
                       publishLocation: pipeline
-
           - job: Generate_Docs_JS
             timeoutInMinutes: 60
             displayName: Generate JS Docs
+            condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
             pool:
                 vmImage: windows-latest
             steps:
