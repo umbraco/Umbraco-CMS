@@ -211,6 +211,18 @@
     # /p:UmbracoBuild tells the csproj that we are building from PS, not VS
   })
 
+  $ubuild.DefineMethod("CompileJsonSchema",
+  {
+    Write-Host "Generating JSON Schema for AppSettings"
+    Write-Host "Logging to $($this.BuildTemp)\json.schema.log"
+
+    ## NOTE: Need to specify the outputfile to point to the build temp folder
+    &dotnet run --project "$($this.SolutionRoot)\src\JsonSchema\JsonSchema.csproj" `
+        -c Release > "$($this.BuildTemp)\json.schema.log" `
+        -- `
+        --outputFile "$($this.BuildTemp)\WebApp\umbraco\config\appsettings-schema.json"
+  })
+
   $ubuild.DefineMethod("PrepareTests",
   {
     Write-Host "Prepare Tests"
@@ -510,6 +522,8 @@
     $this.CompileBelle()
     if ($this.OnError()) { return }
     $this.CompileUmbraco()
+    if ($this.OnError()) { return }
+    $this.CompileJsonSchema()
     if ($this.OnError()) { return }
     $this.PrepareTests()
     if ($this.OnError()) { return }

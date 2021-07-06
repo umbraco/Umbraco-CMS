@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -8,6 +10,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// </summary>
     public class ContentNotificationSettings
     {
+        internal const bool StaticDisableHtmlEmail = false;
+
         /// <summary>
         /// Gets or sets a value for the email address for notifications.
         /// </summary>
@@ -16,6 +20,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value indicating whether HTML email notifications should be disabled.
         /// </summary>
-        public bool DisableHtmlEmail { get; set; } = false;
+        [DefaultValue(StaticDisableHtmlEmail)]
+        public bool DisableHtmlEmail { get; set; } = StaticDisableHtmlEmail;
     }
 }

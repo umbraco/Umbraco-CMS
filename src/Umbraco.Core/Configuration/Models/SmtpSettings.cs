@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
@@ -10,8 +11,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Matches MailKit.Security.SecureSocketOptions and defined locally to avoid having to take
     /// a dependency on this external library into Umbraco.Core.
-    /// See: http://www.mimekit.net/docs/html/T_MailKit_Security_SecureSocketOptions.htm
     /// </summary>
+    /// <seealso cref="http://www.mimekit.net/docs/html/T_MailKit_Security_SecureSocketOptions.htm"/>
     public enum SecureSocketOptions
     {
         /// <summary>
@@ -45,6 +46,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// </summary>
     public class SmtpSettings : ValidatableEntryBase
     {
+        internal const string StaticSecureSocketOptions = "Auto";
+        internal const string StaticDeliveryMethod = "Network";
+
         /// <summary>
         /// Gets or sets a value for the SMTP from address to use for messages.
         /// </summary>
@@ -65,7 +69,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the secure socket options.
         /// </summary>
-        public SecureSocketOptions SecureSocketOptions { get; set; } = SecureSocketOptions.Auto;
+        [DefaultValue(StaticSecureSocketOptions)]
+        public SecureSocketOptions SecureSocketOptions { get; set; } = Enum<SecureSocketOptions>.Parse(StaticSecureSocketOptions);
 
         /// <summary>
         /// Gets or sets a value for the SMTP pick-up directory.
@@ -75,7 +80,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the SMTP delivery method.
         /// </summary>
-        public SmtpDeliveryMethod DeliveryMethod { get; set; } = SmtpDeliveryMethod.Network;
+        [DefaultValue(StaticDeliveryMethod)]
+        public SmtpDeliveryMethod DeliveryMethod { get; set; } = Enum<SmtpDeliveryMethod>.Parse(StaticDeliveryMethod);
 
         /// <summary>
         /// Gets or sets a value for the SMTP user name.

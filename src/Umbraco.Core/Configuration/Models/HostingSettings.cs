@@ -1,13 +1,19 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.ComponentModel;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for hosting settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigHosting)]
     public class HostingSettings
     {
+        internal const string StaticLocalTempStorageLocation = "Default";
+        internal const bool StaticDebug = false;
+
         /// <summary>
         /// Gets or sets a value for the application virtual path.
         /// </summary>
@@ -16,12 +22,14 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the location of temporary files.
         /// </summary>
-        public LocalTempStorage LocalTempStorageLocation { get; set; } = LocalTempStorage.Default;
+        [DefaultValue(StaticLocalTempStorageLocation)] 
+        public LocalTempStorage LocalTempStorageLocation { get; set; } = Enum<LocalTempStorage>.Parse(StaticLocalTempStorageLocation);
 
         /// <summary>
         /// Gets or sets a value indicating whether umbraco is running in [debug mode].
         /// </summary>
         /// <value><c>true</c> if [debug mode]; otherwise, <c>false</c>.</value>
-        public bool Debug { get; set; } = false;
+        [DefaultValue(StaticDebug)]
+        public bool Debug { get; set; } = StaticDebug;
     }
 }
