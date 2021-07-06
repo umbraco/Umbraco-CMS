@@ -69,8 +69,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             // Don't run on replicas nor unknown role servers
             switch (_serverRegistrar.CurrentServerRole)
             {
-                case ServerRole.Website:
-                    _logger.LogDebug("Does not run on replica servers.");
+                case ServerRole.Subscriber:
+                    _logger.LogDebug("Does not run on subscriber servers.");
                     return;
                 case ServerRole.Unknown:
                     _logger.LogDebug("Does not run on servers with unknown role.");

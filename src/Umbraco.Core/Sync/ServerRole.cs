@@ -16,13 +16,13 @@ namespace Umbraco.Cms.Core.Sync
         Single = 1,
 
         /// <summary>
-        /// In a multi-servers environment, the server is a website/frontend server.
+        /// In a multi-servers environment, the server is a Subscriber server.
         /// </summary>
-        Website = 2,
+        Subscriber = 2,
 
         /// <summary>
-        /// In a multi-servers environment, the server is the scheduler server.
+        /// In a multi-servers environment, the server is the Scheduling Publisher.
         /// </summary>
-        Scheduler = 3
+        SchedulingPublisher = 3
     }
 }
