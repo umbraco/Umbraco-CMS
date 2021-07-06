@@ -25,14 +25,17 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: PowerShell@1
-                  displayName: Update Version and Artifact Name
+                  displayName: Set $isRelease variable
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
                           $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
-                          Write-Host "##vso[task.setvariable variable=isRelease]$isRelease"
+
                           if ($isRelease.Count -gt 0){
-                            Write-Host "##vso[build.addbuildtag]Release build"
+                             Write-Host "##vso[build.addbuildtag]Release build"
+                             Write-Host "##vso[task.setvariable variable=isRelease]true"
+                          }else{
+                             Write-Host "##vso[task.setvariable variable=isRelease]false"
                           }
     - stage: Unit_Tests
       displayName: Unit Tests
