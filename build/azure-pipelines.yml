@@ -477,7 +477,7 @@ stages:
     - stage: Artifacts_Docs
       displayName: 'Static Code Documentation'
       dependsOn: [Determine_build_type]
-      condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], true)
+      condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
       jobs:
           - job: Generate_Docs_CSharp
             timeoutInMinutes: 60
