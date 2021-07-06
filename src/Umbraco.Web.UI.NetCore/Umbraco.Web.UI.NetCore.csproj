@@ -121,6 +121,6 @@
     <RemoveDir Directories="@(BelleLib)" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
 
     <Message Text="Remove $(JsonSchemaPath)." Importance="High" Condition="Exists('$(JsonSchemaPath)') and !Exists('$(SolutionDir)preserve.jsonschema')" />
-    <Delete Files="$(JsonSchemaPath)"  Condition="Exists('$(JsonSchemaPath)') and !Exists('$(SolutionDir)preserve.jsonschema')"/>
+    <Delete Files="$(JsonSchemaPath)" Condition="Exists('$(JsonSchemaPath)') and !Exists('$(SolutionDir)preserve.jsonschema')" />
   </Target>
 </Project>
