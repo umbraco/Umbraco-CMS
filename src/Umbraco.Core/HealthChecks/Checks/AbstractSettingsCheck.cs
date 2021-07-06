@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks
         /// <summary>
         /// Gets the message for when the check has succeeded.
         /// </summary>
-        public virtual string CheckSuccessMessage => LocalizedTextService.Localize("healthcheck/checkSuccessMessage", new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath });
+        public virtual string CheckSuccessMessage => LocalizedTextService.Localize("healthcheck", "checkSuccessMessage", new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath });
 
         /// <summary>
         /// Gets the message for when the check has failed.
@@ -62,10 +62,10 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks
         public virtual string CheckErrorMessage =>
             ValueComparisonType == ValueComparisonType.ShouldEqual
                 ? LocalizedTextService.Localize(
-                    "healthcheck/checkErrorMessageDifferentExpectedValue",
+                    "healthcheck", "checkErrorMessageDifferentExpectedValue",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath })
                 : LocalizedTextService.Localize(
-                    "healthcheck/checkErrorMessageUnexpectedValue",
+                    "healthcheck", "checkErrorMessageUnexpectedValue",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value, ItemPath });
 
         /// <inheritdoc/>

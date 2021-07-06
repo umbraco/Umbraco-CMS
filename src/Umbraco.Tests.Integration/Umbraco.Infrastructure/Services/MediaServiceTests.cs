@@ -183,27 +183,27 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Arrange
             MediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
             MediaTypeService.Save(mediaType);
-            IMedia media = MediaService.CreateMedia(string.Empty, -1, "video");
+            IMedia media = MediaService.CreateMedia(string.Empty, -1, Constants.Conventions.MediaTypes.VideoAlias);
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => MediaService.Save(media));
         }
 
-        /*
-        [Test]
-        public void Ensure_Content_Xml_Created()
-        {
-            var mediaType = MockedContentTypes.CreateVideoMediaType();
-            MediaTypeService.Save(mediaType);
-            var media = MediaService.CreateMedia("Test", -1, "video");
 
-            MediaService.Save(media);
-
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                Assert.IsTrue(scope.Database.Exists<ContentXmlDto>(media.Id));
-            }
-        }*/
+        // [Test]
+        // public void Ensure_Content_Xml_Created()
+        // {
+        //     var mediaType = MediaTypeBuilder.CreateVideoMediaType();
+        //     MediaTypeService.Save(mediaType);
+        //     var media = MediaService.CreateMedia("Test", -1, Constants.Conventions.MediaTypes.VideoAlias);
+        //
+        //     MediaService.Save(media);
+        //
+        //     using (var scope = ScopeProvider.CreateScope())
+        //     {
+        //         Assert.IsTrue(scope.Database.Exists<ContentXmlDto>(media.Id));
+        //     }
+        // }
 
         [Test]
         public void Can_Get_Media_By_Path()

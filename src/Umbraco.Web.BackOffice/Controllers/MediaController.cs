@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 Id = Constants.System.RecycleBinMedia,
                 Alias = "recycleBin",
                 ParentId = -1,
-                Name = _localizedTextService.Localize("general/recycleBin"),
+                Name = _localizedTextService.Localize("general", "recycleBin"),
                 ContentTypeAlias = "recycleBin",
                 CreateDate = DateTime.Now,
                 IsContainer = true,
@@ -452,9 +452,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var moveResult = _mediaService.MoveToRecycleBin(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
                 if (moveResult == false)
                 {
-                    //returning an object of INotificationModel will ensure that any pending
-                    // notification messages are added to the response.
-                    return new ValidationErrorResult(new SimpleNotificationModel());
+                    return ValidationProblem();
                 }
             }
             else
@@ -462,9 +460,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var deleteResult = _mediaService.Delete(foundMedia, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
                 if (deleteResult == false)
                 {
-                    //returning an object of INotificationModel will ensure that any pending
-                    // notification messages are added to the response.
-                    return new ValidationErrorResult(new SimpleNotificationModel());
+                    return ValidationProblem();
                 }
             }
 
@@ -500,11 +496,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (sourceParentID == destinationParentID)
             {
-                return new ValidationErrorResult(new SimpleNotificationModel(new BackOfficeNotification("",_localizedTextService.Localize("media/moveToSameFolderFailed"),NotificationStyle.Error)));
+                return ValidationProblem(new SimpleNotificationModel(new BackOfficeNotification("",_localizedTextService.Localize("media", "moveToSameFolderFailed"),NotificationStyle.Error)));
             }
             if (moveResult == false)
             {
-                return new ValidationErrorResult(new SimpleNotificationModel());
+                return ValidationProblem();
             }
             else
             {
@@ -563,9 +559,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the model state to the outgoing object and throw validation response
-                    var forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
-                    forDisplay.Errors = ModelState.ToErrorDictionary();
-                    return new ValidationErrorResult(forDisplay);
+                    MediaItemDisplay forDisplay = _umbracoMapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
+                    return ValidationProblem(forDisplay, ModelState);
                 }
             }
 
@@ -578,8 +573,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //lastly, if it is not valid, add the model state to the outgoing object and throw a 403
             if (!ModelState.IsValid)
             {
-                display.Errors = ModelState.ToErrorDictionary();
-                return new ValidationErrorResult(display, StatusCodes.Status403Forbidden);
+                return ValidationProblem(display, ModelState, StatusCodes.Status403Forbidden);
             }
 
             //put the correct msgs in
@@ -590,8 +584,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (saveStatus.Success)
                     {
                         display.AddSuccessNotification(
-                            _localizedTextService.Localize("speechBubbles/editMediaSaved"),
-                            _localizedTextService.Localize("speechBubbles/editMediaSavedText"));
+                            _localizedTextService.Localize("speechBubbles", "editMediaSaved"),
+                            _localizedTextService.Localize("speechBubbles", "editMediaSavedText"));
                     }
                     else
                     {
@@ -602,7 +596,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         // is no Id to redirect to!
                         if (saveStatus.Result.Result == OperationResultType.FailedCancelledByEvent && IsCreatingAction(contentItem.Action))
                         {
-                            return new ValidationErrorResult(display);
+                            return ValidationProblem(display);
                         }
                     }
 
@@ -622,7 +616,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             _mediaService.EmptyRecycleBin(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(Constants.Security.SuperUserId));
 
-            return new UmbracoNotificationSuccessResponse(_localizedTextService.Localize("defaultdialogs/recycleBinIsEmpty"));
+            return Ok(_localizedTextService.Localize("defaultdialogs", "recycleBinIsEmpty"));
         }
 
         /// <summary>
@@ -661,7 +655,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (_mediaService.Sort(sortedMedia) == false)
                 {
                     _logger.LogWarning("Media sorting failed, this was probably caused by an event being cancelled");
-                    return new ValidationErrorResult("Media sorting failed, this was probably caused by an event being cancelled");
+                    return ValidationProblem("Media sorting failed, this was probably caused by an event being cancelled");
                 }
                 return Ok();
             }
@@ -837,15 +831,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var saveResult = _mediaService.Save(f, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
                     if (saveResult == false)
                     {
-                        AddCancelMessage(tempFiles,
-                            message: _localizedTextService.Localize("speechBubbles/operationCancelledText") + " -- " + mediaItemName);
+                        AddCancelMessage(tempFiles, _localizedTextService.Localize("speechBubbles", "operationCancelledText") + " -- " + mediaItemName);
                     }
                 }
                 else
                 {
                     tempFiles.Notifications.Add(new BackOfficeNotification(
-                        _localizedTextService.Localize("speechBubbles/operationFailedHeader"),
-                        _localizedTextService.Localize("media/disallowedFileType"),
+                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        _localizedTextService.Localize("media", "disallowedFileType"),
                         NotificationStyle.Warning));
                 }
             }
@@ -919,7 +912,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
                 else
                 {
-                    return new ValidationErrorResult("The request was not formatted correctly, the parentId is not an integer, Guid or UDI");
+                    return ValidationProblem("The request was not formatted correctly, the parentId is not an integer, Guid or UDI");
                 }
             }
 
@@ -931,10 +924,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var authorizationResult = await _authorizationService.AuthorizeAsync(User, new MediaPermissionsResource(_mediaService.GetById(intParentId)), requirement);
                 if (!authorizationResult.Succeeded)
                 {
-                    return new ValidationErrorResult(
+                    return ValidationProblem(
                     new SimpleNotificationModel(new BackOfficeNotification(
-                        _localizedTextService.Localize("speechBubbles/operationFailedHeader"),
-                        _localizedTextService.Localize("speechBubbles/invalidUserPermissionsText"),
+                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        _localizedTextService.Localize("speechBubbles", "invalidUserPermissionsText"),
                         NotificationStyle.Warning)),
                         StatusCodes.Status403Forbidden);
                 }
@@ -969,8 +962,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 if (toMove.ContentType.AllowedAsRoot == false && mediaTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
                 {
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedAtRoot"), "");
-                    return new ValidationErrorResult(notificationModel);
+                    notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedAtRoot"), "");
+                    return ValidationProblem(notificationModel);
                 }
             }
             else
@@ -987,16 +980,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedByContentType"), "");
-                    return new ValidationErrorResult(notificationModel);
+                    notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedByContentType"), "");
+                    return ValidationProblem(notificationModel);
                 }
 
                 // Check on paths
                 if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
                 {
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy/notAllowedByPath"), "");
-                    return new ValidationErrorResult(notificationModel);
+                    notificationModel.AddErrorNotification(_localizedTextService.Localize("moveOrCopy", "notAllowedByPath"), "");
+                    return ValidationProblem(notificationModel);
                 }
             }
 

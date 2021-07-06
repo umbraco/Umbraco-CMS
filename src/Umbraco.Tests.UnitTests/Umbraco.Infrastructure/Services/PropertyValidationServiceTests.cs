@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
         private void MockObjects(out PropertyValidationService validationService, out IDataType dt)
         {
             var textService = new Mock<ILocalizedTextService>();
-            textService.Setup(x => x.Localize(It.IsAny<string>(), Thread.CurrentThread.CurrentCulture, null)).Returns("Localized text");
+            textService.Setup(x => x.Localize(It.IsAny<string>(),It.IsAny<string>(), Thread.CurrentThread.CurrentCulture, null)).Returns("Localized text");
 
             var dataTypeService = new Mock<IDataTypeService>();
             IDataType dataType = Mock.Of<IDataType>(

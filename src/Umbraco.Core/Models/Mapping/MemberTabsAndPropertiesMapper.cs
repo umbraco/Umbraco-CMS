@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
             {
                 isLockedOutProperty.View = "readonlyvalue";
-                isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
+                isLockedOutProperty.Value = _localizedTextService.Localize("general", "no");
             }
 
             if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser != null
@@ -108,14 +108,14 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}id",
-                    Label = _localizedTextService.Localize("general/id"),
+                    Label = _localizedTextService.Localize("general","id"),
                     Value = new List<string> {member.Id.ToString(), member.Key.ToString()},
                     View = "idwithguid"
                 },
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}doctype",
-                    Label = _localizedTextService.Localize("content/membertype"),
+                    Label = _localizedTextService.Localize("content","membertype"),
                     Value = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, member.ContentType.Name),
                     View = _propertyEditorCollection[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
                 },
@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
-                    Label = _localizedTextService.Localize("general/email"),
+                    Label = _localizedTextService.Localize("general","email"),
                     Value = member.Email,
                     View = "email",
                     Validation = {Mandatory = true}
@@ -131,8 +131,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password",
-                    Label = _localizedTextService.Localize("password"),
-
+                    Label = _localizedTextService.Localize(null,"password"),
                     Value = new Dictionary<string, object>
                     {
                         // TODO: why ignoreCase, what are we doing here?!
@@ -146,7 +145,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}membergroup",
-                    Label = _localizedTextService.Localize("content/membergroup"),
+                    Label = _localizedTextService.Localize("content","membergroup"),
                     Value = GetMemberGroupValue(member.Username),
                     View = "membergroups",
                     Config = new Dictionary<string, object> {{"IsRequired", true}}
@@ -222,7 +221,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var prop = new ContentPropertyDisplay
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login",
-                Label = localizedText.Localize("login"),
+                Label = localizedText.Localize(null,"login"),
                 Value = member.Username
             };
 

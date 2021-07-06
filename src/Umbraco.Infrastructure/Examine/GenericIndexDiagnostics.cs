@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Examine;
+using Examine.Search;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Extensions;
@@ -18,6 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private readonly IIndex _index;
         private static readonly string[] s_ignoreProperties = { "Description" };
 
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
         public GenericIndexDiagnostics(IIndex index) => _index = index;
 
         public int DocumentCount => -1; //unknown
@@ -31,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
             try
             {
-                var result = _index.Searcher.Search("test");
+                var result = _index.Searcher.CreateQuery().ManagedQuery("test").SelectFields(_idOnlyFieldSet).Execute(new QueryOptions(0, 1));
                 return Attempt<string>.Succeed(); //if we can search we'll assume it's healthy
             }
             catch (Exception e)

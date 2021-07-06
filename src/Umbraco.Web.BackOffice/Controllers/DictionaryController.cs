@@ -13,8 +13,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Extensions;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -101,15 +99,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public ActionResult<int> Create(int parentId, string key)
         {
             if (string.IsNullOrEmpty(key))
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Key can not be empty."); // TODO: translate
+                return ValidationProblem("Key can not be empty."); // TODO: translate
 
             if (_localizationService.DictionaryItemExists(key))
             {
                 var message = _localizedTextService.Localize(
-                     "dictionaryItem/changeKeyError",
+                     "dictionaryItem","changeKeyError",
                      _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings),
                      new Dictionary<string, string> { { "0", key } });
-                return ValidationErrorResult.CreateNotificationValidationErrorResult(message);
+                return ValidationProblem(message);
             }
 
             try
@@ -130,7 +128,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating dictionary with {Name} under {ParentId}", key, parentId);
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Error creating dictionary item");
+                return ValidationProblem("Error creating dictionary item");
             }
         }
 
@@ -207,7 +205,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 _localizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString()));
 
             if (dictionaryItem == null)
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Dictionary item does not exist");
+                return ValidationProblem("Dictionary item does not exist");
 
             var userCulture = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserCulture(_localizedTextService, _globalSettings);
 
@@ -220,11 +218,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
 
                     var message = _localizedTextService.Localize(
-                        "dictionaryItem/changeKeyError",
+                        "dictionaryItem","changeKeyError",
                         userCulture,
                         new Dictionary<string, string> { { "0", dictionary.Name } });
                     ModelState.AddModelError("Name", message);
-                    return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                    return ValidationProblem(ModelState);
                 }
 
                 dictionaryItem.ItemKey = dictionary.Name;
@@ -243,7 +241,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var model = _umbracoMapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
                 model.Notifications.Add(new BackOfficeNotification(
-                    _localizedTextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty,
+                    _localizedTextService.Localize("speechBubbles","dictionaryItemSaved", userCulture), string.Empty,
                     NotificationStyle.Success));
 
                 return model;
@@ -251,7 +249,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error saving dictionary with {Name} under {ParentId}", dictionary.Name, dictionary.ParentId);
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Something went wrong saving dictionary");
+                return ValidationProblem("Something went wrong saving dictionary");
             }
         }
 

@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Core.Events
                             item.Entity.WriterId,
                             item.Entity.Id,
                             ObjectTypes.GetName(UmbracoObjectTypes.Document),
-                            string.Format(_textService.Localize("recycleBin/contentTrashed"), item.Entity.Id, originalParentId)
+                            string.Format(_textService.Localize("recycleBin","contentTrashed"), item.Entity.Id, originalParentId)
                         );
                     }
                 }
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Core.Events
                             item.Entity.CreatorId,
                             item.Entity.Id,
                             ObjectTypes.GetName(UmbracoObjectTypes.Media),
-                            string.Format(_textService.Localize("recycleBin/mediaTrashed"), item.Entity.Id, originalParentId)
+                            string.Format(_textService.Localize("recycleBin","mediaTrashed"), item.Entity.Id, originalParentId)
                         );
                     }
                 }

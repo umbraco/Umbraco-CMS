@@ -209,7 +209,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else
             {
                 AddModelErrors(result);
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return new ValidationErrorResult(ModelState);
             }
         }
 
@@ -383,12 +383,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     var code = await _userManager.GeneratePasswordResetTokenAsync(identityUser);
                     var callbackUrl = ConstructCallbackUrl(identityUser.Id, code);
 
-                    var message = _textService.Localize("login/resetPasswordEmailCopyFormat",
+                    var message = _textService.Localize("login","resetPasswordEmailCopyFormat",
                         // Ensure the culture of the found user is used for the email!
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, _textService, _globalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
-                    var subject = _textService.Localize("login/resetPasswordEmailCopySubject",
+                    var subject = _textService.Localize("login","resetPasswordEmailCopySubject",
                         // Ensure the culture of the found user is used for the email!
                         UmbracoUserExtensions.GetUserCulture(identityUser.Culture, _textService, _globalSettings));
 
@@ -445,11 +445,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return BadRequest("Invalid code");
             }
 
-            var subject = _textService.Localize("login/mfaSecurityCodeSubject",
+            var subject = _textService.Localize("login","mfaSecurityCodeSubject",
                        // Ensure the culture of the found user is used for the email!
                        UmbracoUserExtensions.GetUserCulture(user.Culture, _textService, _globalSettings));
 
-            var message = _textService.Localize("login/mfaSecurityCodeMessage",
+            var message = _textService.Localize("login","mfaSecurityCodeMessage",
                 // Ensure the culture of the found user is used for the email!
                 UmbracoUserExtensions.GetUserCulture(user.Culture, _textService, _globalSettings),
                 new[] { code });
@@ -474,7 +474,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             if (ModelState.IsValid == false)
             {
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return new ValidationErrorResult(ModelState);
             }
 
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();

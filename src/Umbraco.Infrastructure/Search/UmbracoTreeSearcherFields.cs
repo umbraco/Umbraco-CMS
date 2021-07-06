@@ -1,31 +1,61 @@
+
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Infrastructure.Search
 {
     public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
     {
-        private IReadOnlyList<string> _backOfficeFields = new List<string> {"id", "__NodeId", "__Key"};
-        public IEnumerable<string> GetBackOfficeFields()
-        {
-            return _backOfficeFields;
-        }
-
-
-        private IReadOnlyList<string> _backOfficeMembersFields = new List<string> {"email", "loginName"};
-        public IEnumerable<string> GetBackOfficeMembersFields()
-        {
-            return _backOfficeMembersFields;
-        }
+        private IReadOnlyList<string> _backOfficeFields = new List<string> {"id", UmbracoExamineFieldNames.ItemIdFieldName, UmbracoExamineFieldNames.NodeKeyFieldName};
+        private readonly ISet<string> _backOfficeFieldsToLoad = new HashSet<string> { "id", UmbracoExamineFieldNames.ItemIdFieldName, UmbracoExamineFieldNames.NodeKeyFieldName, "nodeName", UmbracoExamineFieldNames.IconFieldName, UmbracoExamineFieldNames.CategoryFieldName, "parentID", UmbracoExamineFieldNames.ItemTypeFieldName };
         private IReadOnlyList<string> _backOfficeMediaFields = new List<string> { UmbracoExamineFieldNames.UmbracoFileFieldName };
-        public IEnumerable<string> GetBackOfficeMediaFields()
+        private readonly ISet<string> _backOfficeMediaFieldsToLoad = new HashSet<string> { UmbracoExamineFieldNames.UmbracoFileFieldName };
+        private IReadOnlyList<string> _backOfficeMembersFields = new List<string> { "email", "loginName" };
+        private readonly ISet<string> _backOfficeMembersFieldsToLoad = new HashSet<string> { "email", "loginName" };
+        private readonly ISet<string> _backOfficeDocumentFieldsToLoad = new HashSet<string> { UmbracoExamineFieldNames.VariesByCultureFieldName };
+        private readonly ILocalizationService _localizationService;
+
+        public UmbracoTreeSearcherFields(ILocalizationService localizationService)
         {
-            return _backOfficeMediaFields;
+            _localizationService = localizationService;
         }
-        public IEnumerable<string> GetBackOfficeDocumentFields()
+
+        /// <inheritdoc />
+        public IEnumerable<string> GetBackOfficeFields() => _backOfficeFields;
+
+        /// <inheritdoc />
+        public IEnumerable<string> GetBackOfficeMembersFields() => _backOfficeMembersFields;
+
+        /// <inheritdoc />
+        public IEnumerable<string> GetBackOfficeMediaFields() => _backOfficeMediaFields;
+
+        /// <inheritdoc />
+        public IEnumerable<string> GetBackOfficeDocumentFields() => Enumerable.Empty<string>();
+
+        /// <inheritdoc />
+        public ISet<string> GetBackOfficeFieldsToLoad() => _backOfficeFieldsToLoad;
+
+        /// <inheritdoc />
+        public ISet<string> GetBackOfficeMembersFieldsToLoad() => _backOfficeMembersFieldsToLoad;
+
+        /// <inheritdoc />
+        public ISet<string> GetBackOfficeMediaFieldsToLoad() => _backOfficeMediaFieldsToLoad;
+
+        /// <inheritdoc />
+        public ISet<string> GetBackOfficeDocumentFieldsToLoad()
         {
-            return Enumerable.Empty<string>();
+            var fields = _backOfficeDocumentFieldsToLoad;
+
+            // We need to load all nodeName_* fields but we won't know those up front so need to get
+            // all langs (this is cached)
+            foreach(var field in _localizationService.GetAllLanguages().Select(x => "nodeName_" + x.IsoCode.ToLowerInvariant()))
+            {
+                fields.Add(field);
+            }
+
+            return fields;
         }
     }
 }

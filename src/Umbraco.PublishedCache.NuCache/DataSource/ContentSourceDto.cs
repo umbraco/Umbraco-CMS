@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource

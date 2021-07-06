@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -18,7 +17,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
 
-    public class LogViewerController : UmbracoAuthorizedJsonController
+    public class LogViewerController : BackOfficeNotificationsController
     {
         private readonly ILogViewer _logViewer;
 
@@ -51,7 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //We will need to stop the request if trying to do this on a 1GB file
             if (CanViewLogs(logTimePeriod) == false)
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Unable to view logs, due to size");
+                return ValidationProblem("Unable to view logs, due to size");
             }
 
             return _logViewer.GetNumberOfErrors(logTimePeriod);
@@ -64,7 +63,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //We will need to stop the request if trying to do this on a 1GB file
             if (CanViewLogs(logTimePeriod) == false)
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Unable to view logs, due to size");
+                return ValidationProblem("Unable to view logs, due to size");
             }
 
             return _logViewer.GetLogLevelCounts(logTimePeriod);
@@ -77,7 +76,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //We will need to stop the request if trying to do this on a 1GB file
             if (CanViewLogs(logTimePeriod) == false)
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Unable to view logs, due to size");
+                return ValidationProblem("Unable to view logs, due to size");
             }
 
             return new ActionResult<IEnumerable<LogTemplate>>(_logViewer.GetMessageTemplates(logTimePeriod));
@@ -91,7 +90,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //We will need to stop the request if trying to do this on a 1GB file
             if (CanViewLogs(logTimePeriod) == false)
             {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult("Unable to view logs, due to size");
+                return ValidationProblem("Unable to view logs, due to size");
             }
 
             var direction = orderDirection == "Descending" ? Direction.Descending : Direction.Ascending;
