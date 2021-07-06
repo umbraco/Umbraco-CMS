@@ -24,7 +24,6 @@ namespace JsonSchema
             {
                 public ActiveDirectorySettings ActiveDirectory { get; set; }
                 public ContentSettings Content { get; set; }
-                public CoreDebugSettings CoreDebug { get; set; }
                 public ExceptionFilterSettings ExceptionFilter { get; set; }
                 public ModelsBuilderSettings ModelsBuilder { get; set; }
                 public GlobalSettings Global { get; set; }
