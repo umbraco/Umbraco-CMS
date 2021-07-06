@@ -108,7 +108,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.2.22" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
       <Version>3.5.4</Version>
@@ -133,6 +133,10 @@
     <ProjectReference Include="..\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj">
       <Project>{33085570-9bf2-4065-a9b0-a29d920d13ba}</Project>
       <Name>Umbraco.Persistence.SqlCe</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
+      <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
+      <Name>Umbraco.PublishedCache.NuCache</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -165,11 +169,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializerFactory.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\LazyCompressedString.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheSerializerComponent.cs" />
-    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComposer.cs" />
-    <Compile Include="Search\IUmbracoTreeSearcherFields2.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
     <Compile Include="UmbracoDbProviderFactoryCreator.cs" />
@@ -183,7 +183,6 @@
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="HttpContextUmbracoContextAccessor.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedSnapshotService.cs" />
     <Compile Include="WebApi\EnableDetailedErrorsAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />

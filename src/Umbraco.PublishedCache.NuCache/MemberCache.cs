@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
-    internal class MemberCache : IPublishedMemberCache
+    public class MemberCache : IPublishedMemberCache
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;

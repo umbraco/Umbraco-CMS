@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {

@@ -17,7 +17,7 @@ using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
-    internal class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
+    public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
     {
         private readonly ContentStore.Snapshot _snapshot;
         private readonly IAppCache _snapshotCache;

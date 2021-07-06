@@ -10,7 +10,7 @@ using Umbraco.Cms.Infrastructure.PublishedCache.Snap;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
-    internal class SnapDictionary<TKey, TValue>
+    public class SnapDictionary<TKey, TValue>
         where TValue : class
     {
         // read
