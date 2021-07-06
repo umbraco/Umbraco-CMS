@@ -21,7 +21,6 @@
   <ItemGroup>
     <Folder Include="App_Plugins" />
     <Folder Include="Views" />
-    <Folder Include="wwwroot/Media" />
   </ItemGroup>
 
   <ItemGroup>
@@ -103,10 +102,10 @@
     <CallTarget Targets="JsonSchemaBuild" Condition="!Exists('$(JsonSchemaPath)') and '$(UmbracoBuild)' == ''" />
   </Target>
   <Target Name="BelleBuild">
-    <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $ubuild = &amp;&quot;$pwd/build/build.ps1&quot; -get ; $ubuild.CompileBelle() }&quot;" />
+    <Exec WorkingDirectory="$(ProjectDir)/../../src/Umbraco.Web.UI.Client/" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;{ npm install ; npm run build }'" />
   </Target>
   <Target Name="JsonSchemaBuild">
-    <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;dotnet run --project $pwd/src/JsonSchema/JsonSchema.csproj -c Release -- --outputFile $pwd/src/Umbraco.Web.UI.NetCore/$(JsonSchemaPath) &quot;" />
+    <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;dotnet run --project $pwd/src/JsonSchema/JsonSchema.csproj -c Release -- --outputFile $pwd/src/Umbraco.Web.UI.NetCore/$(JsonSchemaPath)'" />
   </Target>
   
   <!-- clean Belle when cleaning and rebuilding, but only in Visual Studio -->
