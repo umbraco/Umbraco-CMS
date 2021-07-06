@@ -25,7 +25,7 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: PowerShell@1
-                  name: setVariable
+                  name: setReleaseVariable
                   displayName: Set isRelease variable
                   inputs:
                       scriptType: inlineScript
@@ -477,7 +477,7 @@ stages:
     - stage: Artifacts_Docs
       displayName: 'Static Code Documentation'
       dependsOn: [Determine_build_type]
-      condition: 'eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setVariable.IsRelease'], true)'
+      condition: 'eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], true)'
       jobs:
           - job: Generate_Docs_CSharp
             timeoutInMinutes: 60
