@@ -76,18 +76,15 @@ namespace Umbraco.Web.Editors.Filters
         /// <summary>
         /// Authorize that the user is not adding a section to the group that they don't have access to
         /// </summary>
-        /// <param name="currentUser"></param>
-        /// <param name="currentAllowedSections"></param>
-        /// <param name="proposedAllowedSections"></param>
-        /// <returns></returns>
-        public Attempt<string> AuthorizeSectionChanges(IUser currentUser,
-            IEnumerable<string> currentAllowedSections,
+        public Attempt<string> AuthorizeSectionChanges(
+            IUser currentUser,
+            IEnumerable<string> existingSections,
             IEnumerable<string> proposedAllowedSections)
         {
             if (currentUser.IsAdmin())
                 return Attempt<string>.Succeed();
 
-            var sectionsAdded = currentAllowedSections.Except(proposedAllowedSections).ToArray();
+            var sectionsAdded = proposedAllowedSections.Except(existingSections).ToArray();
             var sectionAccessMissing = sectionsAdded.Except(currentUser.AllowedSections).ToArray();
             return sectionAccessMissing.Length > 0
                 ? Attempt.Fail("Current user doesn't have access to add these sections " + string.Join(", ", sectionAccessMissing))

@@ -22,7 +22,7 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
-
+        private const char DefaultEscapedStringEscapeChar = '\\';
         private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
         private static readonly char[] ToCSharpEscapeChars;
 
@@ -1490,5 +1490,44 @@ namespace Umbraco.Core
         /// </summary>
         public static string NullOrWhiteSpaceAsNull(this string text)
             => string.IsNullOrWhiteSpace(text) ? null : text;
+
+        /// <summary>
+        /// Splits a string with an escape character that allows for the split character to exist in a string
+        /// </summary>
+        /// <param name="value">The string to split</param>
+        /// <param name="splitChar">The character to split on</param>
+        /// <param name="escapeChar">The character which can be used to escape the character to split on</param>
+        /// <returns>The string split into substrings delimited by the split character</returns>
+        public static IEnumerable<string> EscapedSplit(this string value, char splitChar, char escapeChar = DefaultEscapedStringEscapeChar)
+        {
+            if (value == null) yield break;
+
+            var sb = new StringBuilder(value.Length);
+            var escaped = false;
+
+            foreach (var chr in value.ToCharArray())
+            {
+                if (escaped)
+                {
+                    escaped = false;
+                    sb.Append(chr);
+                }
+                else if (chr == splitChar)
+                {
+                    yield return sb.ToString();
+                    sb.Clear();
+                }
+                else if (chr == escapeChar)
+                {
+                    escaped = true;
+                }
+                else
+                {
+                    sb.Append(chr);
+                }
+            }
+
+            yield return sb.ToString();
+        }
     }
 }

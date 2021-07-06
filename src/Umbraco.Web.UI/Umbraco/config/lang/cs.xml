@@ -280,7 +280,7 @@
     <key alias="childItems" version="7.0">Podřízené položky</key>
     <key alias="target" version="7.0">Cíl</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentDeleteAllItems">Are you sure you want to delete all items?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
@@ -451,7 +451,7 @@
     <key alias="recycleBinDeleting">Položky koše jsou nyní mazány. Nezavírejte, prosím, toto okno, dokud operace probíhá</key>
     <key alias="recycleBinIsEmpty">Koš je nyní prázdný</key>
     <key alias="recycleBinWarning">Odebrání položek z koše způsobí jejich trvalé odstranění</key>
-    <key alias="regexSearchError"><![CDATA[Webová služba<a target='_blank' href='http://regexlib.com'>regexlib.com</a> má v tuto chvíli nějaké problémy, které jsou mimo naší kontrolu. Omlouváme se za vzniklé nepříjemnosti.]]></key>
+    <key alias="regexSearchError"><![CDATA[Webová služba<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> má v tuto chvíli nějaké problémy, které jsou mimo naší kontrolu. Omlouváme se za vzniklé nepříjemnosti.]]></key>
     <key alias="regexSearchHelp">Vyhledat regulární výraz pro přidání validace formulářového prvku. Například: 'email, 'PSČ' 'URL'</key>
     <key alias="removeMacro">Odstranit makro</key>
     <key alias="requiredField">Pole je vyžadování</key>
@@ -929,7 +929,7 @@
     <key alias="instruction">přihlašte se níže</key>
     <key alias="signInWith">Přihlásit se pomocí</key>
     <key alias="timeout">Relace vypršela</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ]]></key>
     <key alias="forgottenPassword">Zapomenuté heslo?</key>
     <key alias="forgottenPasswordInstruction">Na uvedenou adresu bude zaslán e-mail s odkazem pro obnovení hesla</key>
     <key alias="requestPasswordResetConfirmation">Pokud odpovídá našim záznamům, bude na zadanou adresu zaslán e-mail s pokyny k obnovení hesla</key>
@@ -987,7 +987,7 @@
 																<tbody>
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Kliknutím na tento odkaz obnovíte své heslo
 																			</a>
 																		</td>
@@ -1920,7 +1920,7 @@
 																			<tbody>
 																				<tr>
 																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																							Kliknutím na tento odkaz přijměte pozvání
 																						</a>
 																					</td>

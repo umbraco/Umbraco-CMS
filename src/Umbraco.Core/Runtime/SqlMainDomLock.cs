@@ -1,5 +1,6 @@
 ﻿using NPoco;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -18,6 +20,7 @@ namespace Umbraco.Core.Runtime
 {
     internal class SqlMainDomLock : IMainDomLock
     {
+        private readonly TimeSpan _lockTimeout;
         private string _lockId;
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
@@ -40,6 +43,8 @@ namespace Umbraco.Core.Runtime
                Constants.System.UmbracoConnectionName,
                _logger,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
+
+            _lockTimeout = TimeSpan.FromMilliseconds(GlobalSettings.GetSqlWriteLockTimeoutFromConfigFile(logger));
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
@@ -81,7 +86,7 @@ namespace Umbraco.Core.Runtime
                     // wait to get a write lock
                     _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Constants.Locks.MainDom);
                 }
-                catch(SqlException ex)
+                catch (SqlException ex)
                 {
                     if (IsLockTimeoutException(ex))
                     {
@@ -121,7 +126,7 @@ namespace Umbraco.Core.Runtime
             }
 
 
-            return await WaitForExistingAsync(tempId, millisecondsTimeout);
+            return await WaitForExistingAsync(tempId, millisecondsTimeout).ConfigureAwait(false);
         }
 
         public Task ListenAsync()
@@ -134,13 +139,15 @@ namespace Umbraco.Core.Runtime
 
             // Create a long running task (dedicated thread)
             // to poll to check if we are still the MainDom registered in the DB
-            return Task.Factory.StartNew(
-                ListeningLoop,
-                _cancellationTokenSource.Token,
-                TaskCreationOptions.LongRunning,
-                // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
-                TaskScheduler.Default);
-
+            using (ExecutionContext.SuppressFlow())
+            {
+                return Task.Factory.StartNew(
+                    ListeningLoop,
+                    _cancellationTokenSource.Token,
+                    TaskCreationOptions.LongRunning,
+                    // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                    TaskScheduler.Default);
+            }
         }
 
         /// <summary>
@@ -198,7 +205,7 @@ namespace Umbraco.Core.Runtime
 
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
                         // get a read lock
-                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+                        _sqlServerSyntax.ReadLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                         if (!IsMainDomValue(_lockId, db))
                         {
@@ -222,11 +229,29 @@ namespace Umbraco.Core.Runtime
                     }
                     finally
                     {
-                        db?.CompleteTransaction();
-                        db?.Dispose();
+                        // Even if any of the above fail like BeginTransaction, or even a query after the
+                        // Transaction is started, the calls below will not throw. I've tried all sorts of
+                        // combinations to see if I can make this throw but I can't. In any case, we'll be
+                        // extra safe and try/catch/log
+                        try
+                        {
+                            db?.CompleteTransaction();
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error completing transaction.");
+                        }
+
+                        try
+                        {
+                            db?.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error completing disposing.");
+                        }
                     }
                 }
-
             }
         }
 
@@ -240,37 +265,40 @@ namespace Umbraco.Core.Runtime
         {
             var updatedTempId = tempId + UpdatedSuffix;
 
-            return Task.Run(() =>
+            using (ExecutionContext.SuppressFlow())
             {
-                try
+                return Task.Run(() =>
                 {
-                    using var db = _dbFactory.CreateDatabase();
-
-                    var watch = new Stopwatch();
-                    watch.Start();
-                    while (true)
+                    try
                     {
-                        // poll very often, we need to take over as fast as we can
-                        // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
-                        Thread.Sleep(1000);
+                        using var db = _dbFactory.CreateDatabase();
 
-                        var acquired = TryAcquire(db, tempId, updatedTempId);
-                        if (acquired.HasValue)
-                            return acquired.Value;
-
-                        if (watch.ElapsedMilliseconds >= millisecondsTimeout)
+                        var watch = new Stopwatch();
+                        watch.Start();
+                        while (true)
                         {
-                            return AcquireWhenMaxWaitTimeElapsed(db);
+                            // poll very often, we need to take over as fast as we can
+                            // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
+                            Thread.Sleep(1000);
+
+                            var acquired = TryAcquire(db, tempId, updatedTempId);
+                            if (acquired.HasValue)
+                                return acquired.Value;
+
+                            if (watch.ElapsedMilliseconds >= millisecondsTimeout)
+                            {
+                                return AcquireWhenMaxWaitTimeElapsed(db);
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<SqlMainDomLock>(ex, "An error occurred trying to acquire and waiting for existing SqlMainDomLock to shutdown");
-                    return false;
-                }
+                    catch (Exception ex)
+                    {
+                        _logger.Error<SqlMainDomLock>(ex, "An error occurred trying to acquire and waiting for existing SqlMainDomLock to shutdown");
+                        return false;
+                    }
 
-            }, _cancellationTokenSource.Token);
+                }, _cancellationTokenSource.Token);
+            }
         }
 
         private bool? TryAcquire(IUmbracoDatabase db, string tempId, string updatedTempId)
@@ -284,7 +312,7 @@ namespace Umbraco.Core.Runtime
             {
                 transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
                 // get a read lock
-                _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+                _sqlServerSyntax.ReadLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                 // the row
                 var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
@@ -296,7 +324,7 @@ namespace Umbraco.Core.Runtime
                     // which indicates that we
                     // can acquire it and it has shutdown.
 
-                    _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+                    _sqlServerSyntax.WriteLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                     // so now we update the row with our appdomain id
                     InsertLockRecord(_lockId, db);
@@ -355,7 +383,7 @@ namespace Umbraco.Core.Runtime
             {
                 transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
 
-                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+                _sqlServerSyntax.WriteLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                 // so now we update the row with our appdomain id
                 InsertLockRecord(_lockId, db);
@@ -438,7 +466,7 @@ namespace Umbraco.Core.Runtime
                                 db.BeginTransaction(IsolationLevel.ReadCommitted);
 
                                 // get a write lock
-                                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+                                _sqlServerSyntax.WriteLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                                 // When we are disposed, it means we have released the MainDom lock
                                 // and called all MainDom release callbacks, in this case

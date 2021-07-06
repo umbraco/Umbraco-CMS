@@ -136,7 +136,7 @@
     <key alias="select">Välj</key>
     <key alias="saveAndPreview">Förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
-    <key alias="somethingElse">Ångra</key>
+    <key alias="somethingElse">Gör något annat</key>
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
@@ -302,7 +302,7 @@
     <key alias="recycleBinDeleting">Allt som ligger i papperskorgen tas nu bort. Stäng inte detta fönster förrän detta är klart</key>
     <key alias="recycleBinIsEmpty">Papperskorgen är nu tom</key>
     <key alias="recycleBinWarning">Om du tömmer papperskorgen kommer allt som ligger i den att tas bort permanent</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webbtjänst har för närvarande driftsstörningar. Tyvärr kan vi inte göra något åt detta.]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>'s webbtjänst har för närvarande driftsstörningar. Tyvärr kan vi inte göra något åt detta.]]></key>
     <key alias="regexSearchHelp">Sök efter en regular expression som kan validera ett formulärsfält. t.ex. 'email' eller 'URL'</key>
     <key alias="removeMacro">Ta bort makro</key>
     <key alias="requiredField">Obligatoriskt formulärsfält</key>
@@ -574,7 +574,7 @@
     <key alias="renewSession">Förnya nu för att spara ditt arbete</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
     <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday</key>
     <key alias="greeting2">Happy tremendous Tuesday</key>

@@ -101,7 +101,7 @@ namespace Umbraco.Web.Editors
             if (Services.LocalizationService.DictionaryItemExists(key))
             {
                 var message = Services.TextService.Localize(
-                     "dictionaryItem/changeKeyError",
+                     "dictionaryItem","changeKeyError",
                      Security.CurrentUser.GetUserCulture(Services.TextService, GlobalSettings),
                      new Dictionary<string, string> { { "0", key } });
                 return Request.CreateNotificationValidationErrorResponse(message);
@@ -224,7 +224,7 @@ namespace Umbraco.Web.Editors
                 {
 
                     var message = Services.TextService.Localize(
-                        "dictionaryItem/changeKeyError",
+                        "dictionaryItem","changeKeyError",
                         userCulture,
                         new Dictionary<string, string> { { "0", dictionary.Name } });
                     ModelState.AddModelError("Name", message);
@@ -247,7 +247,7 @@ namespace Umbraco.Web.Editors
                 var model = Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
 
                 model.Notifications.Add(new Notification(
-                    Services.TextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty,
+                    Services.TextService.Localize("speechBubbles","dictionaryItemSaved", userCulture), string.Empty,
                     NotificationStyle.Success));
 
                 return model;

@@ -36,14 +36,21 @@ namespace Umbraco.Web
             {
                 // we have a value
                 // try to cast or convert it
-                var value =  property.GetValue(culture, segment);
-                if (value is T valueAsT) return valueAsT;
-                var valueConverted = value.TryConvertTo<T>();
-                if (valueConverted) return valueConverted.Result;
+                var value = property.GetValue(culture, segment);
+                if (value is T valueAsT)
+                {
+                    return valueAsT;
+                }
 
-                // cannot cast nor convert the value, nothing we can return but 'defaultValue'
+                var valueConverted = value.TryConvertTo<T>();
+                if (valueConverted)
+                {
+                    return valueConverted.Result;
+                }
+
+                // cannot cast nor convert the value, nothing we can return but 'default'
                 // note: we don't want to fallback in that case - would make little sense
-                return defaultValue;
+                return default;
             }
 
             // we don't have a value, try fallback
@@ -55,17 +62,19 @@ namespace Umbraco.Web
             // we don't have a value - neither direct nor fallback
             // give a chance to the converter to return something (eg empty enumerable)
             var noValue = property.GetValue(culture, segment);
-            if (noValue == null)
+            if (noValue is T noValueAsT)
             {
-                return defaultValue;
+                return noValueAsT;
             }
-            if (noValue is T noValueAsT) return noValueAsT;
 
             var noValueConverted = noValue.TryConvertTo<T>();
-            if (noValueConverted) return noValueConverted.Result;
+            if (noValueConverted)
+            {
+                return noValueConverted.Result;
+            }
 
-            // cannot cast noValue nor convert it, nothing we can return but 'defaultValue'
-            return defaultValue;
+            // cannot cast noValue nor convert it, nothing we can return but 'default'
+            return default;
         }
 
         #endregion
