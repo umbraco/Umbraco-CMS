@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -93,6 +94,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 factory.GetRequiredService<IOptions<GlobalSettings>>(),
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>(),
+                factory.GetRequiredService<MediaFileManager>(),
                 packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider container)

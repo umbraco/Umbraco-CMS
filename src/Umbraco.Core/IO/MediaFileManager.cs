@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -15,6 +19,9 @@ namespace Umbraco.Cms.Core.IO
         private readonly IMediaPathScheme _mediaPathScheme;
         private readonly ILogger<MediaFileManager> _logger;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IServiceProvider _serviceProvider;
+        private MediaUrlGeneratorCollection _mediaUrlGenerators;
+        private readonly ContentSettings _contentSettings;
 
         /// <summary>
         /// Gets the media filesystem.
@@ -25,11 +32,15 @@ namespace Umbraco.Cms.Core.IO
             IFileSystem fileSystem,
             IMediaPathScheme mediaPathScheme,
             ILogger<MediaFileManager> logger,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IServiceProvider serviceProvider,
+            IOptions<ContentSettings> contentSettings)
         {
             _mediaPathScheme = mediaPathScheme;
             _logger = logger;
             _shortStringHelper = shortStringHelper;
+            _serviceProvider = serviceProvider;
+            _contentSettings = contentSettings.Value;
             FileSystem = fileSystem;
         }
 
@@ -118,10 +129,35 @@ namespace Umbraco.Cms.Core.IO
 
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
         }
-
+        
         #endregion
 
         #region Associated Media Files
+
+        public Stream GetFile(IMedia media, out string mediaFilePath)
+        {
+            // TODO: If collections were lazy we could just inject them
+            if (_mediaUrlGenerators == null)
+            {
+                _mediaUrlGenerators = _serviceProvider.GetRequiredService<MediaUrlGeneratorCollection>();
+            } 
+
+            // This is how we get all URLs based on the defined aliases,
+            // then we just try each to get a file until one works.
+            var urls = media.GetUrls(_contentSettings, _mediaUrlGenerators);
+            foreach(var url in urls)
+            {
+                Stream stream = FileSystem.OpenFile(url);
+                if (stream != null)
+                {
+                    mediaFilePath = url;
+                    return stream;
+                }
+            }
+
+            mediaFilePath = null;
+            return null;
+        }
 
         /// <summary>
         /// Stores a media file associated to a property of a content item.

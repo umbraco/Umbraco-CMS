@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -9,7 +10,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -76,8 +79,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 Options.Create(new GlobalSettings()),
                 Mock.Of<IHostingEnvironment>());
 
-            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
-                loggerFactory.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());
+            var mediaFileManager = new MediaFileManager(
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IMediaPathScheme>(),
+                loggerFactory.CreateLogger<MediaFileManager>(),
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IServiceProvider>(),
+                Options.Create(new ContentSettings()));
 
             eventAggregatorMock = new Mock<IEventAggregator>();
 

@@ -22,6 +22,8 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -60,17 +62,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
 
             var fs = new FileSystems(loggerFactory, IOHelper, Options.Create(globalSettings), Mock.Of<IHostingEnvironment>());
             var coreDebug = new CoreDebugSettings();
-            MediaFileManager mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(),
-                Mock.Of<IMediaPathScheme>(), Mock.Of<ILogger<MediaFileManager>>(), Mock.Of<IShortStringHelper>());
+            var mediaFileManager = new MediaFileManager(
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IMediaPathScheme>(),
+                Mock.Of<ILogger<MediaFileManager>>(),
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IServiceProvider>(),
+                Options.Create(new ContentSettings()));
             IEventAggregator eventAggregator = Mock.Of<IEventAggregator>();
-            var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileManager, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance, eventAggregator);
+            var scopeProvider = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileManager, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance, eventAggregator);
 
             mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);
             mock.Setup(x => x.GetService(typeof(ILoggerFactory))).Returns(loggerFactory);
             mock.Setup(x => x.GetService(typeof(IProfilingLogger))).Returns(new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetService(typeof(IUmbracoDatabaseFactory))).Returns(f);
-            mock.Setup(x => x.GetService(typeof(IScopeProvider))).Returns(p);
+            mock.Setup(x => x.GetService(typeof(IScopeProvider))).Returns(scopeProvider);
 
             setup?.Invoke(mock);
             return mock.Object;

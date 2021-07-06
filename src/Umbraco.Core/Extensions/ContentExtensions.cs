@@ -224,6 +224,9 @@ namespace Umbraco.Extensions
             string oldpath = null;
             if (property.GetValue(culture, segment) is string svalue)
             {
+                // TODO: This is still horrible! We are not delagating to the actual property editors on how to handle this
+                // which we know how to do.
+
                 if (svalue.DetectIsJson())
                 {
                     // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
@@ -233,6 +236,10 @@ namespace Umbraco.Extensions
             }
 
             var filepath = mediaFileManager.StoreFile(content, property.PropertyType, filename, filestream, oldpath);
+
+            // TODO: And here we are just setting the value to a string which means that any file based editor
+            // will need to handle the raw string value and progressively save it to it's correct (i.e. JSON)
+            // format. 
             property.SetValue(mediaFileManager.FileSystem.GetUrl(filepath), culture, segment);
         }
 

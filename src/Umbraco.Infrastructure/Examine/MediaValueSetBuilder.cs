@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
@@ -43,6 +43,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
                 var umbracoFilePath = string.Empty;
                 var umbracoFile = string.Empty;
+
+                // TODO: To get the file path we should/could use the MediaUrlGeneratorCollection instead of this
+                // just like we are doing in the MediaFileManager?
 
                 var umbracoFileSource  = m.GetValue<string>(Constants.Conventions.Media.File);
 

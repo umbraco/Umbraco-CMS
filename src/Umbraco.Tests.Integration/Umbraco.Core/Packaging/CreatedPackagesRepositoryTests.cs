@@ -11,6 +11,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
@@ -56,6 +57,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
 
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+        private MediaFileManager MediaFileManager => GetRequiredService<MediaFileManager>();
+
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ContentService,
             ContentTypeService,
@@ -68,6 +71,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             MediaService,
             MediaTypeService,
+            MediaFileManager,
             "createdPackages.config",
 
             // temp paths

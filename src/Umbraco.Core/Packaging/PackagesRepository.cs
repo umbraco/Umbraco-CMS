@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -35,6 +38,7 @@ namespace Umbraco.Cms.Core.Packaging
         private readonly PackageDefinitionXmlParser _parser;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
+        private readonly MediaFileManager _mediaFileManager;
 
         /// <summary>
         /// Constructor
@@ -66,6 +70,7 @@ namespace Umbraco.Cms.Core.Packaging
             IOptions<GlobalSettings> globalSettings,
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
+            MediaFileManager mediaFileManager,
             string packageRepositoryFileName,
             string tempFolderPath = null,
             string packagesFolderPath = null,
@@ -90,6 +95,7 @@ namespace Umbraco.Cms.Core.Packaging
             _parser = new PackageDefinitionXmlParser();
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
+            _mediaFileManager = mediaFileManager;
         }
 
         private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + _packageRepositoryFileName;
@@ -197,18 +203,31 @@ namespace Umbraco.Cms.Core.Packaging
                 PackageDictionaryItems(definition, root);
                 PackageLanguages(definition, root);
                 PackageDataTypes(definition, root);
-                PackageMedia(definition, root);
+                Dictionary<string, Stream> mediaFiles = PackageMedia(definition, root);
 
-                var packageXmlFileName = temporaryPath + "/package.xml";
+                var tempPackagePath = temporaryPath + "/package.zip";
 
-                if (File.Exists(packageXmlFileName))
+                using (FileStream fileStream = File.OpenWrite(tempPackagePath))
+                using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                 {
-                    File.Delete(packageXmlFileName);
+                    ZipArchiveEntry packageXmlEntry = archive.CreateEntry("package.xml");
+                    using (Stream entryStream = packageXmlEntry.Open())
+                    {
+                        compiledPackageXml.Save(entryStream);
+                    }
+
+                    foreach (KeyValuePair<string, Stream> mediaFile in mediaFiles)
+                    {
+                        // must ensure the path is relative, doesn't start with /
+                        ZipArchiveEntry mediaEntry = archive.CreateEntry(mediaFile.Key.TrimStart('/'));
+                        using (Stream entryStream = mediaEntry.Open())
+                        using (mediaFile.Value)
+                        {
+                            mediaFile.Value.Seek(0, SeekOrigin.Begin);
+                            mediaFile.Value.CopyTo(entryStream);
+                        }
+                    }
                 }
-
-                compiledPackageXml.Save(packageXmlFileName);
-
-                // check if there's a packages directory below media
 
                 var directoryName =
                     _hostingEnvironment.MapPathWebRoot(Path.Combine(_mediaFolderPath, definition.Name.Replace(' ', '_')));
@@ -218,18 +237,19 @@ namespace Umbraco.Cms.Core.Packaging
                     Directory.CreateDirectory(directoryName);
                 }
 
-                var packPath = Path.Combine(directoryName, "package.xml");
+                var finalPackagePath = Path.Combine(directoryName, "package.zip");
 
-                if (File.Exists(packPath))
+                if (File.Exists(finalPackagePath))
                 {
-                    File.Delete(packPath);
+                    File.Delete(finalPackagePath);
                 }
-                File.Move(packageXmlFileName, packPath);
 
-                definition.PackagePath = packPath;
+                File.Move(tempPackagePath, finalPackagePath);
+
+                definition.PackagePath = finalPackagePath;
                 SavePackage(definition);
 
-                return packPath;
+                return finalPackagePath;
             }
             finally
             {
@@ -305,7 +325,7 @@ namespace Umbraco.Cms.Core.Packaging
             var processed = new Dictionary<Guid, XElement>();
             while (processed.Count < itemCount)
             {
-                foreach(Guid key in items.Keys.ToList())
+                foreach (Guid key in items.Keys.ToList())
                 {
                     (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue) = items[key];
 
@@ -518,14 +538,43 @@ namespace Umbraco.Cms.Core.Packaging
         }
 
 
-        private void PackageMedia(PackageDefinition definition, XElement root)
+        private Dictionary<string, Stream> PackageMedia(PackageDefinition definition, XElement root)
         {
+            var mediaStreams = new Dictionary<string, Stream>();
+
+            // callback that occurs on each serialized media item
+            void OnSerializedMedia(IMedia media, XElement xmlMedia)
+            {
+                // get the media file path and store that separately in the XML.
+                // the media file path is different from the URL and is specifically
+                // extracted using the property editor for this media file and the current media file system.
+                Stream mediaStream = _mediaFileManager.GetFile(media, out var mediaFilePath);
+                if (mediaStream != null)
+                {
+                    xmlMedia.Add(new XAttribute("mediaFilePath", mediaFilePath));
+
+                    // add the stream to our outgoing stream
+                    mediaStreams.Add(mediaFilePath, mediaStream);
+                }
+            }
+
             IEnumerable<IMedia> medias = _mediaService.GetByIds(definition.MediaUdis);
 
-            root.Add(
-                new XElement(
-                    "MediaItems",
-                    medias.Select(x => new XElement("MediaSet", _serializer.Serialize(x, definition.MediaLoadChildNodes)))));
+            var mediaXml = new XElement(
+                                "MediaItems",
+                                medias.Select(media =>
+                                {
+                                    XElement serializedMedia = _serializer.Serialize(
+                                        media,
+                                        definition.MediaLoadChildNodes,
+                                        OnSerializedMedia);
+
+                                    return new XElement("MediaSet", serializedMedia);
+                                }));
+
+            root.Add(mediaXml);
+
+            return mediaStreams;
         }
 
         // TODO: Delete this
