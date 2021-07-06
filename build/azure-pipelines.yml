@@ -25,7 +25,8 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: PowerShell@1
-                  displayName: Set $isRelease variable
+                  name: setVariable
+                  displayName: Set isRelease variable
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
@@ -33,9 +34,9 @@ stages:
 
                           if ($isRelease.Count -gt 0){
                              Write-Host "##vso[build.addbuildtag]Release build"
-                             Write-Host "##vso[task.setvariable variable=isRelease]true"
+                             Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]true"
                           }else{
-                             Write-Host "##vso[task.setvariable variable=isRelease]false"
+                             Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]false"
                           }
     - stage: Unit_Tests
       displayName: Unit Tests
@@ -476,7 +477,7 @@ stages:
     - stage: Artifacts_Docs
       displayName: 'Static Code Documentation'
       dependsOn: [Determine_build_type]
-      condition: 'eq(variables.IsRelease, true)'
+      condition: 'eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setVariable.IsRelease'], true)'
       jobs:
           - job: Generate_Docs_CSharp
             timeoutInMinutes: 60
