@@ -60,6 +60,16 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         public static Fallback ToAncestors => new Fallback(new[] { Ancestors });
 
+        /// <summary>
+        /// Fallback to the default language.
+        /// </summary>
+        public const int DefaultLanguage = 4;
+
+        /// <summary>
+        /// Gets the fallback to default language policy.
+        /// </summary>
+        public static Fallback ToDefaultLanguage => new Fallback(new[] { DefaultLanguage });
+
         /// <inheritdoc />
         public IEnumerator<int> GetEnumerator()
         {

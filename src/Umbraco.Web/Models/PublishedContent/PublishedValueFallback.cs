@@ -48,6 +48,14 @@ namespace Umbraco.Web.Models.PublishedContent
                         if (TryGetValueWithLanguageFallback(property, culture, segment, out value))
                             return true;
                         break;
+                    case Fallback.DefaultLanguage:
+                        var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
+                        if (property.HasValue(defaultCulture, segment))
+                        {
+                            value = property.Value<T>(defaultCulture, segment);
+                            return true;
+                        }
+                        break;
                     default:
                         throw NotSupportedFallbackMethod(f, "property");
                 }
@@ -87,6 +95,14 @@ namespace Umbraco.Web.Models.PublishedContent
                     case Fallback.Language:
                         if (TryGetValueWithLanguageFallback(content, alias, culture, segment, out value))
                             return true;
+                        break;
+                    case Fallback.DefaultLanguage:
+                        var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
+                        if (content.HasValue(alias, defaultCulture, segment))
+                        {
+                            value = content.Value<T>(alias, defaultCulture, segment);
+                            return true;
+                        }
                         break;
                     default:
                         throw NotSupportedFallbackMethod(f, "element");
@@ -137,6 +153,14 @@ namespace Umbraco.Web.Models.PublishedContent
                     case Fallback.Ancestors:
                         if (TryGetValueWithAncestorsFallback(content, alias, culture, segment, out value, ref noValueProperty))
                             return true;
+                        break;
+                    case Fallback.DefaultLanguage:
+                        var defaultCulture = _localizationService.GetDefaultLanguageIsoCode();
+                        if (content.HasValue(alias, defaultCulture, segment))
+                        {
+                            value = content.Value<T>(alias, defaultCulture, segment);
+                            return true;
+                        }
                         break;
                     default:
                         throw NotSupportedFallbackMethod(f, "content");
