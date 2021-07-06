@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
@@ -27,7 +28,6 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
 {
@@ -47,8 +47,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
             ILogger logger = loggerFactory.CreateLogger("GenericLogger");
             var globalSettings = new GlobalSettings();
             var connectionStrings = new ConnectionStrings();
-            var f = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), loggerFactory, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator,
-                new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()));
+            var mapperCollection = new NPocoMapperCollection(new[] { new NullableDateMapper() });
+            var f = new UmbracoDatabaseFactory(
+                loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+                loggerFactory,
+                Options.Create(globalSettings),
+                Options.Create(connectionStrings),
+                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
+                TestHelper.DbProviderFactoryCreator,
+                new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()),
+                mapperCollection);
+
             var fs = new FileSystems(loggerFactory, IOHelper, Options.Create(globalSettings), Mock.Of<IHostingEnvironment>());
             var coreDebug = new CoreDebugSettings();
             MediaFileManager mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(),
@@ -458,13 +467,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         }
 
         [ComposeAfter(typeof(Composer4))]
-        public class Composer2 : TestComposerBase, ICoreComposer
+        public class Composer2 : TestComposerBase
         {
         }
 
         public class Composer3 : TestComposerBase, IUserComposer
         {
         }
+
 
         public class Composer4 : TestComposerBase
         {
@@ -526,6 +536,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         {
         }
 
+        [ComposeAfter(typeof(Composer2))]
+        [ComposeAfter(typeof(Composer4))]
         public class Composer9 : TestComposerBase, ITestComposer
         {
         }
@@ -541,7 +553,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         }
 
         [ComposeAfter(typeof(Composer4), true)]
-        public class Composer12 : TestComposerBase, ICoreComposer
+        public class Composer12 : TestComposerBase
         {
         }
 

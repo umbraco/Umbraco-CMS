@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
         /// <summary>
         /// Adds new indexes to the External Login table
         /// </summary>
-        public override void Migrate()
+        protected override void Migrate()
         {
             // Before adding these indexes we need to remove duplicate data.
             // Get all logins by latest

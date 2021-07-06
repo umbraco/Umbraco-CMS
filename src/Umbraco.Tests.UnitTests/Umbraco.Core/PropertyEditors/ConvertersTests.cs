@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -102,20 +103,20 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 Guid.NewGuid(),
                 new Dictionary<string, object> { { "prop2", "1003" } },
                 false);
-            var cnt1 = new SolidPublishedContent(contentType1)
+            var cnt1 = new InternalPublishedContent(contentType1)
             {
                 Id = 1003,
                 Properties = new[]
                 {
-                    new SolidPublishedProperty { Alias = "prop1", SolidHasValue = true, SolidValue = "val1" }
+                    new InternalPublishedProperty { Alias = "prop1", SolidHasValue = true, SolidValue = "val1" }
                 }
             };
-            var cnt2 = new SolidPublishedContent(contentType1)
+            var cnt2 = new InternalPublishedContent(contentType1)
             {
                 Id = 1004,
                 Properties = new[]
                 {
-                    new SolidPublishedProperty { Alias = "prop2", SolidHasValue = true, SolidValue = "1003" }
+                    new InternalPublishedProperty { Alias = "prop2", SolidHasValue = true, SolidValue = "1003" }
                 }
             };
 

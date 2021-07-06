@@ -6,7 +6,7 @@
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             if(ColumnExists("cmsTemplate", "design"))
                 Delete.Column("design").FromTable("cmsTemplate").Do();

@@ -8,6 +8,11 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Newtonsoft.Json;
+using System;
+using System.Linq;
+using System.Runtime.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -26,6 +31,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         private readonly IIOHelper _ioHelper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MediaPicker3PropertyEditor" /> class.
+        /// </summary>
         public MediaPicker3PropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper,
@@ -35,9 +43,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _ioHelper = ioHelper;
         }
 
+
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MediaPicker3ConfigurationEditor(_ioHelper);
 
+        /// <inheritdoc />
         protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MediaPicker3PropertyValueEditor>(Attribute);
 
         internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
@@ -55,6 +65,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _jsonSerializer = jsonSerializer;
             }
 
+            public override object ToEditor(IProperty property, string culture = null, string segment = null)
+            {
+                var value = property.GetValue(culture, segment);
+
+                return Deserialize(_jsonSerializer, value);
+            }
+
             ///<remarks>
             /// Note: no FromEditor() and ToEditor() methods
             /// We do not want to transform the way the data is stored in the DB and would like to keep a raw JSON string
@@ -62,19 +79,70 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)
             {
-                var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
-
-                if (string.IsNullOrWhiteSpace(rawJson))
-                    yield break;
-
-                var mediaWithCropsDtos = _jsonSerializer.Deserialize<MediaPickerWithCropsValueConverter.MediaWithCropsDto[]>(rawJson);
-
-                foreach (var mediaWithCropsDto in mediaWithCropsDtos)
+                foreach (var dto in Deserialize(_jsonSerializer, value))
                 {
-                    yield return new UmbracoEntityReference(GuidUdi.Create(Constants.UdiEntityType.Media, mediaWithCropsDto.MediaKey));
+                    yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Media, dto.MediaKey));
                 }
             }
 
+            internal static IEnumerable<MediaWithCropsDto> Deserialize(IJsonSerializer jsonSerializer,object value)
+            {
+                var rawJson = value is string str ? str : value?.ToString();
+                if (string.IsNullOrWhiteSpace(rawJson))
+                {
+                    yield break;
+                }
+
+                if (!rawJson.DetectIsJson())
+                {
+                    // Old comma seperated UDI format
+                    foreach (var udiStr in rawJson.Split(Constants.CharArrays.Comma))
+                    {
+                        if (UdiParser.TryParse(udiStr, out GuidUdi udi))
+                        {
+                            yield return new MediaWithCropsDto
+                            {
+                                Key = Guid.NewGuid(),
+                                MediaKey = udi.Guid,
+                                Crops = Enumerable.Empty<ImageCropperValue.ImageCropperCrop>(),
+                                FocalPoint = new ImageCropperValue.ImageCropperFocalPoint
+                                {
+                                    Left = 0.5m,
+                                    Top = 0.5m
+                                }
+                            };
+                        }
+                    }
+                }
+                else
+                {
+                    // New JSON format
+                    foreach (var dto in jsonSerializer.Deserialize<IEnumerable<MediaWithCropsDto>>(rawJson))
+                    {
+                        yield return dto;
+                    }
+                }
+            }
+
+
+            /// <summary>
+            /// Model/DTO that represents the JSON that the MediaPicker3 stores.
+            /// </summary>
+            [DataContract]
+            internal class MediaWithCropsDto
+            {
+                [DataMember(Name = "key")]
+                public Guid Key { get; set; }
+
+                [DataMember(Name = "mediaKey")]
+                public Guid MediaKey { get; set; }
+
+                [DataMember(Name = "crops")]
+                public IEnumerable<ImageCropperValue.ImageCropperCrop> Crops { get; set; }
+
+                [DataMember(Name = "focalPoint")]
+                public ImageCropperValue.ImageCropperFocalPoint FocalPoint { get; set; }
+            }
         }
     }
 }

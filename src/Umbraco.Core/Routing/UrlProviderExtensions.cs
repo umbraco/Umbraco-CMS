@@ -48,7 +48,7 @@ namespace Umbraco.Extensions
 
             if (content.Published == false)
             {
-                result.Add(UrlInfo.Message(textService.Localize("content/itemNotPublished")));
+                result.Add(UrlInfo.Message(textService.Localize("content", "itemNotPublished")));
                 return result;
             }
 
@@ -145,7 +145,7 @@ namespace Umbraco.Extensions
 
                     // deal with exceptions
                     case "#ex":
-                        result.Add(UrlInfo.Message(textService.Localize("content/getUrlException"), culture));
+                        result.Add(UrlInfo.Message(textService.Localize("content", "getUrlException"), culture));
                         break;
 
                     // got a URL, deal with collisions, add URL
@@ -182,17 +182,17 @@ namespace Umbraco.Extensions
             if (parent == null)
             {
                 // oops, internal error
-                return UrlInfo.Message(textService.Localize("content/parentNotPublishedAnomaly"), culture);
+                return UrlInfo.Message(textService.Localize("content", "parentNotPublishedAnomaly"), culture);
             }
             else if (!parent.Published)
             {
                 // totally not published
-                return UrlInfo.Message(textService.Localize("content/parentNotPublished", new[] { parent.Name }), culture);
+                return UrlInfo.Message(textService.Localize("content", "parentNotPublished", new[] { parent.Name }), culture);
             }
             else
             {
                 // culture not published
-                return UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] {parent.Name}), culture);
+                return UrlInfo.Message(textService.Localize("content", "parentCultureNotPublished", new[] {parent.Name}), culture);
             }
         }
 
@@ -221,7 +221,7 @@ namespace Umbraco.Extensions
                     logger.LogDebug(logMsg, url, uri, culture);
                 }
 
-                var urlInfo = UrlInfo.Message(textService.Localize("content/routeErrorCannotRoute"), culture);
+                var urlInfo = UrlInfo.Message(textService.Localize("content", "routeErrorCannotRoute"), culture);
                 return Attempt.Succeed(urlInfo);
             }
 
@@ -243,7 +243,7 @@ namespace Umbraco.Extensions
                 l.Reverse();
                 var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
 
-                var urlInfo = UrlInfo.Message(textService.Localize("content/routeError", new[] { s }), culture);
+                 var urlInfo = UrlInfo.Message(textService.Localize("content", "routeError", new[] { s }), culture);
                 return Attempt.Succeed(urlInfo);
             }
 

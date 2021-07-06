@@ -102,23 +102,23 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
                     if (s_certificateDaysToExpiry <= 0)
                     {
                         result = StatusResultType.Error;
-                        message = _textService.Localize("healthcheck/httpsCheckExpiredCertificate");
+                        message = _textService.Localize("healthcheck","httpsCheckExpiredCertificate");
                     }
                     else if (s_certificateDaysToExpiry < numberOfDaysForExpiryWarning)
                     {
                         result = StatusResultType.Warning;
-                        message = _textService.Localize("healthcheck/httpsCheckExpiringCertificate", new[] { s_certificateDaysToExpiry.ToString() });
+                        message = _textService.Localize("healthcheck","httpsCheckExpiringCertificate", new[] { s_certificateDaysToExpiry.ToString() });
                     }
                     else
                     {
                         result = StatusResultType.Success;
-                        message = _textService.Localize("healthcheck/httpsCheckValidCertificate");
+                        message = _textService.Localize("healthcheck","httpsCheckValidCertificate");
                     }
                 }
                 else
                 {
                     result = StatusResultType.Error;
-                    message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url, response.ReasonPhrase });
+                    message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url, response.ReasonPhrase });
                 }
             }
             catch (Exception ex)
@@ -127,12 +127,12 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
                 if (exception != null)
                 {
                     message = exception.Status == WebExceptionStatus.TrustFailure
-                        ? _textService.Localize("healthcheck/httpsCheckInvalidCertificate", new[] { exception.Message })
-                        : _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url, exception.Message });
+                        ? _textService.Localize("healthcheck","httpsCheckInvalidCertificate", new[] { exception.Message })
+                        : _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url, exception.Message });
                 }
                 else
                 {
-                    message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url, ex.Message });
+                    message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url, ex.Message });
                 }
 
                 result = StatusResultType.Error;
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             Uri uri = _hostingEnvironment.ApplicationMainUrl;
             var success = uri.Scheme == "https";
 
-            return Task.FromResult(new HealthCheckStatus(_textService.Localize("healthcheck/httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
+            return Task.FromResult(new HealthCheckStatus(_textService.Localize("healthcheck","httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
             {
                 ResultType = success ? StatusResultType.Success : StatusResultType.Error,
                 ReadMoreLink = success ? null : Constants.HealthChecks.DocumentationLinks.Security.HttpsCheck.CheckIfCurrentSchemeIsHttps
@@ -168,13 +168,13 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             StatusResultType resultType;
             if (uri.Scheme != "https")
             {
-                resultMessage = _textService.Localize("healthcheck/httpsCheckConfigurationRectifyNotPossible");
+                resultMessage = _textService.Localize("healthcheck","httpsCheckConfigurationRectifyNotPossible");
                 resultType = StatusResultType.Info;
             }
             else
             {
                 resultMessage = _textService.Localize(
-                    "healthcheck/httpsCheckConfigurationCheckResult",
+                    "healthcheck","httpsCheckConfigurationCheckResult",
                     new[] { httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not" });
                 resultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error;
             }

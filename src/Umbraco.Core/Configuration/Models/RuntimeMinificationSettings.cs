@@ -1,16 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
+    [UmbracoOptions(Constants.Configuration.ConfigRuntimeMinification)]
     public class RuntimeMinificationSettings
     {
-        public bool UseInMemoryCache { get; set; } = false;
+        internal const bool StaticUseInMemoryCache = false;
+        internal const string StaticCacheBuster = "Version";
+
+        /// <summary>
+        /// Use in memory cache
+        /// </summary>
+        [DefaultValue(StaticUseInMemoryCache)]
+        public bool UseInMemoryCache { get; set; } = StaticUseInMemoryCache;
 
         /// <summary>
         /// The cache buster type to use
         /// </summary>
-        public RuntimeMinificationCacheBuster CacheBuster { get; set; } = RuntimeMinificationCacheBuster.Version;
+        [DefaultValue(StaticCacheBuster)]
+        public RuntimeMinificationCacheBuster CacheBuster { get; set; } = Enum<RuntimeMinificationCacheBuster>.Parse(StaticCacheBuster);
     }
 }

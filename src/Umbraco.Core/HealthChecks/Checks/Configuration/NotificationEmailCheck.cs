@@ -9,6 +9,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration
 {
+
     /// <summary>
     /// Health check for the recommended production configuration for Notification Email.
     /// </summary>
@@ -49,11 +50,11 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration
 
         /// <inheritdoc/>
         public override string CheckSuccessMessage =>
-            LocalizedTextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage",
+            LocalizedTextService.Localize("healthcheck","notificationEmailsCheckSuccessMessage",
                 new[] { CurrentValue ?? "&lt;null&gt;" });
 
         /// <inheritdoc/>
-        public override string CheckErrorMessage => LocalizedTextService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
+        public override string CheckErrorMessage => LocalizedTextService.Localize("healthcheck","notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
 
         /// <inheritdoc/>
         public override string ReadMoreLink => Constants.HealthChecks.DocumentationLinks.Configuration.NotificationEmailCheck;

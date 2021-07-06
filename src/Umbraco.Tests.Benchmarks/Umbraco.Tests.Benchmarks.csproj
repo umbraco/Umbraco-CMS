@@ -1,21 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <OutputType>Exe</OutputType>
-    <LangVersion>8</LangVersion>
+    <OutputType>Exe</OutputType> 
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="CtorInvokeBenchmarks.cs.bak" />
     <None Remove="ReflectionUtilities-Unused.cs.bak" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-    <ProjectReference Include="..\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet">
@@ -27,10 +25,7 @@
     <PackageReference Include="Moq">
       <Version>4.16.1</Version>
     </PackageReference>
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.226201">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />    
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-  </ItemGroup>
+  </ItemGroup>  
 </Project>

@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for active directory settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigActiveDirectory)]
     public class ActiveDirectorySettings
     {
         /// <summary>

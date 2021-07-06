@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Migrations;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations
@@ -38,6 +37,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// Adds a post-migration.
         /// </summary>
         void AddPostMigration<TMigration>()
-            where TMigration : IMigration;
+            where TMigration : MigrationBase;
     }
 }

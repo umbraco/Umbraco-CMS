@@ -15,36 +15,22 @@
             </div>
 
 			<ul class="umb-actions umb-actions-child">
-
 				<li data-element="action-{{docType.alias}}" class="umb-action" ng-repeat="docType in allowedTypes">
-					<button ng-click="createMediaItem(docType)" class="umb-action-link umb-outline btn-reset" prevent-default>
-						<i class="large icon {{docType.icon}}"></i>
+					<button type="button" ng-click="createMediaItem(docType)" class="umb-action-link umb-outline btn-reset">
+						<umb-icon icon="{{docType.icon}}" class="{{docType.icon}} icon large"></umb-icon>
 						<span class="menu-label">
 							{{docType.name}}
 							<small>{{docType.description}}</small>
 						</span>
 					</button>
 				</li>
-				<!--
-					<li class="add">
-						<a href="#settings/documenttype/create/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
-							<i class="icon-large icon-plus"></i>
-							<span class="menu-label">
-								Create a new media type
-								<small>
-									Design and configure a new media type
-								</small>
-							</span>
-						</a>
-					</li>
-				-->
 			</ul>
 
 		</div>
 	</div>
 
 	<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-		<button class="btn btn-info" ng-click="closeDialog()">
+		<button type="button" class="btn btn-info" ng-click="closeDialog()">
 			<localize key="buttons_somethingElse">Do something else</localize>
 		</button>
 	</div>

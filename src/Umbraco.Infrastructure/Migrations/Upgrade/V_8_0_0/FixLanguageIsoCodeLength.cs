@@ -6,7 +6,7 @@
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // there is some confusion here when upgrading from v7
             // it should be 14 already but that's not always the case

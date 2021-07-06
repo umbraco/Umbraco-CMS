@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mail;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
                 return;
             }
 
-            var message = _textService.Localize("healthcheck/scheduledHealthCheckEmailBody", new[]
+            var message = _textService.Localize("healthcheck","scheduledHealthCheckEmailBody", new[]
             {
                 DateTime.Now.ToShortDateString(),
                 DateTime.Now.ToShortTimeString(),
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
             // you can identify the site that these results are for.
             var host = _hostingEnvironment.ApplicationMainUrl?.ToString();
 
-            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host });
+            var subject = _textService.Localize("healthcheck","scheduledHealthCheckEmailSubject", new[] { host });
 
 
             var mailMessage = CreateMailMessage(subject, message);

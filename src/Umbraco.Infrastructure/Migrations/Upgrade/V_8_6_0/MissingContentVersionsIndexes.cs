@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0
         {
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // We must check before we create an index because if we are upgrading from v7 we force re-create all
             // indexes in the whole DB and then this would throw

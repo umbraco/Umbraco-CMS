@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data.Common;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -15,6 +15,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
 {
+
     /// <summary>
     /// Default implementation of <see cref="IUmbracoDatabaseFactory"/>.
     /// </summary>
@@ -31,6 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     {
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+        private readonly NPocoMapperCollection _npocoMappers;
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly ILogger<UmbracoDatabaseFactory> _logger;
@@ -81,13 +83,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             IOptions<ConnectionStrings> connectionStrings,
             Lazy<IMapperCollection> mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            NPocoMapperCollection npocoMappers)
         {
 
             _globalSettings = globalSettings;
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
             _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ?? throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
+            _npocoMappers = npocoMappers;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory;
 
@@ -220,46 +224,62 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             // rest to be lazy-initialized
         }
 
-        private void EnsureInitialized()
-        {
-            LazyInitializer.EnsureInitialized(ref _sqlContext, ref _initialized, ref _lock, Initialize);
-        }
+        private void EnsureInitialized() => LazyInitializer.EnsureInitialized(ref _sqlContext, ref _initialized, ref _lock, Initialize);
 
         private SqlContext Initialize()
         {
             _logger.LogDebug("Initializing.");
 
-            if (ConnectionString.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper connection string.");
-            if (_providerName.IsNullOrWhiteSpace()) throw new InvalidOperationException("The factory has not been configured with a proper provider name.");
+            if (ConnectionString.IsNullOrWhiteSpace())
+            {
+                throw new InvalidOperationException("The factory has not been configured with a proper connection string.");
+            }
+
+            if (_providerName.IsNullOrWhiteSpace())
+            {
+                throw new InvalidOperationException("The factory has not been configured with a proper provider name.");
+            }
 
             if (DbProviderFactory == null)
+            {
                 throw new Exception($"Can't find a provider factory for provider name \"{_providerName}\".");
+            }
 
             // cannot initialize without being able to talk to the database
             // TODO: Why not?
             if (!DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DbProviderFactory))
+            {
                 throw new Exception("Cannot connect to the database.");
+            }
 
             _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(ConnectionString);
             _commandRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(ConnectionString);
 
-
             _databaseType = DatabaseType.Resolve(DbProviderFactory.GetType().Name, _providerName);
             if (_databaseType == null)
+            {
                 throw new Exception($"Can't find an NPoco database type for provider name \"{_providerName}\".");
+            }
 
             _sqlSyntax = _dbProviderFactoryCreator.GetSqlSyntaxProvider(_providerName);
             if (_sqlSyntax == null)
+            {
                 throw new Exception($"Can't find a sql syntax provider for provider name \"{_providerName}\".");
+            }
 
             _bulkSqlInsertProvider = _dbProviderFactoryCreator.CreateBulkSqlInsertProvider(_providerName);
 
             if (_databaseType.IsSqlServer())
+            {
                 UpdateSqlServerDatabaseType();
+            }
 
             // ensure we have only 1 set of mappers, and 1 PocoDataFactory, for all database
             // so that everything NPoco is properly cached for the lifetime of the application
-            _pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
+            _pocoMappers = new NPoco.MapperCollection();
+            // add all registered mappers for NPoco
+            _pocoMappers.AddRange(_npocoMappers);
+
             var factory = new FluentPocoDataFactory(GetPocoDataFactoryResolver);
             _pocoDataFactory = factory;
             var config = new FluentConfig(xmappers => factory);
@@ -270,7 +290,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 .WithFluentConfig(config)); // with proper configuration
 
             if (_npocoDatabaseFactory == null)
+            {
                 throw new NullReferenceException("The call to UmbracoDatabaseFactory.Config yielded a null UmbracoDatabaseFactory instance.");
+            }
 
             _logger.LogDebug("Initialized.");
 
@@ -293,9 +315,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         // method used by NPoco's UmbracoDatabaseFactory to actually create the database instance
         private UmbracoDatabase CreateDatabaseInstance()
-        {
-            return new UmbracoDatabase(ConnectionString, SqlContext, DbProviderFactory, _loggerFactory.CreateLogger<UmbracoDatabase>(), _bulkSqlInsertProvider, _databaseSchemaCreatorFactory, _connectionRetryPolicy, _commandRetryPolicy);
-        }
+            => new UmbracoDatabase(
+                ConnectionString,
+                SqlContext,
+                DbProviderFactory,
+                _loggerFactory.CreateLogger<UmbracoDatabase>(),
+                _bulkSqlInsertProvider,
+                _databaseSchemaCreatorFactory,
+                _connectionRetryPolicy,
+                _commandRetryPolicy);
 
         protected override void DisposeResources()
         {

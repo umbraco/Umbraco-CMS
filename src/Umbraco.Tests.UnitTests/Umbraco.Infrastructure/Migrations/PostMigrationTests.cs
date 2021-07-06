@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -9,7 +9,6 @@ using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
@@ -36,9 +35,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                     switch (t.Name)
                     {
                         case nameof(NoopMigration):
-                            return new NoopMigration();
+                            return new NoopMigration(c);
                         case nameof(TestPostMigration):
-                            return new TestPostMigration();
+                            return new TestPostMigration(c);
                         default:
                             throw new NotSupportedException();
                     }
@@ -84,11 +83,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                     switch (t.Name)
                     {
                         case nameof(NoopMigration):
-                            return new NoopMigration();
+                            return new NoopMigration(c);
                         case nameof(TestMigration):
                             return new TestMigration(c);
                         case nameof(TestPostMigration):
-                            return new TestPostMigration();
+                            return new TestPostMigration(c);
                         default:
                             throw new NotSupportedException();
                     }
@@ -135,7 +134,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 
             public static int MigrateCount { get; set; }
 
-            public override void Migrate()
+            protected override void Migrate()
             {
                 MigrateCount++;
 
@@ -143,11 +142,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             }
         }
 
-        public class TestPostMigration : IMigration
+        public class TestPostMigration : MigrationBase
         {
+            public TestPostMigration(IMigrationContext context) : base(context)
+            {
+            }
+
             public static int MigrateCount { get; set; }
 
-            public void Migrate() => MigrateCount++;
+            protected override void Migrate() => MigrateCount++;
         }
     }
 }

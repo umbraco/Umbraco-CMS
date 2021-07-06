@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
         //
         // this is taking care of ppl left in this state
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // note - original AddVariationTables1 just did
             // Create.Table<ContentVersionCultureVariationDto>().Do();

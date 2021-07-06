@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for healthchecks settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigHealthChecks)]
     public class HealthChecksSettings
     {
         /// <summary>

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.XPath;
 using Examine;
 using Examine.Search;
@@ -237,6 +236,10 @@ namespace Umbraco.Cms.Infrastructure
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords,
             string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
+            => Search(term, skip, take, out totalRecords, culture, indexName, null);
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null)
         {
             if (skip < 0)
             {
@@ -283,6 +286,10 @@ namespace Umbraco.Cms.Infrastructure
                     umbIndex.GetCultureAndInvariantFields(culture)
                         .ToArray(); // Get all index fields suffixed with the culture name supplied
                 queryExecutor = query.ManagedQuery(term, fields);
+            }
+            if (loadedFields != null && queryExecutor is IBooleanOperation booleanOperation)
+            {
+                queryExecutor = booleanOperation.SelectFields(loadedFields);
             }
 
             var results = skip == 0 && take == 0

@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             if(!isCultureVariant && !isSegmentVariant)
             {
-                return _localizedTextService.Localize("general/default");
+                return _localizedTextService.Localize("general", "default");
             }
 
             var parts = new List<string>();

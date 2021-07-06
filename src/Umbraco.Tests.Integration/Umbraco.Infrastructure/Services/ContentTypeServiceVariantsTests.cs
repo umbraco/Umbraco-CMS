@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
@@ -17,7 +18,7 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.PublishedCache;
-using Umbraco.Cms.Infrastructure.PublishedCache.Compose;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -52,14 +53,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
+            InMemoryConfiguration[Constants.Configuration.ConfigNuCache + ":" + nameof(NuCacheSettings.NuCacheSerializerType)] = NuCacheSerializerType.JSON.ToString();
             builder.AddNuCache();
             builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
-            var composer = new NotificationsComposer();
-            composer.Compose(builder);
         }
 
         private void AssertJsonStartsWith(int id, string expected)
         {
+
             string json = GetJson(id).Replace('"', '\'');
             int pos = json.IndexOf("'cd':", StringComparison.InvariantCultureIgnoreCase);
             json = json.Substring(0, pos + "'cd':".Length);

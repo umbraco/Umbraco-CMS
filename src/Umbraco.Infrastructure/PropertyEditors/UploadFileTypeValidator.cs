@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 {
                     //we only store a single value for this editor so the 'member' or 'field'
                     // we'll associate this error with will simply be called 'value'
-                    yield return new ValidationResult(_localizedTextService.Localize("errors/dissallowedMediaType"), new[] { "value" });
+                    yield return new ValidationResult(_localizedTextService.Localize("errors", "dissallowedMediaType"), new[] { "value" });
                 }
             }
         }

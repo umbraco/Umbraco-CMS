@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for type finder settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigTypeFinder)]
     public class TypeFinderSettings
     {
         /// <summary>

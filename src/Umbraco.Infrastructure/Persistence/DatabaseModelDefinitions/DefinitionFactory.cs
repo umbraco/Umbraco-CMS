@@ -167,6 +167,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
                     definition.Columns.Add(new IndexColumnDefinition {Name = column, Direction = Direction.Ascending});
                 }
             }
+            if (string.IsNullOrEmpty(attribute.IncludeColumns) == false)
+            {
+                var columns = attribute.IncludeColumns.Split(',').Select(p => p.Trim());
+                foreach (var column in columns)
+                {
+                    definition.IncludeColumns.Add(new IndexColumnDefinition { Name = column, Direction = Direction.Ascending });
+                }
+            }
             return definition;
         }
     }

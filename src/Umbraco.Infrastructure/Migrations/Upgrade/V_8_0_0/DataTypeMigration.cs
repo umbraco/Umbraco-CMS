@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // drop and create columns
             Delete.Column("pk").FromTable("cmsDataType").Do();

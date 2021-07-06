@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             {
                 // if there are no trees defined for this section but the section is defined then we can have a simple
                 // full screen section without trees
-                var name = _localizedTextService.Localize("sections/" + application);
+                var name = _localizedTextService.Localize("sections", application);
                 return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
             }
 
@@ -128,7 +128,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     }
                 }
 
-                var name = _localizedTextService.Localize("sections/" + application);
+                var name = _localizedTextService.Localize("sections", application);
 
                 if (nodes.Count > 0)
                 {
@@ -173,7 +173,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 var name = groupName.IsNullOrWhiteSpace() ? "thirdPartyGroup" : groupName;
 
                 var groupRootNode = TreeRootNode.CreateGroupNode(nodes, application);
-                groupRootNode.Name = _localizedTextService.Localize("treeHeaders/" + name);
+                groupRootNode.Name = _localizedTextService.Localize("treeHeaders", name);
                 treeRootNodes.Add(groupRootNode);
             }
 

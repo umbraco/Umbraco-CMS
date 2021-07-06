@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // so that is why it is being used here.
                 ModelState.AddModelError("value", result.Errors.ToErrorMessage());
 
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                return ValidationProblem(ModelState);
             }
 
             //They've successfully set their password, we can now update their user account to be approved
@@ -233,7 +233,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 // even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
-                result.AddSuccessNotification(_localizedTextService.Localize("user/password"), _localizedTextService.Localize("user/passwordChanged"));
+                result.AddSuccessNotification(_localizedTextService.Localize("user","password"), _localizedTextService.Localize("user","passwordChanged"));
                 return result;
             }
 
@@ -242,7 +242,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
 
-            return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+            return ValidationProblem(ModelState);
         }
 
         // TODO: Why is this necessary? This inherits from UmbracoAuthorizedApiController

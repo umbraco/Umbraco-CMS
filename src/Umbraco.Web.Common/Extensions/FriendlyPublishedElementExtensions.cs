@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using System.Linq.Expressions;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 
@@ -70,5 +72,11 @@ namespace Umbraco.Extensions
         public static bool IsVisible(this IPublishedElement content) => content.IsVisible(PublishedValueFallback);
 
 
+        /// <summary>
+        /// Gets the value of a property.
+        /// </summary>
+        public static TValue ValueFor<TModel, TValue>(this TModel model, Expression<Func<TModel, TValue>> property, string culture = null, string segment = null, Fallback fallback = default, TValue defaultValue = default)
+            where TModel : IPublishedElement =>
+            model.ValueFor(PublishedValueFallback, property, culture, segment, fallback);
     }
 }

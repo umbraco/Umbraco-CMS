@@ -78,6 +78,18 @@
     </PackageReference>
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
+    <PackageReference Include="K4os.Compression.LZ4">
+      <Version>1.1.11</Version>
+    </PackageReference>
+    <PackageReference Include="LightInject" Version="5.4.0" />
+    <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
+    <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
+    <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
+    <PackageReference Include="Markdown" Version="2.2.1" />
+    <PackageReference Include="MessagePack">
+      <Version>2.2.85</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
@@ -96,7 +108,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MiniProfiler" Version="4.2.22" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="SecurityCodeScan">
       <Version>3.5.4</Version>
@@ -122,6 +134,10 @@
       <Project>{33085570-9bf2-4065-a9b0-a29d920d13ba}</Project>
       <Name>Umbraco.Persistence.SqlCe</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
+      <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
+      <Name>Umbraco.PublishedCache.NuCache</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <!-- no globbing for now, painful -->
@@ -145,6 +161,15 @@
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UmbracoContext.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializationResult.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializerEntityType.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IDictionaryOfPropertyDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\LazyCompressedString.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComponent.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByUdiRouteHandler.cs" />
     <Compile Include="UmbracoDbProviderFactoryCreator.cs" />
@@ -241,4 +266,5 @@
   <!--      <Output TaskParameter="SerializationAssembly" ItemName="SerializationAssembly" />-->
   <!--    </SGen>-->
   <!--  </Target>-->
+
 </Project>

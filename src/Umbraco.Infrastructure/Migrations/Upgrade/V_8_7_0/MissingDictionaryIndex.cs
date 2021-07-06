@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0
         /// Adds an index to the foreign key column <c>parent</c> on <c>DictionaryDto</c>'s table
         /// if it doesn't already exist
         /// </summary>
-        public override void Migrate()
+        protected override void Migrate()
         {
             var indexName = "IX_" + DictionaryDto.TableName + "_Parent";
 

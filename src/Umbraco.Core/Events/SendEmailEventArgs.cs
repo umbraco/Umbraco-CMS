@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Email;
 
 namespace Umbraco.Cms.Core.Events
 {

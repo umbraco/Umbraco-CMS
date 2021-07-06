@@ -25,22 +25,30 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 {
     public class SqlMainDomLock : IMainDomLock
     {
-        private string _lockId;
+        private readonly string _lockId;
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger<SqlMainDomLock> _logger;
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private IUmbracoDatabase _db;
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly IUmbracoDatabase _db;
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private SqlServerSyntaxProvider _sqlServerSyntax;
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _errorDuringAcquiring;
-        private object _locker = new object();
+        private readonly object _locker = new object();
         private bool _hasTable = false;
 
-        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, IOptions<GlobalSettings> globalSettings, IOptions<ConnectionStrings> connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+        public SqlMainDomLock(
+            ILogger<SqlMainDomLock> logger,
+            ILoggerFactory loggerFactory,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<ConnectionStrings> connectionStrings,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            IHostingEnvironment hostingEnvironment,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            NPocoMapperCollection npocoMappers)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
@@ -48,13 +56,15 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _globalSettings = globalSettings;
             _sqlServerSyntax = new SqlServerSyntaxProvider(_globalSettings);
             _hostingEnvironment = hostingEnvironment;
-            _dbFactory = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
+            _dbFactory = new UmbracoDatabaseFactory(
+                loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                 _globalSettings,
                connectionStrings,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
                dbProviderFactoryCreator,
-               databaseSchemaCreatorFactory);
+               databaseSchemaCreatorFactory,
+               npocoMappers);
 
             MainDomKey = MainDomKeyPrefix + "-" + (Environment.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
         }

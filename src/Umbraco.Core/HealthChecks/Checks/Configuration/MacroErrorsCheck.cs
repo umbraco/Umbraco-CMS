@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration
         /// </summary>
         public override string CheckSuccessMessage =>
             _textService.Localize(
-                "healthcheck/macroErrorModeCheckSuccessMessage",
+                "healthcheck","macroErrorModeCheckSuccessMessage",
                 new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration
         /// </summary>
         public override string CheckErrorMessage =>
             _textService.Localize(
-                "healthcheck/macroErrorModeCheckErrorMessage",
+                "healthcheck","macroErrorModeCheckErrorMessage",
                 new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
     }
 }

@@ -86,9 +86,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     view.Content = display.Content;
                     var result = _fileService.CreatePartialView(view, display.Snippet, currentUser.Id);
                     if (result.Success)
+                    {
                         return Ok();
+                    }
                     else
-                        return ValidationErrorResult.CreateNotificationValidationErrorResult(result.Exception.Message);
+                    {
+                        return ValidationProblem(result.Exception.Message);
+                    }
 
                 case Constants.Trees.PartialViewMacros:
                     var viewMacro = new PartialView(PartialViewType.PartialViewMacro, display.VirtualPath);
@@ -97,7 +101,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     if (resultMacro.Success)
                         return Ok();
                     else
-                        return ValidationErrorResult.CreateNotificationValidationErrorResult(resultMacro.Exception.Message);
+                        return ValidationProblem(resultMacro.Exception.Message);
 
                 case Constants.Trees.Scripts:
                     var script = new Script(display.VirtualPath);
@@ -123,7 +127,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (string.IsNullOrWhiteSpace(parentId)) throw new ArgumentException("Value cannot be null or whitespace.", "parentId");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (name.ContainsAny(Path.GetInvalidPathChars())) {
-                return ValidationErrorResult.CreateNotificationValidationErrorResult(_localizedTextService.Localize("codefile/createFolderIllegalChars"));
+                return ValidationProblem(_localizedTextService.Localize("codefile", "createFolderIllegalChars"));
             }
 
             // if the parentId is root (-1) then we just need an empty string as we are
@@ -418,8 +422,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
 
                     display.AddErrorNotification(
-                        _localizedTextService.Localize("speechBubbles/partialViewErrorHeader"),
-                        _localizedTextService.Localize("speechBubbles/partialViewErrorText"));
+                        _localizedTextService.Localize("speechBubbles", "partialViewErrorHeader"),
+                        _localizedTextService.Localize("speechBubbles", "partialViewErrorText"));
                     break;
 
                 case Constants.Trees.PartialViewMacros:
@@ -433,8 +437,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
 
                     display.AddErrorNotification(
-                        _localizedTextService.Localize("speechBubbles/partialViewErrorHeader"),
-                        _localizedTextService.Localize("speechBubbles/partialViewErrorText"));
+                        _localizedTextService.Localize("speechBubbles", "partialViewErrorHeader"),
+                        _localizedTextService.Localize("speechBubbles", "partialViewErrorText"));
                     break;
 
                 case Constants.Trees.Scripts:

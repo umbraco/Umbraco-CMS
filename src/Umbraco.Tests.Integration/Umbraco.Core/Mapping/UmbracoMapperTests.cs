@@ -260,8 +260,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
             }
 
             Assert.AreEqual(contentType.CompositionPropertyGroups.Count(), invariantContent.Tabs.Count() - 1);
-            Assert.IsTrue(invariantContent.Tabs.Any(x => x.Label == _localizedTextService.Localize("general/properties")));
-            Assert.AreEqual(2, invariantContent.Tabs.Where(x => x.Label == _localizedTextService.Localize("general/properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
+            Assert.IsTrue(invariantContent.Tabs.Any(x => x.Label == _localizedTextService.Localize("general","properties")));
+            Assert.AreEqual(2, invariantContent.Tabs.Where(x => x.Label == _localizedTextService.Localize("general","properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
         }
 
         private void AssertBasics(ContentItemDisplay result, IContent content)

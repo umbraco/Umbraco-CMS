@@ -95,12 +95,12 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
                 }
 
                 message = success
-                    ? LocalizedTextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderFound")
-                    : LocalizedTextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderNotFound");
+                    ? LocalizedTextService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderFound")
+                    : LocalizedTextService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderNotFound");
             }
             catch (Exception ex)
             {
-                message = LocalizedTextService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = LocalizedTextService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             return

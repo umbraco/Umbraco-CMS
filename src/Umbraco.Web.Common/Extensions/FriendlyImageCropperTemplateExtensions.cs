@@ -38,12 +38,23 @@ namespace Umbraco.Extensions
             string cropAlias) =>
             mediaItem.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
 
+        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias)
+            => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
 
+        /// <summary>
+        /// Gets the crop URL by using only the specified <paramref name="imageCropperValue" />.
+        /// </summary>
+        /// <param name="mediaItem">The media item.</param>
+        /// <param name="imageCropperValue">The image cropper value.</param>
+        /// <param name="cropAlias">The crop alias.</param>
+        /// <returns>
+        /// The image crop URL.
+        /// </returns>
         public static string GetCropUrl(
             this IPublishedContent mediaItem,
-            string cropAlias,
-            ImageCropperValue imageCropperValue)
-            => mediaItem.GetCropUrl(cropAlias, ImageUrlGenerator, imageCropperValue);
+            ImageCropperValue imageCropperValue,
+            string cropAlias)
+            => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, imageCropperValue, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
 
         /// <summary>
         /// Gets the underlying image processing service URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
@@ -65,6 +76,9 @@ namespace Umbraco.Extensions
             string propertyAlias,
             string cropAlias) =>
             mediaItem.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
+
+        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias)
+            => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
 
         /// <summary>
         /// Gets the underlying image processing service URL from the IPublishedContent item.
@@ -327,6 +341,6 @@ namespace Umbraco.Extensions
             this MediaWithCrops mediaWithCrops,
             string alias,
             string cacheBusterValue = null)
-            => mediaWithCrops.GetLocalCropUrl(alias, ImageUrlGenerator,  cacheBusterValue);
+            => mediaWithCrops.GetLocalCropUrl(alias, cacheBusterValue);
     }
 }

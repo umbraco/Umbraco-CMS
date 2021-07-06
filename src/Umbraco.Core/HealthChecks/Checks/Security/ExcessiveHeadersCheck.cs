@@ -68,12 +68,12 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
                     .ToArray();
                 success = headersFound.Any() == false;
                 message = success
-                    ? _textService.Localize("healthcheck/excessiveHeadersNotFound")
-                    : _textService.Localize("healthcheck/excessiveHeadersFound", new[] { string.Join(", ", headersFound) });
+                    ? _textService.Localize("healthcheck","excessiveHeadersNotFound")
+                    : _textService.Localize("healthcheck","excessiveHeadersFound", new[] { string.Join(", ", headersFound) });
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             return

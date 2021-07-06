@@ -1,6 +1,5 @@
-﻿using System.IO;
+using System.IO;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
@@ -8,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
     /// <summary>
     /// Deletes the old file that saved log queries
     /// </summary>
-    public class DeleteLogViewerQueryFile : IMigration
+    public class DeleteLogViewerQueryFile : MigrationBase
     {
         private readonly IHostingEnvironment _hostingEnvironment;
 
@@ -16,12 +15,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
         /// Initializes a new instance of the <see cref="DeleteLogViewerQueryFile"/> class.
         /// </summary>
         public DeleteLogViewerQueryFile(IMigrationContext context, IHostingEnvironment hostingEnvironment)
+            : base(context)
         {
             _hostingEnvironment = hostingEnvironment;
         }
 
         /// <inheritdoc />
-        public void Migrate()
+        protected override void Migrate()
         {
             var logViewerQueryFile = MigrateLogViewerQueriesFromFileToDb.GetLogViewerQueryFile(_hostingEnvironment);
 

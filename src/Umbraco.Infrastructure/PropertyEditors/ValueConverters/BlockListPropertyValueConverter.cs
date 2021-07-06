@@ -116,6 +116,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                             settingsData = null;
                     }
 
+                    // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
                     var layoutType = typeof(BlockListItem<,>).MakeGenericType(contentData.GetType(), settingsData?.GetType() ?? typeof(IPublishedElement));
                     var layoutRef = (BlockListItem)Activator.CreateInstance(layoutType, contentGuidUdi, contentData, settingGuidUdi, settingsData);
 

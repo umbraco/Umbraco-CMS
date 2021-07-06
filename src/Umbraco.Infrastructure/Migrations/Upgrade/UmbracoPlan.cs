@@ -9,6 +9,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_10_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_15_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Extensions;
 
@@ -200,14 +201,26 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             // to 8.10.0
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
 
+            // NOTE: we need to do a merge migration here because as of 'now',
+            // v9-beta* is already out and 8.15 isn't out yet
+            // so we need to ensure that migrations from 8.15 are included in the next
+            // v9*.
+
+            // to 8.15.0...
+            Merge()
+                .To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}")
+                .To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}")
+
             // to 9.0.0
-            To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}");
-            To<ExternalLoginTableIndexes>("{50A43237-A6F4-49E2-A7A6-5DAD65C84669}");
-            To<ExternalLoginTokenTable>("{3D8DADEF-0FDA-4377-A5F0-B52C2110E8F2}");
-            To<MemberTableColumns>("{1303BDCF-2295-4645-9526-2F32E8B35ABD}");
-            To<AddPasswordConfigToMemberTable>("{86AC839A-0D08-4D09-B7B5-027445E255A1}");
+                .With()
+                .To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}")
+                .To<ExternalLoginTableIndexes>("{50A43237-A6F4-49E2-A7A6-5DAD65C84669}")
+                .To<ExternalLoginTokenTable>("{3D8DADEF-0FDA-4377-A5F0-B52C2110E8F2}")
+                .To<MemberTableColumns>("{1303BDCF-2295-4645-9526-2F32E8B35ABD}")
+                .To<AddPasswordConfigToMemberTable>("{86AC839A-0D08-4D09-B7B5-027445E255A1}")
 
             //FINAL
+            .As("{5060F3D2-88BE-4D30-8755-CF51F28EAD12}");
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // add the new languages lock object
             AddLockObjects.EnsureLockObject(Database, Cms.Core.Constants.Locks.Languages, "Languages");

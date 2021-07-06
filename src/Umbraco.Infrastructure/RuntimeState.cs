@@ -141,10 +141,6 @@ namespace Umbraco.Cms.Core
                 case UmbracoDatabaseState.Ok:
                 default:
                     {
-                        // if we already know we want to upgrade, exit here
-                        if (Level == RuntimeLevel.Upgrade)
-                            return;
-
                         // the database version matches the code & files version, all clear, can run
                         Level = RuntimeLevel.Run;
                         Reason = RuntimeLevelReason.Run;

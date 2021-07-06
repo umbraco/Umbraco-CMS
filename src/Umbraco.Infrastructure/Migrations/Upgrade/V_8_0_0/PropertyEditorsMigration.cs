@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             RenameDataType(Cms.Core.Constants.PropertyEditors.Legacy.Aliases.ContentPicker2, Cms.Core.Constants.PropertyEditors.Aliases.ContentPicker);
             RenameDataType(Cms.Core.Constants.PropertyEditors.Legacy.Aliases.MediaPicker2, Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker);

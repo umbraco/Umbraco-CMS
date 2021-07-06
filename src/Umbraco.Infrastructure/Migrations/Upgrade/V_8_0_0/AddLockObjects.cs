@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             : base(context)
         { }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             // some may already exist, just ensure everything we need is here
             EnsureLockObject(Cms.Core.Constants.Locks.Servers, "Servers");

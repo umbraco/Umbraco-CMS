@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -44,6 +44,10 @@ namespace Umbraco.Cms.Core.HealthChecks
         /// Get the status for this health check
         /// </summary>
         /// <returns></returns>
+        /// <remarks>
+        /// If there are possible actions to take to rectify this check, this method must be overridden by a sub class
+        /// in order to explicitly provide those actions.
+        /// </remarks>
         public abstract Task<IEnumerable<HealthCheckStatus>> GetStatus();
 
         /// <summary>
