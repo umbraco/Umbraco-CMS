@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
@@ -17,7 +19,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData);
 
         /// <summary>
-        /// Serializes the <see cref="ContentCacheDataModel"/> 
+        /// Serializes the <see cref="ContentCacheDataModel"/>
         /// </summary>
         ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model);
     }

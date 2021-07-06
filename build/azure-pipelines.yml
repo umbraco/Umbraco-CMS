@@ -2,6 +2,7 @@ name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd
 variables:
     buildConfiguration: Release
     SA_PASSWORD: UmbracoIntegration123!
+    UmbracoBuild: AzurePipeline
 resources:
     containers:
         - container: mssql
@@ -14,6 +15,28 @@ resources:
               - '1433:1433'
           options: '--name mssql'
 stages:
+    - stage: Determine_build_type
+      displayName: Determine build type
+      dependsOn: [ ]
+      jobs:
+          - job: Set_build_variables
+            displayName: Set build variables
+            pool:
+                vmImage: windows-latest
+            steps:
+                - task: PowerShell@1
+                  displayName: Set $isRelease variable
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: >
+                          $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
+
+                          if ($isRelease.Count -gt 0){
+                             Write-Host "##vso[build.addbuildtag]Release build"
+                             Write-Host "##vso[task.setvariable variable=isRelease]true"
+                          }else{
+                             Write-Host "##vso[task.setvariable variable=isRelease]false"
+                          }
     - stage: Unit_Tests
       displayName: Unit Tests
       dependsOn: []
@@ -333,12 +356,10 @@ stages:
 
                         $version = $ubuild.GetUmbracoVersion()
 
-                        $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
-
 
                         if ($isRelease.Count -gt 0){
                           $continuous = $version.Semver
-                          Write-Host "##vso[build.addbuildtag]Release build"
+
                         }
                         else
                         {
@@ -366,10 +387,7 @@ stages:
                             $a.symbols.version.defaultValue = $continuous
 
                             $a | ConvertTo-Json -depth 32| set-content $templatePath
-                            Write-Host "##vso[build.addbuildtag]Continuous build"
-
                           }
-
 
                         Write-Host "##vso[build.updatebuildnumber]$continuous.$(Build.BuildId)"
 
@@ -383,6 +401,15 @@ stages:
                           $ubuild = build\build.ps1 -get
 
                           $ubuild.PrepareBuild("vso")
+                - task: PowerShell@1
+                  displayName: Prepare JSON Schema
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: |
+                          Write-Host "Working folder: $pwd"
+                          $ubuild = build\build.ps1 -get -continue
+
+                          $ubuild.CompileJsonSchema()
                 - task: NodeTool@0
                   displayName: Use Node 11.x
                   inputs:
@@ -448,8 +475,8 @@ stages:
                   condition: succeededOrFailed()
     - stage: Artifacts_Docs
       displayName: 'Static Code Documentation'
-      dependsOn: []
-      condition: 'ne(variables[''Umbraco.IsReleaseBuild''], ''false'')'
+      dependsOn: [Determine_build_type]
+      condition: 'eq(variables.IsRelease, true)'
       jobs:
           - job: Generate_Docs_CSharp
             timeoutInMinutes: 60

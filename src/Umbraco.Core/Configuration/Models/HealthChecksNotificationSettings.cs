@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Umbraco.Cms.Core.Configuration.Models
@@ -12,10 +13,14 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// </summary>
     public class HealthChecksNotificationSettings
     {
+        internal const bool StaticEnabled = false;
+        internal const string StaticPeriod = "1.00:00:00"; //TimeSpan.FromHours(24);
+
         /// <summary>
         /// Gets or sets a value indicating whether health check notifications are enabled.
         /// </summary>
-        public bool Enabled { get; set; } = false;
+        [DefaultValue(StaticEnabled)]
+        public bool Enabled { get; set; } = StaticEnabled;
 
         /// <summary>
         /// Gets or sets a value for the first run time of a healthcheck notification in crontab format.
@@ -25,7 +30,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the period of the healthcheck notification.
         /// </summary>
-        public TimeSpan Period { get; set; } = TimeSpan.FromHours(24);
+        [DefaultValue(StaticPeriod)]
+        public TimeSpan Period { get; set; } = TimeSpan.Parse(StaticPeriod);
 
         /// <summary>
         /// Gets or sets a value for the collection of health check notification methods.

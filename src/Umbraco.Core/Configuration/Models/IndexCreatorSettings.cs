@@ -8,6 +8,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// <summary>
     /// Typed configuration options for index creator settings.
     /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigExamine)]
     public class IndexCreatorSettings
     {
         /// <summary>
