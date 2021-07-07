@@ -38,6 +38,7 @@ namespace Umbraco.Cms.Core.Packaging
                 PackageFile = null,
                 Name = package.Element("name")?.Value,
                 Macros = xml.Root.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
+                MacroPartialViews = xml.Root.Element("MacroPartialViews")?.Elements("view") ?? Enumerable.Empty<XElement>(),
                 Templates = xml.Root.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),
                 Stylesheets = xml.Root.Element("Stylesheets")?.Elements("styleSheet") ?? Enumerable.Empty<XElement>(),
                 DataTypes = xml.Root.Element("DataTypes")?.Elements("DataType") ?? Enumerable.Empty<XElement>(),

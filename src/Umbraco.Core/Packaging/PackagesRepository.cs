@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Options;
@@ -372,18 +373,30 @@ namespace Umbraco.Cms.Core.Packaging
 
         private void PackageMacros(PackageDefinition definition, XContainer root)
         {
+            var packagedMacros = new List<IMacro>();
             var macros = new XElement("Macros");
             foreach (var macroId in definition.Macros)
             {
-                if (!int.TryParse(macroId, out var outInt))
+                if (!int.TryParse(macroId, out int outInt))
+                {
                     continue;
+                }
 
-                var macroXml = GetMacroXml(outInt, out var macro);
+                XElement macroXml = GetMacroXml(outInt, out IMacro macro);
                 if (macroXml == null)
+                {
                     continue;
+                }
+
                 macros.Add(macroXml);
+                packagedMacros.Add(macro);
             }
+
             root.Add(macros);
+
+            // get the partial views for macros and package those
+            IEnumerable<string> views = packagedMacros.Select(x => x.MacroSource).Where(x => x.EndsWith(".cshtml"));
+            PackagePartialViews(views, root, "MacroPartialViews");
         }
 
         private void PackageStylesheets(PackageDefinition definition, XContainer root)
@@ -413,6 +426,33 @@ namespace Umbraco.Cms.Core.Packaging
                 templatesXml.Add(_serializer.Serialize(template));
             }
             root.Add(templatesXml);
+        }
+
+        private void PackagePartialViews(IEnumerable<string> viewPaths, XContainer root, string elementName)
+        {
+            var viewsXml = new XElement(elementName);
+            foreach (var viewPath in viewPaths)
+            {
+                // TODO: See TODO note in MacrosController about the inconsistencies of usages of partial views
+                // and how paths are saved. We have no choice currently but to assume that all views are 100% always
+                // on the content path.
+
+                var physicalPath = _hostingEnvironment.MapPathContentRoot(viewPath);
+                if (!File.Exists(physicalPath))
+                {
+                    throw new InvalidOperationException("Could not find partial view at path " + viewPath);
+                }
+
+                var fileContents = File.ReadAllText(physicalPath, Encoding.UTF8);
+
+                viewsXml.Add(
+                    new XElement(
+                        "view",
+                        new XAttribute("path", viewPath),
+                        new XCData(fileContents)));
+            }
+
+            root.Add(viewsXml);
         }
 
         private void PackageDocumentTypes(PackageDefinition definition, XContainer root)

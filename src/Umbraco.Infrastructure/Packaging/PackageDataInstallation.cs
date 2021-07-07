@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
@@ -39,6 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
@@ -59,7 +61,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IOptions<GlobalSettings> globalSettings,
             IConfigurationEditorJsonSerializer serializer,
             IMediaService mediaService,
-            IMediaTypeService mediaTypeService)
+            IMediaTypeService mediaTypeService,
+            IHostingEnvironment hostingEnvironment)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -74,6 +77,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _serializer = serializer;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
+            _hostingEnvironment = hostingEnvironment;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
@@ -91,7 +95,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     DataTypesInstalled = ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
-                    MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
+                    MacrosInstalled = ImportMacros(compiledPackage.Macros, compiledPackage.MacroPartialViews, userId),
                     TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
                     DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId),
                     MediaTypesInstalled = ImportMediaTypes(compiledPackage.MediaTypes, userId),
@@ -1235,6 +1239,30 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #endregion
 
+        private void ImportPartialViews(IEnumerable<XElement> viewElements)
+        {
+            foreach(XElement element in viewElements)
+            {
+                var path = element.AttributeValue<string>("path");
+                if (path == null)
+                {
+                    throw new InvalidOperationException("No path attribute found");
+                }
+                var contents = element.Value;
+                if (contents.IsNullOrWhiteSpace())
+                {
+                    throw new InvalidOperationException("No content found for partial view");
+                }
+
+                var physicalPath = _hostingEnvironment.MapPathContentRoot(path);
+                // TODO: Do we overwrite? IMO I don't think so since these will be views a user will change.
+                if (!System.IO.File.Exists(physicalPath))
+                {
+                    System.IO.File.WriteAllText(physicalPath, contents, Encoding.UTF8);
+                }
+            }
+        }
+
         #region Macros
 
         /// <summary>
@@ -1243,14 +1271,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="macroElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <returns></returns>
-        public IReadOnlyList<IMacro> ImportMacros(IEnumerable<XElement> macroElements, int userId)
+        public IReadOnlyList<IMacro> ImportMacros(
+            IEnumerable<XElement> macroElements,
+            IEnumerable<XElement> macroPartialViewsElements,
+            int userId)
         {
             var macros = macroElements.Select(ParseMacroElement).ToList();
 
-            foreach (var macro in macros)
+            foreach (IMacro macro in macros)
             {
                 _macroService.Save(macro, userId);
             }
+
+            ImportPartialViews(macroPartialViewsElements);
 
             return macros;
         }
