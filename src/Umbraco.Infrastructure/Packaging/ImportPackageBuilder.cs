@@ -1,6 +1,9 @@
 using System;
 using System.Xml.Linq;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
@@ -9,8 +12,20 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 {
     internal class ImportPackageBuilder : ExpressionBuilderBase<ImportPackageBuilderExpression>, IImportPackageBuilder, IExecutableBuilder
     {
-        public ImportPackageBuilder(IPackagingService packagingService, IMigrationContext context)
-            : base(new ImportPackageBuilderExpression(packagingService, context))
+        public ImportPackageBuilder(
+            IPackagingService packagingService,
+            MediaFileManager mediaFileManager,
+            IShortStringHelper shortStringHelper,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            IJsonSerializer jsonSerializer,
+            IMigrationContext context)
+            : base(new ImportPackageBuilderExpression(
+                packagingService,
+                mediaFileManager,
+                shortStringHelper,
+                contentTypeBaseServiceProvider,
+                jsonSerializer,
+                context))
         {
         }
 
