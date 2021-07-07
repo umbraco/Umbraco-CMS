@@ -145,7 +145,8 @@ namespace Umbraco.Extensions
                 DbProviderFactories.GetFactory,
                 factory.GetServices<ISqlSyntaxProvider>(),
                 factory.GetServices<IBulkSqlInsertProvider>(),
-                factory.GetServices<IEmbeddedDatabaseCreator>()
+                factory.GetServices<IEmbeddedDatabaseCreator>(),
+                factory.GetServices<IProviderSpecificMapperFactory>()
             ));
 
             builder.AddCoreInitialServices();
@@ -351,14 +352,17 @@ namespace Umbraco.Extensions
                     Type sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider");
                     Type sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeBulkSqlInsertProvider");
                     Type sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeEmbeddedDatabaseCreator");
-                    Type sqlCeImageMapperType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeImageMapper");
+                    Type sqlCeSpecificMapperFactory = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSpecificMapperFactory");
 
-                    if (!(sqlCeSyntaxProviderType is null || sqlCeBulkSqlInsertProviderType is null || sqlCeEmbeddedDatabaseCreatorType is null))
+                    if (!(sqlCeSyntaxProviderType is null
+                          || sqlCeBulkSqlInsertProviderType is null
+                          || sqlCeEmbeddedDatabaseCreatorType is null
+                          || sqlCeSpecificMapperFactory is null))
                     {
                         builder.Services.AddSingleton(typeof(ISqlSyntaxProvider), sqlCeSyntaxProviderType);
                         builder.Services.AddSingleton(typeof(IBulkSqlInsertProvider), sqlCeBulkSqlInsertProviderType);
                         builder.Services.AddSingleton(typeof(IEmbeddedDatabaseCreator), sqlCeEmbeddedDatabaseCreatorType);
-                        builder.NPocoMappers().Add(sqlCeImageMapperType);
+                        builder.Services.AddSingleton(typeof(IProviderSpecificMapperFactory), sqlCeSpecificMapperFactory);
                     }
 
                     var sqlCeAssembly = Assembly.LoadFrom(Path.Combine(binFolder, "System.Data.SqlServerCe.dll"));
