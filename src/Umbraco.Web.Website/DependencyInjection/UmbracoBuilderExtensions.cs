@@ -40,7 +40,10 @@ namespace Umbraco.Extensions
             builder.Services.AddScoped<UmbracoRouteValueTransformer>();
             builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
             builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
-            builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
+
+            // Umbraco Rendering Defaults startup options to define which RenderController type to use
+            builder.Services.ConfigureOptions<UmbracoRenderingDefaultsOptionsSetup>();
+
             builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
 
             builder.Services.AddSingleton<FrontEndRoutes>();

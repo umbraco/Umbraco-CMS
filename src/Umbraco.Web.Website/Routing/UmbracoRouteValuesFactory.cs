@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
@@ -18,7 +19,6 @@ namespace Umbraco.Cms.Web.Website.Routing
     /// </summary>
     public class UmbracoRouteValuesFactory : IUmbracoRouteValuesFactory
     {
-        private readonly IUmbracoRenderingDefaults _renderingDefaults;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UmbracoFeatures _umbracoFeatures;
         private readonly IControllerActionSearcher _controllerActionSearcher;
@@ -30,18 +30,17 @@ namespace Umbraco.Cms.Web.Website.Routing
         /// Initializes a new instance of the <see cref="UmbracoRouteValuesFactory"/> class.
         /// </summary>
         public UmbracoRouteValuesFactory(
-            IUmbracoRenderingDefaults renderingDefaults,
+            IOptions<UmbracoRenderingDefaultsOptions> renderingDefaults,
             IShortStringHelper shortStringHelper,
             UmbracoFeatures umbracoFeatures,
             IControllerActionSearcher controllerActionSearcher,
             IPublishedRouter publishedRouter)
         {
-            _renderingDefaults = renderingDefaults;
             _shortStringHelper = shortStringHelper;
             _umbracoFeatures = umbracoFeatures;
             _controllerActionSearcher = controllerActionSearcher;
             _publishedRouter = publishedRouter;
-            _defaultControllerName = new Lazy<string>(() => ControllerExtensions.GetControllerName(_renderingDefaults.DefaultControllerType));
+            _defaultControllerName = new Lazy<string>(() => ControllerExtensions.GetControllerName(renderingDefaults.Value.DefaultControllerType));
             _defaultControllerDescriptor = new Lazy<ControllerActionDescriptor>(() =>
             {
                 ControllerActionDescriptor descriptor = _controllerActionSearcher.Find<IRenderController>(
