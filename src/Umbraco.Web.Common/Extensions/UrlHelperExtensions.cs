@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -12,8 +14,10 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
@@ -280,5 +284,51 @@ namespace Umbraco.Extensions
             return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
         }
 
+        /// <summary>
+        /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="action"></param>
+        /// <param name="controllerName"></param>
+        /// <returns></returns>
+        public static string SurfaceAction(this IUrlHelper url, IUmbracoContext umbracoContext, IDataProtectionProvider dataProtectionProvider,string action, string controllerName)
+        {
+            return url.SurfaceAction(umbracoContext, dataProtectionProvider, action, controllerName, null);
+        }
+
+        /// <summary>
+        /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="action"></param>
+        /// <param name="controllerName"></param>
+        /// <param name="additionalRouteVals"></param>
+        /// <returns></returns>
+        public static string SurfaceAction(this IUrlHelper url, IUmbracoContext umbracoContext, IDataProtectionProvider dataProtectionProvider,string action, string controllerName, object additionalRouteVals)
+        {
+            return url.SurfaceAction(umbracoContext, dataProtectionProvider, action, controllerName, "", additionalRouteVals);
+        }
+
+        /// <summary>
+        /// Generates a URL based on the current Umbraco URL with a custom query string that will route to the specified SurfaceController
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="action"></param>
+        /// <param name="controllerName"></param>
+        /// <param name="area"></param>
+        /// <param name="additionalRouteVals"></param>
+        /// <returns></returns>
+        public static string SurfaceAction(this IUrlHelper url, IUmbracoContext umbracoContext, IDataProtectionProvider dataProtectionProvider, string action, string controllerName, string area, object additionalRouteVals)
+        {
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
+
+            var encryptedRoute = EncryptionHelper.CreateEncryptedRouteString(dataProtectionProvider, controllerName, action, area, additionalRouteVals);
+
+            var result = umbracoContext.OriginalRequestUrl.AbsolutePath.EnsureEndsWith('?') + "ufprt=" + encryptedRoute;
+            return result;
+        }
     }
 }
