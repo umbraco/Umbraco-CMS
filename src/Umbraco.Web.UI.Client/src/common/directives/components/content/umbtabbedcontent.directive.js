@@ -105,15 +105,6 @@
                 tab.active = true;
             };
 
-            $scope.getValidationAlias = function ({ parentKey, alias }) {
-                if (parentKey) {
-                    const parentGroup = $scope.content.tabs.find(tab => tab.key === parentKey);
-                    return parentGroup.alias;
-                } else {
-                    return alias;
-                }
-            };
-
             $scope.$watchCollection('content.tabs', () => {
                 $scope.tabs = $filter("filter")($scope.content.tabs, (tab) => {
                     return tab.type === 1;
@@ -122,6 +113,18 @@
                 if ($scope.tabs.length > 0 && !$scope.activeTabKey) {
                     $scope.activeTabKey = $scope.tabs[0].key;
                 }
+
+                // for validation to work for each tab we need to associate a group with a tab.
+                $scope.content.tabs.forEach(group => {
+                    let validationAlias = group.alias;
+
+                    if (group.parentKey) {
+                        const parentGroup = $scope.content.tabs.find(tab => tab.key === group.parentKey);
+                        validationAlias = parentGroup.alias;
+                    }
+
+                    group.validationAlias = validationAlias;
+                });
             });
             
             $scope.$on("editors.apps.appChanged", function($event, $args) {

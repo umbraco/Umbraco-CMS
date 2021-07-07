@@ -24,7 +24,6 @@
 
         vm.getScope = getScope; // used by property editors to get a scope that is the root of split view, content apps etc.
         vm.setActiveTab = setActiveTab;
-        vm.getValidationAlias = getValidationAlias;
         
         $scope.$watchCollection('vm.model.variants[0].tabs', () => {
             vm.tabs = $filter("filter")(vm.model.variants[0].tabs, (tab) => {
@@ -34,6 +33,18 @@
             if (vm.tabs.length > 0 && !vm.activeTabKey) {
                 vm.activeTabKey = vm.tabs[0].key;
             }
+
+            // for validation to work for each tab we need to associate a group with a tab.
+            vm.model.variants[0].tabs.forEach(group => {
+                let validationAlias = group.alias;
+
+                if (group.parentKey) {
+                    const parentGroup = vm.model.variants[0].tabs.find(tab => tab.key === group.parentKey);
+                    validationAlias = parentGroup.alias;
+                }
+
+                group.validationAlias = validationAlias;
+            });
         });
 
         function getScope() {
@@ -45,16 +56,6 @@
             vm.tabs.forEach(tab => tab.active = false);
             tab.active = true;
         }
-
-        function getValidationAlias ({ parentKey, alias }) {
-            if (parentKey) {
-                const parentGroup = vm.model.variants[0].tabs.find(tab => tab.key === parentKey);
-                return parentGroup.alias;
-            } else {
-                return alias;
-            }
-        }
-
     }
 
 })();
