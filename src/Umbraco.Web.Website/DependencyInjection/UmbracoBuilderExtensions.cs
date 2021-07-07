@@ -42,7 +42,7 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
 
             // Umbraco Rendering Defaults startup options to define which RenderController type to use
-            builder.Services.ConfigureOptions<UmbracoRenderingDefaultsOptionsSetup>();
+            builder.Services.ConfigureOptions<UmbracoRenderingDefaultsOptions>();
 
             builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
 

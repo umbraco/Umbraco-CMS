@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Umbraco.Cms.Web.Website.Controllers
 {
@@ -10,6 +11,6 @@ namespace Umbraco.Cms.Web.Website.Controllers
         /// <summary>
         /// Gets the default umbraco render controller type
         /// </summary>
-        public Type DefaultControllerType { get; set; }
+        public Type DefaultControllerType { get; set; } = typeof(RenderController);
     }
 }
