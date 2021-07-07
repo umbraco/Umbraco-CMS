@@ -11,6 +11,25 @@
     display: inline-flex;
     position: relative;
     top: 1px;
+
+    .badge {
+        background-color: @red;
+        animation-duration: 1.4s;
+        animation-iteration-count: infinite;
+        animation-name: umb-tab--badge-bounce;
+        animation-timing-function: ease;
+        display: none;
+        margin-left: 5px;
+    
+        @keyframes umb-tab--badge-bounce {
+            0%   { transform: translateY(0); }
+            20%  { transform: translateY(-6px); }
+            40%  { transform: translateY(0); }
+            55%  { transform: translateY(-3px); }
+            70%  { transform: translateY(0); }
+            100% { transform: translateY(0); }
+        }
+    }
 }
 
 .umb-tab-button {
@@ -82,23 +101,29 @@
 .show-validation .umb-tab--error > .umb-tab-button,
 .show-validation .umb-tab--error > .umb-tab-button:hover,
 .show-validation .umb-tab--error > .umb-tab-button:focus {
-    color: @white !important;
-    background-color: @red !important;
-    border-color: @errorBorder;
+    color: @red !important;
 }
+
+.show-validation {
+    .umb-tab--error {
+        .badge {
+            display: block;
+        }
+
+        .umb-tab-button {
+            &::after {
+                background-color: @red;
+            }
+        }
+    }
+}
+
 .show-validation.show-validation-type-warning .umb-tab--error > .umb-tab-button,
 .show-validation.show-validation-type-warning .umb-tab--error > .umb-tab-button:hover,
 .show-validation.show-validation-type-warning .umb-tab--error > .umb-tab-button:focus {
     color: @white !important;
     background-color: @yellow-d2 !important;
     border-color: @warningBorder;
-}
-
-.show-validation .umb-tab--error .umb-tab-button:before {
-    content: "\e25d";
-    font-family: "icomoon";
-    margin-right: 5px;
-    vertical-align: top;
 }
 
 // tabs tray

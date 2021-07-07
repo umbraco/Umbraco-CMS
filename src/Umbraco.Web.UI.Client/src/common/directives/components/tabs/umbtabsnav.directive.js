@@ -90,9 +90,11 @@ Use this directive to render a tabs navigation.
 (function() {
     'use strict';
 
-    function TabsNavDirective($timeout, $window) {
+    function TabsNavDirective($timeout, $window, eventsService) {
 
         function link(scope, element, attrs, ctrl) {
+
+            const evts = [];
 
             var tabNavItemsWidths = [];
             // the parent is the component itself so we need to go one level higher
@@ -135,10 +137,17 @@ Use this directive to render a tabs navigation.
                 calculateWidth();
             });
 
+            evts.push(eventsService.on("app.tabChange", function (event, args) {
+                calculateWidth();
+            }));
+
             scope.$on('$destroy', function() {
                 $(window).off('resize.tabsNav');
-            });
 
+                for (var e in evts) {
+                    eventsService.unsubscribe(evts[e]);
+                }
+            });
         }
 
         function UmbTabsNavController(eventsService) {

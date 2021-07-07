@@ -105,6 +105,15 @@
                 tab.active = true;
             };
 
+            $scope.getValidationAlias = function ({ parentKey, alias }) {
+                if (parentKey) {
+                    const parentGroup = $scope.content.tabs.find(tab => tab.key === parentKey);
+                    return parentGroup.alias;
+                } else {
+                    return alias;
+                }
+            };
+
             $scope.$watchCollection('content.tabs', () => {
                 $scope.tabs = $filter("filter")($scope.content.tabs, (tab) => {
                     return tab.type === 1;
