@@ -138,6 +138,10 @@ Use this directive to render a tabs navigation.
             });
 
             evts.push(eventsService.on("app.tabChange", function (event, args) {
+                // the event it sent for both apps and tabs. We only need to calculate the width when an app changes
+                if(args.tab) {
+                    return;
+                }
                 calculateWidth();
             }));
 
