@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Features;
@@ -29,7 +30,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
     {
         private UmbracoRouteValuesFactory GetFactory(
             out Mock<IPublishedRouter> publishedRouter,
-            out UmbracoRenderingDefaults renderingDefaults,
+            out IOptions<UmbracoRenderingDefaultsOptions> renderingDefaults,
             out IPublishedRequest request)
         {
             var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
@@ -41,7 +42,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
                 .Returns((IPublishedRequest r, IPublishedContent c) => Task.FromResult(builtRequest))
                 .Verifiable();
 
-            renderingDefaults = new UmbracoRenderingDefaults();
+            renderingDefaults = Mock.Of<IOptions<UmbracoRenderingDefaultsOptions>>(x => x.Value.DefaultControllerType == typeof(RenderController));
 
             // add the default one
             var actionDescriptors = new List<ActionDescriptor>
@@ -82,12 +83,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
         [Test]
         public async Task Adds_Result_To_Route_Value_Dictionary()
         {
-            UmbracoRouteValuesFactory factory = GetFactory(out _, out UmbracoRenderingDefaults renderingDefaults, out IPublishedRequest request);
+            UmbracoRouteValuesFactory factory = GetFactory(out _, out IOptions<UmbracoRenderingDefaultsOptions> renderingDefaults, out IPublishedRequest request);
 
             UmbracoRouteValues result = await factory.CreateAsync(new DefaultHttpContext(), request);
 
             Assert.IsNotNull(result);
-            Assert.AreEqual(renderingDefaults.DefaultControllerType, result.ControllerType);
+            Assert.AreEqual(renderingDefaults.Value.DefaultControllerType, result.ControllerType);
             Assert.AreEqual(UmbracoRouteValues.DefaultActionName, result.ActionName);
             Assert.IsNull(result.TemplateName);
         }
