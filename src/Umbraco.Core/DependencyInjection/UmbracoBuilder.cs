@@ -145,9 +145,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             this.AddAllCoreCollectionBuilders();
             this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
 
-            Services.AddSingleton<ManifestWatcher>();
             Services.AddSingleton<UmbracoRequestPaths>();
-            this.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, AppPluginsManifestWatcherNotificationHandler>();
 
             Services.AddUnique<InstallStatusTracker>();
 
