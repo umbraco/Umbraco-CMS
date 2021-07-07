@@ -1,6 +1,7 @@
 using System;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -14,17 +15,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
     {
         public ImportPackageBuilder(
             IPackagingService packagingService,
+            IMediaService mediaService,
             MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
             IShortStringHelper shortStringHelper,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IJsonSerializer jsonSerializer,
             IMigrationContext context)
             : base(new ImportPackageBuilderExpression(
                 packagingService,
+                mediaService,
                 mediaFileManager,
+                mediaUrlGenerators,
                 shortStringHelper,
                 contentTypeBaseServiceProvider,
-                jsonSerializer,
                 context))
         {
         }

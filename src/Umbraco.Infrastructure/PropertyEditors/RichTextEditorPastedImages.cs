@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -28,11 +28,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly MediaFileManager _mediaFileManager;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
-        private readonly IJsonSerializer _serializer;
-
-        const string TemporaryImageDataAttribute = "data-tmpimg";
+        private const string TemporaryImageDataAttribute = "data-tmpimg";
 
         public RichTextEditorPastedImages(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -41,9 +40,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IMediaService mediaService,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
             IShortStringHelper shortStringHelper,
-            IPublishedUrlProvider publishedUrlProvider,
-            IJsonSerializer serializer)
+            IPublishedUrlProvider publishedUrlProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -51,9 +50,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ?? throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
             _mediaFileManager = mediaFileManager;
+            _mediaUrlGenerators = mediaUrlGenerators;
             _shortStringHelper = shortStringHelper;
             _publishedUrlProvider = publishedUrlProvider;
-            _serializer = serializer;
         }
 
         /// <summary>
@@ -107,7 +106,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     if (fileStream == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fileStream)
                     {
-                        mediaFile.SetValue(_mediaFileManager, _shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File, safeFileName, fileStream);
+                        mediaFile.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, safeFileName, fileStream);
                     }
 
                     _mediaService.Save(mediaFile, userId);

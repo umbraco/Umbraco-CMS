@@ -9,7 +9,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
-using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations;
@@ -20,25 +20,28 @@ namespace Umbraco.Cms.Infrastructure.Packaging
     internal class ImportPackageBuilderExpression : MigrationExpressionBase
     {
         private readonly IPackagingService _packagingService;
+        private readonly IMediaService _mediaService;
         private readonly MediaFileManager _mediaFileManager;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly IJsonSerializer _jsonSerializer;
         private bool _executed;
 
         public ImportPackageBuilderExpression(
             IPackagingService packagingService,
+            IMediaService mediaService,
             MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
             IShortStringHelper shortStringHelper,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IJsonSerializer jsonSerializer,
             IMigrationContext context) : base(context)
         {
             _packagingService = packagingService;
+            _mediaService = mediaService;
             _mediaFileManager = mediaFileManager;
+            _mediaUrlGenerators = mediaUrlGenerators;
             _shortStringHelper = shortStringHelper;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _jsonSerializer = jsonSerializer;
         }
 
         /// <summary>
@@ -78,21 +81,23 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     var mediaWithFiles = xml.XPathSelectElements(
                         "./umbPackage/MediaItems/MediaSet//*[@id][@mediaFilePath]")
                         .ToDictionary(
-                            x => x.AttributeValue<int>("id"),
+                            x => x.AttributeValue<Guid>("key"),
                             x => x.AttributeValue<string>("mediaFilePath"));
 
-                    // TODO: Almost works! Just wonder if the media installed list is empty because nothing changed?
-
-                    foreach(IMedia media in installationSummary.MediaInstalled)
+                    // Any existing media by GUID will not be installed by the package service, it will just be skipped
+                    // so you cannot 'update' media (or content) using a package since those are not schema type items.
+                    // This means you cannot 'update' the media file either. The installationSummary.MediaInstalled
+                    // will be empty for any existing media which means that the files will also not be updated.
+                    foreach (IMedia media in installationSummary.MediaInstalled)
                     {
-                        if (mediaWithFiles.TryGetValue(media.Id, out var mediaFilePath))
+                        if (mediaWithFiles.TryGetValue(media.Key, out var mediaFilePath))
                         {
-                            // this is a media item that has a file, so find that file in the zip
-                            string entryName = mediaFilePath.TrimStart('/');
-                            ZipArchiveEntry mediaEntry = zipPackage.GetEntry(entryName);
+                            // this is a media item that has a file, so find that file in the zip                            
+                            var entryPath = $"media{mediaFilePath.EnsureStartsWith('/')}";
+                            ZipArchiveEntry mediaEntry = zipPackage.GetEntry(entryPath);
                             if (mediaEntry == null)
                             {
-                                throw new InvalidOperationException("No media file found in package zip for path " + entryName);
+                                throw new InvalidOperationException("No media file found in package zip for path " + entryPath);
                             }
 
                             // read the media file and save it to the media item
@@ -101,13 +106,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                             {
                                 media.SetValue(
                                     _mediaFileManager,
+                                    _mediaUrlGenerators,
                                     _shortStringHelper,
                                     _contentTypeBaseServiceProvider,
-                                    _jsonSerializer,
                                     Constants.Conventions.Media.File,
                                     Path.GetFileName(mediaFilePath),
                                     mediaStream);
                             }
+
+                            _mediaService.Save(media);
                         }
                     }
                 }

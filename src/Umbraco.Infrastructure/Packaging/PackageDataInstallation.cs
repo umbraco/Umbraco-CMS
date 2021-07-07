@@ -168,7 +168,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             var contents = ParseContentBaseRootXml(roots, parentId, importedDocumentTypes, typeService, service).ToList();
             if (contents.Any())
+            {
                 service.Save(contents, userId);
+            }
 
             return contents;
 
@@ -189,29 +191,35 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             //    "'DocumentSet' (for structured imports) nor is the first element a Document (for single document import).");
         }
 
-        private IEnumerable<T> ParseContentBaseRootXml<T, S>(
+        private IEnumerable<TContentBase> ParseContentBaseRootXml<TContentBase, TContentTypeComposition>(
             IEnumerable<XElement> roots,
             int parentId,
-            IDictionary<string, S> importedContentTypes,
-            IContentTypeBaseService<S> typeService,
-            IContentServiceBase<T> service)
-            where T : class, IContentBase
-            where S : IContentTypeComposition
+            IDictionary<string, TContentTypeComposition> importedContentTypes,
+            IContentTypeBaseService<TContentTypeComposition> typeService,
+            IContentServiceBase<TContentBase> service)
+            where TContentBase : class, IContentBase
+            where TContentTypeComposition : IContentTypeComposition
         {
-            var contents = new List<T>();
-            foreach (var root in roots)
+            var contents = new List<TContentBase>();
+            foreach (XElement root in roots)
             {
                 var contentTypeAlias = root.Name.LocalName;
 
                 if (!importedContentTypes.ContainsKey(contentTypeAlias))
                 {
-                    var contentType = FindContentTypeByAlias(contentTypeAlias, typeService);
+                    TContentTypeComposition contentType = FindContentTypeByAlias(contentTypeAlias, typeService);
+                    if (contentType == null)
+                    {
+                        throw new InvalidOperationException("Could not find content type with alias " + contentTypeAlias);
+                    }
                     importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                var content = CreateContentFromXml(root, importedContentTypes[contentTypeAlias], default, parentId, service);
+                TContentBase content = CreateContentFromXml(root, importedContentTypes[contentTypeAlias], default, parentId, service);
                 if (content == null)
+                {
                     continue;
+                }
 
                 contents.Add(content);
 
@@ -280,7 +288,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 return null;
             }
 
-            var id = element.Attribute("id").Value;
             var level = element.Attribute("level").Value;
             var sortOrder = element.Attribute("sortOrder").Value;
             var nodeName = element.Attribute("nodeName").Value;

@@ -67,7 +67,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IRelationService _relationService;
         private readonly IImageUrlGenerator _imageUrlGenerator;
-        private readonly IJsonSerializer _serializer;
         private readonly IAuthorizationService _authorizationService;
         private readonly AppCaches _appCaches;
         private readonly ILogger<MediaController> _logger;
@@ -90,6 +89,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IRelationService relationService,
             PropertyEditorCollection propertyEditors,
             MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IJsonSerializer serializer,
@@ -111,10 +111,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _relationService = relationService;
             _propertyEditors = propertyEditors;
             _mediaFileManager = mediaFileManager;
+            _mediaUrlGenerators = mediaUrlGenerators;
             _hostingEnvironment = hostingEnvironment;
             _logger = loggerFactory.CreateLogger<MediaController>();
             _imageUrlGenerator = imageUrlGenerator;
-            _serializer = serializer;
             _authorizationService = authorizationService;
             _appCaches = appCaches;
         }
@@ -289,6 +289,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly MediaFileManager _mediaFileManager;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly IHostingEnvironment _hostingEnvironment;
 
 
@@ -827,7 +828,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     await using (var stream = formFile.OpenReadStream())
                     {
-                        f.SetValue(_mediaFileManager, _shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File, fileName, stream);
+                        f.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
                     }
 
 

@@ -10,6 +10,7 @@ using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -17,7 +18,6 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -33,23 +33,26 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
     public class IndexInitializer
     {
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IJsonSerializer _jsonSerializer;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly IScopeProvider _scopeProvider;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly IOptions<ContentSettings> _contentSettings;
 
         public IndexInitializer(
             IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
             PropertyEditorCollection propertyEditors,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
             IScopeProvider scopeProvider,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IOptions<ContentSettings> contentSettings)
         {
             _shortStringHelper = shortStringHelper;
-            _jsonSerializer = jsonSerializer;
             _propertyEditors = propertyEditors;
+            _mediaUrlGenerators = mediaUrlGenerators;
             _scopeProvider = scopeProvider;
             _loggerFactory = loggerFactory;
+            _contentSettings = contentSettings;
         }
 
         public ContentValueSetBuilder GetContentValueSetBuilder(bool publishedValuesOnly)
@@ -80,7 +83,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
 
         public MediaIndexPopulator GetMediaIndexRebuilder(IMediaService mediaService)
         {
-            var mediaValueSetBuilder = new MediaValueSetBuilder(_propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(_shortStringHelper) }), GetMockUserService(), Mock.Of<ILogger<MediaValueSetBuilder>>(), _shortStringHelper, _jsonSerializer);
+            var mediaValueSetBuilder = new MediaValueSetBuilder(
+                _propertyEditors,
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(_shortStringHelper) }),
+                _mediaUrlGenerators,
+                GetMockUserService(),
+                _shortStringHelper,
+                _contentSettings);
             var mediaIndexDataSource = new MediaIndexPopulator(null, mediaService, mediaValueSetBuilder);
             return mediaIndexDataSource;
         }

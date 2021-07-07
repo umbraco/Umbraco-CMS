@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -107,52 +108,40 @@ namespace Umbraco.Cms.Core.IO
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
         }
 
-        /// <summary>
-        /// Gets the file path of a media file.
-        /// </summary>
-        /// <param name="filename">The file name.</param>
-        /// <param name="prevpath">A previous file path.</param>
-        /// <param name="cuid">The unique identifier of the content/media owning the file.</param>
-        /// <param name="puid">The unique identifier of the property type owning the file.</param>
-        /// <returns>The filesystem-relative path to the media file.</returns>
-        /// <remarks>In the old, legacy, number-based scheme, we try to re-use the media folder
-        /// specified by <paramref name="prevpath"/>. Else, we CREATE a new one. Each time we are invoked.</remarks>
-        public string GetMediaPath(string filename, string prevpath, Guid cuid, Guid puid)
-        {
-            filename = Path.GetFileName(filename);
-            if (filename == null)
-            {
-                throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
-            }
-
-            filename = _shortStringHelper.CleanStringForSafeFileName(filename.ToLowerInvariant());
-
-            return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
-        }
-        
         #endregion
 
         #region Associated Media Files
 
-        public Stream GetFile(IMedia media, out string mediaFilePath)
+        /// <summary>
+        /// Returns a stream (file) for a content item or null if there is no file.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="mediaFilePath">The file path if a file was found</param>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="variationContextAccessor"></param>
+        /// <returns></returns>
+        public Stream GetFile(
+            IContentBase content,
+            out string mediaFilePath,
+            string propertyTypeAlias = Constants.Conventions.Media.File,
+            string culture = null,
+            string segment = null)
         {
             // TODO: If collections were lazy we could just inject them
             if (_mediaUrlGenerators == null)
             {
                 _mediaUrlGenerators = _serviceProvider.GetRequiredService<MediaUrlGeneratorCollection>();
-            } 
+            }
 
-            // This is how we get all URLs based on the defined aliases,
-            // then we just try each to get a file until one works.
-            var urls = media.GetUrls(_contentSettings, _mediaUrlGenerators);
-            foreach(var url in urls)
+            if (!content.TryGetMediaPath(propertyTypeAlias, _mediaUrlGenerators, out mediaFilePath, culture, segment))
             {
-                Stream stream = FileSystem.OpenFile(url);
-                if (stream != null)
-                {
-                    mediaFilePath = url;
-                    return stream;
-                }
+                return null;
+            }
+
+            Stream stream = FileSystem.OpenFile(mediaFilePath);
+            if (stream != null)
+            {
+                return stream;
             }
 
             mediaFilePath = null;
@@ -207,8 +196,7 @@ namespace Umbraco.Cms.Core.IO
             }
 
             // get the filepath, store the data
-            // use oldpath as "prevpath" to try and reuse the folder, in original number-based scheme
-            var filepath = GetMediaPath(filename, oldpath, content.Key, propertyType.Key);
+            var filepath = GetMediaPath(filename, content.Key, propertyType.Key);
             FileSystem.AddFile(filepath, filestream);
             return filepath;
         }

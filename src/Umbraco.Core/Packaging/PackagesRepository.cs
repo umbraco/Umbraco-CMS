@@ -218,8 +218,8 @@ namespace Umbraco.Cms.Core.Packaging
 
                     foreach (KeyValuePair<string, Stream> mediaFile in mediaFiles)
                     {
-                        // must ensure the path is relative, doesn't start with /
-                        ZipArchiveEntry mediaEntry = archive.CreateEntry(mediaFile.Key.TrimStart('/'));
+                        var entryPath = $"media{mediaFile.Key.EnsureStartsWith('/')}";
+                        ZipArchiveEntry mediaEntry = archive.CreateEntry(entryPath);
                         using (Stream entryStream = mediaEntry.Open())
                         using (mediaFile.Value)
                         {

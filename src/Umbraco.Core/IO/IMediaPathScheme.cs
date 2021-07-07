@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Cms.Core.IO
 {
@@ -14,9 +14,9 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="itemGuid">The (content, media) item unique identifier.</param>
         /// <param name="propertyGuid">The property type unique identifier.</param>
         /// <param name="filename">The file name.</param>
-        /// <param name="previous">A previous filename.</param>
+        /// 
         /// <returns>The filesystem-relative complete file path.</returns>
-        string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename, string previous = null);
+        string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename);
 
         /// <summary>
         /// Gets the directory that can be deleted when the file is deleted.
