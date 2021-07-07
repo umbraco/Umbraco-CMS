@@ -15,15 +15,18 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
+        private readonly IPublishedValueFallback _publishedValueFallback;
         private readonly IJsonSerializer _jsonSerializer;
 
         public MediaPickerWithCropsValueConverter(
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IPublishedUrlProvider publishedUrlProvider,
+            IPublishedValueFallback publishedValueFallback,
             IJsonSerializer jsonSerializer)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             _publishedUrlProvider = publishedUrlProvider;
+            _publishedValueFallback = publishedValueFallback;
             _jsonSerializer = jsonSerializer;
         }
 
@@ -77,7 +80,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
                     // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
                     var mediaWithCropsType = typeof(MediaWithCrops<>).MakeGenericType(mediaItem.GetType());
-                    var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem, localCrops);
+                    var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem, _publishedValueFallback, localCrops);
 
                     mediaItems.Add(mediaWithCrops);
 

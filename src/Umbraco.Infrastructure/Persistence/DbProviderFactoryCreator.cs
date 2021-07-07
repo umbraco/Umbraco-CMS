@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
@@ -12,17 +13,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private readonly IDictionary<string, IEmbeddedDatabaseCreator> _embeddedDatabaseCreators;
         private readonly IDictionary<string, ISqlSyntaxProvider> _syntaxProviders;
         private readonly IDictionary<string, IBulkSqlInsertProvider> _bulkSqlInsertProviders;
+        private readonly IDictionary<string, IProviderSpecificMapperFactory> _providerSpecificMapperFactories;
 
         public DbProviderFactoryCreator(
             Func<string, DbProviderFactory> getFactory,
             IEnumerable<ISqlSyntaxProvider> syntaxProviders,
             IEnumerable<IBulkSqlInsertProvider> bulkSqlInsertProviders,
-            IEnumerable<IEmbeddedDatabaseCreator> embeddedDatabaseCreators)
+            IEnumerable<IEmbeddedDatabaseCreator> embeddedDatabaseCreators,
+            IEnumerable<IProviderSpecificMapperFactory> providerSpecificMapperFactories)
         {
             _getFactory = getFactory;
             _embeddedDatabaseCreators = embeddedDatabaseCreators.ToDictionary(x=>x.ProviderName);
             _syntaxProviders = syntaxProviders.ToDictionary(x=>x.ProviderName);
             _bulkSqlInsertProviders = bulkSqlInsertProviders.ToDictionary(x=>x.ProviderName);
+            _providerSpecificMapperFactories = providerSpecificMapperFactories.ToDictionary(x=>x.ProviderName);
         }
 
         public DbProviderFactory CreateFactory(string providerName)
@@ -60,6 +64,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             {
                 creator.Create();
             }
+        }
+
+        public NPocoMapperCollection ProviderSpecificMappers(string providerName)
+        {
+            if(_providerSpecificMapperFactories.TryGetValue(providerName, out var mapperFactory))
+            {
+                return mapperFactory.Mappers;
+            }
+
+            return new NPocoMapperCollection(Array.Empty<IMapper>());
         }
     }
 }

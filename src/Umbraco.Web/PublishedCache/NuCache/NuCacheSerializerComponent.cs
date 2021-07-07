@@ -4,9 +4,10 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -52,7 +53,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (serializer != currentSerializer)
             {
-                _profilingLogger.Warn<NuCacheSerializerComponent>($"Database NuCache was serialized using {currentSerializer}. Currently configured NuCache serializer {serializer}. Rebuilding Nucache");
 
                 using (_profilingLogger.TraceDuration<NuCacheSerializerComponent>($"Rebuilding NuCache database with {currentSerializer} serializer"))
                 {

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     /// <summary>
     /// Implements <see cref="IDomainCache"/> for NuCache.
     /// </summary>
-    internal class DomainCache : IDomainCache
+    public class DomainCache : IDomainCache
     {
         private readonly SnapDictionary<int, Domain>.Snapshot _snapshot;
 

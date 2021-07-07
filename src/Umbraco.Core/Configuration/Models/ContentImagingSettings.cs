@@ -1,6 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
+using System.ComponentModel;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -20,10 +23,13 @@ namespace Umbraco.Cms.Core.Configuration.Models
             }
         };
 
+        internal const string StaticImageFileTypes = "jpeg,jpg,gif,bmp,png,tiff,tif";
+
         /// <summary>
         /// Gets or sets a value for the collection of accepted image file extensions.
         /// </summary>
-        public string[] ImageFileTypes { get; set; } = new[] { "jpeg", "jpg", "gif", "bmp", "png", "tiff", "tif" };
+        [DefaultValue(StaticImageFileTypes)]
+        public string[] ImageFileTypes { get; set; } = StaticImageFileTypes.Split(',');
 
         /// <summary>
         /// Gets or sets a value for the imaging autofill following media file upload fields.

@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Text;
-using Umbraco.Core.Exceptions;
+using Umbraco.Cms.Core.Exceptions;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
