@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -128,7 +129,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                     return _roslynCompiler;
                 }
 
-                _roslynCompiler = new RoslynCompiler(AssemblyLoadContext.All.SelectMany(x => x.Assemblies));
+                _roslynCompiler = new RoslynCompiler();
                 return _roslynCompiler;
             }
         }
