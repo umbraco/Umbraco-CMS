@@ -1,6 +1,7 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Services;
@@ -18,6 +19,27 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     public class KeyValueServiceTests : UmbracoIntegrationTest
     {
         private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
+
+        [Test]
+        public void Can_Query_For_Key_Prefix()
+        {
+            // Arrange
+            KeyValueService.SetValue("test1", "hello1");
+            KeyValueService.SetValue("test2", "hello2");
+            KeyValueService.SetValue("test3", "hello3");
+            KeyValueService.SetValue("test4", "hello4");
+            KeyValueService.SetValue("someotherprefix1", "helloagain1");
+            // Act
+            IReadOnlyDictionary<string, string> value = KeyValueService.FindByKeyPrefix("test");
+
+            // Assert
+
+            Assert.AreEqual(4, value.Count);
+            Assert.AreEqual("hello1", value["test1"]);
+            Assert.AreEqual("hello2", value["test2"]);
+            Assert.AreEqual("hello3", value["test3"]);
+            Assert.AreEqual("hello4", value["test4"]);
+        }
 
         [Test]
         public void GetValue_ForMissingKey_ReturnsNull()

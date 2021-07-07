@@ -5,14 +5,10 @@ namespace Umbraco.Cms.Core.Notifications
 {
     public class ImportedPackageNotification : StatefulNotification
     {
-
-        public ImportedPackageNotification(InstallationSummary installationSummary, IPackageInfo packageMetaData)
+        public ImportedPackageNotification(InstallationSummary installationSummary)
         {
             InstallationSummary = installationSummary;
-            PackageMetaData = packageMetaData;
         }
-
-        public IPackageInfo PackageMetaData { get; }
 
         public InstallationSummary InstallationSummary { get; }
     }

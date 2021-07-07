@@ -1217,25 +1217,19 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="deletewarning">This will delete the package</key>
     <key alias="dropHere">Drop to upload</key>
     <key alias="includeAllChildNodes">Include all child nodes</key>
-    <key alias="orClickHereToUpload">or click here to choose package file</key>
-    <key alias="uploadPackage">Upload package</key>
-    <key alias="localPackageDescription">Install a local package by selecting it from your machine. Only install packages from sources you know and trust</key>
-    <key alias="uploadAnother">Upload another package</key>
-    <key alias="cancelAndUploadAnother">Cancel and upload another package</key>
-    <key alias="accept">I accept</key>
+   <key alias="accept">I accept</key>
     <key alias="termsOfUse">terms of use</key>
 
     <key alias="pathToFile">Path to file</key>
     <key alias="pathToFileDescription">Absolute path to file (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Installed</key>
     <key alias="installedPackages">Installed packages</key>
-    <key alias="installLocal">Install local</key>
     <key alias="installFinish">Finish</key>
+    <key alias="installInstructions">Install instructions</key>
     <key alias="noConfigurationView">This package has no configuration view</key>
     <key alias="noPackagesCreated">No packages have been created yet</key>
     <key alias="noPackages">You don’t have any packages installed</key>
     <key alias="noPackagesDescription"><![CDATA[You don’t have any packages installed. Either install a local package by selecting it from your machine, or browse through available packages using the <strong>'Packages'</strong> icon in the top right of your screen]]></key>
-    <key alias="packageActions">Package Actions</key>
     <key alias="packageAuthorUrl">Author URL</key>
     <key alias="packageContent">Package Content</key>
     <key alias="packageFiles">Package Files</key>
@@ -1271,6 +1265,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageNoItemsText"><![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
       You can safely remove this from the system by clicking "uninstall package" below.]]></key>
     <key alias="packageOptions">Package options</key>
+    <key alias="packageMigrationsRun">Run pending package migrations</key>
     <key alias="packageReadme">Package readme</key>
     <key alias="packageRepository">Package repository</key>
     <key alias="packageUninstallConfirm">Confirm package uninstall</key>
@@ -1283,15 +1278,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageVersion">Package version</key>
     <key alias="packageAlreadyInstalled">Package already installed</key>
     <key alias="targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of</key>
-    <key alias="installStateUninstalling">Uninstalling...</key>
-    <key alias="installStateDownloading">Downloading...</key>
-    <key alias="installStateImporting">Importing...</key>
-    <key alias="installStateInstalling">Installing...</key>
-    <key alias="installStateRestarting">Restarting, please wait...</key>
-    <key alias="installStateComplete">All done, your browser will now refresh, please wait...</key>
-    <key alias="installStateCompleted">Please click 'Finish' to complete installation and reload the page.</key>
-    <key alias="installStateUploading">Uploading package...</key>
-    <key alias="verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>

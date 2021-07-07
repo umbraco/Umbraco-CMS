@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
         // ensures we are not already building,
         // ie we did not forget to .Do() an expression
-        private T BeginBuild<T>(T builder)
+        private protected T BeginBuild<T>(T builder)
         {
             if (Context.BuildingExpression)
                 throw new IncompleteMigrationExpressionException("Cannot create a new expression: the previous expression has not run.");

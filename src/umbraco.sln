@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29209.152
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
 		..\linting\.editorconfig = ..\linting\.editorconfig
@@ -96,8 +94,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		VWDPort = "62926"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378-AFE1-40A5-90BD-82833375DBFE}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\NuSpecs\tools\applications.config.install.xdt = ..\build\NuSpecs\tools\applications.config.install.xdt
@@ -168,18 +164,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}.Release|Any CPU.ActiveCfg = Release|Any CPU

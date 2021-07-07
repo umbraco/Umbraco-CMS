@@ -1102,24 +1102,17 @@
     <key alias="deletewarning">Tím se balíček odstraní</key>
     <key alias="dropHere">Přetáhněte sem pro nahrání</key>
     <key alias="includeAllChildNodes">Zahrnout všechny podřízené uzly</key>
-    <key alias="orClickHereToUpload">nebo kliknutím sem vyberte soubor balíčku</key>
-    <key alias="uploadPackage">Nahrát balíček</key>
-    <key alias="localPackageDescription">Nainstalujte místní balíček výběrem ze svého počítače. Instalujte pouze balíčky ze zdrojů, které znáte a kterým důvěřujete</key>
-    <key alias="uploadAnother">Nahrát další balíček</key>
-    <key alias="cancelAndUploadAnother">Zrušit a nahrát další balíček</key>
     <key alias="accept">Přijímám</key>
     <key alias="termsOfUse">podmínky použití</key>
     <key alias="pathToFile">Cesta k souboru</key>
     <key alias="pathToFileDescription">Absolutní cesta k souboru (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Nainstalováno</key>
     <key alias="installedPackages">Nainstalované balíčky</key>
-    <key alias="installLocal">Instalovat místní</key>
     <key alias="installFinish">Dokončit</key>
     <key alias="noConfigurationView">Tento balíček nemá žádné zobrazení konfigurace</key>
     <key alias="noPackagesCreated">Zatím nebyly vytvořeny žádné balíčky</key>
     <key alias="noPackages">Nemáte nainstalované žádné balíčky</key>
     <key alias="noPackagesDescription"><![CDATA[Nemáte nainstalované žádné balíčky. Nainstalujte místní balíček tak, že jej vyberete ze svého počítače, nebo procházejte dostupné balíčky pomocí ikony <strong>Balíčky</strong> v pravém horním rohu obrazovky.]]></key>
-    <key alias="packageActions">Akce balíčku</key>
     <key alias="packageAuthorUrl">Web autora</key>
     <key alias="packageContent">Obsah balíčku</key>
     <key alias="packageFiles">Soubory balíčku</key>
@@ -1173,9 +1166,6 @@
     <key alias="installStateImporting">Importuji...</key>
     <key alias="installStateInstalling">Instaluji...</key>
     <key alias="installStateRestarting">Restartuji, prosím čekejte...</key>
-    <key alias="installStateComplete">Vše je hotovo, váš prohlížeč se nyní obnoví, prosím čekejte...</key>
-    <key alias="installStateCompleted">Klepnutím na tlačítko „Dokončit“ dokončete instalaci a znovu načtěte stránku.</key>
-    <key alias="installStateUploading">Nahrávám balíček...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Vložit s úplným formatováním (nedoporučeno)</key>

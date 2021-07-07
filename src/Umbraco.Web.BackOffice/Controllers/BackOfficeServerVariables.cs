@@ -260,10 +260,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.GetByKey(Guid.Empty))
                         },
                         {
-                            "packageInstallApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PackageInstallController>(
-                                controller => controller.Fetch(string.Empty))
-                        },
-                        {
                             "packageApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PackageController>(
                                 controller => controller.GetCreatedPackages())
                         },

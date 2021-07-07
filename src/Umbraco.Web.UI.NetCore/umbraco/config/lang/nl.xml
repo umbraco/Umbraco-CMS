@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="nl" intName="Dutch" localName="Nederlands" lcid="19" culture="nl-NL">
   <creator>
     <name>The Umbraco community</name>
@@ -1020,24 +1020,17 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="deletewarning">Dit zal de package verwijderen</key>
     <key alias="dropHere">Neerzetten om te uploaden</key>
     <key alias="includeAllChildNodes">Inclusief alle onderliggende nodes</key>
-    <key alias="orClickHereToUpload">of klik hier om een package bestand te kiezen</key>
-    <key alias="uploadPackage">Package uploaden</key>
-    <key alias="localPackageDescription">Installeer een lokale package door het op je computer te selecteren. Installeer alleen packages van bronnen die je vertrouwt.</key>
-    <key alias="uploadAnother">Nog een package uploaden</key>
-    <key alias="cancelAndUploadAnother">Annuleren en een andere package uploaden</key>
     <key alias="accept">Accepteren</key>
     <key alias="termsOfUse">gebruiksvoorwaarden</key>
     <key alias="pathToFile">Pad naar bestand</key>
     <key alias="pathToFileDescription">Absoluut pad naar bestand (bv: /bin/umbraco.bin)</key>
     <key alias="installed">Geïnstalleerd</key>
     <key alias="installedPackages">Geïnstalleerde packages</key>
-    <key alias="installLocal">Lokaal installeren</key>
     <key alias="installFinish">Voltooien</key>
     <key alias="noConfigurationView">Deze package heeft geen instellingen</key>
     <key alias="noPackagesCreated">Er zijn nog geen packages aangemaakt</key>
     <key alias="noPackages">Er zijn geen packages geïnstalleerd</key>
     <key alias="noPackagesDescription"><![CDATA[Je hebt geen packages geïnstalleerd. Installeer een lokale package door het op je computer te selecteren of blader door beschikbare packages met het pictogram <strong>'Packages'</strong> rechtsboven in je scherm.]]></key>
-    <key alias="packageActions">Package Acties</key>
     <key alias="packageAuthorUrl">Auteur URL</key>
     <key alias="packageContent">Package Inhoud</key>
     <key alias="packageFiles">Package Bestanden</key>
@@ -1095,7 +1088,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="installStateRestarting">Aan het herstarten, een ogenblik geduld aub...</key>
     <key alias="installStateComplete">Geïnstalleerd! Je browser zal nu automatisch ververst worden...</key>
     <key alias="installStateCompleted">Klik op "Voltooien" om de installatie te voltooien en de pagina te vernieuwen.</key>
-    <key alias="installStateUploading">Package uploaden...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Plakken met alle opmaak (Niet aanbevolen)</key>

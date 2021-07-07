@@ -1,29 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <umbPackage>
   <files />
   <info>
     <package>
       <name>Dictionary-Package</name>
-      <version>1.0</version>
-      <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>http://not.available</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
     </package>
-    <author>
-      <name>Test</name>
-      <website>http://not.available</website>
-    </author>
-    <readme><![CDATA[]]></readme>
   </info>
   <DictionaryItems>
-    <DictionaryItem Key="Parent">
+    <DictionaryItem Key="28f2e02a-8c66-4fcd-85e3-8524d551c0d3" Name="Parent">
       <Value LanguageId="2" LanguageCultureAlias="nb-NO"><![CDATA[ForelderVerdi]]></Value>
       <Value LanguageId="3" LanguageCultureAlias="en-GB"><![CDATA[ParentValue]]></Value>
-      <DictionaryItem Key="Child">
+      <DictionaryItem Key="e7dba0a9-d517-4ba4-8e18-2764d392c611" Name="Child">
         <Value LanguageId="2" LanguageCultureAlias="nb-NO"><![CDATA[BarnVerdi]]></Value>
         <Value LanguageId="3" LanguageCultureAlias="en-GB"><![CDATA[ChildValue]]></Value>
       </DictionaryItem>

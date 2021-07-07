@@ -4,28 +4,14 @@
   <info>
     <package>
       <name>Package With MediaTypes And Media + Folder</name>
-      <version>1.0.0</version>
-      <iconUrl></iconUrl>
-      <license url="http://opensource.org/licenses/MIT">MIT License</license>
-      <url>http://www.umbraco.com</url>
-      <requirements type="Strict">
-        <major>0</major>
-        <minor>5</minor>
-        <patch>0</patch>
-      </requirements>
     </package>
-    <author>
-      <name>dteam</name>
-      <website>http://www.umbraco.com</website>
-    </author>
-    <contributors></contributors>
-    <readme><![CDATA[]]></readme>
   </info>
   <DocumentTypes />
   <MediaTypes>
     <MediaType>
       <Info>
         <Name>Folder</Name>
+        <Key>c3ddc08e-3b5e-42b2-9f0b-6e5c79a2e2e0</Key>
         <Alias>Folder</Alias>
         <Icon>icon-folder</Icon>
         <Thumbnail>icon-folder</Thumbnail>
@@ -43,6 +29,7 @@
     <MediaType>
       <Info>
         <Name>Image</Name>
+        <Key>ee78bb5b-3734-4b86-bd48-d9ca2e6d6846</Key>
         <Alias>Image</Alias>
         <Icon>icon-picture</Icon>
         <Thumbnail>icon-picture</Thumbnail>

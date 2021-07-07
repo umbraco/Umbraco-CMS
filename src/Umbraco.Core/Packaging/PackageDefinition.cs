@@ -2,44 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.Packaging;
 
 namespace Umbraco.Cms.Core.Packaging
 {
-    [DataContract(Name = "packageInstance")]
-    public class PackageDefinition : IPackageInfo
-    {
-        /// <summary>
-        /// Converts a <see cref="CompiledPackage"/> model to a <see cref="PackageDefinition"/> model
-        /// </summary>
-        /// <param name="compiled"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is used only for conversions and will not 'get' a PackageDefinition from the repository with a valid ID
-        /// </remarks>
-        public static PackageDefinition FromCompiledPackage(CompiledPackage compiled)
-        {
-            return new PackageDefinition
-            {
-                Actions = compiled.Actions,
-                Author = compiled.Author,
-                AuthorUrl = compiled.AuthorUrl,
-                Contributors = compiled.Contributors,
-                PackageView = compiled.PackageView,
-                IconUrl = compiled.IconUrl,
-                License = compiled.License,
-                LicenseUrl = compiled.LicenseUrl,
-                Name = compiled.Name,
-                Readme = compiled.Readme,
-                UmbracoVersion = compiled.UmbracoVersion,
-                Url = compiled.Url,
-                Version = compiled.Version,
-                Files = compiled.Files.Select(x => x.OriginalPath).ToList()
-            };
-        }
 
+    /// <summary>
+    /// A created package in the back office.
+    /// </summary>
+    /// <remarks>
+    /// This data structure is persisted to createdPackages.config when creating packages in the back office.
+    /// </remarks>
+    [DataContract(Name = "packageInstance")]
+    public class PackageDefinition
+    {
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
@@ -50,48 +27,12 @@ namespace Umbraco.Cms.Core.Packaging
         [Required]
         public string Name { get; set; } = string.Empty;
 
-        [DataMember(Name = "url")]
-        [Required]
-        [Url]
-        public string Url { get; set; } = string.Empty;
-
         /// <summary>
-        /// The full path to the package's zip file when it was installed (or is being installed)
+        /// The full path to the package's xml file
         /// </summary>
         [ReadOnly(true)]
         [DataMember(Name = "packagePath")]
         public string PackagePath { get; set; } = string.Empty;
-
-        [DataMember(Name = "version")]
-        [Required]
-        public string Version { get; set; } = "1.0.0";
-
-        /// <summary>
-        /// The minimum umbraco version that this package requires
-        /// </summary>
-        [DataMember(Name = "umbracoVersion")]
-        public Version UmbracoVersion { get; set; }
-
-        [DataMember(Name = "author")]
-        [Required]
-        public string Author { get; set; } = string.Empty;
-
-        [DataMember(Name = "authorUrl")]
-        [Required]
-        [Url]
-        public string AuthorUrl { get; set; } = string.Empty;
-
-        [DataMember(Name = "contributors")]
-        public IList<string> Contributors { get; set; } = new List<string>();
-
-        [DataMember(Name = "license")]
-        public string License { get; set; } = "MIT License";
-
-        [DataMember(Name = "licenseUrl")]
-        public string LicenseUrl { get; set; } = "http://opensource.org/licenses/MIT";
-
-        [DataMember(Name = "readme")]
-        public string Readme { get; set; } = string.Empty;
 
         [DataMember(Name = "contentLoadChildNodes")]
         public bool ContentLoadChildNodes { get; set; }
@@ -120,21 +61,8 @@ namespace Umbraco.Cms.Core.Packaging
         [DataMember(Name = "stylesheets")]
         public IList<string> Stylesheets { get; set; } = new List<string>();
 
-        [DataMember(Name = "files")]
-        public IList<string> Files { get; set; } = new List<string>();
-
-        /// <inheritdoc />
-        [DataMember(Name = "packageView")]
-        public string PackageView { get; set; } = string.Empty;
-
-        [DataMember(Name = "actions")]
-        public string Actions { get; set; } = "<actions></actions>";
-
         [DataMember(Name = "dataTypes")]
         public IList<string> DataTypes { get; set; } = new List<string>();
-
-        [DataMember(Name = "iconUrl")]
-        public string IconUrl { get; set; } = string.Empty;
 
         [DataMember(Name = "mediaUdis")]
         public IList<GuidUdi> MediaUdis { get; set; } = Array.Empty<GuidUdi>();

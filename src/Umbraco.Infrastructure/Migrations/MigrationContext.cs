@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Migrations
@@ -10,17 +11,23 @@ namespace Umbraco.Cms.Infrastructure.Migrations
     /// </summary>
     internal class MigrationContext : IMigrationContext
     {
+        private readonly List<Type> _postMigrations = new List<Type>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationContext"/> class.
         /// </summary>
-        public MigrationContext(IUmbracoDatabase database, ILogger<MigrationContext> logger)
+        public MigrationContext(MigrationPlan plan, IUmbracoDatabase database, ILogger<MigrationContext> logger)
         {
+            Plan = plan;
             Database = database ?? throw new ArgumentNullException(nameof(database));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _postMigrations.AddRange(plan.PostMigrationTypes);
         }
 
         /// <inheritdoc />
         public ILogger<IMigrationContext> Logger { get; }
+
+        public MigrationPlan Plan { get; }
 
         /// <inheritdoc />
         public IUmbracoDatabase Database { get; }
@@ -35,14 +42,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         public bool BuildingExpression { get; set; }
 
         // this is only internally exposed
-        public List<Type> PostMigrations { get; } = new List<Type>();
+        public IReadOnlyList<Type> PostMigrations => _postMigrations;
 
         /// <inheritdoc />
         public void AddPostMigration<TMigration>()
             where TMigration : MigrationBase
         {
             // just adding - will be de-duplicated when executing
-            PostMigrations.Add(typeof(TMigration));
+            _postMigrations.Add(typeof(TMigration));
         }
     }
 }

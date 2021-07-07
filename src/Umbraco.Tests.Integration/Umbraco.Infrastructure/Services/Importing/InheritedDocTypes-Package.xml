@@ -4,25 +4,13 @@
   <info>
     <package>
       <name>DocTypeError</name>
-      <version>1</version>
-      <license url="http://www.opensource.org/licenses/mit-license.php">Personal license</license>
-      <url>http://www.iseli-webconsulting.de</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
     </package>
-    <author>
-      <name>Iseli Webconsulting</name>
-      <website>http://www.iseli-webconsulting.de</website>
-    </author>
-    <readme><![CDATA[Test package to reproduce the error for document type properties assigned to a tab inherited from a master document type.]]></readme>
   </info>
   <DocumentTypes>
     <DocumentType>
       <Info>
         <Name>MR Basisseite</Name>
+        <Key>02e4e119-2eeb-4b92-9880-0c35d66a16b2</Key>
         <Alias>MRBasePage</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -79,6 +67,7 @@
     <DocumentType>
       <Info>
         <Name>MR Startseite</Name>
+        <Key>4ecde940-89bd-47c2-9c9c-3cfcc32e8e52</Key>
         <Alias>MRStartPage</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>

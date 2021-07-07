@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
@@ -25,10 +26,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
     public class AdvancedMigrationTests : UmbracoIntegrationTest
     {
-        private readonly ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
-
         private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
         private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();
+        private IMigrationPlanExecutor MigrationPlanExecutor => GetRequiredService<IMigrationPlanExecutor>();
 
         [Test]
         public void CreateTableOfTDto()
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("done"));
 
-                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
 
                 var helper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator);
                 bool exists = helper.TableExists("umbracoUser");
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<DeleteKeysAndIndexesMigration>("done"));
 
-                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
@@ -125,7 +125,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<DeleteKeysAndIndexesMigration>("b")
                         .To<CreateKeysAndIndexesOfTDtoMigration>("done"));
 
-                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
@@ -160,7 +160,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<DeleteKeysAndIndexesMigration>("b")
                         .To<CreateKeysAndIndexesMigration>("done"));
 
-                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
@@ -192,7 +192,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<CreateColumnMigration>("done"));
 
-                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }

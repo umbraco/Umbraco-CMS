@@ -12,7 +12,7 @@
         let packageInstallData = localStorageService.get("packageInstallData");
         let packageUri = $routeParams.method;
 
-        if (packageInstallData) {            
+        if (packageInstallData) {
             localStorageService.remove("packageInstallData");
 
             if (packageInstallData.postInstallationPath) {
@@ -71,16 +71,6 @@
                         "alias": "umbInstalled",
                         "action": function () {
                             $location.path("/packages/packages/installed");
-                        }
-                    },
-                    {
-                        "name": vm.page.labels.install,
-                        "icon": "icon-cloud-upload",
-                        "view": "views/packages/views/install-local.html",
-                        "active": packageUri === "local",
-                        "alias": "umbInstallLocal",
-                        "action": function () {
-                            $location.path("/packages/packages/local");
                         }
                     },
                     {

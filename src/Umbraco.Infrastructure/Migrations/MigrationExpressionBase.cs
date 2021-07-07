@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
             return ToString();
         }
 
-        public void Execute()
+        public virtual void Execute()
         {
             if (_executed)
                 throw new InvalidOperationException("This expression has already been executed.");

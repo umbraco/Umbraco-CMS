@@ -4,20 +4,7 @@
   <info>
     <package>
       <name>Composite Test</name>
-      <version>dfsfd</version>
-      <license url="http://opensource.org/licenses/MIT">MIT License</license>
-      <url>ddsff</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
     </package>
-    <author>
-      <name>fsdfds</name>
-      <website>sfdf</website>
-    </author>
-    <readme><![CDATA[sdffds]]></readme>
   </info>
   <Documents>
     <DocumentSet importMode="root">
@@ -33,6 +20,7 @@
     <DocumentType>
       <Info>
         <Name>Composite Test</Name>
+        <Key>eebd6e3a-91bc-4bac-be16-3c8d47ee3359</Key>
         <Alias>CompositeTest</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -56,6 +44,7 @@
     <DocumentType>
       <Info>
         <Name>Content</Name>
+        <Key>1c51fc0a-79f7-4d3f-9174-95a2628505de</Key>
         <Alias>Content</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -90,6 +79,7 @@
     <DocumentType>
       <Info>
         <Name>Meta</Name>
+        <Key>0e0ad7de-aff1-4e4b-af8c-85e790669412</Key>
         <Alias>Meta</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -134,6 +124,7 @@
     <DocumentType>
       <Info>
         <Name>SEO</Name>
+        <Key>cc58b45e-369c-4429-be1b-1b9f7acfd360</Key>
         <Alias>Seo</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>

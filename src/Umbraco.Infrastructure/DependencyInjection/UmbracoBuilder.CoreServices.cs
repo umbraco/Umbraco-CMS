@@ -20,6 +20,7 @@ using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
@@ -43,6 +44,7 @@ using Umbraco.Cms.Infrastructure.Media;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
+using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -68,9 +70,13 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
             builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.NPocoMappers().Add<NullableDateMapper>();
+            builder.PackageMigrationPlans().Add(() => builder.TypeLoader.GetPackageMigrationPlans());
 
             builder.Services.AddUnique<IRuntimeState, RuntimeState>();
             builder.Services.AddUnique<IRuntime, CoreRuntime>();
+            builder.Services.AddUnique<PendingPackageMigrations>();
+            builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
+            builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
 
             // composers
             builder
@@ -114,6 +120,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptions<RequestHandlerSettings>>().Value)));
 
+            builder.Services.AddUnique<IMigrationPlanExecutor, MigrationPlanExecutor>();
             builder.Services.AddUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
             builder.AddPreValueMigrators();

@@ -1,6 +1,8 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
@@ -9,24 +11,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     {
         public static UmbracoDatabase AsUmbracoDatabase(this IUmbracoDatabase database)
         {
-            var asDatabase = database as UmbracoDatabase;
-            if (asDatabase == null) throw new Exception("oops: database.");
+            if (database is not UmbracoDatabase asDatabase)
+            {
+                throw new Exception("oops: database.");
+            }
+
             return asDatabase;
         }
 
         /// <summary>
-        /// Gets a key/value directly from the database, no scope, nothing.
+        /// Gets a dictionary of key/values directly from the database, no scope, nothing.
         /// </summary>
         /// <remarks>Used by <see cref="CoreRuntimeBootstrapper"/> to determine the runtime state.</remarks>
-        public static string GetFromKeyValueTable(this IUmbracoDatabase database, string key)
+        public static IReadOnlyDictionary<string, string> GetFromKeyValueTable(this IUmbracoDatabase database, string keyPrefix)
         {
             if (database is null) return null;
+
+            // create the wildcard where clause
+            ISqlSyntaxProvider sqlSyntax = database.SqlContext.SqlSyntax;
+            var whereParam = sqlSyntax.GetStringColumnWildcardComparison(
+                sqlSyntax.GetQuotedColumnName("key"),
+                0,
+                Querying.TextColumnType.NVarchar);
 
             var sql = database.SqlContext.Sql()
                 .Select<KeyValueDto>()
                 .From<KeyValueDto>()
-                .Where<KeyValueDto>(x => x.Key == key);
-            return database.FirstOrDefault<KeyValueDto>(sql)?.Value;
+                .Where(whereParam, keyPrefix + sqlSyntax.GetWildcardPlaceholder());
+
+            return database.Fetch<KeyValueDto>(sql)
+                .ToDictionary(x => x.Key, x => x.Value);
         }
 
 

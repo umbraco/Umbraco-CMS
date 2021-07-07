@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -67,14 +68,10 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
-            builder.Services.AddUnique<IPackageActionRunner, PackageActionRunner>();
-
             builder.Services.AddUnique<ConflictingPackageData>();
             builder.Services.AddUnique<CompiledPackageXmlParser>();
             builder.Services.AddUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
-            builder.Services.AddUnique<IInstalledPackagesRepository>(factory => CreatePackageRepository(factory, "installedPackages.config"));
             builder.Services.AddUnique<PackageDataInstallation>();
-            builder.Services.AddUnique<PackageFileInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
 
             return builder;
@@ -93,8 +90,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 factory.GetRequiredService<ILocalizationService>(),
                 factory.GetRequiredService<IHostingEnvironment>(),
                 factory.GetRequiredService<IEntityXmlSerializer>(),
-                factory.GetRequiredService<ILoggerFactory>(),
-                factory.GetRequiredService<IUmbracoVersion>(),
                 factory.GetRequiredService<IOptions<GlobalSettings>>(),
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>(),

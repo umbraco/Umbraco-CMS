@@ -138,7 +138,7 @@
     <key alias="saveListView">Sauver la mise en page de la liste</key>
     <key alias="schedulePublish">Planifier</key>
     <key alias="saveAndPreview">Prévisualiser</key>
-    <key alias="showPage">Prévisualiser</key>    
+    <key alias="showPage">Prévisualiser</key>
     <key alias="showPageDisabled">La prévisualisation est désactivée car aucun modèle n'a été assigné.</key>
     <key alias="styleChoose">Choisir un style</key>
     <key alias="styleShow">Afficher les styles</key>
@@ -320,7 +320,7 @@
   <area alias="media">
     <key alias="clickToUpload">Cliquez pour télécharger</key>
     <key alias="orClickHereToUpload">ou cliquez ici pour choisir un fichier</key>
-	<key alias="dragFilesHereToUpload">Vous pouvez faire glisser des fichiers ici pour télécharger.</key>
+	  <key alias="dragFilesHereToUpload">Vous pouvez faire glisser des fichiers ici pour télécharger.</key>
     <key alias="disallowedFileType">Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé.</key>
     <key alias="maxFileSize">La taille maximum de fichier est</key>
     <key alias="mediaRoot">Racine du média</key>
@@ -1166,24 +1166,17 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="deletewarning">Ceci va supprimer le package</key>
     <key alias="dropHere">Déposez pour uploader</key>
     <key alias="includeAllChildNodes">Inclure tous les noeuds enfant</key>
-    <key alias="orClickHereToUpload">ou cliquez ici pour choisir les fichiers</key>
-    <key alias="uploadPackage">Uploader un package</key>
-    <key alias="localPackageDescription">Installez un package local en le sélectionnant sur votre ordinateur. Installez uniquement des packages de sources fiables que vous connaissez</key>
-    <key alias="uploadAnother">Uploader un autre package</key>
-    <key alias="cancelAndUploadAnother">Annuler et uploader un autre package</key>
     <key alias="accept">J'accepte</key>
     <key alias="termsOfUse">les conditions d'utilisation</key>
     <key alias="pathToFile">Chemin du fichier</key>
     <key alias="pathToFileDescription">Le chemin absolu du fichier (eg: /bin/umbraco.bin)</key>
     <key alias="installed">Installé</key>
     <key alias="installedPackages">Packages installés</key>
-    <key alias="installLocal">Installer localement</key>
     <key alias="installFinish">Terminer</key>
     <key alias="noConfigurationView">Ce package n'a pas de vue de configuration</key>
     <key alias="noPackagesCreated">Aucun package n'a encore été créé</key>
     <key alias="noPackages">Vous n'avez aucun package installé</key>
     <key alias="noPackagesDescription"><![CDATA[Vous n'avez pas de package installé. Veuillez soit installer un package local en le sélectionnant sur votre ordinateur, soit naviguer dans la liste des packages disponibles en utilisant l'icone <strong>'Packages'</strong> en haut à droite de votre écran]]></key>
-    <key alias="packageActions">Actions du package</key>
     <key alias="packageAuthorUrl">URL de l'auteur</key>
     <key alias="packageContent">Contenu du package</key>
     <key alias="packageFiles">Fichiers du package</key>
@@ -1232,14 +1225,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="packageVersionUpgrade">Mise à jour à partir de la version</key>
     <key alias="packageAlreadyInstalled">Package déjà installé</key>
     <key alias="targetVersionMismatch">Ce package ne peut pas être installé, il nécessite au minimum la version Umbraco %0%</key>
-    <key alias="installStateUninstalling">Désinstallation...</key>
-    <key alias="installStateDownloading">Téléchargement...</key>
-    <key alias="installStateImporting">Import...</key>
-    <key alias="installStateInstalling">Installation...</key>
-    <key alias="installStateRestarting">Redémarrage, veuillez patienter...</key>
-    <key alias="installStateComplete">Terminé, votre navigateur va être rafraîchi, veuillez patienter...</key>
-    <key alias="installStateCompleted">Veuillez cliquer sur terminer pour compléter l'installation et recharger la page.</key>
-    <key alias="installStateUploading">Package en cours de chargement...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Coller en conservant le formatage (non recommandé)</key>

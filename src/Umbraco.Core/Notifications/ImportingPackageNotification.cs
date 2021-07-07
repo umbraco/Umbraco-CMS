@@ -4,15 +4,12 @@ namespace Umbraco.Cms.Core.Notifications
 {
     public class ImportingPackageNotification : StatefulNotification, ICancelableNotification
     {
-        public ImportingPackageNotification(string packageName, IPackageInfo packageMetaData)
+        public ImportingPackageNotification(string packageName)
         {
-            PackageName = packageName;
-            PackageMetaData = packageMetaData;
+            PackageName = packageName;        
         }
 
         public string PackageName { get; }
-
-        public IPackageInfo PackageMetaData { get; }
 
         public bool Cancel { get; set; }
     }
