@@ -19,12 +19,10 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
     /// </summary>
     public abstract class Builder
     {
-        private readonly IList<TypeModel> _typeModels;
-
         protected Dictionary<string, string> ModelsMap { get; } = new Dictionary<string, string>();
 
         // the list of assemblies that will be 'using' by default
-        protected readonly IList<string> TypesUsing = new List<string>
+        protected IList<string> TypesUsing { get; } = new List<string>
         {
             "System",
             "System.Linq.Expressions",
@@ -50,16 +48,13 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         /// Gets the list of models to generate.
         /// </summary>
         /// <returns>The models to generate</returns>
-        public IEnumerable<TypeModel> GetModelsToGenerate()
-        {
-            return _typeModels;
-        }
+        public IEnumerable<TypeModel> GetModelsToGenerate() => TypeModels;
 
         /// <summary>
         /// Gets the list of all models.
         /// </summary>
         /// <remarks>Includes those that are ignored.</remarks>
-        public IList<TypeModel> TypeModels => _typeModels;
+        public IList<TypeModel> TypeModels { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Builder"/> class with a list of models to generate,
@@ -69,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         /// <param name="modelsNamespace">The models namespace.</param>
         protected Builder(ModelsBuilderSettings config, IList<TypeModel> typeModels)
         {
-            _typeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
+            TypeModels = typeModels ?? throw new ArgumentNullException(nameof(typeModels));
 
             Config = config ?? throw new ArgumentNullException(nameof(config));
 
@@ -91,7 +86,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         /// </summary>
         private void Prepare()
         {
-            TypeModel.MapModelTypes(_typeModels, ModelsNamespace);
+            TypeModel.MapModelTypes(TypeModels, ModelsNamespace);
 
             var isInMemoryMode = Config.ModelsMode == ModelsMode.InMemoryAuto;
 
@@ -101,20 +96,20 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             // for the last one, don't throw in InMemory mode, see comment
 
             // ensure we have no duplicates type names
-            foreach (var xx in _typeModels.GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
+            foreach (var xx in TypeModels.GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
                 throw new InvalidOperationException($"Type name \"{xx.Key}\" is used"
                     + $" for types with alias {string.Join(", ", xx.Select(x => x.ItemType + ":\"" + x.Alias + "\""))}. Names have to be unique."
                     + " Consider using an attribute to assign different names to conflicting types.");
 
             // ensure we have no duplicates property names
-            foreach (var typeModel in _typeModels)
+            foreach (var typeModel in TypeModels)
                 foreach (var xx in typeModel.Properties.GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
                     throw new InvalidOperationException($"Property name \"{xx.Key}\" in type {typeModel.ItemType}:\"{typeModel.Alias}\""
                         + $" is used for properties with alias {string.Join(", ", xx.Select(x => "\"" + x.Alias + "\""))}. Names have to be unique."
                         + " Consider using an attribute to assign different names to conflicting properties.");
 
             // ensure content & property type don't have identical name (csharp hates it)
-            foreach (var typeModel in _typeModels)
+            foreach (var typeModel in TypeModels)
             {
                 foreach (var xx in typeModel.Properties.Where(x => x.ClrName == typeModel.ClrName))
                 {
@@ -142,7 +137,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             //        xx.Alias));
 
             // discover interfaces that need to be declared / implemented
-            foreach (var typeModel in _typeModels)
+            foreach (var typeModel in TypeModels)
             {
                 // collect all the (non-removed) types implemented at parent level
                 // ie the parent content types and the mixins content types, recursively
@@ -170,7 +165,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             }
 
             // ensure elements don't inherit from non-elements
-            foreach (var typeModel in _typeModels.Where(x => x.IsElement))
+            foreach (var typeModel in TypeModels.Where(x => x.IsElement))
             {
                 if (typeModel.BaseType != null && !typeModel.BaseType.IsElement)
                     throw new InvalidOperationException($"Cannot generate model for type '{typeModel.Alias}' because it is an element type, but its parent type '{typeModel.BaseType.Alias}' is not.");
@@ -196,7 +191,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             return true;
         }
 
-        public string ModelsNamespaceForTests;
+        public string ModelsNamespaceForTests { get; set; }
 
         public string GetModelsNamespace()
         {

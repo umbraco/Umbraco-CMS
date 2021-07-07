@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using Microsoft.Extensions.DependencyModel;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
@@ -13,37 +13,36 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
     {
         public const string GeneratedAssemblyName = "ModelsGeneratedAssembly";
 
-        private OutputKind _outputKind;
-        private CSharpParseOptions _parseOptions;
-        private List<MetadataReference> _refs;
+        private readonly OutputKind _outputKind;
+        private readonly CSharpParseOptions _parseOptions;
+        private readonly IEnumerable<MetadataReference> _refs;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RoslynCompiler"/> class.
         /// </summary>
-        /// <param name="referenceAssemblies">Referenced assemblies used in the source file</param>
         /// <remarks>
         /// Roslyn compiler which can be used to compile a c# file to a Dll assembly
         /// </remarks>
-        public RoslynCompiler(IEnumerable<Assembly> referenceAssemblies)
+        public RoslynCompiler()
         {
             _outputKind = OutputKind.DynamicallyLinkedLibrary;
             _parseOptions = CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.Latest);  // What languageversion should we default to?
 
-            // The references should be the same every time GetCompiledAssembly is called
-            // Making it kind of a waste to convert the Assembly types into MetadataReference
-            // every time GetCompiledAssembly is called, so that's why I do it in the ctor
-            _refs = new List<MetadataReference>();
-            foreach (var assembly in referenceAssemblies.Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location)).Distinct())
-            {
-                _refs.Add(MetadataReference.CreateFromFile(assembly.Location));
-            };
+            // In order to dynamically compile the assembly, we need to add all refs from our current
+            // application. This will also add the correct framework dependencies and we won't have to worry
+            // about the specific framework that is currently being run.
+            // This was borrowed from: https://github.com/dotnet/core/issues/2082#issuecomment-442713181
+            // because we were running into the same error as that thread because we were either:
+            // - not adding enough of the runtime dependencies OR
+            // - we were explicitly adding the wrong runtime dependencies
+            // ... at least that the gist of what I can tell.
+            MetadataReference[] refs =
+                DependencyContext.Default.CompileLibraries
+                .SelectMany(cl => cl.ResolveReferencePaths())
+                .Select(asm => MetadataReference.CreateFromFile(asm))
+                .ToArray();
 
-            // Might have to do this another way, see
-            // see https://github.com/aspnet/RoslynCodeDomProvider/blob/master/src/Microsoft.CodeDom.Providers.DotNetCompilerPlatform/CSharpCompiler.cs:
-            // mentions "Bug 913691: Explicitly add System.Runtime as a reference."
-            // and explicitly adds System.Runtime to references
-            _refs.Add(MetadataReference.CreateFromFile(typeof(System.Runtime.AssemblyTargetedPatchBandAttribute).Assembly.Location));
-            _refs.Add(MetadataReference.CreateFromFile(typeof(System.CodeDom.Compiler.GeneratedCodeAttribute).Assembly.Location));
+            _refs = refs.ToList();
         }
 
         /// <summary>
