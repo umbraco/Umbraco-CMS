@@ -26,11 +26,16 @@ namespace Umbraco.Cms.Core.Packaging
 
         public static string GetEmbeddedPackageDataManifestHash(Type planType)
         {
+            // SEE: HashFromStreams in the benchmarks project for how fast this is. It will run
+            // on every startup for every embedded package.zip. The bigger the zip, the more time it takes.
+            // But it is still very fast ~303ms for a 100MB file. This will only be an issue if there are
+            // several very large package.zips. 
+
             using Stream stream = GetEmbeddedPackageStream(planType);
             using HashAlgorithm alg = SHA1.Create();
 
             // create a string output for the hash
-            var stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();            
             var hashedByteArray = alg.ComputeHash(stream);
             foreach (var b in hashedByteArray)
             {
