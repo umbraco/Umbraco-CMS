@@ -427,7 +427,7 @@
             scope.removeTab = function (tab, indexInTabs) {
                 localizationService.localizeMany(['general_delete', 'defaultdialogs_confirmdelete', 'contentTypeEditor_confirmDeleteTabNotice']).then(function (data) {
                     overlayService.confirmDelete({
-                        title: data[0] + ' tab',
+                        title: data[0],
                         content: data[1] + ' "' + tab.name + '"?',
                         confirmMessage: data[2],
                         submitButtonLabelKey: 'contentTypeEditor_yesDelete',
@@ -572,7 +572,7 @@
             scope.removeGroup = function (selectedGroup) {
                 localizationService.localizeMany(['general_delete', 'defaultdialogs_confirmdelete', 'contentTypeEditor_confirmDeleteGroupNotice']).then(function (data) {
                     overlayService.confirmDelete({
-                        title: data[0] + ' group',
+                        title: data[0],
                         content: data[1] + ' "' + selectedGroup.name + '"?',
                         confirmMessage: data[2],
                         submitButtonLabelKey: 'contentTypeEditor_yesDelete',
@@ -747,7 +747,7 @@
             scope.deleteProperty = function (properties, { id, label }) {
                 localizationService.localizeMany(['general_delete', 'defaultdialogs_confirmdelete']).then(function (data) {
                     overlayService.confirmDelete({
-                        title: data[0] + ' property',
+                        title: data[0],
                         content: data[1] + ' "' + label + '"?',
                         submitButtonLabelKey: 'contentTypeEditor_yesDelete',
                         submit: function () {
