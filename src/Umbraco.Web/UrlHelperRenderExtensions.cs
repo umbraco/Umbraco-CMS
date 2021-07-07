@@ -7,7 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Extensions;
 using Umbraco.Web.Composing;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for UrlHelper for use in templates
