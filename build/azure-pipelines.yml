@@ -25,7 +25,8 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: PowerShell@1
-                  displayName: Set $isRelease variable
+                  name: setReleaseVariable
+                  displayName: Set isRelease variable
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
@@ -33,9 +34,9 @@ stages:
 
                           if ($isRelease.Count -gt 0){
                              Write-Host "##vso[build.addbuildtag]Release build"
-                             Write-Host "##vso[task.setvariable variable=isRelease]true"
+                             Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]true"
                           }else{
-                             Write-Host "##vso[task.setvariable variable=isRelease]false"
+                             Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]false"
                           }
     - stage: Unit_Tests
       displayName: Unit Tests
@@ -356,6 +357,7 @@ stages:
 
                         $version = $ubuild.GetUmbracoVersion()
 
+                        $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
 
                         if ($isRelease.Count -gt 0){
                           $continuous = $version.Semver
@@ -476,11 +478,11 @@ stages:
     - stage: Artifacts_Docs
       displayName: 'Static Code Documentation'
       dependsOn: [Determine_build_type]
-      condition: 'eq(variables.IsRelease, true)'
       jobs:
           - job: Generate_Docs_CSharp
             timeoutInMinutes: 60
             displayName: Generate C# Docs
+            condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
             pool:
                 vmImage: windows-latest
             steps:
@@ -521,10 +523,10 @@ stages:
                       targetPath: $(Build.ArtifactStagingDirectory)\docs\csharp-docs.zip
                       artifact: docs-cs
                       publishLocation: pipeline
-
           - job: Generate_Docs_JS
             timeoutInMinutes: 60
             displayName: Generate JS Docs
+            condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
             pool:
                 vmImage: windows-latest
             steps:
