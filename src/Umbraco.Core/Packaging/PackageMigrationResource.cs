@@ -45,10 +45,11 @@ namespace Umbraco.Cms.Core.Packaging
         }
 
         public static ZipArchive GetEmbeddedPackageDataManifest(Type planType, out XDocument packageXml)
-        {   
-            Stream stream = GetEmbeddedPackageStream(planType);
+            => GetPackageDataManifest(GetEmbeddedPackageStream(planType), out packageXml);
 
-            var zip = new ZipArchive(stream, ZipArchiveMode.Read);
+        public static ZipArchive GetPackageDataManifest(Stream packageZipStream, out XDocument packageXml)
+        {
+            var zip = new ZipArchive(packageZipStream, ZipArchiveMode.Read);
             ZipArchiveEntry packageXmlEntry = zip.GetEntry("package.xml");
             if (packageXmlEntry == null)
             {
@@ -56,7 +57,10 @@ namespace Umbraco.Cms.Core.Packaging
             }
 
             using (Stream packageXmlStream = packageXmlEntry.Open())
-            using (var xmlReader = XmlReader.Create(packageXmlStream))
+            using (var xmlReader = XmlReader.Create(packageXmlStream, new XmlReaderSettings
+            {
+                IgnoreWhitespace = true
+            }))
             {
                 packageXml = XDocument.Load(xmlReader);
             }
