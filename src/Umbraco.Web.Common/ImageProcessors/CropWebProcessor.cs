@@ -42,7 +42,6 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
 
         private static Rectangle GetCropRectangle(int width, int height, ImageCropperCropCoordinates coordinates)
         {
-
             // Get coordinates of top left corner of the rectangle
             var topX = decimal.ToInt32(width * coordinates.X1);
             var topY = decimal.ToInt32(height * coordinates.Y1);
@@ -68,11 +67,13 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
 
             return new ImageCropperCropCoordinates()
             {
-                X1 = decimal.Parse(crops[0], CultureInfo.InvariantCulture),
-                Y1 = decimal.Parse(crops[1], CultureInfo.InvariantCulture),
-                X2 = decimal.Parse(crops[2], CultureInfo.InvariantCulture),
-                Y2 = decimal.Parse(crops[3], CultureInfo.InvariantCulture)
+                X1 = ParseDecimal(crops[0]),
+                Y1 = ParseDecimal(crops[1]),
+                X2 = ParseDecimal(crops[2]),
+                Y2 = ParseDecimal(crops[3])
             };
         }
+
+        private static decimal ParseDecimal(string decimalString) => decimal.Parse(decimalString, CultureInfo.InvariantCulture);
     }
 }
