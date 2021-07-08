@@ -20,21 +20,35 @@
             scope.sortingButtonKey = "general_reorder";
             scope.compositionsButtonState = "init";
             scope.tabs = [];
-            scope.openTabKey = getFirstTab() ? getFirstTab().key : null;
+            scope.genericGroups = [];
+            scope.openTabKey = null;
+            scope.hasGenericTab = false;
+            scope.genericTab = {
+                key: null,
+                name: "Generic",
+                parentKey: null,
+                type: TYPE_TAB,
+                sortOrder: 0,
+                properties: []
+            };
             
-            scope.$watchCollection('model.groups', (newValue) => {
-                scope.tabs = $filter("filter")(scope.model.groups, (group) => {
+            eventBindings.push(scope.$watchCollection('model.groups', (newValue) => {
+                scope.tabs = $filter("filter")(newValue, (group) => {
                     return group.type === TYPE_TAB;
                 });
 
                 scope.tabs.forEach(tab => {
-                    tab.indexInGroups = scope.model.groups.findIndex(group => group.key === tab.key);
+                    tab.indexInGroups = newValue.findIndex(group => group.key === tab.key);
                 });
-            });
 
-            function getFirstTab () {
-                return scope.model.groups.find(group => group.type === TYPE_TAB);
-            }
+                checkGenericTabVisibility();
+
+                if (!scope.openTabKey && scope.hasGenericTab) {
+                    scope.openTabKey = null;
+                } else if (!scope.openTabKey && scope.tabs.length > 0) {
+                    scope.openTabKey = scope.tabs[0].key;
+                }
+            }));
 
             function activate() {
                 setSortingOptions();
@@ -46,6 +60,10 @@
 
                 localizationService.localize("contentTypeEditor_tabHasNoSortOrder").then(function (value) {
                     tabNoSortOrderTranslated = value;
+                });
+
+                localizationService.localize("general_generic").then(function (value) {
+                    scope.genericTab.name = value;
                 });
             }
 
@@ -105,7 +123,7 @@
                     accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
                     tolerance : 'pointer',
                     over: function (evt, ui) {
-                        scope.openTabKey = evt.target.dataset.tabKey || "";
+                        scope.openTabKey = evt.target.dataset.tabKey || null;
                         scope.$evalAsync();
                     }
                 };
@@ -246,6 +264,8 @@
                         scope.sortingButtonKey = "general_reorder";
                     }
 
+                    checkGenericTabVisibility();
+
                 } else {
                     scope.sortingMode = true;
                     scope.sortingButtonKey = "general_reorderDone";
@@ -261,27 +281,14 @@
                     view: "views/common/infiniteeditors/compositions/compositions.html",
                     size: "small",
                     submit: function () {
-
-                        // make sure that all tabs has an init property
-                        if (scope.model.groups.length !== 0) {
-                            angular.forEach(scope.model.groups, function (group) {
-                                addInitProperty(group);
-                            });
-                        }
-
-                        // remove overlay
                         editorService.close();
-
                     },
                     close: function (oldModel) {
-
                         // reset composition changes
                         scope.model.groups = oldModel.contentType.groups;
                         scope.model.compositeContentTypes = oldModel.contentType.compositeContentTypes;
 
-                        // remove overlay
                         editorService.close();
-
                     },
                     selectCompositeContentType: function (selectedContentType) {
 
@@ -393,7 +400,7 @@
 
             };
 
-            /* ---------- TABS ---------- */            
+            /* ---------- TABS ---------- */
             scope.changeTab = function ({key}) {
                 scope.openTabKey = key;
             };
@@ -413,7 +420,11 @@
                 };
 
                 if (newTabIndex === 0) {
-                    scope.model.groups.forEach(group => group.parentKey = tab.key);
+                    scope.model.groups.forEach(group => {
+                        if (!group.inherited) {
+                            group.parentKey = tab.key;
+                        }
+                    });
                 }
 
                 scope.model.groups = [...scope.model.groups, tab];
@@ -439,7 +450,11 @@
 
                             // we need a timeout because the filter hasn't updated the tabs collection
                             $timeout(() => {
-                                scope.openTabKey = indexInTabs > 0 ? scope.tabs[indexInTabs - 1].key : scope.tabs[0].key;
+                                if (scope.tabs.length > 0) {
+                                    scope.openTabKey = indexInTabs > 0 ? scope.tabs[indexInTabs - 1].key : scope.tabs[0].key;
+                                } else {
+                                    scope.openTabKey = null;
+                                }
                             });
 
                             scope.$broadcast('umbOverflowChecker.checkOverflow');
@@ -483,6 +498,11 @@
                     return true;
                 }
             };
+
+            function checkGenericTabVisibility () {
+                const hasRootGroups = scope.model.groups.filter(group => group.type === TYPE_GROUP && group.parentKey === null).length > 0;
+                scope.hasGenericTab = (hasRootGroups && scope.tabs.length > 0) || scope.sortingMode;
+            }
 
             /* Properties */
 

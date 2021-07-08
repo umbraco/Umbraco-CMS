@@ -68,6 +68,7 @@
       onFocusName: '&?',
       onFocus: '&?',
       onChangeSortOrderValue: '&?',
+      allowChangeName: '<?',
       onChangeName: '&?',
       valServerFieldName: '@'
     },

@@ -9,6 +9,14 @@
                     <span class="caret"></span>
                 </div>
                 <ul class="umb-group-builder__tabs-list" ui-sortable="sortableOptionsTab" ng-model="tabs" umb-overflow-checker on-overflow="setTabOverflowState(overflowLeft, overflowRight)">
+                    <li ng-if="hasGenericTab" umb-droppable="droppableOptionsTab" data-tab-key="{{genericTab.key}}">
+                        <umb-content-type-tab
+                            tab="genericTab"
+                            is-open="!openTabKey"
+                            on-click="changeTab(genericTab)"
+                            allow-change-name="false">
+                        </umb-content-type-tab>
+                    </li>
                     <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-key="{{tab.key}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
                         <umb-content-type-tab
                             tab="tab"
@@ -108,7 +116,7 @@
     
     <!-- Groups -->
     <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
-        <div ng-repeat="(groupIndex, group) in model.groups track by group.key" ng-show="group.parentKey === openTabKey" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-key="{{group.key}}">
+        <div ng-repeat="(groupIndex, group) in model.groups track by group.key" ng-show="group.type === 0 && group.parentKey === openTabKey" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-key="{{group.key}}">
             <umb-content-type-group
                 ng-if="group.tabState !== 'init'"
                 on-focus="activateGroup(group)"
