@@ -87,8 +87,8 @@ namespace Umbraco.Cms.Core.Routing
 
         private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)
         {
-            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
-            var entityContent = contentCache.GetById(entity.Id);
+            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot?.Content;
+            var entityContent = contentCache?.GetById(entity.Id);
             if (entityContent == null)
                 return;
 
