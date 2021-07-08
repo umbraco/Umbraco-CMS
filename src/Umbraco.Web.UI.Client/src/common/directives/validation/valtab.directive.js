@@ -13,14 +13,17 @@ function valTab($timeout) {
         link: function (scope, element, attr, ctrs) {
 
             var form = ctrs[0];
-            var tabAlias = scope.tab.alias;                        
+            var tabAlias = scope.tab.alias;
+
+            let closestEditor = element.closest(".blockelement-inlineblock-editor");
+            closestEditor = closestEditor.length === 0 ? element.closest(".umb-editor-sub-view") : closestEditor;
+            closestEditor = closestEditor.length === 0 ? element.closest(".umb-editor") : closestEditor;
+
             scope.tabHasError = false;
 
             function setValidity (form) {
                 if (!form.$valid) {
-                    var subView = element.closest(".umb-editor-sub-view");
-                    var editor = subView.length > 0 ? subView : element.closest(".umb-editor");
-                    var tabContent = editor.find("[data-element='tab-content-" + tabAlias + "']");
+                    var tabContent = closestEditor.find("[data-element='tab-content-" + tabAlias + "']");
 
                     //check if the validation messages are contained inside of this tabs 
                     if (tabContent.find(".ng-invalid").length > 0) {
