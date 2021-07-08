@@ -264,12 +264,12 @@
                         scope.sortingButtonKey = "general_reorder";
                     }
 
-                    checkGenericTabVisibility();
-
                 } else {
                     scope.sortingMode = true;
                     scope.sortingButtonKey = "general_reorderDone";
                 }
+
+                checkGenericTabVisibility();
 
             };
 
