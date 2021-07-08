@@ -1293,6 +1293,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageVersionUpgrade">Upgrading from version</key>
     <key alias="packageAlreadyInstalled">Package already installed</key>
     <key alias="targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of</key>
+    <key alias="verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Paste with full formatting (Not recommended)</key>
