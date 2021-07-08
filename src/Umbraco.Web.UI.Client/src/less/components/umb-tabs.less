@@ -98,32 +98,37 @@
     }
 }
 
-.show-validation .umb-tab--error > .umb-tab-button,
-.show-validation .umb-tab--error > .umb-tab-button:hover,
-.show-validation .umb-tab--error > .umb-tab-button:focus {
-    color: @red !important;
-}
-
 .show-validation {
-    .umb-tab--error {
-        .badge {
-            display: block;
-        }
 
-        .umb-tab-button {
-            &::after {
+    &.show-validation-type-error {
+        .umb-tab--error {
+            .badge {
+                display: block;
                 background-color: @red;
+            }
+
+            .umb-tab-button {
+                &::after {
+                    background-color: @red;
+                }
             }
         }
     }
-}
 
-.show-validation.show-validation-type-warning .umb-tab--error > .umb-tab-button,
-.show-validation.show-validation-type-warning .umb-tab--error > .umb-tab-button:hover,
-.show-validation.show-validation-type-warning .umb-tab--error > .umb-tab-button:focus {
-    color: @white !important;
-    background-color: @yellow-d2 !important;
-    border-color: @warningBorder;
+    &.show-validation-type-warning {
+        .umb-tab--error {
+            .badge {
+                display: block;
+                background-color: @yellow-d2;
+            }
+
+            .umb-tab-button {
+                &::after {
+                    background-color: @yellow-d2;
+                }
+            }
+        }
+    }
 }
 
 // tabs tray
