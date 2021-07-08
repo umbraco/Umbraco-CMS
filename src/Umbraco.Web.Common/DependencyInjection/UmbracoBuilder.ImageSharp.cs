@@ -10,6 +10,7 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Web.Common.ImageProcessors;
 
 namespace Umbraco.Extensions
 {
@@ -51,6 +52,8 @@ namespace Umbraco.Extensions
                 .SetCache<PhysicalFileSystemCache>()
                 .SetCacheHash<CacheHash>()
                 .AddProvider<PhysicalFileSystemProvider>()
+                .ClearProcessors()  // ImageSharp includes the processors by default, so we have to clear and re-add to control the order
+                .AddProcessor<CropWebProcessor>()
                 .AddProcessor<ResizeWebProcessor>()
                 .AddProcessor<FormatWebProcessor>()
                 .AddProcessor<BackgroundColorWebProcessor>();
