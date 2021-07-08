@@ -14,7 +14,7 @@
             }
         });
 
-    function ElementEditorContentComponentController($scope, $filter) {
+    function ElementEditorContentComponentController($scope, $filter, contentEditingHelper) {
 
         // We need a controller for the component to work.
         var vm = this;
@@ -30,20 +30,16 @@
                 return tab.type === 1;
             });
 
-            if (vm.tabs.length > 0 && !vm.activeTabKey) {
-                vm.activeTabKey = vm.tabs[0].key;
+            if (vm.tabs.length > 0) {
+                // if we have tabs and some groups that doesn't belong to a tab we need to render those on an "Other" tab.
+                contentEditingHelper.registerGenericTab(vm.model.variants[0].tabs);
+                
+                setActiveTab(vm.tabs[0]);
             }
 
             // for validation to work for each tab we need to associate a group with a tab.
             vm.model.variants[0].tabs.forEach(group => {
-                let validationAlias = group.alias;
-
-                if (group.parentKey) {
-                    const parentGroup = vm.model.variants[0].tabs.find(tab => tab.key === group.parentKey);
-                    validationAlias = parentGroup.alias;
-                }
-
-                group.validationAlias = validationAlias;
+                group.validationAlias = contentEditingHelper.generateTabValidationAlias(group, vm.model.variants[0].tabs);
             });
         });
 

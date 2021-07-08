@@ -180,6 +180,58 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         },
 
+        genericTabAlias: "_umb_genericTab",
+
+        generateTabValidationAlias: function (group, groups) {
+            let validationAlias = this.genericTabAlias;
+
+            if (group.parentKey) {
+                const parentGroup = groups.find(tab => tab.key === group.parentKey);
+                validationAlias = parentGroup.alias;
+            }
+
+            // tabs should use their own alias so direct properties will trigger the right tab
+            if (group.type === 1) {
+                validationAlias = group.alias;
+            }
+
+            return validationAlias;
+        },
+
+        registerGenericTab: function (groups) {
+            if (!groups) {
+                return;
+            }
+
+            const genericTabAlias = this.genericTabAlias;
+            const hasGenericTab = groups.find(group => group.alias === genericTabAlias);
+
+            if (hasGenericTab) {
+                return;
+            }
+
+            const isRootGroup = (group) => group.type === 0 && group.parentKey === null;
+            const hasRootGroups = groups.filter(group => isRootGroup(group)).length > 0;
+
+            if (!hasRootGroups) {
+                return;
+            }
+
+            const genericTab = {
+                label: 'Generic',
+                alias: genericTabAlias,
+                key: null,
+                parentKey: null,
+                type: 1,
+                properties: []
+            };
+
+            localizationService.localize("general_generic").then(function (value) {
+                genericTab.label = value;
+                groups.unshift(genericTab);
+            });
+        },
+
         /** Returns the action button definitions based on what permissions the user has.
         The content.allowedActions parameter contains a list of chars, each represents a button by permission so
         here we'll build the buttons according to the chars of the user. */

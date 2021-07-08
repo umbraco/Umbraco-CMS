@@ -2,7 +2,7 @@
     'use strict';
 
     /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
-    function tabbedContentDirective($timeout, $filter) {
+    function tabbedContentDirective($timeout, $filter, contentEditingHelper) {
 
         function link($scope, $element) {
             
@@ -101,7 +101,7 @@
 
             $scope.setActiveTab = function(tab) {
                 $scope.activeTabKey = tab.key;
-                $scope.content.tabs.forEach(tab => tab.active = false);
+                $scope.tabs.forEach(tab => tab.active = false);
                 tab.active = true;
             };
 
@@ -110,20 +110,16 @@
                     return tab.type === 1;
                 });
 
-                if ($scope.tabs.length > 0 && !$scope.activeTabKey) {
-                    $scope.activeTabKey = $scope.tabs[0].key;
+                if ($scope.tabs.length > 0) {
+                    // if we have tabs and some groups that doesn't belong to a tab we need to render those on an "Other" tab.
+                    contentEditingHelper.registerGenericTab($scope.content.tabs);
+
+                    $scope.setActiveTab($scope.tabs[0]);
                 }
 
                 // for validation to work for each tab we need to associate a group with a tab.
                 $scope.content.tabs.forEach(group => {
-                    let validationAlias = group.alias;
-
-                    if (group.parentKey) {
-                        const parentGroup = $scope.content.tabs.find(tab => tab.key === group.parentKey);
-                        validationAlias = parentGroup.alias;
-                    }
-
-                    group.validationAlias = validationAlias;
+                    group.validationAlias = contentEditingHelper.generateTabValidationAlias(group, $scope.content.tabs);
                 });
             });
             
