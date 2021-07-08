@@ -95,6 +95,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>(),
                 factory.GetRequiredService<MediaFileManager>(),
+                factory.GetRequiredService<FileSystems>(),
                 packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider container)

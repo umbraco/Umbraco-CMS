@@ -545,7 +545,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //now we need to convert the unknown ones
             switch (type)
             {
-                case UmbracoEntityTypes.Domain:
                 case UmbracoEntityTypes.Language:
                 case UmbracoEntityTypes.User:
                 case UmbracoEntityTypes.Macro:
@@ -705,7 +704,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 case UmbracoEntityTypes.PropertyType:
                 case UmbracoEntityTypes.PropertyGroup:
-                case UmbracoEntityTypes.Domain:
                 case UmbracoEntityTypes.Language:
                 case UmbracoEntityTypes.User:
                 case UmbracoEntityTypes.Macro:
@@ -791,7 +789,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 case UmbracoEntityTypes.PropertyType:
                 case UmbracoEntityTypes.PropertyGroup:
-                case UmbracoEntityTypes.Domain:
                 case UmbracoEntityTypes.Language:
                 case UmbracoEntityTypes.User:
                 case UmbracoEntityTypes.Macro:
@@ -835,7 +832,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //now we need to convert the unknown ones
             switch (entityType)
             {
-                case UmbracoEntityTypes.Domain:
                 case UmbracoEntityTypes.Language:
                 case UmbracoEntityTypes.User:
                 case UmbracoEntityTypes.Macro:
@@ -902,7 +898,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 case UmbracoEntityTypes.PropertyType:
                 case UmbracoEntityTypes.PropertyGroup:
-                case UmbracoEntityTypes.Domain:
                 case UmbracoEntityTypes.Language:
                 case UmbracoEntityTypes.User:
                 case UmbracoEntityTypes.Macro:
@@ -934,7 +929,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 case UmbracoEntityTypes.PropertyType:
                 case UmbracoEntityTypes.PropertyGroup:
-                case UmbracoEntityTypes.Domain:
                 case UmbracoEntityTypes.Language:
                 case UmbracoEntityTypes.User:
                 case UmbracoEntityTypes.Macro:
@@ -966,7 +960,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 case UmbracoEntityTypes.PropertyType:
                 case UmbracoEntityTypes.PropertyGroup:
-                case UmbracoEntityTypes.Domain:
                 case UmbracoEntityTypes.Language:
                 case UmbracoEntityTypes.User:
                 case UmbracoEntityTypes.Macro:
@@ -993,8 +986,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case UmbracoEntityTypes.PropertyType:
 
                 case UmbracoEntityTypes.PropertyGroup:
-
-                case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:
 
@@ -1025,8 +1016,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case UmbracoEntityTypes.PropertyType:
 
                 case UmbracoEntityTypes.PropertyGroup:
-
-                case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:
 
@@ -1140,6 +1129,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     return _fileService.GetStylesheets().Select(MapEntities());
 
+                case UmbracoEntityTypes.Script:
+
+                    if (!postFilter.IsNullOrWhiteSpace())
+                        throw new NotSupportedException("Filtering on scripts is not currently supported");
+
+                    return _fileService.GetScripts().Select(MapEntities());
+
+                case UmbracoEntityTypes.PartialView:
+
+                    if (!postFilter.IsNullOrWhiteSpace())
+                        throw new NotSupportedException("Filtering on scripts is not currently supported");
+
+                    return _fileService.GetPartialViews().Select(MapEntities());
+
                 case UmbracoEntityTypes.Language:
 
                     if (!postFilter.IsNullOrWhiteSpace())
@@ -1153,7 +1156,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     return GetAllDictionaryItems();
 
-                case UmbracoEntityTypes.Domain:
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
             }

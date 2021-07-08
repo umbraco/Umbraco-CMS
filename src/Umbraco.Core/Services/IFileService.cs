@@ -15,6 +15,13 @@ namespace Umbraco.Cms.Core.Services
         void CreatePartialViewMacroFolder(string folderPath);
         void DeletePartialViewFolder(string folderPath);
         void DeletePartialViewMacroFolder(string folderPath);
+
+        /// <summary>
+        /// Gets a list of all <see cref="IPartialView"/> objects
+        /// </summary>
+        /// <returns>An enumerable list of <see cref="IPartialView"/> objects</returns>
+        IEnumerable<IPartialView> GetPartialViews(params string[] names);
+
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
         Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId);
@@ -77,7 +84,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="name">Name of the stylesheet incl. extension</param>
         /// <returns>A <see cref="IStylesheet"/> object</returns>
-        IStylesheet GetStylesheetByName(string name);
+        IStylesheet GetStylesheet(string name);
 
         /// <summary>
         /// Saves a <see cref="IStylesheet"/>
@@ -128,11 +135,17 @@ namespace Umbraco.Cms.Core.Services
         long GetStylesheetFileSize(string filepath);
 
         /// <summary>
+        /// Gets a list of all <see cref="IScript"/> objects
+        /// </summary>
+        /// <returns>An enumerable list of <see cref="IScript"/> objects</returns>
+        IEnumerable<IScript> GetScripts(params string[] names);
+
+        /// <summary>
         /// Gets a <see cref="IScript"/> object by its name
         /// </summary>
         /// <param name="name">Name of the script incl. extension</param>
         /// <returns>A <see cref="IScript"/> object</returns>
-        IScript GetScriptByName(string name);
+        IScript GetScript(string name);
 
         /// <summary>
         /// Saves a <see cref="Script"/>

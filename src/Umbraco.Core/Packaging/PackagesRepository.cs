@@ -6,9 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -40,6 +38,7 @@ namespace Umbraco.Cms.Core.Packaging
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly MediaFileManager _mediaFileManager;
+        private readonly FileSystems _fileSystems;
 
         /// <summary>
         /// Constructor
@@ -72,6 +71,7 @@ namespace Umbraco.Cms.Core.Packaging
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
             MediaFileManager mediaFileManager,
+            FileSystems fileSystems,
             string packageRepositoryFileName,
             string tempFolderPath = null,
             string packagesFolderPath = null,
@@ -97,6 +97,7 @@ namespace Umbraco.Cms.Core.Packaging
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
             _mediaFileManager = mediaFileManager;
+            _fileSystems = fileSystems;
         }
 
         private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + _packageRepositoryFileName;
@@ -190,7 +191,7 @@ namespace Umbraco.Cms.Core.Packaging
             try
             {
                 //Init package file
-                var compiledPackageXml = CreateCompiledPackageXml(out var root);
+                XDocument compiledPackageXml = CreateCompiledPackageXml(out XElement root);
 
                 //Info section
                 root.Add(GetPackageInfoXml(definition));
@@ -200,6 +201,8 @@ namespace Umbraco.Cms.Core.Packaging
                 PackageMediaTypes(definition, root);
                 PackageTemplates(definition, root);
                 PackageStylesheets(definition, root);
+                PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem);
+                PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem);
                 PackageMacros(definition, root);
                 PackageDictionaryItems(definition, root);
                 PackageLanguages(definition, root);
@@ -396,21 +399,60 @@ namespace Umbraco.Cms.Core.Packaging
 
             // get the partial views for macros and package those
             IEnumerable<string> views = packagedMacros.Select(x => x.MacroSource).Where(x => x.EndsWith(".cshtml"));
-            PackagePartialViews(views, root, "MacroPartialViews");
+            PackageMacroPartialViews(views, root);
         }
 
         private void PackageStylesheets(PackageDefinition definition, XContainer root)
         {
             var stylesheetsXml = new XElement("Stylesheets");
-            foreach (var stylesheetName in definition.Stylesheets)
+            foreach (var stylesheet in definition.Stylesheets)
             {
-                if (stylesheetName.IsNullOrWhiteSpace())
+                if (stylesheet.IsNullOrWhiteSpace())
+                {
                     continue;
-                var xml = GetStylesheetXml(stylesheetName, true);
+                }
+
+                XElement xml = GetStylesheetXml(stylesheet, true);
                 if (xml != null)
+                {
                     stylesheetsXml.Add(xml);
+                }
             }
             root.Add(stylesheetsXml);
+        }
+
+        private void PackageStaticFiles(
+            IEnumerable<string> filePaths,
+            XContainer root,
+            string containerName,
+            string elementName,
+            IFileSystem fileSystem)
+        {
+            var scriptsXml = new XElement(containerName);
+            foreach (var file in filePaths)
+            {
+                if (file.IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                if (!fileSystem.FileExists(file))
+                {
+                    throw new InvalidOperationException("No file found with path " + file);
+                }
+
+                using (Stream stream = fileSystem.OpenFile(file))
+                using (var reader = new StreamReader(stream))
+                {
+                    var fileContents = reader.ReadToEnd();
+                    scriptsXml.Add(
+                        new XElement(
+                            elementName,
+                            new XAttribute("path", file),
+                            new XCData(fileContents)));
+                }
+            }
+            root.Add(scriptsXml);
         }
 
         private void PackageTemplates(PackageDefinition definition, XContainer root)
@@ -428,9 +470,9 @@ namespace Umbraco.Cms.Core.Packaging
             root.Add(templatesXml);
         }
 
-        private void PackagePartialViews(IEnumerable<string> viewPaths, XContainer root, string elementName)
+        private void PackageMacroPartialViews(IEnumerable<string> viewPaths, XContainer root)
         {
-            var viewsXml = new XElement(elementName);
+            var viewsXml = new XElement("MacroPartialViews");
             foreach (var viewPath in viewPaths)
             {
                 // TODO: See TODO note in MacrosController about the inconsistencies of usages of partial views
@@ -447,7 +489,7 @@ namespace Umbraco.Cms.Core.Packaging
 
                 viewsXml.Add(
                     new XElement(
-                        "view",
+                        "View",
                         new XAttribute("path", viewPath),
                         new XCData(fileContents)));
             }
@@ -631,34 +673,23 @@ namespace Umbraco.Cms.Core.Packaging
         /// <summary>
         /// Converts a umbraco stylesheet to a package xml node
         /// </summary>
-        /// <param name="name">The name of the stylesheet.</param>
+        /// <param name="path">The path of the stylesheet.</param>
         /// <param name="includeProperties">if set to <c>true</c> [include properties].</param>
         /// <returns></returns>
-        private XElement GetStylesheetXml(string name, bool includeProperties)
+        private XElement GetStylesheetXml(string path, bool includeProperties)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
-            var sts = _fileService.GetStylesheetByName(name);
-            if (sts == null)
-                return null;
-            var stylesheetXml = new XElement("Stylesheet");
-            stylesheetXml.Add(new XElement("Name", sts.Alias));
-            stylesheetXml.Add(new XElement("FileName", sts.Name));
-            stylesheetXml.Add(new XElement("Content", new XCData(sts.Content)));
-
-            if (!includeProperties)
-                return stylesheetXml;
-
-            var properties = new XElement("Properties");
-            foreach (var ssP in sts.Properties)
+            if (string.IsNullOrWhiteSpace(path))
             {
-                var property = new XElement("Property");
-                property.Add(new XElement("Name", ssP.Name));
-                property.Add(new XElement("Alias", ssP.Alias));
-                property.Add(new XElement("Value", ssP.Value));
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
             }
-            stylesheetXml.Add(properties);
-            return stylesheetXml;
+
+            IStylesheet stylesheet = _fileService.GetStylesheet(path);
+            if (stylesheet == null)
+            {
+                return null;
+            }
+
+            return _serializer.Serialize(stylesheet, includeProperties);
         }
 
         private void AddDocumentType(IContentType dt, HashSet<IContentType> dtl)

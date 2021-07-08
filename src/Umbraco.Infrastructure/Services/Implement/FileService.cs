@@ -65,11 +65,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IStylesheet GetStylesheetByName(string name)
+        public IStylesheet GetStylesheet(string path)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _stylesheetRepository.Get(name);
+                return _stylesheetRepository.Get(path);
             }
         }
 
@@ -177,7 +177,16 @@ namespace Umbraco.Cms.Core.Services.Implement
         #region Scripts
 
         /// <inheritdoc />
-        public IScript GetScriptByName(string name)
+        public IEnumerable<IScript> GetScripts(params string[] names)
+        {
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _scriptRepository.GetMany(names);
+            }
+        }
+
+        /// <inheritdoc />
+        public IScript GetScript(string name)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -644,6 +653,14 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 _partialViewMacroRepository.DeleteFolder(folderPath);
                 scope.Complete();
+            }
+        }
+
+        public IEnumerable<IPartialView> GetPartialViews(params string[] names)
+        {
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _partialViewRepository.GetMany(names);
             }
         }
 

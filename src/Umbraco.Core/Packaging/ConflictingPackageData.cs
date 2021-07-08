@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Packaging
                     if (xElement == null)
                         throw new FormatException("Missing \"Name\" element");
 
-                    return _fileService.GetStylesheetByName(xElement.Value) as IFile;
+                    return _fileService.GetStylesheet(xElement.Value) as IFile;
                 })
                 .Where(v => v != null);
         }

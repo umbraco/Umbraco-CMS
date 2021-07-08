@@ -52,6 +52,9 @@ namespace Umbraco.Cms.Core.Packaging
         [DataMember(Name = "templates")]
         public IList<string> Templates { get; set; } = new List<string>();
 
+        [DataMember(Name = "partialViews")]
+        public IList<string> PartialViews { get; set; } = new List<string>();
+
         [DataMember(Name = "documentTypes")]
         public IList<string> DocumentTypes { get; set; } = new List<string>();
 
@@ -60,6 +63,9 @@ namespace Umbraco.Cms.Core.Packaging
 
         [DataMember(Name = "stylesheets")]
         public IList<string> Stylesheets { get; set; } = new List<string>();
+
+        [DataMember(Name = "scripts")]
+        public IList<string> Scripts { get; set; } = new List<string>();
 
         [DataMember(Name = "dataTypes")]
         public IList<string> DataTypes { get; set; } = new List<string>();

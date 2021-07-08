@@ -17,6 +17,8 @@ namespace Umbraco.Cms.Core.Models.Packaging
         public IEnumerable<XElement> MacroPartialViews { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> Templates { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> Stylesheets { get; set; } // TODO: make strongly typed
+        public IEnumerable<XElement> Scripts { get; set; } // TODO: make strongly typed
+        public IEnumerable<XElement> PartialViews { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> DataTypes { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> Languages { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> DictionaryItems { get; set; } // TODO: make strongly typed

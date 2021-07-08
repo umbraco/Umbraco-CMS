@@ -648,7 +648,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement macrosElement = xml.Descendants("Macros").First();
 
             // Act
-            var macros = PackageDataInstallation.ImportMacros(macrosElement.Elements("macro"), 0).ToList();
+            var macros = PackageDataInstallation.ImportMacros(
+                macrosElement.Elements("macro"),
+                Enumerable.Empty<XElement>(),
+                0).ToList();
 
             // Assert
             Assert.That(macros.Any(), Is.True);
@@ -669,7 +672,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement macrosElement = xml.Descendants("Macros").First();
 
             // Act
-            var macros = PackageDataInstallation.ImportMacros(macrosElement.Elements("macro"), 0).ToList();
+            var macros = PackageDataInstallation.ImportMacros(
+                macrosElement.Elements("macro"),
+                Enumerable.Empty<XElement>(),
+                0).ToList();
 
             // Assert
             Assert.That(macros.Any(), Is.True);
