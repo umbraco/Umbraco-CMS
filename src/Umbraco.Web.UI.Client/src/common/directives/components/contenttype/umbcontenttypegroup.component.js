@@ -9,20 +9,11 @@
 
     const vm = this;
 
-    vm.$onInit = onInit;
-
     vm.updateName = updateName;
     vm.removeGroup = removeGroup;
     vm.whenNameFocus = whenNameFocus;
     vm.whenFocus = whenFocus;
     vm.changeSortOrderValue = changeSortOrderValue;
-
-    function onInit() {
-      // we need a group name for the validation and angular doesn't allow dashes in form name.
-      // this is a workaround to make it work
-      const identifier = vm.group.key.replaceAll('-', '');
-      vm.formName = `groupForm${identifier}`;
-    }
 
     function updateName (group) {
       if (vm.onUpdateName) {
@@ -66,10 +57,11 @@
       allowRemove: '<',
       onRemove: '&',
       sorting: '<',
-      valServerFieldName: '@',
       onNameFocus: '&',
       onFocus: '&',
-      onChangeSortOrderValue: '&'
+      onChangeSortOrderValue: '&',
+      valServerFieldName: '@',
+      valTabAlias: "@"
     },
     controller: umbContentTypeGroupController
   };

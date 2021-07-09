@@ -12,14 +12,21 @@ function valTab($timeout) {
         restrict: "A",
         link: function (scope, element, attr, ctrs) {
 
+            var evts = [];
             var form = ctrs[0];
-            var tabAlias = scope.tab.alias;
+            var tab = scope.$eval(attr.valTab) || scope.tab;
+
+            if (!tab) {
+                return;
+            }
+
+            var tabAlias = tab.alias || tab.key;
 
             let closestEditor = element.closest(".blockelement-inlineblock-editor");
             closestEditor = closestEditor.length === 0 ? element.closest(".umb-editor-sub-view") : closestEditor;
             closestEditor = closestEditor.length === 0 ? element.closest(".umb-editor") : closestEditor;
 
-            scope.tabHasError = false;
+            setSuccess();
 
             function setValidity (form) {
                 if (!form.$valid) {
@@ -27,23 +34,50 @@ function valTab($timeout) {
 
                     //check if the validation messages are contained inside of this tabs 
                     if (tabContent.find(".ng-invalid").length > 0) {
-                        scope.tabHasError = true;
+                        setError();
                     } else {
-                        scope.tabHasError = false;
+                        setSuccess();
                     }
                 }
                 else {
-                    scope.tabHasError = false;
+                    setSuccess();
                 }
+            }
+
+            function setError () {
+                scope.tabHasError = true;
+                tab.hasError = true;
+            }
+
+            function setSuccess () {
+                scope.tabHasError = false;
+                tab.hasError = false;
+            }
+
+            function subscribe () {
+                for (let control of form.$$controls) {
+                    var unbind = scope.$watch(() => control.$invalid, function () {                        
+                        setValidity(form);
+                    });
+
+                    evts.push(unbind);
+                }
+            }
+
+            function unsubscribe () {
+                evts.forEach(event => event());
             }
 
             // we need to watch validation state on individual controls so we can update specific tabs accordingly
             $timeout(() => {
-                for (let control of form.$$controls) {
-                    scope.$watch(() => control.$invalid, function () {
-                        setValidity(form);
-                    });
-                }
+                scope.$watchCollection(() => form.$$controls, function (newValue) {
+                    unsubscribe();
+                    subscribe();
+                });
+            });
+
+            scope.$on('$destroy', function () {
+                unsubscribe();
             });
         }
     };

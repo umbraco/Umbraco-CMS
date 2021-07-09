@@ -40,9 +40,10 @@
       sortable: '<',
       onEdit: '&',
       onRemove: '&',
+      onChangeSortOrderValue: '&',
       valServerFieldAlias: '@',
       valServerFieldLabel: '@',
-      onChangeSortOrderValue: '&'
+      valTabAlias: '@'
     },
     controllerAs: 'vm',
     controller: umbContentTypePropertyController

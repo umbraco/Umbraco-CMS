@@ -17,7 +17,7 @@
                             allow-change-name="false">
                         </umb-content-type-tab>
                     </li>
-                    <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-key="{{tab.key}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
+                    <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-key="{{tab.key}}">
                         <umb-content-type-tab
                             tab="tab"
                             is-open="tab.key === openTabKey"
@@ -125,8 +125,9 @@
                 allow-remove="canRemoveGroup(group) && !sortingMode"
                 on-remove="removeGroup(group)"
                 sorting="sortingMode"
+                on-change-sort-order-value="onChangeGroupSortOrderValue(group)"
                 val-server-field-name="{{'Groups[' + $index + '].Name'}}"
-                on-change-sort-order-value="onChangeGroupSortOrderValue(group)">
+                val-tab-alias="{{group.validationAlias}}">
                 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties" ng-show="group.properties.length > 0 || sortingMode">
                     <li ng-repeat="(propertyIndex, property) in group.properties track by property.alias" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
@@ -136,9 +137,10 @@
                             sortable="sortingMode"
                             on-edit="editPropertyTypeSettings(property)"
                             on-remove="deleteProperty(group.properties, property)"
+                            on-change-sort-order-value="onChangePropertySortOrderValue(group)"
                             val-server-field-alias="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Alias'}}"
                             val-server-field-label="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Label'}}"
-                            on-change-sort-order-value="onChangePropertySortOrderValue(group)">
+                            val-tab-alias="{{group.validationAlias}}">
                         </umb-content-type-property>
                     </li>
                 </ul>

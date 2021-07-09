@@ -183,19 +183,20 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         genericTabAlias: "_umb_genericTab",
 
         generateTabValidationAlias: function (group, groups) {
+            const prefix = "tab-content-";
             let validationAlias = this.genericTabAlias;
 
             if (group.parentKey) {
                 const parentGroup = groups.find(tab => tab.key === group.parentKey);
-                validationAlias = parentGroup.alias;
+                validationAlias = parentGroup.alias || parentGroup.key;
             }
 
             // tabs should use their own alias so direct properties will trigger the right tab
             if (group.type === 1) {
-                validationAlias = group.alias;
+                validationAlias = group.alias || group.key;
             }
 
-            return validationAlias;
+            return prefix + validationAlias;
         },
 
         registerGenericTab: function (groups) {

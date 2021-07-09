@@ -6,7 +6,7 @@
         </umb-editor-tab-bar>
 
         <umb-box ng-repeat="tab in tabs" ng-show="tab.key === activeTabKey && tab.properties.length > 0">
-            <umb-box-content data-element="tab-content-{{tab.validationAlias}}">
+            <umb-box-content data-element="{{tab.validationAlias}}">
                 <umb-property
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in tab.properties track by property.alias"
@@ -29,7 +29,7 @@
                 <div id="group-{{group.id}}">{{ group.label }}</div>
             </div>
 
-            <div class="umb-group-panel__content" data-element="tab-content-{{group.validationAlias}}">
+            <div class="umb-group-panel__content" data-element="{{group.validationAlias}}">
                 <umb-property
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in group.properties track by property.alias"

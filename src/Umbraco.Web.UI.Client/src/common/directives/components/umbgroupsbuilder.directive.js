@@ -3,7 +3,7 @@
 
     function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource,
         dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService,
-        localizationService, editorService, eventsService, overlayService) {
+        localizationService, editorService, eventsService, overlayService, contentEditingHelper) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -26,6 +26,7 @@
             scope.genericTab = {
                 key: null,
                 name: "Generic",
+                alias: contentEditingHelper.genericTabAlias,
                 parentKey: null,
                 type: TYPE_TAB,
                 sortOrder: 0,
@@ -39,6 +40,10 @@
 
                 scope.tabs.forEach(tab => {
                     tab.indexInGroups = newValue.findIndex(group => group.key === tab.key);
+                });
+
+                newValue.forEach(group => {
+                    group.validationAlias = contentEditingHelper.generateTabValidationAlias(group, newValue);
                 });
 
                 checkGenericTabVisibility();
