@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
@@ -43,11 +44,11 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
         private static Rectangle GetCropRectangle(int width, int height, ImageCropperCropCoordinates coordinates)
         {
             // Get coordinates of top left corner of the rectangle
-            var topX = decimal.ToInt32(width * coordinates.X1);
-            var topY = decimal.ToInt32(height * coordinates.Y1);
+            var topX = RoundToInt(width * coordinates.X1);
+            var topY = RoundToInt(height * coordinates.Y1);
             // Get coordinated of bottom right corner
-            var bottomX = decimal.ToInt32(width - (width * coordinates.X2));
-            var bottomY = decimal.ToInt32(height - (height * coordinates.Y2));
+            var bottomX = RoundToInt(width - (width * coordinates.X2));
+            var bottomY = RoundToInt(height - (height * coordinates.Y2));
 
             // Get width and height of crop
             var cropWidth = bottomX - topX;
@@ -55,6 +56,8 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
 
             return new Rectangle(topX, topY, cropWidth, cropHeight);
         }
+
+        private static int RoundToInt(decimal number) => decimal.ToInt32(Math.Round(number));
 
         private static ImageCropperCropCoordinates GetCropCoordinates(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
         {
