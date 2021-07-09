@@ -171,6 +171,7 @@
     <Compile Include="PropertyEditors\NoopPropertyCacheCompressionOptions.cs" />
     <Compile Include="PropertyEditors\PropertyCacheCompression.cs" />
     <Compile Include="PropertyEditors\IPropertyCacheCompression.cs" />
+    <Compile Include="PropertyEditors\UnPublishedContentPropertyCacheCompressionOptions.cs" />
     <Compile Include="Serialization\AutoInterningStringConverter.cs" />
     <Compile Include="Serialization\AutoInterningStringKeyCaseInsensitiveDictionaryConverter.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerConfiguration.cs" />

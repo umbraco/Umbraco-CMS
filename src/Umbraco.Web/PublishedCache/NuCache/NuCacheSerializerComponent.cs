@@ -16,6 +16,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     public class NuCacheSerializerComponent : IComponent
     {
         internal const string Nucache_Serializer_Key = "Umbraco.Web.PublishedCache.NuCache.Serializer";
+        internal const string Nucache_UnPublishedContentCompression_Key = "Umbraco.Web.PublishedCache.NuCache.CompressUnPublishedContent";
         private const string JSON_SERIALIZER_VALUE = "JSON";
         private readonly Lazy<IPublishedSnapshotService> _service;
         private readonly IKeyValueService _keyValueService;
