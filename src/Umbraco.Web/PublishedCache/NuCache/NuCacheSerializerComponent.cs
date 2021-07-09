@@ -54,7 +54,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 _profilingLogger.Warn<NuCacheSerializerComponent>($"Database NuCache was serialized using {currentSerializer}. Currently configured NuCache serializer {serializer}. Rebuilding Nucache");
 
-                using (_profilingLogger.TraceDuration<NuCacheSerializerComponent>($"Rebuilding NuCache database with {currentSerializer} serializer"))
+                using (_profilingLogger.TraceDuration<NuCacheSerializerComponent>($"Rebuilding NuCache database with {serializer} serializer"))
                 {
                     _service.Value.Rebuild();
                     _keyValueService.SetValue(Nucache_Serializer_Key, serializer);

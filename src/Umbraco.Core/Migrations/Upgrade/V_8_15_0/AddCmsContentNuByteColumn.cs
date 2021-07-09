@@ -16,6 +16,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_15_0
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
 
             AddColumnIfNotExists<ContentNuDto>(columns, "dataRaw");
+
+            // allow null
+            AlterColumn<ContentNuDto>(Constants.DatabaseSchema.Tables.NodeData, "data");
         }
     }
 }
