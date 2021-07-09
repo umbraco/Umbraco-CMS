@@ -17,12 +17,17 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly Assembly _entryPointAssembly;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly IEnumerable<string> _additionalTargetAssemblies;
         private List<Assembly> _discovered;
 
-        public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly, ILoggerFactory loggerFactory)
+        public DefaultUmbracoAssemblyProvider(
+            Assembly entryPointAssembly,
+            ILoggerFactory loggerFactory,
+            IEnumerable<string> additionalTargetAssemblies = null)
         {
             _entryPointAssembly = entryPointAssembly ?? throw new ArgumentNullException(nameof(entryPointAssembly));
             _loggerFactory = loggerFactory;
+            _additionalTargetAssemblies = additionalTargetAssemblies;
         }
 
         // TODO: It would be worth investigating a netcore3 version of this which would use
@@ -40,7 +45,9 @@ namespace Umbraco.Cms.Core.Composing
                     return _discovered;
                 }
 
-                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, Constants.Composing.UmbracoCoreAssemblyNames, true, _loggerFactory);
+                IEnumerable<string> additionalTargetAssemblies = _additionalTargetAssemblies.Concat(Constants.Composing.UmbracoCoreAssemblyNames);
+
+                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, additionalTargetAssemblies.ToArray(), true, _loggerFactory);
                 _discovered = finder.Find().ToList();
 
                 return _discovered;

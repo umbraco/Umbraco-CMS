@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
         public void Initialize()
         {
             var typeFinder = TestHelper.GetTypeFinder();
-            TypeLoader = new TypeLoader(typeFinder, NoAppCache.Instance, new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfiler>(), false, AssembliesToScan);
+            TypeLoader = new TypeLoader(typeFinder, new VaryingRuntimeHash(), NoAppCache.Instance, new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfiler>(), false, AssembliesToScan);
         }
 
         protected virtual IEnumerable<Assembly> AssembliesToScan

@@ -48,6 +48,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
                 };
             _typeLoader = new TypeLoader(
                 typeFinder,
+                new VaryingRuntimeHash(),
                 NoAppCache.Instance,
                 new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
                 Mock.Of<ILogger<TypeLoader>>(),

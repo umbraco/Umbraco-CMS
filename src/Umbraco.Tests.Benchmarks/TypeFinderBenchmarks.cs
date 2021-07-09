@@ -16,8 +16,8 @@ namespace Umbraco.Tests.Benchmarks
 
         public TypeFinderBenchmarks()
         {
-            _typeFinder1 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance), new VaryingRuntimeHash());
-            _typeFinder2 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance), new VaryingRuntimeHash())
+            _typeFinder1 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance));
+            _typeFinder2 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance))
             {
                 QueryWithReferencingAssemblies = false
             };

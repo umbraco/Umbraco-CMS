@@ -3,6 +3,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -60,37 +61,22 @@ namespace Umbraco.Extensions
             return services;
         }
 
-        internal static ITypeFinder AddTypeFinder(
-            this IServiceCollection services,
-            ILoggerFactory loggerFactory,
-            Assembly entryAssembly,
-            IConfiguration config,
-            IProfiler profiler)
-        {
-            TypeFinderSettings typeFinderSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
-
-            var assemblyProvider = new DefaultUmbracoAssemblyProvider(entryAssembly, loggerFactory);
-
-            RuntimeHashPaths runtimeHashPaths = new RuntimeHashPaths().AddAssemblies(assemblyProvider);
-
-            var runtimeHash = new RuntimeHash(
-                new ProfilingLogger(
-                    loggerFactory.CreateLogger<RuntimeHash>(),
-                    profiler),
-                runtimeHashPaths);
-
-            var typeFinder =  new TypeFinder(
-                loggerFactory.CreateLogger<TypeFinder>(),
-                assemblyProvider,
-                runtimeHash,
-                new TypeFinderConfig(Options.Create(typeFinderSettings))
-            );
-
-            services.AddUnique<ITypeFinder>(typeFinder);
-
-            return typeFinder;
-        }
-
+        /// <summary>
+        /// Called to create the <see cref="TypeLoader"/> to assign to the <see cref="IUmbracoBuilder"/>
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="entryAssembly"></param>
+        /// <param name="hostingEnvironment"></param>
+        /// <param name="loggerFactory"></param>
+        /// <param name="appCaches"></param>
+        /// <param name="configuration"></param>
+        /// <param name="profiler"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This should never be called in a web project. It is used internally by Umbraco but could be used in unit tests.
+        /// If called in a web project it will have no affect except to create and return a new TypeLoader but this will not
+        /// be the instance in DI.
+        /// </remarks>
         public static TypeLoader AddTypeLoader(
             this IServiceCollection services,
             Assembly entryAssembly,
@@ -100,17 +86,42 @@ namespace Umbraco.Extensions
             IConfiguration configuration,
             IProfiler profiler)
         {
-            ITypeFinder typeFinder = services.AddTypeFinder(loggerFactory, entryAssembly, configuration, profiler);
+            TypeFinderSettings typeFinderSettings = configuration.GetSection(Cms.Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
+
+            var assemblyProvider = new DefaultUmbracoAssemblyProvider(
+                entryAssembly,
+                loggerFactory,
+                typeFinderSettings.AdditionalEntryAssemblies);
+
+            RuntimeHashPaths runtimeHashPaths = new RuntimeHashPaths().AddAssemblies(assemblyProvider);
+
+            var runtimeHash = new RuntimeHash(
+                new ProfilingLogger(
+                    loggerFactory.CreateLogger<RuntimeHash>(),
+                    profiler),
+                runtimeHashPaths);
+
+            var typeFinderConfig = new TypeFinderConfig(Options.Create(typeFinderSettings));
+
+            var typeFinder = new TypeFinder(
+                loggerFactory.CreateLogger<TypeFinder>(),
+                assemblyProvider,
+                typeFinderConfig
+            );
 
             var typeLoader = new TypeLoader(
                 typeFinder,
+                runtimeHash,
                 appCaches.RuntimeCache,
                 new DirectoryInfo(hostingEnvironment.LocalTempPath),
                 loggerFactory.CreateLogger<TypeLoader>(),
                 profiler
             );
 
-            services.AddUnique<TypeLoader>(typeLoader);
+            // This will add it ONCE and not again which is what we want since we don't actually want people to call this method
+            // in the web project.
+            services.TryAddSingleton<ITypeFinder>(typeFinder);
+            services.TryAddSingleton<TypeLoader>(typeLoader);
 
             return typeLoader;
         }
