@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Composing
         private volatile HashSet<Assembly> _localFilteredAssemblyCache;
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
-        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache = new ConcurrentDictionary<string, Type>();
+        private static readonly ConcurrentDictionary<string, Type> s_typeNamesCache = new ConcurrentDictionary<string, Type>();
 
         private readonly ITypeFinderConfig _typeFinderConfig;
         // used for benchmark tests
@@ -255,7 +255,7 @@ namespace Umbraco.Cms.Core.Composing
             }
 
             // It didn't parse, so try loading from each already loaded assembly and cache it
-            return TypeNamesCache.GetOrAdd(name, s =>
+            return s_typeNamesCache.GetOrAdd(name, s =>
                 AppDomain.CurrentDomain.GetAssemblies()
                     .Select(x => x.GetType(s))
                     .FirstOrDefault(x => x != null));

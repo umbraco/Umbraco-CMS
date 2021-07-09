@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly Assembly _entryPointAssembly;
         private readonly ILoggerFactory _loggerFactory;
+        private List<Assembly> _discovered;
 
         public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly, ILoggerFactory loggerFactory)
         {
@@ -33,8 +35,15 @@ namespace Umbraco.Cms.Core.Composing
         {
             get
             {
+                if (_discovered != null)
+                {
+                    return _discovered;
+                }
+
                 var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, Constants.Composing.UmbracoCoreAssemblyNames, true, _loggerFactory);
-                return finder.Find();
+                _discovered = finder.Find().ToList();
+
+                return _discovered;
             }
         }
     }

@@ -204,7 +204,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             // Add it!
             TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
-                webHostEnvironment,
                 TestHelper.GetHostingEnvironment(),
                 TestHelper.ConsoleLoggerFactory,
                 AppCaches.NoCache,

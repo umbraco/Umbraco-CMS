@@ -63,20 +63,29 @@ namespace Umbraco.Extensions
         internal static ITypeFinder AddTypeFinder(
             this IServiceCollection services,
             ILoggerFactory loggerFactory,
-            IWebHostEnvironment webHostEnvironment,
             Assembly entryAssembly,
             IConfiguration config,
             IProfilingLogger profilingLogger)
         {
+            TypeFinderSettings typeFinderSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
 
-            var typeFinderSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
+            var assemblyProvider = new DefaultUmbracoAssemblyProvider(entryAssembly, loggerFactory);
 
-            var runtimeHashPaths = new RuntimeHashPaths().AddFolder(new DirectoryInfo(Path.Combine(webHostEnvironment.ContentRootPath, "bin")));
+            var runtimeHashPaths = new RuntimeHashPaths();
+            foreach(Assembly assembly in assemblyProvider.Assemblies)
+            {
+                // TODO: We need to test this on a published website
+                if (!assembly.IsDynamic && assembly.Location != null)
+                {
+                    runtimeHashPaths.AddFile(new FileInfo(assembly.Location));
+                }
+            }
+
             var runtimeHash = new RuntimeHash(profilingLogger, runtimeHashPaths);
 
             var typeFinder =  new TypeFinder(
                 loggerFactory.CreateLogger<TypeFinder>(),
-                new DefaultUmbracoAssemblyProvider(entryAssembly, loggerFactory),
+                assemblyProvider,
                 runtimeHash,
                 new TypeFinderConfig(Options.Create(typeFinderSettings))
             );
@@ -89,7 +98,6 @@ namespace Umbraco.Extensions
         public static TypeLoader AddTypeLoader(
             this IServiceCollection services,
             Assembly entryAssembly,
-            IWebHostEnvironment webHostEnvironment,
             IHostingEnvironment hostingEnvironment,
             ILoggerFactory loggerFactory,
             AppCaches appCaches,
@@ -97,7 +105,7 @@ namespace Umbraco.Extensions
             IProfiler profiler)
         {
             var profilingLogger = new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), profiler);
-            var typeFinder = services.AddTypeFinder(loggerFactory, webHostEnvironment, entryAssembly, configuration, profilingLogger);
+            var typeFinder = services.AddTypeFinder(loggerFactory, entryAssembly, configuration, profilingLogger);
 
             var typeLoader = new TypeLoader(
                 typeFinder,

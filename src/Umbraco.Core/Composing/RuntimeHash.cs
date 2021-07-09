@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Composing
 {
@@ -12,6 +14,7 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly IProfilingLogger _logger;
         private readonly RuntimeHashPaths _paths;
+        private string _calculated;
 
         public RuntimeHash(IProfilingLogger logger, RuntimeHashPaths paths)
         {
@@ -22,13 +25,18 @@ namespace Umbraco.Cms.Core.Composing
 
         public string GetHashValue()
         {
-            var allPaths = _paths.GetFolders()
-                .Select(x => ((FileSystemInfo) x, false))
-                .Concat(_paths.GetFiles().Select(x => ((FileSystemInfo) x.Key, x.Value)));
+            if (_calculated != null)
+            {
+                return _calculated;
+            }
 
-            var hash = GetFileHash(allPaths);
+            IEnumerable<(FileSystemInfo, bool)> allPaths = _paths.GetFolders()
+                .Select(x => ((FileSystemInfo)x, false))
+                .Concat(_paths.GetFiles().Select(x => ((FileSystemInfo)x.Key, x.Value)));
 
-            return hash;
+            _calculated = GetFileHash(allPaths);
+
+            return _calculated;
         }
 
         /// <summary>
@@ -48,7 +56,7 @@ namespace Umbraco.Cms.Core.Composing
 
                 using var generator = new HashGenerator();
 
-                foreach (var (fileOrFolder, scanFileContent) in filesAndFolders)
+                foreach ((FileSystemInfo fileOrFolder, bool scanFileContent) in filesAndFolders)
                 {
                     if (scanFileContent)
                     {
@@ -56,9 +64,16 @@ namespace Umbraco.Cms.Core.Composing
                         // normalize the content for cr/lf and case-sensitivity
                         if (uniqContent.Add(fileOrFolder.FullName))
                         {
-                            if (File.Exists(fileOrFolder.FullName) == false) continue;
-                            var content = RemoveCrLf(File.ReadAllText(fileOrFolder.FullName));
-                            generator.AddCaseInsensitiveString(content);
+                            if (File.Exists(fileOrFolder.FullName) == false)
+                            {
+                                continue;
+                            }
+
+                            using (FileStream fileStream = File.OpenRead(fileOrFolder.FullName))
+                            {
+                                var hash = fileStream.GetStreamHash();
+                                generator.AddCaseInsensitiveString(hash);
+                            }
                         }
                     }
                     else
@@ -74,18 +89,5 @@ namespace Umbraco.Cms.Core.Composing
             }
         }
 
-        // fast! (yes, according to benchmarks)
-        private static string RemoveCrLf(string s)
-        {
-            var buffer = new char[s.Length];
-            var count = 0;
-            // ReSharper disable once ForCanBeConvertedToForeach - no!
-            for (var i = 0; i < s.Length; i++)
-            {
-                if (s[i] != '\r' && s[i] != '\n')
-                    buffer[count++] = s[i];
-            }
-            return new string(buffer, 0, count);
-        }
     }
 }

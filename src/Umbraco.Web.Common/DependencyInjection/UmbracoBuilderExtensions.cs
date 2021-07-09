@@ -108,7 +108,7 @@ namespace Umbraco.Extensions
             services.AddUnique(profiler);
 
             ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
-            TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
+            TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
 
             // adds the umbraco startup filter which will call UseUmbraco early on before
             // other start filters are applied (depending on the ordering of IStartupFilters in DI).
