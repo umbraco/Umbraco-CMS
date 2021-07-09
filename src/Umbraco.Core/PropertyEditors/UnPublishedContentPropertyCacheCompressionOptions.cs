@@ -14,11 +14,7 @@ namespace Umbraco.Core.PropertyEditors
     {
         public bool IsCompressed(IReadOnlyContentBase content, PropertyType propertyType, IDataEditor dataEditor, bool published)
         {
-            if (published)
-            {
-                return false;
-            }
-            if (propertyType.SupportsPublishing && propertyType.ValueStorageType == ValueStorageType.Ntext)
+            if (!published && propertyType.SupportsPublishing && propertyType.ValueStorageType == ValueStorageType.Ntext)
             {
                 //Only compress non published content that supports publishing and the property is text
                 return true;
