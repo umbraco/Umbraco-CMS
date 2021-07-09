@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -76,7 +76,7 @@ namespace Umbraco.Extensions
              if (text == null)
                  return null;
 
-             if (text.StartsWith("#") == false)
+             if (text.StartsWith("#") == false || text.IndexOf('_') == -1)
                  return text;
 
              text = text.Substring(1);
@@ -87,6 +87,9 @@ namespace Umbraco.Extensions
              }
 
              var areaAndKey = text.Split('_');
+
+             if (areaAndKey.Length < 2) 
+                return text;
 
              value = manager.Localize(areaAndKey[0], areaAndKey[1]);
              return value.StartsWith("[") ? text : value;
