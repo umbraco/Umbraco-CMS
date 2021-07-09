@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
             CommandParser parser,
             CultureInfo culture)
         {
-            ImageCropperCropCoordinates cropCoordinates = GetCropCoordinates(commands);
+            ImageCropperCropCoordinates cropCoordinates = GetCropCoordinates(commands, parser, culture);
             if (cropCoordinates is null)
             {
                 return image;
@@ -56,24 +56,22 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
             return new Rectangle(topX, topY, cropWidth, cropHeight);
         }
 
-        private static ImageCropperCropCoordinates GetCropCoordinates(IDictionary<string, string> commands)
+        private static ImageCropperCropCoordinates GetCropCoordinates(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
         {
-            if (!commands.TryGetValue(Crop, out var crop))
+            float[] crops = parser.ParseValue<float[]>(commands.GetValueOrDefault(Crop), culture);
+            
+            if (crops.Length != 4)
             {
                 return null;
             }
 
-            var crops = crop.Split(',');
-
             return new ImageCropperCropCoordinates()
             {
-                X1 = ParseDecimal(crops[0]),
-                Y1 = ParseDecimal(crops[1]),
-                X2 = ParseDecimal(crops[2]),
-                Y2 = ParseDecimal(crops[3])
+                X1 = crops[0],
+                Y1 = crops[1],
+                X2 = crops[2],
+                Y2 = crops[3]
             };
         }
-
-        private static decimal ParseDecimal(string decimalString) => decimal.Parse(decimalString, CultureInfo.InvariantCulture);
     }
 }
