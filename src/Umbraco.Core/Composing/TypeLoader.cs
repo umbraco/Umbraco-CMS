@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
@@ -55,8 +54,8 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, IEnumerable<Assembly> assembliesToScan = null)
-            : this(typeFinder, runtimeCache, localTempPath, logger, profilingLogger, true, assembliesToScan)
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfiler profiler, IEnumerable<Assembly> assembliesToScan = null)
+            : this(typeFinder, runtimeCache, localTempPath, logger, profiler, true, assembliesToScan)
         { }
 
         /// <summary>
@@ -68,13 +67,18 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
+        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfiler profiler, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
         {
+            if (profiler is null)
+            {
+                throw new ArgumentNullException(nameof(profiler));
+            }
+
             TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempPath = localTempPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
+            _profilingLogger = new ProfilingLogger(logger, profiler);
             _assemblies = assembliesToScan;
 
             _fileBasePath = new Lazy<string>(GetFileBasePath);

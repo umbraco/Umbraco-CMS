@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
                 NoAppCache.Instance,
                 new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)),
                 Mock.Of<ILogger<TypeLoader>>(),
-                new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>()),
+                Mock.Of<IProfiler>(),
                 false,
                 assemblies);
         }

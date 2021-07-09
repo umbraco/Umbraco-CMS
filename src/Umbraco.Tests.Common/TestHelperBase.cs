@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Tests.Common
         public ITypeFinder GetTypeFinder() => _typeFinder;
 
         public TypeLoader GetMockedTypeLoader() =>
-            new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfilingLogger>());
+            new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfiler>());
 
         //// public Configs GetConfigs() => GetConfigsFactory().Create();
 

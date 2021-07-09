@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Benchmarks
                 cache,
                 null,
                 new NullLogger<TypeLoader>(),
-                new ProfilingLogger(new NullLogger<ProfilingLogger>(), new NoopProfiler()));
+                new NoopProfiler());
 
             // populate the cache
             cache.Insert(
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Benchmarks
                 NoAppCache.Instance,
                 null,
                 new NullLogger<TypeLoader>(),
-                new ProfilingLogger(new NullLogger<ProfilingLogger>(), new NoopProfiler()));
+                new NoopProfiler());
         }
 
         /// <summary>

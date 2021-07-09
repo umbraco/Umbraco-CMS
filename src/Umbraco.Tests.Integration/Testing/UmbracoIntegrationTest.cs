@@ -202,14 +202,15 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
 
             // Add it!
+            Core.Hosting.IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
             TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
-                TestHelper.GetHostingEnvironment(),
+                hostingEnvironment,
                 TestHelper.ConsoleLoggerFactory,
                 AppCaches.NoCache,
                 Configuration,
                 TestHelper.Profiler);
-            var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory);
+            var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
 
             builder.Services.AddLogger(TestHelper.GetHostingEnvironment(), TestHelper.GetLoggingConfiguration(), Configuration);
 

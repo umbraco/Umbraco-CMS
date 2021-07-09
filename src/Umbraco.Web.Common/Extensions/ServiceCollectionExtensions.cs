@@ -65,23 +65,19 @@ namespace Umbraco.Extensions
             ILoggerFactory loggerFactory,
             Assembly entryAssembly,
             IConfiguration config,
-            IProfilingLogger profilingLogger)
+            IProfiler profiler)
         {
             TypeFinderSettings typeFinderSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigTypeFinder).Get<TypeFinderSettings>() ?? new TypeFinderSettings();
 
             var assemblyProvider = new DefaultUmbracoAssemblyProvider(entryAssembly, loggerFactory);
 
-            var runtimeHashPaths = new RuntimeHashPaths();
-            foreach(Assembly assembly in assemblyProvider.Assemblies)
-            {
-                // TODO: We need to test this on a published website
-                if (!assembly.IsDynamic && assembly.Location != null)
-                {
-                    runtimeHashPaths.AddFile(new FileInfo(assembly.Location));
-                }
-            }
+            RuntimeHashPaths runtimeHashPaths = new RuntimeHashPaths().AddAssemblies(assemblyProvider);
 
-            var runtimeHash = new RuntimeHash(profilingLogger, runtimeHashPaths);
+            var runtimeHash = new RuntimeHash(
+                new ProfilingLogger(
+                    loggerFactory.CreateLogger<RuntimeHash>(),
+                    profiler),
+                runtimeHashPaths);
 
             var typeFinder =  new TypeFinder(
                 loggerFactory.CreateLogger<TypeFinder>(),
@@ -104,15 +100,14 @@ namespace Umbraco.Extensions
             IConfiguration configuration,
             IProfiler profiler)
         {
-            var profilingLogger = new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), profiler);
-            var typeFinder = services.AddTypeFinder(loggerFactory, entryAssembly, configuration, profilingLogger);
+            ITypeFinder typeFinder = services.AddTypeFinder(loggerFactory, entryAssembly, configuration, profiler);
 
             var typeLoader = new TypeLoader(
                 typeFinder,
                 appCaches.RuntimeCache,
                 new DirectoryInfo(hostingEnvironment.LocalTempPath),
                 loggerFactory.CreateLogger<TypeLoader>(),
-                profilingLogger
+                profiler
             );
 
             services.AddUnique<TypeLoader>(typeLoader);
