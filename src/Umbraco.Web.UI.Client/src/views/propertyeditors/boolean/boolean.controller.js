@@ -56,11 +56,11 @@ function booleanEditorController($scope) {
     };
 
     // If another property editor changes the model.value we want to pick that up and reflect the value in this one.
-    $scope.$watch("model.value", function(newVal, oldVal) {
+    var unsubscribe = $scope.$watch("model.value", function(newVal, oldVal) {
         if(newVal !== oldVal) {
             setupViewModel();
         }
-    })
+    });
 
     // Update the value when the toggle is clicked
     $scope.toggle = function(){
@@ -74,6 +74,10 @@ function booleanEditorController($scope) {
         $scope.model.value = $scope.model.config.truevalue;
         setupViewModel();
     };
+
+    $scope.$on('$destroy', function () {
+        unsubscribe();
+    });
 
 }
 angular.module("umbraco").controller("Umbraco.PropertyEditors.BooleanController", booleanEditorController);
