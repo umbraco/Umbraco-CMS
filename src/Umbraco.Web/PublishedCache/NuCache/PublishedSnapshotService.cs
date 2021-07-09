@@ -1491,7 +1491,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
             };
 
-            var serialized = serializer.Serialize(ReadOnlyContentBaseAdapter.Create(content), contentCacheData);
+            var serialized = serializer.Serialize(ReadOnlyContentBaseAdapter.Create(content), contentCacheData,published);
 
             var dto = new ContentNuDto
             {

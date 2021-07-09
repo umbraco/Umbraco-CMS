@@ -26,8 +26,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 composition.RegisterUnique<IContentCacheDataSerializerFactory, MsgPackContentNestedDataSerializerFactory>();                
             }
-
-            composition.RegisterUnique<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
+            var unPublishedContentCompression = ConfigurationManager.AppSettings[NuCacheSerializerComponent.Nucache_UnPublishedContentCompression_Key]; 
+            if ("MsgPack" == serializer && "true" == unPublishedContentCompression)
+            {
+                composition.RegisterUnique<IPropertyCacheCompressionOptions, UnPublishedContentPropertyCacheCompressionOptions>();
+            }
+            else
+            {
+                composition.RegisterUnique<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
+            }
+           
 
             composition.RegisterUnique(factory => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
 
