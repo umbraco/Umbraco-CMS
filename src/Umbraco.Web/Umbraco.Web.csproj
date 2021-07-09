@@ -68,11 +68,17 @@
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
+    <PackageReference Include="K4os.Compression.LZ4">
+      <Version>1.1.11</Version>
+    </PackageReference>
     <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
     <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
     <PackageReference Include="Markdown" Version="2.2.1" />
+    <PackageReference Include="MessagePack">
+      <Version>2.2.85</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.0" />
@@ -269,6 +275,15 @@
     <Compile Include="PropertyEditors\MediaPicker3PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializationResult.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializerEntityType.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IDictionaryOfPropertyDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\LazyCompressedString.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializer.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorElementTypeValidationResult.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorPropertyTypeValidationResult.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorValidationResult.cs" />
@@ -276,6 +291,9 @@
     <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComponent.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComposer.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MediaPickerWithCropsValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
@@ -294,6 +312,7 @@
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
+    <Compile Include="Search\IUmbracoTreeSearcherFields2.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrorMiddlware.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrors.cs" />
@@ -597,7 +616,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfPropertyDataSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\ContentNestedData.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataModel.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\CultureVariation.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IDataSource.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
@@ -1150,9 +1169,7 @@
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
-    <Compile Include="FormlessPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="FormlessPage.cs" />
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="ModelStateExtensions.cs" />
@@ -1307,7 +1324,7 @@
     </PropertyGroup>
     <ItemGroup>
       <!-- we want to exclude all facade references ?! -->
-      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http'" />
+      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'Microsoft.Bcl.AsyncInterfaces' and '%(ReferencePath.FileName)' != 'System.Buffers' and '%(ReferencePath.FileName)' != 'System.Numerics.Vectors' and '%(ReferencePath.FileName)' != 'System.Runtime.CompilerServices.Unsafe'" />
     </ItemGroup>
     <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />
     <!--

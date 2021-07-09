@@ -319,6 +319,7 @@
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v12.0</VSToolsPath>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0</VSToolsPath>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0</VSToolsPath>
+    <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v16.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v16.0</VSToolsPath>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v17.0</VSToolsPath>
   </PropertyGroup>
   <!-- determine WebPublishingTasks -->
@@ -329,7 +330,7 @@
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>      
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
   <!-- get TransformXml task from WebPublishingtasks -->
   <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
@@ -347,9 +348,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8140</DevelopmentServerPort>
+          <DevelopmentServerPort>8150</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8140</IISUrl>
+          <IISUrl>http://localhost:8150</IISUrl>
           <DevelopmentServerPort>8131</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:8131</IISUrl>
