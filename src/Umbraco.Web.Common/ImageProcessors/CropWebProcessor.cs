@@ -58,8 +58,8 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
 
         private static ImageCropperCropCoordinates GetCropCoordinates(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
         {
-            float[] crops = parser.ParseValue<float[]>(commands.GetValueOrDefault(Crop), culture);
-            
+            decimal[] crops = parser.ParseValue<decimal[]>(commands.GetValueOrDefault(Crop), culture);
+
             if (crops.Length != 4)
             {
                 return null;
