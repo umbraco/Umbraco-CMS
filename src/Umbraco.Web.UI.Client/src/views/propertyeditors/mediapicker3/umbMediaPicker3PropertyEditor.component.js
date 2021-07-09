@@ -93,6 +93,10 @@
 
             vm.model.value.forEach(mediaEntry => updateMediaEntryData(mediaEntry));
 
+            // set the onValueChanged callback, this will tell us if the media picker model changed on the server
+            // once the data is submitted. If so we need to re-initialize
+            vm.model.onValueChanged = onServerValueChanged;
+
             userService.getCurrentUser().then(function (userData) {
 
                 if (!vm.model.config.startNodeId) {
@@ -114,6 +118,15 @@
             });
 
         };
+
+        function onServerValueChanged(newVal, oldVal) {
+            if(newVal === null || !Array.isArray(newVal)) {
+                newVal = [];
+                vm.model.value = newVal;
+            }
+
+            vm.model.value.forEach(mediaEntry => updateMediaEntryData(mediaEntry));
+        }
 
         function setDirty() {
             if (vm.propertyForm) {
