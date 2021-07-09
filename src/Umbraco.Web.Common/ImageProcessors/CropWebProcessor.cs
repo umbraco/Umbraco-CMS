@@ -41,6 +41,13 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
 
         public IEnumerable<string> Commands { get; } = CropCommands;
 
+        /// <summary>
+        /// Gets a rectangle that is calculated from crop coordinates.
+        /// </summary>
+        /// <param name="width">The width of the image being cropped.</param>
+        /// <param name="height">The height of the image being cropped.</param>
+        /// <param name="coordinates">Coordinate set to calculate rectangle from.</param>
+        /// <returns>Rectangle with the position and sized described in coordinates.</returns>
         private static Rectangle GetCropRectangle(int width, int height, ImageCropperCropCoordinates coordinates)
         {
             // Get coordinates of top left corner of the rectangle
@@ -57,8 +64,20 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
             return new Rectangle(topX, topY, cropWidth, cropHeight);
         }
 
+        /// <summary>
+        /// Converts a decimal to an int with rounding.
+        /// </summary>
+        /// <param name="number">Decimal to convert.</param>
+        /// <returns>The decimal rounded to an int.</returns>
         private static int RoundToInt(decimal number) => decimal.ToInt32(Math.Round(number));
 
+        /// <summary>
+        /// Gets the crop coordinates from the query string.
+        /// </summary>
+        /// <param name="commands">Commands dictionary to parse the coordinates from.</param>
+        /// <param name="parser">Parser provided by imagesharp.</param>
+        /// <param name="culture">Culture to use for parsing.</param>
+        /// <returns>Coordinates of the crop.</returns>
         private static ImageCropperCropCoordinates GetCropCoordinates(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
         {
             decimal[] crops = parser.ParseValue<decimal[]>(commands.GetValueOrDefault(Crop), culture);
