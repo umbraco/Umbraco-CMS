@@ -45,7 +45,11 @@ namespace Umbraco.Cms.Core.Composing
                     return _discovered;
                 }
 
-                IEnumerable<string> additionalTargetAssemblies = _additionalTargetAssemblies.Concat(Constants.Composing.UmbracoCoreAssemblyNames);
+                IEnumerable<string> additionalTargetAssemblies = Constants.Composing.UmbracoCoreAssemblyNames;
+                if (_additionalTargetAssemblies != null)
+                {
+                    additionalTargetAssemblies = additionalTargetAssemblies.Concat(_additionalTargetAssemblies);
+                }
 
                 var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, additionalTargetAssemblies.ToArray(), true, _loggerFactory);
                 _discovered = finder.Find().ToList();
