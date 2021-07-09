@@ -1,7 +1,7 @@
 function booleanEditorController($scope) {
 
     // Setup the default config
-    // This allow to overwrite the configuration when property editor is re-used 
+    // This allow to overwrite the configuration when property editor is re-used
     // in e.g. third party packages, dashboard or content app. For example when using umb-property-editor.
     // At the moment this use "1/0" as default for "truevalue" and "falsevalue", but allow "True/False" as well.
     // Maybe sometime later we can make it support "Yes/No" or "On/Off" as well similar to ng-true-value and ng-false-value in Angular.
@@ -54,6 +54,13 @@ function booleanEditorController($scope) {
         //update the display val again if it has changed from the server
         setupViewModel();
     };
+
+    // If another property editor changes the model.value we want to pick that up and reflect the value in this one.
+    $scope.$watch("model.value", function(newVal, oldVal) {
+        if(newVal !== oldVal) {
+            setupViewModel();
+        }
+    })
 
     // Update the value when the toggle is clicked
     $scope.toggle = function(){
