@@ -40,7 +40,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             _options = defaultOptions
                 .WithResolver(resolver)
                 .WithCompression(MessagePackCompression.Lz4BlockArray)
-                .WithSecurity(MessagePackSecurity.UntrustedData);            
+                .WithSecurity(MessagePackSecurity.UntrustedData);
         }
 
         public string ToJson(byte[] bin)
@@ -49,7 +49,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return json;
         }
 
-        public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData,bool published)
+        public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData, bool published)
         {
             if (byteData != null)
             {
@@ -62,7 +62,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 // NOTE: We don't really support strings but it's possible if manually used (i.e. tests)
                 var bin = Convert.FromBase64String(stringData);
                 var cacheModel = MessagePackSerializer.Deserialize<ContentCacheDataModel>(bin, _options);
-                Expand(content, cacheModel,published);
+                Expand(content, cacheModel, published);
                 return cacheModel;
             }
             else
@@ -71,7 +71,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
         }
 
-        public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model,bool published)
+        public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model, bool published)
         {
             Compress(content, model, published);
             var bytes = MessagePackSerializer.Serialize(model, _options);
@@ -81,7 +81,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         /// <summary>
         /// Used during serialization to compress properties
         /// </summary>
+        /// <param name="content"></param>
         /// <param name="model"></param>
+        /// <param name="published"></param>
         /// <remarks>
         /// This will essentially 'double compress' property data. The MsgPack data as a whole will already be compressed
         /// but this will go a step further and double compress property data so that it is stored in the nucache file
@@ -89,11 +91,11 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         /// read/decompressed as a string to be displayed on the front-end. This allows for potentially a significant
         /// memory savings but could also affect performance of first rendering pages while decompression occurs.
         /// </remarks>
-        private void Compress(IReadOnlyContentBase content, ContentCacheDataModel model,bool published)
+        private void Compress(IReadOnlyContentBase content, ContentCacheDataModel model, bool published)
         {
             foreach(var propertyAliasToData in model.PropertyData)
             {
-                if (_propertyOptions.IsCompressed(content, propertyAliasToData.Key,published))
+                if (_propertyOptions.IsCompressed(content, propertyAliasToData.Key, published))
                 {
                     foreach(var property in propertyAliasToData.Value.Where(x => x.Value != null && x.Value is string))
                     {
@@ -106,8 +108,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         /// <summary>
         /// Used during deserialization to map the property data as lazy or expand the value
         /// </summary>
+        /// <param name="content"></param>
         /// <param name="nestedData"></param>
-        private void Expand(IReadOnlyContentBase content, ContentCacheDataModel nestedData,bool published)
+        /// <param name="published"></param>
+        private void Expand(IReadOnlyContentBase content, ContentCacheDataModel nestedData, bool published)
         {
             foreach (var propertyAliasToData in nestedData.PropertyData)
             {

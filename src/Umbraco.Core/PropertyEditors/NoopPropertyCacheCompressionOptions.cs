@@ -7,6 +7,6 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     internal class NoopPropertyCacheCompressionOptions : IPropertyCacheCompressionOptions
     {
-        public bool IsCompressed(IReadOnlyContentBase content, PropertyType propertyType, IDataEditor dataEditor,bool published) => false;
+        public bool IsCompressed(IReadOnlyContentBase content, PropertyType propertyType, IDataEditor dataEditor, bool published) => false;
     }
 }

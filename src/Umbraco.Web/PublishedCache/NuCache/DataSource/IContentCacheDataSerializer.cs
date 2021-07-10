@@ -17,9 +17,9 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData, bool published);
 
         /// <summary>
-        /// Serializes the <see cref="ContentCacheDataModel"/> 
+        /// Serializes the <see cref="ContentCacheDataModel"/>
         /// </summary>
-        ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model,bool published);
+        ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model, bool published);
     }
 
 }

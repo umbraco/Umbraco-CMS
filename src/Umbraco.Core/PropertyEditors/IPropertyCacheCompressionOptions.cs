@@ -11,6 +11,6 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="propertyType">The property to compress or not</param>
         /// <param name="dataEditor">The datatype of the property to compress or not</param>
         /// <param name="published">Whether this content is the published version</param>
-        bool IsCompressed(IReadOnlyContentBase content, PropertyType propertyType, IDataEditor dataEditor,bool published);
+        bool IsCompressed(IReadOnlyContentBase content, PropertyType propertyType, IDataEditor dataEditor, bool published);
     }
 }
