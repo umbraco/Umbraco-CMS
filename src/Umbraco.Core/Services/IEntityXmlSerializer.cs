@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models;
 
@@ -22,7 +23,8 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         XElement Serialize(
             IMedia media,
-            bool withDescendants = false);
+            bool withDescendants = false,
+            Action<IMedia, XElement> onMediaItemSerialized = null);
 
         /// <summary>
         /// Exports an IMember item as an XElement.

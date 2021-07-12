@@ -11,6 +11,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
@@ -56,6 +57,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
 
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
+        private MediaFileManager MediaFileManager => GetRequiredService<MediaFileManager>();
+
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ContentService,
             ContentTypeService,
@@ -68,6 +71,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             MediaService,
             MediaTypeService,
+            MediaFileManager,
             "createdPackages.config",
 
             // temp paths
@@ -200,10 +204,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             
             string packageXmlPath = PackageBuilder.ExportPackage(def);
 
-            using (var stream = File.OpenRead(packageXmlPath))
+            using (var packageZipStream = File.OpenRead(packageXmlPath))
+            using (ZipArchive zipArchive = PackageMigrationResource.GetPackageDataManifest(packageZipStream, out XDocument packageXml))
             {
-                var xml = XDocument.Load(stream);
-                var dictionaryItems = xml.Root.Element("DictionaryItems");
+                var dictionaryItems = packageXml.Root.Element("DictionaryItems");
                 Assert.IsNotNull(dictionaryItems);
                 var rootItems = dictionaryItems.Elements("DictionaryItem").ToList();
                 Assert.AreEqual(2, rootItems.Count);
@@ -240,12 +244,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             def = PackageBuilder.GetById(def.Id); // re-get
             Assert.IsNotNull(def.PackagePath);
 
-            using (var packageXmlStream = File.OpenRead(packageXmlPath))
+            using (FileStream packageZipStream = File.OpenRead(packageXmlPath))
+            using (ZipArchive zipArchive = PackageMigrationResource.GetPackageDataManifest(packageZipStream, out XDocument packageXml))
             {
-                var xml = XDocument.Load(packageXmlStream);
-                Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
+                Assert.AreEqual("umbPackage", packageXml.Root.Name.ToString());
 
-                Assert.AreEqual($"<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
+                Assert.AreEqual(
+                    $"<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>",
+                    packageXml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
 
                 // TODO: There's a whole lot more assertions to be done
 

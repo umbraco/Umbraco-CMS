@@ -69,9 +69,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return editor;
         }
 
-        public bool TryGetMediaPath(string alias, object value, out string mediaPath)
+        public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
         {
-            if (alias == Alias)
+            if (propertyEditorAlias == Alias)
             {
                 mediaPath = value?.ToString();
                 return true;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
@@ -25,8 +25,19 @@ namespace Umbraco.Extensions
             if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
 
             var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content, culture)).FirstOrDefault(u => u != null);
-            url ??= new DefaultUrlSegmentProvider(shortStringHelper).GetUrlSegment(content, culture); // be safe
+            if (url == null)
+            {
+                if (s_defaultUrlSegmentProvider == null)
+                {
+                    s_defaultUrlSegmentProvider = new DefaultUrlSegmentProvider(shortStringHelper);
+                }
+
+                url = s_defaultUrlSegmentProvider.GetUrlSegment(content, culture); // be safe
+            }
+            
             return url;
         }
+
+        private static DefaultUrlSegmentProvider s_defaultUrlSegmentProvider;
     }
 }

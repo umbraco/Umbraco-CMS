@@ -5,6 +5,7 @@ using Umbraco.Tests.Benchmarks.Config;
 
 namespace Umbraco.Tests.Benchmarks
 {
+
     [QuickRunWithMemoryDiagnoserConfig]
     public class CombineGuidBenchmarks
     {
