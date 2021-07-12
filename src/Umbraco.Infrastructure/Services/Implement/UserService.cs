@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Globalization;
@@ -273,16 +273,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Saves an <see cref="IUser"/>
         /// </summary>
         /// <param name="entity"><see cref="IUser"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUser entity, bool raiseEvents = true)
+        public void Save(IUser entity)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 var savingNotification = new UserSavingNotification(entity, evtMsgs);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -297,10 +295,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 try
                 {
                     _userRepository.Save(entity);
-                    if (raiseEvents)
-                    {
-                        scope.Notifications.Publish(new UserSavedNotification(entity, evtMsgs).WithStateFrom(savingNotification));
-                    }
+                    scope.Notifications.Publish(new UserSavedNotification(entity, evtMsgs).WithStateFrom(savingNotification));
 
                     scope.Complete();
                 }
@@ -321,9 +316,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Saves a list of <see cref="IUser"/> objects
         /// </summary>
         /// <param name="entities"><see cref="IEnumerable{IUser}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IEnumerable<IUser> entities, bool raiseEvents = true)
+        public void Save(IEnumerable<IUser> entities)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -332,7 +325,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var savingNotification = new UserSavingNotification(entitiesA, evtMsgs);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -350,10 +343,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 }
 
-                if (raiseEvents)
-                {
-                    scope.Notifications.Publish(new UserSavedNotification(entitiesA, evtMsgs).WithStateFrom(savingNotification));
-                }
+                scope.Notifications.Publish(new UserSavedNotification(entitiesA, evtMsgs).WithStateFrom(savingNotification));
 
                 //commit the whole lot in one go
                 scope.Complete();
@@ -818,7 +808,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </param>
         /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true)
+        public void Save(IUserGroup userGroup, int[] userIds = null)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -843,7 +833,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 // this is the default/expected notification for the IUserGroup entity being saved
                 var savingNotification = new UserGroupSavingNotification(userGroup, evtMsgs);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -851,7 +841,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 // this is an additional notification for special auditing
                 var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, evtMsgs);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
+                if (scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
                 {
                     scope.Complete();
                     return;
@@ -859,11 +849,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, userIds);
 
-                if (raiseEvents)
-                {
-                    scope.Notifications.Publish(new UserGroupSavedNotification(userGroup, evtMsgs).WithStateFrom(savingNotification));
-                    scope.Notifications.Publish(new UserGroupWithUsersSavedNotification(userGroupWithUsers, evtMsgs).WithStateFrom(savingUserGroupWithUsersNotification));
-                }
+                scope.Notifications.Publish(new UserGroupSavedNotification(userGroup, evtMsgs).WithStateFrom(savingNotification));
+                scope.Notifications.Publish(new UserGroupWithUsersSavedNotification(userGroupWithUsers, evtMsgs).WithStateFrom(savingUserGroupWithUsersNotification));
 
                 scope.Complete();
             }

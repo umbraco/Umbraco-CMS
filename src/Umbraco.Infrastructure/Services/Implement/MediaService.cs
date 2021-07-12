@@ -654,14 +654,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public Attempt<OperationResult> Save(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 var savingNotification = new MediaSavingNotification(media, eventMessages);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(eventMessages);
@@ -685,10 +685,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 _mediaRepository.Save(media);
-                if (raiseEvents)
-                {
-                    scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
-                }
+                scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
+                // TODO: See note about supressing events in content service
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode, eventMessages));
 
                 Audit(AuditType.Save, userId, media.Id);
@@ -704,7 +702,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Cms.Core.Constants.Security.SuperUserId, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
             IMedia[] mediasA = medias.ToArray();
@@ -712,7 +710,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 var savingNotification = new MediaSavingNotification(mediasA, messages);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(messages);
@@ -731,10 +729,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _mediaRepository.Save(media);
                 }
 
-                if (raiseEvents)
-                {
-                    scope.Notifications.Publish(new MediaSavedNotification(mediasA, messages).WithStateFrom(savingNotification));
-                }
+                scope.Notifications.Publish(new MediaSavedNotification(mediasA, messages).WithStateFrom(savingNotification));
+                // TODO: See note about supressing events in content service
                 scope.Notifications.Publish(new MediaTreeChangeNotification(treeChanges, messages));
                 Audit(AuditType.Save, userId == -1 ? 0 : userId, Cms.Core.Constants.System.Root, "Bulk save media");
 
@@ -1095,7 +1091,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<IMedia> items, int userId = Cms.Core.Constants.Security.SuperUserId, bool raiseEvents = true)
+        public bool Sort(IEnumerable<IMedia> items, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             IMedia[] itemsA = items.ToArray();
             if (itemsA.Length == 0)
@@ -1108,7 +1104,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 var savingNotification = new MediaSavingNotification(itemsA, messages);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return false;
@@ -1135,10 +1131,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _mediaRepository.Save(media);
                 }
 
-                if (raiseEvents)
-                {
-                    scope.Notifications.Publish(new MediaSavedNotification(itemsA, messages).WithStateFrom(savingNotification));
-                }
+                scope.Notifications.Publish(new MediaSavedNotification(itemsA, messages).WithStateFrom(savingNotification));
+                // TODO: See note about supressing events in content service
                 scope.Notifications.Publish(new MediaTreeChangeNotification(saved, TreeChangeTypes.RefreshNode, messages));
                 Audit(AuditType.Sort, userId, 0);
 
