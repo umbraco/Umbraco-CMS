@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Events
         /// Supresses all notifications from being added/created until the result object is disposed.
         /// </summary>
         /// <returns></returns>
-        IDisposable Supress();
+        IDisposable Suppress();
 
         /// <summary>
         /// Publishes a cancelable notification to the notification subscribers

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Notifications;
 
@@ -28,7 +29,7 @@ namespace Umbraco.Cms.Core.Events
                 throw new ArgumentNullException(nameof(notification));
             }
 
-            if (_isSuppressed)
+            if (CanSuppress(notification) && _isSuppressed)
             {
                 return false;
             }
@@ -44,7 +45,7 @@ namespace Umbraco.Cms.Core.Events
                 throw new ArgumentNullException(nameof(notification));
             }
 
-            if (_isSuppressed)
+            if (CanSuppress(notification) && _isSuppressed)
             {
                 return false;
             }
@@ -60,7 +61,7 @@ namespace Umbraco.Cms.Core.Events
                 throw new ArgumentNullException(nameof(notification));
             }
 
-            if (_isSuppressed)
+            if (CanSuppress(notification) && _isSuppressed)
             {
                 return;
             }
@@ -86,7 +87,7 @@ namespace Umbraco.Cms.Core.Events
             }
         }
 
-        public IDisposable Supress()
+        public IDisposable Suppress()
         {
             lock(_locker)
             {
@@ -97,6 +98,9 @@ namespace Umbraco.Cms.Core.Events
                 return new Suppressor(this);
             }
         }
+
+        private bool CanSuppress(INotification notification)
+            => notification.GetType().GetCustomAttribute<CannotSuppressNotificationAttribute>() == null;
 
         private class Suppressor : IDisposable
         {

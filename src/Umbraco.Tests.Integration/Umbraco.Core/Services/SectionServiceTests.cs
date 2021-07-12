@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
         private IUser CreateTestUser()
         {
             using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
-            using IDisposable _ = scope.Notifications.Supress();
+            using IDisposable _ = scope.Notifications.Suppress();
 
             var globalSettings = new GlobalSettings();
             var user = new User(globalSettings)

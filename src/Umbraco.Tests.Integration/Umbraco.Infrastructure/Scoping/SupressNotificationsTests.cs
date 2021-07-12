@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         public void GivenScope_WhenNotificationsSuppressed_ThenNotificationsDoNotExecute()
         {
             using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
-            using IDisposable _ = scope.Notifications.Supress();
+            using IDisposable _ = scope.Notifications.Suppress();
 
             ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
             ContentTypeService.Save(contentType);
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         {
             using (IScope parentScope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                using IDisposable _ = parentScope.Notifications.Supress();
+                using IDisposable _ = parentScope.Notifications.Suppress();
 
                 using (IScope childScope = ScopeProvider.CreateScope(autoComplete: true))
                 {
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             int asserted = 0;
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                using IDisposable suppressed = scope.Notifications.Supress();
+                using IDisposable suppressed = scope.Notifications.Suppress();
 
                 MediaType mediaType = MediaTypeBuilder.CreateImageMediaType("test");
                 MediaTypeService.Save(mediaType);
@@ -81,6 +81,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             }   
 
             Assert.AreEqual(asserted + 1, TestContext.CurrentContext.AssertCount);
+        }
+
+        [Test]
+        public void GivenSuppressedNotificationsOnParent_WhenChildSupresses_ThenExceptionIsThrown()
+        {
+            using (IScope parentScope = ScopeProvider.CreateScope(autoComplete: true))
+            using (IDisposable parentSuppressed = parentScope.Notifications.Suppress())
+            {
+                using (IScope childScope = ScopeProvider.CreateScope(autoComplete: true))                
+                {
+                    Assert.Throws<InvalidOperationException>(() => childScope.Notifications.Suppress());
+                }
+            }
         }
 
         private class TestContentNotificationHandler : INotificationHandler<ContentSavingNotification>
