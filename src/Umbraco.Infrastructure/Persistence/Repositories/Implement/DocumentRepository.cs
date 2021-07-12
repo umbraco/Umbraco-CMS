@@ -451,20 +451,30 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, entity.PublishedVersionId, entity.Properties, LanguageRepository, out var edited, out var editedCultures);
-            foreach (var propertyDataDto in propertyDataDtos)
+            IEnumerable<PropertyDataDto> propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, entity.PublishedVersionId, entity.Properties, LanguageRepository, out var edited, out HashSet<string> editedCultures);
+            foreach (PropertyDataDto propertyDataDto in propertyDataDtos)
+            {
                 Database.Insert(propertyDataDto);
+            }
+
+            // refresh content
+            entity.SetCultureEdited(editedCultures);
 
             // if !publishing, we may have a new name != current publish name,
             // also impacts 'edited'
             if (!publishing && entity.PublishName != entity.Name)
+            {
                 edited = true;
+            }
 
             // persist the document dto
             // at that point, when publishing, the entity still has its old Published value
             // so we need to explicitly update the dto to persist the correct value
             if (entity.PublishedState == PublishedState.Publishing)
+            {
                 dto.Published = true;
+            }
+
             dto.NodeId = nodeDto.NodeId;
             entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Insert(dto);
@@ -472,19 +482,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //insert the schedule
             PersistContentSchedule(entity, false);
 
-
             // persist the variations
             if (entity.ContentType.VariesByCulture())
             {
                 // bump dates to align cultures to version
-                if (publishing)
-                    entity.AdjustDates(contentVersionDto.VersionDate);
+                entity.AdjustDates(contentVersionDto.VersionDate, publishing);
 
                 // names also impact 'edited'
                 // ReSharper disable once UseDeconstruction
-                foreach (var cultureInfo in entity.CultureInfos)
+                foreach (ContentCultureInfos cultureInfo in entity.CultureInfos)
+                {
                     if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
+                    {
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
+                    }
+                }
 
                 // insert content variations
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
@@ -492,9 +504,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // insert document variations
                 Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
             }
-
-            // refresh content
-            entity.SetCultureEdited(editedCultures);
 
             // trigger here, before we reset Published etc
             OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
@@ -547,7 +556,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // check if we need to make any database changes at all
             if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
                     && !isEntityDirty && !entity.IsAnyUserPropertyDirty())
+            {
                 return; // no change to save, do nothing, don't even update dates
+            }
 
             // whatever we do, we must check that we are saving the current version
             var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId)).FirstOrDefault();
@@ -633,26 +644,32 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     Database.Insert(documentVersionDto);
                 }
 
-            // replace the property data (rather than updating)
+                // replace the property data (rather than updating)
                 // only need to delete for the version that existed, the new version (if any) has no property data yet
-            var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
-            // insert property data
-            ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out var editedCultures);
+                var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
+
+                // insert property data
+                ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out HashSet<string> editedCultures);
+
+                // refresh content
+                entity.SetCultureEdited(editedCultures);
 
                 // if !publishing, we may have a new name != current publish name,
                 // also impacts 'edited'
                 if (!publishing && entity.PublishName != entity.Name)
+                {
                     edited = true;
+                }
 
                 if (entity.ContentType.VariesByCulture())
                 {
                     // bump dates to align cultures to version
-                    if (publishing)
-                        entity.AdjustDates(contentVersionDto.VersionDate);
+                    entity.AdjustDates(contentVersionDto.VersionDate, publishing);
 
                     // names also impact 'edited'
                     // ReSharper disable once UseDeconstruction
-                     foreach (var cultureInfo in entity.CultureInfos)
+                    foreach (var cultureInfo in entity.CultureInfos)
+                    {
                         if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
                         {
                             edited = true;
@@ -664,6 +681,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                             // when the name is set, and it all works because the controller does it - but, if someone uses a
                             // service to change a property value and save (without setting name), the update date does not change.
                         }
+                    }
 
                     // replace the content version variations (rather than updating)
                     // only need to delete for the version that existed, the new version (if any) has no property data yet
@@ -687,27 +705,33 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
                 }
 
-                // refresh content
-                entity.SetCultureEdited(editedCultures);
-
                 // update the document dto
                 // at that point, when un/publishing, the entity still has its old Published value
                 // so we need to explicitly update the dto to persist the correct value
                 if (entity.PublishedState == PublishedState.Publishing)
+                {
                     dto.Published = true;
+                }
                 else if (entity.PublishedState == PublishedState.Unpublishing)
+                {
                     dto.Published = false;
+                }
+
                 entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
                 Database.Update(dto);
 
                 //update the schedule
-                if (entity.IsPropertyDirty("ContentSchedule"))
+                if (entity.IsPropertyDirty(nameof(entity.ContentSchedule)))
+                {
                     PersistContentSchedule(entity, true);
+                }
 
                 // if entity is publishing, update tags, else leave tags there
                 // means that implicitly unpublished, or trashed, entities *still* have tags in db
                 if (entity.PublishedState == PublishedState.Publishing)
+                {
                     SetEntityTags(entity, _tagRepository, _serializer);
+                }
             }
 
             // trigger here, before we reset Published etc
@@ -1224,7 +1248,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 {
                     Template1Id = dto.DocumentVersionDto.TemplateId
                 };
-                if (dto.Published) temp.Template2Id = dto.PublishedVersionDto.TemplateId;
+                if (dto.Published)
+                    temp.Template2Id = dto.PublishedVersionDto.TemplateId;
                 temps.Add(temp);
             }
 
@@ -1397,7 +1422,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (temp.PublishedVersionId > 0)
                     versions.Add(temp.PublishedVersionId);
             }
-            if (versions.Count == 0) return new Dictionary<int, List<ContentVariation>>();
+            if (versions.Count == 0)
+                return new Dictionary<int, List<ContentVariation>>();
 
             var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, 2000, batch
                 => Sql()
@@ -1467,7 +1493,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // if not publishing, we're just updating the 'current' (non-published) version,
             // so there are no DTOs to create for the 'published' version which remains unchanged
-            if (!publishing) yield break;
+            if (!publishing)
+                yield break;
 
             // create dtos for the 'published' version, for published cultures (those having a name)
             // ReSharper disable once UseDeconstruction
@@ -1588,7 +1615,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private void EnsureVariantNamesAreUnique(IContent content, bool publishing)
         {
-            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos.Count == 0) return;
+            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureInfos.Count == 0)
+                return;
 
             // get names per culture, at same level (ie all siblings)
             var sql = SqlEnsureVariantNamesAreUnique.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
@@ -1596,7 +1624,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .GroupBy(x => x.LanguageId)
                 .ToDictionary(x => x.Key, x => x);
 
-            if (names.Count == 0) return;
+            if (names.Count == 0)
+                return;
 
             // note: the code below means we are going to unique-ify every culture names, regardless
             // of whether the name has changed (ie the culture has been updated) - some saving culture
@@ -1605,14 +1634,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             foreach (var cultureInfo in content.CultureInfos)
             {
                 var langId = LanguageRepository.GetIdByIsoCode(cultureInfo.Culture);
-                if (!langId.HasValue) continue;
-                if (!names.TryGetValue(langId.Value, out var cultureNames)) continue;
+                if (!langId.HasValue)
+                    continue;
+                if (!names.TryGetValue(langId.Value, out var cultureNames))
+                    continue;
 
                 // get a unique name
                 var otherNames = cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
                 var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, cultureInfo.Name);
 
-                if (uniqueName == content.GetCultureName(cultureInfo.Culture)) continue;
+                if (uniqueName == content.GetCultureName(cultureInfo.Culture))
+                    continue;
 
                 // update the name, and the publish name if published
                 content.SetCultureName(uniqueName, cultureInfo.Culture);
