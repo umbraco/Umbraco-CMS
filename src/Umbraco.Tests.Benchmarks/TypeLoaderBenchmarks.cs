@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Benchmarks
 
             // populate the cache
             cache.Insert(
-                TypeLoader.CacheKey,
+                _typeLoader1.CacheKey,
                 GetCache,
                 TimeSpan.FromDays(1));
 
