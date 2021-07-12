@@ -96,6 +96,8 @@ namespace Umbraco.Cms.Core.Composing
                 //if they have changed, we need to write the new file
                 if (RequiresRescanning)
                 {
+                    _logger.LogDebug("Plugin types are being re-scanned. Cached hash value: {CachedHash}, Current hash value: {CurrentHash}", CachedAssembliesHash, CurrentAssembliesHash);
+
                     // if the hash has changed, clear out the persisted list no matter what, this will force
                     // rescanning of all types including lazy ones.
                     // http://issues.umbraco.org/issue/U4-4789
