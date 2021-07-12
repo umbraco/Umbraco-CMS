@@ -20,8 +20,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
     public class SupressNotificationsTests : UmbracoIntegrationTest
     {
         private IContentService ContentService => GetRequiredService<IContentService>();
-
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+        private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+        private IMediaService MediaService => GetRequiredService<IMediaService>();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
@@ -29,6 +30,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             builder.AddNotificationHandler<ContentSavingNotification, TestContentNotificationHandler>();
             builder.AddNotificationHandler<ContentTypeSavingNotification, TestContentTypeNotificationHandler>();
+            builder.AddNotificationHandler<MediaSavedNotification, TestMediaNotificationHandler>();
         }
 
         [Test]
@@ -41,8 +43,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             ContentTypeService.Save(contentType);
             Content content = ContentBuilder.CreateBasicContent(contentType);
             ContentService.Save(content);
-
-            Assert.Pass();
         }
 
         [Test]
@@ -58,16 +58,41 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                     ContentTypeService.Save(contentType);
                     Content content = ContentBuilder.CreateBasicContent(contentType);
                     ContentService.Save(content);
-
-                    Assert.Pass();
                 }
             }
+        }
+
+        [Test]
+        public void GivenSuppressedNotifications_WhenDisposed_ThenNotificationsExecute()
+        {
+            int asserted = 0;
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                using IDisposable suppressed = scope.Notifications.Supress();
+
+                MediaType mediaType = MediaTypeBuilder.CreateImageMediaType("test");
+                MediaTypeService.Save(mediaType);
+
+                suppressed.Dispose();
+
+                asserted = TestContext.CurrentContext.AssertCount;
+                Media media = MediaBuilder.CreateMediaImage(mediaType, -1);
+                MediaService.Save(media);
+            }   
+
+            Assert.AreEqual(asserted + 1, TestContext.CurrentContext.AssertCount);
         }
 
         private class TestContentNotificationHandler : INotificationHandler<ContentSavingNotification>
         {
             public void Handle(ContentSavingNotification notification)
                 => Assert.Fail("Notification was sent");
+        }
+
+        private class TestMediaNotificationHandler : INotificationHandler<MediaSavedNotification>
+        {
+            public void Handle(MediaSavedNotification notification)
+                => Assert.IsNotNull(notification);
         }
 
         private class TestContentTypeNotificationHandler : INotificationHandler<ContentTypeSavingNotification>
