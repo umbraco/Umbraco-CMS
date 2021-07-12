@@ -257,7 +257,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<Member2MemberGroupDto>()
                 .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where("cmsMember2MemberGroup.Member in (@ids)", new { ids = memberIds });
+                .WhereIn<Member2MemberGroupDto>(x => x.Member, memberIds);
 
             var currentlyAssigned = Database.Fetch<AssignedRolesDto>(assignedSql).ToArray();
 
@@ -271,6 +271,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var found = currentlyAssigned.Where(x => x.MemberId == mId).ToArray();
                 var assignedRoles = found.Where(x => roleNames.Contains(x.RoleName, StringComparer.CurrentCultureIgnoreCase)).Select(x => x.RoleName);
                 var nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
+
                 foreach (var toAssign in nonAssignedRoles)
                 {
                     var groupId = rolesForNames.First(x => x.Text.InvariantEquals(toAssign)).NodeId;
