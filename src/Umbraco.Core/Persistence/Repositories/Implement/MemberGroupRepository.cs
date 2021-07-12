@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
 
             if (ids.Any())
-                sql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
+                sql.WhereIn<NodeDto>(x => x.NodeId, ids);
 
             return Database.Fetch<NodeDto>(sql).Select(x => MemberGroupFactory.BuildEntity(x));
         }
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IMemberGroup Get(Guid uniqueId)
         {
             var sql = GetBaseQuery(false);
-            sql.Where("umbracoNode.uniqueId = @uniqueId", new { uniqueId });
+            sql.Where<NodeDto>(x => x.UniqueId == uniqueId);
 
             var dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
