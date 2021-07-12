@@ -98,6 +98,13 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             sb.AppendFormat("{0}[global::System.CodeDom.Compiler.GeneratedCodeAttribute(\"Umbraco.ModelsBuilder.Embedded\", \"{1}\")]\n", tabs, ApiVersion.Current.Version);
         }
 
+        // writes an attribute that specifies that an output may be null.
+        // (useful for consuming projects with nullable reference types enabled)
+        private static void WriteMaybeNullAttribute(StringBuilder sb, string tabs, bool isReturn = false)
+        {
+            sb.AppendFormat("{0}[{1}global::System.Diagnostics.CodeAnalysis.MaybeNull]\n", tabs, isReturn ? "return: " : "");
+        }
+
         private void WriteContentType(StringBuilder sb, TypeModel type)
         {
             string sep;
@@ -185,9 +192,11 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             sb.AppendFormat("\t\tpublic new const PublishedItemType ModelItemType = PublishedItemType.{0};\n",
                 itemType);
             WriteGeneratedCodeAttribute(sb, "\t\t");
+            WriteMaybeNullAttribute(sb, "\t\t", true);
             sb.Append("\t\tpublic new static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor)\n");
             sb.Append("\t\t\t=> PublishedModelUtility.GetModelContentType(publishedSnapshotAccessor, ModelItemType, ModelTypeAlias);\n");
             WriteGeneratedCodeAttribute(sb, "\t\t");
+            WriteMaybeNullAttribute(sb, "\t\t", true);
             sb.AppendFormat("\t\tpublic static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<{0}, TValue>> selector)\n",
                 type.ClrName);
             sb.Append("\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);\n");
@@ -305,6 +314,8 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             }
 
             WriteGeneratedCodeAttribute(sb, "\t\t");
+            if (!property.ModelClrType.IsValueType)
+                WriteMaybeNullAttribute(sb, "\t\t");
             sb.AppendFormat("\t\t[ImplementPropertyType(\"{0}\")]\n", property.Alias);
 
             if (mixinStatic)
@@ -349,6 +360,8 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
                 sb.AppendFormat("\t\t/// <summary>Static getter for {0}</summary>\n", XmlCommentString(property.Name));
 
             WriteGeneratedCodeAttribute(sb, "\t\t");
+            if (!property.ModelClrType.IsValueType)
+                WriteMaybeNullAttribute(sb, "\t\t", true);
             sb.Append("\t\tpublic static ");
             WriteClrType(sb, property.ClrTypeName);
             sb.AppendFormat(" {0}(I{1} that, IPublishedValueFallback publishedValueFallback) => that.Value",
@@ -404,6 +417,9 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             if (!string.IsNullOrWhiteSpace(property.Name))
                 sb.AppendFormat("\t\t/// <summary>{0}</summary>\n", XmlCommentString(property.Name));
             WriteGeneratedCodeAttribute(sb, "\t\t");
+            if (!property.ModelClrType.IsValueType)
+                WriteMaybeNullAttribute(sb, "\t\t");
+
             sb.Append("\t\t");
             WriteClrType(sb, property.ClrTypeName);
             sb.AppendFormat(" {0} {{ get; }}\n",
