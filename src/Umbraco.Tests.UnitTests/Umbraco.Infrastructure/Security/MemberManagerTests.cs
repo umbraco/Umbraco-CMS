@@ -246,7 +246,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         private void MockMemberServiceForCreateMember(IMember fakeMember)
         {
             _mockMemberService.Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(fakeMember);
-            _mockMemberService.Setup(x => x.Save(fakeMember, false));
+            _mockMemberService.Setup(x => x.Save(fakeMember));
         }
     }
 }

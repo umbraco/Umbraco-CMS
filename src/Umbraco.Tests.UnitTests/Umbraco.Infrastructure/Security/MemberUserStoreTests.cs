@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 m.HasIdentity == false);
 
             _mockMemberService.Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(mockMember);
-            _mockMemberService.Setup(x => x.Save(mockMember, It.IsAny<bool>()));
+            _mockMemberService.Setup(x => x.Save(mockMember));
 
             // act
             IdentityResult actual = await sut.CreateAsync(null);
@@ -118,10 +118,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 m.ContentTypeAlias == fakeMemberType.Alias &&
                 m.HasIdentity == true);
 
-            bool raiseEvents = false;
-
             _mockMemberService.Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(mockMember);
-            _mockMemberService.Setup(x => x.Save(mockMember, raiseEvents));
+            _mockMemberService.Setup(x => x.Save(mockMember));
 
             // act
             IdentityResult identityResult = await sut.CreateAsync(fakeUser, CancellationToken.None);
@@ -130,7 +128,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             Assert.IsTrue(identityResult.Succeeded);
             Assert.IsTrue(!identityResult.Errors.Any());
             _mockMemberService.Verify(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
-            _mockMemberService.Verify(x => x.Save(mockMember, It.IsAny<bool>()));
+            _mockMemberService.Verify(x => x.Save(mockMember));
         }
 
         [Test]
@@ -175,9 +173,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 m.RawPasswordValue == "xyz" &&
                 m.SecurityStamp == "xyz");
 
-            bool raiseEvents = false;
-
-            _mockMemberService.Setup(x => x.Save(mockMember, raiseEvents));
+            _mockMemberService.Setup(x => x.Save(mockMember));
             _mockMemberService.Setup(x => x.GetById(123)).Returns(mockMember);
 
             // act
@@ -200,7 +196,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             Assert.AreEqual(fakeUser.SecurityStamp, mockMember.SecurityStamp);
             Assert.AreNotEqual(DateTime.MinValue, mockMember.EmailConfirmedDate.Value);
 
-            _mockMemberService.Verify(x => x.Save(mockMember, It.IsAny<bool>()));
+            _mockMemberService.Verify(x => x.Save(mockMember));
             _mockMemberService.Verify(x => x.GetById(123));
             _mockMemberService.Verify(x => x.ReplaceRoles(new[] { 123 }, new[] { "role1", "role2" }));
         }
