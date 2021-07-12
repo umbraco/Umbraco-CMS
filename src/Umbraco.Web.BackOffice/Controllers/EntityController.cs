@@ -1139,7 +1139,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case UmbracoEntityTypes.PartialView:
 
                     if (!postFilter.IsNullOrWhiteSpace())
-                        throw new NotSupportedException("Filtering on scripts is not currently supported");
+                        throw new NotSupportedException("Filtering on partial views is not currently supported");
 
                     return _fileService.GetPartialViews().Select(MapEntities());
 
