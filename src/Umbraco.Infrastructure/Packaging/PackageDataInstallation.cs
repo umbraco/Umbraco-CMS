@@ -1276,12 +1276,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     throw new InvalidOperationException("No path attribute found");
                 }
-                var contents = element.Value;
-                if (contents.IsNullOrWhiteSpace())
-                {
-                    throw new InvalidOperationException("No content found for partial view");
-                }
-
+                var contents = element.Value ?? string.Empty;
+                
                 var physicalPath = _hostingEnvironment.MapPathContentRoot(path);
                 // TODO: Do we overwrite? IMO I don't think so since these will be views a user will change.
                 if (!System.IO.File.Exists(physicalPath))
@@ -1412,9 +1408,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 var path = partialViewXml.AttributeValue<string>("path");
 
-                if (path.IsNullOrWhiteSpace())
+                if (path == null)
                 {
-                    continue;
+                    throw new InvalidOperationException("No path attribute found");
                 }
 
                 IPartialView partialView = _fileService.GetPartialView(path);
@@ -1422,12 +1418,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 // only update if it doesn't exist
                 if (partialView == null)
                 {
-                    var content = partialViewXml.Value;
-                    if (content == null)
-                    {
-                        continue;
-                    }
-
+                    var content = partialViewXml.Value ?? string.Empty;
+                    
                     partialView = new PartialView(PartialViewType.PartialView, path) { Content = content };
                     _fileService.SavePartialView(partialView, userId);
                     result.Add(partialView);
