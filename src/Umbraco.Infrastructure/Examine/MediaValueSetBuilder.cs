@@ -46,8 +46,6 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             foreach (IMedia m in media)
             {
-                var umbracoFilePath = string.Empty;
-                var umbracoFile = string.Empty;
 
                 var urlValue = m.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
 
