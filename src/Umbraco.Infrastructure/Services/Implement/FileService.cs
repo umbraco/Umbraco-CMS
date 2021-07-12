@@ -56,11 +56,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         #region Stylesheets
 
         /// <inheritdoc />
-        public IEnumerable<IStylesheet> GetStylesheets(params string[] names)
+        public IEnumerable<IStylesheet> GetStylesheets(params string[] paths)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _stylesheetRepository.GetMany(names);
+                return _stylesheetRepository.GetMany(paths);
             }
         }
 

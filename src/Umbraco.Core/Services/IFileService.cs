@@ -77,14 +77,14 @@ namespace Umbraco.Cms.Core.Services
         /// Gets a list of all <see cref="IStylesheet"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="IStylesheet"/> objects</returns>
-        IEnumerable<IStylesheet> GetStylesheets(params string[] names);
+        IEnumerable<IStylesheet> GetStylesheets(params string[] paths);
 
         /// <summary>
         /// Gets a <see cref="IStylesheet"/> object by its name
         /// </summary>
-        /// <param name="name">Name of the stylesheet incl. extension</param>
+        /// <param name="path">Path of the stylesheet incl. extension</param>
         /// <returns>A <see cref="IStylesheet"/> object</returns>
-        IStylesheet GetStylesheet(string name);
+        IStylesheet GetStylesheet(string path);
 
         /// <summary>
         /// Saves a <see cref="IStylesheet"/>
