@@ -379,7 +379,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="contents"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns></returns>
         Attempt<OperationResult> IContentServiceBase<IContent>.Save(IEnumerable<IContent> contents, int userId) => Attempt.Succeed(Save(contents, userId));
 
@@ -1099,7 +1098,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="allLangs"></param>
         /// <param name="notificationState"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <param name="branchOne"></param>
         /// <param name="branchRoot"></param>
         /// <param name="eventMessages"></param>
@@ -1113,8 +1111,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content,
             EventMessages eventMessages, IReadOnlyCollection<ILanguage> allLangs,
             IDictionary<string, object> notificationState,
-            int userId = Cms.Core.Constants.Security.SuperUserId,
-            bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
+            int userId = Constants.Security.SuperUserId,
+            bool branchOne = false, bool branchRoot = false)
         {
             if (scope == null)
             {
@@ -1271,10 +1269,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             SaveDocument(content);
 
             // raise the Saved event, always
-            if (raiseEvents)
-            {
-                scope.Notifications.Publish(new ContentSavedNotification(content, eventMessages).WithState(notificationState));
-            }
+            scope.Notifications.Publish(new ContentSavedNotification(content, eventMessages).WithState(notificationState));
 
             if (unpublishing) // we have tried to unpublish - won't happen in a branch
             {
@@ -2383,7 +2378,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </remarks>
         /// <param name="items"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns>Result indicating what action was taken when handling the command.</returns>
         public OperationResult Sort(IEnumerable<IContent> items, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
@@ -2412,7 +2406,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </remarks>
         /// <param name="ids"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns>Result indicating what action was taken when handling the command.</returns>
         public OperationResult Sort(IEnumerable<int> ids, int userId = Cms.Core.Constants.Security.SuperUserId)
         {

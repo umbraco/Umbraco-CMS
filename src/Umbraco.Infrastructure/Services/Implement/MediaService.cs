@@ -653,7 +653,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         public Attempt<OperationResult> Save(IMedia media, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
@@ -701,7 +700,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages messages = EventMessagesFactory.Get();
@@ -1089,7 +1087,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="items"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
         public bool Sort(IEnumerable<IMedia> items, int userId = Cms.Core.Constants.Security.SuperUserId)
         {

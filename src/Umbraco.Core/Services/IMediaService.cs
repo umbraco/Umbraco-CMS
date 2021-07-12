@@ -300,7 +300,6 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="items"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
         bool Sort(IEnumerable<IMedia> items, int userId = Constants.Security.SuperUserId);
 
