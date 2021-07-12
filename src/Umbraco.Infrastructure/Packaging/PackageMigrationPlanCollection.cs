@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Packaging
@@ -8,7 +9,7 @@ namespace Umbraco.Cms.Core.Packaging
     /// </summary>
     public class PackageMigrationPlanCollection : BuilderCollectionBase<PackageMigrationPlan>
     {
-        public PackageMigrationPlanCollection(IEnumerable<PackageMigrationPlan> items) : base(items)
+        public PackageMigrationPlanCollection(Func<IEnumerable<PackageMigrationPlan>> items) : base(items)
         {
         }
     }

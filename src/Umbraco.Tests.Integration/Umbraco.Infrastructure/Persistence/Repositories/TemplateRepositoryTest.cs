@@ -11,6 +11,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
@@ -267,8 +268,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
                 var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
                 var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
-                var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
-                var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+                var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
+                var dataValueReferences = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
                 var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService, serializer, Mock.Of<IEventAggregator>());
 
                 Template template = TemplateBuilder.CreateTextPageTemplate();

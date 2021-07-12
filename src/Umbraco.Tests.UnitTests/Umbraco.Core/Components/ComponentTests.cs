@@ -49,13 +49,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
             ILogger logger = loggerFactory.CreateLogger("GenericLogger");
             var globalSettings = new GlobalSettings();
             var connectionStrings = new ConnectionStrings();
-            var mapperCollection = new NPocoMapperCollection(new[] { new NullableDateMapper() });
+            var mapperCollection = new NPocoMapperCollection(() => new[] { new NullableDateMapper() });
             var f = new UmbracoDatabaseFactory(
                 loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                 Options.Create(globalSettings),
                 Options.Create(connectionStrings),
-                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
+                new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
                 TestHelper.DbProviderFactoryCreator,
                 new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()),
                 mapperCollection);

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Trees
     {
         private readonly Dictionary<string, SearchableApplicationTree> _dictionary;
 
-        public SearchableTreeCollection(IEnumerable<ISearchableTree> items, ITreeService treeService)
+        public SearchableTreeCollection(Func<IEnumerable<ISearchableTree>> items, ITreeService treeService)
             : base(items)
         {
             _dictionary = CreateDictionary(treeService);

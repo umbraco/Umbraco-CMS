@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Tour
@@ -8,11 +9,8 @@ namespace Umbraco.Cms.Core.Tour
     /// </summary>
     public class TourFilterCollection : BuilderCollectionBase<BackOfficeTourFilter>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TourFilterCollection"/> class.
-        /// </summary>
-        public TourFilterCollection(IEnumerable<BackOfficeTourFilter> items)
-            : base(items)
-        { }
+        public TourFilterCollection(Func<IEnumerable<BackOfficeTourFilter>> items) : base(items)
+        {
+        }
     }
 }
