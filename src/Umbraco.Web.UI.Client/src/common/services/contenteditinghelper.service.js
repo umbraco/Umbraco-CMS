@@ -182,8 +182,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         genericTabAlias: "_umb_genericTab",
 
-        generateTabAlias: function(alias, parentAlias) {
-            return (parentAlias !== "" && parentAlias != null ? parentAlias + "/" : "" ) + alias;
+        generateTabAlias: function(parentAlias, name) {
+            return (parentAlias !== "" && parentAlias != null ? parentAlias + "/" : "" ) + name.toUmbracoAlias();
         },
 
         getParentAliasFromAlias: function(alias) {

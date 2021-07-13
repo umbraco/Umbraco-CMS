@@ -12,7 +12,7 @@
                     <li ng-if="hasGenericTab" umb-droppable="droppableOptionsTab" data-tab-key="{{genericTab.key}}">
                         <umb-content-type-tab
                             tab="genericTab"
-                            is-open="!openTabKey"
+                            is-open="!openTabAlias"
                             on-click="changeTab(genericTab)"
                             allow-change-name="false">
                         </umb-content-type-tab>
@@ -20,14 +20,14 @@
                     <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-key="{{tab.key}}">
                         <umb-content-type-tab
                             tab="tab"
-                            is-open="tab.key === openTabKey"
+                            is-open="tab.alias === openTabAlias"
                             on-click="changeTab(tab)"
                             sorting="sortingMode"
                             allow-remove="canRemoveTab(tab) && !sortingMode"
                             on-remove="removeTab(tab, tabIndex)"
                             val-server-field-name="{{'Groups[' + tab.indexInGroups + '].Name'}}"
                             on-change-sort-order-value="onChangeTabSortOrderValue(tab)"
-                            on-change-name="onChangeTabName(name)">
+                            on-change-name="onChangeTabName(key)">
                         </umb-content-type-tab>
                     </li>
                     <li>
@@ -131,6 +131,7 @@
                 group="group"
                 allow-remove="canRemoveGroup(group) && !sortingMode"
                 on-remove="removeGroup(group)"
+                on-update-name="onChangeGroupName(group)"
                 sorting="sortingMode"
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)"
                 val-server-field-name="{{'Groups[' + $index + '].Name'}}"
@@ -166,7 +167,7 @@
         ng-if="!sortingMode"
         type="button"
         class="umb-group-builder__group -placeholder"
-        ng-click="addGroup(openTabKey)"
+        ng-click="addGroupToActiveTab()"
         data-element="group-add">
         <localize key="contentTypeEditor_addGroup"></localize>
     </button>
