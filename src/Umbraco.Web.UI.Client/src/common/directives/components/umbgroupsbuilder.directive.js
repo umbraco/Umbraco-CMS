@@ -21,13 +21,13 @@
             scope.compositionsButtonState = "init";
             scope.tabs = [];
             scope.genericGroups = [];
-            scope.openTabKey = null;
+            scope.openTabAlias = null;
             scope.hasGenericTab = false;
             scope.genericTab = {
                 key: null,
                 name: "Generic",
                 alias: contentEditingHelper.genericTabAlias,
-                parentKey: null,
+                parentAlias: "",
                 type: TYPE_TAB,
                 sortOrder: 0,
                 properties: []
@@ -40,14 +40,15 @@
 
                 scope.tabs.forEach(tab => {
                     tab.indexInGroups = newValue.findIndex(group => group.key === tab.key);
+                    tab.parentAlias = contentEditingHelper.getParentAliasFromAlias(tab.alias);
                 });
 
                 checkGenericTabVisibility();
 
-                if (!scope.openTabKey && scope.hasGenericTab) {
-                    scope.openTabKey = null;
-                } else if (!scope.openTabKey && scope.tabs.length > 0) {
-                    scope.openTabKey = scope.tabs[0].key;
+                if (!scope.openTabAlias && scope.hasGenericTab) {
+                    scope.openTabAlias = null;
+                } else if (!scope.openTabAlias && scope.tabs.length > 0) {
+                    scope.openTabAlias = scope.tabs[0].alias;
                 }
             }));
 
@@ -101,10 +102,11 @@
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
                     stop: function (event, ui) {
-                        const groupKey = ui.item[0].dataset.groupKey ? ui.item[0].dataset.groupKey : "";
-                        const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : "";
-                        group.parentKey = scope.openTabKey;
-                        const groupsInTab = scope.model.groups.filter(group => group.parentKey === scope.openTabKey);
+                        const groupAlias = ui.item[0].dataset.groupAlias ? ui.item[0].dataset.groupAlias : "";
+                        const group = groupAlias ? scope.model.groups.find(group => group.alias === groupAlias) : {};
+                        group.parentAlias = scope.openTabAlias;
+                        group.alias = (group.parentAlias !== "" ? group.parentAlias + "/" : "") + group.alias.substring(group.alias.lastIndexOf('/')+1);
+                        const groupsInTab = scope.model.groups.filter(group => group.parentAlias === scope.openTabAlias);
                         updateSortOrder(groupsInTab);
                     }
                 };
@@ -402,8 +404,8 @@
             };
 
             /* ---------- TABS ---------- */
-            scope.changeTab = function ({key}) {
-                scope.openTabKey = key;
+            scope.changeTab = function ({alias}) {
+                scope.openTabAlias = alias;
             };
 
             scope.addTab = function () {

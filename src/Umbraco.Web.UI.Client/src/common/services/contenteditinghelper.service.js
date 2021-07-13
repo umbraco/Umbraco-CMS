@@ -182,6 +182,14 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         genericTabAlias: "_umb_genericTab",
 
+        generateTabAlias: function(alias, parentAlias) {
+            return (parentAlias !== "" && parentAlias != null ? parentAlias + "/" : "" ) + alias;
+        },
+
+        getParentAliasFromAlias: function(alias) {
+            return alias.substring(0, alias.lastIndexOf("/"));
+        },
+
         registerGenericTab: function (groups) {
             if (!groups) {
                 return;
@@ -194,7 +202,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 return;
             }
 
-            const isRootGroup = (group) => group.type === 0 && group.parentKey === null;
+            const isRootGroup = (group) => group.type === 0 && group.parentAlias === "";
             const hasRootGroups = groups.filter(group => isRootGroup(group)).length > 0;
 
             if (!hasRootGroups) {
@@ -205,7 +213,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 label: 'Generic',
                 alias: genericTabAlias,
                 key: null,
-                parentKey: null,
+                parentAlias: "",
                 type: 1,
                 properties: []
             };
