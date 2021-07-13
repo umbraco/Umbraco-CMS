@@ -26,7 +26,7 @@ angular.module('umbraco')
 
         if ($scope.model.value) {
 
-            if (Array.isArray($scope.model.value)) {
+            if (!Array.isArray($scope.model.value)) {
                 $scope.ids = $scope.model.value.split(",");
             } else {
                 $scope.ids.push($scope.model.value);
@@ -49,7 +49,7 @@ angular.module('umbraco')
             });
         }
 
-        $scope.openContentPicker = function () {
+        $scope.openTreePicker = function () {
             var treePicker = config;
             treePicker.section = config.type;
 
