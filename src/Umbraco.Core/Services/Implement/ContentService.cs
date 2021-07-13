@@ -605,6 +605,32 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
+        public IEnumerable<IContent> GetPagedChildren(Guid id, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IContent> filter = null, Ordering ordering = null)
+        {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+
+                var parent = GetById(id);
+                if (parent == null)
+                {
+                    totalChildren = 0;
+                    return Enumerable.Empty<IContent>();
+                }
+
+                var query = Query<IContent>().Where(x => x.ParentId == parent.Id);
+                return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            }
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
             IQuery<IContent> filter = null, Ordering ordering = null)
         {
@@ -657,6 +683,18 @@ namespace Umbraco.Core.Services.Implement
         {
             // intentionally not locking
             var content = GetById(id);
+            return GetParent(content);
+        }
+
+        /// <summary>
+        /// Gets the parent of the current content as an <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="key">Guid key of the <see cref="IContent"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IContent"/> object</returns>
+        public IContent GetParent(Guid key)
+        {
+            // intentionally not locking
+            var content = GetById(key);
             return GetParent(content);
         }
 
