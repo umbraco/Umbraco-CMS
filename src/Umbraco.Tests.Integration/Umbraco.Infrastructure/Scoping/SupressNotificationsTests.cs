@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void GivenSuppressedNotificationsOnParent_WhenChildSupresses_ThenExceptionIsThrown()
+        public void GivenSuppressedNotificationsOnParent_WhenChildSuppresses_ThenExceptionIsThrown()
         {
             using (IScope parentScope = ScopeProvider.CreateScope(autoComplete: true))
             using (IDisposable parentSuppressed = parentScope.Notifications.Suppress())
