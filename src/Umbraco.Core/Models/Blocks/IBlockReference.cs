@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models.Blocks
+﻿using Umbraco.Core.Models.PublishedContent;
+
+namespace Umbraco.Core.Models.Blocks
 {
     /// <summary>
     /// Represents a data item reference for a Block Editor implementation.
@@ -24,7 +26,52 @@
     /// <remarks>
     /// See: https://github.com/umbraco/rfcs/blob/907f3758cf59a7b6781296a60d57d537b3b60b8c/cms/0011-block-data-structure.md#strongly-typed
     /// </remarks>
-    public interface IBlockReference<TSettings> : IBlockReference
+    public interface IBlockReference<TSettings> : IBlockSettings<TSettings>
+    {
+
+    }
+
+    /// <summary>
+    /// Represents a data item reference with content and settings for a Block editor implementation.
+    /// </summary>
+    /// <typeparam name="TContent">The type of the content.</typeparam>
+    /// <typeparam name="TSettings">The type of the settings.</typeparam>
+    /// <remarks>
+    /// See: https://github.com/umbraco/rfcs/blob/907f3758cf59a7b6781296a60d57d537b3b60b8c/cms/0011-block-data-structure.md#strongly-typed
+    /// </remarks>
+    public interface IBlockReference<TContent, TSettings> : IBlockContent<TContent>, IBlockSettings<TSettings>, IBlockReference
+        where TContent : IPublishedElement
+    {
+
+    }
+
+    /// <summary>
+    /// Represents the content for a Block editor implementation.
+    /// </summary>
+    /// <typeparam name="TContent">The type of the content.</typeparam>
+    /// <remarks>
+    /// See: https://github.com/umbraco/rfcs/blob/907f3758cf59a7b6781296a60d57d537b3b60b8c/cms/0011-block-data-structure.md#strongly-typed
+    /// </remarks>
+    public interface IBlockContent<TContent>
+        where TContent : IPublishedElement
+    {
+        /// <summary>
+        /// Gets the settings.
+        /// </summary>
+        /// <value>
+        /// The settings.
+        /// </value>
+        TContent Content { get; }
+    }
+
+    /// <summary>
+    /// Represents the settings for a Block editor implementation.
+    /// </summary>
+    /// <typeparam name="TSettings">The type of the settings.</typeparam>
+    /// <remarks>
+    /// See: https://github.com/umbraco/rfcs/blob/907f3758cf59a7b6781296a60d57d537b3b60b8c/cms/0011-block-data-structure.md#strongly-typed
+    /// </remarks>
+    public interface IBlockSettings<TSettings>
     {
         /// <summary>
         /// Gets the settings.
