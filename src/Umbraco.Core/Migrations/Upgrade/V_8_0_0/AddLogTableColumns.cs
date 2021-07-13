@@ -13,8 +13,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
 
-            AddColumnIfNotExists<LogDto>(columns, "entityType");
-            AddColumnIfNotExists<LogDto>(columns, "parameters");            
+            AddColumn<LogDto>(columns, "entityType");
+            AddColumn<LogDto>(columns, "parameters");            
         }
     }
 }

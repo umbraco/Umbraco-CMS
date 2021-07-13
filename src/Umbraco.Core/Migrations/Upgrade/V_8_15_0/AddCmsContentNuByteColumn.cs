@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_15_0
 {
@@ -7,15 +6,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_15_0
     {
         public AddCmsContentNuByteColumn(IMigrationContext context)
             : base(context)
-        {
-
-        }
+        { }
 
         public override void Migrate()
         {
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
-
-            AddColumnIfNotExists<ContentNuDto>(columns, "dataRaw");
+            AddColumn<ContentNuDto>("dataRaw");
         }
     }
 }
