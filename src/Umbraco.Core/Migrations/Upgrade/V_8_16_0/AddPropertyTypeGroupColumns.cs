@@ -11,11 +11,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_16_0
 
         public override void Migrate()
         {
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
-
-            AddColumn<PropertyTypeGroupDto>(columns, "type");
-
-            AddColumn<PropertyTypeGroupDto>(columns, "alias", out var sqls);
+            AddColumn<PropertyTypeGroupDto>("type");
+            AddColumn<PropertyTypeGroupDto>("alias", out var sqls);
             var dtos = Database.Fetch<PropertyTypeGroupDto>();
             foreach (var dto in dtos)
             {
