@@ -24,12 +24,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Index(IndexTypes.NonClustered)]
         public int UserId { get; set; }
 
+        /// <summary>
+        /// Used to store the name of the provider (i.e. Facebook, Google)
+        /// </summary>
         [Column("loginProvider")]
         [Length(400)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Index(IndexTypes.UniqueNonClustered, ForColumns = "loginProvider,userId", Name = "IX_" + TableName + "_LoginProvider")]
         public string LoginProvider { get; set; }
 
+        /// <summary>
+        /// Stores the key the provider uses to lookup the login
+        /// </summary>
         [Column("providerKey")]
         [Length(4000)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
