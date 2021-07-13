@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using System.Collections.Generic;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.Validators;
 
 namespace Umbraco.Web.PropertyEditors
@@ -8,6 +9,8 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     internal class IntegerConfigurationEditor : ConfigurationEditor
     {
+        private readonly Dictionary<string, object> _config = new Dictionary<string, object>() { { "integer", true } };
+
         public IntegerConfigurationEditor()
         {
             Fields.Add(new ConfigurationField(new IntegerValidator())
@@ -15,7 +18,8 @@ namespace Umbraco.Web.PropertyEditors
                 Description = "Enter the minimum amount of number to be entered",
                 Key = "min",
                 View = "number",
-                Name = "Minimum"
+                Name = "Minimum",
+                Config = _config
             });
 
             Fields.Add(new ConfigurationField(new IntegerValidator())
@@ -23,7 +27,8 @@ namespace Umbraco.Web.PropertyEditors
                 Description = "Enter the intervals amount between each step of number to be entered",
                 Key = "step",
                 View = "number",
-                Name = "Step Size"
+                Name = "Step Size",
+                Config = _config
             });
 
             Fields.Add(new ConfigurationField(new IntegerValidator())
@@ -31,7 +36,8 @@ namespace Umbraco.Web.PropertyEditors
                 Description = "Enter the maximum amount of number to be entered",
                 Key = "max",
                 View = "number",
-                Name = "Maximum"
+                Name = "Maximum",
+                Config = _config
             });
         }
     }
