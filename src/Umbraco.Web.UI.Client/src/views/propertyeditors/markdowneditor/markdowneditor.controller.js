@@ -15,12 +15,12 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
     function openMediaPicker(callback) {
         var mediaPicker = {
             disableFolderSelect: true,
-            submit: function(model) {
+            submit: function (model) {
                 var selectedImagePath = model.selection[0].image;
                 callback(selectedImagePath);
                 editorService.close();
             },
-            close: function() {
+            close: function () {
                 editorService.close();
             }
         };
@@ -30,11 +30,15 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
     function openLinkPicker(callback) {
         var linkPicker = {
             hideTarget: true,
-            submit: function(model) {
-                callback(model.target.url, model.target.name);
+            submit: function (model) {
+                var url = model.target.url;
+                if (model.target.udi) {
+                    url = "{localLink:" + model.target.udi + "}";
+                }
+                callback(url + model.target.anchor, model.target.name);
                 editorService.close();
             },
-            close: function() {
+            close: function () {
                 editorService.close();
             }
         };
