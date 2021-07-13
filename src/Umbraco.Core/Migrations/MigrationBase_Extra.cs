@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations
@@ -10,150 +7,81 @@ namespace Umbraco.Core.Migrations
     /// <summary>
     /// Provides a base class to all migrations.
     /// </summary>
+    /// <remarks>
+    /// This file provides extra methods for migrations.
+    /// </remarks>
     public abstract partial class MigrationBase
     {
-        // provides extra methods for migrations
-
-        [Obsolete("Renamed to AddColumn, as that already checks whether the column does not exist.")]
-        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string columnName) => AddColumn<T>(columns, columnName);
-
-        [Obsolete("Renamed to AddColumn, as that already checks whether the column does not exist.")]
-        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName) => AddColumn<T>(columns, tableName, columnName);
-
-        protected void AddColumn<T>(string columnName)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, table.Name, columnName);
-        }
-
-        protected void AddColumn<T>(string tableName, string columnName)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, tableName, columnName);
-        }
-
-        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string columnName)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(columns, table, table.Name, columnName);
-        }
-
-        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(columns, table, tableName, columnName);
-        }
-
-        private void AddColumn(TableDefinition table, string tableName, string columnName)
-        {
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
-            AddColumn(columns, table, tableName, columnName);
-        }
-
-        private void AddColumn(IEnumerable<ColumnInfo> columns, TableDefinition table, string tableName, string columnName)
-        {
-            if (ColumnExists(columns, tableName, columnName)) return;
-
-            var column = table.Columns.First(x => x.Name == columnName);
-            var createSql = SqlSyntax.Format(column);
-            Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
-        }
-
-        protected void AddColumn<T>(string columnName, out IEnumerable<string> sqls)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, table.Name, columnName, out sqls);
-        }
-
-        protected void AddColumn<T>(string tableName, string columnName, out IEnumerable<string> sqls)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, tableName, columnName, out sqls);
-        }
-
-        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string columnName, out IEnumerable<string> sqls)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(columns, table, table.Name, columnName, out sqls);
-        }
-
-        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName, out IEnumerable<string> sqls)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(columns, table, tableName, columnName, out sqls);
-        }
-
-        private void AddColumn(TableDefinition table, string tableName, string columnName, out IEnumerable<string> sqls)
-        {
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
-            AddColumn(columns, table, tableName, columnName, out sqls);
-        }
-
-        private void AddColumn(IEnumerable<ColumnInfo> columns, TableDefinition table, string tableName, string columnName, out IEnumerable<string> sqls)
-        {
-            if (ColumnExists(columns, tableName, columnName))
-            {
-                sqls = Enumerable.Empty<string>();
-                return;
-            }
-
-            var column = table.Columns.First(x => x.Name == columnName);
-            var createSql = SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out sqls);
-            Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
-        }
-
-        protected void AlterColumn<T>(string tableName, string columnName)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            var column = table.Columns.First(x => x.Name == columnName);
-            SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out var sqls);
-            foreach (var sql in sqls)
-                Execute.Sql(sql).Do();
-        }
-
-        protected void ReplaceColumn<T>(string tableName, string currentName, string newName)
-        {
-            if (DatabaseType.IsSqlCe())
-            {
-                AddColumn<T>(tableName, newName, out var sqls);
-                Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}").Do();
-                foreach (var sql in sqls) Execute.Sql(sql).Do();
-                Delete.Column(currentName).FromTable(tableName).Do();
-            }
-            else
-            {
-                Execute.Sql(SqlSyntax.FormatColumnRename(tableName, currentName, newName)).Do();
-                AlterColumn<T>(tableName, newName);
-            }
-        }
-
+        /// <summary>
+        /// Determines whether the table exists.
+        /// </summary>
+        /// <param name="tableName">The name of the table.</param>
+        /// <returns>
+        ///   <c>true</c> if the table exists; otherwise, <c>false</c>.
+        /// </returns>
         protected bool TableExists(string tableName)
         {
             var tables = SqlSyntax.GetTablesInSchema(Context.Database);
+
             return tables.Any(x => x.InvariantEquals(tableName));
         }
 
+        /// <summary>
+        /// Determines whether the index exists.
+        /// </summary>
+        /// <param name="indexName">The name of the index.</param>
+        /// <returns>
+        ///   <c>true</c> if the index exists; otherwise, <c>false</c>.
+        /// </returns>
         protected bool IndexExists(string indexName)
         {
             var indexes = SqlSyntax.GetDefinedIndexes(Context.Database);
+
             return indexes.Any(x => x.Item2.InvariantEquals(indexName));
         }
 
+        /// <summary>
+        /// Determines whether the column exists in the specified table.
+        /// </summary>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="columnName">The name of the column.</param>
+        /// <returns>
+        ///   <c>true</c> if the index exists; otherwise, <c>false</c>.
+        /// </returns>
         protected bool ColumnExists(string tableName, string columnName)
         {
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
+            var columns = SqlSyntax.GetColumnsInSchema(Context.Database);
+
             return ColumnExists(columns, tableName, columnName);
         }
 
+        /// <summary>
+        /// Determines whether the column exists in the specified table.
+        /// </summary>
+        /// <param name="columns">The existing column information to check the existance of the column against.</param>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="columnName">The name of the column.</param>
+        /// <returns>
+        ///   <c>true</c> if the index exists; otherwise, <c>false</c>.
+        /// </returns>
         protected bool ColumnExists(IEnumerable<ColumnInfo> columns, string tableName, string columnName)
         {
             return columns.Any(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
         }
 
+        /// <summary>
+        /// Gets the data type for the column in the specified table.
+        /// </summary>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="columnName">The name of the column.</param>
+        /// <returns>
+        /// The data type for the column.
+        /// </returns>
         protected string ColumnType(string tableName, string columnName)
         {
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
+            var columns = SqlSyntax.GetColumnsInSchema(Context.Database);
             var column = columns.FirstOrDefault(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
+
             return column?.DataType;
         }
     }

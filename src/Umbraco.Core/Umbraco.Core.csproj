@@ -137,6 +137,10 @@
     <Compile Include="Dashboards\ContentDashboardSettings.cs" />
     <Compile Include="Dashboards\IContentDashboardSettings.cs" />
     <Compile Include="Exceptions\UnattendedInstallException.cs" />
+    <Compile Include="Migrations\MigrationBase_Extra.cs" />
+    <Compile Include="Migrations\MigrationBase_ReplaceColumn.cs" />
+    <Compile Include="Migrations\MigrationBase_AlterColumn.cs" />
+    <Compile Include="Migrations\MigrationBase_Obsolete.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
@@ -517,7 +521,7 @@
     <Compile Include="Manifest\ManifestDashboard.cs" />
     <Compile Include="Migrations\IncompleteMigrationExpressionException.cs" />
     <Compile Include="Migrations\MergeBuilder.cs" />
-    <Compile Include="Migrations\MigrationBase_Extra.cs" />
+    <Compile Include="Migrations\MigrationBase_AddColumn.cs" />
     <Compile Include="Migrations\PostMigrations\IPublishedSnapshotRebuilder.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
     <Compile Include="Migrations\PostMigrations\RebuildPublishedSnapshot.cs" />
