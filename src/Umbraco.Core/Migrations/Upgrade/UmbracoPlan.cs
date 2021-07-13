@@ -10,6 +10,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_15_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_16_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -207,7 +208,10 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}");
             To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}");
 
-            //FINAL
+            // to 8.16.0
+            To<AddDomainSortOrder>("{ace18303-f74a-40d2-83c4-4ab24b33cbfb}");
+
+            // FINAL
         }
     }
 }

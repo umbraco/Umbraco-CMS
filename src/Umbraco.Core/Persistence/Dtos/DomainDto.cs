@@ -25,9 +25,12 @@ namespace Umbraco.Core.Persistence.Dtos
         public string DomainName { get; set; }
 
         /// <summary>
-        /// Used for a result on the query to get the associated language for a domain if there is one
+        /// Used for a result on the query to get the associated language for a domain, if there is one.
         /// </summary>
         [ResultColumn("languageISOCode")]
         public string IsoCode { get; set; }
+
+        [Column("sortOrder")]
+        public int SortOrder { get; set; }
     }
 }

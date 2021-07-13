@@ -12,5 +12,6 @@ namespace Umbraco.Core.Services
         IEnumerable<IDomain> GetAll(bool includeWildcards);
         IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards);
         Attempt<OperationResult> Save(IDomain domainEntity);
+        Attempt<OperationResult> Sort(IEnumerable<IDomain> items);
     }
 }

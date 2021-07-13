@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            frequest.Domain = new DomainAndUri(new Domain(1, "mysite", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/"));
+            frequest.Domain = new DomainAndUri(new Domain(1, "mysite", -1, CultureInfo.CurrentCulture, false, 0), new Uri("http://mysite/"));
             var lookup = new ContentFinderByUrl(Logger);
 
             var result = lookup.TryFindContent(frequest);
@@ -151,7 +151,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            frequest.Domain = new DomainAndUri(new Domain(1, "mysite/æøå", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/æøå"));
+            frequest.Domain = new DomainAndUri(new Domain(1, "mysite/æøå", -1, CultureInfo.CurrentCulture, false, 0), new Uri("http://mysite/æøå"));
             var lookup = new ContentFinderByUrl(Logger);
 
             var result = lookup.TryFindContent(frequest);
