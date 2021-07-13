@@ -146,6 +146,8 @@
     <Compile Include="Models\RangeTests.cs" />
     <Compile Include="Models\UserGroupTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
+    <Compile Include="Packaging\Action\MockActionHelper.cs" />
+    <Compile Include="Packaging\PackageActionTest.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />

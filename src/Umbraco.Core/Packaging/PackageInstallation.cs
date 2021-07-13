@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Packaging
 {
@@ -80,7 +77,10 @@ namespace Umbraco.Core.Packaging
             summary.Actions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(package.Actions), package.Name);
 
             //run actions before files are removed
-            summary.ActionErrors = UndoPackageActions(package, summary.Actions).ToList();
+            var actionErrors = new List<string>();
+            actionErrors.AddRange(UndoPackageActions(package, summary.Actions).ToList()); // Run the undoable install actions
+            actionErrors.AddRange(RunPackageActions(package, summary.Actions, (n) => n.RunAt != ActionRunAt.Uninstall).ToList()); //Run the actions tagged only for 'uninstall'
+            summary.ActionErrors = actionErrors;
 
             var filesRemoved = _packageFileInstallation.UninstallFiles(package);
             summary.FilesUninstalled = filesRemoved;
@@ -95,7 +95,7 @@ namespace Umbraco.Core.Packaging
             installationSummary.Actions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(compiledPackage.Actions), compiledPackage.Name);
             installationSummary.MetaData = compiledPackage;
             installationSummary.FilesInstalled = packageDefinition.Files;
-            
+
             //make sure the definition is up to date with everything
             foreach (var x in installationSummary.DataTypesInstalled) packageDefinition.DataTypes.Add(x.Id.ToInvariantString());
             foreach (var x in installationSummary.LanguagesInstalled) packageDefinition.Languages.Add(x.Id.ToInvariantString());
@@ -108,22 +108,22 @@ namespace Umbraco.Core.Packaging
             packageDefinition.ContentNodeId = contentInstalled.Count > 0 ? contentInstalled[0].Id.ToInvariantString() : null;
 
             //run package actions
-            installationSummary.ActionErrors = RunPackageActions(packageDefinition, installationSummary.Actions).ToList();
+            installationSummary.ActionErrors = RunPackageActions(packageDefinition, installationSummary.Actions, (n) => n.RunAt != ActionRunAt.Install).ToList(); //Run the actions tagged only for 'install'
 
             return installationSummary;
         }
 
-        private IEnumerable<string> RunPackageActions(PackageDefinition packageDefinition, IEnumerable<PackageAction> actions)
+        private IEnumerable<string> RunPackageActions(PackageDefinition packageDefinition, IEnumerable<PackageAction> actions, Func<PackageAction, bool> actionCriteria)
         {
+            var uninstallActions = new StringBuilder("<actions>");
             foreach (var n in actions)
             {
                 //if there is an undo section then save it to the definition so we can run it at uninstallation 
-                var undo = n.Undo;
-                if (undo)
-                    packageDefinition.Actions += n.XmlData.ToString();
+                var undoOrUninstall = (n.RunAt == ActionRunAt.Install && n.Undo) || n.RunAt == ActionRunAt.Uninstall;
+                if (undoOrUninstall)
+                    uninstallActions.Append(n.XmlData.ToString());
 
-                //Run the actions tagged only for 'install'
-                if (n.RunAt != ActionRunAt.Install) continue;
+                if (actionCriteria(n)) continue;
 
                 if (n.Alias.IsNullOrWhiteSpace()) continue;
 
@@ -131,14 +131,17 @@ namespace Umbraco.Core.Packaging
                 if (!_packageActionRunner.RunPackageAction(packageDefinition.Name, n.Alias, n.XmlData, out var err))
                     foreach (var e in err) yield return e;
             }
+
+            uninstallActions.Append("</actions>");
+            packageDefinition.Actions = uninstallActions.ToString();
         }
 
         private IEnumerable<string> UndoPackageActions(IPackageInfo packageDefinition, IEnumerable<PackageAction> actions)
         {
             foreach (var n in actions)
             {
-                //Run the actions tagged only for 'uninstall'
-                if (n.RunAt != ActionRunAt.Uninstall) continue;
+                //Run the install actions marked with undo
+                if (!(n.RunAt == ActionRunAt.Install && n.Undo)) continue;
 
                 if (n.Alias.IsNullOrWhiteSpace()) continue;
 
@@ -189,7 +192,7 @@ namespace Umbraco.Core.Packaging
             }
         }
 
-        
-        
+
+
     }
 }
