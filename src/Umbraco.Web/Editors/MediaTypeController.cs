@@ -263,6 +263,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentId"></param>
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [OutgoingEditorModelEvent]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
@@ -309,6 +310,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentId"></param>
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [OutgoingEditorModelEvent]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Guid contentId)
         {
             var entity = Current.Services.EntityService.Get(contentId);
@@ -325,6 +327,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentId"></param>
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        [OutgoingEditorModelEvent]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Udi contentId)
         {
             var guidUdi = contentId as GuidUdi;
