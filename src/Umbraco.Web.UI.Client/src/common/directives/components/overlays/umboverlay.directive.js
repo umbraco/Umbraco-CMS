@@ -189,7 +189,7 @@ Opens an overlay to show a custom YSOD. </br>
 </table>
 
 @param {object} model Overlay options.
-@param {string} view Path to view or one of the default view names.
+@param {string} view Path to view, one of the default view names or an HTML string.
 @param {string} position The overlay position ("left", "right", "center": "target").
 **/
 
@@ -264,10 +264,21 @@ Opens an overlay to show a custom YSOD. </br>
             }
 
             function setView() {
-
                 if (scope.view) {
 
-                    if (scope.view.indexOf(".html") === -1) {
+                    // an inline template must be HTML, so must start and end with < and > respectively
+                    if (scope.view.startsWith('<') && scope.view.endsWith('>')) {
+                        // reuse the existing scoped-view element, and compile our view into it
+                        const element = el.find('.scoped-view');
+                        element.html(scope.view);
+                        element.show();
+                        $compile(element.contents())(scope);
+                        
+                        // ensure the ng-include view isn't rendered 
+                        scope.viewIsLiteral = true;
+                    }
+                    // when passed a view alias eg confirm, ysod
+                    else if (scope.view.indexOf(".html") === -1) {
                         var viewAlias = scope.view.toLowerCase();
                         scope.view = "views/common/overlays/" + viewAlias + "/" + viewAlias + ".html";
                     }
