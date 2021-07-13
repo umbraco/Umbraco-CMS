@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -13,17 +14,16 @@ namespace Umbraco.Core.Migrations
     {
         // provides extra methods for migrations
 
+        [Obsolete("Renamed to AddColumn, as that already checks whether the column does not exist.")]
+        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string columnName) => AddColumn<T>(columns, columnName);
+
+        [Obsolete("Renamed to AddColumn, as that already checks whether the column does not exist.")]
+        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName) => AddColumn<T>(columns, tableName, columnName);
+
         protected void AddColumn<T>(string columnName)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
             AddColumn(table, table.Name, columnName);
-        }
-
-        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string columnName)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            if (columns.Any(x => x.TableName.InvariantEquals(table.Name) && !x.ColumnName.InvariantEquals(columnName)))
-                AddColumn(table, table.Name, columnName);
         }
 
         protected void AddColumn<T>(string tableName, string columnName)
@@ -32,20 +32,30 @@ namespace Umbraco.Core.Migrations
             AddColumn(table, tableName, columnName);
         }
 
-        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName)
+        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string columnName)
         {
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            if (columns.Any(x => x.TableName.InvariantEquals(tableName) && !x.ColumnName.InvariantEquals(columnName)))
-                AddColumn(table, tableName, columnName);
+            AddColumn(columns, table, table.Name, columnName);
+        }
+
+        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(columns, table, tableName, columnName);
         }
 
         private void AddColumn(TableDefinition table, string tableName, string columnName)
         {
-            if (ColumnExists(tableName, columnName)) return;
+            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
+            AddColumn(columns, table, tableName, columnName);
+        }
+
+        private void AddColumn(IEnumerable<ColumnInfo> columns, TableDefinition table, string tableName, string columnName)
+        {
+            if (ColumnExists(columns, tableName, columnName)) return;
 
             var column = table.Columns.First(x => x.Name == columnName);
             var createSql = SqlSyntax.Format(column);
-            
             Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
         }
 
@@ -61,9 +71,27 @@ namespace Umbraco.Core.Migrations
             AddColumn(table, tableName, columnName, out sqls);
         }
 
+        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string columnName, out IEnumerable<string> sqls)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(columns, table, table.Name, columnName, out sqls);
+        }
+
+        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName, out IEnumerable<string> sqls)
+        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            AddColumn(columns, table, tableName, columnName, out sqls);
+        }
+
         private void AddColumn(TableDefinition table, string tableName, string columnName, out IEnumerable<string> sqls)
         {
-            if (ColumnExists(tableName, columnName))
+            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
+            AddColumn(columns, table, tableName, columnName, out sqls);
+        }
+
+        private void AddColumn(IEnumerable<ColumnInfo> columns, TableDefinition table, string tableName, string columnName, out IEnumerable<string> sqls)
+        {
+            if (ColumnExists(columns, tableName, columnName))
             {
                 sqls = Enumerable.Empty<string>();
                 return;
@@ -114,6 +142,11 @@ namespace Umbraco.Core.Migrations
         protected bool ColumnExists(string tableName, string columnName)
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
+            return ColumnExists(columns, tableName, columnName);
+        }
+
+        protected bool ColumnExists(IEnumerable<ColumnInfo> columns, string tableName, string columnName)
+        {
             return columns.Any(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
         }
 
