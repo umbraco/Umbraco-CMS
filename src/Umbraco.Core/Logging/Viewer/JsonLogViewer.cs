@@ -9,7 +9,7 @@ using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    internal class JsonLogViewer : LogViewerSourceBase
+    public class JsonLogViewer : LogViewerSourceBase
     {
         private readonly string _logsPath;
         private readonly ILogger _logger;
