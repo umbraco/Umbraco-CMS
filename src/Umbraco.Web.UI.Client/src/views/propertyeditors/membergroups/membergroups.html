@@ -1,15 +1,15 @@
-<div ng-controller="Umbraco.PropertyEditors.MemberGroupController">
+<div ng-controller="Umbraco.PropertyEditors.MemberGroupController as vm">
 
     <umb-node-preview ng-repeat="group in getSelected() | orderBy"
-                      icon="'icon-users'"
+                      icon="'icon-users-alt'"
                       name="group"
                       allow-remove="true"
-                      on-remove="removeGroup(group)">
+                      on-remove="vm.removeGroup(group)">
     </umb-node-preview>
 
     <button type="button"
             class="umb-node-preview-add"
-            ng-click="pickGroup()">
+            ng-click="vm.pickGroup()">
         <localize key="general_add">Add</localize>
     </button>
 
