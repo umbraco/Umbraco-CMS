@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Web.Security;
 using Umbraco.Core.Composing;
@@ -48,6 +49,21 @@ namespace Umbraco.Web.WebApi
 
             var helper = Current.Factory.GetInstance<MembershipHelper>();
             return helper.IsMemberAuthorized(AllowType.Split(Constants.CharArrays.Comma), AllowGroup.Split(Constants.CharArrays.Comma), members);
+        }
+        
+        protected override void HandleUnauthorizedRequest(HttpActionContext actionContext)
+        {
+            if (actionContext.RequestContext.Principal.Identity.IsAuthenticated)
+            {
+                // we aren't in the correct group/type/members so forbidden otherwise circular login!
+                // provide a 403
+                actionContext.Response = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.Forbidden);                  
+            }
+            else
+            {
+                //not authorised sends a 401 to retry authorisation
+                base.HandleUnauthorizedRequest(actionContext);
+            }
         }
 
     }
