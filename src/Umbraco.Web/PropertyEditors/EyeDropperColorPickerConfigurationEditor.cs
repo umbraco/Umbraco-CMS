@@ -24,8 +24,6 @@ namespace Umbraco.Web.PropertyEditors
         /// <inheritdoc />
         public override EyeDropperColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, EyeDropperColorPickerConfiguration configuration)
         {
-            var output = new EyeDropperColorPickerConfiguration();
-
             var showAlpha = true;
             var showPalette = true;
 

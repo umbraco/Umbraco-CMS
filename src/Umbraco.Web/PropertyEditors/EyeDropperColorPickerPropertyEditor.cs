@@ -6,6 +6,7 @@ namespace Umbraco.Web.PropertyEditors
 {
     [DataEditor(
         Constants.PropertyEditors.Aliases.ColorPickerEyeDropper,
+        EditorType.PropertyValue | EditorType.MacroParameter,
         "Eye Dropper Color Picker",
         "eyedropper",
         Icon = "icon-colorpicker",

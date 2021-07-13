@@ -52,7 +52,7 @@ namespace Umbraco.Core
                 public const string ColorPicker = "Umbraco.ColorPicker";
 
                 /// <summary>
-                /// EyeDropper Color Picker.
+                /// Eye Dropper Color Picker.
                 /// </summary>
                 public const string ColorPickerEyeDropper = "Umbraco.ColorPicker.EyeDropper";
 
