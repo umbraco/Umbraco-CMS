@@ -1,5 +1,7 @@
 function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeResource, memberTypeResource, editorService, eventsService, angularHelper) {
+
     var vm = this;
+
     vm.loading = false;
     vm.itemTypes = [];
     vm.remove = remove;
