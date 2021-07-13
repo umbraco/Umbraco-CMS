@@ -11,7 +11,7 @@ namespace Umbraco.Core.PropertyEditors
         public PropertyEditorCollection(DataEditorCollection dataEditors, ManifestParser manifestParser)
             : base(dataEditors
                 .Where(x => (x.Type & EditorType.PropertyValue) > 0)
-                .Union(manifestParser.Manifest.PropertyEditors))
+                .Union(manifestParser.Manifest.PropertyEditors, new PropertyComparer<IDataEditor>(pe => pe.Alias)))
         { }
 
         public PropertyEditorCollection(DataEditorCollection dataEditors)
