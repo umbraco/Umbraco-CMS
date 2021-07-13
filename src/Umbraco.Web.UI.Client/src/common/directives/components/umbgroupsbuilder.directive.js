@@ -32,7 +32,7 @@
                 sortOrder: 0,
                 properties: []
             };
-            
+
             eventBindings.push(scope.$watchCollection('model.groups', (newValue) => {
                 scope.tabs = $filter("filter")(newValue, (group) => {
                     return group.type === TYPE_TAB;
@@ -40,10 +40,6 @@
 
                 scope.tabs.forEach(tab => {
                     tab.indexInGroups = newValue.findIndex(group => group.key === tab.key);
-                });
-
-                newValue.forEach(group => {
-                    group.validationAlias = contentEditingHelper.generateTabValidationAlias(group, newValue);
                 });
 
                 checkGenericTabVisibility();
@@ -105,7 +101,7 @@
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
                     stop: function (event, ui) {
-                        const groupKey = ui.item[0].dataset.groupKey ? ui.item[0].dataset.groupKey : "";    
+                        const groupKey = ui.item[0].dataset.groupKey ? ui.item[0].dataset.groupKey : "";
                         const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : "";
                         group.parentKey = scope.openTabKey;
                         const groupsInTab = scope.model.groups.filter(group => group.parentKey === scope.openTabKey);
