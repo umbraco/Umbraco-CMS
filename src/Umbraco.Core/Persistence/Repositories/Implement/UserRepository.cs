@@ -420,7 +420,7 @@ ORDER BY colName";
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoUser.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.User}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

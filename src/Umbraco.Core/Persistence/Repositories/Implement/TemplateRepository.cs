@@ -116,7 +116,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return Constants.DatabaseSchema.Tables.Node + ".id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

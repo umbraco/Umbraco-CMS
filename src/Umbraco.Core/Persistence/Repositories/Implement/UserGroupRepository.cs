@@ -271,7 +271,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoUserGroup.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.UserGroup}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

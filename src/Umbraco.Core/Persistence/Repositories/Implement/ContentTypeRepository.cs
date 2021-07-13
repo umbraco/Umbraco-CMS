@@ -134,7 +134,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (objectTypes.Any())
             {
-                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", new { objectTypes = objectTypes });
+                sql = sql.WhereIn<NodeDto>(dto => dto.NodeObjectType, objectTypes);
             }
 
             return Database.Fetch<string>(sql);
@@ -173,7 +173,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoNode.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
