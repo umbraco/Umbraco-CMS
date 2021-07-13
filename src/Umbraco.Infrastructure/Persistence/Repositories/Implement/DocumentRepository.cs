@@ -457,9 +457,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 Database.Insert(propertyDataDto);
             }
 
-            // refresh content
-            entity.SetCultureEdited(editedCultures);
-
             // if !publishing, we may have a new name != current publish name,
             // also impacts 'edited'
             if (!publishing && entity.PublishName != entity.Name)
@@ -485,18 +482,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // persist the variations
             if (entity.ContentType.VariesByCulture())
             {
-                // bump dates to align cultures to version
-                entity.AdjustDates(contentVersionDto.VersionDate, publishing);
-
                 // names also impact 'edited'
                 // ReSharper disable once UseDeconstruction
                 foreach (ContentCultureInfos cultureInfo in entity.CultureInfos)
                 {
                     if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
                     {
-                        (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
+                        (editedCultures ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase)).Add(cultureInfo.Culture);
                     }
                 }
+
+                // refresh content
+                entity.SetCultureEdited(editedCultures);
+
+                // bump dates to align cultures to version
+                entity.AdjustDates(contentVersionDto.VersionDate, publishing);
 
                 // insert content variations
                 Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
@@ -651,9 +651,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // insert property data
                 ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out HashSet<string> editedCultures);
 
-                // refresh content
-                entity.SetCultureEdited(editedCultures);
-
                 // if !publishing, we may have a new name != current publish name,
                 // also impacts 'edited'
                 if (!publishing && entity.PublishName != entity.Name)
@@ -663,9 +660,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 if (entity.ContentType.VariesByCulture())
                 {
-                    // bump dates to align cultures to version
-                    entity.AdjustDates(contentVersionDto.VersionDate, publishing);
-
                     // names also impact 'edited'
                     // ReSharper disable once UseDeconstruction
                     foreach (var cultureInfo in entity.CultureInfos)
@@ -673,7 +667,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
                         {
                             edited = true;
-                            (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(cultureInfo.Culture);
+                            (editedCultures ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase)).Add(cultureInfo.Culture);
 
                             // TODO: change tracking
                             // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
@@ -682,6 +676,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                             // service to change a property value and save (without setting name), the update date does not change.
                         }
                     }
+
+                    // refresh content
+                    entity.SetCultureEdited(editedCultures);
+
+                    // bump dates to align cultures to version
+                    entity.AdjustDates(contentVersionDto.VersionDate, publishing);
 
                     // replace the content version variations (rather than updating)
                     // only need to delete for the version that existed, the new version (if any) has no property data yet
