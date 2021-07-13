@@ -160,7 +160,8 @@ angular.module("umbraco")
                         entityResource.getById($scope.lastOpenedNode, "media")
                             .then(ensureWithinStartNode, gotoStartNode);
                     } else {
-                        gotoStartNode();
+                        entityResource.getById($scope.startNodeId, "media")
+                            .then(gotoStartNode);
                     }
                 } else {
                     // if a target is specified, go look it up - generally this target will just contain ids not the actual full
@@ -377,7 +378,7 @@ angular.module("umbraco")
                     gotoFolder({ id: $scope.lastOpenedNode || $scope.startNodeId, name: "Media", icon: "icon-folder", path: node.path });
                     return true;
                 } else {
-                    gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+                    gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder", path: node.path });
                     return false;
                 }
             }
@@ -393,8 +394,8 @@ angular.module("umbraco")
                 return false;
             }
 
-            function gotoStartNode() {
-                gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+            function gotoStartNode(node) {
+                gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder", path: node.path });
             }
 
             function openDetailsDialog() {
