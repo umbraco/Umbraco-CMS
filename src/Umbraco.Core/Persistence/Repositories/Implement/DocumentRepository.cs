@@ -153,6 +153,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .From<DocumentDto>()
                 .InnerJoin<ContentDto>().On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                //inner join to filter by contentType alias
+                .InnerJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId)
 
                 // inner join on mandatory edited version
                 .InnerJoin<ContentVersionDto>()
