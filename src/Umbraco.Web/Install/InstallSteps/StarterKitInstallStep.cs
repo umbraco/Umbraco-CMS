@@ -12,7 +12,7 @@ namespace Umbraco.Web.Install.InstallSteps
     [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitInstall", 31, "",
         PerformsAppRestart = true)]
-    internal class StarterKitInstallStep : InstallSetupStep<object>
+    public class StarterKitInstallStep : InstallSetupStep<object>
     {
         private readonly HttpContextBase _httContext;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -23,6 +23,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _httContext = httContext;
             _umbracoContextAccessor = umbracoContextAccessor;
             _packagingService = packagingService;
+            Removable = true;
         }
 
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
@@ -8,7 +9,8 @@ namespace Umbraco.Web.Install
     public sealed class InstallStepCollection
     {
         private readonly InstallHelper _installHelper;
-        private readonly IEnumerable<InstallSetupStep> _orderedInstallerSteps;
+        private List<InstallSetupStep> _orderedInstallerSteps;
+        public event EventHandler<InstallStepCollection> PrepareListEvent;
 
         public InstallStepCollection(InstallHelper installHelper, IEnumerable<InstallSetupStep> installerSteps)
         {
@@ -16,7 +18,7 @@ namespace Umbraco.Web.Install
 
             // TODO: this is ugly but I have a branch where it's nicely refactored - for now we just want to manage ordering
             var a = installerSteps.ToArray();
-            _orderedInstallerSteps = new InstallSetupStep[]
+            _orderedInstallerSteps = new List<InstallSetupStep>
             {
                 a.OfType<NewInstallStep>().First(),
                 a.OfType<UpgradeStep>().First(),
@@ -31,8 +33,10 @@ namespace Umbraco.Web.Install
                 a.OfType<StarterKitInstallStep>().First(),
                 a.OfType<StarterKitCleanupStep>().First(),
 
-                a.OfType<SetUmbracoVersionStep>().First(),
+
             };
+            OnPreparingList(this);
+            _orderedInstallerSteps.Add(a.OfType<SetUmbracoVersionStep>().First());
         }
 
 
@@ -48,13 +52,27 @@ namespace Umbraco.Web.Install
             return _orderedInstallerSteps;
         }
 
-        /// <summary>
+        public void OnPreparingList(InstallStepCollection stepColletion)
+        {
+            PrepareListEvent?.Invoke(this,stepColletion);
+        }
+
+    /// <summary>
         /// Returns the steps that are used only for the current installation type
         /// </summary>
         /// <returns></returns>
         public IEnumerable<InstallSetupStep> GetStepsForCurrentInstallType()
+    {
+        var allSteps = GetAllSteps().ToList();
+            return allSteps.Where(x => x.InstallTypeTarget.HasFlag(_installHelper.GetInstallationType()));
+        }
+        public void RemoveStepByType(Type type)
         {
-            return GetAllSteps().Where(x => x.InstallTypeTarget.HasFlag(_installHelper.GetInstallationType()));
+            _orderedInstallerSteps.RemoveAll(e=>e.Removable && e.StepType ==type);
+        }
+        public void Add(InstallSetupStep step)
+        {
+            _orderedInstallerSteps.Add(step);
         }
     }
 }

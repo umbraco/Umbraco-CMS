@@ -68,6 +68,8 @@ namespace Umbraco.Web.Install.Models
         public InstallationType InstallTypeTarget { get; private set; }
 
         [IgnoreDataMember]
+        public bool Removable { get; protected set; } = false;
+        [IgnoreDataMember]
         public bool PerformsAppRestart { get; private set; }
 
         /// <summary>
