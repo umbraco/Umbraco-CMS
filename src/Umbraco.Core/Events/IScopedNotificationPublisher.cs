@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Events
     public interface IScopedNotificationPublisher
     {
         /// <summary>
-        /// Supresses all notifications from being added/created until the result object is disposed.
+        /// Suppresses all notifications from being added/created until the result object is disposed.
         /// </summary>
         /// <returns></returns>
         IDisposable Suppress();
