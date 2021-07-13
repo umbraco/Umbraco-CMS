@@ -22,7 +22,7 @@ namespace Umbraco.Web.Dictionary
     {
         private readonly ILocalizationService _localizationService;
         private readonly IAppCache _requestCache;
-        private readonly CultureInfo _specificCulture;
+        public CultureInfo _specificCulture;
 
         public DefaultCultureDictionary()
             : this(Current.Services.LocalizationService, Current.AppCaches.RequestCache)
@@ -52,24 +52,19 @@ namespace Umbraco.Web.Dictionary
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string this[string key]
+        public string this[string key] => GetByLanguage(key, Language);
+
+        public string GetByCulture(string key, string culture)
         {
-            get
-            {
-                var found = _localizationService.GetDictionaryItemByKey(key);
-                if (found == null)
-                {
-                    return string.Empty;
-                }
+            var language = _localizationService.GetLanguageByIsoCode(culture);
+            return language is null ? string.Empty : GetByLanguage(key, language);
+        }
 
-                var byLang = found.Translations.FirstOrDefault(x => x.Language.Equals(Language));
-                if (byLang == null)
-                {
-                    return string.Empty;
-                }
-
-                return byLang.Value;
-            }
+        private string GetByLanguage(string key, ILanguage language)
+        {
+            var found = _localizationService.GetDictionaryItemByKey(key);
+            var byLang = found?.Translations.FirstOrDefault(x => x.Language.Equals(language));
+            return byLang == null ? string.Empty : byLang.Value;
         }
 
         /// <summary>
@@ -121,14 +116,15 @@ namespace Umbraco.Web.Dictionary
             {
                 //ensure it's stored/retrieved from request cache
                 //NOTE: This is no longer necessary since these are cached at the runtime level, but we can leave it here for now.
-                return _requestCache.GetCacheItem<ILanguage>(typeof (DefaultCultureDictionary).Name + "Culture" + Culture.Name,
-                    () => {
+                return _requestCache.GetCacheItem<ILanguage>(typeof(DefaultCultureDictionary).Name + "Culture" + Culture.Name,
+                    () =>
+                    {
                         // find a language that matches the current culture or any of its parent cultures
                         var culture = Culture;
-                        while(culture != CultureInfo.InvariantCulture)
+                        while (culture != CultureInfo.InvariantCulture)
                         {
                             var language = _localizationService.GetLanguageByIsoCode(culture.Name);
-                            if(language != null)
+                            if (language != null)
                             {
                                 return language;
                             }

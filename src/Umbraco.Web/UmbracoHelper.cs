@@ -208,6 +208,14 @@ namespace Umbraco.Web
             return dictionaryValue;
         }
 
+        public string GetDictionaryValue(string key, string altText, string culture)
+        {
+            var dictionaryValue = _cultureDictionary.GetByCulture(key, culture);
+            if (string.IsNullOrWhiteSpace(dictionaryValue))
+                dictionaryValue = altText;
+            return dictionaryValue;
+        }
+
         /// <summary>
         /// Returns the ICultureDictionary for access to dictionary items
         /// </summary>
