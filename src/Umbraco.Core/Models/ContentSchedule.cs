@@ -33,7 +33,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets the unique identifier of the document targeted by the scheduled action.
+        /// Gets the unique identifier of the scheduled action.
         /// </summary>
         [DataMember]
         public Guid Id { get; internal set; }
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Models
 
         public object DeepClone()
         {
-            return new ContentSchedule(Id, Culture, Date, Action);
+            return new ContentSchedule(default, Culture, Date, Action);
         }
     }
 }
