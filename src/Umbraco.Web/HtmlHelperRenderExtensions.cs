@@ -82,8 +82,41 @@ namespace Umbraco.Web
             ViewDataDictionary viewData = null,
             Func<object, ViewDataDictionary, string> contextualKeyBuilder = null)
         {
+            var cacheKey = BuildCachedPartialCacheKey(partialViewName, cacheByPage, cacheByMember);
+            if (contextualKeyBuilder != null)
+            {
+                var contextualKey = contextualKeyBuilder(model, viewData);
+                cacheKey += $"c{contextualKey}-";
+            }
+            return Current.AppCaches.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey, viewData);
+        }
+
+        public static IHtmlString CachedPartial(
+            this HtmlHelper htmlHelper,
+            string partialViewName,
+            Func<object> builder,
+            int cachedSeconds,
+            bool cacheByPage = false,
+            bool cacheByMember = false,
+            ViewDataDictionary viewData = null,
+            Func<ViewDataDictionary, string> contextualKeyBuilder = null)
+        {
+            var cacheKey = BuildCachedPartialCacheKey(partialViewName, cacheByPage, cacheByMember);
+            if (contextualKeyBuilder != null)
+            {
+                var contextualKey = contextualKeyBuilder(viewData);
+                cacheKey += $"c{contextualKey}-";
+            }
+            return Current.AppCaches.CachedPartialView(htmlHelper, partialViewName, builder, cachedSeconds, cacheKey, viewData);
+        }
+
+        private static string BuildCachedPartialCacheKey(
+            string partialViewName,
+            bool cacheByPage = false,
+            bool cacheByMember = false)
+        {
             var cacheKey = new StringBuilder(partialViewName);
-             //let's always cache by the current culture to allow variants to have different cache results
+            //let's always cache by the current culture to allow variants to have different cache results
             var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
             if (!string.IsNullOrEmpty(cultureName))
             {
@@ -103,12 +136,8 @@ namespace Umbraco.Web
                 var currentMember = helper.GetCurrentMember();
                 cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
             }
-            if (contextualKeyBuilder != null)
-            {
-                var contextualKey = contextualKeyBuilder(model, viewData);
-                cacheKey.AppendFormat("c{0}-", contextualKey);
-            }
-            return Current.AppCaches.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
+
+            return cacheKey.ToString();
         }
 
         public static MvcHtmlString EditorFor<T>(this HtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
@@ -176,7 +205,7 @@ namespace Umbraco.Web
             if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
             if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
 
-            var routeVals = new RouteValueDictionary(new {area = ""});
+            var routeVals = new RouteValueDictionary(new { area = "" });
 
             var surfaceController = Current.SurfaceControllerTypes.SingleOrDefault(x => x == surfaceType);
             if (surfaceController == null)
