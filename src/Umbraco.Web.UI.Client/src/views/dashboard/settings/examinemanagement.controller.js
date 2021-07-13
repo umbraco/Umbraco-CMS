@@ -166,17 +166,17 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
                 vm.searchResults.totalPages = Math.ceil(vm.searchResults.totalRecords / 20);
                 // add URLs to edit well known entities
                 _.each(vm.searchResults.results, function (result) {
-                    var section = result.values["__IndexType"];
+                    var section = result.values["__IndexType"][0];
                     switch (section) {
                         case "content":
                         case "media":
-                            result.editUrl = "/" + section + "/" + section + "/edit/" + result.values["__NodeId"];
-                            result.editId = result.values["__NodeId"];
+                            result.editUrl = "/" + section + "/" + section + "/edit/" + result.values["__NodeId"][0];
+                            result.editId = result.values["__NodeId"][0];
                             result.editSection = section;
                             break;
                         case "member":
-                            result.editUrl = "/member/member/edit/" + result.values["__Key"];
-                            result.editId = result.values["__Key"];
+                            result.editUrl = "/member/member/edit/" + result.values["__Key"][0];
+                            result.editId = result.values["__Key"][0];
                             result.editSection = section;
                             break;
                     }
