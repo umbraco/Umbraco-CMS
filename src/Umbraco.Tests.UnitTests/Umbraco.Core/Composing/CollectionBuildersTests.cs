@@ -406,9 +406,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
             using (IServiceScope scope = serviceProvider.CreateScope())
             {
                 col2 = scope.ServiceProvider.GetRequiredService<TestCollection>();
-            }
 
-            AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
+                // NOTE: We must assert here so that the lazy collection is resolved
+                // within this service provider scope, else if you resolve the collection
+                // after the service provider scope is disposed, you'll get an object
+                // disposed error (expected).
+                AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
+            }
+            
             AssertNotSameCollection(col1A, col2);
         }
 
