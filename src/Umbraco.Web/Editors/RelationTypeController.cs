@@ -145,7 +145,7 @@ namespace Umbraco.Web.Editors
         /// <returns>A <see cref="HttpResponseMessage"/> containing the persisted relation type's ID.</returns>
         public HttpResponseMessage PostCreate(RelationTypeSave relationType)
         {
-            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(true), relationType.IsBidirectional, relationType.ChildObjectType, relationType.ParentObjectType);
+            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(true), relationType.IsBidirectional, relationType.ParentObjectType, relationType.ChildObjectType);
 
             try
             {
