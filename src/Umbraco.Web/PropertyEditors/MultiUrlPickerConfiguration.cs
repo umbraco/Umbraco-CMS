@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -5,11 +6,17 @@ namespace Umbraco.Web.PropertyEditors
 
     public class MultiUrlPickerConfiguration : IIgnoreUserStartNodesConfig
     {
-        [ConfigurationField("minNumber", "Minimum number of items", "number")]
-        public int MinNumber { get; set; }
+        [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of urls")]
+        public NumberRange ValidationLimit { get; set; } = new NumberRange();
 
-        [ConfigurationField("maxNumber", "Maximum number of items", "number")]
-        public int MaxNumber { get; set; }
+        public class NumberRange
+        {
+            [JsonProperty("min")]
+            public int? Min { get; set; }
+
+            [JsonProperty("max")]
+            public int? Max { get; set; }
+        }
 
         [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
