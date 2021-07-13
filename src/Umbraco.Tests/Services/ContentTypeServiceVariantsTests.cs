@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CSharpTest.Net.Serialization;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -54,8 +55,19 @@ namespace Umbraco.Tests.Services
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
 
-            var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
+            var globalSettings = Factory.GetInstance<IGlobalSettings>();
 
+            var dictionaryPropertySerializer = new DictionaryOfPropertyDataSerializer();
+            var dictionaryCultureSerializer = new DictionaryOfCultureVariationSerializer();
+            var contentDataSerializer = new ContentDataSerializer(dictionaryPropertySerializer, dictionaryCultureSerializer);
+            var contentNodeKitSerializer = new ContentNodeKitSerializer(contentDataSerializer);
+            var intSerializer = new PrimitiveSerializer();
+            var keySerializer = new BPlusTreeTransactableDictionarySerializerAdapter<int>(intSerializer);
+            var valueSerializer = new BPlusTreeTransactableDictionarySerializerAdapter<ContentNodeKit>(contentNodeKitSerializer);
+            var transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory<int, ContentNodeKit>(globalSettings, valueSerializer, keySerializer);
+            INucacheRepositoryFactory nucacheRepositoryFactory = new TransactableDictionaryNucacheRepositoryFactory(transactableDictionaryFactory);
+            var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
+            var segmentProvider = new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() });
             return new PublishedSnapshotService(
                 options,
                 null,
@@ -67,15 +79,16 @@ namespace Umbraco.Tests.Services
                 Mock.Of<IVariationContextAccessor>(),
                 ProfilingLogger,
                 ScopeProvider,
-                documentRepository, mediaRepository, memberRepository,
                 DefaultCultureAccessor,
-                new DatabaseDataSource(nestedContentDataSerializerFactory),
+                   new DatabaseDataSource(nestedContentDataSerializerFactory, documentRepository, mediaRepository, memberRepository,
+                ScopeProvider, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() })),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                segmentProvider,
                 new TestSyncBootStateAccessor(SyncBootState.WarmBoot),
-                nestedContentDataSerializerFactory);
+                nucacheRepositoryFactory.GetMediaRepository(),
+                nucacheRepositoryFactory.GetContentRepository());
         }
 
         public class LocalServerMessenger : ServerMessengerBase

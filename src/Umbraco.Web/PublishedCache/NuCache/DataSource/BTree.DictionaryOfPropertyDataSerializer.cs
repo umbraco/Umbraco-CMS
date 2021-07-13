@@ -9,7 +9,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// <summary>
     /// Serializes/Deserializes property data as a dictionary for BTree
     /// </summary>
-    internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>, IDictionaryOfPropertyDataSerializer
+    internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>
     {
         public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
         {

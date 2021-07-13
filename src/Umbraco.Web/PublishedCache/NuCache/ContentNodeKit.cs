@@ -4,7 +4,7 @@ using Umbraco.Web.PublishedCache.NuCache.DataSource;
 namespace Umbraco.Web.PublishedCache.NuCache
 {
     // what's needed to actually build a content node
-    internal struct ContentNodeKit
+    public struct ContentNodeKit
     {
         public ContentNode Node;
         public int ContentTypeId;
