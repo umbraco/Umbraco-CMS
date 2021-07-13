@@ -1,38 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Templates
 {
-
-    public sealed class HtmlImageSourceParser
+    /// <summary>
+    /// HTML image source parser.
+    /// </summary>
+    public class HtmlImageSourceParser
     {
-        public HtmlImageSourceParser(Func<Guid, string> getMediaUrl)
+        /// <summary>
+        /// The image URL generator.
+        /// </summary>
+        protected readonly IImageUrlGenerator _imageUrlGenerator;
+
+        /// <summary>
+        /// The umbraco context accessor.
+        /// </summary>
+        protected readonly IUmbracoContextAccessor _umbracoContextAccessor;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
+        /// </summary>
+        /// <param name="getMediaUrl">The get media URL.</param>
+        /// <param name="imageUrlGenerator">The image URL generator.</param>
+        public HtmlImageSourceParser(Func<Guid, string> getMediaUrl, IImageUrlGenerator imageUrlGenerator = null)
         {
             this._getMediaUrl = getMediaUrl;
+            this._imageUrlGenerator = imageUrlGenerator;
         }
 
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
+        /// </summary>
+        /// <param name="umbracoContextAccessor">The umbraco context accessor.</param>
+        /// <param name="imageUrlGenerator">The image URL generator.</param>
+        public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor, IImageUrlGenerator imageUrlGenerator)
+            : this(umbracoContextAccessor)
+        {
+            this._imageUrlGenerator = imageUrlGenerator;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HtmlImageSourceParser" /> class.
+        /// </summary>
+        /// <param name="umbracoContextAccessor">The umbraco context accessor.</param>
         public HtmlImageSourceParser(IUmbracoContextAccessor umbracoContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
-        private static readonly Regex ResolveImgPattern = new Regex(@"(<img[^>]*src="")([^""\?]*)((?:\?[^""]*)?""[^>]*data-udi="")([^""]*)(""[^>]*>)",
+        /// <summary>
+        /// The resolve img pattern.
+        /// </summary>
+        protected static readonly Regex ResolveImgPattern = new Regex(@"(<img[^>]*src="")([^""\?]*)((?:\?[^""]*)?""[^>]*data-udi="")([^""]*)(""[^>]*>)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        private static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
+        /// <summary>
+        /// The data udi attribute regex.
+        /// </summary>
+        protected static readonly Regex DataUdiAttributeRegex = new Regex(@"data-udi=\\?(?:""|')(?<udi>umb://[A-z0-9\-]+/[A-z0-9]+)\\?(?:""|')",
             RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-        private Func<Guid, string> _getMediaUrl;
+        /// <summary>
+        /// The get media URL.
+        /// </summary>
+        protected Func<Guid, string> _getMediaUrl;
 
         /// <summary>
         /// Parses out media UDIs from an html string based on 'data-udi' html attributes
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">The text.</param>
         /// <returns></returns>
-        public IEnumerable<Udi> FindUdisFromDataAttributes(string text)
+        public virtual IEnumerable<Udi> FindUdisFromDataAttributes(string text)
         {
             var matches = DataUdiAttributeRegex.Matches(text);
             if (matches.Count == 0)
@@ -48,12 +92,14 @@ namespace Umbraco.Web.Templates
         /// <summary>
         /// Parses the string looking for Umbraco image tags and updates them to their up-to-date image sources.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">The text.</param>
         /// <returns></returns>
-        /// <remarks>Umbraco image tags are identified by their data-udi attributes</remarks>
-        public string EnsureImageSources(string text)
+        /// <remarks>
+        /// Umbraco image tags are identified by their data-udi attributes
+        /// </remarks>
+        public virtual string EnsureImageSources(string text)
         {
-            if(_getMediaUrl == null)
+            if (_getMediaUrl == null)
                 _getMediaUrl = (guid) => _umbracoContextAccessor.UmbracoContext.UrlProvider.GetMediaUrl(guid);
 
             return ResolveImgPattern.Replace(text, match =>
@@ -77,17 +123,75 @@ namespace Umbraco.Web.Templates
                     return match.Value;
                 }
 
-                return $"{match.Groups[1].Value}{mediaUrl}{match.Groups[3].Value}{udi}{match.Groups[5].Value}";
+                string attributes;
+                if (this._imageUrlGenerator != null &&
+                    this.ParseImageUrlGenerationOptions(mediaUrl, match.Value, out var imageUrlGenerationOptions))
+                {
+                    var endSrc = match.Groups[3].Value.IndexOf('"');
+                    attributes = match.Groups[3].Value.Substring(endSrc);
+                    mediaUrl = this._imageUrlGenerator.GetImageUrl(imageUrlGenerationOptions);
+                }
+                else
+                {
+                    attributes = match.Groups[3].Value;
+                }
+
+                return $"{match.Groups[1].Value}{mediaUrl}{attributes}{udi}{match.Groups[5].Value}";
             });
         }
 
         /// <summary>
         /// Removes media URLs from &lt;img&gt; tags where a data-udi attribute is present
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">The text.</param>
         /// <returns></returns>
-        public string RemoveImageSources(string text)
+        public virtual string RemoveImageSources(string text)
             // see comment in ResolveMediaFromTextString for group reference
             => ResolveImgPattern.Replace(text, "$1$3$4$5");
+
+        /// <summary>
+        /// Parses the <see cref="ImageUrlGenerationOptions" /> from the specified <paramref name="imgTag" />.
+        /// </summary>
+        /// <param name="mediaUrl">The media URL.</param>
+        /// <param name="imgTag">The img tag.</param>
+        /// <returns>
+        /// The parsed <see cref="ImageUrlGenerationOptions" /> from the specified <paramref name="imgTag" />.
+        /// </returns>
+        protected virtual bool ParseImageUrlGenerationOptions(string mediaUrl, string imgTag, out ImageUrlGenerationOptions options)
+        {
+            var html = new HtmlDocument();
+            html.LoadHtml(imgTag);
+            var img = html.DocumentNode.FirstChild;
+            if (img?.Name == "img")
+            {
+                var result = new Lazy<ImageUrlGenerationOptions>(() => new ImageUrlGenerationOptions(mediaUrl));
+                if (double.TryParse(img.Attributes["width"]?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var width))
+                {
+                    result.Value.Width = (int)Math.Round(width);
+                }
+
+                if (double.TryParse(img.Attributes["height"]?.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var height))
+                {
+                    result.Value.Height = (int)Math.Round(height);
+                }
+
+                if (img.Attributes["data-mode"]?.Value.IsNullOrWhiteSpace() == false)
+                {
+                    result.Value.ImageCropMode = img.Attributes["data-mode"].Value;
+                }
+                else if (result.IsValueCreated)
+                {
+                    result.Value.ImageCropMode = "max";
+                }
+
+                options = result.IsValueCreated ? result.Value : default;
+            }
+            else
+            {
+                options = default;
+            }
+
+            return options != default;
+        }
     }
 }
