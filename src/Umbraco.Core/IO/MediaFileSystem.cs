@@ -59,23 +59,23 @@ namespace Umbraco.Core.IO
         #region Media Path
 
         /// <inheritoc />
-        public string GetMediaPath(string filename, Guid cuid, Guid puid)
+        public string GetMediaPath(string filename, Guid cuid, Guid puid, string culture = null)
         {
             filename = Path.GetFileName(filename);
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
             filename = IOHelper.SafeFileName(filename.ToLowerInvariant());
 
-            return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
+            return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, null, culture);
         }
 
         /// <inheritoc />
-        public string GetMediaPath(string filename, string prevpath, Guid cuid, Guid puid)
+        public string GetMediaPath(string filename, string prevpath, Guid cuid, Guid puid, string culture = null)
         {
             filename = Path.GetFileName(filename);
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
             filename = IOHelper.SafeFileName(filename.ToLowerInvariant());
 
-            return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
+            return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath, culture);
         }
 
         #endregion
@@ -83,7 +83,7 @@ namespace Umbraco.Core.IO
         #region Associated Media Files
 
         /// <inheritoc />
-        public string StoreFile(IContentBase content, PropertyType propertyType, string filename, Stream filestream, string oldpath)
+        public string StoreFile(IContentBase content, PropertyType propertyType, string filename, Stream filestream, string oldpath, string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));
@@ -97,13 +97,13 @@ namespace Umbraco.Core.IO
 
             // get the filepath, store the data
             // use oldpath as "prevpath" to try and reuse the folder, in original number-based scheme
-            var filepath = GetMediaPath(filename, oldpath, content.Key, propertyType.Key);
+            var filepath = GetMediaPath(filename, oldpath, content.Key, propertyType.Key, culture);
             AddFile(filepath, filestream);
             return filepath;
         }
 
         /// <inheritoc />
-        public string CopyFile(IContentBase content, PropertyType propertyType, string sourcepath)
+        public string CopyFile(IContentBase content, PropertyType propertyType, string sourcepath, string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));
@@ -115,7 +115,7 @@ namespace Umbraco.Core.IO
 
             // get the filepath
             var filename = Path.GetFileName(sourcepath);
-            var filepath = GetMediaPath(filename, content.Key, propertyType.Key);
+            var filepath = GetMediaPath(filename, content.Key, propertyType.Key, culture);
             this.CopyFile(sourcepath, filepath);
             return filepath;
         }
