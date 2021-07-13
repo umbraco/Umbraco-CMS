@@ -50,16 +50,18 @@
 
         vm.labels = {};
 
+        vm.syncModel = [];
+
         localizationService.localizeMany(["grid_addElement", "content_createEmpty"]).then(function (data) {
             vm.labels.grid_addElement = data[0];
             vm.labels.content_createEmpty = data[1];
         });
 
-        vm.$onInit = function() {
+        vm.$onInit = function () {
 
             vm.validationLimit = vm.model.config.validationLimit || {};
             // If single-mode we only allow 1 item as the maximum:
-            if(vm.model.config.multiple === false) {
+            if (vm.model.config.multiple === false) {
                 vm.validationLimit.max = 1;
             }
             vm.model.config.crops = vm.model.config.crops || [];
@@ -83,7 +85,7 @@
             };
 
             var propertyActions = [];
-            if(vm.supportCopy) {
+            if (vm.supportCopy) {
                 propertyActions.push(copyAllMediasAction);
             }
             propertyActions.push(removeAllMediasAction);
@@ -92,11 +94,12 @@
                 vm.umbProperty.setPropertyActions(propertyActions);
             }
 
-            if(vm.model.value === null || !Array.isArray(vm.model.value)) {
-                vm.model.value = [];
+            if (vm.model.value !== null && Array.isArray(vm.model.value)) {
+                vm.syncModel = vm.model.value;
             }
 
-            vm.model.value.forEach(mediaEntry => updateMediaEntryData(mediaEntry));
+            vm.syncModel.forEach(mediaEntry => updateMediaEntryData(mediaEntry));
+            sync();
 
             userService.getCurrentUser().then(function (userData) {
 
@@ -132,7 +135,7 @@
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
                 dataTypeKey: vm.model.dataTypeKey,
                 multiPicker: vm.singleMode !== true,
-                clickPasteItem: function(item, mouseEvent) {
+                clickPasteItem: function (item, mouseEvent) {
 
                     if (Array.isArray(item.data)) {
                         var indexIncrementor = 0;
@@ -144,7 +147,7 @@
                     } else {
                         requestPasteFromClipboard(createIndex, item.data, item.type);
                     }
-                    if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                    if (!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         mediaPicker.close();
                     }
                 },
@@ -157,10 +160,11 @@
                         mediaEntry.key = String.CreateGuid();
                         mediaEntry.mediaKey = entry.key;
                         updateMediaEntryData(mediaEntry);
-                        vm.model.value.splice(createIndex + indexIncrementor, 0, mediaEntry);
+                        vm.syncModel.splice(createIndex + indexIncrementor, 0, mediaEntry);
                         indexIncrementor++;
                     });
 
+                    sync();
                     setDirty();
                 },
                 close: function () {
@@ -177,7 +181,7 @@
             };
 
             mediaPicker.clipboardItems = clipboardService.retriveEntriesOfType(clipboardService.TYPES.MEDIA, vm.allowedTypes || null);
-            mediaPicker.clipboardItems.sort( (a, b) => {
+            mediaPicker.clipboardItems.sort((a, b) => {
                 return b.date - a.date
             });
 
@@ -221,7 +225,7 @@
         }
 
         function resetCrop(cropEntry) {
-            Object.assign(cropEntry, vm.model.config.crops.find( c => c.alias === cropEntry.alias));
+            Object.assign(cropEntry, vm.model.config.crops.find(c => c.alias === cropEntry.alias));
             cropEntry.coordinates = null;
             setDirty();
         }
@@ -246,24 +250,26 @@
         }
 
         function removeMedia(media) {
-            var index = vm.model.value.indexOf(media);
+            var index = vm.syncModel.indexOf(media);
             if (index !== -1) {
-                vm.model.value.splice(index, 1);
+                vm.syncModel.splice(index, 1);
             }
+            sync();
         }
 
         function deleteAllMedias() {
-            vm.model.value = [];
+            vm.syncModel = [];
+            sync();
         }
 
         function setActiveMedia(mediaEntryOrNull) {
             vm.activeMediaEntry = mediaEntryOrNull;
         }
-        
+
         function editMedia(mediaEntry, options, $event) {
 
-            if($event)
-            $event.stopPropagation();
+            if ($event)
+                $event.stopPropagation();
 
             options = options || {};
 
@@ -287,13 +293,14 @@
                 enableFocalPointSetter: vm.model.config.enableLocalFocalPoint || false,
                 view: "views/common/infiniteeditors/mediaEntryEditor/mediaEntryEditor.html",
                 size: "large",
-                submit: function(model) {
-                    vm.model.value[vm.model.value.indexOf(mediaEntry)] = mediaEntryClone;
-                    setActiveMedia(null)
+                submit: function (model) {
+                    vm.syncModel[vm.syncModel.indexOf(mediaEntry)] = mediaEntryClone;
+                    setActiveMedia(null);
+                    sync();
                     editorService.close();
                 },
-                close: function(model) {
-                    if(model.createFlow === true) {
+                close: function (model) {
+                    if (model.createFlow === true) {
                         // This means that the user cancelled the creation and we should remove the media item.
                         // TODO: remove new media item.
                     }
@@ -329,7 +336,7 @@
         };
 
         var requestCopyAllMedias = function () {
-            var mediaKeys = vm.model.value.map(x => x.mediaKey)
+            var mediaKeys = vm.syncModel.map(x => x.mediaKey);
             entityResource.getByIds(mediaKeys, "Media").then(function (entities) {
 
                 // gather aliases
@@ -341,7 +348,7 @@
                 var documentInfo = getDocumentNameAndIcon();
 
                 localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, documentInfo.name]).then(function (localizedLabel) {
-                    clipboardService.copyArray(clipboardService.TYPES.MEDIA, aliases, vm.model.value, localizedLabel, documentInfo.icon || "icon-thumbnail-list", vm.model.id);
+                    clipboardService.copyArray(clipboardService.TYPES.MEDIA, aliases, vm.syncModel, localizedLabel, documentInfo.icon || "icon-thumbnail-list", vm.model.id);
                 });
             });
         };
@@ -362,8 +369,9 @@
 
             pasteEntry.key = String.CreateGuid();
             updateMediaEntryData(pasteEntry);
-            vm.model.value.splice(createIndex, 0, pasteEntry);
+            vm.syncModel.splice(createIndex, 0, pasteEntry);
 
+            sync();
             return true;
         }
 
@@ -383,6 +391,10 @@
             });
         }
 
+        function sync() {
+            vm.model.value = vm.syncModel;
+        }
+
         vm.sortableOptions = {
             cursor: "grabbing",
             handle: "umb-media-card",
@@ -400,24 +412,24 @@
 
             // enable/disable property actions
             if (copyAllMediasAction) {
-                copyAllMediasAction.isDisabled = vm.model.value.length === 0;
+                copyAllMediasAction.isDisabled = vm.syncModel.length === 0;
             }
             if (removeAllMediasAction) {
-                removeAllMediasAction.isDisabled = vm.model.value.length === 0;
+                removeAllMediasAction.isDisabled = vm.syncModel.length === 0;
             }
 
             // validate limits:
             if (vm.propertyForm && vm.validationLimit) {
 
-                var isMinRequirementGood = vm.validationLimit.min === null || vm.model.value.length >= vm.validationLimit.min;
+                var isMinRequirementGood = vm.validationLimit.min === null || vm.syncModel.length >= vm.validationLimit.min;
                 vm.propertyForm.minCount.$setValidity("minCount", isMinRequirementGood);
 
-                var isMaxRequirementGood = vm.validationLimit.max === null || vm.model.value.length <= vm.validationLimit.max;
+                var isMaxRequirementGood = vm.validationLimit.max === null || vm.syncModel.length <= vm.validationLimit.max;
                 vm.propertyForm.maxCount.$setValidity("maxCount", isMaxRequirementGood);
             }
         }
 
-        unsubscribe.push($scope.$watch(() => vm.model.value.length, onAmountOfMediaChanged));
+        unsubscribe.push($scope.$watch(() => vm.syncModel.length, onAmountOfMediaChanged));
 
         $scope.$on("$destroy", function () {
             for (const subscription of unsubscribe) {
