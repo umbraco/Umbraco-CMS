@@ -35,9 +35,9 @@ namespace Umbraco.Core.Persistence.Factories
                         group.Id = groupDto.Id;
 
                     group.Key = groupDto.UniqueId;
-                    group.ParentKey = groupDto.ParentKey;
                     group.Type = (PropertyGroupType)groupDto.Type;
                     group.Name = groupDto.Text;
+                    group.Alias = groupDto.Alias;
                     group.SortOrder = groupDto.SortOrder;
 
                     group.PropertyTypes = new PropertyTypeCollection(isPublishing);
@@ -107,10 +107,10 @@ namespace Umbraco.Core.Persistence.Factories
             var dto = new PropertyTypeGroupDto
             {
                 UniqueId = propertyGroup.Key,
-                ParentKey = propertyGroup.ParentKey,
                 Type = (short)propertyGroup.Type,
                 ContentTypeNodeId = contentTypeId,
                 Text = propertyGroup.Name,
+                Alias = propertyGroup.Alias,
                 SortOrder = propertyGroup.SortOrder
             };
 

@@ -13,12 +13,12 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [DebuggerDisplay("Id: {Id}, Name: {Name}")]
+    [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
-        private Guid? _parentKey;
         private PropertyGroupType _type;
         private string _name;
+        private string _alias;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;
 
@@ -34,19 +34,6 @@ namespace Umbraco.Core.Models
         private void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(PropertyTypes));
-        }
-
-        /// <summary>
-        /// Gets or sets the parent key of the group.
-        /// </summary>
-        /// <value>
-        /// The parent key.
-        /// </value>
-        [DataMember]
-        public Guid? ParentKey
-        {
-            get => _parentKey;
-            set => SetPropertyValueAndDetectChanges(value, ref _parentKey, nameof(ParentKey));
         }
 
         /// <summary>
@@ -73,6 +60,19 @@ namespace Umbraco.Core.Models
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+        }
+
+        /// <summary>
+        /// Gets or sets the alias of the group.
+        /// </summary>
+        /// <value>
+        /// The alias.
+        /// </value>
+        [DataMember]
+        public string Alias
+        {
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
         }
 
         /// <summary>
@@ -121,9 +121,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public bool Equals(PropertyGroup other) => base.Equals(other) || (other != null && Name.InvariantEquals(other.Name) && ParentKey == other.ParentKey && Type == other.Type);
+        public bool Equals(PropertyGroup other) => base.Equals(other) || (other != null && Type == other.Type && Alias == other.Alias);
 
-        public override int GetHashCode() => (base.GetHashCode(), Name?.ToLowerInvariant(), ParentKey, Type).GetHashCode();
+        public override int GetHashCode() => (base.GetHashCode(), Type, Alias).GetHashCode();
 
         protected override void PerformDeepClone(object clone)
         {
@@ -133,17 +133,53 @@ namespace Umbraco.Core.Models
 
             if (clonedEntity._propertyTypes != null)
             {
-                clonedEntity._propertyTypes.ClearCollectionChangedEvents();             //clear this event handler if any
+                clonedEntity._propertyTypes.ClearCollectionChangedEvents(); //clear this event handler if any
                 clonedEntity._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
-                clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;       //re-assign correct event handler
+                clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged; //re-assign correct event handler
             }
         }
     }
 
     internal static class PropertyGroupExtensions
     {
+        private const char aliasSeparator = '/';
+
+        internal static string GetParentAlias(string alias)
+        {
+            var lastIndex = alias?.LastIndexOf(aliasSeparator) ?? -1;
+            if (lastIndex == -1)
+            {
+                return null;
+            }
+
+            return alias.Substring(0, lastIndex);
+        }
+
+        public static string GetParentAlias(this PropertyGroup propertyGroup) => GetParentAlias(propertyGroup.Alias);
+
+        public static void UpdateParentAlias(this PropertyGroup propertyGroup, string parentAlias)
+        {
+            // Get current alias without parent
+            var alias = propertyGroup.Alias;
+            var lastIndex = alias?.LastIndexOf(aliasSeparator) ?? -1;
+            if (lastIndex != -1)
+            {
+                alias = alias.Substring(lastIndex + 1);
+            }
+
+            // Update alias
+            if (string.IsNullOrEmpty(parentAlias))
+            {
+                propertyGroup.Alias = alias;
+            }
+            else
+            {
+                propertyGroup.Alias = parentAlias + aliasSeparator + alias;
+            }
+        }
+
         /// <summary>
-        /// Orders the property groups by hierarchy (so child groups are after their parent group) and removes circular references.
+        /// Orders the property groups by hierarchy (so child groups are after their parent group).
         /// </summary>
         /// <param name="propertyGroups">The property groups.</param>
         /// <returns>
@@ -151,22 +187,15 @@ namespace Umbraco.Core.Models
         /// </returns>
         public static IEnumerable<PropertyGroup> OrderByHierarchy(this IEnumerable<PropertyGroup> propertyGroups)
         {
-            var groups = propertyGroups.ToList();
-            var visitedParentKeys = new HashSet<Guid>(groups.Count);
+            var groupsByParentAlias = propertyGroups.ToLookup(x => x.GetParentAlias());
 
-            IEnumerable<PropertyGroup> OrderByHierarchy(Guid? parentKey)
+            IEnumerable<PropertyGroup> OrderByHierarchy(string parentAlias)
             {
-                if (parentKey.HasValue && visitedParentKeys.Add(parentKey.Value) == false)
-                {
-                    // We already visited this parent key, stop to prevent a circular reference
-                    yield break;
-                }
-
-                foreach (var group in groups.Where(x => x.ParentKey == parentKey).OrderBy(x => x.Type).ThenBy(x => x.SortOrder))
+                foreach (var group in groupsByParentAlias[parentAlias].OrderBy(x => x.SortOrder))
                 {
                     yield return group;
 
-                    foreach (var childGroup in OrderByHierarchy(group.Key))
+                    foreach (var childGroup in OrderByHierarchy(group.Alias))
                     {
                         yield return childGroup;
                     }

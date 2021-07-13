@@ -205,53 +205,35 @@ namespace Umbraco.Core.Models
             return CompositionPropertyTypes.Any(x => x.Alias == propertyTypeAlias);
         }
 
-        /// <summary>
-        /// Adds a PropertyGroup.
-        /// </summary>
-        /// <param name="groupName">Name of the PropertyGroup to add</param>
-        /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
+        /// <inheritdoc />
         public override bool AddPropertyGroup(string groupName)
         {
-            return AddAndReturnPropertyGroup(null, groupName) != null;
+            return AddAndReturnPropertyGroup(groupName, groupName.ToSafeAlias()) != null;
         }
 
-        public override bool AddPropertyGroup(Guid key, string groupName)
+        /// <inheritdoc />
+        public override bool AddPropertyGroup(string groupName, string alias)
         {
-            return AddAndReturnPropertyGroup(key, groupName) != null;
+            return AddAndReturnPropertyGroup(groupName, alias) != null;
         }
 
-        private PropertyGroup AddAndReturnPropertyGroup(Guid? key, string name)
+        private PropertyGroup AddAndReturnPropertyGroup(string name, string alias)
         {
             // Ensure we don't have it already
-            if (PropertyGroups.Contains(name))
+            if (PropertyGroups.Contains(alias))
                 return null;
-
-            // Only update name if key already exists
-            if (key.HasValue)
-            {
-                var existingGroup = PropertyGroups.FirstOrDefault(x => x.Key == key.Value);
-                if (existingGroup != null)
-                {
-                    existingGroup.Name = name;
-                    return null;
-                }
-            }
 
             // Add new group
             var group = new PropertyGroup(SupportsPublishing)
             {
-                Name = name
+                Name = name,
+                Alias = alias
             };
-
-            if (key.HasValue)
-            {
-                group.Key = key.Value;
-            }
 
             // check if it is inherited - there might be more than 1 but we want the 1st, to
             // reuse its sort order - if there are more than 1 and they have different sort
             // orders... there isn't much we can do anyways
-            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(name));
+            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Alias == alias);
             if (inheritGroup == null)
             {
                 // no, just local, set sort order
@@ -284,8 +266,9 @@ namespace Umbraco.Core.Models
                 return false;
 
             // get and ensure a group local to this content type
-            var group = PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName))
-                ?? AddAndReturnPropertyGroup(null, propertyGroupName);
+            var group = PropertyGroups.FirstOrDefault(x => x.Alias == propertyGroupName)
+                ?? PropertyGroups.FirstOrDefault(x => x.Alias == propertyGroupName.ToSafeAlias()) // TODO Remove in v9 (only needed for backwards compatibility with names)
+                ?? AddAndReturnPropertyGroup(propertyGroupName, propertyGroupName.ToSafeAlias()); // TODO Do we need both name and alias for this to work?
             if (group == null)
                 return false;
 

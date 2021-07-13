@@ -23,21 +23,19 @@ namespace Umbraco.Core.Persistence.Dtos
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyTypeGroupUniqueID")]
         public Guid UniqueId { get; set; }
 
-        [Column("parentKey")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [ForeignKey(typeof(PropertyTypeGroupDto), Column = "uniqueID", Name = "FK_" + TableName + "_parentKey")]
-        public Guid? ParentKey { get; set; }
+        [Column("contenttypeNodeId")]
+        [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
+        public int ContentTypeNodeId { get; set; }
 
         [Column("type")]
         [Constraint(Default = 0)]
         public short Type { get; set; }
 
-        [Column("contenttypeNodeId")]
-        [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
-        public int ContentTypeNodeId { get; set; }
-
         [Column("text")]
         public string Text { get; set; }
+
+        [Column("alias")]
+        public string Alias { get; set; }
 
         [Column("sortorder")]
         public int SortOrder { get; set; }

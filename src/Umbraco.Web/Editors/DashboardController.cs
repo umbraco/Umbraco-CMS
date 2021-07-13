@@ -216,7 +216,6 @@ namespace Umbraco.Web.Editors
             {
                 Id = x.Id,
                 Key = x.Key,
-                ParentKey = x.ParentKey,
                 Type = x.Type,
                 Alias = x.Alias,
                 Label = x.Label,

@@ -13,19 +13,18 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_16_0
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
 
-            // Add new columns
-            AddColumnIfNotExists<PropertyTypeGroupDto>(columns, "parentKey");
-            AddColumnIfNotExists<PropertyTypeGroupDto>(columns, "type");
+            AddColumn<PropertyTypeGroupDto>(columns, "type");
 
-            // Create self-referencing foreign key
-            var foreignKeyName = "FK_" + PropertyTypeGroupDto.TableName + "_parentKey";
-            if (SqlSyntax.GetConstraintsPerTable(Context.Database).Any(x => x.Item2.InvariantEquals(foreignKeyName)) == false)
+            AddColumn<PropertyTypeGroupDto>(columns, "alias", out var sqls);
+            var dtos = Database.Fetch<PropertyTypeGroupDto>();
+            foreach (var dto in dtos)
             {
-                Create.ForeignKey(foreignKeyName)
-                    .FromTable(PropertyTypeGroupDto.TableName).ForeignColumn("parentKey")
-                    .ToTable(PropertyTypeGroupDto.TableName).PrimaryColumn("uniqueID")
-                    .Do();
+                // Generate alias from current name
+                dto.Alias = dto.Text.ToSafeAlias();
+
+                Database.Update(dto, x => new { x.Alias });
             }
+            foreach (var sql in sqls) Database.Execute(sql);
         }
     }
 }

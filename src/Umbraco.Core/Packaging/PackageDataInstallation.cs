@@ -742,27 +742,25 @@ namespace Umbraco.Core.Packaging
             var propertyGroupElements = propertyGroupsContainer.Elements("Tab");
             foreach (var propertyGroupElement in propertyGroupElements)
             {
-                var caption = propertyGroupElement.Element("Caption").Value;
+                var name = propertyGroupElement.Element("Caption").Value; // TODO Rename to Name (same in EntityXmlSerializer)
+
+                var alias = propertyGroupElement.Element("Alias")?.Value;
+                if (string.IsNullOrEmpty(alias))
+                {
+                    alias = name.ToSafeAlias();
+                }
+
+                contentType.AddPropertyGroup(name, alias);
+                var propertyGroup = contentType.PropertyGroups[alias];
 
                 if (Guid.TryParse(propertyGroupElement.Element("Key")?.Value, out var key))
                 {
-                    contentType.AddPropertyGroup(key, caption);
+                    propertyGroup.Key = key;
                 }
-                else
-                {
-                    contentType.AddPropertyGroup(caption);
-                }
-
-                var propertyGroup = contentType.PropertyGroups[caption];
 
                 if (Enum.TryParse<PropertyGroupType>(propertyGroupElement.Element("Type")?.Value, out var type))
                 {
                     propertyGroup.Type = type;
-                }
-
-                if (Guid.TryParse(propertyGroupElement.Element("ParentKey")?.Value, out var parentKey))
-                {
-                    propertyGroup.ParentKey = parentKey;
                 }
 
                 if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, out var sortOrder))

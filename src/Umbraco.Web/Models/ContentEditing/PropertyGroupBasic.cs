@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
 
@@ -37,15 +38,16 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "key")]
         public Guid Key { get; set; }
 
-        [DataMember(Name = "parentKey")]
-        public Guid? ParentKey { get; set; }
-
         [DataMember(Name = "type")]
         public PropertyGroupType Type { get; set; }
 
         [Required]
         [DataMember(Name = "name")]
         public string Name { get; set; }
+
+        [Required]
+        [DataMember(Name = "alias")]
+        public string Alias { get; set; }
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
@@ -62,5 +64,40 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "properties")]
         public IEnumerable<TPropertyType> Properties { get; set; }
+    }
+
+    internal static class PropertyGroupBasicExtensions
+    {
+        public static string GetParentAlias(this PropertyGroupBasic propertyGroup)
+            => PropertyGroupExtensions.GetParentAlias(propertyGroup.Alias);
+
+        /// <summary>
+        /// Orders the property groups by hierarchy (so child groups are after their parent group).
+        /// </summary>
+        /// <typeparam name="T">The display type of the property type.</typeparam>
+        /// <param name="propertyGroups">The property groups.</param>
+        /// <returns>
+        /// The ordered property groups.
+        /// </returns>
+        public static IEnumerable<T> OrderByHierarchy<T>(this IEnumerable<T> propertyGroups)
+            where T : PropertyGroupBasic
+        {
+            var groupsByParentAlias = propertyGroups.ToLookup(x => x.GetParentAlias());
+
+            IEnumerable<T> OrderByHierarchy(string parentAlias)
+            {
+                foreach (var group in groupsByParentAlias[parentAlias].OrderBy(x => x.SortOrder))
+                {
+                    yield return group;
+
+                    foreach (var childGroup in OrderByHierarchy(group.Alias))
+                    {
+                        yield return childGroup;
+                    }
+                }
+            }
+
+            return OrderByHierarchy(null);
+        }
     }
 }

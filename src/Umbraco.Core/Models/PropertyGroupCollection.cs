@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -20,17 +21,16 @@ namespace Umbraco.Core.Models
         private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PropertyGroupCollection"/> class.
+        /// Initializes a new instance of the <see cref="PropertyGroupCollection" /> class.
         /// </summary>
-        /// <remarks>
-        /// Property group names are case-insensitive and the internal lookup dictionary is disabled to support renaming groups.
-        /// </remarks>
         internal PropertyGroupCollection()
-            : base(StringComparer.InvariantCultureIgnoreCase, -1)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PropertyGroupCollection" /> class.
+        /// </summary>
+        /// <param name="groups">The groups.</param>
         public PropertyGroupCollection(IEnumerable<PropertyGroup> groups)
-            : this()
         {
             Reset(groups);
         }
@@ -50,9 +50,28 @@ namespace Umbraco.Core.Models
                 Add(group);
         }
 
+        public new PropertyGroup this[string key]
+        {
+            // TODO Remove this property in v9 (only needed for backwards compatibility with names)
+            get
+            {
+                var item = base[key];
+                if (item == null && !key.Contains('/'))
+                {
+                    item = base[key.ToSafeAlias()];
+                }
+
+                return item;
+            }
+        }
+
         protected override void SetItem(int index, PropertyGroup item)
         {
             var oldItem = index >= 0 ? this[index] : item;
+
+            oldItem.PropertyChanged -= PropertyGroup_PropertyChanged;
+            item.PropertyChanged += PropertyGroup_PropertyChanged;
+
             base.SetItem(index, item);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem));
         }
@@ -60,18 +79,28 @@ namespace Umbraco.Core.Models
         protected override void RemoveItem(int index)
         {
             var removed = this[index];
+
+            removed.PropertyChanged -= PropertyGroup_PropertyChanged;
+
             base.RemoveItem(index);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
         }
 
         protected override void InsertItem(int index, PropertyGroup item)
         {
+            item.PropertyChanged += PropertyGroup_PropertyChanged;
+
             base.InsertItem(index, item);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
         protected override void ClearItems()
         {
+            foreach (var item in this)
+            {
+                item.PropertyChanged -= PropertyGroup_PropertyChanged;
+            }
+
             base.ClearItems();
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
@@ -82,15 +111,21 @@ namespace Umbraco.Core.Models
             {
                 _addLocker.EnterWriteLock();
 
+                // Ensure alias is set
+                if (string.IsNullOrEmpty(item.Alias))
+                {
+                    item.Alias = item.Name.ToSafeAlias();
+                }
+
                 // Note this is done to ensure existing groups can be renamed
                 if (item.HasIdentity && item.Id > 0)
                 {
                     var index = IndexOfKey(item.Id);
                     if (index != -1)
                     {
-                        var keyExists = Contains(item.Name);
+                        var keyExists = Contains(item.Alias);
                         if (keyExists)
-                            throw new Exception($"Naming conflict: Changing the name of PropertyGroup '{item.Name}' would result in duplicates");
+                            throw new ArgumentException($"Naming conflict: changing the alias of property group '{item.Name}' would result in duplicates.");
 
                         // Collection events will be raised in SetItem
                         SetItem(index, item);
@@ -99,7 +134,7 @@ namespace Umbraco.Core.Models
                 }
                 else
                 {
-                    var index = IndexOfKey(item.Name);
+                    var index = IndexOfKey(item.Alias);
                     if (index != -1)
                     {
                         // Collection events will be raised in SetItem
@@ -118,25 +153,57 @@ namespace Umbraco.Core.Models
             }
         }
 
+        private void PropertyGroup_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var item = sender as PropertyGroup;
+
+            if (e.PropertyName == nameof(PropertyGroup.Alias))
+            {
+                ChangeItemKey(item, item.Alias);
+
+                // Update child aliases
+                foreach (var childItem in this.Where(x => x.GetParentAlias() == item.Alias))
+                {
+                    childItem.UpdateParentAlias(item.Alias);
+                }
+            }
+        }
+
+        public new bool Contains(string key)
+        {
+            // TODO Remove this method in v9 (only needed for backwards compatibility with names)
+            return base.Contains(key) || (!key.Contains('/') && base.Contains(key.ToSafeAlias()));
+        }
+
         public bool Contains(int id)
         {
             return this.Any(x => x.Id == id);
         }
 
-        public void RemoveItem(string propertyGroupName)
+        public void RemoveItem(string key)
         {
-            var index = IndexOfKey(propertyGroupName);
+            var index = IndexOfKey(key);
 
             // Only removes an item if the key was found
             if (index != -1)
                 RemoveItem(index);
         }
 
-        public int IndexOfKey(string key) => this.FindIndex(x => x.Name.InvariantEquals(key));
+        public int IndexOfKey(string key)
+        {
+            var index = this.FindIndex(x => x.Alias == key);
+            if (index == -1 && !key.Contains('/'))
+            {
+                // TODO Clean up for v9 (only needed for backwards compatibility with names)
+                index = this.IndexOfKey(key.ToSafeAlias());
+            }
+
+            return index;
+        }
 
         public int IndexOfKey(int id) => this.FindIndex(x => x.Id == id);
 
-        protected override string GetKeyForItem(PropertyGroup item) => item.Name;
+        protected override string GetKeyForItem(PropertyGroup item) => item.Alias;
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 

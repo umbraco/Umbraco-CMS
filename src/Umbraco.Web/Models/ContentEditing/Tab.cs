@@ -17,9 +17,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "key")]
         public Guid Key { get; set; }
 
-        [DataMember(Name = "parentKey")]
-        public Guid? ParentKey { get; set; }
-
+        [Obsolete("A generic tab should not reference property group specific types!")]
         [DataMember(Name = "type")]
         public PropertyGroupType Type { get; set; }
 

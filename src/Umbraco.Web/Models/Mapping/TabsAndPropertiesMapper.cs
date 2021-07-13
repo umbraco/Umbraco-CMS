@@ -130,13 +130,13 @@ namespace Umbraco.Web.Models.Mapping
             // and there might be duplicates (content does not work like contentType and there is no
             // content.CompositionPropertyGroups).
             var groups = contentType.CompositionPropertyGroups.OrderByHierarchy().ToArray();
-            var parentKeys = groups.Where(x => x.ParentKey.HasValue).Select(x => x.ParentKey.Value).Distinct().ToArray();
-            foreach (var groupsByHierarchy in groups.GroupBy(x => (x.Name, x.ParentKey, x.Type)))
+            var parentAliases = groups.Select(x => x.GetParentAlias()).Distinct().ToArray();
+            foreach (var groupsByAlias in groups.GroupBy(x => x.Alias))
             {
                 var properties = new List<Property>();
 
-                // merge properties for groups with the same name
-                foreach (var group in groupsByHierarchy)
+                // merge properties for groups with the same alias
+                foreach (var group in groupsByAlias)
                 {
                     var groupProperties = source.GetPropertiesForGroup(group)
                         .Where(x => IgnoreProperties.Contains(x.Alias) == false); // skip ignored
@@ -144,7 +144,7 @@ namespace Umbraco.Web.Models.Mapping
                     properties.AddRange(groupProperties);
                 }
 
-                if (properties.Count == 0 && groupsByHierarchy.All(x => !parentKeys.Contains(x.Key)))
+                if (properties.Count == 0 && !parentAliases.Contains(groupsByAlias.Key))
                     continue;
 
                 //map the properties
@@ -152,19 +152,17 @@ namespace Umbraco.Web.Models.Mapping
 
                 // add the tab
                 // we need to pick an identifier... there is no "right" way...
-                var g = groupsByHierarchy.FirstOrDefault(x => x.Id == source.ContentTypeId) // try local
-                    ?? groupsByHierarchy.First(); // else pick one randomly
+                var g = groupsByAlias.FirstOrDefault(x => x.Id == source.ContentTypeId) // try local
+                    ?? groupsByAlias.First(); // else pick one randomly
 
                 tabs.Add(new Tab<ContentPropertyDisplay>
                 {
                     Id = g.Id,
                     Key = g.Key,
-                    ParentKey = g.ParentKey,
                     Type = g.Type,
-                    Alias = g.Name,
                     Label = LocalizedTextService.UmbracoDictionaryTranslate(g.Name),
-                    Properties = mappedProperties,
-                    IsActive = false
+                    Alias = g.Alias,
+                    Properties = mappedProperties
                 });
             }
 

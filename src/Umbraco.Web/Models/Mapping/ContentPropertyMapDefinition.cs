@@ -37,10 +37,10 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.Id = source.Id;
             target.Key = source.Key;
-            target.ParentKey = source.ParentKey;
             target.Type = source.Type;
-            target.IsActive = true;
             target.Label = source.Name;
+            target.Alias = source.Alias;
+            target.IsActive = true;
         }
 
         private void Map(Property source, ContentPropertyBasic target, MapperContext context)

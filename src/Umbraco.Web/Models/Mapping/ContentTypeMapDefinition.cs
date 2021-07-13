@@ -302,9 +302,9 @@ namespace Umbraco.Web.Models.Mapping
                 target.Id = source.Id;
 
             target.Key = source.Key;
-            target.ParentKey = source.ParentKey;
             target.Type = source.Type;
             target.Name = source.Name;
+            target.Alias = source.Alias;
             target.SortOrder = source.SortOrder;
         }
 
@@ -315,9 +315,9 @@ namespace Umbraco.Web.Models.Mapping
                 target.Id = source.Id;
 
             target.Key = source.Key;
-            target.ParentKey = source.ParentKey;
             target.Type = source.Type;
             target.Name = source.Name;
+            target.Alias = source.Alias;
             target.SortOrder = source.SortOrder;
         }
 
@@ -328,9 +328,9 @@ namespace Umbraco.Web.Models.Mapping
                 target.Id = source.Id;
 
             target.Key = source.Key;
-            target.ParentKey = source.ParentKey;
             target.Type = source.Type;
             target.Name = source.Name;
+            target.Alias = source.Alias;
             target.SortOrder = source.SortOrder;
 
             target.Inherited = source.Inherited;
@@ -344,9 +344,9 @@ namespace Umbraco.Web.Models.Mapping
                 target.Id = source.Id;
 
             target.Key = source.Key;
-            target.ParentKey = source.ParentKey;
             target.Type = source.Type;
             target.Name = source.Name;
+            target.Alias = source.Alias;
             target.SortOrder = source.SortOrder;
 
             target.Inherited = source.Inherited;
@@ -447,7 +447,7 @@ namespace Umbraco.Web.Models.Mapping
             var destOrigProperties = target.PropertyTypes.ToArray(); // all properties, in groups or not
             var destGroups = new List<PropertyGroup>();
             var sourceGroups = source.Groups.Where(x => x.IsGenericProperties == false).ToArray();
-            var parentKeys = sourceGroups.Where(x => x.ParentKey.HasValue).Select(x => x.ParentKey.Value).Distinct().ToArray();
+            var sourceGroupParentAliases = sourceGroups.Select(x => x.GetParentAlias()).Distinct().ToArray();
             foreach (var sourceGroup in sourceGroups)
             {
                 // get the dest group
@@ -461,7 +461,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 // if the group has no local properties and is not used as parent, skip it, ie sort-of garbage-collect
                 // local groups which would not have local properties anymore
-                if (destProperties.Length == 0 && !parentKeys.Contains(sourceGroup.Key))
+                if (destProperties.Length == 0 && !sourceGroupParentAliases.Contains(sourceGroup.Alias))
                     continue;
 
                 // ensure no duplicate alias, then assign the group properties collection

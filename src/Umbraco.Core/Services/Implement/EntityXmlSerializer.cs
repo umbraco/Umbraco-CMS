@@ -487,7 +487,7 @@ namespace Umbraco.Core.Services.Implement
                     new XElement("Key", propertyType.Key),
                     new XElement("Type", propertyType.PropertyEditorAlias),
                     new XElement("Definition", definition.Key),
-                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name), // TODO Rename to PropertyGroupKey
+                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Alias), // TODO Rename to PropertyGroupAlias
                     new XElement("SortOrder", propertyType.SortOrder),
                     new XElement("Mandatory", propertyType.Mandatory.ToString()),
                     new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),
@@ -506,10 +506,10 @@ namespace Umbraco.Core.Services.Implement
             foreach (var propertyGroup in propertyGroups)
             {
                 yield return new XElement("Tab", // TODO Rename to PropertyGroup
-                    new XElement("Caption", propertyGroup.Name), // TODO Rename to Name
                     new XElement("Key", propertyGroup.Key),
-                    new XElement("ParentKey", propertyGroup.ParentKey),
                     new XElement("Type", propertyGroup.Type.ToString()),
+                    new XElement("Caption", propertyGroup.Name), // TODO Rename to Name (same in PackageDataInstallation)
+                    new XElement("Alias", propertyGroup.Alias),
                     new XElement("SortOrder", propertyGroup.SortOrder));
             }
         }
