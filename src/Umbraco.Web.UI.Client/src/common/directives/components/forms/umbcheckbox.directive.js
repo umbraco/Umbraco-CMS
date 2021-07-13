@@ -52,7 +52,7 @@
             vm.inputId = vm.inputId || "umb-check_" + String.CreateGuid();
 
             vm.icon = vm.icon || vm.iconClass || null;
-
+      
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
             if (vm.labelKey) {
                  localizationService.localize(vm.labelKey).then(function (data) {
