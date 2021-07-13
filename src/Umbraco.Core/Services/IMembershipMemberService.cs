@@ -127,7 +127,7 @@ namespace Umbraco.Core.Services
         /// <param name="entity"><see cref="IMember"/> or <see cref="IUser"/> to Save</param>
         /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(T entity, bool raiseEvents = true);
+        Attempt<OperationResult> Save(T entity, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a list of <see cref="IMembershipUser"/> objects
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Services
         /// <param name="entities"><see cref="IEnumerable{T}"/> to save</param>
         /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(IEnumerable<T> entities, bool raiseEvents = true);
+        Attempt<OperationResult> Save(IEnumerable<T> entities, bool raiseEvents = true);
 
         /// <summary>
         /// Gets the default MemberType alias

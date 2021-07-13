@@ -246,7 +246,7 @@ namespace Umbraco.Core.Services
         /// </param>
         /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true);
+        Attempt<OperationResult> Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true);
 
         /// <summary>
         /// Deletes a UserGroup

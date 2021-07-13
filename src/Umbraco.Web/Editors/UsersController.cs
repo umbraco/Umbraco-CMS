@@ -44,6 +44,7 @@ namespace Umbraco.Web.Editors
     [UmbracoApplicationAuthorize(Constants.Applications.Users)]
     [PrefixlessBodyModelValidator]
     [IsCurrentUserModelFilter]
+    [AppendCurrentEventMessages]
     public class UsersController : UmbracoAuthorizedJsonController
     {
         public UsersController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
