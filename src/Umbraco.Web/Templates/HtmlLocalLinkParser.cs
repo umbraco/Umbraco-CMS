@@ -65,6 +65,7 @@ namespace Umbraco.Web.Templates
                 throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
 
             var urlProvider = _umbracoContextAccessor.UmbracoContext.UrlProvider;
+            var culture = Thread.CurrentThread.CurrentCulture.Name;
 
             foreach((int? intId, GuidUdi udi, string tagValue) in FindLocalLinkIds(text))
             {
@@ -72,7 +73,7 @@ namespace Umbraco.Web.Templates
                 {
                     var newLink = "#";
                     if (udi.EntityType == Constants.UdiEntityType.Document)
-                        newLink = urlProvider.GetUrl(udi.Guid);
+                        newLink = urlProvider.GetUrl(udi.Guid, UrlMode.Default, culture);
                     else if (udi.EntityType == Constants.UdiEntityType.Media)
                         newLink = urlProvider.GetMediaUrl(udi.Guid);
 
@@ -83,7 +84,7 @@ namespace Umbraco.Web.Templates
                 }
                 else if (intId.HasValue)
                 {
-                    var newLink = urlProvider.GetUrl(intId.Value);
+                    var newLink = urlProvider.GetUrl(intId.Value, UrlMode.Default, culture);
                     text = text.Replace(tagValue, "href=\"" + newLink);
                 }
             }
