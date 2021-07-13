@@ -7,11 +7,13 @@ using System.Web;
 
 namespace Umbraco.Web
 {
+    [Obsolete]
     public static class BlockListTemplateExtensions
     {
         public const string DefaultFolder = "BlockList/";
         public const string DefaultTemplate = "Default";
 
+        [Obsolete("Use @Html.Partials(model, \"BlockList\") instead.")]
         public static IHtmlString GetBlockListHtml(this HtmlHelper html, BlockListModel model, string template = DefaultTemplate)
         {
             if (model?.Count == 0) return new MvcHtmlString(string.Empty);
@@ -20,10 +22,14 @@ namespace Umbraco.Web
             return html.Partial(view, model);
         }
 
+        [Obsolete("Use @Html.Partials(property.Value<BlockListModel>(), \"BlockList\") instead.")]
         public static IHtmlString GetBlockListHtml(this HtmlHelper html, IPublishedProperty property, string template = DefaultTemplate) => GetBlockListHtml(html, property?.GetValue() as BlockListModel, template);
+
+        [Obsolete("Use @Html.Partials(contentItem.Value<BlockListModel>(propertyAlias), \"BlockList\") instead.")]
 
         public static IHtmlString GetBlockListHtml(this HtmlHelper html, IPublishedContent contentItem, string propertyAlias) => GetBlockListHtml(html, contentItem, propertyAlias, DefaultTemplate);
 
+        [Obsolete("Use @Html.Partials(contentItem.Value<BlockListModel>(propertyAlias), \"BlockList\") instead.")]
         public static IHtmlString GetBlockListHtml(this HtmlHelper html, IPublishedContent contentItem, string propertyAlias, string template)
         {
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
