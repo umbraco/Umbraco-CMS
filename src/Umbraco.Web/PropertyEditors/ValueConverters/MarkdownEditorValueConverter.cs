@@ -9,7 +9,7 @@ using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    [DefaultPropertyValueConverter]
+    [DefaultPropertyValueConverter(typeof(Core.PropertyEditors.ValueConverters.MarkdownEditorValueConverter))]
     public class MarkdownEditorValueConverter : PropertyValueConverterBase
     {
         private readonly HtmlLocalLinkParser _localLinkParser;

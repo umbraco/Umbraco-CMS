@@ -3,14 +3,16 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Templates;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    [DefaultPropertyValueConverter]
+    [DefaultPropertyValueConverter(typeof(Core.PropertyEditors.ValueConverters.TextStringValueConverter))]
     public class TextStringValueConverter : PropertyValueConverterBase
     {
+        private readonly HtmlLocalLinkParser _linkParser;
+        private readonly HtmlUrlParser _urlParser;
+
         public TextStringValueConverter(HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser)
         {
             _linkParser = linkParser;
@@ -22,9 +24,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             Constants.PropertyEditors.Aliases.TextBox,
             Constants.PropertyEditors.Aliases.TextArea
         };
-        private readonly HtmlLocalLinkParser _linkParser;
-        private readonly HtmlUrlParser _urlParser;
-
+        
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => PropertyTypeAliases.Contains(propertyType.EditorAlias);
 
