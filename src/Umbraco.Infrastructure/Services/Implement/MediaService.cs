@@ -685,7 +685,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _mediaRepository.Save(media);
                 scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
-                // TODO: See note about supressing events in content service
+                // TODO: See note about suppressing events in content service
                 scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode, eventMessages));
 
                 Audit(AuditType.Save, userId, media.Id);
