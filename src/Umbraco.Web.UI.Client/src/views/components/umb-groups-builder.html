@@ -113,10 +113,15 @@
             </button>
         </umb-box-content>
     </umb-box>
-    
+
     <!-- Groups -->
     <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
-        <div ng-repeat="(groupIndex, group) in model.groups track by group.key" ng-show="group.type === 0 && group.parentKey === openTabKey" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-key="{{group.key}}">
+        <div
+            ng-repeat="(groupIndex, group) in model.groups track by group.key"
+            ng-show="group.type === 0 && group.parentKey === openTabKey"
+            ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}"
+            data-group-key="{{group.key}}">
+
             <umb-content-type-group
                 ng-if="group.tabState !== 'init'"
                 on-focus="activateGroup(group)"
@@ -128,7 +133,7 @@
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)"
                 val-server-field-name="{{'Groups[' + $index + '].Name'}}"
                 val-tab-alias="{{group.validationAlias}}">
-                
+
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties" ng-show="group.properties.length > 0 || sortingMode">
                     <li ng-repeat="(propertyIndex, property) in group.properties track by property.alias" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
                         <umb-content-type-property
