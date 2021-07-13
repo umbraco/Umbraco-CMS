@@ -598,6 +598,7 @@
                                 formHelper.resetForm({ scope: $scope, hasErrors: true });
                                 $scope.page.buttonGroupState = 'error';
                                 handleHttpException(err);
+                                overlayService.close();
                             });
 
 
