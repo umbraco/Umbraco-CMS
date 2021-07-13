@@ -1,6 +1,5 @@
 using Umbraco.Core.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using System.Globalization;
@@ -54,14 +53,41 @@ namespace Umbraco.Web.Routing
 
                     if (node != null)
                     {
+                        string culture;
                         //if we have a node, check if we have a culture in the query string
                         if (frequest.UmbracoContext.HttpContext.Request.QueryString.ContainsKey("culture"))
                         {
-                            //we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
-                            frequest.Culture = CultureInfo.GetCultureInfo(frequest.UmbracoContext.HttpContext.Request.QueryString["culture"]);
+                            culture = frequest.UmbracoContext.HttpContext.Request.QueryString["culture"];
+
+                            if (culture != "invariant")
+                            {
+                                //we're assuming it will match a culture, if an invalid one is passed in, an exception will throw (there is no TryGetCultureInfo method), i think this is ok though
+                                frequest.Culture = CultureInfo.GetCultureInfo(frequest.UmbracoContext.HttpContext.Request.QueryString["culture"]);
+                            }
+                            else
+                            {
+                                culture = frequest.Culture.Name;
+                            }
+                        }
+                        else
+                        {
+                            culture = frequest.Culture.Name;
                         }
 
+                        string segment = null;
+
+                        if (frequest.UmbracoContext.HttpContext.Request.QueryString.ContainsKey("segment"))
+                        {
+                            // when there is a segment query we assume user is previewing segmented content
+                            segment = frequest.UmbracoContext.HttpContext.Request.QueryString["segment"];
+                        }
+
+                        
                         frequest.PublishedContent = node;
+
+
+                        frequest.UmbracoContext.VariationContextAccessor.VariationContext = new VariationContext(culture, segment);
+
                         _logger.Debug<ContentFinderByIdPath,int>("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
                     }
                     else

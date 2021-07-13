@@ -84,12 +84,19 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [UmbracoAuthorize]
-        public ActionResult Frame(int id, string culture)
+        public ActionResult Frame(int id, string culture, string segment)
         {
             EnterPreview(id);
 
             // use a numeric URL because content may not be in cache and so .Url would fail
             var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
+
+            if (segment.IsNullOrWhiteSpace() == false)
+            {
+                query += query.IsNullOrWhiteSpace() ? "?" : "&";
+                query += $"segment={segment}";
+            }
+
             Response.Redirect($"../../{id}.aspx{query}", true);
 
             return null;
