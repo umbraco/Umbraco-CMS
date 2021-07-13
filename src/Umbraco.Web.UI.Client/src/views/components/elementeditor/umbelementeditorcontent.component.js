@@ -24,7 +24,7 @@
 
         vm.getScope = getScope; // used by property editors to get a scope that is the root of split view, content apps etc.
         vm.setActiveTab = setActiveTab;
-        
+
         $scope.$watchCollection('vm.model.variants[0].tabs', () => {
             vm.tabs = $filter("filter")(vm.model.variants[0].tabs, (tab) => {
                 return tab.type === 1;
@@ -33,14 +33,9 @@
             if (vm.tabs.length > 0) {
                 // if we have tabs and some groups that doesn't belong to a tab we need to render those on an "Other" tab.
                 contentEditingHelper.registerGenericTab(vm.model.variants[0].tabs);
-                
+
                 setActiveTab(vm.tabs[0]);
             }
-
-            // for validation to work for each tab we need to associate a group with a tab.
-            vm.model.variants[0].tabs.forEach(group => {
-                group.validationAlias = contentEditingHelper.generateTabValidationAlias(group, vm.model.variants[0].tabs);
-            });
         });
 
         function getScope() {

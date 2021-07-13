@@ -132,7 +132,7 @@
                 sorting="sortingMode"
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)"
                 val-server-field-name="{{'Groups[' + $index + '].Name'}}"
-                val-tab-alias="{{group.validationAlias}}">
+                val-tab-alias="{{group.alias}}">
 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties" ng-show="group.properties.length > 0 || sortingMode">
                     <li ng-repeat="(propertyIndex, property) in group.properties track by property.alias" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
@@ -145,7 +145,7 @@
                             on-change-sort-order-value="onChangePropertySortOrderValue(group)"
                             val-server-field-alias="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Alias'}}"
                             val-server-field-label="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Label'}}"
-                            val-tab-alias="{{group.validationAlias}}">
+                            val-tab-alias="{{group.alias}}">
                         </umb-content-type-property>
                     </li>
                 </ul>
