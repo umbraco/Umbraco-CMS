@@ -181,7 +181,7 @@ namespace Umbraco.Tests.Services
         [Test]
         public void Can_Delete_Language()
         {
-            var norwegian = new Language("nb-NO") { CultureName = "Norwegian" };
+            var norwegian = new Language("nb-NO", "Norwegian Bokmål (Norway)");
             ServiceContext.LocalizationService.Save(norwegian, 0);
             Assert.That(norwegian.HasIdentity, Is.True);
             var languageId = norwegian.Id;
@@ -196,7 +196,7 @@ namespace Umbraco.Tests.Services
         public void Can_Delete_Language_Used_As_Fallback()
         {
             var danish = ServiceContext.LocalizationService.GetLanguageByIsoCode("da-DK");
-            var norwegian = new Language("nb-NO") { CultureName = "Norwegian", FallbackLanguageId = danish.Id };
+            var norwegian = new Language("nb-NO", "Norwegian Bokmål (Norway)") { FallbackLanguageId = danish.Id };
             ServiceContext.LocalizationService.Save(norwegian, 0);
             var languageId = danish.Id;
 
@@ -346,7 +346,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var localizationService = ServiceContext.LocalizationService;
             var isoCode = "en-AU";
-            var language = new Core.Models.Language(isoCode);
+            var language = new Core.Models.Language(isoCode, "English (Australia)");
 
             // Act
             localizationService.Save(language);
@@ -361,7 +361,7 @@ namespace Umbraco.Tests.Services
         {
             var localizationService = ServiceContext.LocalizationService;
             var isoCode = "en-AU";
-            var language = new Core.Models.Language(isoCode);
+            var language = new Core.Models.Language(isoCode, "English (Australia)");
 
             // Act
             localizationService.Save(language);
@@ -375,14 +375,14 @@ namespace Umbraco.Tests.Services
         public void Set_Default_Language()
         {
             var localizationService = ServiceContext.LocalizationService;
-            var language = new Core.Models.Language("en-AU");
+            var language = new Core.Models.Language("en-AU", "English (Australia)");
             language.IsDefault = true;
             localizationService.Save(language);
             var result = localizationService.GetLanguageById(language.Id);
 
             Assert.IsTrue(result.IsDefault);
 
-            var language2 = new Core.Models.Language("en-NZ");
+            var language2 = new Core.Models.Language("en-NZ", "English (New Zealand)");
             language2.IsDefault = true;
             localizationService.Save(language2);
             var result2 = localizationService.GetLanguageById(language2.Id);
@@ -398,7 +398,7 @@ namespace Umbraco.Tests.Services
         {
             var localizationService = ServiceContext.LocalizationService;
             var isoCode = "en-AU";
-            var language = new Core.Models.Language(isoCode);
+            var language = new Core.Models.Language(isoCode, "English (Australia)");
             localizationService.Save(language);
 
             // Act
@@ -411,8 +411,8 @@ namespace Umbraco.Tests.Services
 
         public override void CreateTestData()
         {
-            var danish = new Language("da-DK") { CultureName = "Danish" };
-            var english = new Language("en-GB") { CultureName = "English" };
+            var danish = new Language("da-DK", "Danish (Denmark)");
+            var english = new Language("en-GB", "English (United Kingdom)");
             ServiceContext.LocalizationService.Save(danish, 0);
             ServiceContext.LocalizationService.Save(english, 0);
             _danishLangId = danish.Id;

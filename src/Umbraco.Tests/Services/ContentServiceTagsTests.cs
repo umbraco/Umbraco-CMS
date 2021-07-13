@@ -79,7 +79,7 @@ namespace Umbraco.Tests.Services
         public void TagsCanBeVariant()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language("fr-FR", "French (France)")); // en-US is already there
 
             var contentService = ServiceContext.ContentService;
             var contentTypeService = ServiceContext.ContentTypeService;
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Services
         public void TagsCanBecomeInvariant()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language("fr-FR", "French (France)")); // en-US is already there
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Services
         public void TagsCanBecomeInvariant2()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language("fr-FR", "French (France)")); // en-US is already there
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -307,7 +307,7 @@ namespace Umbraco.Tests.Services
         public void TagsCanBecomeInvariantByPropertyType()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language("fr-FR", "French (France)")); // en-US is already there
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
@@ -364,7 +364,7 @@ namespace Umbraco.Tests.Services
         public void TagsCanBecomeInvariantByPropertyTypeAndBackToVariant()
         {
             var languageService = ServiceContext.LocalizationService;
-            languageService.Save(new Language("fr-FR")); // en-US is already there
+            languageService.Save(new Language("fr-FR", "French (France)")); // en-US is already there
 
             var enId = ServiceContext.LocalizationService.GetLanguageIdByIsoCode("en-US").Value;
 
