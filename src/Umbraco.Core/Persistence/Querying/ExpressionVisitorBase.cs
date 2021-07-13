@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Querying
     /// An expression tree parser to create SQL statements and SQL parameters based on a strongly typed expression.
     /// </summary>
     /// <remarks>This object is stateful and cannot be re-used to parse an expression.</remarks>
-    internal abstract class ExpressionVisitorBase
+    public abstract class ExpressionVisitorBase
     {
         protected ExpressionVisitorBase(ISqlSyntaxProvider sqlSyntax)
         {
