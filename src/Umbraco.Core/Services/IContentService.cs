@@ -293,6 +293,11 @@ namespace Umbraco.Core.Services
         void Move(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
+        /// Moves a document under a new parent and shows event messages (if any).
+        /// </summary>
+        OperationResult MoveWithResult(IContent content, int parentId, int userId = Constants.Security.SuperUserId);
+
+        /// <summary>
         /// Copies a document.
         /// </summary>
         /// <remarks>
