@@ -60,6 +60,22 @@ namespace Umbraco.Web.Editors
             get { return Services.MemberService.GetMembershipScenario(); }
         }
 
+        public PagedResult<MemberBasic> GetMembersByGroup(
+            int groupId,
+            int pageNumber = 1,
+            int pageSize = 100)
+        {
+
+            var members = Services.MemberService.GetMembersByGroup(groupId, pageNumber, pageSize, out var totalRecords);
+
+            var pagedResult = new PagedResult<MemberBasic>(totalRecords, pageNumber, pageSize)
+            {
+                Items = members
+                        .Select(x => Mapper.Map<MemberBasic>(x))
+            };
+            return pagedResult;
+        }
+
         public PagedResult<MemberBasic> GetPagedResults(
             int pageNumber = 1,
             int pageSize = 100,

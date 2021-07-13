@@ -474,6 +474,39 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         }
 
+
+        public IEnumerable<IMember> FindMembersByGroup(int memberGroupId, long pageNumber, int pageSize, out long totalRecords)
+        {
+            var sql = SqlContext.Sql().Select<MemberDto>(r =>
+                            r.Select(x => x.ContentVersionDto)
+                                .Select(x => x.ContentDto, r1 =>
+                                    r1.Select(x => x.NodeDto)))
+
+                        // ContentRepositoryBase expects a variantName field to order by name
+                        // so get it here, though for members it's just the plain node name
+                        .AndSelect<NodeDto>(x => Alias(x.Text, "variantName"))
+                .From<MemberDto>()
+                .InnerJoin<ContentDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentVersionDto>().On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<Member2MemberGroupDto>().On<MemberDto, Member2MemberGroupDto>((left, right) => left.NodeId == right.Member)
+
+                // joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
+                // the execution plan says it doesn't so we'll go with that and in that case, it might be worth joining the content
+                // types by default on the document and media repos so we can query by content type there too.
+                .InnerJoin<ContentTypeDto>().On<ContentDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId);
+
+            sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            sql.Where("MemberGroup = @memberGroupId", new { memberGroupId });
+            sql.OrderBy("Email");
+                            
+            var result = Database.Page<MemberDto>(pageNumber, pageSize, sql);
+
+            totalRecords = result.TotalItems;
+
+            return MapDtosToContent(result.Items);
+        }
+
         public bool Exists(string username)
         {
             var sql = Sql()

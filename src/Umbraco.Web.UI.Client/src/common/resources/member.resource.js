@@ -22,6 +22,30 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
 
     return {
+        getMembersByGroup: function(options) {
+            var defaults = {
+                pageSize: 25,
+                pageNumber: 1
+            };
+
+            angular.extend(defaults, options);
+
+            options = defaults;
+
+            var params = [
+                { groupId: options.groupId },
+                { pageNumber: options.pageNumber },
+                { pageSize: options.pageSize }
+            ];
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "memberApiBaseUrl",
+                        "GetMembersByGroup",
+                        params)),
+                'Failed to retrieve members by group');
+        },
         getPagedResults: function(memberTypeAlias, options) {
 
             if (memberTypeAlias === 'all-members') {
