@@ -101,6 +101,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     {
                         property.Value = LZ4Pickler.Pickle(Encoding.UTF8.GetBytes((string)property.Value), LZ4Level.L00_FAST);
                     }
+                    foreach (var property in propertyAliasToData.Value.Where(x => x.Value != null && x.Value is int intVal))
+                    {
+                        property.Value = Convert.ToBoolean((int)property.Value);
+                    }
                 }
             }
         }
