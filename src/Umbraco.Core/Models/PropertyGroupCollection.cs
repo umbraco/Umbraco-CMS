@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading;
 
 namespace Umbraco.Core.Models
 {
@@ -17,8 +16,6 @@ namespace Umbraco.Core.Models
     // TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
     public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged, IDeepCloneable
     {
-        private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
-
         internal PropertyGroupCollection()
         { }
 
@@ -70,47 +67,37 @@ namespace Umbraco.Core.Models
 
         internal new void Add(PropertyGroup item)
         {
-            try
+            //Note this is done to ensure existing groups can be renamed
+            if (item.HasIdentity && item.Id > 0)
             {
-                _addLocker.EnterWriteLock();
-
-                //Note this is done to ensure existing groups can be renamed
-                if (item.HasIdentity && item.Id > 0)
+                var exists = Contains(item.Id);
+                if (exists)
                 {
-                    var exists = Contains(item.Id);
+                    var keyExists = Contains(item.Name);
+                    if (keyExists)
+                        throw new Exception($"Naming conflict: Changing the name of PropertyGroup '{item.Name}' would result in duplicates");
+
+                    //collection events will be raised in SetItem
+                    SetItem(IndexOfKey(item.Id), item);
+                    return;
+                }
+            }
+            else
+            {
+                var key = GetKeyForItem(item);
+                if (key != null)
+                {
+                    var exists = Contains(key);
                     if (exists)
                     {
-                        var keyExists = Contains(item.Name);
-                        if (keyExists)
-                            throw new Exception($"Naming conflict: Changing the name of PropertyGroup '{item.Name}' would result in duplicates");
-
                         //collection events will be raised in SetItem
-                        SetItem(IndexOfKey(item.Id), item);
+                        SetItem(IndexOfKey(key), item);
                         return;
                     }
                 }
-                else
-                {
-                    var key = GetKeyForItem(item);
-                    if (key != null)
-                    {
-                        var exists = Contains(key);
-                        if (exists)
-                        {
-                            //collection events will be raised in SetItem
-                            SetItem(IndexOfKey(key), item);
-                            return;
-                        }
-                    }
-                }
-                //collection events will be raised in InsertItem
-                base.Add(item);
             }
-            finally
-            {
-                if (_addLocker.IsWriteLockHeld)
-                    _addLocker.ExitWriteLock();
-            }
+            //collection events will be raised in InsertItem
+            base.Add(item);
         }
 
         /// <summary>

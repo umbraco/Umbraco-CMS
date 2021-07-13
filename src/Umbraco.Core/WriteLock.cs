@@ -1,20 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace Umbraco.Core
 {
-    /// <summary>
-    /// Provides a convenience methodology for implementing locked access to resources.
-    /// </summary>
-    /// <remarks>
-    /// <para>Intended as an infrastructure class.</para>
-    /// <para>This is a very inefficient way to lock as it allocates one object each time we lock,
-    /// so it's OK to use this class for things that happen once, where it is convenient, but not
-    /// for performance-critical code!</para>
-    /// </remarks>
+    [Obsolete("Use ReaderWriterLockSlim directly. This will be removed in future versions.")]
     public class WriteLock : IDisposable
     {
         private readonly ReaderWriterLockSlim _rwLock;
