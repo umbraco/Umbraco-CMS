@@ -1,5 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using Umbraco.Cms.Core.IO;
 
@@ -7,6 +9,25 @@ namespace Umbraco.Extensions
 {
     public static class FileSystemExtensions
     {
+        public static string GetStreamHash(this Stream fileStream)
+        {
+            if (fileStream.CanSeek)
+            {
+                fileStream.Seek(0, SeekOrigin.Begin);
+            }
+
+            using HashAlgorithm alg = SHA1.Create();
+
+            // create a string output for the hash
+            var stringBuilder = new StringBuilder();
+            var hashedByteArray = alg.ComputeHash(fileStream);
+            foreach (var b in hashedByteArray)
+            {
+                stringBuilder.Append(b.ToString("x2"));
+            }
+            return stringBuilder.ToString();
+        }
+
         /// <summary>
         /// Attempts to open the file at <code>filePath</code> up to <code>maxRetries</code> times,
         /// with a thread sleep time of <code>sleepPerRetryInMilliseconds</code> between retries.

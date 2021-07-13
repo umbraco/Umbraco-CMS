@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Packaging
 {
@@ -32,16 +33,7 @@ namespace Umbraco.Cms.Core.Packaging
             // several very large package.zips. 
 
             using Stream stream = GetEmbeddedPackageStream(planType);
-            using HashAlgorithm alg = SHA1.Create();
-
-            // create a string output for the hash
-            var stringBuilder = new StringBuilder();            
-            var hashedByteArray = alg.ComputeHash(stream);
-            foreach (var b in hashedByteArray)
-            {
-                stringBuilder.Append(b.ToString("x2"));
-            }
-            return stringBuilder.ToString();            
+            return stream.GetStreamHash();
         }
 
         public static ZipArchive GetEmbeddedPackageDataManifest(Type planType, out XDocument packageXml)

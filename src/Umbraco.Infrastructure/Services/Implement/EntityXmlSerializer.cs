@@ -264,12 +264,17 @@ namespace Umbraco.Cms.Core.Services.Implement
             return xml;
         }
 
-        public XElement Serialize(Stylesheet stylesheet)
+        public XElement Serialize(IStylesheet stylesheet, bool includeProperties)
         {
             var xml = new XElement("Stylesheet",
                 new XElement("Name", stylesheet.Alias),
                 new XElement("FileName", stylesheet.Path),
                 new XElement("Content", new XCData(stylesheet.Content)));
+
+            if (!includeProperties)
+            {
+                return xml;
+            }
 
             var props = new XElement("Properties");
             xml.Add(props);

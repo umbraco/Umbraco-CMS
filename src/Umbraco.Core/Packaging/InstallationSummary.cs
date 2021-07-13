@@ -27,6 +27,8 @@ namespace Umbraco.Cms.Core.Packaging
         public IEnumerable<IContentType> DocumentTypesInstalled { get; set; } = Enumerable.Empty<IContentType>();
         public IEnumerable<IMediaType> MediaTypesInstalled { get; set; } = Enumerable.Empty<IMediaType>();
         public IEnumerable<IFile> StylesheetsInstalled { get; set; } = Enumerable.Empty<IFile>();
+        public IEnumerable<IScript> ScriptsInstalled { get; set; } = Enumerable.Empty<IScript>();
+        public IEnumerable<IPartialView> PartialViewsInstalled { get; set; } = Enumerable.Empty<IPartialView>();
         public IEnumerable<IContent> ContentInstalled { get; set; } = Enumerable.Empty<IContent>();
         public IEnumerable<IMedia> MediaInstalled { get; set; } = Enumerable.Empty<IMedia>();
         public string PackageName { get; }

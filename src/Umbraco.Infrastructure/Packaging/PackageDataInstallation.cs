@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
@@ -39,6 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
@@ -59,7 +62,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IOptions<GlobalSettings> globalSettings,
             IConfigurationEditorJsonSerializer serializer,
             IMediaService mediaService,
-            IMediaTypeService mediaTypeService)
+            IMediaTypeService mediaTypeService,
+            IHostingEnvironment hostingEnvironment)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -74,6 +78,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _serializer = serializer;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
+            _hostingEnvironment = hostingEnvironment;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
             _contentService = contentService;
@@ -91,7 +96,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     DataTypesInstalled = ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
-                    MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
+                    MacrosInstalled = ImportMacros(compiledPackage.Macros, compiledPackage.MacroPartialViews, userId),
                     TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
                     DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId),
                     MediaTypesInstalled = ImportMediaTypes(compiledPackage.MediaTypes, userId),
@@ -102,6 +107,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var importedMediaTypes = installationSummary.MediaTypesInstalled.ToDictionary(x => x.Alias, x => x);
 
                 installationSummary.StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId);
+                installationSummary.PartialViewsInstalled = ImportPartialViews(compiledPackage.PartialViews, userId);
+                installationSummary.ScriptsInstalled = ImportScripts(compiledPackage.Scripts, userId);
                 installationSummary.ContentInstalled = ImportContentBase(compiledPackage.Documents, importedDocTypes, userId, _contentTypeService, _contentService);
                 installationSummary.MediaInstalled = ImportContentBase(compiledPackage.Media, importedMediaTypes, userId, _mediaTypeService, _mediaService);
 
@@ -1243,16 +1250,41 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="macroElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <returns></returns>
-        public IReadOnlyList<IMacro> ImportMacros(IEnumerable<XElement> macroElements, int userId)
+        public IReadOnlyList<IMacro> ImportMacros(
+            IEnumerable<XElement> macroElements,
+            IEnumerable<XElement> macroPartialViewsElements,
+            int userId)
         {
             var macros = macroElements.Select(ParseMacroElement).ToList();
 
-            foreach (var macro in macros)
+            foreach (IMacro macro in macros)
             {
                 _macroService.Save(macro, userId);
             }
 
+            ImportMacroPartialViews(macroPartialViewsElements);
+
             return macros;
+        }
+
+        private void ImportMacroPartialViews(IEnumerable<XElement> viewElements)
+        {
+            foreach (XElement element in viewElements)
+            {
+                var path = element.AttributeValue<string>("path");
+                if (path == null)
+                {
+                    throw new InvalidOperationException("No path attribute found");
+                }
+                var contents = element.Value ?? string.Empty;
+                
+                var physicalPath = _hostingEnvironment.MapPathContentRoot(path);
+                // TODO: Do we overwrite? IMO I don't think so since these will be views a user will change.
+                if (!System.IO.File.Exists(physicalPath))
+                {
+                    System.IO.File.WriteAllText(physicalPath, contents, Encoding.UTF8);
+                }
+            }
         }
 
         private IMacro ParseMacroElement(XElement macroElement)
@@ -1335,30 +1367,94 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         #endregion
 
+        public IReadOnlyList<IScript> ImportScripts(IEnumerable<XElement> scriptElements, int userId)
+        {
+            var result = new List<IScript>();
+
+            foreach (XElement scriptXml in scriptElements)
+            {
+                var path = scriptXml.AttributeValue<string>("path");
+
+                if (path.IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                IScript script = _fileService.GetScript(path);
+
+                // only update if it doesn't exist
+                if (script == null)
+                {
+                    var content = scriptXml.Value;
+                    if (content == null)
+                    {
+                        continue;
+                    }
+
+                    script = new Script(path) { Content = content };
+                    _fileService.SaveScript(script, userId);
+                    result.Add(script);
+                }
+            }
+
+            return result;
+        }
+
+        public IReadOnlyList<IPartialView> ImportPartialViews(IEnumerable<XElement> partialViewElements, int userId)
+        {
+            var result = new List<IPartialView>();
+
+            foreach (XElement partialViewXml in partialViewElements)
+            {
+                var path = partialViewXml.AttributeValue<string>("path");
+
+                if (path == null)
+                {
+                    throw new InvalidOperationException("No path attribute found");
+                }
+
+                IPartialView partialView = _fileService.GetPartialView(path);
+
+                // only update if it doesn't exist
+                if (partialView == null)
+                {
+                    var content = partialViewXml.Value ?? string.Empty;
+                    
+                    partialView = new PartialView(PartialViewType.PartialView, path) { Content = content };
+                    _fileService.SavePartialView(partialView, userId);
+                    result.Add(partialView);
+                }
+            }
+
+            return result;
+        }
+
         #region Stylesheets
 
         public IReadOnlyList<IFile> ImportStylesheets(IEnumerable<XElement> stylesheetElements, int userId)
         {
             var result = new List<IFile>();
 
-            foreach (var n in stylesheetElements)
+            foreach (XElement n in stylesheetElements)
             {
-                var stylesheetName = n.Element("Name")?.Value;
-                if (stylesheetName.IsNullOrWhiteSpace())
-                    continue;
+                var stylesheetPath = n.Element("FileName")?.Value;
 
-                var s = _fileService.GetStylesheetByName(stylesheetName);
+                if (stylesheetPath.IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+
+                IStylesheet s = _fileService.GetStylesheet(stylesheetPath);
                 if (s == null)
                 {
-                    var fileName = n.Element("FileName")?.Value;
-                    if (fileName == null)
-                        continue;
                     var content = n.Element("Content")?.Value;
                     if (content == null)
+                    {
                         continue;
+                    }
 
-                    s = new Stylesheet(fileName) { Content = content };
-                    _fileService.SaveStylesheet(s);
+                    s = new Stylesheet(stylesheetPath) { Content = content };
+                    _fileService.SaveStylesheet(s, userId);
                 }
 
                 foreach (var prop in n.XPathSelectElements("Properties/Property"))
@@ -1386,7 +1482,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     sp.Alias = alias;
                     sp.Value = prop.Element("Value")?.Value;
                 }
-                _fileService.SaveStylesheet(s);
+                _fileService.SaveStylesheet(s, userId);
                 result.Add(s);
             }
 

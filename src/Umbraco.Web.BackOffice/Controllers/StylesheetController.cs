@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public IEnumerable<StylesheetRule> GetRulesByName(string name)
         {
-            var css = _fileService.GetStylesheetByName(name.EnsureEndsWith(".css"));
+            var css = _fileService.GetStylesheet(name.EnsureEndsWith(".css"));
             if (css == null)
                 return Enumerable.Empty<StylesheetRule>();
 

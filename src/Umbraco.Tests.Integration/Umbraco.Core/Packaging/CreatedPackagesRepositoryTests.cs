@@ -59,6 +59,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
 
         private MediaFileManager MediaFileManager => GetRequiredService<MediaFileManager>();
 
+        private FileSystems FileSystems => GetRequiredService<FileSystems>();
+
         public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
             ContentService,
             ContentTypeService,
@@ -72,6 +74,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             MediaService,
             MediaTypeService,
             MediaFileManager,
+            FileSystems,
             "createdPackages.config",
 
             // temp paths

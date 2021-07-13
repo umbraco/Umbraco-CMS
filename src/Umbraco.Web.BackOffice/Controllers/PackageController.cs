@@ -75,10 +75,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return package;
         }
 
-        public PackageDefinition GetEmpty()
-        {
-            return new PackageDefinition();
-        }
+        public PackageDefinition GetEmpty() => new PackageDefinition();
 
         /// <summary>
         /// Creates or updates a package

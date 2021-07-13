@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem object</returns>
         XElement Serialize(IDictionaryItem dictionaryItem, bool includeChildren);
 
-        XElement Serialize(Stylesheet stylesheet);
+        XElement Serialize(IStylesheet stylesheet, bool includeProperties);
 
         /// <summary>
         /// Exports a list of <see cref="ILanguage"/> items to xml as an <see cref="XElement"/>
