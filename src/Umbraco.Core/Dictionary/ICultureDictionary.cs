@@ -17,6 +17,14 @@ namespace Umbraco.Core.Dictionary
         string this[string key] { get; }
 
         /// <summary>
+        /// Returns the dictionary value based on the key and the culture supplied
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        string GetByCulture(string key, string culture);
+
+        /// <summary>
         /// Returns the current culture
         /// </summary>
         CultureInfo Culture { get; }
