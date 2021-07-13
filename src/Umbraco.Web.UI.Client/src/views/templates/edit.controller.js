@@ -142,11 +142,10 @@
                     submit();
                 }
 
-
             }, function (err) {
-                if (suppressNotification) {
-                    vm.page.saveButtonState = "error";
+                vm.page.saveButtonState = "error";
 
+                if (suppressNotification) {
                     localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function (data) {
                         var header = data[0];
                         var message = data[1];
@@ -184,20 +183,6 @@
         vm.ready = function (template) {
             vm.page.loading = false;
             vm.template = template;
-
-            // if this is a new template, bind to the blur event on the name
-            if (create) {
-                $timeout(function () {
-                    var nameField = $('[data-element="editor-name-field"]');
-                    if (nameField) {
-                        nameField.on('blur', function (event) {
-                            if (event.target.value) {
-                                vm.save(true);
-                            }
-                        });
-                    }
-                });
-            }
 
             // sync state
             if (!infiniteMode) {
