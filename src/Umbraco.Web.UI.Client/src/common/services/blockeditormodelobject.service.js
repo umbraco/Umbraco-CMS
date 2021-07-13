@@ -229,7 +229,7 @@
          */
         var notSupportedProperties = [
             "Umbraco.Tags",
-            "Umbraco.UploadField",
+            //"Umbraco.UploadField",
             "Umbraco.ImageCropper",
             "Umbraco.NestedContent"
         ];
