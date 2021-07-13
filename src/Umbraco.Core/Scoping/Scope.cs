@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Text;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -18,6 +19,12 @@ namespace Umbraco.Core.Scoping
     /// <remarks>Not thread-safe obviously.</remarks>
     internal class Scope : IScope2
     {
+        private enum LockType
+        {
+            ReadLock,
+            WriteLock
+        }
+
         private readonly ScopeProvider _scopeProvider;
         private readonly ILogger _logger;
 
@@ -37,10 +44,12 @@ namespace Umbraco.Core.Scoping
         private IEventDispatcher _eventDispatcher;
 
         private object _dictionaryLocker;
+        private readonly object _lockQueueLocker = new object();
         private HashSet<int> _readLocks;
         private HashSet<int> _writeLocks;
         internal Dictionary<Guid, Dictionary<int, int>> ReadLocks;
         internal Dictionary<Guid, Dictionary<int, int>> WriteLocks;
+        private List<(LockType lockType, TimeSpan timeout, int lockId)> _queuedLocks;
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
@@ -63,7 +72,6 @@ namespace Umbraco.Core.Scoping
             _scopeFileSystem = scopeFileSystems;
             _callContext = callContext;
             _autoComplete = autoComplete;
-
             Detachable = detachable;
 
             _dictionaryLocker = new object();
@@ -214,7 +222,7 @@ namespace Umbraco.Core.Scoping
             {
                 if (_isolationLevel != IsolationLevel.Unspecified) return _isolationLevel;
                 if (ParentScope != null) return ParentScope.IsolationLevel;
-                return Database.SqlContext.SqlSyntax.DefaultIsolationLevel;
+                return SqlContext.SqlSyntax.DefaultIsolationLevel;
             }
         }
 
@@ -226,7 +234,24 @@ namespace Umbraco.Core.Scoping
                 EnsureNotDisposed();
 
                 if (_database != null)
+                {
+                    // If the database has already been resolved, we are already in a
+                    // transaction, but it's possible that more locks have been requested
+                    // so acquire them.
+
+                    // TODO: This is the issue we face with non-eager locks. If locks are
+                    // requested after the Database property is resolved, those locks may
+                    // not get executed because the developer may be using their local Database variable
+                    // instead of accessing via scope.Database.
+                    // In our case within Umbraco, I don't think this ever occurs, all locks are requested
+                    // up-front, however, that might not be the case for others.
+                    // The other way to deal with this would be to bake this callback somehow into the
+                    // UmbracoDatabase instance directly and ensure it's called when OnExecutingCommand
+                    // (so long as the executing command isn't a lock command itself!)
+                    // If we could do that, that would be the ultimate lazy executed locks.
+                    EnsureDbLocks();
                     return _database;
+                }
 
                 if (ParentScope != null)
                 {
@@ -244,6 +269,7 @@ namespace Umbraco.Core.Scoping
                 try
                 {
                     _database.BeginTransaction(IsolationLevel);
+                    EnsureDbLocks();
                     return _database;
                 }
                 catch
@@ -260,7 +286,16 @@ namespace Umbraco.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                return ParentScope == null ? _database : ParentScope.DatabaseOrNull;
+                if (ParentScope == null)
+                {
+                    if (_database != null)
+                    {
+                        EnsureDbLocks();
+                    }
+                    return _database;
+                }
+
+                return ParentScope.DatabaseOrNull;
             }
         }
 
@@ -327,6 +362,69 @@ namespace Umbraco.Core.Scoping
             }
         }
 
+        /// <summary>
+        /// When we require a ReadLock or a WriteLock we don't immediately request these locks from the database,
+        /// instead we only request them when necessary (lazily).
+        /// To do this, we queue requests for read/write locks.
+        /// This is so that if there'a request for either of these
+        /// locks, but the service/repository returns an item from the cache, we don't end up making a DB call to make the
+        /// read/write lock.
+        /// This executes the queue of requested locks in order in an efficient way lazily whenever the database instance is
+        /// resolved.
+        /// </summary>
+        private void EnsureDbLocks()
+        {
+            lock (_lockQueueLocker)
+            {
+                if (_queuedLocks?.Count > 0)
+                {
+                    var currentType = LockType.ReadLock;
+                    var currentTimeout = TimeSpan.Zero;
+                    var collectedIds = new HashSet<int>();
+                    for (int i = 0; i < _queuedLocks.Count; i++)
+                    {
+                        var entry = _queuedLocks[i];
+                        if (i == 0)
+                        {
+                            currentType = entry.lockType;
+                            currentTimeout = entry.timeout;
+                        }
+                        else if (entry.lockType != currentType || entry.timeout != currentTimeout)
+                        {
+                            // the lock type or timeout switched.
+                            // process the lock ids collected
+                            switch (currentType)
+                            {
+                                case LockType.ReadLock:
+                                    ReadLockInner(_database, InstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                                    break;
+                                case LockType.WriteLock:
+                                    WriteLockInner(_database, InstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                                    break;
+                            }
+                            // clear the collected and set new type
+                            collectedIds.Clear();
+                            currentType = entry.lockType;
+                            currentTimeout = entry.timeout;
+                        }
+                        collectedIds.Add(entry.lockId);
+                    }
+                    // process the remaining
+                    switch (currentType)
+                    {
+                        case LockType.ReadLock:
+                            ReadLockInner(_database, InstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                            break;
+                        case LockType.WriteLock:
+                            WriteLockInner(_database, InstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                            break;
+                    }
+
+                    _queuedLocks.Clear();
+                }
+            }
+        }
+
         private void EnsureNotDisposed()
         {
             if (_disposed)
@@ -388,6 +486,11 @@ namespace Umbraco.Core.Scoping
                 parent.ChildCompleted(_completed);
             else
                 DisposeLastScope();
+
+            lock (_lockQueueLocker)
+            {
+                _queuedLocks?.Clear();
+            }
 
             _disposed = true;
             GC.SuppressFinalize(this);
@@ -478,7 +581,7 @@ namespace Umbraco.Core.Scoping
         //    to ensure we don't leave a scope around, etc
         private void RobustExit(bool completed, bool onException)
         {
-             if (onException) completed = false;
+            if (onException) completed = false;
 
             TryFinally(() =>
             {
@@ -596,17 +699,71 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        /// <inheritdoc />
-        public void ReadLock(params int[] lockIds) => ReadLockInner(InstanceId, null, lockIds);
+        public void EagerReadLock(params int[] lockIds) => ReadLockInner(Database, InstanceId, null, lockIds);
 
         /// <inheritdoc />
-        public void ReadLock(TimeSpan timeout, int lockId) => ReadLockInner(InstanceId, timeout, lockId);
+        public void ReadLock(params int[] lockIds)
+        {
+            lock (_lockQueueLocker)
+            {
+                if (_queuedLocks == null)
+                {
+                    _queuedLocks = new List<(LockType, TimeSpan, int)>();
+                }
+                foreach (var lockId in lockIds)
+                {
+                    _queuedLocks.Add((LockType.ReadLock, TimeSpan.Zero, lockId));
+                }
+            }
+        }
+
+        public void EagerReadLock(TimeSpan timeout, int lockId) => ReadLockInner(Database, InstanceId, timeout, lockId);
 
         /// <inheritdoc />
-        public void WriteLock(params int[] lockIds) => WriteLockInner(InstanceId, null, lockIds);
+        public void ReadLock(TimeSpan timeout, int lockId)
+        {
+            lock (_lockQueueLocker)
+            {
+                if (_queuedLocks == null)
+                {
+                    _queuedLocks = new List<(LockType, TimeSpan, int)>();
+                }
+                _queuedLocks.Add((LockType.ReadLock, timeout, lockId));
+            }
+        }
+
+        public void EagerWriteLock(params int[] lockIds) => WriteLockInner(Database, InstanceId, null, lockIds);
 
         /// <inheritdoc />
-        public void WriteLock(TimeSpan timeout, int lockId) => WriteLockInner(InstanceId, timeout, lockId);
+        public void WriteLock(params int[] lockIds)
+        {
+            lock (_lockQueueLocker)
+            {
+                if (_queuedLocks == null)
+                {
+                    _queuedLocks = new List<(LockType, TimeSpan, int)>();
+                }
+                foreach (var lockId in lockIds)
+                {
+                    _queuedLocks.Add((LockType.WriteLock, TimeSpan.Zero, lockId));
+                }
+            }
+        }
+
+        public void EagerWriteLock(TimeSpan timeout, int lockId) => WriteLockInner(Database, InstanceId, timeout, lockId);
+
+        /// <inheritdoc />
+        public void WriteLock(TimeSpan timeout, int lockId)
+        {
+            lock (_lockQueueLocker)
+            {
+                if (_queuedLocks == null)
+                {
+                    _queuedLocks = new List<(LockType, TimeSpan, int)>();
+                }
+                _queuedLocks.Add((LockType.WriteLock, timeout, lockId));
+            }
+        }
 
         /// <summary>
         /// Handles acquiring a read lock, will delegate it to the parent if there are any.
@@ -614,17 +771,17 @@ namespace Umbraco.Core.Scoping
         /// <param name="instanceId">Instance ID of the requesting scope.</param>
         /// <param name="timeout">Optional database timeout in milliseconds.</param>
         /// <param name="lockIds">Array of lock object identifiers.</param>
-        private void ReadLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
+        private void ReadLockInner(IUmbracoDatabase db, Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
         {
             if (ParentScope is not null)
             {
                 // If we have a parent we delegate lock creation to parent.
-                ParentScope.ReadLockInner(instanceId, timeout, lockIds);
+                ParentScope.ReadLockInner(db, instanceId, timeout, lockIds);
             }
             else
             {
                 // We are the outermost scope, handle the lock request.
-                LockInner(instanceId, ref ReadLocks, ref _readLocks, ObtainReadLock, ObtainTimeoutReadLock, timeout, lockIds);
+                LockInner(db, instanceId, ref ReadLocks, ref _readLocks, ObtainReadLock, ObtainTimeoutReadLock, timeout, lockIds);
             }
         }
 
@@ -634,17 +791,17 @@ namespace Umbraco.Core.Scoping
         /// <param name="instanceId">Instance ID of the requesting scope.</param>
         /// <param name="timeout">Optional database timeout in milliseconds.</param>
         /// <param name="lockIds">Array of lock object identifiers.</param>
-        private void WriteLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
+        private void WriteLockInner(IUmbracoDatabase db, Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
         {
             if (ParentScope is not null)
             {
                 // If we have a parent we delegate lock creation to parent.
-                ParentScope.WriteLockInner(instanceId, timeout, lockIds);
+                ParentScope.WriteLockInner(db, instanceId, timeout, lockIds);
             }
             else
             {
                 // We are the outermost scope, handle the lock request.
-                LockInner(instanceId, ref WriteLocks, ref _writeLocks, ObtainWriteLock, ObtainTimeoutWriteLock, timeout, lockIds);
+                LockInner(db, instanceId, ref WriteLocks, ref _writeLocks, ObtainWriteLock, ObtainTimeoutWriteLock, timeout, lockIds);
             }
         }
 
@@ -658,8 +815,8 @@ namespace Umbraco.Core.Scoping
         /// <param name="obtainLockTimeout">Delegate used to request the lock from the database with a timeout.</param>
         /// <param name="timeout">Optional timeout parameter to specify a timeout.</param>
         /// <param name="lockIds">Lock identifiers to lock on.</param>
-        private void LockInner(Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>> locks, ref HashSet<int> locksSet,
-            Action<int> obtainLock, Action<int, TimeSpan> obtainLockTimeout, TimeSpan? timeout = null,
+        private void LockInner(IUmbracoDatabase db, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>> locks, ref HashSet<int> locksSet,
+            Action<IUmbracoDatabase, int> obtainLock, Action<IUmbracoDatabase, int, TimeSpan> obtainLockTimeout, TimeSpan? timeout = null,
             params int[] lockIds)
         {
             lock (_dictionaryLocker)
@@ -677,12 +834,12 @@ namespace Umbraco.Core.Scoping
                             if (timeout is null)
                             {
                                 // We just want an ordinary lock.
-                                obtainLock(lockId);
+                                obtainLock(db, lockId);
                             }
                             else
                             {
                                 // We want a lock with a custom timeout
-                                obtainLockTimeout(lockId, timeout.Value);
+                                obtainLockTimeout(db, lockId, timeout.Value);
                             }
                         }
                         catch
@@ -708,9 +865,9 @@ namespace Umbraco.Core.Scoping
         /// Obtains an ordinary read lock.
         /// </summary>
         /// <param name="lockId">Lock object identifier to lock.</param>
-        private void ObtainReadLock(int lockId)
+        private void ObtainReadLock(IUmbracoDatabase db, int lockId)
         {
-            Database.SqlContext.SqlSyntax.ReadLock(Database, lockId);
+            SqlContext.SqlSyntax.ReadLock(db, lockId);
         }
 
         /// <summary>
@@ -718,24 +875,24 @@ namespace Umbraco.Core.Scoping
         /// </summary>
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
-        private void ObtainTimeoutReadLock(int lockId, TimeSpan timeout)
+        private void ObtainTimeoutReadLock(IUmbracoDatabase db, int lockId, TimeSpan timeout)
         {
-            var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
+            var syntax2 = SqlContext.SqlSyntax as ISqlSyntaxProvider2;
             if (syntax2 is null)
             {
-                throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
+                throw new InvalidOperationException($"{SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
             }
 
-            syntax2.ReadLock(Database, timeout, lockId);
+            syntax2.ReadLock(db, timeout, lockId);
         }
 
         /// <summary>
         /// Obtains an ordinary write lock.
         /// </summary>
         /// <param name="lockId">Lock object identifier to lock.</param>
-        private void ObtainWriteLock(int lockId)
+        private void ObtainWriteLock(IUmbracoDatabase db, int lockId)
         {
-            Database.SqlContext.SqlSyntax.WriteLock(Database, lockId);
+            SqlContext.SqlSyntax.WriteLock(db, lockId);
         }
 
         /// <summary>
@@ -743,15 +900,15 @@ namespace Umbraco.Core.Scoping
         /// </summary>
         /// <param name="lockId">Lock object identifier to lock.</param>
         /// <param name="timeout">TimeSpan specifying the timout period.</param>
-        private void ObtainTimeoutWriteLock(int lockId, TimeSpan timeout)
+        private void ObtainTimeoutWriteLock(IUmbracoDatabase db, int lockId, TimeSpan timeout)
         {
-            var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
+            var syntax2 = SqlContext.SqlSyntax as ISqlSyntaxProvider2;
             if (syntax2 is null)
             {
-                throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
+                throw new InvalidOperationException($"{SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
             }
 
-            syntax2.WriteLock(Database, timeout, lockId);
+            syntax2.WriteLock(db, timeout, lockId);
         }
     }
 }
