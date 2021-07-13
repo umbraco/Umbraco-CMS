@@ -2,7 +2,8 @@
   <ng-form name="multipleTextboxForm">
     <div ui-sortable="sortableOptions" ng-model="model.value">
       <div class="flex flex-wrap textbox-wrapper" ng-repeat="item in model.value track by $index">
-          <input type="text" name="item_{{$index}}" ng-model="item.value"
+          <label class="control-label" for="item_{{$id}}_{{$index}}">{{$parent.$parent.$parent.model.label}} {{$index+1}}</label>
+          <input type="text" name="item_{{$index}}" id="item_{{$id}}_{{$index}}" ng-model="item.value"
                  class="umb-property-editor umb-textstring textstring flx-i"
                  ng-trim="false"
                  ng-keyup="addRemoveOnKeyDown($event, $index)"
