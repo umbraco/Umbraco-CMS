@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-    public class SupressNotificationsTests : UmbracoIntegrationTest
+    public class SuppressNotificationsTests : UmbracoIntegrationTest
     {
         private IContentService ContentService => GetRequiredService<IContentService>();
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
