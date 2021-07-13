@@ -10,6 +10,8 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Scoping;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Examine
 {
@@ -18,19 +20,39 @@ namespace Umbraco.Examine
         private readonly UrlSegmentProviderCollection _urlSegmentProviders;
         private readonly IUserService _userService;
         private readonly ILogger _logger;
+        private readonly IScopeProvider _scopeProvider;
+        private static readonly object[] _negativeOneArray = new object[] { -1 };
+        private static readonly object[] _doubleQuestionMarkArray = new object[] { "??" };
 
         public MediaValueSetBuilder(PropertyEditorCollection propertyEditors,
             UrlSegmentProviderCollection urlSegmentProviders,
-            IUserService userService, ILogger logger)
+            IUserService userService, ILogger logger,
+            IScopeProvider scopeProvider)
             : base(propertyEditors, false)
         {
             _urlSegmentProviders = urlSegmentProviders;
             _userService = userService;
             _logger = logger;
+            _scopeProvider = scopeProvider;
         }
 
         /// <inheritdoc />
         public override IEnumerable<ValueSet> GetValueSets(params IMedia[] media)
+        {
+            Dictionary<int, object[]> creatorIds;
+
+            // We can lookup all of the creator/writer names at once which can save some
+            // processing below instead of one by one.
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                creatorIds = _userService.GetProfilesById(media.Select(x => x.CreatorId).ToArray())
+                    .ToDictionary(x => x.Id, x => new object[] { x.Name });
+                scope.Complete();
+            }
+
+            return GetValueSetsEnumerable(media, creatorIds);
+        }
+        public  IEnumerable<ValueSet> GetValueSetsEnumerable(IMedia[] media, Dictionary<int, object[]> creatorIds)
         {
             foreach (var m in media)
             {
@@ -39,7 +61,7 @@ namespace Umbraco.Examine
                 var umbracoFilePath = string.Empty;
                 var umbracoFile = string.Empty;
 
-                var umbracoFileSource  = m.GetValue<string>(Constants.Conventions.Media.File);
+                var umbracoFileSource = m.GetValue<string>(Constants.Conventions.Media.File);
 
                 if (umbracoFileSource.DetectIsJson())
                 {
@@ -76,7 +98,7 @@ namespace Umbraco.Examine
                     {"icon", m.ContentType.Icon?.Yield() ?? Enumerable.Empty<string>()},
                     {"id", new object[] {m.Id}},
                     {UmbracoExamineIndex.NodeKeyFieldName, new object[] {m.Key}},
-                    {"parentID", new object[] {m.Level > 1 ? m.ParentId : -1}},
+                    {"parentID", m.Level > 1 ? new object[] {m.ParentId } : _negativeOneArray},
                     {"level", new object[] {m.Level}},
                     {"creatorID", new object[] {m.CreatorId}},
                     {"sortOrder", new object[] {m.SortOrder}},
@@ -86,7 +108,7 @@ namespace Umbraco.Examine
                     {"urlName", urlValue?.Yield() ?? Enumerable.Empty<string>()},
                     {"path", m.Path?.Yield() ?? Enumerable.Empty<string>()},
                     {"nodeType", m.ContentType.Id.ToString().Yield() },
-                    {"creatorName", (m.GetCreatorProfile(_userService)?.Name ?? "??").Yield()},
+                   {"creatorName", creatorIds.TryGetValue(m.CreatorId, out var creatorProfile) ? creatorProfile : _doubleQuestionMarkArray },
                     {UmbracoExamineIndex.UmbracoFileFieldName, umbracoFile.Yield()}
                 };
 
