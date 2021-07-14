@@ -1147,9 +1147,9 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var service = ServiceContext.ContentTypeService;
-            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true, "Content");
+            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true, "Content", "content");
             service.Save(page);
-            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true, "Content_");
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true, "Content", "content2");
             service.Save(contentPage);
             var advancedPage = MockedContentTypes.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true, "Details");
             service.Save(advancedPage);
@@ -1166,19 +1166,20 @@ namespace Umbraco.Tests.Services
             {
                  Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
-            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "content", "Content");
+            var authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
             service.Save(contentPage);
 
             var compositionAdded = contentPage.AddContentType(contentMetaComposition);
             service.Save(contentPage);
 
-            //Change the name of the tab on the "root" content type 'page'.
-            var propertyGroup = contentPage.PropertyGroups["Content_"];
-            Assert.Throws<Exception>(() => contentPage.PropertyGroups.Add(new PropertyGroup(true)
+            // Change the alias of the tab on the "root" content type 'page'
+            var propertyGroup = contentPage.PropertyGroups["content2"];
+            Assert.Throws<ArgumentException>(() => contentPage.PropertyGroups.Add(new PropertyGroup(true)
             {
                 Id = propertyGroup.Id,
                 Name = "Content",
+                Alias = "content",
                 SortOrder = 0
             }));
 

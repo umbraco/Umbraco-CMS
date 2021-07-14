@@ -167,6 +167,17 @@ namespace Umbraco.Core.Models
         }
 
         // TODO Remove this method in v9 (only needed for backwards compatibility with names)
+        public new bool Remove(string key)
+        {
+            var index = IndexOfKey(key);
+            if (index == -1) return false;
+
+            RemoveAt(index);
+
+            return true;
+        }
+
+        // TODO Remove this method in v9 (only needed for backwards compatibility with names)
         public new bool Contains(string key) => IndexOfKey(key) != -1;
 
         public bool Contains(int id)
