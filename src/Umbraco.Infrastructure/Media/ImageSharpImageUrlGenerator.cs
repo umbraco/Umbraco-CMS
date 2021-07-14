@@ -49,10 +49,9 @@ namespace Umbraco.Cms.Infrastructure.Media
 
         private void AppendFocalPoint(StringBuilder imageProcessorUrl, ImageUrlGenerationOptions options)
         {
-            imageProcessorUrl.Append("?center=");
+            imageProcessorUrl.Append("?rxy=");
             imageProcessorUrl.Append(options.FocalPoint.Top.ToString(CultureInfo.InvariantCulture)).Append(",");
             imageProcessorUrl.Append(options.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
-            imageProcessorUrl.Append("&mode=crop");
         }
 
         private void AppendCrop(StringBuilder imageProcessorUrl, ImageUrlGenerationOptions options)
@@ -62,7 +61,6 @@ namespace Umbraco.Cms.Infrastructure.Media
             imageProcessorUrl.Append(options.Crop.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
             imageProcessorUrl.Append(options.Crop.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
             imageProcessorUrl.Append(options.Crop.Y2.ToString(CultureInfo.InvariantCulture));
-            imageProcessorUrl.Append("&cropmode=percentage");
         }
     }
 }

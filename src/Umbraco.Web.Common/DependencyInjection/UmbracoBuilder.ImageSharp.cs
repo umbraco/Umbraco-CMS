@@ -10,6 +10,7 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Web.Common.ImageProcessors;
 
 namespace Umbraco.Extensions
 {
@@ -50,7 +51,9 @@ namespace Umbraco.Extensions
                 })
                 .SetCache<PhysicalFileSystemCache>()
                 .SetCacheHash<CacheHash>()
-                .AddProvider<PhysicalFileSystemProvider>()
+                .ClearProcessors()
+                .RemoveProcessor<ResizeWebProcessor>() // The Resize processor is added by default, so remove it to ensure that the crop processor runs first
+                .AddProcessor<CropWebProcessor>()
                 .AddProcessor<ResizeWebProcessor>()
                 .AddProcessor<FormatWebProcessor>()
                 .AddProcessor<BackgroundColorWebProcessor>();
