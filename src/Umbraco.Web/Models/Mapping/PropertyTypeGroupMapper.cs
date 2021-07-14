@@ -140,14 +140,10 @@ namespace Umbraco.Web.Models.Mapping
             // if there are any generic properties, add the corresponding tab
             if (genericProperties.Any())
             {
-                string name = "Generic properties",
-                    alias = name.ToSafeAlias();
-
                 var genericGroup = new PropertyGroupDisplay<TPropertyType>
                 {
                     Id = PropertyGroupBasic.GenericPropertiesGroupId,
-                    Name = name,
-                    Alias = alias,
+                    Name = "Generic properties",
                     SortOrder = 999,
                     ContentTypeId = source.Id,
                     Properties = genericProperties

@@ -747,7 +747,7 @@ namespace Umbraco.Core.Packaging
                 var alias = propertyGroupElement.Element("Alias")?.Value;
                 if (string.IsNullOrEmpty(alias))
                 {
-                    alias = name.ToSafeAlias();
+                    alias = name.ToSafeAlias(true);
                 }
 
                 contentType.AddPropertyGroup(name, alias);

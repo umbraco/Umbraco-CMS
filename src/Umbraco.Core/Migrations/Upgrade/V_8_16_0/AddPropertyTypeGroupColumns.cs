@@ -17,7 +17,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_16_0
             foreach (var dto in dtos)
             {
                 // Generate alias from current name
-                dto.Alias = dto.Text.ToSafeAlias();
+                dto.Alias = dto.Text.ToSafeAlias(true);
 
                 Database.Update(dto, x => new { x.Alias });
             }

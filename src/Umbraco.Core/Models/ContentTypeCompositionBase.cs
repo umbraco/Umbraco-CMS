@@ -208,7 +208,7 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public override bool AddPropertyGroup(string groupName)
         {
-            return AddAndReturnPropertyGroup(groupName, groupName.ToSafeAlias()) != null;
+            return AddAndReturnPropertyGroup(groupName, groupName.ToSafeAlias(true)) != null;
         }
 
         /// <inheritdoc />
@@ -267,8 +267,8 @@ namespace Umbraco.Core.Models
 
             // get and ensure a group local to this content type
             var group = PropertyGroups.FirstOrDefault(x => x.Alias == propertyGroupName)
-                ?? PropertyGroups.FirstOrDefault(x => x.Alias == propertyGroupName.ToSafeAlias()) // TODO Remove in v9 (only needed for backwards compatibility with names)
-                ?? AddAndReturnPropertyGroup(propertyGroupName, propertyGroupName.ToSafeAlias()); // TODO Do we need both name and alias for this to work?
+                ?? PropertyGroups.FirstOrDefault(x => x.Alias == propertyGroupName.ToSafeAlias(true)) // TODO Remove in v9 (only needed for backwards compatibility with names)
+                ?? AddAndReturnPropertyGroup(propertyGroupName, propertyGroupName.ToSafeAlias(true)); // TODO Do we need both name and alias for this to work?
             if (group == null)
                 return false;
 

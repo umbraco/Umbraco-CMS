@@ -58,7 +58,7 @@ namespace Umbraco.Core.Models
                 var item = base[key];
                 if (item == null && !key.Contains('/'))
                 {
-                    item = base[key.ToSafeAlias()];
+                    item = base[key.ToSafeAlias(true)];
                 }
 
                 return item;
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Models
                 // Ensure alias is set
                 if (string.IsNullOrEmpty(item.Alias))
                 {
-                    item.Alias = item.Name.ToSafeAlias();
+                    item.Alias = item.Name.ToSafeAlias(true);
                 }
 
                 // Note this is done to ensure existing groups can be renamed
@@ -172,7 +172,7 @@ namespace Umbraco.Core.Models
         public new bool Contains(string key)
         {
             // TODO Remove this method in v9 (only needed for backwards compatibility with names)
-            return base.Contains(key) || (!key.Contains('/') && base.Contains(key.ToSafeAlias()));
+            return base.Contains(key) || (!key.Contains('/') && base.Contains(key.ToSafeAlias(true)));
         }
 
         public bool Contains(int id)
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Models
             if (index == -1 && !key.Contains('/'))
             {
                 // TODO Clean up for v9 (only needed for backwards compatibility with names)
-                index = this.IndexOfKey(key.ToSafeAlias());
+                index = this.FindIndex(x => x.Alias == key.ToSafeAlias(true));
             }
 
             return index;
