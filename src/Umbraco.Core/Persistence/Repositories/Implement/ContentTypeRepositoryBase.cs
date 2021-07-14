@@ -368,7 +368,6 @@ AND umbracoNode.id <> @id",
                     Database.Update<PropertyTypeDto>("SET propertyTypeGroupId = NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete });
 
                     // now we can delete the tabs
-                    Database.Update<PropertyTypeGroupDto>("SET parentKey = NULL WHERE id IN (@ids)", new { ids = groupsToDelete });
                     Database.Delete<PropertyTypeGroupDto>("WHERE id IN (@ids)", new { ids = groupsToDelete });
                 }
             }
@@ -1359,7 +1358,6 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
                 "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE contentTypeId = @id",
-                "UPDATE " + Constants.DatabaseSchema.Tables.PropertyTypeGroup + " SET parentKey = NULL WHERE contenttypeNodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup + " WHERE contenttypeNodeId = @id"
             };
             return list;
