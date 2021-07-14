@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Web.Common.Templates
         {
             var httpContext = _httpContextAccessor.GetRequiredHttpContext();
 
-            var viewResult = _viewEngine.GetView(null, $"~/Views/{request.GetTemplateAlias()}.cshtml", false);
+            var viewResult = _viewEngine.GetView(null, $"~/Views/{request.GetTemplateAlias()}.cshtml", true);
 
             if (viewResult.Success == false)
             {
