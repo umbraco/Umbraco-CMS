@@ -858,7 +858,7 @@ namespace Umbraco.Core.Services.Implement
                     var xGroupUsers = groupUsers.ToDictionary(x => x.Id, x => x);
                     var groupIds = groupUsers.Select(x => x.Id).ToArray();
 
-                    addedUsers = _userRepository.GetMany(userIds.Except(groupIds).ToArray()).Where(x => x.Id != 0).ToArray();
+                    addedUsers = userIds.Except(groupIds).Count() > 0 ? _userRepository.GetMany(userIds.Except(groupIds).ToArray()).Where(x => x.Id != 0).ToArray() : new IUser[] { };
                     removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
                 }
 
