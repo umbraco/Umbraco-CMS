@@ -134,12 +134,6 @@
                     });
                 }
 
-                scope.editor.variantApps.forEach((app) => {
-                    if (app.alias === "umbContent") {
-                        app.anchors = scope.editor.content.tabs;
-                    }
-                });
-
                 scope.content.variants.forEach(function (variant) {
 
                     // if we are looking for the variant with default language then we also want to check for invariant variant.
@@ -213,6 +207,10 @@
                     scope.vm.variantMenu.sort(sortVariantsMenu);
                 }
             };
+
+            unsubscribe.push(scope.$watch('splitViewOpen', (newVal) => {
+                scope.vm.navigationItemLimit = newVal === true ? 0 : undefined;
+            }));
 
             onInit();
 

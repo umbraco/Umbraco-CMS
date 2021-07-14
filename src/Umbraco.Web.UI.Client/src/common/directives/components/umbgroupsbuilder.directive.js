@@ -3,9 +3,12 @@
 
     function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource,
         dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService,
-        localizationService, editorService, eventsService, overlayService) {
+        localizationService, editorService, eventsService, overlayService, contentEditingHelper) {
 
         function link(scope, el, attr, ctrl) {
+
+            const TYPE_GROUP = 0;
+            const TYPE_TAB = 1;
 
             var eventBindings = [];
             var validationTranslated = "";
@@ -14,26 +17,43 @@
             scope.dataTypeHasChanged = false;
             scope.sortingMode = false;
             scope.toolbar = [];
-            scope.sortableOptionsGroup = {};
-            scope.sortableOptionsProperty = {};
             scope.sortingButtonKey = "general_reorder";
             scope.compositionsButtonState = "init";
+            scope.tabs = [];
+            scope.genericGroups = [];
+            scope.openTabAlias = "";
+            scope.hasGenericTab = false;
+            scope.genericTab = {
+                key: null,
+                name: "Generic",
+                alias: contentEditingHelper.genericTabAlias,
+                parentAlias: "",
+                type: TYPE_TAB,
+                sortOrder: 0,
+                properties: []
+            };
+
+            eventBindings.push(scope.$watchCollection('model.groups', (newValue) => {
+                scope.tabs = $filter("filter")(newValue, (group) => {
+                    return group.type === TYPE_TAB;
+                });
+
+                scope.tabs.forEach(tab => {
+                    tab.indexInGroups = newValue.findIndex(group => group.key === tab.key);
+                    tab.parentAlias = contentEditingHelper.getParentAliasFromAlias(tab.alias);
+                });
+
+                checkGenericTabVisibility();
+
+                if (!scope.openTabAlias && scope.hasGenericTab) {
+                    scope.openTabAlias = "";
+                } else if (!scope.openTabAlias && scope.tabs.length > 0) {
+                    scope.openTabAlias = scope.tabs[0].alias;
+                }
+            }));
 
             function activate() {
-
                 setSortingOptions();
-
-                // set placeholder property on each group
-                if (scope.model.groups.length !== 0) {
-                    angular.forEach(scope.model.groups, function (group) {
-                        addInitProperty(group);
-                    });
-                }
-
-                // add init tab
-                addInitGroup(scope.model.groups);
-
-                activateFirstGroup(scope.model.groups);
 
                 // localize texts
                 localizationService.localize("validation_validation").then(function (value) {
@@ -43,97 +63,112 @@
                 localizationService.localize("contentTypeEditor_tabHasNoSortOrder").then(function (value) {
                     tabNoSortOrderTranslated = value;
                 });
+
+                localizationService.localize("general_generic").then(function (value) {
+                    scope.genericTab.name = value;
+                });
             }
 
             function setSortingOptions() {
 
-                scope.sortableOptionsGroup = {
-                    axis: 'y',
-                    distance: 10,
+                const defaultOptions = {
+                    axis: '',
                     tolerance: "pointer",
                     opacity: 0.7,
                     scroll: true,
                     cursor: "move",
-                    placeholder: "umb-group-builder__group-sortable-placeholder",
                     zIndex: 6000,
+                    forcePlaceholderSize: true,
+                    dropOnEmpty: true,
+                    helper: "clone",
+                    appendTo: "body"
+                };
+
+                scope.sortableOptionsTab = {
+                    ...defaultOptions,
+                    connectWith: ".umb-group-builder__tabs",
+                    placeholder: "umb-group-builder__tab-sortable-placeholder",
+                    handle: ".umb-group-builder__tab-handle",
+                    items: ".umb-group-builder__tab-sortable",
+                    stop: function (event, ui) {
+                        updateSortOrder(scope.tabs);
+                    }
+                };
+
+                scope.sortableOptionsGroup = {
+                    ...defaultOptions,
+                    connectWith: ".umb-group-builder__groups",
+                    placeholder: "umb-group-builder__group-sortable-placeholder",
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
-                    start: function (e, ui) {
-                        ui.placeholder.height(ui.item.height());
-                    },
-                    stop: function (e, ui) {
-                        updateTabsSortOrder();
+                    stop: function (event, ui) {
+                        const groupAlias = ui.item[0].dataset.groupAlias ? ui.item[0].dataset.groupAlias : "";
+                        const group = groupAlias ? scope.model.groups.find(group => group.alias === groupAlias) : {};
+                        group.parentAlias = scope.openTabAlias;
+                        group.alias = (group.parentAlias !== "" ? group.parentAlias + "/" : "") + group.alias.substring(group.alias.lastIndexOf('/')+1);
+                        const groupsInTab = scope.model.groups.filter(group => group.parentAlias === scope.openTabAlias);
+                        updateSortOrder(groupsInTab);
                     }
                 };
 
                 scope.sortableOptionsProperty = {
-                    axis: 'y',
-                    distance: 10,
-                    tolerance: "pointer",
+                    ...defaultOptions,
                     connectWith: ".umb-group-builder__properties",
-                    opacity: 0.7,
-                    scroll: true,
-                    cursor: "move",
                     placeholder: "umb-group-builder__property_sortable-placeholder",
-                    zIndex: 6000,
                     handle: ".umb-group-builder__property-handle",
                     items: ".umb-group-builder__property-sortable",
-                    start: function (e, ui) {
-                        ui.placeholder.height(ui.item.height());
-                    },
                     stop: function (e, ui) {
                         updatePropertiesSortOrder();
                     }
                 };
 
+                scope.droppableOptionsTab = {
+                    accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
+                    tolerance : 'pointer',
+                    over: function (evt, ui) {
+                        scope.openTabAlias = evt.target.dataset.tabAlias || "";
+                        scope.$evalAsync();
+                    }
+                };
             }
 
-            function updateTabsSortOrder() {
+            function updateSortOrder(items) {
+                let first = true;
+                let prevSortOrder = 0;
 
-                var first = true;
-                var prevSortOrder = 0;
-
-                scope.model.groups.map(function (group) {
-
-                    var index = scope.model.groups.indexOf(group);
-
-                    if (group.tabState !== "init") {
+                items.forEach((item, index) => {
+                    if (item.tabState !== "init" && item.propertyState !== "init") {
 
                         // set the first not inherited tab to sort order 0
-                        if (!group.inherited && first) {
+                        if (!item.inherited && first) {
 
                             // set the first tab sort order to 0 if prev is 0
                             if (prevSortOrder === 0) {
-                                group.sortOrder = 0;
+                                item.sortOrder = 0;
                                 // when the first tab is inherited and sort order is not 0
                             } else {
-                                group.sortOrder = prevSortOrder + 1;
+                                item.sortOrder = prevSortOrder + 1;
                             }
 
                             first = false;
 
-                        } else if (!group.inherited && !first) {
+                        } else if (!item.inherited && !first) {
+                            // find next item
+                            const nextItem = items[index + 1];
 
-                            // find next group
-                            var nextGroup = scope.model.groups[index + 1];
-
-                            // if a groups is dropped in the middle of to groups with
-                            // same sort order. Give it the dropped group same sort order
-                            if (prevSortOrder === nextGroup.sortOrder) {
-                                group.sortOrder = prevSortOrder;
+                            // if an item is dropped in the middle of the collection with
+                            // same sort order. Give it the dropped item same sort order
+                            if (nextItem && nextItem.sortOrder === prevSortOrder) {
+                                item.sortOrder = prevSortOrder;
                             } else {
-                                group.sortOrder = prevSortOrder + 1;
+                                item.sortOrder = prevSortOrder + 1;
                             }
-
                         }
 
                         // store this tabs sort order as reference for the next
-                        prevSortOrder = group.sortOrder;
-
+                        prevSortOrder = item.sortOrder;
                     }
-
                 });
-
             }
 
             function filterAvailableCompositions(selectedContentType, selecting) {
@@ -178,13 +213,7 @@
             }
 
             function updatePropertiesSortOrder() {
-
-                angular.forEach(scope.model.groups, function (group) {
-                    if (group.tabState !== "init") {
-                        group.properties = contentTypeHelper.updatePropertiesSortOrder(group.properties);
-                    }
-                });
-
+                scope.model.groups.forEach(group => group.properties = contentTypeHelper.updatePropertiesSortOrder(group.properties));
             }
 
             function setupAvailableContentTypesModel(result) {
@@ -239,11 +268,11 @@
                     }
 
                 } else {
-
                     scope.sortingMode = true;
                     scope.sortingButtonKey = "general_reorderDone";
-
                 }
+
+                checkGenericTabVisibility();
 
             };
 
@@ -255,27 +284,14 @@
                     view: "views/common/infiniteeditors/compositions/compositions.html",
                     size: "small",
                     submit: function () {
-
-                        // make sure that all tabs has an init property
-                        if (scope.model.groups.length !== 0) {
-                            angular.forEach(scope.model.groups, function (group) {
-                                addInitProperty(group);
-                            });
-                        }
-
-                        // remove overlay
                         editorService.close();
-
                     },
                     close: function (oldModel) {
-
                         // reset composition changes
                         scope.model.groups = oldModel.contentType.groups;
                         scope.model.compositeContentTypes = oldModel.contentType.compositeContentTypes;
 
-                        // remove overlay
                         editorService.close();
-
                     },
                     selectCompositeContentType: function (selectedContentType) {
 
@@ -387,34 +403,209 @@
 
             };
 
-            /* ---------- GROUPS ---------- */
+            /* ---------- TABS ---------- */
+            scope.changeTab = function ({alias}) {
+                scope.openTabAlias = alias;
+            };
 
-            scope.addGroup = function (group) {
+            scope.addTab = function () {
+                const newTabIndex = scope.tabs.length;
+                const lastTab = scope.tabs[newTabIndex - 1];
+                const sortOrder = lastTab && lastTab.sortOrder !== undefined ? lastTab.sortOrder + 1 : 0;
 
-                // set group sort order
-                var index = scope.model.groups.indexOf(group);
-                var prevGroup = scope.model.groups[index - 1];
+                const tab = {
+                    key: String.CreateGuid(),
+                    name: "",
+                    parentAlias: "",
+                    type: TYPE_TAB,
+                    sortOrder,
+                    properties: []
+                };
 
-                if (index > 0) {
-                    // set index to 1 higher than the previous groups sort order
-                    group.sortOrder = prevGroup.sortOrder + 1;
-
-                } else {
-                    // first group - sort order will be 0
-                    group.sortOrder = 0;
+                if (newTabIndex === 0) {
+                    scope.model.groups.forEach(group => {
+                        if (!group.inherited) {
+                            group.parentAlias = tab.alias;
+                        }
+                    });
                 }
 
-                // activate group
-                scope.activateGroup(group);
+                scope.model.groups = [...scope.model.groups, tab];
 
-                // push new init tab to the scope
-                addInitGroup(scope.model.groups);
+                scope.openTabAlias = tab.alias;
+
+                scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
+                scope.$broadcast('umbOverflowChecker.checkOverflow');
+            };
+
+            scope.removeTab = function (tab, indexInTabs) {
+                localizationService.localizeMany(['general_delete', 'defaultdialogs_confirmdelete', 'contentTypeEditor_confirmDeleteTabNotice']).then(function (data) {
+                    overlayService.confirmDelete({
+                        title: data[0],
+                        content: data[1] + ' "' + tab.name + '"?',
+                        confirmMessage: data[2],
+                        submitButtonLabelKey: 'contentTypeEditor_yesDelete',
+                        submit: function () {
+                            scope.model.groups.splice(tab.indexInGroups, 1);
+
+                            // remove all child groups
+                            scope.model.groups = scope.model.groups.filter(group => group.parentAlias !== tab.alias);
+
+                            // we need a timeout because the filter hasn't updated the tabs collection
+                            $timeout(() => {
+                                if (scope.tabs.length > 0) {
+                                    scope.openTabAlias = indexInTabs > 0 ? scope.tabs[indexInTabs - 1].alias : scope.tabs[0].alias;
+                                } else {
+                                    scope.openTabAlias = "";
+                                }
+                            });
+
+                            scope.$broadcast('umbOverflowChecker.checkOverflow');
+
+                            overlayService.close();
+                        }
+                    });
+                });
+            };
+
+            scope.canRemoveTab = function (tab) {
+                return tab.inherited !== true;
+            };
+
+            scope.setTabOverflowState = function (overflowLeft, overflowRight) {
+                scope.overflow = { left: overflowLeft, right: overflowRight };
+            };
+
+            scope.onChangeTabSortOrderValue = function () {
+                scope.tabs = $filter('orderBy')(scope.tabs, 'sortOrder');
+            };
+
+            scope.onChangeTabName = function (key) {
+                const changedTab = scope.model.groups.find(group => group.key === key);
+                updateGroupAlias(changedTab)
+                scope.$broadcast('umbOverflowChecker.checkOverflow');
+            };
+
+            /** Universal method for updating group alias (for tabs, field-sets etc.) */
+            function updateGroupAlias(changedGroup) {
+                console.log(changedGroup)
+                const newAlias = contentEditingHelper.generateTabAlias(changedGroup.parentAlias, changedGroup.name);
+                updateDescendingAliases(newAlias, changedGroup.alias);
+                changedGroup.alias = newAlias;
+            }
+
+            function updateDescendingAliases(oldAlias, newAlias) {
+
+                /** current code will replace old alias no matter how deep/nested the groups matching are.
+                 * Meaning no need for recursive code.
+                 * Recursive code could be problematic as we only want to change alias of groups we own, not inherited ones.
+                */
+                const replaceAliasStr = oldAlias + "/";
+                const replaceAliasLength = replaceAliasStr.length;
+                scope.model.groups.forEach(tab => {
+                    if(tab.parentAlias.indexOf(replaceAliasStr) === 0) {
+                        tab.alias = newAlias + "/" + tab.alias.substr(replaceAliasLength)
+                        tab.parentAlias = contentEditingHelper.getParentAliasFromAlias(tab.alias);
+                    }
+                });
+            }
+
+            scope.ungroupedPropertiesAreVisible = function({alias, properties}) {
+                const isOpenTab = alias === scope.openTabAlias;
+
+                if (isOpenTab && properties.length > 0) {
+                    return true;
+                }
+
+                if (isOpenTab && scope.sortingMode) {
+                    return true;
+                }
+
+                const tabHasGroups = scope.model.groups.filter(group => group.parentAlias === alias).length > 0;
+
+                if (isOpenTab && !tabHasGroups) {
+                    return true;
+                }
+            };
+
+            function checkGenericTabVisibility () {
+                const hasRootGroups = scope.model.groups.filter(group => group.type === TYPE_GROUP && group.parentAlias === "").length > 0;
+                scope.hasGenericTab = (hasRootGroups && scope.tabs.length > 0) || scope.sortingMode;
+            }
+
+            /* Properties */
+
+            scope.addNewProperty = function (group) {
+                let newProperty = {
+                    label: null,
+                    alias: null,
+                    propertyState: "init",
+                    validation: {
+                        mandatory: false,
+                        mandatoryMessage: null,
+                        pattern: null,
+                        patternMessage: null
+                    },
+                    labelOnTop: false
+                };
+
+                const propertySettings = {
+                    title: "Property settings",
+                    property: newProperty,
+                    contentType: scope.contentType,
+                    contentTypeName: scope.model.name,
+                    contentTypeAllowCultureVariant: scope.model.allowCultureVariant,
+                    contentTypeAllowSegmentVariant: scope.model.allowSegmentVariant,
+                    view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
+                    size: "small",
+                    submit: function (model) {
+                        newProperty = {...model.property};
+                        newProperty.propertyState = "active";
+
+                        group.properties.push(newProperty);
+
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+
+                editorService.open(propertySettings);
+            };
+
+            /* ---------- GROUPS ---------- */
+
+            scope.addGroup = function (tabAlias) {
+                scope.model.groups = scope.model.groups || [];
+
+                const groupsInTab = scope.model.groups.filter(group => group.parentAlias === tabAlias);
+                const lastGroupSortOrder = groupsInTab.length > 0 ? groupsInTab[groupsInTab.length - 1].sortOrder + 1 : 0;
+
+                const group = {
+                    key: String.CreateGuid(),
+                    properties: [],
+                    parentTabContentTypes: [],
+                    parentTabContentTypeNames: [],
+                    name: "",
+                    alias: "",
+                    parentAlias: tabAlias || "",
+                    type: TYPE_GROUP,
+                    sortOrder: lastGroupSortOrder
+                };
+
+                scope.model.groups = [...scope.model.groups, group];
+
+                scope.activateGroup(group);
             };
 
             scope.activateGroup = function (selectedGroup) {
+                if (!selectedGroup) {
+                    return;
+                }
 
                 // set all other groups that are inactive to active
-                angular.forEach(scope.model.groups, function (group) {
+                scope.model.groups.forEach(group => {
                     // skip init tab
                     if (group.tabState !== "init") {
                         group.tabState = "inActive";
@@ -422,21 +613,35 @@
                 });
 
                 selectedGroup.tabState = "active";
-
             };
+
+            scope.onChangeGroupName = function(group) {
+                updateGroupAlias(group);
+            }
 
             scope.canRemoveGroup = function (group) {
                 return group.inherited !== true && _.find(group.properties, function (property) { return property.locked === true; }) == null;
-            }
-
-            scope.removeGroup = function (groupIndex) {
-                scope.model.groups.splice(groupIndex, 1);
             };
 
-            scope.updateGroupTitle = function (group) {
-                if (group.properties.length === 0) {
-                    addInitProperty(group);
-                }
+            scope.removeGroup = function (selectedGroup) {
+                localizationService.localizeMany(['general_delete', 'defaultdialogs_confirmdelete', 'contentTypeEditor_confirmDeleteGroupNotice']).then(function (data) {
+                    overlayService.confirmDelete({
+                        title: data[0],
+                        content: data[1] + ' "' + selectedGroup.name + '"?',
+                        confirmMessage: data[2],
+                        submitButtonLabelKey: 'contentTypeEditor_yesDelete',
+                        submit: function () {
+                            const index = scope.model.groups.findIndex(group => group.key === selectedGroup.key);
+                            scope.model.groups.splice(index, 1);
+
+                            overlayService.close();
+                        }
+                    });
+                });
+            };
+
+            scope.addGroupToActiveTab = function () {
+                scope.addGroup(scope.openTabAlias);
             };
 
             scope.changeSortOrderValue = function (group) {
@@ -444,60 +649,27 @@
                 if (group.sortOrder !== undefined) {
                     group.showSortOrderMissing = false;
                 }
+
                 scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
             };
 
-            function addInitGroup(groups) {
-
-                // check i init tab already exists
-                var addGroup = true;
-
-                angular.forEach(groups, function (group) {
-                    if (group.tabState === "init") {
-                        addGroup = false;
-                    }
-                });
-
-                if (addGroup) {
-                    groups.push({
-                        properties: [],
-                        parentTabContentTypes: [],
-                        parentTabContentTypeNames: [],
-                        name: "",
-                        tabState: "init"
-                    });
-                }
-
-                return groups;
-            }
-
-            function activateFirstGroup(groups) {
-                if (groups && groups.length > 0) {
-                    var firstGroup = groups[0];
-                    if (!firstGroup.tabState || firstGroup.tabState === "inActive") {
-                        firstGroup.tabState = "active";
-                    }
-                }
-            }
+            scope.onChangeGroupSortOrderValue = function (sortedGroup) {
+                const groupsInTab = scope.model.groups.filter(group => group.parentAlias === sortedGroup.parentAlias);
+                const otherGroups = scope.model.groups.filter(group => group.parentAlias !== sortedGroup.parentAlias);
+                const sortedGroups = $filter('orderBy')(groupsInTab, 'sortOrder');
+                scope.model.groups = [...otherGroups, ...sortedGroups];
+            };
 
             /* ---------- PROPERTIES ---------- */
-
             scope.addPropertyToActiveGroup = function () {
-                var group = _.find(scope.model.groups, group => group.tabState === "active");
-                if (!group && scope.model.groups.length) {
-                    group = scope.model.groups[0];
+                let activeGroup = scope.model.groups.find(group => group.tabState === "active");
+
+                if (!activeGroup && scope.model.groups.length) {
+                    activeGroup = scope.model.groups[0];
                 }
 
-                if (!group || !group.name) {
-                    return;
-                }
-
-                var property = _.find(group.properties, property => property.propertyState === "init");
-                if (!property) {
-                    return;
-                }
-                scope.addProperty(property, group);
-            }
+                scope.addNewProperty(activeGroup);
+            };
 
             scope.addProperty = function (property, group) {
 
@@ -576,12 +748,14 @@
                             // close the editor
                             editorService.close();
 
-                            // push new init property to group
-                            addInitProperty(group);
+                            if (group) {
+                                // push new init property to group
+                                addInitProperty(group);
 
-                            // set focus on init property
-                            var numberOfProperties = group.properties.length;
-                            group.properties[numberOfProperties - 1].focus = true;
+                                // set focus on init property
+                                var numberOfProperties = group.properties.length;
+                                group.properties[numberOfProperties - 1].focus = true;
+                            }
 
                             notifyChanged();
                         },
@@ -624,12 +798,25 @@
                 }
             };
 
-            scope.deleteProperty = function (tab, propertyIndex) {
+            scope.deleteProperty = function (properties, { id, label }) {
+                localizationService.localizeMany(['general_delete', 'defaultdialogs_confirmdelete']).then(function (data) {
+                    overlayService.confirmDelete({
+                        title: data[0],
+                        content: data[1] + ' "' + label + '"?',
+                        submitButtonLabelKey: 'contentTypeEditor_yesDelete',
+                        submit: function () {
+                            const index = properties.findIndex(property => property.id === id);
+                            properties.splice(index, 1);
+                            notifyChanged();
 
-                // remove property
-                tab.properties.splice(propertyIndex, 1);
+                            overlayService.close();
+                        }
+                    });
+                });
+            };
 
-                notifyChanged();
+            scope.onChangePropertySortOrderValue = function (group) {
+                group.properties = $filter('orderBy')(group.properties, 'sortOrder');
             };
 
             function notifyChanged() {

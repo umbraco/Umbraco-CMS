@@ -180,6 +180,50 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         },
 
+        genericTabAlias: "_umb_genericTab",
+
+        generateTabAlias: function(parentAlias, name) {
+            return (parentAlias !== "" && parentAlias != null ? parentAlias + "/" : "" ) + name.toUmbracoAlias();
+        },
+
+        getParentAliasFromAlias: function(alias) {
+            return alias.substring(0, alias.lastIndexOf("/"));
+        },
+
+        registerGenericTab: function (groups) {
+            if (!groups) {
+                return;
+            }
+
+            const genericTabAlias = this.genericTabAlias;
+            const hasGenericTab = groups.find(group => group.alias === genericTabAlias);
+
+            if (hasGenericTab) {
+                return;
+            }
+
+            const isRootGroup = (group) => group.type === 0 && group.parentAlias === "";
+            const hasRootGroups = groups.filter(group => isRootGroup(group)).length > 0;
+
+            if (!hasRootGroups) {
+                return;
+            }
+
+            const genericTab = {
+                label: 'Generic',
+                alias: genericTabAlias,
+                key: null,
+                parentAlias: "",
+                type: 1,
+                properties: []
+            };
+
+            localizationService.localize("general_generic").then(function (value) {
+                genericTab.label = value;
+                groups.unshift(genericTab);
+            });
+        },
+
         /** Returns the action button definitions based on what permissions the user has.
         The content.allowedActions parameter contains a list of chars, each represents a button by permission so
         here we'll build the buttons according to the chars of the user. */

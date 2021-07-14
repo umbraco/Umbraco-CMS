@@ -478,6 +478,7 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 Id = 222,
                 Name = "Group 1",
+                Alias = "group1",
                 SortOrder = 1,
                 Properties = new[]
                 {
@@ -549,6 +550,7 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 Id = 222,
                 Name = "Group 1",
+                Alias = "group1",
                 SortOrder = 1,
                 Properties = new[]
                 {
@@ -961,6 +963,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
                         Properties = new[]
@@ -1010,6 +1013,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
                         Properties = new[]
@@ -1062,6 +1066,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
                         Properties = new[]
@@ -1109,6 +1114,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
                         Properties = new[]
@@ -1134,6 +1140,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 894,
                         Name = "Tab 2",
+                        Alias = "tab2",
                         SortOrder = 0,
                         Inherited = true,
                         Properties = new[]
@@ -1189,6 +1196,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
                         Properties = new[]
@@ -1214,6 +1222,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 894,
                         Name = "Tab 2",
+                        Alias = "tab2",
                         SortOrder = 0,
                         Inherited = true,
                         Properties = new[]

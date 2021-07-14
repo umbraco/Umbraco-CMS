@@ -272,9 +272,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return new PropertyGroup(new PropertyTypeCollection(isPublishing))
             {
                 Id = dto.Id,
+                Key = dto.UniqueId,
+                Type = (PropertyGroupType)dto.Type,
                 Name = dto.Text,
-                SortOrder = dto.SortOrder,
-                Key = dto.UniqueId
+                Alias = dto.Alias,
+                SortOrder = dto.SortOrder
             };
         }
 

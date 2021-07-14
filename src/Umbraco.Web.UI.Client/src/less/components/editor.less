@@ -104,7 +104,7 @@
 }
 
 .-split-view-active .umb-editor-header__name-and-description {
-    margin-right: 0;
+	margin-right: 0;
 }
 
 .umb-editor-header__name-wrapper ng-form {
@@ -162,6 +162,29 @@ input.umb-editor-header__name-input:disabled {
         padding-left: 30px;
         padding-right: 30px;
     }
+}
+
+// Tab bar
+.umb-editor-tab-bar {
+	position: sticky;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 90;
+	margin: -20px -20px 20px -20px;
+	padding: 0 20px;
+	background: @white;
+	box-shadow: 1px 1px 0 @gray-9;
+
+	.umb-tabs-nav {
+		border-bottom: none;
+	}
+
+	.umb-tab {
+		button {
+			padding: 15px 20px;
+		}
+	}
 }
 
 // container

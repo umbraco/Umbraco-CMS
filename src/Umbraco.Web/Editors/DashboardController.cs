@@ -215,6 +215,8 @@ namespace Umbraco.Web.Editors
             return _dashboardService.GetDashboards(section, Security.CurrentUser).Select(x => new Tab<IDashboardSlim>
             {
                 Id = x.Id,
+                Key = x.Key,
+                Type = x.Type,
                 Alias = x.Alias,
                 Label = x.Label,
                 Expanded = x.Expanded,

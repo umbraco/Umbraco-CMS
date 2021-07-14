@@ -1,0 +1,149 @@
+<div data-element="property-{{vm.property.alias}}" class="umb-group-builder__property" ng-class="{'-active': vm.dialogIsOpen, '-active': vm.property.propertyState=='active', '-inherited': vm.property.inherited, '-locked': vm.property.locked, 'umb-group-builder__property-handle -sortable': vm.sortable && !vm.property.inherited, '-sortable-locked': vm.sortable && vm.property.inherited}">
+
+  <!-- property meta text -->
+  <div class="umb-group-builder__property-meta" ng-class="{'-full-width': vm.sortable}" data-element="{{vm.valTabAlias}}">
+
+      <ng-form name="propertyTypeForm">
+          <div class="control-group -no-margin" ng-if="!vm.sortable">
+
+              <div class="umb-group-builder__property-meta-alias umb-locked-field__text cursor-not-allowed" style="padding-left: 1px" ng-if="vm.property.inherited || vm.property.locked">{{ vm.property.alias }}</div>
+              <umb-locked-field
+                  ng-if="!vm.property.inherited && !vm.property.locked"
+                  locked="locked"
+                  ng-model="vm.property.alias"
+                  placeholder-text="'Alias...'"
+                  server-validation-field="{{ vm.valServerFieldAlias }}">
+              </umb-locked-field>
+
+              <div class="umb-group-builder__property-meta-label">
+                  <textarea localize="placeholder"
+                            placeholder="@placeholders_label"
+                            ng-model="vm.property.label"
+                            ng-disabled="vm.property.inherited || vm.property.locked"
+                            name="groupName"
+                            umb-auto-resize
+                            required
+                            val-server-field="{{ vm.valServerFieldLabel }}">
+                  </textarea>
+
+                  <div ng-messages="propertyTypeForm.groupName.$error" show-validation-on-submit>
+                      <div class="umb-validation-label" ng-message="valServerField">{{propertyTypeForm.groupName.errorMsg}}</div>
+                      <div class="umb-validation-label" ng-message="required"><localize key="contentTypeEditor_requiredLabel"></localize></div>
+                  </div>
+
+              </div>
+
+              <div class="umb-group-builder__property-meta-description">
+                  <textarea
+                      localize="placeholder"
+                      placeholder="@placeholders_enterDescription"
+                      ng-model="vm.property.description"
+                      ng-disabled="vm.property.inherited || vm.property.locked"
+                      umb-auto-resize>
+                  </textarea>
+              </div>
+          </div>
+      </ng-form>
+
+      <div ng-if="vm.sortable" class="flex items-center">
+          <i class="icon icon-navigation" ng-if="!vm.property.inherited" style="margin-right: 10px;"></i>
+          <span class="umb-group-builder__property-meta-label">{{ vm.property.label }}</span>
+          <span class="umb-group-builder__property-meta-alias" style="margin-bottom: 0; margin-left: 5px; margin-top: 1px;">({{ vm.property.alias }})</span>
+          <input name="propertySortOrder" type="number" class="umb-group-builder__group-sort-value umb-property-editor-tiny" ng-model="vm.property.sortOrder" ng-disabled="vm.property.inherited" ng-blur="vm.changeSortOrderValue()" />
+      </div>
+
+  </div>
+
+
+  <div tabindex="-1" class="umb-group-builder__property-preview" ng-if="!vm.sortable" ng-class="{'-not-clickable': !vm.sortable && (vm.property.inherited || vm.property.locked)}">
+
+      <div class="umb-group-builder__property-tags">
+
+          <span class="umb-group-builder__property-tag -white">
+              <span ng-if="vm.property.dataTypeName !== undefined">{{vm.property.dataTypeName}}</span>
+              <span ng-if="vm.property.dataTypeName == undefined"><localize key="general_preview"></localize></span>
+          </span>
+
+          <div class="umb-group-builder__property-tag -white" ng-if="vm.property.validation.mandatory">
+              <i class="umb-group-builder__property-tag-icon">*</i>
+              <localize key="general_mandatory"></localize>
+          </div>
+
+          <div class="umb-group-builder__property-tag -white" ng-if="vm.property.showOnMemberProfile">
+              <i class="icon-eye umb-group-builder__property-tag-icon"></i>
+              <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+          </div>
+
+          <div class="umb-group-builder__property-tag -white" ng-if="vm.property.memberCanEdit">
+              <i class="icon-edit umb-group-builder__property-tag-icon"></i>
+              <localize key="contentTypeEditor_memberCanEdit"></localize>
+          </div>
+
+          <div class="umb-group-builder__property-tag -white" ng-if="vm.property.isSensitiveData">
+              <i class="icon-lock umb-group-builder__property-tag-icon"></i>
+              <localize key="contentTypeEditor_isSensitiveData"></localize>
+          </div>
+
+          <div class="umb-group-builder__property-tag -white" ng-if="vm.property.allowCultureVariant">
+              <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
+              <localize key="contentTypeEditor_cultureVariantLabel"></localize>
+          </div>
+
+          <div class="umb-group-builder__property-tag -white" ng-if="vm.property.allowSegmentVariant">
+              <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
+              <localize key="contentTypeEditor_segmentVariantLabel"></localize>
+          </div>
+
+      </div>
+
+      <div class="umb-group-builder__property-tags -right">
+
+          <div class="umb-group-builder__property-tag" ng-if="vm.property.inherited">
+              <umb-icon icon="icon-merge" class="icon-merge"></umb-icon>
+              <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom"></localize></span>
+              {{vm.property.contentTypeName}}
+          </div>
+
+          <div class="umb-group-builder__property-tag" ng-if="vm.property.locked">
+              <umb-icon icon="icon-lock" class="icon-lock"></umb-icon>
+              <localize key="general_locked"></localize>
+          </div>
+
+      </div>
+
+      <ng-form inert class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="vm.edit()" tabindex="-1">
+          <umb-property-editor
+              ng-if="vm.property.view !== undefined"
+              model="vm.property"
+              preview="true">
+          </umb-property-editor>
+      </ng-form>
+
+      <button aria-label="Open settings" class="umb-group-builder__open-settings" ng-if="!vm.property.inherited && !vm.property.locked" ng-click="vm.edit()"></button>
+
+  </div>
+
+  <!-- row tools -->
+  <div class="umb-group-builder__property-actions" ng-if="!vm.sortable">
+
+      <div ng-if="!vm.property.inherited">
+
+          <!-- settings for property -->
+          <div class="umb-group-builder__property-action">
+              <button aria-label="Open settings" class="btn-icon" ng-click="vm.edit()" localize="title" title="@general_edit">
+                  <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+              </button>
+          </div>
+
+          <!-- delete property -->
+          <div ng-if="!vm.property.locked" class="umb-group-builder__property-action">
+              <button aria-label="Delete property" class="btn-icon" ng-click="vm.remove()">
+                  <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
+              </button>
+          </div>
+
+      </div>
+
+  </div>
+
+</div>

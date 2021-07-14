@@ -143,7 +143,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                 // if groups are named the same - merge the groups
                 contentType.groups.forEach(function (contentTypeGroup) {
 
-                    if (contentTypeGroup.name === compositionGroup.name) {
+                    if (contentTypeGroup.name === compositionGroup.name && contentTypeGroup.type === compositionGroup.type) {
 
                         // set flag to show if properties has been merged into a tab
                         compositionGroup.groupIsMerged = true;

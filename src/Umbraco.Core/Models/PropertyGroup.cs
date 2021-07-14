@@ -1,20 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// A group of property types, which corresponds to the properties grouped under a Tab.
+    /// Represents a group of property types.
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [DebuggerDisplay("Id: {Id}, Name: {Name}")]
+    [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
+        private PropertyGroupType _type;
         private string _name;
+        private string _alias;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;
 
@@ -33,8 +37,24 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Name of the Group, which corresponds to the Tab-name in the UI
+        /// Gets or sets the type of the group.
         /// </summary>
+        /// <value>
+        /// The type.
+        /// </value>
+        [DataMember]
+        public PropertyGroupType Type
+        {
+            get => _type;
+            set => SetPropertyValueAndDetectChanges(value, ref _type, nameof(Type));
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the group.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
         [DataMember]
         public string Name
         {
@@ -43,8 +63,24 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Sort Order of the Group
+        /// Gets or sets the alias of the group.
         /// </summary>
+        /// <value>
+        /// The alias.
+        /// </value>
+        [DataMember]
+        public string Alias
+        {
+            get => _alias;
+            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
+        }
+
+        /// <summary>
+        /// Gets or sets the sort order of the group.
+        /// </summary>
+        /// <value>
+        /// The sort order.
+        /// </value>
         [DataMember]
         public int SortOrder
         {
@@ -53,10 +89,13 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets a collection of PropertyTypes for this PropertyGroup
+        /// Gets or sets a collection of property types for the group.
         /// </summary>
+        /// <value>
+        /// The property types.
+        /// </value>
         /// <remarks>
-        /// Marked DoNotClone because we will manually deal with cloning and the event handlers
+        /// Marked with DoNotClone, because we will manually deal with cloning and the event handlers.
         /// </remarks>
         [DataMember]
         [DoNotClone]
@@ -82,18 +121,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public bool Equals(PropertyGroup other)
-        {
-            if (base.Equals(other)) return true;
-            return other != null && Name.InvariantEquals(other.Name);
-        }
+        public bool Equals(PropertyGroup other) => base.Equals(other) || (other != null && Type == other.Type && Alias == other.Alias);
 
-        public override int GetHashCode()
-        {
-            var baseHash = base.GetHashCode();
-            var nameHash = Name.ToLowerInvariant().GetHashCode();
-            return baseHash ^ nameHash;
-        }
+        public override int GetHashCode() => (base.GetHashCode(), Type, Alias).GetHashCode();
 
         protected override void PerformDeepClone(object clone)
         {
@@ -103,10 +133,121 @@ namespace Umbraco.Core.Models
 
             if (clonedEntity._propertyTypes != null)
             {
-                clonedEntity._propertyTypes.ClearCollectionChangedEvents();             //clear this event handler if any
+                clonedEntity._propertyTypes.ClearCollectionChangedEvents(); //clear this event handler if any
                 clonedEntity._propertyTypes = (PropertyTypeCollection) _propertyTypes.DeepClone(); //manually deep clone
-                clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;       //re-assign correct event handler
+                clonedEntity._propertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged; //re-assign correct event handler
             }
+        }
+    }
+
+    public static class PropertyGroupExtensions
+    {
+        private const char aliasSeparator = '/';
+
+        internal static string GetCurrentAlias(string alias)
+        {
+            var lastIndex = alias?.LastIndexOf(aliasSeparator) ?? -1;
+            if (lastIndex != -1)
+            {
+                return alias.Substring(lastIndex + 1);
+            }
+
+            return alias;
+        }
+
+        internal static string GetParentAlias(string alias)
+        {
+            var lastIndex = alias?.LastIndexOf(aliasSeparator) ?? -1;
+            if (lastIndex == -1)
+            {
+                return null;
+            }
+
+            return alias.Substring(0, lastIndex);
+        }
+
+        /// <summary>
+        /// Gets the current alias.
+        /// </summary>
+        /// <param name="propertyGroup">The property group.</param>
+        /// <returns>
+        /// The current alias.
+        /// </returns>
+        public static string GetCurrentAlias(this PropertyGroup propertyGroup) => GetCurrentAlias(propertyGroup.Alias);
+
+        /// <summary>
+        /// Updates the current alias.
+        /// </summary>
+        /// <param name="propertyGroup">The property group.</param>
+        /// <param name="currentAlias">The current alias.</param>
+        public static void UpdateCurrentAlias(this PropertyGroup propertyGroup, string currentAlias)
+        {
+            var parentAlias = propertyGroup.GetParentAlias();
+            if (string.IsNullOrEmpty(parentAlias))
+            {
+                propertyGroup.Alias = currentAlias;
+            }
+            else
+            {
+                propertyGroup.Alias = parentAlias + aliasSeparator + currentAlias;
+            }
+        }
+
+        /// <summary>
+        /// Gets the parent alias.
+        /// </summary>
+        /// <param name="propertyGroup">The property group.</param>
+        /// <returns>
+        /// The parent alias.
+        /// </returns>
+        public static string GetParentAlias(this PropertyGroup propertyGroup) => GetParentAlias(propertyGroup.Alias);
+
+        /// <summary>
+        /// Updates the parent alias.
+        /// </summary>
+        /// <param name="propertyGroup">The property group.</param>
+        /// <param name="parentAlias">The parent alias.</param>
+        public static void UpdateParentAlias(this PropertyGroup propertyGroup, string parentAlias)
+        {
+            var currentAlias = propertyGroup.GetCurrentAlias();
+            if (string.IsNullOrEmpty(parentAlias))
+            {
+                propertyGroup.Alias = currentAlias;
+            }
+            else
+            {
+                propertyGroup.Alias = parentAlias + aliasSeparator + currentAlias;
+            }
+        }
+
+        /// <summary>
+        /// Orders the property groups by hierarchy (so child groups are after their parent group).
+        /// </summary>
+        /// <param name="propertyGroups">The property groups.</param>
+        /// <returns>
+        /// The ordered property groups.
+        /// </returns>
+        public static IEnumerable<PropertyGroup> OrderByHierarchy(this IEnumerable<PropertyGroup> propertyGroups)
+        {
+            var groupsByParentAlias = propertyGroups.ToLookup(x => x.GetParentAlias());
+
+            IEnumerable<PropertyGroup> OrderByHierarchy(string parentAlias)
+            {
+                foreach (var group in groupsByParentAlias[parentAlias].OrderBy(x => x.SortOrder))
+                {
+                    yield return group;
+
+                    if (!string.IsNullOrEmpty(group.Alias))
+                    {
+                        foreach (var childGroup in OrderByHierarchy(group.Alias))
+                        {
+                            yield return childGroup;
+                        }
+                    }
+                }
+            }
+
+            return OrderByHierarchy(null);
         }
     }
 }
