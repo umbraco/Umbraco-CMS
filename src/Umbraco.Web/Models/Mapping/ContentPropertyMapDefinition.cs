@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.Id = source.Id;
             target.Key = source.Key;
-            target.Type = source.Type;
+            target.Type = (int)source.Type;
             target.Label = source.Name;
             target.Alias = source.Alias;
             target.IsActive = true;

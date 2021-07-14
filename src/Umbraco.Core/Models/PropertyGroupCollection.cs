@@ -178,16 +178,17 @@ namespace Umbraco.Core.Models
         }
 
         // TODO Remove this method in v9 (only needed for backwards compatibility with names)
-        public new bool Contains(string key) => IndexOfKey(key) != -1;
+        public new bool Contains(string groupName) => IndexOfKey(groupName) != -1;
 
         public bool Contains(int id)
         {
             return this.Any(x => x.Id == id);
         }
 
-        public void RemoveItem(string key)
+        [Obsolete("Use Remove(key) instead.")]
+        public void RemoveItem(string propertyGroupName)
         {
-            var index = IndexOfKey(key);
+            var index = IndexOfKey(propertyGroupName);
 
             // Only removes an item if the key was found
             if (index != -1)

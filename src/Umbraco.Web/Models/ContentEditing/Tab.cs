@@ -17,9 +17,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "key")]
         public Guid Key { get; set; }
 
-        [Obsolete("A generic tab should not reference property group specific types!")]
         [DataMember(Name = "type")]
-        public PropertyGroupType Type { get; set; }
+        public int Type { get; set; }
 
         [DataMember(Name = "active")]
         public bool IsActive { get; set; }

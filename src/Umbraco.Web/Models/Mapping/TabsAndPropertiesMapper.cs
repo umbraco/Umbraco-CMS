@@ -159,7 +159,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Id = g.Id,
                     Key = g.Key,
-                    Type = g.Type,
+                    Type = (int)g.Type,
                     Label = LocalizedTextService.UmbracoDictionaryTranslate(g.Name),
                     Alias = g.Alias,
                     Properties = mappedProperties
