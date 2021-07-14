@@ -298,9 +298,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate -Key -PropertyTypes
         private static void Map(PropertyGroupBasic<PropertyTypeBasic> source, PropertyGroup target, MapperContext context)
         {
-            if (source.Id > 0)
-                target.Id = source.Id;
-
+            target.Id = source.Id;
             target.Key = source.Key;
             target.Type = source.Type;
             target.Name = source.Name;
@@ -311,9 +309,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate -Key -PropertyTypes
         private static void Map(PropertyGroupBasic<MemberPropertyTypeBasic> source, PropertyGroup target, MapperContext context)
         {
-            if (source.Id > 0)
-                target.Id = source.Id;
-
+            target.Id = source.Id;
             target.Key = source.Key;
             target.Type = source.Type;
             target.Name = source.Name;
@@ -324,32 +320,26 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -ContentTypeId -ParentTabContentTypes -ParentTabContentTypeNames
         private static void Map(PropertyGroupBasic<PropertyTypeBasic> source, PropertyGroupDisplay<PropertyTypeDisplay> target, MapperContext context)
         {
-            if (source.Id > 0)
-                target.Id = source.Id;
-
+            target.Inherited = source.Inherited;
+            target.Id = source.Id;
             target.Key = source.Key;
             target.Type = source.Type;
             target.Name = source.Name;
             target.Alias = source.Alias;
             target.SortOrder = source.SortOrder;
-
-            target.Inherited = source.Inherited;
             target.Properties = context.MapEnumerable<PropertyTypeBasic, PropertyTypeDisplay>(source.Properties);
         }
 
         // Umbraco.Code.MapAll -ContentTypeId -ParentTabContentTypes -ParentTabContentTypeNames
         private static void Map(PropertyGroupBasic<MemberPropertyTypeBasic> source, PropertyGroupDisplay<MemberPropertyTypeDisplay> target, MapperContext context)
         {
-            if (source.Id > 0)
-                target.Id = source.Id;
-
+            target.Inherited = source.Inherited;
+            target.Id = source.Id;
             target.Key = source.Key;
             target.Type = source.Type;
             target.Name = source.Name;
             target.Alias = source.Alias;
             target.SortOrder = source.SortOrder;
-
-            target.Inherited = source.Inherited;
             target.Properties = context.MapEnumerable<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>(source.Properties);
         }
 

@@ -80,10 +80,10 @@ namespace Umbraco.Web.Models.Mapping
                     Name = propertyGroup.Name,
                     Alias = propertyGroup.Alias,
                     SortOrder = propertyGroup.SortOrder,
+                    Properties = MapProperties(propertyGroup.PropertyTypes, source, propertyGroup.Id, false),
                     ContentTypeId = source.Id
                 };
 
-                group.Properties = MapProperties(propertyGroup.PropertyTypes, source, propertyGroup.Id, false);
                 groups.Add(group);
             }
 
@@ -101,19 +101,19 @@ namespace Umbraco.Web.Models.Mapping
 
                 var group = new PropertyGroupDisplay<TPropertyType>
                 {
+                    Inherited = true,
                     Id = propertyGroup.Id,
                     Key = propertyGroup.Key,
                     Type = propertyGroup.Type,
                     Name = propertyGroup.Name,
                     Alias = propertyGroup.Alias,
                     SortOrder = propertyGroup.SortOrder,
-                    Inherited = true,
+                    Properties = MapProperties(propertyGroup.PropertyTypes, definingContentType, propertyGroup.Id, true),
                     ContentTypeId = definingContentType.Id,
                     ParentTabContentTypes = new[] { definingContentType.Id },
                     ParentTabContentTypeNames = new[] { definingContentType.Name }
                 };
 
-                group.Properties = MapProperties(propertyGroup.PropertyTypes, definingContentType, propertyGroup.Id, true);
                 groups.Add(group);
             }
 
@@ -145,8 +145,8 @@ namespace Umbraco.Web.Models.Mapping
                     Id = PropertyGroupBasic.GenericPropertiesGroupId,
                     Name = "Generic properties",
                     SortOrder = 999,
-                    ContentTypeId = source.Id,
-                    Properties = genericProperties
+                    Properties = genericProperties,
+                    ContentTypeId = source.Id
                 };
 
                 groups.Add(genericGroup);
