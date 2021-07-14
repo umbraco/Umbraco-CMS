@@ -45,8 +45,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
                 Create
                      .Index(indexName1)
                      .OnTable(ExternalLoginDto.TableName)
-                     .OnColumn("loginProvider").Ascending()
-                     .OnColumn("userId").Ascending()
+                     .OnColumn("loginProvider")
+                     .Ascending()
                      .WithOptions()
                      .Unique()
                      .WithOptions()

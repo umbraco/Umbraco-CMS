@@ -25,9 +25,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public int UserId { get; set; }
 
         [Column("loginProvider")]
-        [Length(400)]
+        [Length(4000)] // TODO: This value seems WAY too high, this is just a name
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.UniqueNonClustered, ForColumns = "loginProvider,userId", Name = "IX_" + TableName + "_LoginProvider")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_LoginProvider")]
         public string LoginProvider { get; set; }
 
         [Column("providerKey")]
