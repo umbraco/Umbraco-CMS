@@ -1147,9 +1147,9 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var service = ServiceContext.ContentTypeService;
-            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true, "Content", "content");
+            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true, "Content");
             service.Save(page);
-            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true, "Content", "content2");
+            var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true, "Content 2");
             service.Save(contentPage);
             var advancedPage = MockedContentTypes.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, true, "Details");
             service.Save(advancedPage);
@@ -1173,13 +1173,13 @@ namespace Umbraco.Tests.Services
             var compositionAdded = contentPage.AddContentType(contentMetaComposition);
             service.Save(contentPage);
 
-            // Change the alias of the tab on the "root" content type 'page'
-            var propertyGroup = contentPage.PropertyGroups["content2"];
+            // Change the name of the tab on the "root" content type 'page'
+            var propertyGroup = contentPage.PropertyGroups["Content 2"];
             Assert.Throws<ArgumentException>(() => contentPage.PropertyGroups.Add(new PropertyGroup(true)
             {
                 Id = propertyGroup.Id,
                 Name = "Content",
-                Alias = "content",
+                //Alias = "content",
                 SortOrder = 0
             }));
 
@@ -1282,7 +1282,7 @@ namespace Umbraco.Tests.Services
             {
                  Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var addedToContentPage = contentPage.AddPropertyType(propertyType, "Content");
+            var addedToContentPage = contentPage.AddPropertyType(propertyType, "content", "Content");
 
             // Assert
             Assert.That(metaAdded, Is.True);
@@ -1300,10 +1300,10 @@ namespace Umbraco.Tests.Services
             // Arrange
             var service = ServiceContext.ContentTypeService;
 
-            // create 'page' content type with a 'Content_' group
-            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, false, "Content_");
+            // create 'page' content type with a 'Content 2' group
+            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, false, "Content 2");
             Assert.AreEqual(1, page.PropertyGroups.Count);
-            Assert.AreEqual("Content_", page.PropertyGroups.First().Name);
+            Assert.AreEqual("Content 2", page.PropertyGroups.First().Name);
             Assert.AreEqual(3, page.PropertyTypes.Count());
             Assert.AreEqual("Title", page.PropertyTypes.First().Name);
             Assert.AreEqual("Body Text", page.PropertyTypes.Skip(1).First().Name);
@@ -1313,7 +1313,7 @@ namespace Umbraco.Tests.Services
             // create 'contentPage' content type as a child of 'page'
             var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true);
             Assert.AreEqual(1, page.PropertyGroups.Count);
-            Assert.AreEqual("Content_", page.PropertyGroups.First().Name);
+            Assert.AreEqual("Content 2", page.PropertyGroups.First().Name);
             Assert.AreEqual(3, contentPage.PropertyTypes.Count());
             Assert.AreEqual("Title", contentPage.PropertyTypes.First().Name);
             Assert.AreEqual("Body Text", contentPage.PropertyTypes.Skip(1).First().Name);
@@ -1327,7 +1327,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, meta.PropertyTypes.Count());
             Assert.AreEqual("Meta Keywords", meta.PropertyTypes.First().Name);
             Assert.AreEqual("Meta Description", meta.PropertyTypes.Skip(1).First().Name);
-            meta.AddPropertyGroup("Content");
+            meta.AddPropertyGroup("Content", "content");
             Assert.AreEqual(2, meta.PropertyTypes.Count());
             service.Save(meta);
 
@@ -1340,7 +1340,7 @@ namespace Umbraco.Tests.Services
             {
                  Name = "Test Textbox", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var prop1Added = contentPage.AddPropertyType(prop1, "Content_");
+            var prop1Added = contentPage.AddPropertyType(prop1, "content2", "Content 2");
             Assert.IsTrue(prop1Added);
 
             // add property 'prop2' to 'contentPage' group 'Content'
@@ -1348,13 +1348,13 @@ namespace Umbraco.Tests.Services
             {
                  Name = "Another Test Textbox", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var prop2Added = contentPage.AddPropertyType(prop2, "Content");
+            var prop2Added = contentPage.AddPropertyType(prop2, "content2", "Content 2");
             Assert.IsTrue(prop2Added);
 
             // save 'contentPage' content type
             service.Save(contentPage);
 
-            var group = page.PropertyGroups["Content_"];
+            var group = page.PropertyGroups["content2"];
             group.Name = "ContentTab"; // rename the group
             service.Save(page);
             Assert.AreEqual(3, page.PropertyTypes.Count());
@@ -1364,7 +1364,7 @@ namespace Umbraco.Tests.Services
             Assert.IsNotNull(contentPageAgain);
 
             // assert that 'Content_' group is still there because we don't propagate renames
-            var findGroup = contentPageAgain.CompositionPropertyGroups.FirstOrDefault(x => x.Name == "Content_");
+            var findGroup = contentPageAgain.CompositionPropertyGroups.FirstOrDefault(x => x.Name == "Content 2");
             Assert.IsNotNull(findGroup);
 
             // count all property types (local and composed)
@@ -1381,7 +1381,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var service = ServiceContext.ContentTypeService;
-            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true, "Content_");
+            var page = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true, "Content 2");
             service.Save(page);
             var contentPage = MockedContentTypes.CreateSimpleContentType("contentPage", "Content Page", page, true, "Contentx");
             service.Save(contentPage);
@@ -1402,7 +1402,7 @@ namespace Umbraco.Tests.Services
             {
                  Name = "Subtitle", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "Content_");//Will be added to the parent tab
+            var bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "Content 2");//Will be added to the parent tab
             var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");//Will be added to the "Content Meta" composition
             service.Save(contentPage);
 
@@ -1418,13 +1418,13 @@ namespace Umbraco.Tests.Services
             {
                  Name = "Keywords", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            var authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content_");//Will be added to an ancestor tab
+            var authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content 2");//Will be added to an ancestor tab
             var descriptionAdded = advancedPage.AddPropertyType(descriptionPropertyType, "Contentx");//Will be added to a parent tab
             var keywordsAdded = advancedPage.AddPropertyType(keywordsPropertyType, "Content");//Will be added to the "Content Meta" composition
             service.Save(advancedPage);
 
             //Change the name of the tab on the "root" content type 'page'.
-            var propertyGroup = page.PropertyGroups["Content_"];
+            var propertyGroup = page.PropertyGroups["Content 2"];
             page.PropertyGroups.Add(new PropertyGroup(true) { Id = propertyGroup.Id, Name = "Content", SortOrder = 0 });
             service.Save(page);
 
@@ -1440,10 +1440,10 @@ namespace Umbraco.Tests.Services
             Assert.DoesNotThrow(() => service.Get("advancedPage"));
 
             var advancedPageReloaded = service.Get("advancedPage");
-            var contentUnderscoreTabExists = advancedPageReloaded.CompositionPropertyGroups.Any(x => x.Name.Equals("Content_"));
+            var content2TabExists = advancedPageReloaded.CompositionPropertyGroups.Any(x => x.Name.Equals("Content 2"));
 
             // now is true, because we don't propagate renames anymore
-            Assert.That(contentUnderscoreTabExists, Is.True);
+            Assert.That(content2TabExists, Is.True);
 
             var numberOfContentTabs = advancedPageReloaded.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
             Assert.That(numberOfContentTabs, Is.EqualTo(4));

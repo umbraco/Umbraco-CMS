@@ -168,9 +168,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-        public static ContentType CreateSimpleContentType3(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", string propertyGroupAlias = "content")
+        public static ContentType CreateSimpleContentType3(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
         {
-            var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases, propertyGroupName, propertyGroupAlias);
+            var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases, propertyGroupName);
 
             var propertyType = new PropertyType(Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Nvarchar)
             {
@@ -186,9 +186,9 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-        public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", string propertyGroupAlias = "content")
+        public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
         {
-            var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases, propertyGroupName, propertyGroupAlias);
+            var contentType = CreateSimpleContentType(alias, name, parent, randomizeAliases, propertyGroupName);
 
             var propertyType = new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
             {
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-        public static ContentType CreateSimpleContentType(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content", string propertyGroupAlias = "content")
+        public static ContentType CreateSimpleContentType(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
         {
             var contentType = parent == null ? new ContentType(-1) : new ContentType(parent, alias);
 
@@ -225,7 +225,6 @@ namespace Umbraco.Tests.TestHelpers.Entities
             var pg = new PropertyGroup(contentCollection)
             {
                 Name = propertyGroupName,
-                Alias = propertyGroupAlias,
                 SortOrder = 1
             };
             contentType.PropertyGroups.Add(pg);
