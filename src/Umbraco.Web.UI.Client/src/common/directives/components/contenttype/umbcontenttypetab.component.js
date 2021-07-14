@@ -4,7 +4,7 @@
   /**
    * A component to render the content type tab
    */
-  
+
   function umbContentTypeTabController() {
 
     const vm = this;
@@ -48,7 +48,7 @@
 
     function changeName () {
       if (vm.onChangeName) {
-        vm.onChangeName({ name: vm.tab.name });
+        vm.onChangeName({ key: vm.tab.key, name: vm.tab.name });
       }
     }
 

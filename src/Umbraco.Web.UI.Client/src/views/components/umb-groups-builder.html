@@ -12,7 +12,7 @@
                     <li ng-if="hasGenericTab" umb-droppable="droppableOptionsTab" data-tab-key="{{genericTab.key}}">
                         <umb-content-type-tab
                             tab="genericTab"
-                            is-open="!openTabKey"
+                            is-open="!openTabAlias"
                             on-click="changeTab(genericTab)"
                             allow-change-name="false">
                         </umb-content-type-tab>
@@ -20,14 +20,14 @@
                     <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-key="{{tab.key}}">
                         <umb-content-type-tab
                             tab="tab"
-                            is-open="tab.key === openTabKey"
+                            is-open="tab.alias === openTabAlias"
                             on-click="changeTab(tab)"
                             sorting="sortingMode"
                             allow-remove="canRemoveTab(tab) && !sortingMode"
                             on-remove="removeTab(tab, tabIndex)"
                             val-server-field-name="{{'Groups[' + tab.indexInGroups + '].Name'}}"
                             on-change-sort-order-value="onChangeTabSortOrderValue(tab)"
-                            on-change-name="onChangeTabName(name)">
+                            on-change-name="onChangeTabName(key)">
                         </umb-content-type-tab>
                     </li>
                     <li>
@@ -118,9 +118,11 @@
     <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
         <div
             ng-repeat="(groupIndex, group) in model.groups track by group.key"
-            ng-show="group.type === 0 && group.parentKey === openTabKey"
+            ng-show="group.type === 0 && group.parentAlias === openTabAlias"
             ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}"
-            data-group-key="{{group.key}}">
+            data-group-key="{{group.key}}"
+            data-group-alias="{{group.alias}}"
+            data-group-parent-alias="{{group.parentAlias}}">
 
             <umb-content-type-group
                 ng-if="group.tabState !== 'init'"
@@ -129,10 +131,11 @@
                 group="group"
                 allow-remove="canRemoveGroup(group) && !sortingMode"
                 on-remove="removeGroup(group)"
+                on-update-name="onChangeGroupName(group)"
                 sorting="sortingMode"
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)"
                 val-server-field-name="{{'Groups[' + $index + '].Name'}}"
-                val-tab-alias="{{group.validationAlias}}">
+                val-tab-alias="{{group.alias}}">
 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties" ng-show="group.properties.length > 0 || sortingMode">
                     <li ng-repeat="(propertyIndex, property) in group.properties track by property.alias" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
@@ -145,7 +148,7 @@
                             on-change-sort-order-value="onChangePropertySortOrderValue(group)"
                             val-server-field-alias="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Alias'}}"
                             val-server-field-label="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Label'}}"
-                            val-tab-alias="{{group.validationAlias}}">
+                            val-tab-alias="{{group.alias}}">
                         </umb-content-type-property>
                     </li>
                 </ul>
@@ -164,7 +167,7 @@
         ng-if="!sortingMode"
         type="button"
         class="umb-group-builder__group -placeholder"
-        ng-click="addGroup(openTabKey)"
+        ng-click="addGroupToActiveTab()"
         data-element="group-add">
         <localize key="contentTypeEditor_addGroup"></localize>
     </button>
