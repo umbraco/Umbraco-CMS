@@ -1095,15 +1095,32 @@ AND umbracoNode.id <> @id",
                 }
             }
 
-            //lookup all matching rows in umbracoDocumentCultureVariation
-            var docCultureVariationsToUpdate = editedLanguageVersions.InGroupsOf(2000)
-                .SelectMany(_ => Database.Fetch<DocumentCultureVariationDto>(
-                    Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
-                            .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedLanguageVersions.Keys.Select(x => x.langId).ToList())
-                            .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, editedLanguageVersions.Keys.Select(x => x.nodeId))))
-                .DistinctBy(x => (x.NodeId, (int?)x.LanguageId))
-                //convert to dictionary with the same key type
-                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
+            // lookup all matching rows in umbracoDocumentCultureVariation in groups 
+            var editedLanguageVersionsInGroups = editedLanguageVersions.InGroupsOf(2000);
+
+            var docCultureVariationsToUpdate = new Dictionary<(int NodeId, int? LanguageId), DocumentCultureVariationDto>();
+
+            foreach (var editedLanguageVersionsGroup in editedLanguageVersionsInGroups)
+            {
+                var group = editedLanguageVersionsGroup.ToList();
+                var nodeIds = group.Select(keyValuePair => keyValuePair.Key.nodeId);
+
+                var sql = Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
+                     .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId,
+                         editedLanguageVersions.Keys.Select(x => x.langId).ToList())
+                     .WhereIn<DocumentCultureVariationDto>(x => x.NodeId,
+                         nodeIds);
+
+                var docCultureVariationsToUpdatePerGroup = group.SelectMany(_ =>
+                    Database.Fetch<DocumentCultureVariationDto>(sql))
+                    .DistinctBy(x => (x.NodeId, (int?)x.LanguageId))
+                    .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
+
+
+                docCultureVariationsToUpdate = docCultureVariationsToUpdate.Concat(docCultureVariationsToUpdatePerGroup.Where(x => !docCultureVariationsToUpdate.ContainsKey(x.Key)))
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            }
 
             var toUpdate = new List<DocumentCultureVariationDto>();
             foreach (var ev in editedLanguageVersions)
