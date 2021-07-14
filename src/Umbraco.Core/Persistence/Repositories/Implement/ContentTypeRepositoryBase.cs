@@ -1101,6 +1101,7 @@ AND umbracoNode.id <> @id",
                     Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
                             .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedLanguageVersions.Keys.Select(x => x.langId).ToList())
                             .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, editedLanguageVersions.Keys.Select(x => x.nodeId))))
+                .DistinctBy(x => (x.NodeId, (int?)x.LanguageId))
                 //convert to dictionary with the same key type
                 .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
 
