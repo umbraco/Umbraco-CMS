@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             => new ValidationErrorResult(value, statusCode);
 
         /// <summary>
-        /// Returns an Umbraco compatible validation problem for the object result
+        /// Returns an Umbraco compatible validation problem for the given notification model
         /// </summary>
         /// <param name="model"></param>
         /// <param name="statusCode"></param>
