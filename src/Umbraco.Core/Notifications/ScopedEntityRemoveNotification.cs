@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications
 {
-    [CannotSuppressNotification]
     [Obsolete("This is only used for the internal cache and will change, use tree change notifications instead")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ScopedEntityRemoveNotification : ObjectNotification<IContentBase>

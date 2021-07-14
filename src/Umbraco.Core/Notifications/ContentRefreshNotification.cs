@@ -7,7 +7,6 @@ namespace Umbraco.Cms.Core.Notifications
 {
 
     [Obsolete("This is only used for the internal cache and will change, use saved notifications instead")]
-    [CannotSuppressNotification]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ContentRefreshNotification : EntityRefreshNotification<IContent>
     {
