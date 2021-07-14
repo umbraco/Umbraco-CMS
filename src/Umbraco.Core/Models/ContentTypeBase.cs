@@ -297,26 +297,12 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
         public abstract bool PropertyTypeExists(string propertyTypeAlias);
 
-        /// <summary>
-        /// Adds a property group with the alias based on the name.
-        /// This method will also check if a group already exists with the same alias.
-        /// </summary>
-        /// <param name="groupName">Name of the PropertyGroup to add</param>
-        /// <returns>
-        /// Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c>
-        /// </returns>
+        /// <inheritdoc />
+        [Obsolete("Use AddPropertyGroup(name, alias) instead to explicitly set the alias.")]
         public abstract bool AddPropertyGroup(string groupName);
 
-        /// <summary>
-        /// Adds a PropertyGroup.
-        /// This method will also check if a group already exists with the same name and link it to the parent.
-        /// </summary>
-        /// <param name="groupName">Name of the PropertyGroup to add</param>
-        /// <param name="alias">The alias.</param>
-        /// <returns>
-        /// Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c>
-        /// </returns>
-        public abstract bool AddPropertyGroup(string groupName, string alias);
+        /// <inheritdoc />
+        public abstract bool AddPropertyGroup(string name, string alias);
 
         /// <summary>
         /// Adds a PropertyType to a specific PropertyGroup

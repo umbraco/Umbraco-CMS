@@ -154,12 +154,13 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// This method will also check if a group already exists with the same alias.
         /// </remarks>
+        [Obsolete("Use AddPropertyGroup(name, alias) instead to explicitly set the alias.")]
         bool AddPropertyGroup(string groupName);
 
         /// <summary>
-        /// Adds a property group with the specified <paramref name="groupName" /> and <paramref name="alias" />.
+        /// Adds a property group with the specified <paramref name="name" /> and <paramref name="alias" />.
         /// </summary>
-        /// <param name="groupName">Name of the group.</param>
+        /// <param name="name">Name of the group.</param>
         /// <param name="alias">The alias.</param>
         /// <returns>
         /// Returns <c>true</c> if a property group with specified <paramref name="alias" /> was added; otherwise, <c>false</c>.
@@ -167,7 +168,7 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// This method will also check if a group already exists with the same alias.
         /// </remarks>
-        bool AddPropertyGroup(string groupName, string alias);
+        bool AddPropertyGroup(string name, string alias);
 
         /// <summary>
         /// Moves a PropertyType to a specified PropertyGroup

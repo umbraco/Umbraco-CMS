@@ -206,15 +206,16 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
+        [Obsolete("Use AddPropertyGroup(name, alias) instead to explicitly set the alias.")]
         public override bool AddPropertyGroup(string groupName)
         {
             return AddAndReturnPropertyGroup(groupName, groupName.ToSafeAlias(true)) != null;
         }
 
         /// <inheritdoc />
-        public override bool AddPropertyGroup(string groupName, string alias)
+        public override bool AddPropertyGroup(string name, string alias)
         {
-            return AddAndReturnPropertyGroup(groupName, alias) != null;
+            return AddAndReturnPropertyGroup(name, alias) != null;
         }
 
         private PropertyGroup AddAndReturnPropertyGroup(string name, string alias)
