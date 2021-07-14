@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache
 
                 var regs = _serverRegistrationRepository.GetMany().ToArray();
-                var hasMaster = regs.Any(x => ((ServerRegistration) x).IsMaster);
+                var hasSchedulingPublisher = regs.Any(x => ((ServerRegistration) x).IsSchedulingPublisher);
                 var server = regs.FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
 
                 if (server == null)
@@ -67,22 +67,20 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 server.IsActive = true;
-                if (hasMaster == false)
-                    server.IsMaster = true;
+                if (hasSchedulingPublisher == false)
+                    server.IsSchedulingPublisher = true;
 
                 _serverRegistrationRepository.Save(server);
                 _serverRegistrationRepository.DeactiveStaleServers(staleTimeout); // triggers a cache reload
 
                 // reload - cheap, cached
 
-                // default role is single server, but if registrations contain more
-                // than one active server, then role is master or replica
                 regs = _serverRegistrationRepository.GetMany().ToArray();
 
                 // default role is single server, but if registrations contain more
-                // than one active server, then role is master or replica
+                // than one active server, then role is scheduling publisher or subscriber
                 _currentServerRole = regs.Count(x => x.IsActive) > 1
-                    ? (server.IsMaster ? ServerRole.Master : ServerRole.Replica)
+                    ? (server.IsSchedulingPublisher ? ServerRole.SchedulingPublisher : ServerRole.Subscriber)
                     : ServerRole.Single;
 
                 scope.Complete();
@@ -105,7 +103,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var server = _serverRegistrationRepository.GetMany().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
                 if (server == null) return;
-                server.IsActive = server.IsMaster = false;
+                server.IsActive = server.IsSchedulingPublisher = false;
                 _serverRegistrationRepository.Save(server); // will trigger a cache reload // will trigger a cache reload
 
                 scope.Complete();

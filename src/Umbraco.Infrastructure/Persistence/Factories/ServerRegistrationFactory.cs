@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories
@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
     {
         public static ServerRegistration BuildEntity(ServerRegistrationDto dto)
         {
-            var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered, dto.DateAccessed, dto.IsActive, dto.IsMaster);
+            var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered, dto.DateAccessed, dto.IsActive, dto.IsSchedulingPublisher);
             // reset dirty initial properties (U4-1946)
             model.ResetDirtyProperties(false);
             return model;
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 ServerAddress = entity.ServerAddress,
                 DateRegistered = entity.CreateDate,
                 IsActive = entity.IsActive,
-                IsMaster = ((ServerRegistration) entity).IsMaster,
+                IsSchedulingPublisher = ((ServerRegistration) entity).IsSchedulingPublisher,
                 DateAccessed = entity.UpdateDate,
                 ServerIdentity = entity.ServerIdentity
             };

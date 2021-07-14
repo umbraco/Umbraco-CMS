@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Sync
     /// </summary>
     /// <remarks>
     /// This is the default service which determines a server's role by using a master election process.
-    /// The master election process doesn't occur until just after startup so this election process doesn't really affect the primary startup phase.
+    /// The scheduling publisher election process doesn't occur until just after startup so this election process doesn't really affect the primary startup phase.
     /// </remarks>
     public sealed class ElectedServerRoleAccessor : IServerRoleAccessor
     {

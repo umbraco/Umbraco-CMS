@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
@@ -35,6 +35,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public bool IsActive { get; set; }
 
         [Column("isMaster")]
-        public bool IsMaster { get; set; }
+        public bool IsSchedulingPublisher { get; set; }
     }
 }
