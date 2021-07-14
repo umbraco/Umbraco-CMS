@@ -16,10 +16,11 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <typeparam name="T">The type of the content last chance finder.</typeparam>
         /// <param name="builder">The builder.</param>
-        public static void SetContentLastChanceFinder<T>(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder SetContentLastChanceFinder<T>(this IUmbracoBuilder builder)
             where T : class, IContentLastChanceFinder
         {
             builder.Services.AddUnique<IContentLastChanceFinder, T>();
+            return builder;
         }
 
         /// <summary>
@@ -27,9 +28,10 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a last chance finder.</param>
-        public static void SetContentLastChanceFinder(this IUmbracoBuilder builder, Func<IServiceProvider, IContentLastChanceFinder> factory)
+        public static IUmbracoBuilder SetContentLastChanceFinder(this IUmbracoBuilder builder, Func<IServiceProvider, IContentLastChanceFinder> factory)
         {
             builder.Services.AddUnique(factory);
+            return builder;
         }
 
         /// <summary>
@@ -37,9 +39,10 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="finder">A last chance finder.</param>
-        public static void SetContentLastChanceFinder(this IUmbracoBuilder builder, IContentLastChanceFinder finder)
+        public static IUmbracoBuilder SetContentLastChanceFinder(this IUmbracoBuilder builder, IContentLastChanceFinder finder)
         {
             builder.Services.AddUnique(finder);
+            return builder;
         }
 
         /// <summary>
@@ -47,10 +50,11 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <typeparam name="T">The type of the site domain helper.</typeparam>
         /// <param name="builder"></param>
-        public static void SetSiteDomainHelper<T>(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder SetSiteDomainHelper<T>(this IUmbracoBuilder builder)
             where T : class, ISiteDomainMapper
         {
             builder.Services.AddUnique<ISiteDomainMapper, T>();
+            return builder;
         }
 
         /// <summary>
@@ -58,9 +62,10 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a helper.</param>
-        public static void SetSiteDomainHelper(this IUmbracoBuilder builder, Func<IServiceProvider, ISiteDomainMapper> factory)
+        public static IUmbracoBuilder SetSiteDomainHelper(this IUmbracoBuilder builder, Func<IServiceProvider, ISiteDomainMapper> factory)
         {
             builder.Services.AddUnique(factory);
+            return builder;
         }
 
         /// <summary>
@@ -68,9 +73,10 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="helper">A helper.</param>
-        public static void SetSiteDomainHelper(this IUmbracoBuilder builder, ISiteDomainMapper helper)
+        public static IUmbracoBuilder SetSiteDomainHelper(this IUmbracoBuilder builder, ISiteDomainMapper helper)
         {
             builder.Services.AddUnique(helper);
+            return builder;
         }
 
         #endregion
