@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
@@ -61,7 +62,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 loggerFactory,
                 _globalSettings,
                connectionStrings,
-               new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
+               new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
                dbProviderFactoryCreator,
                databaseSchemaCreatorFactory,
                npocoMappers);

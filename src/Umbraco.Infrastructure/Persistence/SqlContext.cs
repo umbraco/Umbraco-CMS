@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Linq;
 using NPoco;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
@@ -14,8 +15,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     /// </summary>
     public class SqlContext : ISqlContext
     {
-        private readonly Lazy<IMapperCollection> _mappers;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlContext"/> class.
         /// </summary>
@@ -23,21 +22,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <param name="pocoDataFactory">The Poco data factory.</param>
         /// <param name="databaseType">The database type.</param>
         /// <param name="mappers">The mappers.</param>
-        public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection mappers = null)
-            : this(sqlSyntax, databaseType, pocoDataFactory, new Lazy<IMapperCollection>(() => mappers ?? new MapperCollection(Enumerable.Empty<BaseMapper>())))
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SqlContext"/> class.
-        /// </summary>
-        /// <param name="sqlSyntax">The sql syntax provider.</param>
-        /// <param name="pocoDataFactory">The Poco data factory.</param>
-        /// <param name="databaseType">The database type.</param>
-        /// <param name="mappers">The mappers.</param>
-        public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, Lazy<IMapperCollection> mappers)
+        public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection mappers = null)            
         {
             // for tests
-            _mappers = mappers;
+            Mappers = mappers;
 
             SqlSyntax = sqlSyntax ?? throw new ArgumentNullException(nameof(sqlSyntax));
             PocoDataFactory = pocoDataFactory ?? throw new ArgumentNullException(nameof(pocoDataFactory));
@@ -67,6 +55,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public IPocoDataFactory PocoDataFactory { get; }
 
         /// <inheritdoc />
-        public IMapperCollection Mappers => _mappers.Value;
+        public IMapperCollection Mappers { get; }
     }
 }

@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
         private readonly NPocoMapperCollection _npocoMappers;
         private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly Lazy<IMapperCollection> _mappers;
+        private readonly IMapperCollection _mappers;
         private readonly ILogger<UmbracoDatabaseFactory> _logger;
         private readonly ILoggerFactory _loggerFactory;
 
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
             IOptions<ConnectionStrings> connectionStrings,
-            Lazy<IMapperCollection> mappers,
+            IMapperCollection mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             NPocoMapperCollection npocoMappers)

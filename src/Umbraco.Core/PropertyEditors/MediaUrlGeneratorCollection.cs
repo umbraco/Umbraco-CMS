@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 {
     public class MediaUrlGeneratorCollection : BuilderCollectionBase<IMediaUrlGenerator>
     {
-        public MediaUrlGeneratorCollection(IEnumerable<IMediaUrlGenerator> items) : base(items)
+        public MediaUrlGeneratorCollection(System.Func<IEnumerable<IMediaUrlGenerator>> items) : base(items)
         {
         }
 

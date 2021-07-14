@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
@@ -14,7 +15,7 @@ namespace Umbraco.Cms.Core.ContentApps
         private readonly ILogger<ContentAppFactoryCollection> _logger;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-        public ContentAppFactoryCollection(IEnumerable<IContentAppFactory> items, ILogger<ContentAppFactoryCollection> logger, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        public ContentAppFactoryCollection(Func<IEnumerable<IContentAppFactory>> items, ILogger<ContentAppFactoryCollection> logger, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
             : base(items)
         {
             _logger = logger;

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -36,13 +37,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void GetAllReferences_All_Variants_With_IDataValueReferenceFactory()
         {
-            var collection = new DataValueReferenceFactoryCollection(new TestDataValueReferenceFactory().Yield());
+            var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield());
 
             // label does not implement IDataValueReference
             var labelEditor = new LabelPropertyEditor(
                 DataValueEditorFactory,
                 IOHelper);
-            var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(labelEditor.Yield()));
+            var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelEditor.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -102,13 +103,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void GetAllReferences_All_Variants_With_IDataValueReference_Editor()
         {
-            var collection = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
 
             // mediaPicker does implement IDataValueReference
             var mediaPicker = new MediaPickerPropertyEditor(
                 DataValueEditorFactory,
                 IOHelper);
-            var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(mediaPicker.Yield()));
+            var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -168,13 +169,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void GetAllReferences_Invariant_With_IDataValueReference_Editor()
         {
-            var collection = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
 
             // mediaPicker does implement IDataValueReference
             var mediaPicker = new MediaPickerPropertyEditor(
                 DataValueEditorFactory,
                 IOHelper);
-            var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(mediaPicker.Yield()));
+            var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi3 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();

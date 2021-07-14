@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +21,9 @@ namespace Umbraco.Cms.Core.ContentApps
             // get the logger factory just-in-time - see note below for manifest parser
             var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
             var backOfficeSecurityAccessor = factory.GetRequiredService<IBackOfficeSecurityAccessor>();
-            return new ContentAppFactoryCollection(CreateItems(factory), loggerFactory.CreateLogger<ContentAppFactoryCollection>(), backOfficeSecurityAccessor);
+            return new ContentAppFactoryCollection(
+                () => CreateItems(factory),
+                loggerFactory.CreateLogger<ContentAppFactoryCollection>(), backOfficeSecurityAccessor);
         }
 
         protected override IEnumerable<IContentAppFactory> CreateItems(IServiceProvider factory)

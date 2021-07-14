@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using NPoco;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
@@ -73,7 +74,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 return mapperFactory.Mappers;
             }
 
-            return new NPocoMapperCollection(Array.Empty<IMapper>());
+            return new NPocoMapperCollection(() => Enumerable.Empty<IMapper>());
         }
     }
 }

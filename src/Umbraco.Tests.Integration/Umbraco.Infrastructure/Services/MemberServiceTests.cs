@@ -8,6 +8,7 @@ using System.Threading;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
@@ -107,7 +108,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             member = MemberService.GetById(member.Id);
             Assert.AreEqual("xemail", member.Email);
 
-            var contentTypeFactory = new PublishedContentTypeFactory(new NoopPublishedModelFactory(), new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()), GetRequiredService<IDataTypeService>());
+            var contentTypeFactory = new PublishedContentTypeFactory(new NoopPublishedModelFactory(), new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>()), GetRequiredService<IDataTypeService>());
             var pmemberType = new PublishedContentType(memberType, contentTypeFactory);
 
             var publishedSnapshotAccessor = new TestPublishedSnapshotAccessor();

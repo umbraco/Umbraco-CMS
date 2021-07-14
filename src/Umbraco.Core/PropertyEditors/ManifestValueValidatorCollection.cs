@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
@@ -8,9 +8,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
 {
     public class ManifestValueValidatorCollection : BuilderCollectionBase<IManifestValueValidator>
     {
-        public ManifestValueValidatorCollection(IEnumerable<IManifestValueValidator> items)
-            : base(items)
-        { }
+        public ManifestValueValidatorCollection(Func<IEnumerable<IManifestValueValidator>> items) : base(items)
+        {
+        }
 
         public IManifestValueValidator Create(string name)
         {

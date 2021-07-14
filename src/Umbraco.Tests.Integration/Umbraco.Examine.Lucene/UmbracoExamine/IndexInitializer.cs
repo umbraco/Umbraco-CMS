@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
         {
             var contentValueSetBuilder = new ContentValueSetBuilder(
                 _propertyEditors,
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(_shortStringHelper) }),
+                new UrlSegmentProviderCollection(() => new[] { new DefaultUrlSegmentProvider(_shortStringHelper) }),
                 GetMockUserService(),
                 _shortStringHelper,
                 _scopeProvider,
@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
         {
             var mediaValueSetBuilder = new MediaValueSetBuilder(
                 _propertyEditors,
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider(_shortStringHelper) }),
+                new UrlSegmentProviderCollection(() => new[] { new DefaultUrlSegmentProvider(_shortStringHelper) }),
                 _mediaUrlGenerators,
                 GetMockUserService(),
                 _shortStringHelper,

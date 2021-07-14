@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             _fakeMemberStore = new MemberUserStore(
                 _mockMemberService.Object,
-                new UmbracoMapper(new MapDefinitionCollection(mapDefinitions), scopeProvider),
+                new UmbracoMapper(new MapDefinitionCollection(() => mapDefinitions), scopeProvider),
                 scopeProvider,
                 new IdentityErrorDescriber(),
                 Mock.Of<IPublishedSnapshotAccessor>());

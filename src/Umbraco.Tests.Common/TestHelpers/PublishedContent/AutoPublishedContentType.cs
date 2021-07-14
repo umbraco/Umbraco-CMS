@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -34,7 +35,7 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers.PublishedContent
             };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
-            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeServiceMock.Object);
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>()), dataTypeServiceMock.Object);
             Default = factory.CreatePropertyType("*", 666);
         }
 

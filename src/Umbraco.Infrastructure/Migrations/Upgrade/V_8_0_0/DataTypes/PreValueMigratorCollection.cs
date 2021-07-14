@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
@@ -9,11 +11,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
     {
         private readonly ILogger<PreValueMigratorCollection> _logger;
 
-        public PreValueMigratorCollection(IEnumerable<IPreValueMigrator> items, ILogger<PreValueMigratorCollection> logger)
+        public PreValueMigratorCollection(Func<IEnumerable<IPreValueMigrator>> items, ILogger<PreValueMigratorCollection> logger)
             : base(items)
         {
             _logger = logger;
-            _logger.LogDebug("Migrators: " + string.Join(", ", items.Select(x => x.GetType().Name)));
         }
 
         public IPreValueMigrator GetMigrator(string editorAlias)

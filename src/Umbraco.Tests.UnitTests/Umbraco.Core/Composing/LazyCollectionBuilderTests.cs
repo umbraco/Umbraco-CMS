@@ -184,8 +184,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
         // ReSharper disable once ClassNeverInstantiated.Local
         private class TestCollection : BuilderCollectionBase<ITestInterface>
         {
-            public TestCollection(IEnumerable<ITestInterface> items)
-                : base(items)
+            public TestCollection(Func<IEnumerable<ITestInterface>> items) : base(items)
             {
             }
         }
