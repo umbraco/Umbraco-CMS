@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -73,14 +73,12 @@ namespace Umbraco.Cms.Core
             AddDateTime(f.LastWriteTimeUtc);
 
             //check if it is a file or folder
-            var fileInfo = f as FileInfo;
-            if (fileInfo != null)
+            if (f is FileInfo fileInfo)
             {
                 AddLong(fileInfo.Length);
             }
 
-            var dirInfo = f as DirectoryInfo;
-            if (dirInfo != null)
+            if (f is DirectoryInfo dirInfo)
             {
                 foreach (var d in dirInfo.GetFiles())
                 {

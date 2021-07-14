@@ -17,23 +17,21 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly ILogger<TypeFinder> _logger;
         private readonly IAssemblyProvider _assemblyProvider;
-        private readonly IRuntimeHash _runtimeHash;
         private volatile HashSet<Assembly> _localFilteredAssemblyCache;
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
-        private static readonly ConcurrentDictionary<string, Type> TypeNamesCache = new ConcurrentDictionary<string, Type>();
+        private static readonly ConcurrentDictionary<string, Type> s_typeNamesCache = new ConcurrentDictionary<string, Type>();
 
         private readonly ITypeFinderConfig _typeFinderConfig;
         // used for benchmark tests
         internal bool QueryWithReferencingAssemblies { get; set; } = true;
 
-        public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, IRuntimeHash runtimeHash, ITypeFinderConfig typeFinderConfig = null)
+        public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig typeFinderConfig = null)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _assemblyProvider = assemblyProvider;
-            _runtimeHash = runtimeHash;
             _typeFinderConfig = typeFinderConfig;
-     }
+        }
 
         private string[] _assembliesAcceptingLoadExceptions = null;
 
@@ -64,9 +62,12 @@ namespace Umbraco.Cms.Core.Composing
             var name = a.GetName().Name; // simple name of the assembly
             return AssembliesAcceptingLoadExceptions.Any(pattern =>
             {
-                if (pattern.Length > name.Length) return false; // pattern longer than name
-                if (pattern.Length == name.Length) return pattern.InvariantEquals(name); // same length, must be identical
-                if (pattern[pattern.Length] != '.') return false; // pattern is shorter than name, must end with dot
+                if (pattern.Length > name.Length)
+                    return false; // pattern longer than name
+                if (pattern.Length == name.Length)
+                    return pattern.InvariantEquals(name); // same length, must be identical
+                if (pattern[pattern.Length] != '.')
+                    return false; // pattern is shorter than name, must end with dot
                 return name.StartsWith(pattern); // and name must start with pattern
             });
         }
@@ -111,6 +112,8 @@ namespace Umbraco.Cms.Core.Composing
                             && x.GlobalAssemblyCache == false
                             && exclusionFilter.Any(f => x.FullName.StartsWith(f)) == false);
         }
+
+        // TODO: Kill this
 
         /// <summary>
         /// this is our assembly filter to filter out known types that def don't contain types we'd like to find or plugins
@@ -232,9 +235,6 @@ namespace Umbraco.Cms.Core.Composing
             return GetClassesWithAttribute(attributeType, assemblyList, onlyConcreteClasses);
         }
 
-        /// <inheritdoc />
-        public string GetRuntimeHash() => _runtimeHash.GetHashValue();
-
         /// <summary>
         /// Returns a Type for the string type name
         /// </summary>
@@ -255,7 +255,7 @@ namespace Umbraco.Cms.Core.Composing
             }
 
             // It didn't parse, so try loading from each already loaded assembly and cache it
-            return TypeNamesCache.GetOrAdd(name, s =>
+            return s_typeNamesCache.GetOrAdd(name, s =>
                 AppDomain.CurrentDomain.GetAssemblies()
                     .Select(x => x.GetType(s))
                     .FirstOrDefault(x => x != null));
@@ -455,7 +455,8 @@ namespace Umbraco.Cms.Core.Composing
                 var ex = new ReflectionTypeLoadException(rex.Types, rex.LoaderExceptions, sb.ToString());
 
                 // rethrow with new message, unless accepted
-                if (AcceptsLoadExceptions(a) == false) throw ex;
+                if (AcceptsLoadExceptions(a) == false)
+                    throw ex;
 
                 // log a warning, and return what we can
                 lock (_notifiedLoadExceptionAssemblies)

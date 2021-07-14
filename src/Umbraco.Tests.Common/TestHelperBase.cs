@@ -44,13 +44,13 @@ namespace Umbraco.Cms.Tests.Common
         protected TestHelperBase(Assembly entryAssembly)
         {
             MainDom = new SimpleMainDom();
-            _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance), new VaryingRuntimeHash());
+            _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance));
         }
 
         public ITypeFinder GetTypeFinder() => _typeFinder;
 
         public TypeLoader GetMockedTypeLoader() =>
-            new TypeLoader(Mock.Of<ITypeFinder>(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfilingLogger>());
+            new TypeLoader(Mock.Of<ITypeFinder>(), new VaryingRuntimeHash(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfiler>());
 
         //// public Configs GetConfigs() => GetConfigsFactory().Create();
 
