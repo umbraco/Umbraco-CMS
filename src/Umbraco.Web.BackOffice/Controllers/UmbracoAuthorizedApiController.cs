@@ -116,7 +116,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="value"></param>
         /// <param name="statusCode"></param>
         /// <returns></returns>
-        protected virtual ActionResult ValidationProblem(object value, int statusCode = StatusCodes.Status400BadRequest)
+        protected virtual ActionResult ValidationProblem(object value, int statusCode)
             => new ValidationErrorResult(value, statusCode);
+
+        /// <summary>
+        /// Returns an Umbraco compatible validation problem for the object result
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="statusCode"></param>
+        /// <returns></returns>
+        protected virtual ActionResult ValidationProblem(INotificationModel model, int statusCode = StatusCodes.Status400BadRequest)
+            => new ValidationErrorResult(model, statusCode);
     }
 }
