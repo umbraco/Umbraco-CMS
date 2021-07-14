@@ -1096,7 +1096,7 @@ AND umbracoNode.id <> @id",
             }
 
             // lookup all matching rows in umbracoDocumentCultureVariation in groups 
-            var editedLanguageVersionsInGroups = editedLanguageVersions.InGroupsOf(2000);
+            var editedLanguageVersionsInGroups = editedLanguageVersions.InGroupsOf(1000);
 
             var docCultureVariationsToUpdate = new Dictionary<(int NodeId, int? LanguageId), DocumentCultureVariationDto>();
 
