@@ -20,7 +20,7 @@
         var vm = this;
 
         vm.tabs = [];
-        vm.activeTabKey = '';
+        vm.activeTabAlias = null;
 
         vm.getScope = getScope; // used by property editors to get a scope that is the root of split view, content apps etc.
         vm.setActiveTab = setActiveTab;
@@ -43,7 +43,7 @@
         }
 
         function setActiveTab (tab) {
-            vm.activeTabKey = tab.key;
+            vm.activeTabAlias = tab.alias;
             vm.tabs.forEach(tab => tab.active = false);
             tab.active = true;
         }

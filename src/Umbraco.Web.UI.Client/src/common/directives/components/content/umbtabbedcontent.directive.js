@@ -15,8 +15,13 @@
             scrollableNode.addEventListener("scroll", onScroll);
             scrollableNode.addEventListener("mousewheel", cancelScrollTween);
 
-            $scope.activeTabKey = '';
+            $scope.activeTabAlias = null;
             $scope.tabs = [];
+
+            // Add parentAlias property to all groups
+            $scope.content.tabs.forEach((group) => {
+                group.parentAlias = contentEditingHelper.getParentAlias(group.alias);
+            });
 
             function onScroll(event) {
 
@@ -100,7 +105,7 @@
             };
 
             $scope.setActiveTab = function(tab) {
-                $scope.activeTabKey = tab.key;
+                $scope.activeTabAlias = tab.alias;
                 $scope.tabs.forEach(tab => tab.active = false);
                 tab.active = true;
             };

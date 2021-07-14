@@ -21,32 +21,36 @@
             scope.compositionsButtonState = "init";
             scope.tabs = [];
             scope.genericGroups = [];
-            scope.openTabAlias = "";
+            scope.openTabAlias = null;
             scope.hasGenericTab = false;
             scope.genericTab = {
-                key: null,
-                name: "Generic",
-                alias: contentEditingHelper.genericTabAlias,
-                parentAlias: "",
                 type: TYPE_TAB,
+                name: "Generic",
+                alias: null,
+                parentAlias: null,
                 sortOrder: 0,
                 properties: []
             };
+
+            // Add parentAlias property to all groups
+            scope.model.groups.forEach((group) => {
+                group.parentAlias = contentEditingHelper.getParentAlias(group.alias);
+            });
 
             eventBindings.push(scope.$watchCollection('model.groups', (newValue) => {
                 scope.tabs = $filter("filter")(newValue, (group) => {
                     return group.type === TYPE_TAB;
                 });
 
+                // Update index and parentAlias properties of tabs
                 scope.tabs.forEach(tab => {
-                    tab.indexInGroups = newValue.findIndex(group => group.key === tab.key);
-                    tab.parentAlias = contentEditingHelper.getParentAliasFromAlias(tab.alias);
+                    tab.indexInGroups = newValue.findIndex(group => group.alias === tab.alias);
+                    tab.parentAlias = contentEditingHelper.getParentAlias(tab.alias);
                 });
-
                 checkGenericTabVisibility();
 
                 if (!scope.openTabAlias && scope.hasGenericTab) {
-                    scope.openTabAlias = "";
+                    scope.openTabAlias = null;
                 } else if (!scope.openTabAlias && scope.tabs.length > 0) {
                     scope.openTabAlias = scope.tabs[0].alias;
                 }
@@ -126,7 +130,7 @@
                     accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
                     tolerance : 'pointer',
                     over: function (evt, ui) {
-                        scope.openTabAlias = evt.target.dataset.tabAlias || "";
+                        scope.openTabAlias = evt.target.dataset.tabAlias || null;
                         scope.$evalAsync();
                     }
                 };
@@ -404,7 +408,7 @@
             };
 
             /* ---------- TABS ---------- */
-            scope.changeTab = function ({alias}) {
+            scope.changeTab = function ({ alias }) {
                 scope.openTabAlias = alias;
             };
 
@@ -414,10 +418,10 @@
                 const sortOrder = lastTab && lastTab.sortOrder !== undefined ? lastTab.sortOrder + 1 : 0;
 
                 const tab = {
-                    key: String.CreateGuid(),
-                    name: "",
-                    parentAlias: "",
                     type: TYPE_TAB,
+                    name: "",
+                    alias: String.CreateGuid(),
+                    parentAlias: null,
                     sortOrder,
                     properties: []
                 };
@@ -456,7 +460,7 @@
                                 if (scope.tabs.length > 0) {
                                     scope.openTabAlias = indexInTabs > 0 ? scope.tabs[indexInTabs - 1].alias : scope.tabs[0].alias;
                                 } else {
-                                    scope.openTabAlias = "";
+                                    scope.openTabAlias = null;
                                 }
                             });
 
@@ -480,32 +484,33 @@
                 scope.tabs = $filter('orderBy')(scope.tabs, 'sortOrder');
             };
 
-            scope.onChangeTabName = function (key) {
-                const changedTab = scope.model.groups.find(group => group.key === key);
-                updateGroupAlias(changedTab)
+            scope.onChangeTabName = function (tab) {
+                updateGroupAlias(tab)
+                scope.openTabAlias = tab.alias;
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
             /** Universal method for updating group alias (for tabs, field-sets etc.) */
-            function updateGroupAlias(changedGroup) {
-                console.log(changedGroup)
-                const newAlias = contentEditingHelper.generateTabAlias(changedGroup.parentAlias, changedGroup.name);
-                updateDescendingAliases(newAlias, changedGroup.alias);
-                changedGroup.alias = newAlias;
+            function updateGroupAlias(group) {
+                const currentAlias = contentEditingHelper.generateAlias(group.name),
+                    oldAlias = group.alias,
+                    newAlias = contentEditingHelper.updateCurrentAlias(oldAlias, currentAlias);
+
+                updateDescendingAliases(oldAlias, newAlias);
+                group.alias = newAlias;
             }
 
-            function updateDescendingAliases(oldAlias, newAlias) {
+            function updateDescendingAliases(oldParentAlias, newParentAlias) {
+                scope.model.groups.forEach(group => {
+                    const parentAlias = contentEditingHelper.getParentAlias(group.alias);
 
-                /** current code will replace old alias no matter how deep/nested the groups matching are.
-                 * Meaning no need for recursive code.
-                 * Recursive code could be problematic as we only want to change alias of groups we own, not inherited ones.
-                */
-                const replaceAliasStr = oldAlias + "/";
-                const replaceAliasLength = replaceAliasStr.length;
-                scope.model.groups.forEach(tab => {
-                    if(tab.parentAlias.indexOf(replaceAliasStr) === 0) {
-                        tab.alias = newAlias + "/" + tab.alias.substr(replaceAliasLength)
-                        tab.parentAlias = contentEditingHelper.getParentAliasFromAlias(tab.alias);
+                    if (parentAlias == oldParentAlias) {
+                        const oldAlias = group.alias,
+                            newAlias = contentEditingHelper.updateParentAlias(oldAlias, newParentAlias);
+
+                        updateDescendingAliases(oldAlias, newAlias);
+                        group.alias = newAlias;
+
                     }
                 });
             }
@@ -529,7 +534,7 @@
             };
 
             function checkGenericTabVisibility () {
-                const hasRootGroups = scope.model.groups.filter(group => group.type === TYPE_GROUP && group.parentAlias === "").length > 0;
+                const hasRootGroups = scope.model.groups.filter(group => group.type === TYPE_GROUP && group.parentAlias === null).length > 0;
                 scope.hasGenericTab = (hasRootGroups && scope.tabs.length > 0) || scope.sortingMode;
             }
 
@@ -583,15 +588,14 @@
                 const lastGroupSortOrder = groupsInTab.length > 0 ? groupsInTab[groupsInTab.length - 1].sortOrder + 1 : 0;
 
                 const group = {
-                    key: String.CreateGuid(),
+                    type: TYPE_GROUP,
+                    name: "",
+                    alias: String.CreateGuid(),
+                    parentAlias: tabAlias || null,
+                    sortOrder: lastGroupSortOrder,
                     properties: [],
                     parentTabContentTypes: [],
-                    parentTabContentTypeNames: [],
-                    name: "",
-                    alias: "",
-                    parentAlias: tabAlias || "",
-                    type: TYPE_GROUP,
-                    sortOrder: lastGroupSortOrder
+                    parentTabContentTypeNames: []
                 };
 
                 scope.model.groups = [...scope.model.groups, group];
@@ -631,7 +635,7 @@
                         confirmMessage: data[2],
                         submitButtonLabelKey: 'contentTypeEditor_yesDelete',
                         submit: function () {
-                            const index = scope.model.groups.findIndex(group => group.key === selectedGroup.key);
+                            const index = scope.model.groups.findIndex(group => group.alias === selectedGroup.alias);
                             scope.model.groups.splice(index, 1);
 
                             overlayService.close();

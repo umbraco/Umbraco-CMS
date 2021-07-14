@@ -75,8 +75,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             if (args.showNotifications === undefined) {
                 args.showNotifications = true;
             }
-			// needed for infinite editing to create new items
-			if (args.create === undefined) {
+            // needed for infinite editing to create new items
+            if (args.create === undefined) {
                 if ($routeParams.create) {
                     args.create = true;
                 }
@@ -180,14 +180,32 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         },
 
-        genericTabAlias: "_umb_genericTab",
-
-        generateTabAlias: function(parentAlias, name) {
-            return (parentAlias !== "" && parentAlias != null ? parentAlias + "/" : "" ) + name.toUmbracoAlias();
+        generateAlias: function(name) {
+            return name.toUmbracoAlias();
         },
 
-        getParentAliasFromAlias: function(alias) {
-            return alias.substring(0, alias.lastIndexOf("/"));
+        getCurrentAlias: function (alias) {
+            const lastIndex = alias.lastIndexOf('/');
+
+            return (lastIndex === -1) ? alias : alias.substring(lastIndex + 1);
+        },
+
+        updateCurrentAlias: function (alias, currentAlias) {
+            const parentAlias = this.getParentAlias(alias);
+
+            return (parentAlias == null || parentAlias === '') ? currentAlias : parentAlias + '/' + currentAlias;
+        },
+
+        getParentAlias: function (alias) {
+            const lastIndex = alias.lastIndexOf('/');
+
+            return (lastIndex === -1) ? null : alias.substring(0, lastIndex);
+        },
+
+        updateParentAlias: function (alias, parentAlias) {
+            const currentAlias = this.getCurrentAlias(alias);
+
+            return (parentAlias == null || parentAlias === '') ? currentAlias : parentAlias + '/' + currentAlias;
         },
 
         registerGenericTab: function (groups) {
@@ -195,26 +213,22 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 return;
             }
 
-            const genericTabAlias = this.genericTabAlias;
-            const hasGenericTab = groups.find(group => group.alias === genericTabAlias);
-
+            const hasGenericTab = groups.find(group => group.alias === null);
             if (hasGenericTab) {
                 return;
             }
 
-            const isRootGroup = (group) => group.type === 0 && group.parentAlias === "";
+            const isRootGroup = (group) => group.type === 0 && group.parentAlias === null;
             const hasRootGroups = groups.filter(group => isRootGroup(group)).length > 0;
-
             if (!hasRootGroups) {
                 return;
             }
 
             const genericTab = {
-                label: 'Generic',
-                alias: genericTabAlias,
-                key: null,
-                parentAlias: "",
                 type: 1,
+                label: 'Generic',
+                alias: null,
+                parentAlias: null,
                 properties: []
             };
 
