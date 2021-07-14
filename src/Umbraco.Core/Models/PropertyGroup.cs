@@ -140,9 +140,20 @@ namespace Umbraco.Core.Models
         }
     }
 
-    internal static class PropertyGroupExtensions
+    public static class PropertyGroupExtensions
     {
         private const char aliasSeparator = '/';
+
+        internal static string GetCurrentAlias(string alias)
+        {
+            var lastIndex = alias?.LastIndexOf(aliasSeparator) ?? -1;
+            if (lastIndex != -1)
+            {
+                return alias.Substring(lastIndex + 1);
+            }
+
+            return alias;
+        }
 
         internal static string GetParentAlias(string alias)
         {
@@ -155,26 +166,57 @@ namespace Umbraco.Core.Models
             return alias.Substring(0, lastIndex);
         }
 
-        public static string GetParentAlias(this PropertyGroup propertyGroup) => GetParentAlias(propertyGroup.Alias);
+        /// <summary>
+        /// Gets the current alias.
+        /// </summary>
+        /// <param name="propertyGroup">The property group.</param>
+        /// <returns>
+        /// The current alias.
+        /// </returns>
+        public static string GetCurrentAlias(this PropertyGroup propertyGroup) => GetCurrentAlias(propertyGroup.Alias);
 
-        public static void UpdateParentAlias(this PropertyGroup propertyGroup, string parentAlias)
+        /// <summary>
+        /// Updates the current alias.
+        /// </summary>
+        /// <param name="propertyGroup">The property group.</param>
+        /// <param name="currentAlias">The current alias.</param>
+        public static void UpdateCurrentAlias(this PropertyGroup propertyGroup, string currentAlias)
         {
-            // Get current alias without parent
-            var alias = propertyGroup.Alias;
-            var lastIndex = alias?.LastIndexOf(aliasSeparator) ?? -1;
-            if (lastIndex != -1)
-            {
-                alias = alias.Substring(lastIndex + 1);
-            }
-
-            // Update alias
+            var parentAlias = propertyGroup.GetParentAlias();
             if (string.IsNullOrEmpty(parentAlias))
             {
-                propertyGroup.Alias = alias;
+                propertyGroup.Alias = currentAlias;
             }
             else
             {
-                propertyGroup.Alias = parentAlias + aliasSeparator + alias;
+                propertyGroup.Alias = parentAlias + aliasSeparator + currentAlias;
+            }
+        }
+
+        /// <summary>
+        /// Gets the parent alias.
+        /// </summary>
+        /// <param name="propertyGroup">The property group.</param>
+        /// <returns>
+        /// The parent alias.
+        /// </returns>
+        public static string GetParentAlias(this PropertyGroup propertyGroup) => GetParentAlias(propertyGroup.Alias);
+
+        /// <summary>
+        /// Updates the parent alias.
+        /// </summary>
+        /// <param name="propertyGroup">The property group.</param>
+        /// <param name="parentAlias">The parent alias.</param>
+        public static void UpdateParentAlias(this PropertyGroup propertyGroup, string parentAlias)
+        {
+            var currentAlias = propertyGroup.GetCurrentAlias();
+            if (string.IsNullOrEmpty(parentAlias))
+            {
+                propertyGroup.Alias = currentAlias;
+            }
+            else
+            {
+                propertyGroup.Alias = parentAlias + aliasSeparator + currentAlias;
             }
         }
 
