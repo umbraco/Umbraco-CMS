@@ -81,8 +81,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
             var snapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == contentCache.Object);
             var variationContext = new VariationContext();
             var variationContextAccessor = Mock.Of<IVariationContextAccessor>(x => x.VariationContext == variationContext);
+            var publishedSnapshotAccessor = Mock.Of<IPublishedSnapshotAccessor>(x => x.PublishedSnapshot == snapshot);
 
-            return new PublishedContentQuery(snapshot, variationContextAccessor, examineManager.Object);
+
+            return new PublishedContentQuery(publishedSnapshotAccessor, variationContextAccessor, examineManager.Object);
         }
 
         [TestCase("fr-fr", ExpectedResult = "1, 3", Description = "Search Culture: fr-fr. Must return both fr-fr and invariant results")]
