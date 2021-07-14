@@ -37,6 +37,10 @@ namespace Umbraco.Cms.Core.Configuration
                 {
                     return Umbraco.Cms.Core.Constants.DbProviderNames.SqlCe;
                 }
+                else if (dataSource.EndsWith(".db"))
+                {
+                    return Umbraco.Cms.Core.Constants.DbProviderNames.SQLite;
+                }
             }
 
 

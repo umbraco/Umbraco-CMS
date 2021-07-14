@@ -142,6 +142,7 @@ namespace Umbraco.Extensions
 
             // Add supported databases
             builder.AddUmbracoSqlServerSupport();
+            builder.AddUmbracoSqliteSupport();
             builder.AddUmbracoSqlCeSupport();
             builder.Services.AddUnique<DatabaseSchemaCreatorFactory>();
 
@@ -393,10 +394,21 @@ namespace Umbraco.Extensions
         private static IUmbracoBuilder AddUmbracoSqlServerSupport(this IUmbracoBuilder builder)
         {
             DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
-
+            
             builder.Services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
             builder.Services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
             builder.Services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
+
+            return builder;
+        }
+
+        private static IUmbracoBuilder AddUmbracoSqliteSupport(this IUmbracoBuilder builder)
+        {
+            DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SQLite, Microsoft.Data.Sqlite.SqliteFactory.Instance);
+
+            builder.Services.AddSingleton<ISqlSyntaxProvider, SqliteSyntaxProvider>();
+            builder.Services.AddSingleton<IBulkSqlInsertProvider, SqliteBulkSqlInsertProvider>();
+            builder.Services.AddSingleton<IEmbeddedDatabaseCreator, SQLiteEmbeddedDatabaseCreator>();
 
             return builder;
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
@@ -24,10 +24,18 @@ namespace Umbraco.Extensions
                 return Cms.Core.Constants.DbProviderNames.SqlCe;
             }
 
+            // SQLite DB connection strings use .db file extensions
+            else if (allKeys.InvariantContains("Data Source")
+                //this dictionary is case insensitive
+                && builder["Data source"].ToString().InvariantContains(".db"))
+            {
+                return Cms.Core.Constants.DbProviderNames.SQLite;
+            }
+
             return Cms.Core.Constants.DbProviderNames.SqlServer;
         }
 
-    public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)
+        public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)
         {
 
             var connection = factory.CreateConnection();
@@ -38,6 +46,7 @@ namespace Umbraco.Extensions
             connection.ConnectionString = connectionString;
             using (connection)
             {
+                // TODO: File needs to exist for this to be happy for SQLite
                 return connection.IsAvailable();
             }
         }
