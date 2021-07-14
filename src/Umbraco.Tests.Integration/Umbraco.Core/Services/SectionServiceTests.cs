@@ -1,11 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -39,6 +41,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
 
         private IUser CreateTestUser()
         {
+            using IScope scope = ScopeProvider.CreateScope(autoComplete: true);
+            using IDisposable _ = scope.Notifications.Suppress();
+
             var globalSettings = new GlobalSettings();
             var user = new User(globalSettings)
             {
@@ -46,7 +51,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
                 Username = "testUser",
                 Email = "testuser@test.com",
             };
-            UserService.Save(user, false);
+            UserService.Save(user);
 
             var userGroupA = new UserGroup(ShortStringHelper)
             {
@@ -57,7 +62,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             userGroupA.AddAllowedSection("settings");
 
             // TODO: This is failing the test
-            UserService.Save(userGroupA, new[] { user.Id }, false);
+            UserService.Save(userGroupA, new[] { user.Id });
 
             var userGroupB = new UserGroup(ShortStringHelper)
             {
@@ -66,7 +71,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
             };
             userGroupB.AddAllowedSection("settings");
             userGroupB.AddAllowedSection("member");
-            UserService.Save(userGroupB, new[] { user.Id }, false);
+            UserService.Save(userGroupB, new[] { user.Id });
 
             return UserService.GetUserById(user.Id);
         }

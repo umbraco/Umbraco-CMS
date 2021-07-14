@@ -767,7 +767,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public void Save(IMember member, bool raiseEvents = true)
+        public void Save(IMember member)
         {
             // trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
@@ -778,7 +778,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 var savingNotification = new MemberSavingNotification(member, evtMsgs);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -793,10 +793,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _memberRepository.Save(member);
 
-                if (raiseEvents)
-                {
-                    scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
-                }
+                scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
 
                 Audit(AuditType.Save, 0, member.Id);
 
@@ -805,7 +802,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public void Save(IEnumerable<IMember> members, bool raiseEvents = true)
+        public void Save(IEnumerable<IMember> members)
         {
             var membersA = members.ToArray();
 
@@ -814,7 +811,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -831,10 +828,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _memberRepository.Save(member);
                 }
 
-                if (raiseEvents)
-                {
-                    scope.Notifications.Publish(new MemberSavedNotification(membersA, evtMsgs).WithStateFrom(savingNotification));
-                }
+                scope.Notifications.Publish(new MemberSavedNotification(membersA, evtMsgs).WithStateFrom(savingNotification));
+
                 Audit(AuditType.Save, 0, -1, "Save multiple Members");
 
                 scope.Complete();

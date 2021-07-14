@@ -62,9 +62,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
                 m.Name == "fakeGroupName" && m.CreatorId == 77);
 
-            bool raiseEvents = false;
-
-            _mockMemberGroupService.Setup(x => x.Save(mockMemberGroup, raiseEvents));
+            _mockMemberGroupService.Setup(x => x.Save(mockMemberGroup));
 
             // act
             IdentityResult identityResult = await sut.CreateAsync(fakeRole, fakeCancellationToken);
@@ -72,7 +70,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             // assert
             Assert.IsTrue(identityResult.Succeeded);
             Assert.IsTrue(!identityResult.Errors.Any());
-            _mockMemberGroupService.Verify(x => x.Save(It.IsAny<MemberGroup>(), It.IsAny<bool>()));
+            _mockMemberGroupService.Verify(x => x.Save(It.IsAny<MemberGroup>()));
         }
 
         [Test]
@@ -86,10 +84,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
                 m.Name == "fakeGroupName" && m.CreatorId == 777);
 
-            bool raiseEvents = false;
-
             _mockMemberGroupService.Setup(x => x.GetById(777)).Returns(mockMemberGroup);
-            _mockMemberGroupService.Setup(x => x.Save(mockMemberGroup, raiseEvents));
+            _mockMemberGroupService.Setup(x => x.Save(mockMemberGroup));
 
             // act
             IdentityResult identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
@@ -111,10 +107,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
                 m.Name == "fakeGroupName" && m.CreatorId == 777);
 
-            bool raiseEvents = false;
-
             _mockMemberGroupService.Setup(x => x.GetById(777)).Returns(mockMemberGroup);
-            _mockMemberGroupService.Setup(x => x.Save(mockMemberGroup, raiseEvents));
+            _mockMemberGroupService.Setup(x => x.Save(mockMemberGroup));
 
             // act
             IdentityResult identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
@@ -122,7 +116,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             // assert
             Assert.IsTrue(identityResult.Succeeded);
             Assert.IsTrue(!identityResult.Errors.Any());
-            _mockMemberGroupService.Verify(x => x.Save(It.IsAny<IMemberGroup>(), It.IsAny<bool>()));
+            _mockMemberGroupService.Verify(x => x.Save(It.IsAny<IMemberGroup>()));
             _mockMemberGroupService.Verify(x => x.GetById(777));
         }
 

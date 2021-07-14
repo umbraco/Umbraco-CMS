@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public void Save(IMemberGroup memberGroup, bool raiseEvents = true)
+        public void Save(IMemberGroup memberGroup)
         {
             if (string.IsNullOrWhiteSpace(memberGroup.Name))
             {
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var savingNotification = new MemberGroupSavingNotification(memberGroup, evtMsgs);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -85,10 +85,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _memberGroupRepository.Save(memberGroup);
                 scope.Complete();
 
-                if (raiseEvents)
-                {
-                    scope.Notifications.Publish(new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
-                }
+                scope.Notifications.Publish(new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
             }
         }
 
