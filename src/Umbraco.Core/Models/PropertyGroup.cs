@@ -237,9 +237,12 @@ namespace Umbraco.Core.Models
                 {
                     yield return group;
 
-                    foreach (var childGroup in OrderByHierarchy(group.Alias))
+                    if (!string.IsNullOrEmpty(group.Alias))
                     {
-                        yield return childGroup;
+                        foreach (var childGroup in OrderByHierarchy(group.Alias))
+                        {
+                            yield return childGroup;
+                        }
                     }
                 }
             }
