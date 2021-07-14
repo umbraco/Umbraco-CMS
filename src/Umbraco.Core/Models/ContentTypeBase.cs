@@ -304,13 +304,12 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public abstract bool AddPropertyGroup(string name, string alias);
 
-        /// <summary>
-        /// Adds a PropertyType to a specific PropertyGroup
-        /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
-        /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
-        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
+        /// <inheritdoc />
+        [Obsolete("Use AddPropertyType(propertyType, groupAlias, groupName) instead to explicitly set the alias of the group (note the slighty different parameter order).")]
         public abstract bool AddPropertyType(PropertyType propertyType, string propertyGroupName);
+
+        /// <inheritdoc />
+        public abstract bool AddPropertyType(PropertyType propertyType, string groupAlias, string groupName);
 
         /// <summary>
         /// Adds a PropertyType, which does not belong to a PropertyGroup.
@@ -343,15 +342,18 @@ namespace Umbraco.Core.Models
             if (propertyType == null) return false;
 
             // get new group, if required, and ensure it exists
-            var newPropertyGroup = propertyGroupName == null
-                ? null
-                : PropertyGroups.FirstOrDefault(x => x.Alias == propertyGroupName)
-                    ?? PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName)); // TODO Clean up for v9 (only added for backwards compatibility with names)
-            if (propertyGroupName != null && newPropertyGroup == null) return false;
+            PropertyGroup newPropertyGroup = null;
+            if (propertyGroupName != null)
+            {
+                var index = PropertyGroups.IndexOfKey(propertyGroupName);
+                if (index == -1) return false;
 
+                newPropertyGroup = PropertyGroups[index];
+            }
+            
             // get old group
             var oldPropertyGroup = PropertyGroups.FirstOrDefault(x =>
-                x.PropertyTypes.Any(y => y.Alias.InvariantEquals(propertyTypeAlias)));
+                x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
 
             // set new group
             propertyType.PropertyGroupId = newPropertyGroup == null ? null : new Lazy<int>(() => newPropertyGroup.Id, false);
@@ -401,9 +403,10 @@ namespace Umbraco.Core.Models
         public void RemovePropertyGroup(string propertyGroupName)
         {
             // if no group exists with that name, do nothing
-            var group = PropertyGroups.FirstOrDefault(x => x.Alias == propertyGroupName)
-                ?? PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName)); // TODO Clean up for v9 (only added for backwards compatibility with names)
-            if (group == null) return;
+            var index = PropertyGroups.IndexOfKey(propertyGroupName);
+            if (index == -1) return;
+
+            var group = PropertyGroups[index];
 
             // first remove the group
             PropertyGroups.Remove(group);

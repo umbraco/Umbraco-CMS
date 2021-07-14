@@ -254,24 +254,34 @@ namespace Umbraco.Core.Models
             return group;
         }
 
-        /// <summary>
-        /// Adds a PropertyType to a specific PropertyGroup
-        /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
-        /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
-        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
-        public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
+        /// <inheritdoc />
+        [Obsolete("Use AddPropertyType(propertyType, groupAlias, groupName) instead to explicitly set the alias of the group (note the slighty different parameter order).")]
+        public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName) => AddPropertyType(propertyType, propertyGroupName.ToSafeAlias(true), propertyGroupName);
+
+        /// <inheritdoc />
+        public override bool AddPropertyType(PropertyType propertyType, string groupAlias, string groupName)
         {
             // ensure no duplicate alias - over all composition properties
             if (PropertyTypeExists(propertyType.Alias))
                 return false;
 
             // get and ensure a group local to this content type
-            var group = PropertyGroups.FirstOrDefault(x => x.Alias == propertyGroupName)
-                ?? PropertyGroups.FirstOrDefault(x => x.Alias == propertyGroupName.ToSafeAlias(true)) // TODO Remove in v9 (only needed for backwards compatibility with names)
-                ?? AddAndReturnPropertyGroup(propertyGroupName, propertyGroupName.ToSafeAlias(true)); // TODO Do we need both name and alias for this to work?
-            if (group == null)
+            PropertyGroup group;
+            var index = PropertyGroups.IndexOfKey(groupAlias);
+            if (index != -1)
+            {
+                group = PropertyGroups[index];
+            }
+            else if (!string.IsNullOrEmpty(groupName))
+            {
+                group = AddAndReturnPropertyGroup(groupName, groupAlias);
+                if (group == null) return false;
+            }
+            else
+            {
+                // No group name specified, so we can't create a new one and add the property type
                 return false;
+            }
 
             // add property to group
             propertyType.PropertyGroupId = new Lazy<int>(() => group.Id);

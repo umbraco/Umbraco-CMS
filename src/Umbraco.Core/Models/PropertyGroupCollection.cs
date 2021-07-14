@@ -55,13 +55,10 @@ namespace Umbraco.Core.Models
             // TODO Remove this property in v9 (only needed for backwards compatibility with names)
             get
             {
-                var item = base[key];
-                if (item == null && !key.Contains('/'))
-                {
-                    item = base[key.ToSafeAlias(true)];
-                }
+                var index = IndexOfKey(key);
+                if (index == -1) throw new KeyNotFoundException();
 
-                return item;
+                return this[index];
             }
         }
 
@@ -169,11 +166,8 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public new bool Contains(string key)
-        {
-            // TODO Remove this method in v9 (only needed for backwards compatibility with names)
-            return base.Contains(key) || (!key.Contains('/') && base.Contains(key.ToSafeAlias(true)));
-        }
+        // TODO Remove this method in v9 (only needed for backwards compatibility with names)
+        public new bool Contains(string key) => IndexOfKey(key) != -1;
 
         public bool Contains(int id)
         {
