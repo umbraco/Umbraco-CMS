@@ -3,12 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
@@ -1305,6 +1305,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IMember found = MemberService.GetById(customMember.Id);
 
             Assert.IsTrue(found.IsApproved);
+        }
+
+        [Test]
+        public void Can_CreateWithIdentity()
+        {
+            // Arrange
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            MemberTypeService.Save(memberType);
+            string username = Path.GetRandomFileName();
+
+            // Act
+            IMember member = MemberService.CreateMemberWithIdentity(username, $"{username}@domain.email", Path.GetFileNameWithoutExtension(username), memberType);
+            IMember found = MemberService.GetById(member.Id);
+
+            // Assert
+            Assert.IsNotNull(member, "Verifying a member instance has been created");
+            Assert.IsNotNull(found, "Verifying the created member instance has been retrieved");
+            Assert.IsTrue(found?.Name == member?.Name, "Verifying the retrieved member instance has the expected name");
         }
     }
 }
