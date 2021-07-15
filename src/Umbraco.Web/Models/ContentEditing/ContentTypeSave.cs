@@ -43,7 +43,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (CompositeContentTypes.Any(x => x.IsNullOrWhiteSpace()))
-                yield return new ValidationResult("Composite Content Type value cannot be null", new[] {"CompositeContentTypes"});
+                yield return new ValidationResult("Composite Content Type value cannot be null", new[] { "CompositeContentTypes" });
         }
     }
 
@@ -88,13 +88,14 @@ namespace Umbraco.Web.Models.ContentEditing
                 yield return validationResult;
             }
 
-            var duplicateGroups = Groups.GroupBy(x => x.Name?.ToUpperInvariant()).Where(x => x.Count() > 1).ToArray();
+            var duplicateGroups = Groups.GroupBy(x => x.Alias).Where(x => x.Count() > 1).ToArray();
             if (duplicateGroups.Any())
             {
                 //we need to return the field name with an index so it's wired up correctly
                 var lastIndex = Groups.IndexOf(duplicateGroups.Last().Last());
-                yield return new ValidationResult("Duplicate group names not allowed", new[]
+                yield return new ValidationResult("Duplicate group aliases not allowed", new[]
                 {
+                    // TODO We don't display the alias yet, so add the validation message to the name
                     string.Format("Groups[{0}].Name", lastIndex)
                 });
             }
