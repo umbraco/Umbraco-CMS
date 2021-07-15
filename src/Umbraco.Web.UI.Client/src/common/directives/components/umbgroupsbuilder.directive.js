@@ -503,9 +503,9 @@
 
             /** Universal method for updating group alias (for tabs, field-sets etc.) */
             function updateGroupAlias(group) {
-                const localAlias = contentEditingHelper.generateAlias(group.name),
+                const localAlias = contentEditingHelper.generateLocalAlias(group.name),
                     oldAlias = group.alias,
-                    newAlias = contentEditingHelper.updateCurrentAlias(oldAlias, localAlias);
+                    newAlias = contentEditingHelper.updateLocalAlias(oldAlias, localAlias);
 
                 group.alias = newAlias;
                 group.parentAlias = contentEditingHelper.getParentAlias(newAlias);

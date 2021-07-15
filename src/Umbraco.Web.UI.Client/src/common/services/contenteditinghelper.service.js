@@ -180,20 +180,20 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         },
 
-        generateAlias: function(name) {
+        generateLocalAlias: function(name) {
             return name ? name.toUmbracoAlias() : String.CreateGuid();
         },
 
-        getCurrentAlias: function (alias) {
+        getLocalAlias: function (alias) {
             const lastIndex = alias.lastIndexOf('/');
 
             return (lastIndex === -1) ? alias : alias.substring(lastIndex + 1);
         },
 
-        updateCurrentAlias: function (alias, currentAlias) {
+        updateLocalAlias: function (alias, localAlias) {
             const parentAlias = this.getParentAlias(alias);
 
-            return (parentAlias == null || parentAlias === '') ? currentAlias : parentAlias + '/' + currentAlias;
+            return (parentAlias == null || parentAlias === '') ? localAlias : parentAlias + '/' + localAlias;
         },
 
         getParentAlias: function (alias) {
@@ -203,9 +203,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         },
 
         updateParentAlias: function (alias, parentAlias) {
-            const currentAlias = this.getCurrentAlias(alias);
+            const localAlias = this.getLocalAlias(alias);
 
-            return (parentAlias == null || parentAlias === '') ? currentAlias : parentAlias + '/' + currentAlias;
+            return (parentAlias == null || parentAlias === '') ? localAlias : parentAlias + '/' + localAlias;
         },
 
         registerGenericTab: function (groups) {
