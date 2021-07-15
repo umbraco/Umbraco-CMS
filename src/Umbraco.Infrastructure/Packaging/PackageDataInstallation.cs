@@ -1044,7 +1044,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             if (dataTypes.Count > 0)
             {
-                _dataTypeService.Save(dataTypes, userId, true);
+                _dataTypeService.Save(dataTypes, userId);
             }
 
             return dataTypes;

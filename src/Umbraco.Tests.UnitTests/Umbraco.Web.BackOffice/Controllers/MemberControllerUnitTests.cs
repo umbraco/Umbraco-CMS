@@ -417,7 +417,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(umbracoMembersUserManager)
                .Verify(u => u.AddToRolesAsync(membersIdentityUser, new[] { roleName }));
             Mock.Get(memberService)
-                .Verify(m => m.Save(It.IsAny<Member>(), true));
+                .Verify(m => m.Save(It.IsAny<Member>()));
             AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
         }
 
