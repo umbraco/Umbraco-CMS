@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.ContentApps
             // its dependencies too, and that can create cycles or other oddities
             var manifestParser = factory.GetRequiredService<IManifestParser>();
             var ioHelper = factory.GetRequiredService<IIOHelper>();
-            return base.CreateItems(factory).Concat(manifestParser.Manifest.ContentApps.Select(x => new ManifestContentAppFactory(x, ioHelper)));
+            return base.CreateItems(factory).Concat(manifestParser.CombinedManifest.ContentApps.Select(x => new ManifestContentAppFactory(x, ioHelper)));
         }
     }
 }

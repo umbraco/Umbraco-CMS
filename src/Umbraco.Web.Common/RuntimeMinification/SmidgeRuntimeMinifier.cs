@@ -60,9 +60,21 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
             // replace the default JsMinifier with NuglifyJs and CssMinifier with NuglifyCss in the default pipelines
             // for use with our bundles only (not modifying global options)
             _jsOptimizedPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultJs().Replace<JsMinifier, SmidgeNuglifyJs>(_bundles.PipelineFactory));
-            _jsNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultJs());
+            _jsNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() =>
+            {
+                PreProcessPipeline defaultJs = bundles.PipelineFactory.DefaultJs();
+                // remove minification from this pipeline
+                defaultJs.Processors.RemoveAll(x => x is JsMinifier);
+                return defaultJs;
+            });
             _cssOptimizedPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultCss().Replace<CssMinifier, NuglifyCss>(_bundles.PipelineFactory));
-            _cssNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultCss());
+            _cssNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() =>
+            {
+                PreProcessPipeline defaultCss = bundles.PipelineFactory.DefaultCss();
+                // remove minification from this pipeline
+                defaultCss.Processors.RemoveAll(x => x is CssMinifier);
+                return defaultCss;
+            });
 
             Type cacheBusterType = _runtimeMinificationSettings.CacheBuster switch
             {

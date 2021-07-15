@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public ParameterEditorCollection(DataEditorCollection dataEditors, IManifestParser manifestParser)
             : base(() => dataEditors
                 .Where(x => (x.Type & EditorType.MacroParameter) > 0)
-                .Union(manifestParser.Manifest.PropertyEditors))
+                .Union(manifestParser.CombinedManifest.PropertyEditors))
         { }
 
         // note: virtual so it can be mocked

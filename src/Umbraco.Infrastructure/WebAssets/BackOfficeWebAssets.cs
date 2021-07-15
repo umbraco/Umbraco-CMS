@@ -73,25 +73,66 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
             _runtimeMinifier.CreateJsBundle(UmbracoCoreJsBundleName, false,
                 FormatPaths(GetScriptsForBackOfficeCore()));
 
+
+            // get the property editor assets
             var propertyEditorAssets = ScanPropertyEditors()
                 .GroupBy(x => x.AssetType)
                 .ToDictionary(x => x.Key, x => x.Select(c => c.FilePath));
 
+            // get the back office custom assets
             var customAssets = _customBackOfficeAssetsCollection.GroupBy(x => x.DependencyType).ToDictionary(x => x.Key, x => x.Select(c => c.FilePath));
 
-            var jsAssets = (customAssets.TryGetValue(AssetType.Javascript, out var customScripts) ? customScripts : Enumerable.Empty<string>())
-                .Union(propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>());
+            // This bundle includes all scripts from property editor assets,
+            // custom back office assets, and any scripts found in package manifests
+            // that have the default bundle options.
+
+            IEnumerable<string> jsAssets = (customAssets.TryGetValue(AssetType.Javascript, out IEnumerable<string> customScripts) ? customScripts : Enumerable.Empty<string>())
+                .Union(propertyEditorAssets.TryGetValue(AssetType.Javascript, out IEnumerable<string> scripts) ? scripts : Enumerable.Empty<string>());
+
             _runtimeMinifier.CreateJsBundle(
-                UmbracoExtensionsJsBundleName, true,
+                UmbracoExtensionsJsBundleName,
+                true,
                 FormatPaths(
                     GetScriptsForBackOfficeExtensions(jsAssets)));
 
-            var cssAssets = (customAssets.TryGetValue(AssetType.Css, out var customStyles) ? customStyles : Enumerable.Empty<string>())
-                .Union(propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>());
+            // Create a bundle per package manifest that is declaring an Independent bundle type
+            RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest.Scripts, AssetType.Javascript);
+
+            // This bundle includes all CSS from property editor assets,
+            // custom back office assets, and any CSS found in package manifests
+            // that have the default bundle options.
+
+            IEnumerable<string> cssAssets = (customAssets.TryGetValue(AssetType.Css, out IEnumerable<string> customStyles) ? customStyles : Enumerable.Empty<string>())
+                .Union(propertyEditorAssets.TryGetValue(AssetType.Css, out IEnumerable<string> styles) ? styles : Enumerable.Empty<string>());
+
             _runtimeMinifier.CreateCssBundle(
-                UmbracoCssBundleName, true,
+                UmbracoCssBundleName,
+                true,
                 FormatPaths(
                     GetStylesheetsForBackOffice(cssAssets)));
+
+            // Create a bundle per package manifest that is declaring an Independent bundle type
+            RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest.Stylesheets, AssetType.Css);
+        }
+
+        public static string GetIndependentPackageBundleName(ManifestAssets manifestAssets, AssetType assetType)
+            => $"{manifestAssets.PackageName.ToLowerInvariant()}-{(assetType == AssetType.Css ? "css" : "js")}";
+
+        private void RegisterPackageBundlesForIndependentOptions(
+            IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>> combinedPackageManifestAssets,
+            AssetType assetType)
+        {
+            // Create a bundle per package manifest that is declaring the matching BundleOptions
+            if (combinedPackageManifestAssets.TryGetValue(BundleOptions.Independent, out IReadOnlyList<ManifestAssets> manifestAssetList))
+            {
+                foreach (ManifestAssets manifestAssets in manifestAssetList)
+                {
+                    _runtimeMinifier.CreateJsBundle(
+                        GetIndependentPackageBundleName(manifestAssets, assetType),
+                        true,
+                        FormatPaths(manifestAssets.Assets.ToArray()));
+                }
+            }
         }
 
         /// <summary>
@@ -100,10 +141,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         /// <returns></returns>
         private string[] GetScriptsForBackOfficeExtensions(IEnumerable<string> propertyEditorScripts)
         {
-            var scripts = new HashSet<string>();
-            foreach (string script in _parser.Manifest.Scripts)
+            var scripts = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+
+            // only include scripts with the default bundle options here
+            if (_parser.CombinedManifest.Scripts.TryGetValue(BundleOptions.Default, out IReadOnlyList<ManifestAssets> manifestAssets))
             {
-                scripts.Add(script);
+                foreach (string script in manifestAssets.SelectMany(x => x.Assets))
+                {
+                    scripts.Add(script);
+                }
             }
 
             foreach (string script in propertyEditorScripts)
@@ -130,11 +176,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         /// <returns></returns>
         private string[] GetStylesheetsForBackOffice(IEnumerable<string> propertyEditorStyles)
         {
-            var stylesheets = new HashSet<string>();
+            var stylesheets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
-            foreach (string script in _parser.Manifest.Stylesheets)
+            // only include css with the default bundle options here
+            if (_parser.CombinedManifest.Stylesheets.TryGetValue(BundleOptions.Default, out IReadOnlyList<ManifestAssets> manifestAssets))
             {
-                stylesheets.Add(script);
+                foreach (string script in manifestAssets.SelectMany(x => x.Assets))
+                {
+                    stylesheets.Add(script);
+                }
             }
 
             foreach (string stylesheet in propertyEditorStyles)

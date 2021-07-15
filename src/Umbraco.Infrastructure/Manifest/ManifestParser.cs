@@ -62,22 +62,22 @@ namespace Umbraco.Cms.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger<ManifestParser> logger,  IIOHelper ioHelper, IHostingEnvironment hostingEnvironment)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string appPluginsPath, ILogger<ManifestParser> logger,  IIOHelper ioHelper, IHostingEnvironment hostingEnvironment)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
-            if (path == null) throw new ArgumentNullException(nameof(path));
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(path));
+            if (appPluginsPath == null) throw new ArgumentNullException(nameof(appPluginsPath));
+            if (string.IsNullOrWhiteSpace(appPluginsPath)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(appPluginsPath));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _ioHelper = ioHelper;
             _hostingEnvironment = hostingEnvironment;
 
-            Path = path;
+            AppPluginsPath = appPluginsPath;
         }
 
-        public string Path
+        public string AppPluginsPath
         {
             get => _path;
             set => _path = value.StartsWith("~/") ? _hostingEnvironment.MapPathContentRoot(value) : value;
@@ -87,11 +87,12 @@ namespace Umbraco.Cms.Core.Manifest
         /// Gets all manifests, merged into a single manifest object.
         /// </summary>
         /// <returns></returns>
-        public PackageManifest Manifest
-            => _cache.GetCacheItem<PackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
+        public CompositePackageManifest CombinedManifest
+            => _cache.GetCacheItem<CompositePackageManifest>("Umbraco.Core.Manifest.ManifestParser::Manifests", () =>
             {
-                var manifests = GetManifests();
+                IEnumerable<PackageManifest> manifests = GetManifests();
                 return MergeManifests(manifests);
+
             }, new TimeSpan(0, 4, 0));
 
         /// <summary>
@@ -130,10 +131,10 @@ namespace Umbraco.Cms.Core.Manifest
         /// <summary>
         /// Merges all manifests into one.
         /// </summary>
-        private static PackageManifest MergeManifests(IEnumerable<PackageManifest> manifests)
+        private static CompositePackageManifest MergeManifests(IEnumerable<PackageManifest> manifests)
         {
-            var scripts = new HashSet<string>();
-            var stylesheets = new HashSet<string>();
+            var scripts = new Dictionary<BundleOptions, List<ManifestAssets>>();
+            var stylesheets = new Dictionary<BundleOptions, List<ManifestAssets>>();
             var propertyEditors = new List<IDataEditor>();
             var parameterEditors = new List<IDataEditor>();
             var gridEditors = new List<GridEditor>();
@@ -141,10 +142,28 @@ namespace Umbraco.Cms.Core.Manifest
             var dashboards = new List<ManifestDashboard>();
             var sections = new List<ManifestSection>();
 
-            foreach (var manifest in manifests)
+            foreach (PackageManifest manifest in manifests)
             {
-                if (manifest.Scripts != null) foreach (var script in manifest.Scripts) scripts.Add(script);
-                if (manifest.Stylesheets != null) foreach (var stylesheet in manifest.Stylesheets) stylesheets.Add(stylesheet);
+                if (manifest.Scripts != null)
+                {
+                    if (!scripts.TryGetValue(manifest.BundleOptions, out List<ManifestAssets> scriptsPerBundleOption))
+                    {
+                        scriptsPerBundleOption = new List<ManifestAssets>();
+                        scripts[manifest.BundleOptions] = scriptsPerBundleOption;
+                    }
+                    scriptsPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Scripts));
+                }
+
+                if (manifest.Stylesheets != null)
+                {
+                    if (!stylesheets.TryGetValue(manifest.BundleOptions, out List<ManifestAssets> stylesPerBundleOption))
+                    {
+                        stylesPerBundleOption = new List<ManifestAssets>();
+                        stylesheets[manifest.BundleOptions] = stylesPerBundleOption;
+                    }
+                    stylesPerBundleOption.Add(new ManifestAssets(manifest.PackageName, manifest.Stylesheets));
+                }
+
                 if (manifest.PropertyEditors != null) propertyEditors.AddRange(manifest.PropertyEditors);
                 if (manifest.ParameterEditors != null) parameterEditors.AddRange(manifest.ParameterEditors);
                 if (manifest.GridEditors != null) gridEditors.AddRange(manifest.GridEditors);
@@ -153,17 +172,15 @@ namespace Umbraco.Cms.Core.Manifest
                 if (manifest.Sections != null) sections.AddRange(manifest.Sections.DistinctBy(x => x.Alias.ToLowerInvariant()));
             }
 
-            return new PackageManifest
-            {
-                Scripts = scripts.ToArray(),
-                Stylesheets = stylesheets.ToArray(),
-                PropertyEditors = propertyEditors.ToArray(),
-                ParameterEditors = parameterEditors.ToArray(),
-                GridEditors = gridEditors.ToArray(),
-                ContentApps = contentApps.ToArray(),
-                Dashboards = dashboards.ToArray(),
-                Sections = sections.ToArray()
-            };
+            return new CompositePackageManifest(
+                propertyEditors,
+                parameterEditors,
+                gridEditors,
+                contentApps,
+                dashboards,
+                sections,
+                scripts.ToDictionary(x => x.Key, x => (IReadOnlyList<ManifestAssets>)x.Value),
+                stylesheets.ToDictionary(x => x.Key, x => (IReadOnlyList<ManifestAssets>)x.Value));
         }
 
         // gets all manifest files (recursively)

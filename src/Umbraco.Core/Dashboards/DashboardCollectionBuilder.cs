@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Dashboards
             // its dependencies too, and that can create cycles or other oddities
             var manifestParser = factory.GetRequiredService<IManifestParser>();
 
-            var dashboardSections = Merge(base.CreateItems(factory), manifestParser.Manifest.Dashboards);
+            var dashboardSections = Merge(base.CreateItems(factory), manifestParser.CombinedManifest.Dashboards);
 
             return dashboardSections;
         }
