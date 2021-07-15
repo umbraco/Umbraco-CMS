@@ -110,7 +110,7 @@
                         const groupAlias = ui.item[0].dataset.groupAlias ? ui.item[0].dataset.groupAlias : "";
                         const group = groupAlias ? scope.model.groups.find(group => group.alias === groupAlias) : {};
                         group.parentAlias = scope.openTabAlias;
-                        group.alias = (group.parentAlias !== "" ? group.parentAlias + "/" : "") + group.alias.substring(group.alias.lastIndexOf('/')+1);
+                        group.alias = contentEditingHelper.updateParentAlias(group.alias, scope.openTabAlias);
                         const groupsInTab = scope.model.groups.filter(group => group.parentAlias === scope.openTabAlias);
                         updateSortOrder(groupsInTab);
                     }
@@ -430,10 +430,11 @@
                     properties: []
                 };
 
-                if (newTabIndex === 0) {
+                if (newTabIndex === 0 && scope.hasGenericTab === false) {
                     scope.model.groups.forEach(group => {
-                        if (!group.inherited) {
+                        if (!group.inherited && group.parentAlias == null) {
                             group.parentAlias = tab.alias;
+                            group.alias = contentEditingHelper.updateParentAlias(group.alias, group.parentAlias);
                         }
                     });
                 }
@@ -496,24 +497,25 @@
 
             /** Universal method for updating group alias (for tabs, field-sets etc.) */
             function updateGroupAlias(group) {
-                const currentAlias = contentEditingHelper.generateAlias(group.name),
+                const localAlias = contentEditingHelper.generateAlias(group.name),
                     oldAlias = group.alias,
-                    newAlias = contentEditingHelper.updateCurrentAlias(oldAlias, currentAlias);
+                    newAlias = contentEditingHelper.updateCurrentAlias(oldAlias, localAlias);
 
-                updateDescendingAliases(oldAlias, newAlias);
                 group.alias = newAlias;
+                updateDescendingAliases(oldAlias, newAlias);
             }
 
             function updateDescendingAliases(oldParentAlias, newParentAlias) {
                 scope.model.groups.forEach(group => {
                     const parentAlias = contentEditingHelper.getParentAlias(group.alias);
 
-                    if (parentAlias == oldParentAlias) {
+                    if (parentAlias === oldParentAlias) {
                         const oldAlias = group.alias,
                             newAlias = contentEditingHelper.updateParentAlias(oldAlias, newParentAlias);
 
-                        updateDescendingAliases(oldAlias, newAlias);
                         group.alias = newAlias;
+                        group.parentAlias = newParentAlias;
+                        updateDescendingAliases(oldAlias, newAlias);
 
                     }
                 });
