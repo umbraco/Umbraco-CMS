@@ -220,8 +220,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(
                 _globalSettings,
                 _hostingEnvironment,
-                _manifestParser,
-                Url);
+                _manifestParser);
 
             return new JavaScriptResult(result);
         }

@@ -22,8 +22,7 @@ namespace Umbraco.Extensions
             this IRuntimeMinifier minifier,
             GlobalSettings globalSettings,
             IHostingEnvironment hostingEnvironment,
-            IManifestParser manifestParser,
-            IUrlHelper urlHelper)
+            IManifestParser manifestParser)
         {
             var files = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             foreach(var file in await minifier.GetJsAssetPathsAsync(BackOfficeWebAssets.UmbracoCoreJsBundleName))
@@ -50,15 +49,9 @@ namespace Umbraco.Extensions
             }
 
             // process the "None" bundles, meaning we'll just render the script as-is
-            if (manifestParser.CombinedManifest.Scripts.TryGetValue(BundleOptions.None, out IReadOnlyList<ManifestAssets> noneManifestAssetsList))
+            foreach (var asset in await minifier.GetJsAssetPathsAsync(BackOfficeWebAssets.UmbracoNonOptimizedPackageJsBundleName))
             {
-                foreach (ManifestAssets manifestAssets in noneManifestAssetsList)
-                {
-                    foreach(var asset in manifestAssets.Assets)
-                    {
-                        files.Add(urlHelper.Content(asset));
-                    }
-                }
+                files.Add(asset);
             }
 
             var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(
@@ -67,7 +60,7 @@ namespace Umbraco.Extensions
                 globalSettings,
                 hostingEnvironment);
 
-            result += await GetStylesheetInitializationAsync(minifier, manifestParser, urlHelper);
+            result += await GetStylesheetInitializationAsync(minifier, manifestParser);
 
             return result;
         }
@@ -77,8 +70,7 @@ namespace Umbraco.Extensions
         /// </summary>
         private static async Task<string> GetStylesheetInitializationAsync(
             IRuntimeMinifier minifier,
-            IManifestParser manifestParser,
-            IUrlHelper urlHelper)
+            IManifestParser manifestParser)
         {
             var files = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             foreach(var file in await minifier.GetCssAssetPathsAsync(BackOfficeWebAssets.UmbracoCssBundleName))
@@ -100,15 +92,9 @@ namespace Umbraco.Extensions
             }
 
             // process the "None" bundles, meaning we'll just render the script as-is
-            if (manifestParser.CombinedManifest.Stylesheets.TryGetValue(BundleOptions.None, out IReadOnlyList<ManifestAssets> noneManifestAssetsList))
+            foreach (var asset in await minifier.GetCssAssetPathsAsync(BackOfficeWebAssets.UmbracoNonOptimizedPackageCssBundleName))
             {
-                foreach (ManifestAssets manifestAssets in noneManifestAssetsList)
-                {
-                    foreach (var asset in manifestAssets.Assets)
-                    {
-                        files.Add(urlHelper.Content(asset));
-                    }
-                }
+                files.Add(asset);
             }
 
             var sb = new StringBuilder();

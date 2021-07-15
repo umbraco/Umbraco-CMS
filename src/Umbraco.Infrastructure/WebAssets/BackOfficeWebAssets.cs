@@ -21,6 +21,8 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         public const string UmbracoInitCssBundleName = "umbraco-backoffice-init-css";
         public const string UmbracoCoreJsBundleName = "umbraco-backoffice-js";
         public const string UmbracoExtensionsJsBundleName = "umbraco-backoffice-extensions-js";
+        public const string UmbracoNonOptimizedPackageJsBundleName = "umbraco-backoffice-non-optimized-js";
+        public const string UmbracoNonOptimizedPackageCssBundleName = "umbraco-backoffice-non-optimized-css";
         public const string UmbracoTinyMceJsBundleName = "umbraco-tinymce-js";
         public const string UmbracoUpgradeCssBundleName = "umbraco-authorize-upgrade-css";
 
@@ -51,26 +53,32 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         {
             // Create bundles
 
-            _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName, false,
+            _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName,
+                BundlingOptions.NotOptimizedAndComposite,
                 FormatPaths("lib/bootstrap-social/bootstrap-social.css",
                 "assets/css/umbraco.min.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-            _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName, false,
+            _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName,
+                BundlingOptions.NotOptimizedAndComposite,
                 FormatPaths("assets/css/umbraco.min.css",
                 "lib/bootstrap-social/bootstrap-social.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-            _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName, false,
+            _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName,
+                BundlingOptions.NotOptimizedAndComposite,
                 FormatPaths("assets/css/canvasdesigner.min.css"));
 
-            _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName, false,
+            _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName,
+                BundlingOptions.NotOptimizedAndComposite,
                 FormatPaths(GetScriptsForPreview()));
 
-            _runtimeMinifier.CreateJsBundle(UmbracoTinyMceJsBundleName, false,
+            _runtimeMinifier.CreateJsBundle(UmbracoTinyMceJsBundleName,
+                BundlingOptions.NotOptimizedAndComposite,
                 FormatPaths(GetScriptsForTinyMce()));
 
-            _runtimeMinifier.CreateJsBundle(UmbracoCoreJsBundleName, false,
+            _runtimeMinifier.CreateJsBundle(UmbracoCoreJsBundleName,
+                BundlingOptions.NotOptimizedAndComposite,
                 FormatPaths(GetScriptsForBackOfficeCore()));
 
 
@@ -91,12 +99,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
 
             _runtimeMinifier.CreateJsBundle(
                 UmbracoExtensionsJsBundleName,
-                true,
+                BundlingOptions.OptimizedAndComposite,
                 FormatPaths(
                     GetScriptsForBackOfficeExtensions(jsAssets)));
 
             // Create a bundle per package manifest that is declaring an Independent bundle type
             RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest.Scripts, AssetType.Javascript);
+
+            // Create a single non-optimized (no file processing) bundle for all manifests declaring None as a bundle option
+            RegisterPackageBundlesForNoneOption(_parser.CombinedManifest.Scripts, UmbracoNonOptimizedPackageJsBundleName);
 
             // This bundle includes all CSS from property editor assets,
             // custom back office assets, and any CSS found in package manifests
@@ -107,16 +118,41 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
 
             _runtimeMinifier.CreateCssBundle(
                 UmbracoCssBundleName,
-                true,
+                BundlingOptions.OptimizedAndComposite,
                 FormatPaths(
                     GetStylesheetsForBackOffice(cssAssets)));
 
             // Create a bundle per package manifest that is declaring an Independent bundle type
             RegisterPackageBundlesForIndependentOptions(_parser.CombinedManifest.Stylesheets, AssetType.Css);
+
+            // Create a single non-optimized (no file processing) bundle for all manifests declaring None as a bundle option
+            RegisterPackageBundlesForNoneOption(_parser.CombinedManifest.Stylesheets, UmbracoNonOptimizedPackageCssBundleName);
         }
 
         public static string GetIndependentPackageBundleName(ManifestAssets manifestAssets, AssetType assetType)
             => $"{manifestAssets.PackageName.ToLowerInvariant()}-{(assetType == AssetType.Css ? "css" : "js")}";
+
+        private void RegisterPackageBundlesForNoneOption(
+            IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>> combinedPackageManifestAssets,
+            string bundleName)
+        {
+            var assets = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+
+            // Create a bundle per package manifest that is declaring the matching BundleOptions
+            if (combinedPackageManifestAssets.TryGetValue(BundleOptions.None, out IReadOnlyList<ManifestAssets> manifestAssetList))
+            {
+                foreach(var asset in manifestAssetList.SelectMany(x => x.Assets))
+                {
+                    assets.Add(asset);
+                }
+            }
+
+            _runtimeMinifier.CreateJsBundle(
+                bundleName,
+                // no optimization, no composite files, just render individual files
+                BundlingOptions.NotOptimizedNotComposite,
+                FormatPaths(assets.ToArray()));
+        }
 
         private void RegisterPackageBundlesForIndependentOptions(
             IReadOnlyDictionary<BundleOptions, IReadOnlyList<ManifestAssets>> combinedPackageManifestAssets,
@@ -129,7 +165,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                 {
                     _runtimeMinifier.CreateJsBundle(
                         GetIndependentPackageBundleName(manifestAssets, assetType),
-                        true,
+                        BundlingOptions.OptimizedAndComposite,
                         FormatPaths(manifestAssets.Assets.ToArray()));
                 }
             }
