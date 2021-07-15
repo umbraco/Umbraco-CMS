@@ -155,9 +155,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="isApproved">Is the member approved</param>
         /// <returns><see cref="IMember"/></returns>
         IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias)
-        {
-            return CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias);
-        }
+            => CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias);
 
         /// <summary>
         /// Creates and persists a new <see cref="IMember"/>
@@ -170,29 +168,19 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="isApproved"></param>
         /// <returns><see cref="IMember"/></returns>
         IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string passwordValue, string memberTypeAlias, bool isApproved)
-        {
-            return CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias, isApproved);
-        }
+            => CreateMemberWithIdentity(username, email, username, passwordValue, memberTypeAlias, isApproved);
 
         public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias)
-        {
-            return CreateMemberWithIdentity(username, email, username, "", memberTypeAlias);
-        }
+            => CreateMemberWithIdentity(username, email, username, "", memberTypeAlias);
 
         public IMember CreateMemberWithIdentity(string username, string email, string memberTypeAlias, bool isApproved)
-        {
-            return CreateMemberWithIdentity(username, email, username, "", memberTypeAlias, isApproved);
-        }
+            => CreateMemberWithIdentity(username, email, username, "", memberTypeAlias, isApproved);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
-        {
-            return CreateMemberWithIdentity(username, email, name, "", memberTypeAlias);
-        }
+            => CreateMemberWithIdentity(username, email, name, "", memberTypeAlias);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias, bool isApproved)
-        {
-            return CreateMemberWithIdentity(username, email, name, "", memberTypeAlias, isApproved);
-        }
+            => CreateMemberWithIdentity(username, email, name, "", memberTypeAlias, isApproved);
 
         /// <summary>
         /// Creates and persists a Member
@@ -207,26 +195,29 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, string name, string passwordValue, string memberTypeAlias, bool isApproved = true)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 // locking the member tree secures member types too
                 scope.WriteLock(Constants.Locks.MemberTree);
 
-                var memberType = GetMemberType(scope, memberTypeAlias); // + locks // + locks
+                IMemberType memberType = GetMemberType(scope, memberTypeAlias); // + locks // + locks
                 if (memberType == null)
+                {
                     throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias)); // causes rollback // causes rollback
+                }
 
                 var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
 
                 Save(member);
+
+                scope.Complete();
+
                 return member;
             }
         }
 
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType)
-        {
-            return CreateMemberWithIdentity(username, email, username, "", memberType);
-        }
+            => CreateMemberWithIdentity(username, email, username, "", memberType);
 
         /// <summary>
         /// Creates and persists a Member
@@ -238,14 +229,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="memberType">MemberType the Member should be based on</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType, bool isApproved)
-        {
-            return CreateMemberWithIdentity(username, email, username, "", memberType, isApproved);
-        }
+            => CreateMemberWithIdentity(username, email, username, "", memberType, isApproved);
 
         public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType)
-        {
-            return CreateMemberWithIdentity(username, email, name, "", memberType);
-        }
+            => CreateMemberWithIdentity(username, email, name, "", memberType);
 
         /// <summary>
         /// Creates and persists a Member
@@ -258,9 +245,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="memberType">MemberType the Member should be based on</param>
         /// <returns><see cref="IMember"/></returns>
         public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType, bool isApproved)
-        {
-            return CreateMemberWithIdentity(username, email, name, "", memberType, isApproved);
-        }
+            => CreateMemberWithIdentity(username, email, name, "", memberType, isApproved);
 
         /// <summary>
         /// Creates and persists a Member
@@ -286,10 +271,16 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var vrfy = GetMemberType(scope, memberType.Alias); // + locks
 
                 if (vrfy == null || vrfy.Id != memberType.Id)
+                {
                     throw new ArgumentException($"Member type with alias {memberType.Alias} does not exist or is a different member type."); // causes rollback
+                }
+
                 var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
 
                 Save(member);
+
+                scope.Complete();
+
                 return member;
             }
         }

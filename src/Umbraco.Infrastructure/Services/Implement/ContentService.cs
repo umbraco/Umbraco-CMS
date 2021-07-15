@@ -778,7 +778,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     return OperationResult.Cancel(eventMessages);
                 }
 
-                scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
+                scope.WriteLock(Constants.Locks.ContentTree);
 
                 if (content.HasIdentity == false)
                 {
