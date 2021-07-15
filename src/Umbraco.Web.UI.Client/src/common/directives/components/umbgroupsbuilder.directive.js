@@ -26,6 +26,7 @@
             scope.genericTab = {
                 type: TYPE_TAB,
                 name: "Generic",
+                key: String.CreateGuid(),
                 alias: null,
                 parentAlias: null,
                 sortOrder: 0,
@@ -417,10 +418,13 @@
                 const lastTab = scope.tabs[newTabIndex - 1];
                 const sortOrder = lastTab && lastTab.sortOrder !== undefined ? lastTab.sortOrder + 1 : 0;
 
+                const tabKey = String.CreateGuid();
+
                 const tab = {
                     type: TYPE_TAB,
                     name: "",
-                    alias: String.CreateGuid(),
+                    key: tabKey,
+                    alias: tabKey,
                     parentAlias: null,
                     sortOrder,
                     properties: []
@@ -587,10 +591,13 @@
                 const groupsInTab = scope.model.groups.filter(group => group.parentAlias === tabAlias);
                 const lastGroupSortOrder = groupsInTab.length > 0 ? groupsInTab[groupsInTab.length - 1].sortOrder + 1 : 0;
 
+                const groupKey = String.CreateGuid();
+
                 const group = {
                     type: TYPE_GROUP,
                     name: "",
-                    alias: String.CreateGuid(),
+                    key: groupKey,
+                    alias: groupKey,
                     parentAlias: tabAlias || null,
                     sortOrder: lastGroupSortOrder,
                     properties: [],

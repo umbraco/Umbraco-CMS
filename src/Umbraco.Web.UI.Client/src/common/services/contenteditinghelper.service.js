@@ -227,6 +227,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             const genericTab = {
                 type: 1,
                 label: 'Generic',
+                key: String.CreateGuid(),
                 alias: null,
                 parentAlias: null,
                 properties: []

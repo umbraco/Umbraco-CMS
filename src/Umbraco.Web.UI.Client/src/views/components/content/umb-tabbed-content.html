@@ -5,7 +5,7 @@
             <umb-tabs-nav tabs="tabs" on-tab-change="setActiveTab(tab)"></umb-tabs-nav>
         </umb-editor-tab-bar>
 
-        <umb-box ng-repeat="tab in tabs" ng-show="tab.alias === activeTabAlias && tab.properties.length > 0">
+        <umb-box ng-repeat="tab in tabs track by tab.key" ng-show="tab.alias === activeTabAlias && tab.properties.length > 0">
             <umb-box-content data-element="{{tab.alias}}">
                 <umb-property
                     data-element="property-{{property.alias}}"
@@ -28,7 +28,7 @@
             retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)"
             data-app-anchor="{{group.id}}"
             data-element="group-{{group.alias}}"
-            ng-repeat="group in content.tabs track by group.id"
+            ng-repeat="group in content.tabs track by group.key"
             ng-show="(group.parentAlias === activeTabAlias && group.type === 0) || tabs.length === 0">
 
             <div class="umb-group-panel__header">

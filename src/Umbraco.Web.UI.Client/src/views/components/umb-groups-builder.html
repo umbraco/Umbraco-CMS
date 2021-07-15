@@ -17,7 +17,7 @@
                             allow-change-name="false">
                         </umb-content-type-tab>
                     </li>
-                    <li ng-repeat="(tabIndex, tab) in tabs track by tab.alias" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-alias="{{tab.alias}}">
+                    <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-alias="{{tab.alias}}">
                         <umb-content-type-tab
                             tab="tab"
                             is-open="tab.alias === openTabAlias"
@@ -87,7 +87,7 @@
     </div>
 
     <!-- Properties added directly to a tab -->
-    <umb-box ng-repeat="(tabIndex, tab) in tabs track by tab.alias" ng-show="ungroupedPropertiesAreVisible(tab)">
+    <umb-box ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-show="ungroupedPropertiesAreVisible(tab)">
         <umb-box-content>
             <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties" ng-show="tab.properties.length > 0 || sortingMode">
                 <li ng-repeat="(propertyIndex, property) in tab.properties track by property.alias" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
@@ -117,7 +117,7 @@
     <!-- Groups -->
     <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
         <div
-            ng-repeat="(groupIndex, group) in model.groups track by group.alias"
+            ng-repeat="(groupIndex, group) in model.groups track by group.key"
             ng-show="group.type === 0 && group.parentAlias === openTabAlias"
             ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}"
             data-group-alias="{{group.alias}}"
