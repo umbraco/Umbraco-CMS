@@ -181,7 +181,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         },
 
         generateAlias: function(name) {
-            return name.toUmbracoAlias();
+            return name ? name.toUmbracoAlias() : String.CreateGuid();
         },
 
         getCurrentAlias: function (alias) {

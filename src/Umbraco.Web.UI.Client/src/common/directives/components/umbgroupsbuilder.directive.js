@@ -24,9 +24,9 @@
             scope.openTabAlias = null;
             scope.hasGenericTab = false;
             scope.genericTab = {
+                key: String.CreateGuid(),
                 type: TYPE_TAB,
                 name: "Generic",
-                key: String.CreateGuid(),
                 alias: null,
                 parentAlias: null,
                 sortOrder: 0,
@@ -40,7 +40,7 @@
 
             eventBindings.push(scope.$watchCollection('model.groups', (newValue) => {
                 scope.tabs = $filter("filter")(newValue, (group) => {
-                    return group.type === TYPE_TAB;
+                    return group.type === TYPE_TAB && group.parentAlias == null;
                 });
 
                 // Update index and parentAlias properties of tabs
@@ -107,11 +107,18 @@
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
                     stop: function (event, ui) {
-                        const groupAlias = ui.item[0].dataset.groupAlias ? ui.item[0].dataset.groupAlias : "";
-                        const group = groupAlias ? scope.model.groups.find(group => group.alias === groupAlias) : {};
-                        group.parentAlias = scope.openTabAlias;
-                        group.alias = (group.parentAlias !== "" ? group.parentAlias + "/" : "") + group.alias.substring(group.alias.lastIndexOf('/')+1);
-                        const groupsInTab = scope.model.groups.filter(group => group.parentAlias === scope.openTabAlias);
+                        const groupKey = ui.item[0].dataset.groupKey ? ui.item[0].dataset.groupKey : false;
+                        const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
+
+                        // Update aliases
+                        const parentAlias = scope.openTabAlias,
+                            oldAlias = group.alias,
+                            newAlias = contentEditingHelper.updateParentAlias(oldAlias, parentAlias);
+                        group.alias = newAlias;
+                        group.parentAlias = parentAlias;
+                        updateDescendingAliases(oldAlias, newAlias);
+
+                        const groupsInTab = scope.model.groups.filter(group => group.parentAlias === parentAlias);
                         updateSortOrder(groupsInTab);
                     }
                 };
@@ -418,13 +425,12 @@
                 const lastTab = scope.tabs[newTabIndex - 1];
                 const sortOrder = lastTab && lastTab.sortOrder !== undefined ? lastTab.sortOrder + 1 : 0;
 
-                const tabKey = String.CreateGuid();
-
+                const key = String.CreateGuid();
                 const tab = {
+                    key: key,
                     type: TYPE_TAB,
-                    name: "",
-                    key: tabKey,
-                    alias: tabKey,
+                    name: '',
+                    alias: key, // Temporarily set alias to key, because the name is empty
                     parentAlias: null,
                     sortOrder,
                     properties: []
@@ -502,19 +508,19 @@
 
                 updateDescendingAliases(oldAlias, newAlias);
                 group.alias = newAlias;
+                group.parentAlias = contentEditingHelper.getParentAlias(newAlias);
             }
 
             function updateDescendingAliases(oldParentAlias, newParentAlias) {
                 scope.model.groups.forEach(group => {
                     const parentAlias = contentEditingHelper.getParentAlias(group.alias);
-
                     if (parentAlias == oldParentAlias) {
                         const oldAlias = group.alias,
                             newAlias = contentEditingHelper.updateParentAlias(oldAlias, newParentAlias);
 
                         updateDescendingAliases(oldAlias, newAlias);
                         group.alias = newAlias;
-
+                        group.parentAlias = newParentAlias;
                     }
                 });
             }
@@ -591,13 +597,12 @@
                 const groupsInTab = scope.model.groups.filter(group => group.parentAlias === tabAlias);
                 const lastGroupSortOrder = groupsInTab.length > 0 ? groupsInTab[groupsInTab.length - 1].sortOrder + 1 : 0;
 
-                const groupKey = String.CreateGuid();
-
+                const key = String.CreateGuid();
                 const group = {
+                    key: key,
                     type: TYPE_GROUP,
-                    name: "",
-                    key: groupKey,
-                    alias: groupKey,
+                    name: '',
+                    alias: contentEditingHelper.updateParentAlias(key, tabAlias), // Temporarily set alias to key, because the name is empty
                     parentAlias: tabAlias || null,
                     sortOrder: lastGroupSortOrder,
                     properties: [],
