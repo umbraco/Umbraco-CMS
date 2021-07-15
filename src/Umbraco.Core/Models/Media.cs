@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models
@@ -15,9 +15,9 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="name">name of the Media object</param>
         /// <param name="parent">Parent <see cref="IMedia"/> object</param>
-        /// <param name="contentType">MediaType for the current Media object</param>
-        public Media(string name, IMedia parent, IMediaType contentType)
-            : this(name, parent, contentType, new PropertyCollection())
+        /// <param name="mediaType">MediaType for the current Media object</param>
+        public Media(string name, IMedia parent, IMediaType mediaType)
+            : this(name, parent, mediaType, new PropertyCollection())
         { }
 
         /// <summary>
@@ -25,10 +25,10 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="name">name of the Media object</param>
         /// <param name="parent">Parent <see cref="IMedia"/> object</param>
-        /// <param name="contentType">MediaType for the current Media object</param>
+        /// <param name="mediaType">MediaType for the current Media object</param>
         /// <param name="properties">Collection of properties</param>
-        public Media(string name, IMedia parent, IMediaType contentType, IPropertyCollection properties)
-            : base(name, parent, contentType, properties)
+        public Media(string name, IMedia parent, IMediaType mediaType, IPropertyCollection properties)
+            : base(name, parent, mediaType, properties)
         { }
 
         /// <summary>
@@ -36,9 +36,9 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="name">name of the Media object</param>
         /// <param name="parentId">Id of the Parent IMedia</param>
-        /// <param name="contentType">MediaType for the current Media object</param>
-        public Media(string name, int parentId, IMediaType contentType)
-            : this(name, parentId, contentType, new PropertyCollection())
+        /// <param name="mediaType">MediaType for the current Media object</param>
+        public Media(string name, int parentId, IMediaType mediaType)
+            : this(name, parentId, mediaType, new PropertyCollection())
         { }
 
         /// <summary>
@@ -46,10 +46,10 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="name">Name of the Media object</param>
         /// <param name="parentId">Id of the Parent IMedia</param>
-        /// <param name="contentType">MediaType for the current Media object</param>
+        /// <param name="mediaType">MediaType for the current Media object</param>
         /// <param name="properties">Collection of properties</param>
-        public Media(string name, int parentId, IMediaType contentType, IPropertyCollection properties)
-            : base(name, parentId, contentType, properties)
+        public Media(string name, int parentId, IMediaType mediaType, IPropertyCollection properties)
+            : base(name, parentId, mediaType, properties)
         { }
 
         /// <summary>
@@ -57,9 +57,9 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="contentType">New MediaType for this Media</param>
         /// <remarks>Leaves PropertyTypes intact after change</remarks>
-        internal void ChangeContentType(IMediaType contentType)
+        internal void ChangeContentType(IMediaType mediaType)
         {
-            ChangeContentType(contentType, false);
+            ChangeContentType(mediaType, false);
         }
 
         /// <summary>
@@ -68,14 +68,14 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="contentType">New MediaType for this Media</param>
         /// <param name="clearProperties">Boolean indicating whether to clear PropertyTypes upon change</param>
-        internal void ChangeContentType(IMediaType contentType, bool clearProperties)
+        internal void ChangeContentType(IMediaType mediaType, bool clearProperties)
         {
-            ChangeContentType(new SimpleContentType(contentType));
+            ChangeContentType(new SimpleContentType(mediaType));
 
             if (clearProperties)
-                Properties.EnsureCleanPropertyTypes(contentType.CompositionPropertyTypes);
+                Properties.EnsureCleanPropertyTypes(mediaType.CompositionPropertyTypes);
             else
-                Properties.EnsurePropertyTypes(contentType.CompositionPropertyTypes);
+                Properties.EnsurePropertyTypes(mediaType.CompositionPropertyTypes);
 
             Properties.ClearCollectionChangedEvents(); // be sure not to double add
             Properties.CollectionChanged += PropertiesChanged;
