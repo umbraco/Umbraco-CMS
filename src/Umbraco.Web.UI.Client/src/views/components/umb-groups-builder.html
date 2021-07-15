@@ -17,7 +17,7 @@
                             allow-change-name="false">
                         </umb-content-type-tab>
                     </li>
-                    <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-alias="{{tab.alias}}">
+                    <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-key="{{tab.key}}"  data-tab-alias="{{tab.alias}}">
                         <umb-content-type-tab
                             tab="tab"
                             is-open="tab.alias === openTabAlias"
@@ -120,6 +120,7 @@
             ng-repeat="(groupIndex, group) in model.groups track by group.key"
             ng-show="group.type === 0 && group.parentAlias === openTabAlias"
             ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}"
+            data-group-key="{{group.key}}"
             data-group-alias="{{group.alias}}"
             data-group-parent-alias="{{group.parentAlias}}">
 
