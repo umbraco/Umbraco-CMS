@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.WebAssets
         public static BundlingOptions OptimizedAndComposite => new BundlingOptions(true, true);
         public static BundlingOptions OptimizedNotComposite => new BundlingOptions(true, false);
         public static BundlingOptions NotOptimizedNotComposite => new BundlingOptions(false, false);
-        public static BundlingOptions NotOptimizedAndComposite => new BundlingOptions(false, false);
+        public static BundlingOptions NotOptimizedAndComposite => new BundlingOptions(false, true);
 
         public BundlingOptions(bool optimizeOutput = true, bool enabledCompositeFiles = true)
         {
