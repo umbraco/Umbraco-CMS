@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Manifest
 {
     public interface IManifestParser
     {
-        //string Path { get; set; }
+        string AppPluginsPath { get; set; }
 
         /// <summary>
         /// Gets all manifests, merged into a single manifest object.
