@@ -13,7 +13,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Enables the Umbraco installer
         /// </summary>
-        public static IUmbracoEndpointBuilder UseInstallerEndpoints(this IUmbracoEndpointBuilder app)
+        public static IUmbracoEndpointBuilderContext UseInstallerEndpoints(this IUmbracoEndpointBuilderContext app)
         {
             if (!app.RuntimeState.UmbracoCanBoot())
             {

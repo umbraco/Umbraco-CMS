@@ -1,22 +1,21 @@
 using System;
-using Microsoft.AspNetCore.Builder;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
     public interface IUmbracoApplicationBuilder
     {
         /// <summary>
-        /// Called to include umbraco middleware
+        /// EXPERT/OPTIONAL call to replace the default middlewares that Umbraco installs by default.
         /// </summary>
-        /// <param name="configureUmbraco"></param>
+        /// <param name="configureUmbracoMiddleware"></param>
         /// <returns></returns>
-        IUmbracoApplicationBuilder WithMiddleware(Action<IUmbracoMiddlewareBuilder> configureUmbraco);
+        IUmbracoApplicationBuilder WithCustomDefaultMiddleware(Action<IUmbracoApplicationBuilderContext> configureUmbracoMiddleware);
 
         /// <summary>
-        /// Final call during app building to configure endpoints
+        /// Called to include umbraco middleware
         /// </summary>
-        /// <param name="configureUmbraco"></param>
-        void WithEndpoints(Action<IUmbracoEndpointBuilder> configureUmbraco);
+        /// <param name="configureUmbracoMiddleware"></param>
+        /// <returns></returns>
+        IUmbracoEndpointBuilder WithMiddleware(Action<IUmbracoApplicationBuilderContext> configureUmbracoMiddleware);
     }
 }

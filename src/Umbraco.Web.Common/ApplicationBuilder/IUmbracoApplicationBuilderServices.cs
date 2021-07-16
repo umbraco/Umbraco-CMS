@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Builder;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
-    public interface IUmbracoMiddlewareBuilder
+    public interface IUmbracoApplicationBuilderServices
     {
-        IRuntimeState RuntimeState { get; }
-        IServiceProvider ApplicationServices { get; }
         IApplicationBuilder AppBuilder { get; }
+        IServiceProvider ApplicationServices { get; }
+        IRuntimeState RuntimeState { get; }
     }
 }
