@@ -219,35 +219,5 @@ namespace Umbraco.Core.Models
                 propertyGroup.Alias = parentAlias + aliasSeparator + localAlias;
             }
         }
-
-        /// <summary>
-        /// Orders the property groups by hierarchy (so child groups are after their parent group).
-        /// </summary>
-        /// <param name="propertyGroups">The property groups.</param>
-        /// <returns>
-        /// The ordered property groups.
-        /// </returns>
-        public static IEnumerable<PropertyGroup> OrderByHierarchy(this IEnumerable<PropertyGroup> propertyGroups)
-        {
-            var groupsByParentAlias = propertyGroups.ToLookup(x => x.GetParentAlias());
-
-            IEnumerable<PropertyGroup> OrderByHierarchy(string parentAlias)
-            {
-                foreach (var group in groupsByParentAlias[parentAlias].OrderBy(x => x.SortOrder))
-                {
-                    yield return group;
-
-                    if (!string.IsNullOrEmpty(group.Alias))
-                    {
-                        foreach (var childGroup in OrderByHierarchy(group.Alias))
-                        {
-                            yield return childGroup;
-                        }
-                    }
-                }
-            }
-
-            return OrderByHierarchy(null);
-        }
     }
 }
