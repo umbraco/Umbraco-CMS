@@ -2,6 +2,7 @@
 .umb-group-builder__toolbar {
   display: flex;
   align-items: center;
+  padding: 0;
 
   .left {
     flex: 1 1 auto;
@@ -93,6 +94,10 @@
 
     .umb-group-builder__tab-remove {
       display: block;
+    }
+
+    .umb-group-builder__tab-inherited-label{
+        visibility: visible;
     }
   }
 
@@ -215,8 +220,20 @@
 }
 
 .umb-group-builder__tab-inherited-label {
-  font-size: 12px;
-  color: @gray-6;
+    position: absolute;
+    z-index: 1;
+    display: block;
+    top: -20px;
+    left: 0;
+    white-space: nowrap;
+    margin-left: 4px;
+    padding: 0 4px;
+    visibility: hidden;
+    
+    color: black;
+    font-size: 12px;
+    background-color: #d8d7d9;
+    border-radius: 3px;
 
   button {
     font-size: 12px;
