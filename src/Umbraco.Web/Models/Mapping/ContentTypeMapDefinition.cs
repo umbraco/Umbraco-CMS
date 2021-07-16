@@ -298,7 +298,8 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate -Key -PropertyTypes
         private static void Map(PropertyGroupBasic<PropertyTypeBasic> source, PropertyGroup target, MapperContext context)
         {
-            target.Id = source.Id;
+            if (source.Id > 0)
+                target.Id = source.Id;
             target.Key = source.Key;
             target.Type = source.Type;
             target.Name = source.Name;
@@ -309,7 +310,8 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate -Key -PropertyTypes
         private static void Map(PropertyGroupBasic<MemberPropertyTypeBasic> source, PropertyGroup target, MapperContext context)
         {
-            target.Id = source.Id;
+            if (source.Id > 0)
+                target.Id = source.Id;
             target.Key = source.Key;
             target.Type = source.Type;
             target.Name = source.Name;
@@ -321,7 +323,8 @@ namespace Umbraco.Web.Models.Mapping
         private static void Map(PropertyGroupBasic<PropertyTypeBasic> source, PropertyGroupDisplay<PropertyTypeDisplay> target, MapperContext context)
         {
             target.Inherited = source.Inherited;
-            target.Id = source.Id;
+            if (source.Id > 0)
+                target.Id = source.Id;
             target.Key = source.Key;
             target.Type = source.Type;
             target.Name = source.Name;
@@ -334,7 +337,8 @@ namespace Umbraco.Web.Models.Mapping
         private static void Map(PropertyGroupBasic<MemberPropertyTypeBasic> source, PropertyGroupDisplay<MemberPropertyTypeDisplay> target, MapperContext context)
         {
             target.Inherited = source.Inherited;
-            target.Id = source.Id;
+            if (source.Id > 0)
+                target.Id = source.Id;
             target.Key = source.Key;
             target.Type = source.Type;
             target.Name = source.Name;
@@ -461,7 +465,7 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             // ensure no duplicate name, then assign the groups collection
-            EnsureUniqueNames(destGroups);
+            EnsureUniqueAliases(destGroups);
             target.PropertyGroups = new PropertyGroupCollection(destGroups);
 
             // because the property groups collection was rebuilt, there is no need to remove
@@ -663,15 +667,15 @@ namespace Umbraco.Web.Models.Mapping
                 throw new InvalidOperationException("Cannot map properties due to alias conflict.");
         }
 
-        private static void EnsureUniqueNames(IEnumerable<PropertyGroup> groups)
+        private static void EnsureUniqueAliases(IEnumerable<PropertyGroup> groups)
         {
             var groupsA = groups.ToArray();
             var distinctProperties = groupsA
-                .Select(x => x.Name?.ToUpperInvariant())
+                .Select(x => x.Alias)
                 .Distinct()
                 .Count();
             if (distinctProperties != groupsA.Length)
-                throw new InvalidOperationException("Cannot map groups due to name conflict.");
+                throw new InvalidOperationException("Cannot map groups due to alias conflict.");
         }
 
         private static void MapComposition(ContentTypeSave source, IContentTypeComposition target, Func<string, IContentTypeComposition> getContentType)
