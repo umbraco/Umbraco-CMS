@@ -366,9 +366,9 @@
 
   $ubuild.DefineMethod("PrepareBuild",
   {
-    $this.TempStoreFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
-    Write-Host "Create clean web.config"
-    $this.CopyFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.Template.config", "$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
+    # $this.TempStoreFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
+    # Write-Host "Create clean web.config"
+    # $this.CopyFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.Template.config", "$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
 
     Write-host "Set environment"
     $env:UMBRACO_VERSION=$this.Version.Semver.ToString()
