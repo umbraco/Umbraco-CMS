@@ -120,9 +120,7 @@
             ng-repeat="(groupIndex, group) in model.groups track by group.key"
             ng-show="group.type === 0 && group.parentAlias === openTabAlias"
             ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}"
-            data-group-key="{{group.key}}"
-            data-group-alias="{{group.alias}}"
-            data-group-parent-alias="{{group.parentAlias}}">
+            data-group-key="{{group.key}}">
 
             <umb-content-type-group
                 ng-if="group.tabState !== 'init'"

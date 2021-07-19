@@ -115,6 +115,13 @@
                         const parentAlias = scope.openTabAlias,
                             oldAlias = group.alias || null, // null when group comes from root aka. 'generic'
                             newAlias = contentEditingHelper.updateParentAlias(oldAlias, parentAlias);
+
+                        // Check alias is unique
+                        // TODO: we should properly do this on hover, to let user know it cant be moved.
+                        if (isAliasUnique(newAlias) === false) {
+                            return;
+                        }
+
                         group.alias = newAlias;
                         group.parentAlias = parentAlias;
                         updateDescendingAliases(oldAlias, newAlias);
@@ -142,7 +149,24 @@
                     accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
                     tolerance : 'pointer',
                     over: function (evt, ui) {
-                        scope.openTabAlias = evt.target.dataset.tabAlias || null;
+
+                        const hoveredTabAlias = evt.target.dataset.tabAlias || null;;
+
+                        // if group
+                        if (ui.draggable[0].dataset.groupKey) {
+
+                            const groupKey = ui.draggable[0].dataset.groupKey ? ui.draggable[0].dataset.groupKey : false;
+                            const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
+
+                            const newAlias = contentEditingHelper.updateParentAlias(group.alias || null, hoveredTabAlias);
+                            // Check alias is unique
+                            if (group.alias !== newAlias && isAliasUnique(newAlias) === false) {
+                                // TODO: Missing UI indication of why you cant move here.
+                                return;
+                            }
+                        }
+
+                        scope.openTabAlias = hoveredTabAlias;
                         scope.$evalAsync();
                     }
                 };
