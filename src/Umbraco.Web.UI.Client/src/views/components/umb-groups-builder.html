@@ -87,7 +87,7 @@
     </div>
 
     <!-- Properties added directly to a tab -->
-    <umb-box ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-show="ungroupedPropertiesAreVisible(tab)">
+    <umb-box ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-show="isUngroupedPropertiesVisible(tab)" class="umb-group-builder__ungrouped-properties">
         <umb-box-content>
             <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties" ng-show="tab.properties.length > 0 || sortingMode">
                 <li ng-repeat="(propertyIndex, property) in tab.properties track by property.alias" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">

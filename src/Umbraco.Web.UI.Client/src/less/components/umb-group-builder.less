@@ -90,6 +90,12 @@
   justify-content: center;
   height: 100%;
   border-right: 1px solid @gray-9;
+  &:first-of-type {
+    border-bottom-left-radius: 3px;
+  }
+  &:last-of-type {
+    border-bottom-right-radius: 3px;
+  }
 
   &:hover {
     cursor: pointer;
@@ -214,13 +220,16 @@
 
 .umb-group-builder__tab--placeholder {
   border: 1px dashed @ui-action-discreet-border;
+  color: @ui-action-discreet-type;
   padding-right: 10px;
   min-width: 100px;
   background: transparent;
   border-radius: @baseBorderRadius;
   margin-left: 5px;
+  transition: color, border-color, 80ms;
   &:hover {
-    border: @ui-action-discreet-border-hover;
+    color: @ui-action-discreet-type-hover;
+    border-color: @ui-action-discreet-border-hover;
   }
 }
 
@@ -253,6 +262,10 @@
 
 .umb-group-builder__tab-sort-order {
   margin-left: 10px;
+}
+
+.umb-group-builder__ungrouped-properties {
+    margin-top: 20px;
 }
 
 /* ---------- GROUPS ----------  */

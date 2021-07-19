@@ -106,7 +106,8 @@
                     placeholder: "umb-group-builder__group-sortable-placeholder",
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
-                    stop: function (event, ui) {
+                    stop: function (e, ui) {
+
                         const groupKey = ui.item[0].dataset.groupKey ? ui.item[0].dataset.groupKey : false;
                         const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
 
@@ -130,6 +131,9 @@
                     handle: ".umb-group-builder__property-handle",
                     items: ".umb-group-builder__property-sortable",
                     stop: function (e, ui) {
+
+                        // TODO: Ensure moving of properties works..
+
                         updatePropertiesSortOrder();
                     }
                 };
@@ -528,7 +532,7 @@
                 });
             }
 
-            scope.ungroupedPropertiesAreVisible = function({alias, properties}) {
+            scope.isUngroupedPropertiesVisible = function({alias, properties}) {
                 const isOpenTab = alias === scope.openTabAlias;
 
                 if (isOpenTab && properties.length > 0) {
