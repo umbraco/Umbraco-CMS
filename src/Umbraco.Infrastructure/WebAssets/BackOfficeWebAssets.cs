@@ -163,10 +163,20 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
             {
                 foreach (ManifestAssets manifestAssets in manifestAssetList)
                 {
-                    _runtimeMinifier.CreateJsBundle(
-                        GetIndependentPackageBundleName(manifestAssets, assetType),
-                        BundlingOptions.OptimizedAndComposite,
-                        FormatPaths(manifestAssets.Assets.ToArray()));
+                    string bundleName = GetIndependentPackageBundleName(manifestAssets, assetType);
+                    string[] filePaths = FormatPaths(manifestAssets.Assets.ToArray());
+
+                    switch (assetType)
+                    {
+                        case AssetType.Javascript:                           
+                            _runtimeMinifier.CreateJsBundle(bundleName, BundlingOptions.OptimizedAndComposite, filePaths);
+                            break;
+                        case AssetType.Css:
+                            _runtimeMinifier.CreateCssBundle(bundleName, BundlingOptions.OptimizedAndComposite, filePaths);
+                            break;
+                        default:
+                            throw new IndexOutOfRangeException();
+                    }                    
                 }
             }
         }
