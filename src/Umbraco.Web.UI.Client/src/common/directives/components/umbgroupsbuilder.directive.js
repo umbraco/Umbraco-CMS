@@ -113,7 +113,7 @@
 
                         // Update aliases
                         const parentAlias = scope.openTabAlias,
-                            oldAlias = group.alias,
+                            oldAlias = group.alias || null, // null when group comes from root aka. 'generic'
                             newAlias = contentEditingHelper.updateParentAlias(oldAlias, parentAlias);
                         group.alias = newAlias;
                         group.parentAlias = parentAlias;
@@ -500,10 +500,15 @@
             };
 
             scope.onChangeTabName = function (tab) {
-                updateGroupAlias(tab)
-                scope.openTabAlias = tab.alias;
-                scope.$broadcast('umbOverflowChecker.checkOverflow');
+                if (updateGroupAlias(tab)) {
+                    scope.openTabAlias = tab.alias;
+                    scope.$broadcast('umbOverflowChecker.checkOverflow');
+                }
             };
+
+            function isAliasUnique(alias) {
+                return scope.model.groups.find(group => group.alias === alias) ? false : true;
+            }
 
             /** Universal method for updating group alias (for tabs, field-sets etc.) */
             function updateGroupAlias(group) {
@@ -511,9 +516,15 @@
                     oldAlias = group.alias,
                     newAlias = contentEditingHelper.updateLocalAlias(oldAlias, localAlias);
 
+                // Ensure unique alias, otherwise we would be transforming groups of other parents, we do not want this.
+                if(isAliasUnique(newAlias) === false) {
+                    return false;
+                }
+
                 group.alias = newAlias;
                 group.parentAlias = contentEditingHelper.getParentAlias(newAlias);
                 updateDescendingAliases(oldAlias, newAlias);
+                return true;
             }
 
             function updateDescendingAliases(oldParentAlias, newParentAlias) {
