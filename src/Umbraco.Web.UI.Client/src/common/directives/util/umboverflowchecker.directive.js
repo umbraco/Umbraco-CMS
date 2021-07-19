@@ -1,7 +1,7 @@
 angular.module("umbraco.directives")
     .directive('umbOverflowChecker', function ($parse, $timeout, windowResizeListener) {
         return {
-          restrict: 'A',            
+          restrict: 'A',
           link: function (scope, element, attrs) {
             const overflow = $parse(attrs.onOverflow);
 
@@ -12,10 +12,10 @@ angular.module("umbraco.directives")
               $timeout(() => {
                 const scrollElementScrollWidth = scrollElement.scrollWidth;
                 const containerScrollWidth = container.scrollWidth;
-  
+
                 const overflowLeft = scrollElement.scrollLeft;
                 const overflowRight = containerScrollWidth - scrollElementScrollWidth + overflowLeft;
-  
+
                 scope.$evalAsync(() => overflow(scope, {overflowLeft, overflowRight}));
               }, 50);
             }
@@ -39,9 +39,11 @@ angular.module("umbraco.directives")
               scrollElement.removeEventListener('scroll', checkOverflow);
               windowResizeListener.unregister(checkOverflow);
             });
-            
+
             scope.$on('umbOverflowChecker.checkOverflow', checkOverflow);
             scope.$on('umbOverflowChecker.scrollTo', scrollTo);
+
+            checkOverflow();
           }
         }
     });

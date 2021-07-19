@@ -5,7 +5,7 @@
         $filter, iconHelper, $q, $timeout, notificationsService,
         localizationService, editorService, eventsService, overlayService, contentEditingHelper) {
 
-        function link(scope) {
+        function link(scope, element) {
 
             const TYPE_GROUP = 0;
             const TYPE_TAB = 1;
@@ -518,6 +518,17 @@
             scope.setTabOverflowState = function (overflowLeft, overflowRight) {
                 scope.overflow = { left: overflowLeft, right: overflowRight };
             };
+
+            scope.moveTabsOverflowLeft = function() {
+                //TODO: optimize this...
+                const el = element[0].querySelector(".umb-group-builder__tabs-list");
+                el.scrollLeft -= el.clientWidth * 0.5;
+            }
+            scope.moveTabsOverflowRight = function() {
+                //TODO: optimize this...
+                const el = element[0].querySelector(".umb-group-builder__tabs-list");
+                el.scrollLeft += el.clientWidth * 0.5;
+            }
 
             scope.onChangeTabSortOrderValue = function () {
                 scope.tabs = $filter('orderBy')(scope.tabs, 'sortOrder');

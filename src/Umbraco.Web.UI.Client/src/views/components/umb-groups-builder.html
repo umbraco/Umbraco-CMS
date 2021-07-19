@@ -5,9 +5,9 @@
         <umb-editor-sub-header-content-left class="left">
 
             <div class="umb-group-builder__tabs" ng-if="(sortingMode && tabs.length > 0) || (!sortingMode)">
-                <div ng-show="overflow.left > 0" class="umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--left">
+                <button ng-show="overflow.left > 0" class="btn-reset umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--left" ng-click="moveTabsOverflowLeft()">
                     <span class="caret"></span>
-                </div>
+                </button>
                 <ul class="umb-group-builder__tabs-list" ui-sortable="sortableOptionsTab" ng-model="tabs" umb-overflow-checker on-overflow="setTabOverflowState(overflowLeft, overflowRight)">
                     <li ng-if="hasGenericTab" umb-droppable="droppableOptionsTab" data-tab-alias="{{genericTab.alias}}">
                         <umb-content-type-tab
@@ -42,9 +42,9 @@
                         </button>
                     </li>
                 </ul>
-                <div ng-show="overflow.right < 0" class="umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--right">
+                <button ng-if="overflow.right < 0" class="btn-reset umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--right" ng-click="moveTabsOverflowRight()">
                     <span class="caret"></span>
-                </div>
+                </button>
             </div>
 
         </umb-editor-sub-header-content-left>
