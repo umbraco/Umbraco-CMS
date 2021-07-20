@@ -1,0 +1,10 @@
+<li class="umb-tab" data-element="tab-{{vm.tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': tab.hasError}" val-tab>
+    <button class="btn-reset umb-tab-button"
+        ng-click="vm.onClick($event)"
+        role="tab"
+        aria-selected="{vm.tab.active}"
+        type="button">
+        {{ vm.tab.label }}
+        <div ng-show="!vm.hideBadge && !vm.tab.active" class="badge">!</div>
+    </button>
+</li>
