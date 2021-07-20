@@ -3,8 +3,9 @@
   display: flex;
   align-items: center;
   padding: 0;
-  border-left-width: 1px;
-  border-right-width: 1px;
+  border-right-width: 21px;
+  margin-left: -20px;
+  width: calc(100% + 40px);
 
   .left {
     flex: 1 1 auto;
@@ -33,6 +34,7 @@
   display: flex;
   align-items: center;
   overflow-x: auto;
+  scroll-behavior: smooth;
   -ms-overflow-style: none;
   scrollbar-width: none;
 
@@ -79,6 +81,13 @@
   .caret {
     transform: rotate(270deg) translate(0, -2px);
   }
+}
+
+.umb-group-builder__tabs__add-tab {
+    white-space: nowrap;
+    .umb-button__content {
+        flex-wrap: nowrap;
+    }
 }
 
 .umb-group-builder__tab {
@@ -378,8 +387,7 @@
 input.umb-group-builder__group-title-input {
   border-color: transparent;
   background: transparent;
-  font-weight: bold;
-  color: @black;
+  color: @ui-light-type;
   margin-bottom: 0;
 }
 

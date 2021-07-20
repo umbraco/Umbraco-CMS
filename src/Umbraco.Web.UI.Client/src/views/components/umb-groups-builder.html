@@ -1,6 +1,6 @@
 <div data-element="groups-builder" class="clearfix">
 
-    <umb-editor-sub-header class="umb-group-builder__toolbar">
+    <umb-editor-sub-header class="umb-group-builder__toolbar" appearance="white">
 
         <umb-editor-sub-header-content-left class="left">
 
@@ -30,17 +30,16 @@
                             on-change-name="onChangeTabName(tab)">
                         </umb-content-type-tab>
                     </li>
-                    <li>
-                        <button
-                            ng-if="!sortingMode"
-                            type="button"
-                            hotkey="alt+shift+a"
-                            ng-click="addTab(tab)"
-                            data-element="tab-add"
-                            class="btn-reset umb-group-builder__tab umb-group-builder__tab--placeholder">
-                            Add tab
-                        </button>
-                    </li>
+                    <umb-button
+                        ng-if="!sortingMode"
+                        class="umb-group-builder__tabs__add-tab"
+                        type="button"
+                        label-key="contentTypeEditor_addTab"
+                        icon="icon-add"
+                        button-style="white"
+                        action="addTab();"
+                        size="xs">
+                    </umb-button>
                 </ul>
                 <button ng-if="overflow.right < 0" class="btn-reset umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--right" ng-click="moveTabsOverflowRight()">
                     <span class="caret"></span>
