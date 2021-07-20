@@ -351,6 +351,9 @@
           <DevelopmentServerPort>8150</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:8150</IISUrl>
+          <DevelopmentServerPort>8141</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:8141</IISUrl>
           <DevelopmentServerPort>8131</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:8131</IISUrl>
