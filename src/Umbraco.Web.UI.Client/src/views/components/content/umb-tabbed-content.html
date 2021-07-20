@@ -27,7 +27,7 @@
         <div class="umb-group-panel"
             retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)"
             data-app-anchor="{{group.id}}"
-            data-element="group-{{group.alias}}"
+            data-element="tab-content-{{group.alias}}"
             ng-repeat="group in content.tabs track by group.key"
             ng-show="(group.parentAlias === activeTabAlias && group.type === 0) || tabs.length === 0">
 
@@ -35,7 +35,7 @@
                 <div id="group-{{group.id}}">{{ group.label }}</div>
             </div>
 
-            <div class="umb-group-panel__content" data-element="{{group.alias}}">
+            <div class="umb-group-panel__content">
                 <umb-property
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in group.properties track by property.alias"
