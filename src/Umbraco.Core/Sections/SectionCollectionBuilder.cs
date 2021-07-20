@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Sections
             // its dependencies too, and that can create cycles or other oddities
             var manifestParser = factory.GetRequiredService<IManifestParser>();
 
-            return base.CreateItems(factory).Concat(manifestParser.Manifest.Sections);
+            return base.CreateItems(factory).Concat(manifestParser.CombinedManifest.Sections);
         }
     }
 }

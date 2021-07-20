@@ -25,6 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Parent")]
         public Guid? Parent { get; set; }
 
+        // TODO: This needs to have a unique index.
         [Column("key")]
         [Length(450)]
         [Index(IndexTypes.NonClustered, Name = "IX_cmsDictionary_key")]

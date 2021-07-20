@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
@@ -68,15 +68,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
         void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Constants.Security.SuperUserId);
-
-        /// <summary>
-        /// Saves a collection of <see cref="IDataType"/>
-        /// </summary>
-        /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issuing the save</param>
-        /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
-        void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents);
-
+        
         /// <summary>
         /// Deletes an <see cref="IDataType"/>
         /// </summary>

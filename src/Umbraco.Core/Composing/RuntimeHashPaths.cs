@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace Umbraco.Cms.Core.Composing
 {
@@ -14,6 +15,24 @@ namespace Umbraco.Cms.Core.Composing
         public RuntimeHashPaths AddFolder(DirectoryInfo pathInfo)
         {
             _paths.Add(pathInfo);
+            return this;
+        }
+
+        /// <summary>
+        /// Creates a runtime hash based on the assembly provider
+        /// </summary>
+        /// <param name="assemblyProvider"></param>
+        /// <returns></returns>
+        public RuntimeHashPaths AddAssemblies(IAssemblyProvider assemblyProvider)
+        {
+            foreach (Assembly assembly in assemblyProvider.Assemblies)
+            {
+                // TODO: We need to test this on a published website
+                if (!assembly.IsDynamic && assembly.Location != null)
+                {
+                    AddFile(new FileInfo(assembly.Location));
+                }
+            }
             return this;
         }
 

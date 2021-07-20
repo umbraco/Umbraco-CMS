@@ -434,18 +434,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
-        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Cms.Core.Constants.Security.SuperUserId)
-        {
-            Save(dataTypeDefinitions, userId, true);
-        }
-
-        /// <summary>
-        /// Saves a collection of <see cref="IDataType"/>
-        /// </summary>
-        /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issuing the save</param>
-        /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
-        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents)
+        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var dataTypeDefinitionsA = dataTypeDefinitions.ToArray();
@@ -453,7 +442,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var savingDataTypeNotification = new DataTypeSavingNotification(dataTypeDefinitions, evtMsgs);
-                if (raiseEvents && scope.Notifications.PublishCancelable(savingDataTypeNotification))
+                if (scope.Notifications.PublishCancelable(savingDataTypeNotification))
                 {
                     scope.Complete();
                     return;
@@ -465,10 +454,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _dataTypeRepository.Save(dataTypeDefinition);
                 }
 
-                if (raiseEvents)
-                {
-                    scope.Notifications.Publish(new DataTypeSavedNotification(dataTypeDefinitions, evtMsgs).WithStateFrom(savingDataTypeNotification));
-                }
+                scope.Notifications.Publish(new DataTypeSavedNotification(dataTypeDefinitions, evtMsgs).WithStateFrom(savingDataTypeNotification));
+
                 Audit(AuditType.Save, userId, -1);
 
                 scope.Complete();

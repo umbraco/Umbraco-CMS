@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -8,12 +8,13 @@ using Type = System.Type;
 
 namespace Umbraco.Cms.Infrastructure.Migrations
 {
+
     /// <summary>
     /// Represents a migration plan.
     /// </summary>
     public class MigrationPlan
     {
-        private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>();
+        private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>(StringComparer.InvariantCultureIgnoreCase);
         private readonly List<Type> _postMigrationTypes = new List<Type>();
 
         private string _prevState;
@@ -25,16 +26,31 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// <param name="name">The name of the plan.</param>
         public MigrationPlan(string name)
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            }
 
             Name = name;
         }
 
         /// <summary>
+        /// If set to true the plan executor will ignore any current state persisted and
+        /// run the plan from its initial state to its end state.
+        /// </summary>
+        public virtual bool IgnoreCurrentState { get; } = false;
+
+        /// <summary>
         /// Gets the transitions.
         /// </summary>
         public IReadOnlyDictionary<string, Transition> Transitions => _transitions;
+
+        public IReadOnlyList<Type> PostMigrationTypes => _postMigrationTypes;
 
         /// <summary>
         /// Gets the name of the plan.
@@ -44,12 +60,18 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         // adds a transition
         private MigrationPlan Add(string sourceState, string targetState, Type migration)
         {
-            if (sourceState == null) throw new ArgumentNullException(nameof(sourceState));
-            if (targetState == null) throw new ArgumentNullException(nameof(targetState));
-            if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(targetState));
-            if (sourceState == targetState) throw new ArgumentException("Source and target state cannot be identical.");
-            if (migration == null) throw new ArgumentNullException(nameof(migration));
-            if (!migration.Implements<MigrationBase>()) throw new ArgumentException($"Type {migration.Name} does not implement IMigration.", nameof(migration));
+            if (sourceState == null)
+                throw new ArgumentNullException(nameof(sourceState), $"{nameof(sourceState)} is null, {nameof(MigrationPlan)}.{nameof(MigrationPlan.From)} must not have been called.");
+            if (targetState == null)
+                throw new ArgumentNullException(nameof(targetState));
+            if (string.IsNullOrWhiteSpace(targetState))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(targetState));
+            if (sourceState == targetState)
+                throw new ArgumentException("Source and target state cannot be identical.");
+            if (migration == null)
+                throw new ArgumentNullException(nameof(migration));
+            if (!migration.Implements<MigrationBase>())
+                throw new ArgumentException($"Type {migration.Name} does not implement IMigration.", nameof(migration));
 
             sourceState = sourceState.Trim();
             targetState = targetState.Trim();
@@ -81,10 +103,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         public MigrationPlan To(string targetState)
             => To<NoopMigration>(targetState);
 
+        public MigrationPlan To(Guid targetState)
+            => To<NoopMigration>(targetState.ToString());
+
         /// <summary>
         /// Adds a transition to a target state through a migration.
         /// </summary>
         public MigrationPlan To<TMigration>(string targetState)
+            where TMigration : MigrationBase
+            => To(targetState, typeof(TMigration));
+
+        public MigrationPlan To<TMigration>(Guid targetState)
             where TMigration : MigrationBase
             => To(targetState, typeof(TMigration));
 
@@ -93,6 +122,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// </summary>
         public MigrationPlan To(string targetState, Type migration)
             => Add(_prevState, targetState, migration);
+
+        public MigrationPlan To(Guid targetState, Type migration)
+            => Add(_prevState, targetState.ToString(), migration);
 
         /// <summary>
         /// Sets the starting state.
@@ -111,7 +143,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// <param name="recoverState">The previous target state, which we need to recover from through <typeparamref name="TMigrationRecover"/>.</param>
         /// <param name="targetState">The new target state.</param>
         public MigrationPlan ToWithReplace<TMigrationNew, TMigrationRecover>(string recoverState, string targetState)
-            where TMigrationNew: MigrationBase
+            where TMigrationNew : MigrationBase
             where TMigrationRecover : MigrationBase
         {
             To<TMigrationNew>(targetState);
@@ -138,13 +170,20 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// </summary>
         public MigrationPlan ToWithClone(string startState, string endState, string targetState)
         {
-            if (startState == null) throw new ArgumentNullException(nameof(startState));
-            if (string.IsNullOrWhiteSpace(startState)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(startState));
-            if (endState == null) throw new ArgumentNullException(nameof(endState));
-            if (string.IsNullOrWhiteSpace(endState)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(endState));
-            if (targetState == null) throw new ArgumentNullException(nameof(targetState));
-            if (string.IsNullOrWhiteSpace(targetState)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(targetState));
-            if (startState == endState) throw new ArgumentException("Start and end states cannot be identical.");
+            if (startState == null)
+                throw new ArgumentNullException(nameof(startState));
+            if (string.IsNullOrWhiteSpace(startState))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(startState));
+            if (endState == null)
+                throw new ArgumentNullException(nameof(endState));
+            if (string.IsNullOrWhiteSpace(endState))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(endState));
+            if (targetState == null)
+                throw new ArgumentNullException(nameof(targetState));
+            if (string.IsNullOrWhiteSpace(targetState))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(targetState));
+            if (startState == endState)
+                throw new ArgumentException("Start and end states cannot be identical.");
 
             startState = startState.Trim();
             endState = endState.Trim();
@@ -171,15 +210,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
             return this;
         }
-
-        /// <summary>
-        /// Prepares post-migrations.
-        /// </summary>
-        /// <remarks>
-        /// <para>This can be overriden to filter, complement, and/or re-order post-migrations.</para>
-        /// </remarks>
-        protected virtual IEnumerable<Type> PreparePostMigrations(IEnumerable<Type> types)
-            => types;
 
         /// <summary>
         /// Adds a post-migration to the plan.
@@ -253,7 +283,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations
             var verified = new List<string>();
             foreach (var transition in _transitions.Values)
             {
-                if (transition == null || verified.Contains(transition.SourceState)) continue;
+                if (transition == null || verified.Contains(transition.SourceState))
+                    continue;
 
                 var visited = new List<string> { transition.SourceState };
                 var nextTransition = _transitions[transition.TargetState];
@@ -274,80 +305,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// <summary>
         /// Throws an exception when the initial state is unknown.
         /// </summary>
-        protected virtual void ThrowOnUnknownInitialState(string state)
+        public virtual void ThrowOnUnknownInitialState(string state)
         {
             throw new InvalidOperationException($"The migration plan does not support migrating from state \"{state}\".");
-        }
-
-        /// <summary>
-        /// Executes the plan.
-        /// </summary>
-        /// <param name="scope">A scope.</param>
-        /// <param name="fromState">The state to start execution at.</param>
-        /// <param name="migrationBuilder">A migration builder.</param>
-        /// <param name="logger">A logger.</param>
-        /// <param name="loggerFactory"></param>
-        /// <returns>The final state.</returns>
-        /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
-        public string Execute(IScope scope, string fromState, IMigrationBuilder migrationBuilder, ILogger<MigrationPlan> logger, ILoggerFactory loggerFactory)
-        {
-            Validate();
-
-            if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-
-            logger.LogInformation("Starting '{MigrationName}'...", Name);
-
-            var origState = fromState ?? string.Empty;
-
-            logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
-
-            if (!_transitions.TryGetValue(origState, out var transition))
-                ThrowOnUnknownInitialState(origState);
-
-            var context = new MigrationContext(scope.Database, loggerFactory.CreateLogger<MigrationContext>());
-            context.PostMigrations.AddRange(_postMigrationTypes);
-
-            while (transition != null)
-            {
-                logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
-
-                var migration = migrationBuilder.Build(transition.MigrationType, context);
-                migration.Run();
-
-                var nextState = transition.TargetState;
-                origState = nextState;
-
-                logger.LogInformation("At {OrigState}", origState);
-
-                // throw a raw exception here: this should never happen as the plan has
-                // been validated - this is just a paranoid safety test
-                if (!_transitions.TryGetValue(origState, out transition))
-                    throw new InvalidOperationException($"Unknown state \"{origState}\".");
-            }
-
-            // prepare and de-duplicate post-migrations, only keeping the 1st occurence
-            var temp = new HashSet<Type>();
-            var postMigrationTypes = PreparePostMigrations(context.PostMigrations)
-                .Where(x => !temp.Contains(x))
-                .Select(x => { temp.Add(x); return x; });
-
-            // run post-migrations
-            foreach (var postMigrationType in postMigrationTypes)
-            {
-                logger.LogInformation($"PostMigration: {postMigrationType.FullName}.");
-                var postMigration = migrationBuilder.Build(postMigrationType, context);
-                postMigration.Run();
-            }
-
-            logger.LogInformation("Done (pending scope completion).");
-
-            // safety check - again, this should never happen as the plan has been validated,
-            // and this is just a paranoid safety test
-            if (origState != _finalState)
-                throw new InvalidOperationException($"Internal error, reached state {origState} which is not final state {_finalState}");
-
-            return origState;
         }
 
         /// <summary>

@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
@@ -18,6 +19,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public KeyValueRepository(IScopeAccessor scopeAccessor, ILogger<KeyValueRepository> logger)
             : base(scopeAccessor, AppCaches.NoCache, logger)
         { }
+
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, string> FindByKeyPrefix(string keyPrefix)
+            => Get(Query<IKeyValue>().Where(entity => entity.Identifier.StartsWith(keyPrefix)))
+                .ToDictionary(x => x.Identifier, x => x.Value);
 
         #region Overrides of IReadWriteQueryRepository<string, IKeyValue>
 
@@ -47,15 +53,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return sql;
         }
 
-        protected override string GetBaseWhereClause()
-        {
-            return Cms.Core.Constants.DatabaseSchema.Tables.KeyValue + ".key = @id";
-        }
+        protected override string GetBaseWhereClause() => Core.Constants.DatabaseSchema.Tables.KeyValue + ".key = @id";
 
-        protected override IEnumerable<string> GetDeleteClauses()
-        {
-            return Enumerable.Empty<string>();
-        }
+        protected override IEnumerable<string> GetDeleteClauses() => Enumerable.Empty<string>();
 
         protected override IKeyValue PerformGet(string id)
         {
@@ -73,7 +73,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<IKeyValue> PerformGetByQuery(IQuery<IKeyValue> query)
         {
-            throw new NotSupportedException();
+            var sqlClause = GetBaseQuery(false);
+            var translator = new SqlTranslator<IKeyValue>(sqlClause, query);
+            var sql = translator.Translate();
+            return Database.Fetch<KeyValueDto>(sql).Select(Map);
         }
 
         protected override void PersistNewItem(IKeyValue entity)

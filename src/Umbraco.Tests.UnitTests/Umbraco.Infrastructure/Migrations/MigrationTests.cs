@@ -58,11 +58,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 #endif
         }
 
+        private class TestPlan : MigrationPlan
+        {
+            public TestPlan() : base("Test")
+            {
+            }
+        }
+        private MigrationContext GetMigrationContext() => new MigrationContext(new TestPlan(), Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
+
         [Test]
         public void RunGoodMigration()
         {
-            var migrationContext =
-                new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
+            var migrationContext = GetMigrationContext();
             MigrationBase migration = new GoodMigration(migrationContext);
             migration.Run();
         }
@@ -70,8 +77,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         [Test]
         public void DetectBadMigration1()
         {
-            var migrationContext =
-                new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
+            var migrationContext = GetMigrationContext();
             MigrationBase migration = new BadMigration1(migrationContext);
             Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Run());
         }
@@ -79,8 +85,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         [Test]
         public void DetectBadMigration2()
         {
-            var migrationContext =
-                new MigrationContext(Mock.Of<IUmbracoDatabase>(), Mock.Of<ILogger<MigrationContext>>());
+            var migrationContext = GetMigrationContext();
             MigrationBase migration = new BadMigration2(migrationContext);
             Assert.Throws<IncompleteMigrationExpressionException>(() => migration.Run());
         }

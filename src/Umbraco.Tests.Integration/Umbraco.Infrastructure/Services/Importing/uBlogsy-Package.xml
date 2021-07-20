@@ -1,358 +1,9 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
-  <files>
-    <file>
-      <guid>uBlogsy.BusinessLogic.dll</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uBlogsy.BusinessLogic.dll</orgName>
-    </file>
-    <file>
-      <guid>uBlogsy.BusinessLogic.pdb</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uBlogsy.BusinessLogic.pdb</orgName>
-    </file>
-    <file>
-      <guid>uBlogsy.Common.dll</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uBlogsy.Common.dll</orgName>
-    </file>
-    <file>
-      <guid>uBlogsy.Common.pdb</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uBlogsy.Common.pdb</orgName>
-    </file>
-    <file>
-      <guid>uBlogsy.Mvc.Parts.dll</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uBlogsy.Mvc.Parts.dll</orgName>
-    </file>
-    <file>
-      <guid>uBlogsy.Mvc.Parts.pdb</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uBlogsy.Mvc.Parts.pdb</orgName>
-    </file>
-    <file>
-      <guid>uBlogsy.Web.dll</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uBlogsy.Web.dll</orgName>
-    </file>
-    <file>
-      <guid>uBlogsy.Web.pdb</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uBlogsy.Web.pdb</orgName>
-    </file>
-    <file>
-      <guid>uDateFoldersy.dll</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uDateFoldersy.dll</orgName>
-    </file>
-    <file>
-      <guid>uDateFoldersy.pdb</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uDateFoldersy.pdb</orgName>
-    </file>
-    <file>
-      <guid>uLoremsy.dll</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uLoremsy.dll</orgName>
-    </file>
-    <file>
-      <guid>uLoremsy.pdb</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uLoremsy.pdb</orgName>
-    </file>
-    <file>
-      <guid>uHelpsy.dll</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uHelpsy.dll</orgName>
-    </file>
-    <file>
-      <guid>uHelpsy.pdb</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uHelpsy.pdb</orgName>
-    </file>
-    <file>
-      <guid>uTagsy.Web.dll</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uTagsy.Web.dll</orgName>
-    </file>
-    <file>
-      <guid>uTagsy.Web.pdb</guid>
-      <orgPath>/bin</orgPath>
-      <orgName>uTagsy.Web.pdb</orgName>
-    </file>
-    <file>
-      <guid>CreatePost.ascx</guid>
-      <orgPath>/usercontrols/uBlogsy/dashboard</orgPath>
-      <orgName>CreatePost.ascx</orgName>
-    </file>
-    <file>
-      <guid>RSSImport.ascx</guid>
-      <orgPath>/usercontrols/uBlogsy/dashboard</orgPath>
-      <orgName>RSSImport.ascx</orgName>
-    </file>
-    <file>
-      <guid>uTagsy.ascx</guid>
-      <orgPath>/usercontrols/uTagsy</orgPath>
-      <orgName>uTagsy.ascx</orgName>
-    </file>
-    <file>
-      <guid>uDateFoldersy.config</guid>
-      <orgPath>/config</orgPath>
-      <orgName>uDateFoldersy.config</orgName>
-    </file>
-    <file>
-      <guid>uTagsy.config</guid>
-      <orgPath>/config</orgPath>
-      <orgName>uTagsy.config</orgName>
-    </file>
-    <file>
-      <guid>uLoremsy.config</guid>
-      <orgPath>/config</orgPath>
-      <orgName>uLoremsy.config</orgName>
-    </file>
-    <file>
-      <guid>uBlogsy.css</guid>
-      <orgPath>/css</orgPath>
-      <orgName>uBlogsy.css</orgName>
-    </file>
-    <file>
-      <guid>uBlogsy_feed-icon-14x14.png</guid>
-      <orgPath>/Images</orgPath>
-      <orgName>uBlogsy_feed-icon-14x14.png</orgName>
-    </file>
-    <file>
-      <guid>calendar_view_day.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>calendar_view_day.png</orgName>
-    </file>
-    <file>
-      <guid>date.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>date.png</orgName>
-    </file>
-    <file>
-      <guid>feed.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>feed.png</orgName>
-    </file>
-    <file>
-      <guid>folder_table.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>folder_table.png</orgName>
-    </file>
-    <file>
-      <guid>folder_user.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>folder_user.png</orgName>
-    </file>
-    <file>
-      <guid>house.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>house.png</orgName>
-    </file>
-    <file>
-      <guid>page_green.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>page_green.png</orgName>
-    </file>
-    <file>
-      <guid>page_white_cup.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>page_white_cup.png</orgName>
-    </file>
-    <file>
-      <guid>rss.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>rss.png</orgName>
-    </file>
-    <file>
-      <guid>tag.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>tag.png</orgName>
-    </file>
-    <file>
-      <guid>tag_blue.png</guid>
-      <orgPath>/Umbraco/Images/Umbraco</orgPath>
-      <orgName>tag_blue.png</orgName>
-    </file>
-    <file>
-      <guid>tag_blue_add.png</guid>
-      <orgPath>/Umbraco/Images/Umbraco</orgPath>
-      <orgName>tag_blue_add.png</orgName>
-    </file>
-    <file>
-      <guid>user.png</guid>
-      <orgPath>/umbraco/images/umbraco</orgPath>
-      <orgName>user.png</orgName>
-    </file>
-    <file>
-      <guid>_uBlogsyBase.cshtml</guid>
-      <orgPath>/Views</orgPath>
-      <orgName>_uBlogsyBase.cshtml</orgName>
-    </file>
-    <file>
-      <guid>_uBlogsyBaseSite.cshtml</guid>
-      <orgPath>/Views</orgPath>
-      <orgName>_uBlogsyBaseSite.cshtml</orgName>
-    </file>
-    <file>
-      <guid>_uBlogsyBaseBlog.cshtml</guid>
-      <orgPath>/Views</orgPath>
-      <orgName>_uBlogsyBaseBlog.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyMacroShowSomeLove.cshtml</guid>
-      <orgPath>/Views/MacroPartials/uBlogsy</orgPath>
-      <orgName>uBlogsyMacroShowSomeLove.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyGlobalBrowserTitle.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Global</orgPath>
-      <orgName>uBlogsyGlobalBrowserTitle.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyGlobalFooter.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Global</orgPath>
-      <orgName>uBlogsyGlobalFooter.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyGlobalHeader.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Global</orgPath>
-      <orgName>uBlogsyGlobalHeader.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyGlobalNavigation.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Global</orgPath>
-      <orgName>uBlogsyGlobalNavigation.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyGlobalSeoMeta.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Global</orgPath>
-      <orgName>uBlogsyGlobalSeoMeta.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyLandingListPosts.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Landing</orgPath>
-      <orgName>uBlogsyLandingListPosts.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyLandingShowPost.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Landing</orgPath>
-      <orgName>uBlogsyLandingShowPost.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyPostListAuthors.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Post</orgPath>
-      <orgName>uBlogsyPostListAuthors.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyPostListLabels.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Post</orgPath>
-      <orgName>uBlogsyPostListLabels.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyPostListRelatedPosts.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Post</orgPath>
-      <orgName>uBlogsyPostListRelatedPosts.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyPostListTags.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Post</orgPath>
-      <orgName>uBlogsyPostListTags.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyPostShowPost.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Post</orgPath>
-      <orgName>uBlogsyPostShowPost.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyShowImage.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Shared</orgPath>
-      <orgName>uBlogsyShowImage.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyWidgetListAuthors.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Widgets</orgPath>
-      <orgName>uBlogsyWidgetListAuthors.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyWidgetListBlogRoll.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Widgets</orgPath>
-      <orgName>uBlogsyWidgetListBlogRoll.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyWidgetListLabels.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Widgets</orgPath>
-      <orgName>uBlogsyWidgetListLabels.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyWidgetListPostArchive.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Widgets</orgPath>
-      <orgName>uBlogsyWidgetListPostArchive.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyWidgetListPosts.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Widgets</orgPath>
-      <orgName>uBlogsyWidgetListPosts.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyWidgetListPostsForHome.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Widgets</orgPath>
-      <orgName>uBlogsyWidgetListPostsForHome.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyWidgetListTags.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Widgets</orgPath>
-      <orgName>uBlogsyWidgetListTags.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyWidgetSearch.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Widgets</orgPath>
-      <orgName>uBlogsyWidgetSearch.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uBlogsyWidgetShowRSSLink.cshtml</guid>
-      <orgPath>/Views/Partials/uBlogsy/Widgets</orgPath>
-      <orgName>uBlogsyWidgetShowRSSLink.cshtml</orgName>
-    </file>
-    <file>
-      <guid>uDateFoldersyFolderRedirect.cshtml</guid>
-      <orgPath>/Views/Partials/uDateFoldersy</orgPath>
-      <orgName>uDateFoldersyFolderRedirect.cshtml</orgName>
-    </file>
-    <file>
-      <guid>Installer.ascx</guid>
-      <orgPath>/usercontrols/uBlogsy/dashboard</orgPath>
-      <orgName>Installer.ascx</orgName>
-    </file>
-  </files>
   <info>
     <package>
       <name>uBlogsy</name>
-      <version>3.0</version>
-      <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>https://our.umbraco.com/projects/starter-kits/ublogsy</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
     </package>
-    <author>
-      <name>Anthony Dang</name>
-      <website>http://anthonydotnet.blogspot.com</website>
-    </author>
-    <readme>
-      <![CDATA[uBlogsy is a blog package for Umbraco 4.7.1 and above.
-
-From version 3.0 Umbraco 6 MVC is supported.
-
-Enjoy!
-
-
-]]>
-    </readme>
   </info>
   <Documents>
     <DocumentSet importMode="root">
@@ -497,6 +148,7 @@ http://feeds.feedburner.com/midcodecrisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] [Base]</Name>
+        <Key>4cc72906-14b1-4c98-a4f9-1720bb9bc2fd</Key>
         <Alias>uBlogsyBaseDocType</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -574,6 +226,7 @@ http://feeds.feedburner.com/midcodecrisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] [Base] Container</Name>
+        <Key>734354fd-dcda-4d5b-bf23-353534424484</Key>
         <Alias>uBlogsyBaseContainer</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -592,6 +245,7 @@ http://feeds.feedburner.com/midcodecrisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] [Base] Page</Name>
+        <Key>03c134a7-7ba9-4e60-95f3-9358c2a88235</Key>
         <Alias>uBlogsyBasePage</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -700,6 +354,7 @@ http://feeds.feedburner.com/midcodecrisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] Author</Name>
+        <Key>a148d057-e68f-455c-afb1-eacaa69de147</Key>
         <Alias>uBlogsyAuthor</Alias>
         <Icon>user.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -746,6 +401,7 @@ http://feeds.feedburner.com/midcodecrisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] Container - Author</Name>
+        <Key>e2aff474-6fb7-4ec1-8271-33214ac2ddd6</Key>
         <Alias>uBlogsyContainerAuthor</Alias>
         <Icon>folder_user.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -766,6 +422,7 @@ http://feeds.feedburner.com/midcodecrisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] Container - Email Template</Name>
+        <Key>42af53c7-df89-49cd-b84d-94b978defed5</Key>
         <Alias>uBlogsyContainerEmailTemplate</Alias>
         <Icon>folder_page_white.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -784,6 +441,7 @@ http://feeds.feedburner.com/midcodecrisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] Container - Label</Name>
+        <Key>277fe1af-9719-436e-8bb9-8aa31af6695d</Key>
         <Alias>uBlogsyContainerLabel</Alias>
         <Icon>folder_table.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -804,6 +462,7 @@ http://feeds.feedburner.com/midcodecrisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] Label</Name>
+        <Key>4e45c8dd-f5b1-454f-8042-43cb245e6764</Key>
         <Alias>uBlogsyLabel</Alias>
         <Icon>tag.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -839,6 +498,7 @@ http://feeds.feedburner.com/midcodecrisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] Landing</Name>
+        <Key>8789c927-0a55-408f-81b4-48a00cc3bb5b</Key>
         <Alias>uBlogsyLanding</Alias>
         <Icon>feed.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -872,7 +532,7 @@ http://feeds.feedburner.com/midcodecrisis
           <Description>
             <![CDATA[A list of blogs you want to follow. Make sure it's one per line.
 
-e.g 
+e.g
 http://feeds.feedburner.com/midcodecrisis
 http://feeds.feedburner.com/umbracoblog]]>
           </Description>
@@ -945,6 +605,7 @@ Selected by default.]]>
     <DocumentType>
       <Info>
         <Name>[uBlogsy] Page</Name>
+        <Key>38b8c863-915a-4f9e-aaa6-4c191c933fb6</Key>
         <Alias>uBlogsyPage</Alias>
         <Icon>page_white_cup.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -963,6 +624,7 @@ Selected by default.]]>
     <DocumentType>
       <Info>
         <Name>[uBlogsy] Post</Name>
+        <Key>937bb833-acef-4adc-8168-bf8e8f648d9d</Key>
         <Alias>uBlogsyPost</Alias>
         <Icon>page_green.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1053,6 +715,7 @@ Selected by default.]]>
     <DocumentType>
       <Info>
         <Name>[uBlogsy] RSS</Name>
+        <Key>74cb10d5-60e5-401a-a839-e7eb1140ea8a</Key>
         <Alias>uBlogsyRSS</Alias>
         <Icon>rss.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1115,6 +778,7 @@ e.g Mid-code Crisis
     <DocumentType>
       <Info>
         <Name>[uBlogsy] Site Root</Name>
+        <Key>8a4a40d1-0207-4f5f-aef1-cbcf57d6a408</Key>
         <Alias>uBlogsySiteRoot</Alias>
         <Icon>house.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1137,6 +801,7 @@ e.g Mid-code Crisis
     <DocumentType>
       <Info>
         <Name>[uDateFoldersy] [Base]</Name>
+        <Key>22b97d7d-a619-4193-8e30-3cb1c62d6af9</Key>
         <Alias>uDateFoldersyBase</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1154,6 +819,7 @@ e.g Mid-code Crisis
     <DocumentType>
       <Info>
         <Name>[uDateFoldersy] Folder - Day</Name>
+        <Key>629e17b1-e7f7-46a2-8125-7af73e584c8d</Key>
         <Alias>uDateFoldersyFolderDay</Alias>
         <Icon>calendar_view_day.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1175,6 +841,7 @@ e.g Mid-code Crisis
     <DocumentType>
       <Info>
         <Name>[uDateFoldersy] Folder - Month</Name>
+        <Key>5d0ce254-41b4-467d-9576-e760ac0a1df1</Key>
         <Alias>uDateFoldersyFolderMonth</Alias>
         <Icon>date.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1196,6 +863,7 @@ e.g Mid-code Crisis
     <DocumentType>
       <Info>
         <Name>[uDateFoldersy] Folder - Year</Name>
+        <Key>b1d6036a-c679-4d09-abc3-01d2153dde9c</Key>
         <Alias>uDateFoldersyFolderYear</Alias>
         <Icon>folder_table.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1217,6 +885,7 @@ e.g Mid-code Crisis
     <DocumentType>
       <Info>
         <Name>[uTagsy] [Base]</Name>
+        <Key>5d3d0cb1-bff8-49af-94a2-a22d9d2b2e80</Key>
         <Alias>uTagsyBaseDocType</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1234,6 +903,7 @@ e.g Mid-code Crisis
     <DocumentType>
       <Info>
         <Name>[uTagsy] Tag</Name>
+        <Key>fd188722-5d01-46bc-9c34-4385c7fce5b4</Key>
         <Alias>uTagsyTag</Alias>
         <Icon>tag_blue.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1269,6 +939,7 @@ e.g Mid-code Crisis
     <DocumentType>
       <Info>
         <Name>[uTagsy] Tag Container</Name>
+        <Key>758dc50b-72ed-43cb-90e4-c3f9479cf535</Key>
         <Alias>uTagsyTagContainer</Alias>
         <Icon>tag_blue_add.png</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1320,9 +991,9 @@ e.g Mid-code Crisis
 
 @section uBlogsyMain
 {
-    <div id="uBlogsy"> 
+    <div id="uBlogsy">
         <div id="uBlogsy_main">
-               
+
             <section id="uBlogsy_left_col">
                 @RenderSection("uBlogsyLeftCol")
             </section>
@@ -1341,7 +1012,7 @@ e.g Mid-code Crisis
 
                 @*the awesome tag cloud*@
                 @Html.CachedPartial("uBlogsy/Widgets/uBlogsyWidgetListTags", Model, 0, false, false, new ViewDataDictionary(ViewData) { { "ShowCount", true } })
-                  
+
                 @*list of latest posts*@
                 @Html.CachedPartial("uBlogsy/Widgets/uBlogsyWidgetListPosts", Model, 0, false, false, new ViewDataDictionary(ViewData) { { "ItemLimit", 5 } })
 
@@ -1349,7 +1020,7 @@ e.g Mid-code Crisis
                 @try{
                     @Html.CachedPartial("uCommentsy/Widgets/uCommentsyWidgetListComments", Model, 0, false, false, new ViewDataDictionary(ViewData) { { "ItemLimit", 5 } })
                 }catch (Exception){}
-                        
+
                 @*archive*@
                 @Html.CachedPartial("uBlogsy/Widgets/uBlogsyWidgetListPostArchive", Model, 600, false, false, new ViewDataDictionary(ViewData) { { "AltLayout", false } })
 
@@ -1357,7 +1028,7 @@ e.g Mid-code Crisis
                 @Html.CachedPartial("uBlogsy/Widgets/uBlogsyWidgetListBlogRoll", Model, 600, false, false, new ViewDataDictionary(ViewData) { { "ItemLimit", 5 } })
             </aside>
         </div>
-        
+
         @Html.CachedPartial("uBlogsy/Global/uBlogsyGlobalFooter", Model, 0)
     </div>
 }
@@ -1384,20 +1055,20 @@ e.g Mid-code Crisis
     <!doctype html public "-//w3c//dtd xhtml 1.0 transitional//en" "http://www.w3.org/tr/xhtml1/dtd/xhtml1-transitional.dtd">
     <html lang="en-GB" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB" dir="ltr">
         <head>
-            <title>My Site</title>          
+            <title>My Site</title>
             @RenderSection("uBlogsyHead")
         </head>
         <body>
-           
+
             @*top navigation*@
             @Html.CachedPartial("uBlogsy/Global/uBlogsyGlobalHeader", Model, 60, true)
-                
+
             @*top navigation*@
             @Html.CachedPartial("uBlogsy/Global/uBlogsyGlobalNavigation", Model, 60, true)
-            
-                    
+
+
             @RenderSection("uBlogsyMain")
-            
+
         </body>
     </html>
 }]]>
@@ -1443,11 +1114,11 @@ e.g Mid-code Crisis
             @Umbraco.Field("uBlogsyContentBody")
         }
     </div>
-  
+
     @*list posts*@
     <section class="uBlogsy_posts_container">
-		@Html.CachedPartial("uBlogsy/Landing/uBlogsyLandingListPosts", Model, 0, false, false, new ViewDataDictionary(ViewData) { { "ItemsPerPage", 20 } })		
-    </section>	
+		@Html.CachedPartial("uBlogsy/Landing/uBlogsyLandingListPosts", Model, 0, false, false, new ViewDataDictionary(ViewData) { { "ItemsPerPage", 20 } })
+    </section>
 }
 
 ]]>
@@ -1501,7 +1172,7 @@ e.g Mid-code Crisis
 @inherits UmbracoTemplatePage
 @{
     Layout = "_uBlogsyBaseBlog.cshtml";
-    
+
     var tag = Request.QueryString["tag"];
     var label = Request.QueryString["label"];
     var author = Request.QueryString["author"];
@@ -1514,7 +1185,7 @@ e.g Mid-code Crisis
     var prev = PostService.Instance.GetNextPost(Model.Content, tag, label, author, searchTerm, commenter, year, month, day);
     var next = PostService.Instance.GetPreviousPost(Model.Content, tag, label, author, searchTerm, commenter, year, month, day);
 }
-	
+
 @section uBlogsyHead{}
 
 @section uBlogsyLeftCol{
@@ -1527,22 +1198,22 @@ e.g Mid-code Crisis
                 var prevUrl = prev.Url.GetUrlWithQueryString(Request.QueryString, new[] { "action", "success" });
                 <a href="@prevUrl" class="uBlogsy_prev uBlogsy_font_style20" title="Older Posts">&lt; @Umbraco.GetDictionaryValue("uBlogsyDicPaginationOlder")</a>
             }
-            
+
             @if (next != null)
             {
-                var nextUrl = next.Url.GetUrlWithQueryString(Request.QueryString, new[] { "action", "success" }); 
+                var nextUrl = next.Url.GetUrlWithQueryString(Request.QueryString, new[] { "action", "success" });
                 <a href="@nextUrl" class="uBlogsy_next uBlogsy_font_style20" title="Newer Posts">@Umbraco.GetDictionaryValue("uBlogsyDicPaginationNewer") &gt;</a>
             }
         </div>
-        
+
         @Html.Partial("uBlogsy/Post/uBlogsyPostShowPost", new ViewDataDictionary(ViewData) { {"Node", Model.Content }, { "UseAddthis", true }, { "GravatarSize", 50 } })
-        
-       
+
+
     </div>
 
     @*list of related posts*@
     @Html.Partial("uBlogsy/Post/uBlogsyPostListRelatedPosts", new ViewDataDictionary(ViewData) { { "Node", Model.Content }, { "ItemLimit", 5 }, { "MatchCount", 1 }, { "RelatedAlias", string.Empty } })
-        
+
 
     @*list comments - install uCommentsy, then uncomment this line*@
     @try
@@ -1550,7 +1221,7 @@ e.g Mid-code Crisis
         @Html.Partial("uCommentsy/uCommentsyListComments", new ViewDataDictionary(ViewData) { { "ItemLimit", -1 } })
     }
     catch (Exception) { }
-    
+
     @*render contact form - install uCommentsy, then uncomment this line**@
     @try
     {
@@ -1656,25 +1327,25 @@ e.g Mid-code Crisis
 }
 
 @section uBlogsyHead
-{ 
+{
     <link type="text/css" rel="Stylesheet" media="screen" href="/css/uBlogsy.css" />
 }
 
 
 @section uBlogsyMain
 {
-    <div id="uBlogsy"> 
+    <div id="uBlogsy">
         <div id="uBlogsy_main" style="width:80%;padding: 0 5%">
             <h1>
                 @Umbraco.Field("uBlogsyContentTitle")
             </h1>
-            
+
             <section>
                 @Umbraco.Field("uBlogsyContentBody")
             </section>
-            
+
             @* list posts for home - this only works if the home page is a parent, or sibling of uBlogsyLanding *@
-            @Html.CachedPartial("uBlogsy/Widgets/uBlogsyWidgetListPostsForHome", Model, 0, false, true, new ViewDataDictionary(ViewData) { { "ItemLimit", 5 } })		
+            @Html.CachedPartial("uBlogsy/Widgets/uBlogsyWidgetListPostsForHome", Model, 0, false, true, new ViewDataDictionary(ViewData) { { "ItemLimit", 5 } })
         </div>
     </div>
 }
@@ -1702,18 +1373,18 @@ e.g Mid-code Crisis
       <FileName>uBlogsy</FileName>
       <Content>
         <![CDATA[/* fonts - global */
-#uBlogsy p, 
-#uBlogsy label, 
-#uBlogsy input, 
-#uBlogsy textarea, 
-#uBlogsy a, 
+#uBlogsy p,
+#uBlogsy label,
+#uBlogsy input,
+#uBlogsy textarea,
+#uBlogsy a,
 .uBlogsy_post_body
 { font-family:Arial; }
 
 #uBlogsy,
-#uBlogsy p, 
-#uBlogsy label, 
-#uBlogsy input, 
+#uBlogsy p,
+#uBlogsy label,
+#uBlogsy input,
 #uBlogsy textarea,
 .uBlogsy_post_body
  {font-size:13px;  color:#505050;}
@@ -1750,9 +1421,9 @@ e.g Mid-code Crisis
 
 /* force browser to evaluate box model */
 #uBlogsy_header_container,
-#uBlogsy_main, 
-#uBlogsy_footer, 
-#uBlogsy_left_col,  
+#uBlogsy_main,
+#uBlogsy_footer,
+#uBlogsy_left_col,
 #uBlogsy_right_col,
 .uBlogsy_post,
 .uBlogsy_tag_container  { overflow:hidden; }
@@ -1792,7 +1463,7 @@ e.g Mid-code Crisis
  left col
 ***********************************************/
 /* left col - headers */
-#uBlogsy_left_col h2, 
+#uBlogsy_left_col h2,
 #uBlogsy_left_col h4 { text-transform:uppercase; }
 #uBlogsy_left_col h2{ margin-bottom: 0px;}
 
@@ -1808,13 +1479,13 @@ e.g Mid-code Crisis
 #uBlogsy_left_col .uBlogsy_author_thumb{display: block;float: left; overflow: hidden;padding-right: 10px;}
 
 /* left col - tags and labels */
-#uBlogsy_left_col .uBlogsy_tag_container h5, 
+#uBlogsy_left_col .uBlogsy_tag_container h5,
 #uBlogsy_left_col .uBlogsy_label_container h5{float: left; margin: 0px;padding-right: 10px;}
 
-#uBlogsy_left_col .uBlogsy_tag_container .uBlogsy_tags, 
+#uBlogsy_left_col .uBlogsy_tag_container .uBlogsy_tags,
 #uBlogsy_left_col .uBlogsy_label_container .uBlogsy_labels{ list-style-type:none; float:left; padding:0; margin:0;}
 
-#uBlogsy_left_col .uBlogsy_tag_container .uBlogsy_tags li, 
+#uBlogsy_left_col .uBlogsy_tag_container .uBlogsy_tags li,
 #uBlogsy_left_col .uBlogsy_label_container .uBlogsy_labels li{ display:block; float:left; padding-right:10px;}
 #uBlogsy_left_col .uBlogsy_post_details{ padding-top: 20px;}
 #uBlogsy_left_col .uBlogsy_post_details_right{ width: 80%;float: left}
@@ -1834,7 +1505,7 @@ e.g Mid-code Crisis
 
 
 /**********************************************
- right col 
+ right col
 ***********************************************/
 /* right col - gravatar */
 #uBlogsy_right_col .uBlogsy_gravatar_small { float: left; margin-right: 5px;height: 20px;width: 20px;}
@@ -1860,8 +1531,8 @@ e.g Mid-code Crisis
 /* right col - post archive - alternate layout */
 #uBlogsy_right_col .uBlogsy_post_archive_alt .uBlogsy_year_first .uBlogsy_year_name{display:none; }
 #uBlogsy_right_col .uBlogsy_post_archive_alt .uBlogsy_year_first .uBlogsy_months{ padding-left:0px; margin-top: 0;}
-   
-   
+
+
 /* right col - rss logo */
 #uBlogsy_right_col .uBlogsy_feed { margin-left: 3px; padding: 0 0 0 19px; background: url("../images/uBlogsy_feed-icon-14x14.png") no-repeat 0 50%; height: 15px; display: block; float: left; overflow: hidden;}
 
@@ -1870,7 +1541,7 @@ e.g Mid-code Crisis
 
 
 /**********************************************
- pagination 
+ pagination
 ***********************************************/
 /* pagination - landing */
 #uBlogsy_pagination { display:block; float:right; overflow:hidden;}
@@ -2032,6 +1703,7 @@ e.g Mid-code Crisis
   <Macros>
     <macro>
       <name>[uBlogsy] Show Some Love</name>
+      <key>91AD32D5-7381-4C5A-BD03-97F3CE2511D2</key>
       <alias>uBlogsyShowSomeLove</alias>
       <macroType>Unknown</macroType>
       <macroSource />
@@ -2044,56 +1716,56 @@ e.g Mid-code Crisis
     </macro>
   </Macros>
   <DictionaryItems>
-    <DictionaryItem Key="uBlogsy">
+    <DictionaryItem Name="uBlogsy" Key="36F5C64A-0BE5-448F-A443-3B09D6162D90">
       <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[]]></Value>
-      <DictionaryItem Key="uBlogsyDicArchive">
+      <DictionaryItem Name="uBlogsyDicArchive" Key="36F5C64A-0BE5-448F-A443-3B09D6162D99">>
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Archive]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicAuthors">
+      <DictionaryItem Name="uBlogsyDicAuthors" Key="36F5C64A-0BE5-448F-A443-3B09D6162D98">>
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Authors]]></Value>
-        <DictionaryItem Key="uBlogsyDicPostWrittenBy">
+        <DictionaryItem Name="uBlogsyDicPostWrittenBy" Key="36F5C64A-0BE5-448F-A443-3B09D6162D97">>
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Written by]]></Value>
-          <DictionaryItem Key="uBlogsyDicPostWrittenAt">
+          <DictionaryItem Name="uBlogsyDicPostWrittenAt" Key="36F5C64A-0BE5-448F-A443-3B09D6162D96">>
             <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[at]]></Value>
           </DictionaryItem>
         </DictionaryItem>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicCategories">
+      <DictionaryItem Name="uBlogsyDicCategories">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Categories]]></Value>
-        <DictionaryItem Key="uBlogsyDicCategoriesAll">
+        <DictionaryItem Name="uBlogsyDicCategoriesAll" Key="36F5C64A-0BE5-448F-A443-3B09D6162D95">>
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[All Categories]]></Value>
         </DictionaryItem>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicPagination">
+      <DictionaryItem Name="uBlogsyDicPagination" Key="36F5C64A-0BE5-448F-A443-3B09D6162D94">>
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[]]></Value>
-        <DictionaryItem Key="uBlogsyDicPaginationNewer">
+        <DictionaryItem Name="uBlogsyDicPaginationNewer" Key="36F5C64A-0BE5-448F-A443-3B09D6162D93">
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Newer]]></Value>
         </DictionaryItem>
-        <DictionaryItem Key="uBlogsyDicPaginationOlder">
+        <DictionaryItem Name="uBlogsyDicPaginationOlder" Key="36F5C64A-0BE5-448F-A443-3B09D6162D92">
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Older]]></Value>
         </DictionaryItem>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicPostsLatest">
+      <DictionaryItem Name="uBlogsyDicPostsLatest" Key="36F5C64A-0BE5-448F-A443-3B09D6162D91">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Latest Posts]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicPostsRelated">
+      <DictionaryItem Name="uBlogsyDicPostsRelated" Key="26F5C64A-0BE5-448F-A443-3B09D6162D90">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Related]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicRssSubscribe">
+      <DictionaryItem Name="uBlogsyDicRssSubscribe" Key="26F5C64A-0BE5-448F-A443-3B09D6162D99">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Subscribe]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicSearch">
+      <DictionaryItem Name="uBlogsyDicSearch" Key="26F5C64A-0BE5-448F-A443-3B09D6162D98">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Search]]></Value>
-        <DictionaryItem Key="uBlogsyDicSearchSubmit">
+        <DictionaryItem Name="uBlogsyDicSearchSubmit" Key="26F5C64A-0BE5-448F-A443-3B09D6162D97">
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Submit]]></Value>
         </DictionaryItem>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicTags">
+      <DictionaryItem Name="uBlogsyDicTags" Key="26F5C64A-0BE5-448F-A443-3B09D6162D96">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Tags]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyNavigation">
+      <DictionaryItem Name="uBlogsyNavigation" Key="26F5C64A-0BE5-448F-A443-3B09D6162D95">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[]]></Value>
-        <DictionaryItem Key="uBlogsyNavigationHome">
+        <DictionaryItem Name="uBlogsyNavigationHome" Key="26F5C64A-0BE5-448F-A443-3B09D6162D94">
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Home]]></Value>
         </DictionaryItem>
       </DictionaryItem>

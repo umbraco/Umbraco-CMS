@@ -3,9 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.PackageActions;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Extensions
@@ -13,27 +14,20 @@ namespace Umbraco.Extensions
     public static class TypeLoaderExtensions
     {
         /// <summary>
-        /// Gets all classes implementing <see cref="IDataEditor"/>.
+        /// Gets all types implementing <see cref="IDataEditor"/>.
         /// </summary>
-        public static IEnumerable<Type> GetDataEditors(this TypeLoader mgr)
-        {
-            return mgr.GetTypes<IDataEditor>();
-        }
+        public static IEnumerable<Type> GetDataEditors(this TypeLoader mgr) => mgr.GetTypes<IDataEditor>();
 
         /// <summary>
-        /// Gets all classes implementing ICacheRefresher.
+        /// Gets all types implementing ICacheRefresher.
         /// </summary>
-        public static IEnumerable<Type> GetCacheRefreshers(this TypeLoader mgr)
-        {
-            return mgr.GetTypes<ICacheRefresher>();
-        }
+        public static IEnumerable<Type> GetCacheRefreshers(this TypeLoader mgr) => mgr.GetTypes<ICacheRefresher>();
 
         /// <summary>
-        /// Gets all classes implementing IPackageAction.
+        /// Gets all types implementing <see cref="IAction"/>
         /// </summary>
-        public static IEnumerable<Type> GetPackageActions(this TypeLoader mgr)
-        {
-            return mgr.GetTypes<IPackageAction>();
-        }
+        /// <param name="mgr"></param>
+        /// <returns></returns>
+        public static IEnumerable<Type> GetActions(this TypeLoader mgr) => mgr.GetTypes<IAction>();
     }
 }

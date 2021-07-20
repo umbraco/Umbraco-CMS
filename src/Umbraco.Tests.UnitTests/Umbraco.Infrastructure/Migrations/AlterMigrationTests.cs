@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
@@ -16,14 +17,24 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
     [TestFixture]
     public class AlterMigrationTests
     {
-        private readonly ILogger<MigrationContext> _logger = Mock.Of<ILogger<MigrationContext>>();
+        private readonly ILogger<MigrationContext> _logger = Mock.Of<ILogger<MigrationContext>>();        
+        private class TestPlan : MigrationPlan
+        {
+            public TestPlan() : base("Test")
+            {
+            }
+        }
+        private MigrationContext GetMigrationContext(out TestDatabase db)
+        {
+            db = new TestDatabase();
+            return new MigrationContext(new TestPlan(), db, _logger);
+        }
 
         [Test]
         public void Drop_Foreign_Key()
         {
             // Arrange
-            var database = new TestDatabase();
-            var context = new MigrationContext(database, _logger);
+            var context = GetMigrationContext(out var database);
             var stub = new DropForeignKeyMigrationStub(context);
 
             // Act
@@ -44,8 +55,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         [Test]
         public void CreateColumn()
         {
-            var database = new TestDatabase();
-            var context = new MigrationContext(database, _logger);
+            var context = GetMigrationContext(out var database);
             var migration = new CreateColumnMigration(context);
 
             migration.Run();
@@ -74,8 +84,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         [Test]
         public void AlterColumn()
         {
-            var database = new TestDatabase();
-            var context = new MigrationContext(database, _logger);
+            var context = GetMigrationContext(out var database);
             var migration = new AlterColumnMigration(context);
 
             migration.Run();
@@ -110,8 +119,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         public void Can_Get_Up_Migration_From_MigrationStub()
         {
             // Arrange
-            var database = new TestDatabase();
-            var context = new MigrationContext(database, _logger);
+            var context = GetMigrationContext(out var database);
             var stub = new AlterUserTableMigrationStub(context);
 
             // Act

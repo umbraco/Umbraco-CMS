@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
             };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());
             var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
-            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SqlServer2012, pocoDataFactory, new Lazy<IMapperCollection>(() => factory.GetRequiredService<IMapperCollection>()));
+            SqlContext = new SqlContext(sqlSyntax, DatabaseType.SqlServer2012, pocoDataFactory, factory.GetRequiredService<IMapperCollection>());
             Mappers = factory.GetRequiredService<IMapperCollection>();
         }
     }

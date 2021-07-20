@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             ILanguageRepository languageRepository,
             IRelationRepository relationRepository,
             IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditorCollection,
+            PropertyEditorCollection propertyEditorCollection,
             MediaUrlGeneratorCollection mediaUrlGenerators,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,

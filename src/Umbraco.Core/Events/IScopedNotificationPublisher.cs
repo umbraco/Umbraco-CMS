@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Notifications;
 
@@ -8,6 +9,12 @@ namespace Umbraco.Cms.Core.Events
 {
     public interface IScopedNotificationPublisher
     {
+        /// <summary>
+        /// Suppresses all notifications from being added/created until the result object is disposed.
+        /// </summary>
+        /// <returns></returns>
+        IDisposable Suppress();
+
         /// <summary>
         /// Publishes a cancelable notification to the notification subscribers
         /// </summary>

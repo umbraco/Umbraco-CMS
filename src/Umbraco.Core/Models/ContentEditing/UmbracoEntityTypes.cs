@@ -1,15 +1,10 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// Represents the type's of Umbraco entities that can be resolved from the EntityController
     /// </summary>
     public enum UmbracoEntityTypes
     {
-        /// <summary>
-        /// Domain
-        /// </summary>
-        Domain,
-
         /// <summary>
         /// Language
         /// </summary>
@@ -64,6 +59,16 @@
         /// Stylesheet
         /// </summary>
         Stylesheet,
+
+        /// <summary>
+        /// Script
+        /// </summary>
+        Script,
+
+        /// <summary>
+        /// Partial View
+        /// </summary>
+        PartialView,
 
         /// <summary>
         /// Member

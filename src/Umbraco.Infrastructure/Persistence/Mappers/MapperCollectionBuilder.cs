@@ -32,6 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
             Add<DictionaryMapper>();
             Add<DictionaryTranslationMapper>();
             Add<DomainMapper>();
+            Add<KeyValueMapper>();
             Add<LanguageMapper>();
             Add<MacroMapper>();
             Add<MediaMapper>();

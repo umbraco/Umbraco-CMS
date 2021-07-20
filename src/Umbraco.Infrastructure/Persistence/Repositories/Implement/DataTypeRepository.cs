@@ -29,14 +29,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// </summary>
     internal class DataTypeRepository : EntityRepositoryBase<int, IDataType>, IDataTypeRepository
     {
-        private readonly Lazy<PropertyEditorCollection> _editors;
+        private readonly PropertyEditorCollection _editors;
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly ILogger<IDataType> _dataTypeLogger;
 
         public DataTypeRepository(
             IScopeAccessor scopeAccessor,
             AppCaches cache,
-            Lazy<PropertyEditorCollection> editors,
+            PropertyEditorCollection editors,
             ILogger<DataTypeRepository> logger,
             ILoggerFactory loggerFactory,
             IConfigurationEditorJsonSerializer serializer)
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<DataTypeDto>(dataTypeSql);
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, _dataTypeLogger, _serializer)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
         }
 
         protected override IEnumerable<IDataType> PerformGetByQuery(IQuery<IDataType> query)
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<DataTypeDto>(sql);
 
-            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors.Value, _dataTypeLogger, _serializer)).ToArray();
+            return dtos.Select(x => DataTypeFactory.BuildEntity(x, _editors, _dataTypeLogger, _serializer)).ToArray();
         }
 
         #endregion

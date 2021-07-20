@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
@@ -30,8 +31,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
 
             switch (_runtimeState.Level)
             {
-                case RuntimeLevel.Install:
-                case RuntimeLevel.Upgrade:
+                case var _ when _runtimeState.EnableInstaller():
                     return Task.FromResult(true);
                 default:
                     if (!_backOfficeSecurity.BackOfficeSecurity.IsAuthenticated())

@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Install
 {
@@ -44,8 +45,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
                 {
                     // if not configured (install or upgrade) then we can continue
                     // otherwise we need to ensure that a user is logged in
-                    return _runtimeState.Level == RuntimeLevel.Install
-                           || _runtimeState.Level == RuntimeLevel.Upgrade
+                    return _runtimeState.EnableInstaller()
                            || (authorizationFilterContext.HttpContext.User?.Identity?.IsAuthenticated ?? false);
                 }
                 catch (Exception ex)

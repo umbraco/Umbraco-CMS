@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -8,15 +9,12 @@ namespace Umbraco.Cms.Core.Actions
 {
     public class ActionCollection : BuilderCollectionBase<IAction>
     {
-        public ActionCollection(IEnumerable<IAction> items)
-            : base(items)
-        { }
+        public ActionCollection(Func<IEnumerable<IAction>> items) : base(items)
+        {
+        }
 
         public T GetAction<T>()
-            where T : IAction
-        {
-            return this.OfType<T>().FirstOrDefault();
-        }
+            where T : IAction => this.OfType<T>().FirstOrDefault();
 
         public IEnumerable<IAction> GetByLetters(IEnumerable<string> letters)
         {

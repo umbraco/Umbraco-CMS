@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,6 +10,9 @@ namespace Umbraco.Cms.Core.Composing
     /// <typeparam name="TBuilder">The type of the builder.</typeparam>
     /// <typeparam name="TCollection">The type of the collection.</typeparam>
     /// <typeparam name="TItem">The type of the items.</typeparam>
+    /// <remarks>
+    /// This type of collection builder is typically used when type scanning is required (i.e. plugins).
+    /// </remarks>
     public abstract class LazyCollectionBuilderBase<TBuilder, TCollection, TItem> : CollectionBuilderBase<TBuilder, TCollection, TItem>
         where TBuilder : LazyCollectionBuilderBase<TBuilder, TCollection, TItem>
         where TCollection : class, IBuilderCollection<TItem>
@@ -29,7 +32,7 @@ namespace Umbraco.Cms.Core.Composing
             {
                 types.Clear();
                 _producers.Clear();
-               _excluded.Clear();
+                _excluded.Clear();
             });
             return This;
         }
@@ -45,7 +48,8 @@ namespace Umbraco.Cms.Core.Composing
             Configure(types =>
             {
                 var type = typeof(T);
-                if (types.Contains(type) == false) types.Add(type);
+                if (types.Contains(type) == false)
+                    types.Add(type);
             });
             return This;
         }
@@ -60,7 +64,8 @@ namespace Umbraco.Cms.Core.Composing
             Configure(types =>
             {
                 EnsureType(type, "register");
-                if (types.Contains(type) == false) types.Add(type);
+                if (types.Contains(type) == false)
+                    types.Add(type);
             });
             return This;
         }
@@ -90,7 +95,8 @@ namespace Umbraco.Cms.Core.Composing
             Configure(types =>
             {
                 var type = typeof(T);
-                if (_excluded.Contains(type) == false) _excluded.Add(type);
+                if (_excluded.Contains(type) == false)
+                    _excluded.Add(type);
             });
             return This;
         }
@@ -105,7 +111,8 @@ namespace Umbraco.Cms.Core.Composing
             Configure(types =>
             {
                 EnsureType(type, "exclude");
-                if (_excluded.Contains(type) == false) _excluded.Add(type);
+                if (_excluded.Contains(type) == false)
+                    _excluded.Add(type);
             });
             return This;
         }

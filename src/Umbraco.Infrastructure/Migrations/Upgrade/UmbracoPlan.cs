@@ -1,5 +1,6 @@
 using System;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
@@ -27,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// Initializes a new instance of the <see cref="UmbracoPlan"/> class.
         /// </summary>
         public UmbracoPlan(IUmbracoVersion umbracoVersion)
-            : base(Cms.Core.Constants.System.UmbracoUpgradePlanName)
+            : base(Core.Constants.Conventions.Migrations.UmbracoUpgradePlanName)
         {
             _umbracoVersion = umbracoVersion;
             DefinePlan();
@@ -86,7 +87,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             }
         }
 
-        protected override void ThrowOnUnknownInitialState(string state)
+        public override void ThrowOnUnknownInitialState(string state)
         {
             if (TryGetInitStateVersion(state, out var initVersion))
             {

@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -99,8 +100,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             appCaches ??= AppCaches;
 
             DocumentRepository ctRepository = CreateRepository(scopeAccessor, out contentTypeRepository, out TemplateRepository tr);
-            var editors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>()));
-            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, new Lazy<PropertyEditorCollection>(() => editors), LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory, ConfigurationEditorJsonSerializer);
+            var editors = new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
+            dtdRepository = new DataTypeRepository(scopeAccessor, appCaches, editors, LoggerFactory.CreateLogger<DataTypeRepository>(), LoggerFactory, ConfigurationEditorJsonSerializer);
             return ctRepository;
         }
 
@@ -121,8 +122,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>());
             var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
             var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
-            var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
-            var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+            var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
+            var dataValueReferences = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>());
             var repository = new DocumentRepository(
                 scopeAccessor,
                 appCaches,
@@ -775,7 +776,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
             // One variant (by culture) content type named "umbVariantTextPage"
             // with properties, every 2nd one being variant (by culture), the other being invariant
-            ContentType variantCt = ContentTypeBuilder.CreateSimpleContentType("umbVariantTextpage", "Variant Textpage",  defaultTemplateId: template.Id);
+            ContentType variantCt = ContentTypeBuilder.CreateSimpleContentType("umbVariantTextpage", "Variant Textpage", defaultTemplateId: template.Id);
             variantCt.Variations = ContentVariation.Culture;
             var propTypes = variantCt.PropertyTypes.ToList();
             for (int i = 0; i < propTypes.Count; i++)

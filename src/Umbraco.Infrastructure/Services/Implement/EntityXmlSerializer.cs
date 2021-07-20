@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Xml.Linq;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -98,7 +100,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         public XElement Serialize(
             IMedia media,
-            bool withDescendants = false)
+            bool withDescendants = false,
+            Action<IMedia, XElement> onMediaItemSerialized = null)
         {
             if (_mediaService == null) throw new ArgumentNullException(nameof(_mediaService));
             if (_dataTypeService == null) throw new ArgumentNullException(nameof(_dataTypeService));
@@ -110,7 +113,9 @@ namespace Umbraco.Cms.Core.Services.Implement
             var nodeName = media.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
             const bool published = false; // always false for media
-            var xml = SerializeContentBase(media, media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
+            string urlValue = media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
+            XElement xml = SerializeContentBase(media, urlValue, nodeName, published);
+
 
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
             xml.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
@@ -123,6 +128,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             //xml.Add(new XAttribute("template", 0)); // no template for media
 
+            onMediaItemSerialized?.Invoke(media, xml);
+
             if (withDescendants)
             {
                 const int pageSize = 500;
@@ -131,7 +138,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 while (page * pageSize < total)
                 {
                     var children = _mediaService.GetPagedChildren(media.Id, page++, pageSize, out total);
-                    SerializeChildren(children, xml);
+                    SerializeChildren(children, xml, onMediaItemSerialized);
                 }
             }
 
@@ -242,8 +249,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private XElement Serialize(IDictionaryItem dictionaryItem)
         {
-            var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
-            foreach (var translation in dictionaryItem.Translations)
+            var xml = new XElement("DictionaryItem",
+                new XAttribute("Key", dictionaryItem.Key),
+                new XAttribute("Name", dictionaryItem.ItemKey));
+
+            foreach (IDictionaryTranslation translation in dictionaryItem.Translations)
             {
                 xml.Add(new XElement("Value",
                     new XAttribute("LanguageId", translation.Language.Id),
@@ -254,12 +264,17 @@ namespace Umbraco.Cms.Core.Services.Implement
             return xml;
         }
 
-        public XElement Serialize(Stylesheet stylesheet)
+        public XElement Serialize(IStylesheet stylesheet, bool includeProperties)
         {
             var xml = new XElement("Stylesheet",
                 new XElement("Name", stylesheet.Alias),
                 new XElement("FileName", stylesheet.Path),
                 new XElement("Content", new XCData(stylesheet.Content)));
+
+            if (!includeProperties)
+            {
+                return xml;
+            }
 
             var props = new XElement("Properties");
             xml.Add(props);
@@ -341,6 +356,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var info = new XElement("Info",
                                     new XElement("Name", mediaType.Name),
                                     new XElement("Alias", mediaType.Alias),
+                                    new XElement("Key", mediaType.Key),
                                     new XElement("Icon", mediaType.Icon),
                                     new XElement("Thumbnail", mediaType.Thumbnail),
                                     new XElement("Description", mediaType.Description),
@@ -348,7 +364,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             var masterContentType = mediaType.CompositionAliases().FirstOrDefault();
             if (masterContentType != null)
+            {
                 info.Add(new XElement("Master", masterContentType));
+            }
 
             var structure = new XElement("Structure");
             foreach (var allowedType in mediaType.AllowedContentTypes)
@@ -365,18 +383,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     ? null
                     : mediaType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
 
-                var genericProperty = new XElement("GenericProperty",
-                                                   new XElement("Name", propertyType.Name),
-                                                   new XElement("Alias", propertyType.Alias),
-                                                   new XElement("Type", propertyType.PropertyEditorAlias),
-                                                   new XElement("Definition", definition.Key),
-                                                   new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
-                                                   new XElement("Mandatory", propertyType.Mandatory.ToString()),
-                                                   new XElement("MandatoryMessage", propertyType.MandatoryMessage),
-                                                   new XElement("Validation", propertyType.ValidationRegExp),
-                                                   new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage),
-                                                   new XElement("LabelOnTop", propertyType.LabelOnTop),
-                                                   new XElement("Description", new XCData(propertyType.Description ?? string.Empty)));
+                XElement genericProperty = SerializePropertyType(propertyType, definition, propertyGroup);
                 genericProperties.Add(genericProperty);
             }
 
@@ -419,6 +426,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var xml = new XElement("macro");
             xml.Add(new XElement("name", macro.Name));
+            xml.Add(new XElement("key", macro.Key));
             xml.Add(new XElement("alias", macro.Alias));
             xml.Add(new XElement("macroSource", macro.MacroSource));
             xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
@@ -431,6 +439,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             foreach (var property in macro.Properties)
             {
                 properties.Add(new XElement("property",
+                    new XAttribute("key", property.Key),
                     new XAttribute("name", property.Name),
                     new XAttribute("alias", property.Alias),
                     new XAttribute("sortOrder", property.SortOrder),
@@ -456,8 +465,10 @@ namespace Umbraco.Cms.Core.Services.Implement
                                     new XElement("Variations", contentType.Variations.ToString()));
 
             var masterContentType = contentType.ContentTypeComposition.FirstOrDefault(x => x.Id == contentType.ParentId);
-            if(masterContentType != null)
+            if (masterContentType != null)
+            {
                 info.Add(new XElement("Master", masterContentType.Alias));
+            }
 
             var compositionsElement = new XElement("Compositions");
             var compositions = contentType.ContentTypeComposition;
@@ -475,9 +486,13 @@ namespace Umbraco.Cms.Core.Services.Implement
             info.Add(allowedTemplates);
 
             if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
+            {
                 info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
+            }
             else
+            {
                 info.Add(new XElement("DefaultTemplate", ""));
+            }
 
             var structure = new XElement("Structure");
             foreach (var allowedType in contentType.AllowedContentTypes)
@@ -494,21 +509,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     ? null
                     : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
 
-                var genericProperty = new XElement("GenericProperty",
-                                                   new XElement("Name", propertyType.Name),
-                                                   new XElement("Alias", propertyType.Alias),
-                                                   new XElement("Key", propertyType.Key),
-                                                   new XElement("Type", propertyType.PropertyEditorAlias),
-                                                   new XElement("Definition", definition.Key),
-                                                   new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
-                                                   new XElement("SortOrder", propertyType.SortOrder),
-                                                   new XElement("Mandatory", propertyType.Mandatory.ToString()),
-                                                   new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),
-                                                   propertyType.MandatoryMessage != null ? new XElement("MandatoryMessage", propertyType.MandatoryMessage) : null,
-                                                   propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
-                                                   propertyType.ValidationRegExpMessage != null ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage) : null,
-                                                   propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null,
-                                                   new XElement("Variations", propertyType.Variations.ToString()));
+                XElement genericProperty = SerializePropertyType(propertyType, definition, propertyGroup);
+                genericProperty.Add(new XElement("Variations", propertyType.Variations.ToString()));
 
                 genericProperties.Add(genericProperty);
             }
@@ -534,7 +536,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (contentType.Level != 1 && masterContentType == null)
             {
                 //get URL encoded folder names
-                var folders = _contentTypeService.GetContainers(contentType)
+                IEnumerable<string> folders = _contentTypeService.GetContainers(contentType)
                     .OrderBy(x => x.Level)
                     .Select(x => WebUtility.UrlEncode(x.Name));
 
@@ -542,10 +544,28 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
+            {
                 xml.Add(new XAttribute("Folders", folderNames));
+            }
 
             return xml;
         }
+
+        private XElement SerializePropertyType(IPropertyType propertyType, IDataType definition, PropertyGroup propertyGroup)
+            => new XElement("GenericProperty",
+                    new XElement("Name", propertyType.Name),
+                    new XElement("Alias", propertyType.Alias),
+                    new XElement("Key", propertyType.Key),
+                    new XElement("Type", propertyType.PropertyEditorAlias),
+                    new XElement("Definition", definition.Key),
+                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
+                    new XElement("SortOrder", propertyType.SortOrder),
+                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                    new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),
+                    propertyType.MandatoryMessage != null ? new XElement("MandatoryMessage", propertyType.MandatoryMessage) : null,
+                    propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
+                    propertyType.ValidationRegExpMessage != null ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage) : null,
+                    propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
 
         // exports an IContentBase (IContent, IMedia or IMember) as an XElement.
         private XElement SerializeContentBase(IContentBase contentBase, string urlValue, string nodeName, bool published)
@@ -611,12 +631,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         // exports an IMedia item descendants.
-        private void SerializeChildren(IEnumerable<IMedia> children, XElement xml)
+        private void SerializeChildren(IEnumerable<IMedia> children, XElement xml, Action<IMedia, XElement> onMediaItemSerialized)
         {
             foreach (var child in children)
             {
                 // add the child xml
-                var childXml = Serialize(child);
+                var childXml = Serialize(child, onMediaItemSerialized: onMediaItemSerialized);
                 xml.Add(childXml);
 
                 const int pageSize = 500;
@@ -626,7 +646,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 {
                     var grandChildren = _mediaService.GetPagedChildren(child.Id, page++, pageSize, out total);
                     // recurse
-                    SerializeChildren(grandChildren, childXml);
+                    SerializeChildren(grandChildren, childXml, onMediaItemSerialized);
                 }
             }
         }

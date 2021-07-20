@@ -37,7 +37,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         where TEntity : class, IContentBase
         where TRepository : class, IRepository
     {
-        private readonly Lazy<PropertyEditorCollection> _propertyEditors;
         private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
         private readonly IEventAggregator _eventAggregator;
 
@@ -58,7 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             ILanguageRepository languageRepository,
             IRelationRepository relationRepository,
             IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditors,
+            PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
             IEventAggregator eventAggregator)
@@ -68,7 +67,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             LanguageRepository = languageRepository;
             RelationRepository = relationRepository;
             RelationTypeRepository = relationTypeRepository;
-            _propertyEditors = propertyEditors;
+            PropertyEditors = propertyEditors;
             _dataValueReferenceFactories = dataValueReferenceFactories;
             _eventAggregator = eventAggregator;
         }
@@ -85,7 +84,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected IRelationRepository RelationRepository { get; }
         protected IRelationTypeRepository RelationTypeRepository { get; }
 
-        protected PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
+        protected PropertyEditorCollection PropertyEditors { get; }
 
         #region Versions
 

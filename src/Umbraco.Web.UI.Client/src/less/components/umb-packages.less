@@ -200,7 +200,7 @@
     border: 1px solid @gray-8;
     border-left: 0;
     padding: 10px 0;
-    background: @white; 
+    background: @white;
 }
 
 
@@ -366,7 +366,7 @@
 .umb-package-details__description {
     margin-bottom: 20px;
     line-height: 1.6em;
-    word-wrap: break-word; 
+    word-wrap: break-word;
 }
 
 .umb-package-details__description p {
@@ -376,12 +376,26 @@
 /* Links */
 
 .umb-package-details__link {
-    font-weight: bold;
-    color: @black;
+  font-weight: bold;
+  color: @black;
 }
 
 .umb-package-details__link:hover {
     text-decoration: underline;
+}
+/* Install instructions */
+.umb-package-details__install-instructions {
+  background: #444;
+  color: #fff;
+  font-family: Monaco,Menlo,Consolas,'Courier New',monospace;
+  padding: 20px 20px;
+  border-radius: 5px;
+  margin: 20px 0 10px 0;
+}
+
+/* Install instructions */
+.umb-package-details__install-instructions span {
+  color: @blueMidLight;
 }
 
 /* Owner profile */
@@ -462,7 +476,6 @@
 
 .umb-package-list__item-name {
     font-size: 16px;
-    margin-bottom: 5px;
     color: @black;
     font-weight: bold;
 }

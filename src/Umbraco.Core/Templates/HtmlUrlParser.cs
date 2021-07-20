@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Templates
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
-        public HtmlUrlParser(IOptions<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger ,IProfilingLogger profilingLogger, IIOHelper ioHelper)
+        public HtmlUrlParser(IOptions<ContentSettings> contentSettings, ILogger<HtmlUrlParser> logger, IProfilingLogger profilingLogger, IIOHelper ioHelper)
         {
             _contentSettings = contentSettings.Value;
             _logger = logger;
@@ -36,7 +36,8 @@ namespace Umbraco.Cms.Core.Templates
         /// </remarks>
         public string EnsureUrls(string text)
         {
-            if (_contentSettings.ResolveUrlsFromTextString == false) return text;
+            if (_contentSettings.ResolveUrlsFromTextString == false)
+                return text;
 
             using (var timer = _profilingLogger.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
             {

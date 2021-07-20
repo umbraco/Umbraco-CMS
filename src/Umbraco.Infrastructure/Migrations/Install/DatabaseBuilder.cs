@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
@@ -28,6 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly ILoggerFactory _loggerFactory;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IConfigManipulator _configManipulator;
+        private readonly IMigrationPlanExecutor _migrationPlanExecutor;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
 
         private DatabaseSchemaResult _databaseSchemaValidationResult;
@@ -39,25 +41,26 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             IScopeProvider scopeProvider,
             IUmbracoDatabaseFactory databaseFactory,
             IRuntimeState runtime,
-            ILogger<DatabaseBuilder> logger,
             ILoggerFactory loggerFactory,
             IMigrationBuilder migrationBuilder,
             IKeyValueService keyValueService,
             IHostingEnvironment hostingEnvironment,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IConfigManipulator configManipulator,
+            IMigrationPlanExecutor migrationPlanExecutor,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
             _scopeProvider = scopeProvider;
             _databaseFactory = databaseFactory;
             _runtime = runtime;
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<DatabaseBuilder>();
             _loggerFactory = loggerFactory;
             _migrationBuilder = migrationBuilder;
             _keyValueService = keyValueService;
             _hostingEnvironment = hostingEnvironment;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _configManipulator = configManipulator;
+            _migrationPlanExecutor = migrationPlanExecutor;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
         }
 
@@ -409,7 +412,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public Result UpgradeSchemaAndData(MigrationPlan plan)
+        public Result UpgradeSchemaAndData(UmbracoPlan plan)
         {
             try
             {
@@ -423,7 +426,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 // upgrade
                 var upgrader = new Upgrader(plan);
-                upgrader.Execute(_scopeProvider, _migrationBuilder, _keyValueService, _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
+                upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
 
                 var message = "<p>Upgrade completed!</p>";
 

@@ -108,7 +108,7 @@
     <key alias="inherit">Devral</key>
     <key alias="setLanguage">Kültür</key>
     <key alias="setLanguageHelp">
-      <![CDATA[Geçerli düğümün altındaki düğümler için kültürü ayarlayın, <br /> veya kültürü üst düğümlerden devralın. Ayrıca <br /> 
+      <![CDATA[Geçerli düğümün altındaki düğümler için kültürü ayarlayın, <br /> veya kültürü üst düğümlerden devralın. Ayrıca <br />
         aşağıdaki alan da geçerli değilse geçerli düğüme.]]>
     </key>
     <key alias="setDomains">Alanlar</key>
@@ -1099,7 +1099,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 					</tr>
 				</table>
 			</body>
-		</html>              
+		</html>
   ]]>
     </key>
   </area>
@@ -1128,17 +1128,17 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="mailBody">
       <![CDATA[
       Merhaba %0%
- 
+
       Bu, '%1%' görevinin size bildirilmesi için otomatik bir postadır.
       '%2%' sayfasında gerçekleştirildi
       '%3%' kullanıcısı tarafından
- 
+
       Düzenlemek için http://%4%/#/content/content/edit/%5% adresine gidin.
- 
+
       %6%
- 
+
       İyi günler!
- 
+
       Umbraco robotundan teşekkürler
     ]]>
     </key>
@@ -1218,7 +1218,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 					</tr>
 				</table>
 			</body>
-		</html>  
+		</html>
 	]]>
     </key>
     <key alias="mailBodyVariantHtmlSummary">
@@ -1242,11 +1242,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="deletewarning">Bu, paketi silecek</key>
     <key alias="dropHere">Yüklemek için bırakın</key>
     <key alias="includeAllChildNodes">Tüm alt düğümleri dahil et</key>
-    <key alias="orClickHereToUpload">veya paket dosyasını seçmek için burayı tıklayın</key>
-    <key alias="uploadPackage">Paketi yükle</key>
-    <key alias="localPackageDescription">Makinenizden seçerek yerel bir paket kurun. Yalnızca bildiğiniz ve güvendiğiniz kaynaklardan paket yükleyin</key>
-    <key alias="uploadAnother">Başka bir paket yükleyin</key>
-    <key alias="cancelAndUploadAnother">İptal edin ve başka bir paketi yükleyin</key>
     <key alias="accept">Kabul ediyorum</key>
     <key alias="termsOfUse">kullanım şartları</key>
 
@@ -1254,13 +1249,11 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="pathToFileDescription">Dosyaya giden mutlak yol (yani: /bin/umbraco.bin)</key>
     <key alias="installed">Yüklendi</key>
     <key alias="installedPackages">Yüklü paketler</key>
-    <key alias="installLocal">Yerel yükle</key>
     <key alias="installFinish">Bitir</key>
     <key alias="noConfigurationView">Bu pakette yapılandırma görünümü yok</key>
     <key alias="noPackagesCreated">Henüz paket oluşturulmadı</key>
     <key alias="noPackages">Kurulu paketiniz yok</key>
     <key alias="noPackagesDescription"><![CDATA[Kurulu paketiniz yok. Makinenizden seçerek yerel bir paket kurun veya ekranınızın sağ üst kısmındaki <strong>'Paketler'</strong> simgesini kullanarak mevcut paketlere göz atın]]></key>
-    <key alias="packageActions">Paket İşlemleri</key>
     <key alias="packageAuthorUrl">Yazar URL'si</key>
     <key alias="packageContent">Paket İçeriği</key>
     <key alias="packageFiles">Paket Dosyaları</key>
@@ -1312,14 +1305,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="packageVersion">Paket versiyonu</key>
     <key alias="packageAlreadyInstalled">Paket zaten yüklü</key>
     <key alias="targetVersionMismatch">Bu paket kurulamaz, minimum Umbraco sürümü gerektirir</key>
-    <key alias="installStateUninstalling">Kaldırılıyor ...</key>
-    <key alias="installStateDownloading">İndiriliyor ...</key>
-    <key alias="installStateImporting">İçe Aktarılıyor ...</key>
-    <key alias="installStateInstalling">Kuruluyor ...</key>
-    <key alias="installStateRestarting">Yeniden başlatılıyor, lütfen bekleyin ...</key>
-    <key alias="installStateComplete">Her şey tamam, tarayıcınız şimdi yenilenecek, lütfen bekleyin ...</key>
-    <key alias="installStateCompleted">Kurulumu tamamlamak ve sayfayı yeniden yüklemek için lütfen 'Bitir'i tıklayın.</key>
-    <key alias="installStateUploading">Paket yükleniyor ...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Tam biçimlendirmeyle yapıştırın (Önerilmez)</key>
@@ -1845,18 +1830,18 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="mailBody">
       <![CDATA[
       Merhaba %0%
- 
+
       Bu, '%1%' belgesinin size bildirilmesi için otomatik bir postadır.
       %2% tarafından '%5%' e çevrilmesi istendi.
- 
+
       Düzenlemek için http://%3%/translation/details.aspx?id=%4% adresine gidin.
- 
+
       Veya çeviri görevlerinize genel bir bakış için Umbraco'da oturum açın
       http://%3%
- 
-      İyi günler!       
-      
-      Umbraco robotdan teşekkürler    
+
+      İyi günler!
+
+      Umbraco robotdan teşekkürler
       ]]>
     </key>
     <key alias="noTranslators">Çevirmen kullanıcısı bulunamadı. Lütfen çeviriye içerik göndermeye başlamadan önce bir çevirmen kullanıcısı oluşturun</key>
@@ -2097,7 +2082,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
                 <td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
             </tr>
         </table>
-    </body>                           
+    </body>
 </html>]]>
     </key>
     <key alias="invite">Davet Et</key>

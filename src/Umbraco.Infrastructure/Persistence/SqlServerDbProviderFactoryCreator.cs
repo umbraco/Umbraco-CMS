@@ -1,6 +1,9 @@
-﻿using System;
+using System;
 using System.Data.Common;
+using System.Linq;
 using Microsoft.Extensions.Options;
+using NPoco;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
@@ -48,8 +51,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         }
 
         public void CreateDatabase(string providerName)
-        {
-            throw new NotSupportedException("Embedded databases are not supported");
-        }
+            => throw new NotSupportedException("Embedded databases are not supported");
+
+        public NPocoMapperCollection ProviderSpecificMappers(string providerName)
+            => new NPocoMapperCollection(() => Enumerable.Empty<IMapper>());
     }
 }

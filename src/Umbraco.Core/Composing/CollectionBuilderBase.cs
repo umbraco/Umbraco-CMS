@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Composing
     /// <typeparam name="TCollection">The type of the collection.</typeparam>
     /// <typeparam name="TItem">The type of the items.</typeparam>
     public abstract class CollectionBuilderBase<TBuilder, TCollection, TItem> : ICollectionBuilder<TCollection, TItem>
-        where TBuilder: CollectionBuilderBase<TBuilder, TCollection, TItem>
+        where TBuilder : CollectionBuilderBase<TBuilder, TCollection, TItem>
         where TCollection : class, IBuilderCollection<TItem>
     {
         private readonly List<Type> _types = new List<Type>();
@@ -73,7 +73,8 @@ namespace Umbraco.Cms.Core.Composing
         {
             lock (_locker)
             {
-                if (_registeredTypes != null) return;
+                if (_registeredTypes != null)
+                    return;
 
                 var types = GetRegisteringTypes(_types).ToArray();
 
@@ -110,7 +111,7 @@ namespace Umbraco.Cms.Core.Composing
         /// Creates a collection item.
         /// </summary>
         protected virtual TItem CreateItem(IServiceProvider factory, Type itemType)
-            => (TItem) factory.GetRequiredService(itemType);
+            => (TItem)factory.GetRequiredService(itemType);
 
         /// <summary>
         /// Creates a collection.
@@ -118,9 +119,10 @@ namespace Umbraco.Cms.Core.Composing
         /// <returns>A collection.</returns>
         /// <remarks>Creates a new collection each time it is invoked.</remarks>
         public virtual TCollection CreateCollection(IServiceProvider factory)
-        {
-            return factory.CreateInstance<TCollection>(  CreateItems(factory));
-        }
+            => factory.CreateInstance<TCollection>(CreateItemsFactory(factory));
+
+        // used to resolve a Func<IEnumerable<TItem>> parameter
+        private Func<IEnumerable<TItem>> CreateItemsFactory(IServiceProvider factory) => () => CreateItems(factory);
 
         protected Type EnsureType(Type type, string action)
         {
@@ -139,7 +141,7 @@ namespace Umbraco.Cms.Core.Composing
         public virtual bool Has<T>()
             where T : TItem
         {
-            return _types.Contains(typeof (T));
+            return _types.Contains(typeof(T));
         }
 
         /// <summary>

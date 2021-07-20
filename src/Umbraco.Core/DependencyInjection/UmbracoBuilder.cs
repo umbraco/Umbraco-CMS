@@ -52,23 +52,41 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
         public TypeLoader TypeLoader { get; }
 
+        /// <inheritdoc />
         public ILoggerFactory BuilderLoggerFactory { get; }
 
+        /// <inheritdoc />
+        public IHostingEnvironment BuilderHostingEnvironment { get; }
+
+        public IProfiler Profiler { get; }
+
+        public AppCaches AppCaches { get; }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
+        /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class primarily for testing.
         /// </summary>
         public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader)
-            : this(services, config, typeLoader, NullLoggerFactory.Instance)
+            : this(services, config, typeLoader, NullLoggerFactory.Instance, new NoopProfiler(), AppCaches.Disabled, null)
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoBuilder"/> class.
         /// </summary>
-        public UmbracoBuilder(IServiceCollection services, IConfiguration config, TypeLoader typeLoader, ILoggerFactory loggerFactory)
+        public UmbracoBuilder(
+            IServiceCollection services,
+            IConfiguration config,
+            TypeLoader typeLoader,
+            ILoggerFactory loggerFactory,
+            IProfiler profiler,
+            AppCaches appCaches,
+            IHostingEnvironment hostingEnvironment)
         {
             Services = services;
             Config = config;
             BuilderLoggerFactory = loggerFactory;
+            BuilderHostingEnvironment = hostingEnvironment;
+            Profiler = profiler;
+            AppCaches = appCaches;
             TypeLoader = typeLoader;
 
             AddCoreServices();
@@ -106,6 +124,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
         private void AddCoreServices()
         {
+            Services.AddSingleton(AppCaches);
+            Services.AddSingleton(Profiler);
+
             // Register as singleton to allow injection everywhere.
             Services.AddSingleton<ServiceFactory>(p => p.GetService);
             Services.AddSingleton<IEventAggregator, EventAggregator>();
@@ -145,9 +166,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             this.AddAllCoreCollectionBuilders();
             this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
 
-            Services.AddSingleton<ManifestWatcher>();
             Services.AddSingleton<UmbracoRequestPaths>();
-            this.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, AppPluginsManifestWatcherNotificationHandler>();
 
             Services.AddUnique<InstallStatusTracker>();
 

@@ -7,18 +7,21 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Scoping;
+using Microsoft.Extensions.Logging;
+using System.Numerics;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -29,18 +32,33 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [Authorize(Policy = AuthorizationPolicies.SectionAccessPackages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IPackagingService _packagingService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IKeyValueService _keyValueService;
+        private readonly PendingPackageMigrations _pendingPackageMigrations;
+        private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+        private readonly IMigrationPlanExecutor _migrationPlanExecutor;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly ILogger<PackageController> _logger;
 
         public PackageController(
-            IHostingEnvironment hostingEnvironment,
             IPackagingService packagingService,
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IKeyValueService keyValueService,
+            PendingPackageMigrations pendingPackageMigrations,
+            PackageMigrationPlanCollection packageMigrationPlans,
+            IMigrationPlanExecutor migrationPlanExecutor,
+            IScopeProvider scopeProvider,
+            ILogger<PackageController> logger)
         {
-            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _packagingService = packagingService ?? throw new ArgumentNullException(nameof(packagingService));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+            _keyValueService = keyValueService;
+            _pendingPackageMigrations = pendingPackageMigrations;
+            _packageMigrationPlans = packageMigrationPlans;
+            _migrationPlanExecutor = migrationPlanExecutor;
+            _scopeProvider = scopeProvider;
+            _logger = logger;
         }
 
         public IEnumerable<PackageDefinition> GetCreatedPackages()
@@ -57,10 +75,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return package;
         }
 
-        public PackageDefinition GetEmpty()
-        {
-            return new PackageDefinition();
-        }
+        public PackageDefinition GetEmpty() => new PackageDefinition();
 
         /// <summary>
         /// Creates or updates a package
@@ -101,6 +116,34 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        public ActionResult<IEnumerable<InstalledPackage>> RunMigrations([FromQuery]string packageName)
+        {
+            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+            IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
+            foreach(PackageMigrationPlan plan in _packageMigrationPlans.Where(x => x.PackageName.InvariantEquals(packageName)))
+            {
+                if (pendingMigrations.Contains(plan.Name))
+                {
+                    var upgrader = new Upgrader(plan);
+
+                    try
+                    {
+                        upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Package migration failed on package {Package} for plan {Plan}", packageName, plan.Name);
+
+                        return ValidationErrorResult.CreateNotificationValidationErrorResult(
+                            $"Package migration failed on package {packageName} for plan {plan.Name} with error: {ex.Message}. Check log for full details.");
+                    }
+                }
+            }
+
+            return _packagingService.GetAllInstalledPackages().ToList();
+        }
+
         [HttpGet]
         public IActionResult DownloadCreatedPackage(int id)
         {
@@ -108,8 +151,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (package == null)
                 return NotFound();
 
-            var fullPath = _hostingEnvironment.MapPathWebRoot(package.PackagePath);
-            if (!System.IO.File.Exists(fullPath))
+            if (!System.IO.File.Exists(package.PackagePath))
                 return ValidationProblem("No file found for path " + package.PackagePath);
 
             var fileName = Path.GetFileName(package.PackagePath);
@@ -124,18 +166,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             Response.Headers.Add("Content-Disposition", cd.ToString());
             // Set custom header so umbRequestHelper.downloadFile can save the correct filename
             Response.Headers.Add("x-filename", WebUtility.UrlEncode(fileName));
-            return new FileStreamResult(System.IO.File.OpenRead(fullPath), new MediaTypeHeaderValue("application/octet-stream")
+            return new FileStreamResult(System.IO.File.OpenRead(package.PackagePath), new MediaTypeHeaderValue("application/octet-stream")
             {
                 Charset = encoding.WebName,
             });
 
         }
 
-        public ActionResult<PackageDefinition> GetInstalledPackageById(int id)
+        public ActionResult<InstalledPackage> GetInstalledPackageByName([FromQuery] string packageName)
         {
-            var pack = _packagingService.GetInstalledPackageById(id);
+            InstalledPackage pack = _packagingService.GetInstalledPackageByName(packageName);
             if (pack == null)
+            {
                 return NotFound();
+            }
+
             return pack;
         }
 
@@ -143,24 +188,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Returns all installed packages - only shows their latest versions
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<PackageDefinition> GetInstalled()
-        {
-            return _packagingService.GetAllInstalledPackages()
-                .GroupBy(
-                    //group by name
-                    x => x.Name,
-                    //select the package with a parsed version
-                    pck => SemVersion.TryParse(pck.Version, out var pckVersion)
-                        ? new { package = pck, version = pckVersion }
-                        : new { package = pck, version = new SemVersion(0, 0, 0) })
-                .Select(grouping =>
-                {
-                    //get the max version for the package
-                    var maxVersion = grouping.Max(x => x.version);
-                    //only return the first package with this version
-                    return grouping.First(x => x.version == maxVersion).package;
-                })
-                .ToList();
-        }
+        public IEnumerable<InstalledPackage> GetInstalled()
+            => _packagingService.GetAllInstalledPackages().ToList();
     }
 }

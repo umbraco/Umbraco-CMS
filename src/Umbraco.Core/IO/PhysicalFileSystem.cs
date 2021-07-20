@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -146,17 +146,21 @@ namespace Umbraco.Cms.Core.IO
             var fullPath = GetFullPath(path);
             var exists = File.Exists(fullPath);
             if (exists && overrideExisting == false)
+            {
                 throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
+            }
 
             var directory = Path.GetDirectoryName(fullPath);
             if (directory == null) throw new InvalidOperationException("Could not get directory.");
             Directory.CreateDirectory(directory); // ensure it exists
 
-            if (stream.CanSeek) // TODO: what if we cannot?
+            if (stream.CanSeek)
+            {
                 stream.Seek(0, 0);
+            }
 
-            using (var destination = (Stream) File.Create(fullPath))
-                stream.CopyTo(destination);
+            using var destination = (Stream)File.Create(fullPath);
+            stream.CopyTo(destination);
         }
 
         /// <summary>

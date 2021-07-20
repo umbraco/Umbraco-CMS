@@ -2374,16 +2374,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // what we do in the controller to get rollback versions
             IContent[] versionsSlimFr = versionsSlim.Where(x => x.UpdateDate == x.GetUpdateDate(langFr.IsoCode)).ToArray();
 
-            // TODO this should expect 4, but as the comment below tells we are "*not* properly track 'dirty' for culture"
-            // This should be changed to 4 as soon a this functionality works. Currently it is always 3 due to the sleep
-            // before we save versionId5
-            Assert.AreEqual(3, versionsSlimFr.Length);
+            Assert.AreEqual(4, versionsSlimFr.Length);
 
             // alas, at the moment we do *not* properly track 'dirty' for cultures, meaning
             // that we cannot synchronize dates the way we do with publish dates - and so this
             // would fail - the version UpdateDate is greater than the cultures'.
-            // Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langFr.IsoCode));
-            // Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langDa.IsoCode));
+            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langFr.IsoCode));
+            Assert.AreEqual(versions[0].UpdateDate, versions[0].GetUpdateDate(langDa.IsoCode));
 
             // now roll french back to its very first version
             page.CopyFrom(versions[4], langFr.IsoCode); // only the pure FR values

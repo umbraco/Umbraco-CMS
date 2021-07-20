@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -66,20 +66,24 @@ namespace Umbraco.Cms.Core.Media
             }
             else
             {
-                // if anything goes wrong, just reset the properties
-                try
+                // it might not exist if the media item has been created programatically but doesn't have a file persisted yet.
+                if (_mediaFileManager.FileSystem.FileExists(filepath))
                 {
-                    using (var filestream = _mediaFileManager.FileSystem.OpenFile(filepath))
+                    // if anything goes wrong, just reset the properties
+                    try
                     {
-                        var extension = (Path.GetExtension(filepath) ?? "").TrimStart(Constants.CharArrays.Period);
-                        var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (ImageSize?)_imageDimensionExtractor.GetDimensions(filestream) : null;
-                        SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
+                        using (var filestream = _mediaFileManager.FileSystem.OpenFile(filepath))
+                        {
+                            var extension = (Path.GetExtension(filepath) ?? "").TrimStart(Constants.CharArrays.Period);
+                            var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (ImageSize?)_imageDimensionExtractor.GetDimensions(filestream) : null;
+                            SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Could not populate upload auto-fill properties for file '{File}'.", filepath);
-                    ResetProperties(content, autoFillConfig, culture, segment);
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Could not populate upload auto-fill properties for file '{File}'.", filepath);
+                        ResetProperties(content, autoFillConfig, culture, segment);
+                    }
                 }
             }
         }
