@@ -10,5 +10,11 @@
         ///     and the default access rules for that dashboard will be in use.
         /// </value>
         bool AllowContentDashboardAccessToAllUsers { get; }
+
+        /// <summary>
+        /// Gets the path to use when constructing the URL for retrieving data for the content dashboard.
+        /// </summary>
+        /// <value>The URL path.</value>
+        string ContentDashboardPath { get; }
     }
 }

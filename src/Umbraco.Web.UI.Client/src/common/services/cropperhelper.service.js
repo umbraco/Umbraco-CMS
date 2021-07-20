@@ -44,24 +44,23 @@ function cropperHelper(umbRequestHelper, $http) {
 			return { width:srcWidth*ratio, height:srcHeight*ratio, ratio: ratio};
 		},
 
-		scaleToMaxSize : function(srcWidth, srcHeight, maxSize) {
-			
-			var retVal = {height: srcHeight, width: srcWidth};
+		scaleToMaxSize : function(srcWidth, srcHeight, maxWidth, maxHeight) {
 
-			if(srcWidth > maxSize ||srcHeight > maxSize){
-				var ratio = [maxSize / srcWidth, maxSize / srcHeight ];
-				ratio = Math.min(ratio[0], ratio[1]);
-				
-				retVal.height = srcHeight * ratio;
-				retVal.width = srcWidth * ratio;
-			}
-			
-			return retVal;			
+            // fallback to maxHeight:
+            maxHeight = maxHeight || maxWidth;
+
+            // get smallest ratio, if ratio exceeds 1 we will not scale(hence we parse 1 as the maximum allowed ratio)
+            var ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight, 1);
+
+			return {
+                width: srcWidth * ratio,
+                height:srcHeight * ratio
+            };
 		},
 
 		//returns a ng-style object with top,left,width,height pixel measurements
 		//expects {left,right,top,bottom} - {width,height}, {width,height}, int
-		//offset is just to push the image position a number of pixels from top,left    
+		//offset is just to push the image position a number of pixels from top,left
 		convertToStyle : function(coordinates, originalSize, viewPort, offset){
 
 			var coordinates_px = service.coordinatesToPixels(coordinates, originalSize, offset);
@@ -85,14 +84,14 @@ function cropperHelper(umbRequestHelper, $http) {
 			return style;
 		},
 
-		 
+
 		coordinatesToPixels : function(coordinates, originalSize, offset){
 
 			var coordinates_px = {
 				x1: Math.floor(coordinates.x1 * originalSize.width),
 				y1: Math.floor(coordinates.y1 * originalSize.height),
 				x2: Math.floor(coordinates.x2 * originalSize.width),
-				y2: Math.floor(coordinates.y2 * originalSize.height)								 
+				y2: Math.floor(coordinates.y2 * originalSize.height)
 			};
 
 			return coordinates_px;
@@ -106,25 +105,18 @@ function cropperHelper(umbRequestHelper, $http) {
 			var x2_px = image.width - (x1_px + width);
 			var y2_px = image.height - (y1_px + height);
 
-
 			//crop coordinates in %
 			var crop = {};
-			crop.x1 = x1_px / image.width;
-			crop.y1 = y1_px / image.height;
-			crop.x2 = x2_px / image.width;
-			crop.y2 = y2_px / image.height;
-
-			for(var coord in crop){
-				if(crop[coord] < 0){
-				    crop[coord] = 0;
-				}
-			} 
+			crop.x1 = Math.max(x1_px / image.width, 0);
+			crop.y1 = Math.max(y1_px / image.height, 0);
+			crop.x2 = Math.max(x2_px / image.width, 0);
+			crop.y2 = Math.max(y2_px / image.height, 0);
 
 			return crop;
 		},
 
 		alignToCoordinates : function(image, center, viewport){
-			
+
 			var min_left = (image.width) - (viewport.width);
 			var min_top =  (image.height) - (viewport.height);
 

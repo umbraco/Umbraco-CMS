@@ -188,11 +188,34 @@ namespace Umbraco.Core.Services.Implement
             // TODO: what about culture?
 
             var contentType = GetContentType(contentTypeAlias);
-            if (contentType == null)
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+            return Create(name, parentId, contentType, userId);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object of a specified content type.
+        /// </summary>
+        /// <remarks>This method simply returns a new, non-persisted, IContent without any identity. It
+        /// is intended as a shortcut to creating new content objects that does not invoke a save
+        /// operation against the database.
+        /// </remarks>
+        /// <param name="name">The name of the content object.</param>
+        /// <param name="parentId">The identifier of the parent, or -1.</param>
+        /// <param name="contentType">The content type of the content</param>
+        /// <param name="userId">The optional id of the user creating the content.</param>
+        /// <returns>The content object.</returns>
+        public IContent Create(string name, int parentId, IContentType contentType,
+            int userId = Constants.Security.SuperUserId)
+        {
+            if (contentType is null)
+            {
+                throw new ArgumentException("Content type must be specified", nameof(contentType));
+            }
+
             var parent = parentId > 0 ? GetById(parentId) : null;
-            if (parentId > 0 && parent == null)
+            if (parentId > 0 && parent is null)
+            {
                 throw new ArgumentException("No content with that id.", nameof(parentId));
+            }
 
             var content = new Content(name, parentId, contentType);
             using (var scope = ScopeProvider.CreateScope())
@@ -1088,7 +1111,7 @@ namespace Umbraco.Core.Services.Implement
         /// <remarks>
         /// <para>
         /// Business logic cases such: as unpublishing a mandatory culture, or unpublishing the last culture, checking for pending scheduled publishing, etc... is dealt with in this method.
-        /// There is quite a lot of cases to take into account along with logic that needs to deal with scheduled saving/publishing, branch saving/publishing, etc...       
+        /// There is quite a lot of cases to take into account along with logic that needs to deal with scheduled saving/publishing, branch saving/publishing, etc...
         /// </para>
         /// </remarks>
         private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content,
@@ -1415,7 +1438,7 @@ namespace Umbraco.Core.Services.Implement
 
                         var result = CommitDocumentChangesInternal(scope, d, saveEventArgs, allLangs.Value, d.WriterId);
                         if (result.Success == false)
-                            Logger.Error<ContentService, int, PublishResultType>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                            Logger.Error<ContentService,int,PublishResultType>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                         results.Add(result);
 
                     }
@@ -2118,6 +2141,15 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Succeed(evtMsgs);
         }
 
+        public bool RecycleBinSmells()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.RecycleBinSmells();
+            }
+        }
+
         #endregion
 
         #region Others
@@ -2201,7 +2233,7 @@ namespace Umbraco.Core.Services.Implement
                     while (page * pageSize < total)
                     {
                         var descendants = GetPagedDescendants(content.Id, page++, pageSize, out total);
-                        foreach (var descendant in descendants.OrderBy(x => x.Level).ThenBy(y => y.SortOrder))
+                        foreach (var descendant in descendants)
                         {
                             // if parent has not been copied, skip, else gets its copy id
                             if (idmap.TryGetValue(descendant.ParentId, out parentId) == false) continue;
@@ -2420,7 +2452,7 @@ namespace Umbraco.Core.Services.Implement
                 if (report.FixedIssues.Count > 0)
                 {
                     //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
-                    var root = new Content("root", -1, new ContentType(-1)) { Id = -1, Key = Guid.Empty };
+                    var root = new Content("root", -1, new ContentType(-1)) {Id = -1, Key = Guid.Empty};
                     scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>.EventArgs(new TreeChange<IContent>(root, TreeChangeTypes.RefreshAll)));
                 }
 
@@ -3169,7 +3201,7 @@ namespace Umbraco.Core.Services.Implement
                 if (rollbackSaveResult.Success == false)
                 {
                     //Log the error/warning
-                    Logger.Error<ContentService, int, int, int>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Logger.Error<ContentService,int,int,int>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
                 }
                 else
                 {
@@ -3178,7 +3210,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(RolledBack, this, rollbackEventArgs);
 
                     //Logging & Audit message
-                    Logger.Info<ContentService, int, int, int>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Logger.Info<ContentService,int,int,int>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
                     Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
                 }
 

@@ -54,13 +54,19 @@
 
                                     <div class="umb-package-numbers">
                                         <small class="umb-package-downloads">
-                                            <i class="icon-download-alt" aria-hidden="true"></i>
+                                            <umb-icon icon="icon-download-alt"></umb-icon>
                                             <strong>{{package.downloads}}</strong>
                                         </small>
                                         <small class="umb-package-likes">
-                                            <i class="icon-hearts" aria-hidden="true"></i>
+                                            <umb-icon icon="icon-hearts" class="icon-hearts"></umb-icon>
                                             <strong>{{package.likes}}</strong>
                                         </small>
+                                    </div>
+                                    <div class="umb-package-cloud">
+                                        <div ng-if="package.certifiedToWorkOnUmbracoCloud">
+                                            <umb-icon icon="icon-cloud" class="icon-cloud"></umb-icon>
+                                            <span><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</localize></span>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -93,18 +99,24 @@
 
                                     <div class="umb-package-numbers">
                                         <small class="umb-package-downloads">
-                                            <i class="icon-download-alt" aria-hidden="true"></i>
-                                            <strong>{{ package.downloads }}</strong>
+                                            <umb-icon icon="icon-download-alt"></umb-icon>
+                                            <strong>{{package.downloads}}</strong>
                                         </small>
                                         <small class="umb-package-likes">
-                                            <i class="icon-hearts" aria-hidden="true"></i>
-                                            <strong>{{ package.likes }}</strong>
+                                            <umb-icon icon="icon-hearts" class="icon-hearts"></umb-icon>
+                                            <strong>{{package.likes}}</strong>
                                         </small>
+                                    </div>
+                                    <div class="umb-package-cloud">
+                                        <div ng-if="package.certifiedToWorkOnUmbracoCloud">
+                                            <umb-icon icon="icon-cloud" class="icon-cloud"></umb-icon>
+                                            <span><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</localize></span>
+                                        </div>
                                     </div>
 
                                 </div>
                             </div>
-                            
+
                         </button>
                     </div> <!-- end package -->
 
@@ -267,6 +279,10 @@
                                 <div class="umb-package-details__information-item" ng-if="vm.package.ownerInfo.karma">
                                     <div class="umb-package-details__information-item-label"><localize key="packager_packageLikes">Likes</localize>:</div>
                                     <div class="umb-package-details__information-item-content">{{vm.package.likes}}</div>
+                                </div>
+
+                                <div class="umb-package-details__information-item" ng-if="vm.package.certifiedToWorkOnUmbracoCloud">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco CLoud</localize></div>
                                 </div>
 
                             </div>

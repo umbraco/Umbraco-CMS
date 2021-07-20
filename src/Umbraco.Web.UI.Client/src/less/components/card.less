@@ -96,8 +96,6 @@
 }
 
 
-
-
 //Card icon grid for picking items off a card
 .umb-card-grid {
 	padding: 0;
@@ -129,48 +127,74 @@
 }
 
 .umb-card-grid.-three-in-row li {
-	flex: 0 0 33.333%;
-    max-width:33.333%;
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
 
-    i {
+    span > i, // legacy icon
+    .umb-icon {
         font-size: 36px;
-        line-height: 28px;
+        line-height: 1;
     }
 }
 
-.umb-card-grid .umb-card-grid-item {
-    position: relative;
-	display: block;
-    width: 100%;
-    height: 100%;
-    padding: 10px 5px;
-    border-radius: @baseBorderRadius * 2;
-    transition: background-color 120ms;
-    font-size: 13px;
-    line-height: 1.3em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-
-    > span {
+.umb-card-grid {
+    .umb-card-grid-item {
         position: relative;
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 10px 5px;
+        border-radius: @baseBorderRadius * 2;
+        transition: background-color 120ms;
+        font-size: 13px;
+        line-height: 1.3em;
         display: flex;
-        align-items: center;
-        justify-content: center;
         flex-direction: column;
-        background-color: transparent;
-        word-break: break-word;
+        align-items: center;
+        justify-content: flex-start;
+
+        &__loading {
+            position: absolute;
+            background-color: rgba(255,255,255,0.8);
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        a {
+            color: @ui-option-type;
+            text-decoration: none;
+        }
+
+        > span {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background-color: transparent;
+            word-break: break-word;
+        }
+
+        &:hover {
+            background-color: @ui-option-hover;
+            color: @ui-option-type-hover;
+        }
+
+        &:focus {
+            color: @ui-option-type-hover;
+        }
     }
-}
 
-
-.umb-card-grid .umb-card-grid-item:hover {
-	background-color: @ui-option-hover;
-	color: @ui-option-type-hover;
-}
-.umb-card-grid .umb-card-grid-item:focus {
-	color: @ui-option-type-hover;
+    span > i, // legacy icon
+    .umb-icon {
+        font-size: 30px;
+        line-height: 1;
+        margin-top: 6px;
+        margin-bottom: 10px;
+        display: block;
+    }
 }
 
 .umb-card-grid .umb-card-grid-item.--creator {
@@ -189,7 +213,6 @@
 	width: 100%;
     padding-top: 100%;
     border-radius: @baseBorderRadius * 2;
-    
     box-sizing: border-box;
     transition: background-color 120ms;
     
@@ -216,30 +239,6 @@
         border-radius: @baseBorderRadius * 2;
     }
 }
-
-
-.umb-card-grid a {
-    color: @ui-option-type;
-    text-decoration: none;
-}
-
-.umb-card-grid i {
-    font-size: 30px;
-    line-height: 20px;
-    margin-top: 6px;
-    margin-bottom: 10px;
-    display: block;
-}
-
- .umb-card-grid .umb-card-grid-item__loading {
-	 position: absolute;
-	 background-color: rgba(255,255,255,0.8);
-	 top: 0;
-	 right: 0;
-	 bottom: 0;
-	 left: 0;
- }
-
 
 //Round icon-like button - this should be somewhere else
 .umb-btn-round {

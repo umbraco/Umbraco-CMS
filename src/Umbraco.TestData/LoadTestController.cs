@@ -6,10 +6,9 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using System.Web;
 using System.Web.Hosting;
-using System.Web.Routing;
 using System.Diagnostics;
-using Umbraco.Core.Composing;
-using System.Configuration;
+using Umbraco.Core.IO;
+using System.IO;
 
 // see https://github.com/Shazwazza/UmbracoScripts/tree/master/src/LoadTesting
 
@@ -261,6 +260,15 @@ namespace Umbraco.TestData
             HttpRuntime.UnloadAppDomain();
         }
 
+        public ActionResult ColdBootRestart()
+        {
+            Directory.Delete(IOHelper.MapPath("~/App_Data/TEMP/DistCache"), true);
+
+            DoRestart();
+
+            return Content("Cold Boot Restarted.");
+        }
+
         public ActionResult Restart()
         {
             DoRestart();
@@ -329,43 +337,6 @@ namespace Umbraco.TestData
                 t.SetMasterTemplate(master);
             svces.FileService.SaveTemplate(t);
             return t;
-        }
-    }
-
-    public class TestComponent : IComponent
-    {
-        public void Initialize()
-        {
-            if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
-                return;
-
-            RouteTable.Routes.MapRoute(
-               name: "LoadTest",
-               url: "LoadTest/{action}",
-               defaults: new
-               {
-                   controller = "LoadTest",
-                   action = "Index"
-               },
-               namespaces: new[] { "Umbraco.TestData" }
-           );
-        }
-
-        public void Terminate()
-        {
-        }
-    }
-
-    public class TestComposer : ComponentComposer<TestComponent>, IUserComposer
-    {
-        public override void Compose(Composition composition)
-        {
-            base.Compose(composition);
-
-            if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
-                return;
-
-            composition.Register(typeof(LoadTestController), Lifetime.Request);
         }
     }
 }

@@ -331,11 +331,10 @@ namespace Umbraco.Web.Trees
                         RecycleBinId.ToInvariantString(),
                         id,
                         queryStrings,
-                        Services.TextService.Localize("general/recycleBin"),
+                        Services.TextService.Localize("general", "recycleBin"),
                         "icon-trash",
                         RecycleBinSmells,
                         queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
-
                 }
 
                 return nodes;

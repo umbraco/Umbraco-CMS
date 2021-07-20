@@ -1,4 +1,4 @@
-function booleanEditorController($scope, angularHelper) {
+function booleanEditorController($scope) {
 
     // Setup the default config
     // This allow to overwrite the configuration when property editor is re-used 
@@ -11,8 +11,8 @@ function booleanEditorController($scope, angularHelper) {
         showLabels: false
     };
 
-    if ($scope.model.config && $scope.model.config.showLabels && Object.toBoolean($scope.model.config.showLabels)) {
-        config.showLabels = true;
+    if ($scope.model.config) {
+        $scope.model.config.showLabels = $scope.model.config.showLabels ? Object.toBoolean($scope.model.config.showLabels) : config.showLabels;
     }
 
     // Map the user config
@@ -36,6 +36,12 @@ function booleanEditorController($scope, angularHelper) {
         }
     }
 
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
+
     setupViewModel();
 
     if ($scope.model && !$scope.model.value) {
@@ -51,7 +57,7 @@ function booleanEditorController($scope, angularHelper) {
 
     // Update the value when the toggle is clicked
     $scope.toggle = function(){
-        angularHelper.getCurrentForm($scope).$setDirty();
+        setDirty();
         if ($scope.renderModel.value){
             $scope.model.value = $scope.model.config.falsevalue;
             setupViewModel();
