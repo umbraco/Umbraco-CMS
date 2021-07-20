@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.WebAssets
         /// <exception cref="InvalidOperationException">
         /// Thrown if any of the paths specified are not absolute
         /// </exception>
-        void CreateCssBundle(string bundleName, bool optimizeOutput, params string[] filePaths);
+        void CreateCssBundle(string bundleName, BundlingOptions bundleOptions, params string[] filePaths);
 
         /// <summary>
         /// Renders the html link tag for the bundle
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.WebAssets
         /// <exception cref="InvalidOperationException">
         /// Thrown if any of the paths specified are not absolute
         /// </exception>
-        void CreateJsBundle(string bundleName, bool optimizeOutput, params string[] filePaths);
+        void CreateJsBundle(string bundleName, BundlingOptions bundleOptions, params string[] filePaths);
 
         /// <summary>
         /// Renders the html script tag for the bundle
