@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -23,6 +23,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         private IDbProviderFactoryCreator DbProviderFactoryCreator => GetRequiredService<IDbProviderFactoryCreator>();
         private IUmbracoDatabaseFactory UmbracoDatabaseFactory => GetRequiredService<IUmbracoDatabaseFactory>();
         private IEmbeddedDatabaseCreator EmbeddedDatabaseCreator => GetRequiredService<IEmbeddedDatabaseCreator>();
+
+        public DatabaseBuilderTests()
+        {
+            TestOptionAttributeBase.ScanAssemblies.Add(typeof(DatabaseBuilderTests).Assembly);
+        }
 
         [Test]
         public void CreateDatabase()
