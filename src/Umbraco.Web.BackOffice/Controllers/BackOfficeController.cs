@@ -33,6 +33,7 @@ using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -430,7 +431,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (response == null) throw new ArgumentNullException(nameof(response));
 
             // Sign in the user with this external login provider (which auto links, etc...)
-            var result = await _signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false);
+            SignInResult result = await _signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false);
 
             var errors = new List<string>();
 
@@ -467,17 +468,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return verifyResponse;
 
             }
-            else if (result == Microsoft.AspNetCore.Identity.SignInResult.LockedOut)
+            else if (result == SignInResult.LockedOut)
             {
                 errors.Add($"The local user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} is locked out.");
             }
-            else if (result == Microsoft.AspNetCore.Identity.SignInResult.NotAllowed)
+            else if (result == SignInResult.NotAllowed)
             {
                 // This occurs when SignInManager.CanSignInAsync fails which is when RequireConfirmedEmail , RequireConfirmedPhoneNumber or RequireConfirmedAccount fails
                 // however since we don't enforce those rules (yet) this shouldn't happen.
                 errors.Add($"The user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} has not confirmed their details and cannot sign in.");
             }
-            else if (result == Microsoft.AspNetCore.Identity.SignInResult.Failed)
+            else if (result == SignInResult.Failed)
             {
                 // Failed only occurs when the user does not exist
                 errors.Add("The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account, the provider must be linked from the back office.");
@@ -493,6 +494,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else if (result is AutoLinkSignInResult autoLinkSignInResult && autoLinkSignInResult.Errors.Count > 0)
             {
                 errors.AddRange(autoLinkSignInResult.Errors);
+            }
+            else if (!result.Succeeded)
+            {
+                // this shouldn't occur, the above should catch the correct error but we'll be safe just in case
+                errors.Add($"An unknown error with the requested provider ({loginInfo.LoginProvider}) occurred.");
             }
 
             if (errors.Count > 0)
