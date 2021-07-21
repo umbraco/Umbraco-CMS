@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Microsoft.Extensions.Options;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
 {
@@ -7,11 +8,16 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     /// </summary>
     public class BackOfficeExternalLoginProvider : IEquatable<BackOfficeExternalLoginProvider>
     {
-        public BackOfficeExternalLoginProvider(string name, string authenticationType, BackOfficeExternalLoginProviderOptions properties)
+        public BackOfficeExternalLoginProvider(string name, string authenticationType, IOptions<BackOfficeExternalLoginProviderOptions> properties)
         {
+            if (properties is null)
+            {
+                throw new ArgumentNullException(nameof(properties));
+            }
+
             Name = name ?? throw new ArgumentNullException(nameof(name));
             AuthenticationType = authenticationType ?? throw new ArgumentNullException(nameof(authenticationType));
-            Options = properties ?? throw new ArgumentNullException(nameof(properties));
+            Options = properties.Value;
         }
 
         public string Name { get; }
