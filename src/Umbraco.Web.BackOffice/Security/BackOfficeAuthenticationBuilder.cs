@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             Services.AddSingleton(x => new BackOfficeExternalLoginProvider(
                 displayName,
                 authenticationScheme,
-                x.GetRequiredService<IOptions<BackOfficeExternalLoginProviderOptions>>()));
+                x.GetRequiredService<IOptionsSnapshot<BackOfficeExternalLoginProviderOptions>>()));
             Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>, EnsureBackOfficeScheme<TOptions>>());
 
             return base.AddRemoteScheme<TOptions, THandler>(authenticationScheme, displayName, configureOptions);

@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     /// </summary>
     public class BackOfficeExternalLoginProvider : IEquatable<BackOfficeExternalLoginProvider>
     {
-        public BackOfficeExternalLoginProvider(string name, string authenticationType, IOptions<BackOfficeExternalLoginProviderOptions> properties)
+        public BackOfficeExternalLoginProvider(string name, string authenticationType, IOptionsSnapshot<BackOfficeExternalLoginProviderOptions> properties)
         {
             if (properties is null)
             {
@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
 
             Name = name ?? throw new ArgumentNullException(nameof(name));
             AuthenticationType = authenticationType ?? throw new ArgumentNullException(nameof(authenticationType));
-            Options = properties.Value;
+            Options = properties.Get(authenticationType);
         }
 
         public string Name { get; }
