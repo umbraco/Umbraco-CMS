@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <summary>
         /// Options used to control how users can be auto-linked/created/updated based on the external login provider
         /// </summary>
-        public ExternalSignInAutoLinkOptions AutoLinkOptions { get; set; }
+        public ExternalSignInAutoLinkOptions AutoLinkOptions { get; set; } = new ExternalSignInAutoLinkOptions();
 
         /// <summary>
         /// When set to true will disable all local user login functionality
