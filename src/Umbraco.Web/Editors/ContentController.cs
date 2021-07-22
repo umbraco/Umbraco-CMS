@@ -467,6 +467,11 @@ namespace Umbraco.Web.Editors
             return GetEmptyByKeysInternal(contentTypeKeys, parentId);
         }
 
+        /// <summary>
+        /// Gets a collection of empty content items for all document types.
+        /// </summary>
+        /// <param name="contentTypeByKeys"></param>
+        /// <returns></returns>
         [HttpPost]
         [OutgoingEditorModelEvent]
         public IDictionary<Guid, ContentItemDisplay> PostEmptyByKeys(ContentTypesByKeys contentTypeByKeys)
