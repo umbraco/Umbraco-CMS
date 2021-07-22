@@ -45,12 +45,12 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             base.Services.AddSingleton(x =>
             {
                 // need to create a scope to resolve IOptionsSnapshot
-                using (x.CreateScope())
+                using (IServiceScope serviceScope = x.CreateScope())
                 {
                     return new BackOfficeExternalLoginProvider(
                         displayName,
                         authenticationScheme,
-                        x.GetRequiredService<IOptionsSnapshot<BackOfficeExternalLoginProviderOptions>>());
+                        serviceScope.ServiceProvider.GetRequiredService<IOptionsSnapshot<BackOfficeExternalLoginProviderOptions>>());
                 }   
             });
             Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>, EnsureBackOfficeScheme<TOptions>>());
