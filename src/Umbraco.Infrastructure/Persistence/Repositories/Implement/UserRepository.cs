@@ -432,11 +432,12 @@ ORDER BY colName";
         {
             var list = new List<string>
             {
-                "DELETE FROM umbracoUser2UserGroup WHERE userId = @id",
-                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @id",
-                "DELETE FROM umbracoUserStartNode WHERE userId = @id",
-                "DELETE FROM umbracoUser WHERE id = @id",
-                "DELETE FROM umbracoExternalLogin WHERE id = @id"
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.User} WHERE id = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE id = @id"
             };
             return list;
         }
