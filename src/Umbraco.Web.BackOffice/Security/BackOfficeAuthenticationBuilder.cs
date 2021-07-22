@@ -42,10 +42,17 @@ namespace Umbraco.Cms.Web.BackOffice.Security
 
             // add our login provider to the container along with a custom options configuration
             Services.Configure(authenticationScheme, _loginProviderOptions);
-            Services.AddSingleton(x => new BackOfficeExternalLoginProvider(
-                displayName,
-                authenticationScheme,
-                x.GetRequiredService<IOptionsSnapshot<BackOfficeExternalLoginProviderOptions>>()));
+            base.Services.AddSingleton(x =>
+            {
+                // need to create a scope to resolve IOptionsSnapshot
+                using (x.CreateScope())
+                {
+                    return new BackOfficeExternalLoginProvider(
+                        displayName,
+                        authenticationScheme,
+                        x.GetRequiredService<IOptionsSnapshot<BackOfficeExternalLoginProviderOptions>>());
+                }   
+            });
             Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>, EnsureBackOfficeScheme<TOptions>>());
 
             return base.AddRemoteScheme<TOptions, THandler>(authenticationScheme, displayName, configureOptions);
