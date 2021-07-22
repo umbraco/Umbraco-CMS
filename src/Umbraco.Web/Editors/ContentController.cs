@@ -449,6 +449,13 @@ namespace Umbraco.Web.Editors
             return result;
         }
 
+        private IDictionary<Guid, ContentItemDisplay> GetEmptyByKeysInternal(Guid[] contentTypeKeys, int parentId)
+        {
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
+            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+        }
+
         /// <summary>
         /// Gets a collection of empty content items for all document types.
         /// </summary>
@@ -457,9 +464,14 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public IDictionary<Guid, ContentItemDisplay> GetEmptyByKeys([FromUri] Guid[] contentTypeKeys, [FromUri] int parentId)
         {
-            using var scope = _scopeProvider.CreateScope(autoComplete: true);
-            var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
-            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+            return GetEmptyByKeysInternal(contentTypeKeys, parentId);
+        }
+
+        [HttpPost]
+        [OutgoingEditorModelEvent]
+        public IDictionary<Guid, ContentItemDisplay> PostEmptyByKeys(ContentTypesByKeys contentTypeByKeys)
+        {
+            return GetEmptyByKeysInternal(contentTypeByKeys.ContentTypeKeys, contentTypeByKeys.ParentId);
         }
 
         [OutgoingEditorModelEvent]
