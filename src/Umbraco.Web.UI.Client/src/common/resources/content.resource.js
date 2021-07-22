@@ -694,7 +694,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     $http.post(
                         umbRequestHelper.getApiUrl(
                             "contentApiBaseUrl",
-                            "PostEmptyByKeys"),
+                            "GetEmptyByKeys"),
                         { contentTypeKeys: scaffoldKeys, parentId: parentId }
                     ),
                     'Failed to retrieve data for empty content items ids' + scaffoldKeys.join(", "))

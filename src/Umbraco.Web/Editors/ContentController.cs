@@ -470,11 +470,14 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Gets a collection of empty content items for all document types.
         /// </summary>
+        /// <remarks>
+        /// This is a post request in order to support a large amount of GUIDs without hitting the URL length limit.
+        /// </remarks>
         /// <param name="contentTypeByKeys"></param>
         /// <returns></returns>
         [HttpPost]
         [OutgoingEditorModelEvent]
-        public IDictionary<Guid, ContentItemDisplay> PostEmptyByKeys(ContentTypesByKeys contentTypeByKeys)
+        public IDictionary<Guid, ContentItemDisplay> GetEmptyByKeys(ContentTypesByKeys contentTypeByKeys)
         {
             return GetEmptyByKeysInternal(contentTypeByKeys.ContentTypeKeys, contentTypeByKeys.ParentId);
         }
