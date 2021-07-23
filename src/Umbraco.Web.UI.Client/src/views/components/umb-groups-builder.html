@@ -30,16 +30,18 @@
                             on-change-name="onChangeTabName(tab)">
                         </umb-content-type-tab>
                     </li>
-                    <umb-button
-                        ng-if="!sortingMode"
-                        class="umb-group-builder__tabs__add-tab"
-                        type="button"
-                        label-key="contentTypeEditor_addTab"
-                        icon="icon-add"
-                        button-style="white"
-                        action="addTab();"
-                        size="xs">
-                    </umb-button>
+                    <li class="umb-group-builder__tabs-list__add-tab">
+                        <umb-button
+                            ng-if="!sortingMode"
+                            class="umb-group-builder__tabs__add-tab"
+                            type="button"
+                            label-key="contentTypeEditor_addTab"
+                            icon="icon-add"
+                            button-style="white"
+                            action="addTab();"
+                            size="xs">
+                        </umb-button>
+                    </li>
                 </ul>
                 <button ng-if="overflow.right < 0" class="btn-reset umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--right" ng-click="moveTabsOverflowRight()">
                     <span class="caret"></span>
