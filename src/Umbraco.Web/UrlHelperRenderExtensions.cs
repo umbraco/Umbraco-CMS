@@ -281,14 +281,15 @@ namespace Umbraco.Web
             return CreateHtmlString(url, htmlEncode);
         }
 
-        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, ImageCropperValue imageCropperValue, string cropAlias, bool htmlEncode = true)
-        {
-            if (imageCropperValue == null || string.IsNullOrEmpty(imageCropperValue.Src)) return EmptyHtmlString;
-
-            var url = imageCropperValue.Src.GetCropUrl(imageCropperValue, cropAlias: cropAlias, useCropDimensions: true);
-
-            return CreateHtmlString(url, htmlEncode);
-        }
+        // TODO: enable again in v9 and make sure to document that `@Url.GetCropUrl(Model.Property, cropAlias: "Featured")` needs to be updated - see https://github.com/umbraco/Umbraco-CMS/pull/10527 for alternatives
+        // public static IHtmlString GetCropUrl(this UrlHelper urlHelper, ImageCropperValue imageCropperValue, string cropAlias, bool htmlEncode = true)
+        // {
+        //     if (imageCropperValue == null || string.IsNullOrEmpty(imageCropperValue.Src)) return EmptyHtmlString;
+        //
+        //     var url = imageCropperValue.Src.GetCropUrl(imageCropperValue, cropAlias: cropAlias, useCropDimensions: true);
+        //
+        //     return CreateHtmlString(url, htmlEncode);
+        // }
 
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
             ImageCropperValue imageCropperValue,

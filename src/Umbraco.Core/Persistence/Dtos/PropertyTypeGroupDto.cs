@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public const string TableName = Constants.DatabaseSchema.Tables.PropertyTypeGroup;
 
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 12)]
+        [PrimaryKeyColumn(IdentitySeed = 56)]
         public int Id { get; set; }
 
         [Column("uniqueID")]
