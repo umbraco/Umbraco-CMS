@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Infrastructure.Install
 
                 var innerException = new UnattendedInstallException(
                     "The database configuration failed."
-                    + "\n Please check log file for additional information (can be found in '/Umbraco/Data/Logs/')",
+                    + "\n Please check log file for additional information (can be found in '/umbraco/Logs/')",
                     ex);
 
                 _runtimeState.Configure(Core.RuntimeLevel.BootFailed, Core.RuntimeLevelReason.BootFailedOnException, innerException);
