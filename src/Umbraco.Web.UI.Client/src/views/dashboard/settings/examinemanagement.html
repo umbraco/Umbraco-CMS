@@ -1,7 +1,5 @@
 <div id="examineManagement" class="examine-management" ng-controller="Umbraco.Dashboard.ExamineManagementController as vm">
 
-    {{vm.selectedSearcher}}
-
     <div ng-show="vm.loading">
         <umb-load-indicator></umb-load-indicator>
     </div>
@@ -127,7 +125,7 @@
                                                             <umb-search-filter
                                                                 input-id="examine-search"
                                                                 model="vm.searchText"
-                                                                on-search="vm.search(vm.selectedSearcher, $event)"
+                                                                on-search="vm.search(vm.selectedIndex, $event)"
                                                                 label-key="placeholders_filter"
                                                                 text="Type to filter..."
                                                                 css-class="w-100">
@@ -273,7 +271,7 @@
                                                             <umb-search-filter
                                                                 input-id="examine-search"
                                                                 model="vm.searchText"
-                                                                on-search="vm.search(vm.selectedSearcher, $event)"
+                                                                on-search="vm.search(vm.selectedIndex, $event)"
                                                                 label-key="placeholders_filter"
                                                                 text="Type to filter..."
                                                                 css-class="w-100">
