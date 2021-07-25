@@ -270,7 +270,6 @@ namespace Umbraco.Core.Collections
 
                 if (_dictionaryStorage != null)
                 {
-                    Debug.Assert(_arrayStorage == null);
                     _dictionaryStorage.Add(key, value);
                     return;
                 }
@@ -562,7 +561,6 @@ namespace Umbraco.Core.Collections
 
         private void EnsureCapacitySlow(int capacity)
         {
-            Debug.Assert(_arrayStorage != null);
 
             if (capacity > DefaultArrayThreshold)
             {
@@ -592,9 +590,6 @@ namespace Umbraco.Core.Collections
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                Debug.Assert(_arrayStorage is not null);
-                Debug.Assert(_count <= _arrayStorage.Length);
-
                 return _arrayStorage.AsSpan(0, _count);
             }
         }
@@ -602,8 +597,6 @@ namespace Umbraco.Core.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int FindIndex(TKey key)
         {
-            Debug.Assert(_dictionaryStorage == null);
-            Debug.Assert(_arrayStorage != null);
 
             if (_count > 0)
             {
@@ -622,8 +615,6 @@ namespace Umbraco.Core.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool TryFindItem(TKey key, out TValue? value)
         {
-            Debug.Assert(_dictionaryStorage == null);
-            Debug.Assert(_arrayStorage != null);
 
             if (_count > 0)
             {

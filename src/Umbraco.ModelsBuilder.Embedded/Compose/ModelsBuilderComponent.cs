@@ -69,12 +69,12 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
             var umbracoUrlsObject = serverVars["umbracoUrls"];
             if (umbracoUrlsObject == null)
                 throw new ArgumentException("Null umbracoUrls");
-            if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
+            if (!(umbracoUrlsObject is IDictionary<string, object> umbracoUrls))
                 throw new ArgumentException("Invalid umbracoUrls");
 
             if (!serverVars.ContainsKey("umbracoPlugins"))
                 throw new ArgumentException("Missing umbracoPlugins.");
-            if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
+            if (!(serverVars["umbracoPlugins"] is IDictionary<string, object> umbracoPlugins))
                 throw new ArgumentException("Invalid umbracoPlugins");
 
             if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
