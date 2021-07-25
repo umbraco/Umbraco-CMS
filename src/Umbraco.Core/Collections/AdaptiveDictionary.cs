@@ -115,7 +115,7 @@ namespace Umbraco.Core.Collections
         /// <remarks>This constructor is unoptimized and primarily used for tests.</remarks>
         /// <param name="comparer">Equality comparison.</param>
         /// <param name="capacity">Initial capacity.</param>
-        internal AdaptiveCapacityDictionary(IEnumerable<KeyValuePair<TKey, TValue>> values, int capacity, IEqualityComparer<TKey> comparer)
+        public AdaptiveCapacityDictionary(IEnumerable<KeyValuePair<TKey, TValue>> values, int capacity, IEqualityComparer<TKey> comparer)
         {
             _comparer = comparer ?? EqualityComparer<TKey>.Default;
 
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Collections
         /// </summary>
         /// <param name="dict">A dictionary to use.
         /// </param>
-        internal AdaptiveCapacityDictionary(Dictionary<TKey, TValue> dict)
+        public AdaptiveCapacityDictionary(Dictionary<TKey, TValue> dict)
         {
             _comparer = dict.Comparer;
             _dictionaryStorage = dict;

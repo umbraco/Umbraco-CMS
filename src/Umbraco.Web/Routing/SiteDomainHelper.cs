@@ -5,6 +5,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using System.ComponentModel;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Routing
 {
@@ -16,15 +17,15 @@ namespace Umbraco.Web.Routing
         #region Configure
 
         private static readonly ReaderWriterLockSlim ConfigLock = new ReaderWriterLockSlim();
-        private static Dictionary<string, string[]> _sites;
-        private static Dictionary<string, List<string>> _bindings;
+        private static IDictionary<string, string[]> _sites;
+        private static IDictionary<string, List<string>> _bindings;
         private static Dictionary<string, Dictionary<string, string[]>> _qualifiedSites;
         private bool _disposedValue;
 
         // these are for unit tests *only*
         // ReSharper disable ConvertToAutoPropertyWithPrivateSetter
-        internal static Dictionary<string, string[]> Sites => _sites;
-        internal static Dictionary<string, List<string>> Bindings => _bindings;
+        internal static IDictionary<string, string[]> Sites => _sites;
+        internal static IDictionary<string, List<string>> Bindings => _bindings;
         // ReSharper restore ConvertToAutoPropertyWithPrivateSetter
 
         // these are for validation
@@ -73,7 +74,7 @@ namespace Umbraco.Web.Routing
         {
             using (ConfigWriteLock)
             {
-                _sites = _sites ?? new Dictionary<string, string[]>();
+                _sites = _sites ?? new AdaptiveCapacityDictionary<string, string[]>(1);
                 _sites[key] = ValidateDomains(domains).ToArray();
                 _qualifiedSites = null;
             }
@@ -89,7 +90,7 @@ namespace Umbraco.Web.Routing
         {
             using (ConfigWriteLock)
             {
-                _sites = _sites ?? new Dictionary<string, string[]>();
+                _sites = _sites ?? new AdaptiveCapacityDictionary<string, string[]>(1);
                 _sites[key] = ValidateDomains(domains).ToArray();
                 _qualifiedSites = null;
             }
@@ -142,7 +143,7 @@ namespace Umbraco.Web.Routing
                 foreach (var key in keys.Where(key => !_sites.ContainsKey(key)))
                     throw new ArgumentException($"Not an existing site key: {key}.", nameof(keys));
 
-                _bindings = _bindings ?? new Dictionary<string, List<string>>();
+                _bindings = _bindings ?? new AdaptiveCapacityDictionary<string, List<string>>(0);
 
                 var allkeys = _bindings
                     .Where(kvp => keys.Contains(kvp.Key))

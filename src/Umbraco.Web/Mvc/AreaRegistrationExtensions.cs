@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.WebApi;
 
@@ -77,7 +78,7 @@ namespace Umbraco.Web.Mvc
 
                 //set defaults
                 controllerPluginRoute.Defaults = new RouteValueDictionary(
-                    new Dictionary<string, object>
+                    new AdaptiveCapacityDictionary<string, object>(3)
                     {
                         {"controller", controllerName},
                         {"action", defaultAction},
@@ -116,7 +117,7 @@ namespace Umbraco.Web.Mvc
             if (controllerSuffixName.IsNullOrWhiteSpace() == false)
             {
                 controllerPluginRoute.Constraints = new RouteValueDictionary(
-                    new Dictionary<string, object>
+                    new AdaptiveCapacityDictionary<string, object>(1)
                     {
                         {"controller", @"(\w+)" + controllerSuffixName}
                     });

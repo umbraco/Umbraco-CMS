@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Http;
 using Umbraco.Web.Mvc;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web
 {
@@ -60,7 +61,7 @@ namespace Umbraco.Web
             // Ignore standard stuff...
             using (routes.GetWriteLock())
             {
-                var exclusions = new Dictionary<string, object>()
+                var exclusions = new AdaptiveCapacityDictionary<string, object>(5)
                     {
                         {"{resource}.axd/{*pathInfo}", null},
                         {"{*allaxd}", new { allaxd = @".*\.axd(/.*)?" }},

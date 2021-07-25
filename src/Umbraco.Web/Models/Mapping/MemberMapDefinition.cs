@@ -11,6 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services.Implement;
 using UserProfile = Umbraco.Web.Models.ContentEditing.UserProfile;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -176,7 +177,7 @@ namespace Umbraco.Web.Models.Mapping
 
             if (provider.IsUmbracoMembershipProvider() == false)
             {
-                return new Dictionary<string, string>
+                return new AdaptiveCapacityDictionary<string, string>(3)
                 {
                     {Constants.Conventions.Member.IsLockedOut, Constants.Conventions.Member.IsLockedOut},
                     {Constants.Conventions.Member.IsApproved, Constants.Conventions.Member.IsApproved},
@@ -186,7 +187,7 @@ namespace Umbraco.Web.Models.Mapping
 
             var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
 
-            return new Dictionary<string, string>
+            return new AdaptiveCapacityDictionary<string, string>(3)
             {
                 {Constants.Conventions.Member.IsLockedOut, umbracoProvider.LockPropertyTypeAlias},
                 {Constants.Conventions.Member.IsApproved, umbracoProvider.ApprovedPropertyTypeAlias},

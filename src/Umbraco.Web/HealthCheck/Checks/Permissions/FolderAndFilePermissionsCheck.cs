@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install;
@@ -57,7 +58,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
         {
             // Create lists of paths to check along with a flag indicating if modify rights are required
             // in ALL circumstances or just some
-            var pathsToCheck = new Dictionary<string, PermissionCheckRequirement>
+            var pathsToCheck = new AdaptiveCapacityDictionary<string, PermissionCheckRequirement>(10)
             {
                 { SystemDirectories.Data, PermissionCheckRequirement.Required },
                 { SystemDirectories.Packages, PermissionCheckRequirement.Required},
@@ -73,7 +74,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
 
             //These are special paths to check that will restart an app domain if a file is written to them,
             //so these need to be tested differently
-            var pathsToCheckWithRestarts = new Dictionary<string, PermissionCheckRequirement>
+            var pathsToCheckWithRestarts = new AdaptiveCapacityDictionary<string, PermissionCheckRequirement>(2)
             {
                 { SystemDirectories.AppCode, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Bin, PermissionCheckRequirement.Optional }
@@ -105,7 +106,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
         {
             // Create lists of paths to check along with a flag indicating if modify rights are required
             // in ALL circumstances or just some
-            var pathsToCheck = new Dictionary<string, PermissionCheckRequirement>
+            var pathsToCheck = new AdaptiveCapacityDictionary<string, PermissionCheckRequirement>(1)
             {
                 { "~/Web.config", PermissionCheckRequirement.Optional },
             };
@@ -119,7 +120,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             return GetStatus(requiredPathCheckResult, requiredFailedPaths, optionalPathCheckResult, optionalFailedPaths, PermissionCheckFor.File);
         }
 
-        private static string[] GetPathsToCheck(Dictionary<string, PermissionCheckRequirement> pathsToCheck,
+        private static string[] GetPathsToCheck(IDictionary<string, PermissionCheckRequirement> pathsToCheck,
             PermissionCheckRequirement requirement)
         {
             return pathsToCheck

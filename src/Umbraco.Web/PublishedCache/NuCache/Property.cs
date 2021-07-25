@@ -30,7 +30,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private object _interValue;
 
         // the variant source and inter values
-        private Dictionary<CompositeStringStringKey, SourceInterValue> _sourceValues;
+        private IDictionary<CompositeStringStringKey, SourceInterValue> _sourceValues;
 
         // the variant and non-variant object values
         private CacheValues _cacheValues;
@@ -48,6 +48,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             if (sourceValues != null)
             {
+                if (_sourceValues == null)
+                    _sourceValues = new AdaptiveCapacityDictionary<CompositeStringStringKey, SourceInterValue>(sourceValues.Length);
                 foreach (var sourceValue in sourceValues)
                 {
                     if (sourceValue.Culture == "" && sourceValue.Segment == "")
@@ -56,8 +58,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     }
                     else
                     {
-                        if (_sourceValues == null)
-                            _sourceValues = new Dictionary<CompositeStringStringKey, SourceInterValue>();
                         _sourceValues[new CompositeStringStringKey(sourceValue.Culture, sourceValue.Segment)]
                             = new SourceInterValue { Culture = sourceValue.Culture, Segment = sourceValue.Segment, SourceValue = sourceValue.Value };
                     }
@@ -180,7 +180,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             if (_sourceValues == null)
-                _sourceValues = new Dictionary<CompositeStringStringKey, SourceInterValue>();
+                _sourceValues = new AdaptiveCapacityDictionary<CompositeStringStringKey, SourceInterValue>(1);
 
             var k = new CompositeStringStringKey(culture, segment);
             if (!_sourceValues.TryGetValue(k, out var vvalue))
@@ -257,7 +257,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private class CacheValues : CacheValue
         {
-            private Dictionary<CompositeStringStringKey, CacheValue> _values;
+            private IDictionary<CompositeStringStringKey, CacheValue> _values;
 
             // this is always invoked from within a lock, so does not require its own lock
             public CacheValue For(string culture, string segment)
@@ -266,7 +266,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     return this;
 
                 if (_values == null)
-                    _values = new Dictionary<CompositeStringStringKey, CacheValue>();
+                    _values = new AdaptiveCapacityDictionary<CompositeStringStringKey, CacheValue>(1);
 
                 var k = new CompositeStringStringKey(culture, segment);
                 if (!_values.TryGetValue(k, out var value))

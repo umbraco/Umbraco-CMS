@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -47,21 +48,23 @@ namespace Umbraco.Web.Editors
             _owinContext = _httpContext.GetOwinContext();
         }
 
+        private readonly IReadOnlyDictionary<string,string[]> _bareMiniumServerVariablesKeepOnlyKeys = new AdaptiveCapacityDictionary<string, string[]>
+                    {
+                        {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "iconApiBaseUrl"}},
+                        { "umbracoSettings", new[] { "allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum" }},
+                        { "application", new[] { "applicationPath", "cacheBuster" }},
+                        { "isDebuggingEnabled", new string[] { }},
+                        { "features", new[] { "disabledFeatures" }}
+                    };
+
         /// <summary>
         /// Returns the server variables for non-authenticated users
         /// </summary>
         /// <returns></returns>
-        internal Dictionary<string, object> BareMinimumServerVariables()
+        internal IDictionary<string, object> BareMinimumServerVariables()
         {
             //this is the filter for the keys that we'll keep based on the full version of the server vars
-            var keepOnlyKeys = new Dictionary<string, string[]>
-            {
-                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum"}},
-                {"application", new[] {"applicationPath", "cacheBuster"}},
-                {"isDebuggingEnabled", new string[] { }},
-                {"features", new [] {"disabledFeatures"}}
-            };
+            var keepOnlyKeys = _bareMiniumServerVariablesKeepOnlyKeys;
             //now do the filtering...
             var defaults = GetServerVariables();
             foreach (var key in defaults.Keys.ToArray())
@@ -102,7 +105,7 @@ namespace Umbraco.Web.Editors
         {
             var userMembershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
 
-            var defaultVals = new Dictionary<string, object>
+            var defaultVals = new Dictionary<string, object>(7)
             {
                 {
                     "umbracoUrls", new Dictionary<string, object>
@@ -364,7 +367,7 @@ namespace Umbraco.Web.Editors
                     }
                 },
                 {
-                    "umbracoPlugins", new Dictionary<string, object>
+                    "umbracoPlugins", new AdaptiveCapacityDictionary<string, object>(1)
                     {
                         // for each tree that is [PluginController], get
                         // alias -> areaName
@@ -379,7 +382,7 @@ namespace Umbraco.Web.Editors
                     "application", GetApplicationState()
                 },
                 {
-                    "externalLogins", new Dictionary<string, object>
+                    "externalLogins", new AdaptiveCapacityDictionary<string, object>(1)
                     {
                         {
                             "providers", _owinContext.Authentication.GetBackOfficeExternalLoginProviders()
@@ -394,10 +397,10 @@ namespace Umbraco.Web.Editors
                     }
                 },
                 {
-                    "features", new Dictionary<string,object>
+                    "features", new AdaptiveCapacityDictionary<string,object>(1)
                     {
                         {
-                            "disabledFeatures", new Dictionary<string,object>
+                            "disabledFeatures", new AdaptiveCapacityDictionary<string,object>(1)
                             {
                                 { "disableTemplates", _features.Disabled.DisableTemplates}
                             }
@@ -450,9 +453,9 @@ namespace Umbraco.Web.Editors
         /// Returns the server variables regarding the application state
         /// </summary>
         /// <returns></returns>
-        private Dictionary<string, object> GetApplicationState()
+        private IDictionary<string, object> GetApplicationState()
         {
-            var app = new Dictionary<string, object>
+            var app = new AdaptiveCapacityDictionary<string, object>(5)
             {
                 // add versions - see UmbracoVersion for details & differences
 

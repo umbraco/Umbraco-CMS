@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.Serialization;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         public UserDisplay()
         {
-            AvailableCultures = new Dictionary<string, string>();
+            AvailableCultures = new AdaptiveCapacityDictionary<string, string>();
             StartContentIds = new List<EntityBasic>();
             StartMediaIds = new List<EntityBasic>();
             Navigation = new List<EditorNavigation>();

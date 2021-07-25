@@ -39,6 +39,7 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Editors
 {
@@ -425,7 +426,7 @@ namespace Umbraco.Web.Editors
             var parent = parentId > 0 ? Services.ContentService.GetById(parentId) : null;
             // Since the parent is the same and the path used to get permissions is based on the parent we only have to do it once
             var path = parent == null ? "-1" : parent.Path;
-            var permissions = new Dictionary<string, EntityPermissionSet>
+            var permissions = new AdaptiveCapacityDictionary<string, EntityPermissionSet>(1)
             {
                 [path] = Services.UserService.GetPermissionsForPath(currentUser, path)
             };
@@ -1740,7 +1741,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //we only want to unpublish some of the variants
-                var results = new Dictionary<string, PublishResult>();
+                var results = new AdaptiveCapacityDictionary<string, PublishResult>(model.Cultures.Length);
                 foreach (var c in model.Cultures)
                 {
                     var result = Services.ContentService.Unpublish(foundContent, culture: c, userId: Security.GetUserId().ResultOr(0));

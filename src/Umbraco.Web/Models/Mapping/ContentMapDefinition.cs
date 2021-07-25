@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
@@ -326,7 +327,7 @@ namespace Umbraco.Web.Models.Mapping
             // Element types can't have templates, so no need to query to get the content type
             if (source.ContentType.IsElement)
             {
-                return new Dictionary<string, string>();
+                return new AdaptiveCapacityDictionary<string, string>();
             }
 
             var contentType = _contentTypeService.Get(source.ContentTypeId);

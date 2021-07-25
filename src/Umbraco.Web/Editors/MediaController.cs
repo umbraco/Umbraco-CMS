@@ -37,6 +37,7 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Editors
 {
@@ -856,7 +857,7 @@ namespace Umbraco.Web.Editors
 
             //ensure the user has access to this folder by parent id!
             if (validatePermissions && CheckPermissions(
-                    new Dictionary<string, object>(),
+                    new AdaptiveCapacityDictionary<string, object>(5),
                     Security.CurrentUser,
                     Services.MediaService,
                     Services.EntityService,

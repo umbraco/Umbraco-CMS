@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
@@ -192,7 +193,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_cultures != null) return _cultures;
 
                 if (!ContentType.VariesByCulture())
-                    return _cultures = new Dictionary<string, PublishedCultureInfo>
+                    return _cultures = new AdaptiveCapacityDictionary<string, PublishedCultureInfo>(1)
                     {
                         { "", new PublishedCultureInfo("", ContentData.Name, _urlSegment, CreateDate) }
                     };

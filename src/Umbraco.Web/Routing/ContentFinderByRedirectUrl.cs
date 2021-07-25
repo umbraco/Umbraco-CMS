@@ -67,7 +67,7 @@ namespace Umbraco.Web.Routing
             // to problems if you rename a page back to it's original name or create a new page with the original name
             frequest.Cacheability = HttpCacheability.NoCache;
             frequest.CacheExtensions = new List<string> { "no-store, must-revalidate" };
-            frequest.Headers = new Dictionary<string, string> { { "Pragma", "no-cache" }, { "Expires", "0" } };
+            frequest.Headers = new Dictionary<string, string>(2) { { "Pragma", "no-cache" }, { "Expires", "0" } };
 
             return true;
         }

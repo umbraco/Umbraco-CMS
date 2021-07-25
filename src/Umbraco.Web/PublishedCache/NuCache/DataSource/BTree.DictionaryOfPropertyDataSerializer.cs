@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using CSharpTest.Net.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
@@ -15,7 +16,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         {
             // read properties count
             var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);            
-            var dict = new Dictionary<string, PropertyData[]>(pcount,StringComparer.InvariantCultureIgnoreCase);
+            var dict = new AdaptiveCapacityDictionary<string, PropertyData[]>(pcount,StringComparer.InvariantCultureIgnoreCase);
 
             // read each property
             for (var i = 0; i < pcount; i++)

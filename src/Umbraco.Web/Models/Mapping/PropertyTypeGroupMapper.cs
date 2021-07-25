@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -214,7 +215,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
 
                 var config = propertyEditor == null
-                    ? new Dictionary<string, object>()
+                    ? new AdaptiveCapacityDictionary<string, object>(0)
                     : dataType.Editor.GetConfigurationEditor().ToConfigurationEditor(dataType.Configuration);
 
                 mappedProperties.Add(new TPropertyType

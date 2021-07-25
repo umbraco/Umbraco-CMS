@@ -28,6 +28,7 @@ using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Web.Editors.Filters;
 using Microsoft.Owin.Security;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Editors
 {
@@ -223,10 +224,10 @@ namespace Umbraco.Web.Editors
         // TODO: This should be on the CurrentUserController?
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
-        public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
+        public async Task<IDictionary<string, string>> GetCurrentUserLinkedLogins()
         {
             var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId().ResultOr(0));
-            var result = new Dictionary<string, string>();
+            var result = identityUser != null && identityUser.Logins != null ? new AdaptiveCapacityDictionary<string, string>(identityUser.Logins.Count) : new AdaptiveCapacityDictionary<string, string>(0);
             foreach (var l in identityUser.Logins)
             {
                 result[l.LoginProvider] = l.ProviderKey;

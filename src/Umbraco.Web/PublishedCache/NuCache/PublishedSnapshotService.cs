@@ -8,6 +8,7 @@ using System.Threading;
 using CSharpTest.Net.Collections;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -1419,10 +1420,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             //var propertyEditorResolver = PropertyEditorResolver.Current;
             //var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
 
-            var propertyData = new Dictionary<string, PropertyData[]>();
+            var propertyData = new Dictionary<string, PropertyData[]>(content.Properties.Count);
             foreach (var prop in content.Properties)
             {
-                var pdatas = new List<PropertyData>();
+                var pdatas = new List<PropertyData>(prop.Values.Count);
                 foreach (var pvalue in prop.Values)
                 {
                     // sanitize - properties should be ok but ... never knows
@@ -1458,7 +1459,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 propertyData[prop.Alias] = pdatas.ToArray();
             }
 
-            var cultureData = new Dictionary<string, CultureVariation>();
+            Dictionary<string, CultureVariation> cultureData;
 
             // sanitize - names should be ok but ... never knows
             if (content.ContentType.VariesByCulture())
@@ -1468,7 +1469,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         ? document.PublishCultureInfos
                         : document.CultureInfos)
                     : content.CultureInfos;
-
+                cultureData = new Dictionary<string, CultureVariation>(infos.Count);
                 // ReSharper disable once UseDeconstruction
                 foreach (var cultureInfo in infos)
                 {
@@ -1481,6 +1482,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         IsDraft = cultureIsDraft
                     };
                 }
+            }
+            else
+            {
+                cultureData = new Dictionary<string, CultureVariation>(0);
             }
 
             //the dictionary that will be serialized

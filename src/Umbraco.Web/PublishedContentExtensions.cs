@@ -12,6 +12,7 @@ using Umbraco.Examine;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web
 {
@@ -1206,7 +1207,7 @@ namespace Umbraco.Web
                                 continue; //skip this one, it doesn't match the filter
                         }
 
-                        var standardVals = new Dictionary<string, object>
+                        var standardVals = new AdaptiveCapacityDictionary<string, object>(8)
                             {
                                     { "Id", n.Id },
                                     { "NodeName", n.Name() },

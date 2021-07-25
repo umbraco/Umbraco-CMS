@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Serialization;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Models.ContentEditing
         {
             AllowPreview = true;
             Notifications = new List<Notification>();
-            Errors = new Dictionary<string, object>();
+            Errors = new AdaptiveCapacityDictionary<string, object>();
             Variants = new List<ContentVariantDisplay>();
             ContentApps = new List<ContentApp>();
         }

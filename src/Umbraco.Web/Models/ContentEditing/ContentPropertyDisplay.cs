@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -12,7 +13,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         public ContentPropertyDisplay()
         {
-            Config = new Dictionary<string, object>();
+            Config = new AdaptiveCapacityDictionary<string, object>();
             Validation = new PropertyTypeValidation();
         }
 

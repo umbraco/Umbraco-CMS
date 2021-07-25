@@ -34,8 +34,8 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(2, sites.Count);
 
-            Assert.Contains("site1", sites.Keys);
-            Assert.Contains("site2", sites.Keys);
+            Assert.Contains("site1", (System.Collections.ICollection)sites.Keys);
+            Assert.Contains("site2", (System.Collections.ICollection)sites.Keys);
 
             var domains = sites["site1"];
             Assert.AreEqual(3, domains.Length);
@@ -86,7 +86,7 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(1, sites.Count);
 
-            Assert.Contains("site2", sites.Keys);
+            Assert.Contains("site2", (System.Collections.ICollection)sites.Keys);
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(1, sites.Count);
 
-            Assert.Contains("site1", sites.Keys);
+            Assert.Contains("site1", (System.Collections.ICollection)sites.Keys);
 
             var domains = sites["site1"];
             Assert.AreEqual(2, domains.Count());
@@ -120,8 +120,8 @@ namespace Umbraco.Tests.Routing
             var bindings = SiteDomainHelper.Bindings;
 
             Assert.AreEqual(2, bindings.Count);
-            Assert.Contains("site1", bindings.Keys);
-            Assert.Contains("site2", bindings.Keys);
+            Assert.Contains("site1", (System.Collections.ICollection)bindings.Keys);
+            Assert.Contains("site2", (System.Collections.ICollection)bindings.Keys);
 
             var others = bindings["site1"];
             Assert.AreEqual(1, others.Count);
@@ -146,9 +146,9 @@ namespace Umbraco.Tests.Routing
             var bindings = SiteDomainHelper.Bindings;
 
             Assert.AreEqual(3, bindings.Count);
-            Assert.Contains("site1", bindings.Keys);
-            Assert.Contains("site2", bindings.Keys);
-            Assert.Contains("site3", bindings.Keys);
+            Assert.Contains("site1", (System.Collections.ICollection)bindings.Keys);
+            Assert.Contains("site2", (System.Collections.ICollection)bindings.Keys);
+            Assert.Contains("site3", (System.Collections.ICollection)bindings.Keys);
 
             var others = bindings["site1"];
             Assert.AreEqual(2, others.Count);

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -11,7 +12,7 @@ namespace Umbraco.Web.Models.ContentEditing
         protected ContentItemDisplayBase()
         {
             Notifications = new List<Notification>();
-            Errors = new Dictionary<string, object>();
+            Errors = new AdaptiveCapacityDictionary<string, object>();
         }
 
         /// <summary>

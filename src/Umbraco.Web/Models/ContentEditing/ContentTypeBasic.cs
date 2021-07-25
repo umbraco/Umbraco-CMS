@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         public ContentTypeBasic()
         {
-            Blueprints = new Dictionary<int, string>();
+            Blueprints = new AdaptiveCapacityDictionary<int, string>();
         }
 
         /// <summary>

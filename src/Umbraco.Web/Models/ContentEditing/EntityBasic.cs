@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Web.Http.ModelBinding;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.WebApi;
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         public EntityBasic()
         {
-            AdditionalData = new Dictionary<string, object>();
+            AdditionalData = new AdaptiveCapacityDictionary<string, object>();
         }
 
         [DataMember(Name = "name", IsRequired = true)]

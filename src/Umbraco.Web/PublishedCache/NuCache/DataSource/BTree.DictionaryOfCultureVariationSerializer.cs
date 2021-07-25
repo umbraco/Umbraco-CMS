@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using CSharpTest.Net.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
@@ -18,7 +19,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             if (pcount == 0) return Empty;
 
             // read each variation
-            var dict = new Dictionary<string, CultureVariation>(StringComparer.InvariantCultureIgnoreCase);
+            var dict = new AdaptiveCapacityDictionary<string, CultureVariation>(pcount,StringComparer.InvariantCultureIgnoreCase);
             for (var i = 0; i < pcount; i++)
             {
                 var languageId = string.Intern(PrimitiveSerializer.String.ReadFrom(stream));
