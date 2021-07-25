@@ -1,4 +1,4 @@
-function ExamineManagementController($scope, $http, $q, $timeout, $location, umbRequestHelper, localizationService, overlayService, editorService) {
+function ExamineManagementController($http, $q, $timeout, umbRequestHelper, localizationService, overlayService, editorService) {
 
     var vm = this;
 
