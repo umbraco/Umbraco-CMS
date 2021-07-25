@@ -25,8 +25,10 @@
                         <div class="umb-panel-group__details-status" ng-repeat="indexer in vm.indexerDetails">
 
                             <div class="umb-panel-group__details-status-icon-container">
-                                <i class="umb-panel-status-icon" aria-hidden="true"
-                                   ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}"></i>
+                                <umb-icon icon="{{indexer.isHealthy ? 'icon-check' : 'icon-delete'}}"
+                                          class="umb-panel-status-icon"
+                                          ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}">
+                                </umb-icon>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
@@ -61,7 +63,7 @@
                         <div class="umb-panel-group__details-status" ng-repeat="searcher in vm.searcherDetails">
 
                             <div class="umb-panel-group__details-status-icon-container">
-                                <i class="umb-panel-status-icon icon-info" aria-hidden="true"></i>
+                                <umb-icon icon="icon-info" class="icon-info umb-panel-status-icon"></umb-icon>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
@@ -234,8 +236,10 @@
                             <div class="umb-panel-group__details-status">
 
                                 <div class="umb-panel-group__details-status-icon-container">
-                                    <i class="umb-panel-status-icon" aria-hidden="true"
-                                       ng-class="{'icon-check color-green' : vm.selectedIndex.isHealthy, 'icon-delete color-red' : !vm.selectedIndex.isHealthy}"></i>
+                                    <umb-icon icon="{{indexer.isHealthy ? 'icon-check' : 'icon-delete'}}"
+                                              class="umb-panel-status-icon"
+                                              ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}">
+                                    </umb-icon>
                                 </div>
 
                                 <div class="umb-panel-group__details-status-content">
