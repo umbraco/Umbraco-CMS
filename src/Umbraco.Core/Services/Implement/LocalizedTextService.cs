@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Services.Implement
@@ -41,7 +42,7 @@ namespace Umbraco.Core.Services.Implement
 
         private IDictionary<CultureInfo, IDictionary<string, string>> XmlSourceToNoAreaDictionary(IDictionary<CultureInfo, Lazy<XDocument>> xmlSources)
         {
-            var cultureNoAreaDictionary = new Dictionary<CultureInfo, IDictionary<string, string>>();
+            var cultureNoAreaDictionary = new AdaptiveCapacityDictionary<CultureInfo, IDictionary<string, string>>();
             foreach (var xmlSource in xmlSources)
             {
                 var noAreaAliasValue = GetNoAreaStoredTranslations(xmlSources, xmlSource.Key);
@@ -58,7 +59,7 @@ namespace Umbraco.Core.Services.Implement
 
         private IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> XmlSourcesToAreaDictionary(IDictionary<CultureInfo, Lazy<XDocument>> xmlSources)
         {
-            var cultureDictionary = new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>();
+            var cultureDictionary = new AdaptiveCapacityDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>();
             foreach (var xmlSource in xmlSources)
             {
                 var areaAliaValue = GetAreaStoredTranslations(xmlSources, xmlSource.Key);
@@ -98,14 +99,14 @@ namespace Umbraco.Core.Services.Implement
             foreach (var cultureDictionary in dictionarySource)
             {
                 var areaAliaValue = GetAreaStoredTranslations(source, cultureDictionary.Key);
-                var aliasValue = new Dictionary<string, string>();
+                var aliasValue = new AdaptiveCapacityDictionary<string, string>();
                 foreach (var area in areaAliaValue)
                 {
                     foreach (var alias in area.Value)
                     {
                         if (!aliasValue.ContainsKey(alias.Key))
                         {
-                            aliasValue.Add(alias.Key, alias.Value);
+                            aliasValue.Add(string.Intern(alias.Key), alias.Value);
                         }
                     }
                 }
@@ -157,7 +158,7 @@ namespace Umbraco.Core.Services.Implement
                 _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                 return new Dictionary<string, string>(0);
             }
-            IDictionary<string, string> result = new Dictionary<string, string>();
+            IDictionary<string, string> result = new AdaptiveCapacityDictionary<string, string>();
             //convert all areas + keys to a single key with a '/'
             foreach (var area in _dictionarySource[culture])
             {
@@ -167,20 +168,20 @@ namespace Umbraco.Core.Services.Implement
                     //i don't think it's possible to have duplicates because we're dealing with a dictionary in the first place, but we'll double check here just in case.
                     if (result.ContainsKey(dictionaryKey) == false)
                     {
-                        result.Add(dictionaryKey, key.Value);
+                        result.Add(string.Intern(dictionaryKey), key.Value);
                     }
                 }
             }
             return result;
         }
 
-        private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
+        private IDictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
         {
             var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCulture);
             var areas = xmlSource[cult].Value.XPathSelectElements("//area");
             foreach (var area in areas)
             {
-                var result = new Dictionary<string, string>(StringComparer.InvariantCulture);
+                var result = new AdaptiveCapacityDictionary<string, string>(StringComparer.InvariantCulture);
                 var keys = area.XPathSelectElements("./key");
                 foreach (var key in keys)
                 {
@@ -190,7 +191,7 @@ namespace Umbraco.Core.Services.Implement
                     if (result.ContainsKey(dictionaryKey) == false)
                         result.Add(dictionaryKey, key.Value);
                 }
-                overallResult.Add(area.Attribute("alias").Value, result);
+                overallResult.Add(string.Intern(area.Attribute("alias").Value), result);
             }
 
             //Merge English Dictionary
@@ -200,7 +201,7 @@ namespace Umbraco.Core.Services.Implement
                 var enUS = xmlSource[englishCulture].Value.XPathSelectElements("//area");
                 foreach (var area in enUS)
                 {
-                    IDictionary<string, string> result = new Dictionary<string, string>(StringComparer.InvariantCulture);
+                    IDictionary<string, string> result = new AdaptiveCapacityDictionary<string, string>(StringComparer.InvariantCulture);
                     if (overallResult.ContainsKey(area.Attribute("alias").Value))
                     {
                         result = overallResult[area.Attribute("alias").Value];
@@ -216,15 +217,15 @@ namespace Umbraco.Core.Services.Implement
                     }
                     if (!overallResult.ContainsKey(area.Attribute("alias").Value))
                     {
-                        overallResult.Add(area.Attribute("alias").Value, result);
+                        overallResult.Add(string.Intern(area.Attribute("alias").Value), result);
                     }
                 }
             }
             return overallResult;
         }
-        private Dictionary<string, string> GetNoAreaStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
+        private IDictionary<string, string> GetNoAreaStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
         {
-            var result = new Dictionary<string, string>(StringComparer.InvariantCulture);
+            var result = new AdaptiveCapacityDictionary<string, string>(StringComparer.InvariantCulture);
             var keys = xmlSource[cult].Value.XPathSelectElements("//key");
 
             foreach (var key in keys)
@@ -248,27 +249,27 @@ namespace Umbraco.Core.Services.Implement
                         (string)key.Attribute("alias");
                     //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                     if (result.ContainsKey(dictionaryKey) == false)
-                        result.Add(dictionaryKey, key.Value);
+                        result.Add(string.Intern(dictionaryKey), key.Value);
                 }
             }
             return result;
         }
-        private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> dictionarySource, CultureInfo cult)
+        private IDictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> dictionarySource, CultureInfo cult)
         {
-            var overallResult = new Dictionary<string, IDictionary<string, string>>(StringComparer.InvariantCulture);
+            var overallResult = new AdaptiveCapacityDictionary<string, IDictionary<string, string>>(StringComparer.InvariantCulture);
             var areaDict = dictionarySource[cult];
 
             foreach (var area in areaDict)
             {
-                var result = new Dictionary<string, string>(StringComparer.InvariantCulture);
+                var result = new AdaptiveCapacityDictionary<string, string>(StringComparer.InvariantCulture);
                 var keys = area.Value.Keys;
                 foreach (var key in keys)
                 {
                     //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
                     if (result.ContainsKey(key) == false)
-                        result.Add(key, area.Value[key]);
+                        result.Add(string.Intern(key), area.Value[key]);
                 }
-                overallResult.Add(area.Key, result);
+                overallResult.Add(string.Intern(area.Key), result);
             }
             return overallResult;
         }
@@ -381,7 +382,7 @@ namespace Umbraco.Core.Services.Implement
             if (_dictionarySource.ContainsKey(culture) == false)
             {
                 _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
-                return new Dictionary<string, IDictionary<string, string>>(0);
+                return new AdaptiveCapacityDictionary<string, IDictionary<string, string>>(0);
             }
 
             return _dictionarySource[culture];
