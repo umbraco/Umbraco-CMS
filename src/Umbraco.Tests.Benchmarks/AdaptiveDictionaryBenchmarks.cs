@@ -8,6 +8,7 @@ using Umbraco.Core.Collections;
 
 namespace Umbraco.Tests.Benchmarks
 {
+    [MemoryDiagnoser]
     public class AdaptiveCapacityDictionaryBenchmark
     {
         private AdaptiveCapacityDictionary<string, string> _smallCapDict;
