@@ -4,13 +4,12 @@
 
     .icon {
         position: absolute;
-        width: 30px;
-        height: 30px;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 1px;
-        padding: 0;
+        font-size: 20px;
+        margin: 5px;
+        padding: 1px;
         pointer-events: none;
         color: @ui-action-discreet-type;
         transition: color .1s linear;
@@ -30,6 +29,7 @@
         .icon {
             color: @ui-action-discreet-type-hover;
         }
+
         input {
             color: @ui-action-discreet-border-hover;
             border-color: @ui-action-discreet-border-hover;
@@ -42,10 +42,9 @@
         border-color: @ui-action-discreet-border-hover;
         cursor: unset;
     }
-    
+
     input:focus, &:focus-within input, &.--has-value input {
         width: 190px;
-        padding-left:30px;
+        padding-left: 30px;
     }
-
 }
