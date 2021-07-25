@@ -5,14 +5,14 @@
         ng-repeat="miniListView in miniListViews">
 
         <div class="umb-mini-list-view__title">
-            <i class="umb-mini-list-view__title-icon {{ miniListView.node.icon }}" aria-hidden="true"></i>
+            <umb-icon icon="{{miniListView.node.icon}}" class="{{miniListView.node.icon}} umb-mini-list-view__title-icon"></umb-icon>
             <h4 class="umb-mini-list-view__title-text">{{ miniListView.node.name }}</h4>
         </div>
 
         <div class="umb-mini-list-view__breadcrumb">
 
             <button type="button" ng-if="showBackButton()" class="btn-reset umb-mini-list-view__back" ng-click="exitMiniListView()">
-                <i class="icon-arrow-left umb-mini-list-view__back-icon" aria-hidden="true"></i>
+                <umb-icon icon="icon-arrow-left" class="icon-arrow-left umb-mini-list-view__back-icon"></umb-icon>
                 <span class="umb-mini-list-view__back-text"><localize key="general_back">Back</localize></span> /
             </button>
 
