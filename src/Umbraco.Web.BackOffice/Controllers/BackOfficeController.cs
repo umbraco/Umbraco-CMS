@@ -408,7 +408,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (ViewData.FromBase64CookieData<BackOfficeExternalLoginProviderErrors>(_httpContextAccessor.HttpContext, ViewDataExtensions.TokenExternalSignInError, _jsonSerializer) ||
                 ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
                 ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
+            {
                 return defaultResponse();
+            }
 
             //First check if there's external login info, if there's not proceed as normal
             var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
@@ -442,12 +444,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var errors = new List<string>();
 
-            if (result == Microsoft.AspNetCore.Identity.SignInResult.Success)
+            if (result == SignInResult.Success)
             {
                 // Update any authentication tokens if succeeded
                 await _signInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
             }
-            else if (result == Microsoft.AspNetCore.Identity.SignInResult.TwoFactorRequired)
+            else if (result == SignInResult.TwoFactorRequired)
             {
 
                 var attemptedUser = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
