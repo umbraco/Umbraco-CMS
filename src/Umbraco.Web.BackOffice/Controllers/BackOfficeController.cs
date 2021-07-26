@@ -113,6 +113,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Default()
         {
+            // TODO: It seems that if you login during an authorize upgrade and the upgrade fails, you can still
+            // access the back office. This should redirect to the installer in that case?
+
             // force authentication to occur since this is not an authorized endpoint
             var result = await this.AuthenticateBackOfficeAsync();
 
@@ -455,8 +458,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // Check if we are in an upgrade state, if so we need to redirect
                 if (_runtimeState.Level == Core.RuntimeLevel.Upgrade)
                 {
-                    // redirect to the authorize upgrade endpoint which redirect to the installer
-                    return RedirectToAction(nameof(AuthorizeUpgrade));
+                    // redirect to the the installer
+                    return Redirect("/");
                 }
             }
             else if (result == SignInResult.TwoFactorRequired)
