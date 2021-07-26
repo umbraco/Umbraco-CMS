@@ -13,25 +13,30 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
     /// </summary>
     public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEndpointBuilder, IUmbracoApplicationBuilderContext
     {
-        private Action<IUmbracoApplicationBuilderContext> _customMiddlewareRegistration;
+        private readonly IOptions<UmbracoPipelineOptions> _umbracoPipelineStartupOptions;
 
         public UmbracoApplicationBuilder(IApplicationBuilder appBuilder)
         {
             ApplicationServices = appBuilder.ApplicationServices;
             RuntimeState = appBuilder.ApplicationServices.GetRequiredService<IRuntimeState>();
             AppBuilder = appBuilder ?? throw new ArgumentNullException(nameof(appBuilder));
-            RegisterDefaultRequiredMiddleware = RegisterRequiredMiddleware;
+            _umbracoPipelineStartupOptions = ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
         }
 
         public IServiceProvider ApplicationServices { get; }
         public IRuntimeState RuntimeState { get; }
         public IApplicationBuilder AppBuilder { get; }
-        public Action RegisterDefaultRequiredMiddleware { get; set; }
 
         /// <inheritdoc />
-        public IUmbracoApplicationBuilder WithCustomDefaultMiddleware(Action<IUmbracoApplicationBuilderContext> configureUmbracoMiddleware)
+        public IUmbracoEndpointBuilder WithCustomMiddleware(Action<IUmbracoApplicationBuilderContext> configureUmbracoMiddleware)
         {
-            _customMiddlewareRegistration = configureUmbracoMiddleware;
+            if (configureUmbracoMiddleware is null)
+            {
+                throw new ArgumentNullException(nameof(configureUmbracoMiddleware));
+            }
+
+            configureUmbracoMiddleware(this);
+
             return this;
         }
 
@@ -43,20 +48,11 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
                 throw new ArgumentNullException(nameof(configureUmbracoMiddleware));
             }
 
-            IOptions<UmbracoPipelineOptions> startupOptions = ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
+            RunPrePipeline();
 
-            RunPrePipeline(startupOptions.Value);
+            RegisterDefaultRequiredMiddleware();
 
-            if (_customMiddlewareRegistration != null)
-            {
-                _customMiddlewareRegistration(this);
-            }
-            else
-            {
-                RegisterRequiredMiddleware();
-            }
-
-            RunPostPipeline(startupOptions.Value);
+            RunPostPipeline();
 
             configureUmbracoMiddleware(this);
 
@@ -67,7 +63,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         public void WithEndpoints(Action<IUmbracoEndpointBuilderContext> configureUmbraco)
         {
             IOptions<UmbracoPipelineOptions> startupOptions = ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
-            RunPreEndpointsPipeline(startupOptions.Value);
+            RunPreEndpointsPipeline();
 
             AppBuilder.UseEndpoints(endpoints =>
             {
@@ -82,14 +78,9 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         /// Registers the default required middleware to run Umbraco
         /// </summary>
         /// <param name="umbracoApplicationBuilderContext"></param>
-        private void RegisterRequiredMiddleware()
+        public void RegisterDefaultRequiredMiddleware()
         {
-            AppBuilder.UseUmbracoCore();
-            AppBuilder.UseUmbracoRequestLogging();
-
-            // We need to add this before UseRouting so that the UmbracoContext and other middlewares are executed
-            // before endpoint routing middleware.
-            AppBuilder.UseUmbracoRouting();
+            UseUmbracoCoreMiddleware();
 
             AppBuilder.UseStatusCodePages();
 
@@ -118,25 +109,35 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
             // endpoints are terminating middleware. All of our endpoints are declared in ext of IUmbracoApplicationBuilder
         }
 
-        private void RunPrePipeline(UmbracoPipelineOptions startupOptions)
+        public void UseUmbracoCoreMiddleware()
         {
-            foreach (IUmbracoPipelineFilter filter in startupOptions.PipelineFilters)
+            AppBuilder.UseUmbracoCore();
+            AppBuilder.UseUmbracoRequestLogging();
+
+            // We need to add this before UseRouting so that the UmbracoContext and other middlewares are executed
+            // before endpoint routing middleware.
+            AppBuilder.UseUmbracoRouting();
+        }
+
+        public void RunPrePipeline()
+        {
+            foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
             {
                 filter.OnPrePipeline(AppBuilder);
             }
         }
 
-        private void RunPostPipeline(UmbracoPipelineOptions startupOptions)
+        public void RunPostPipeline()
         {
-            foreach (IUmbracoPipelineFilter filter in startupOptions.PipelineFilters)
+            foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
             {
                 filter.OnPostPipeline(AppBuilder);
             }
         }
 
-        private void RunPreEndpointsPipeline(UmbracoPipelineOptions startupOptions)
+        private void RunPreEndpointsPipeline()
         {
-            foreach (IUmbracoPipelineFilter filter in startupOptions.PipelineFilters)
+            foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
             {
                 filter.OnEndpoints(AppBuilder);
             }
