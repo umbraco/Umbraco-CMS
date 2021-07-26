@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
 
         public string ButtonStyle { get; set; } = "btn-openid";
 
-        public string Icon { get; set; } = "fa-user";
+        public string Icon { get; set; } = "fa fa-user";
 
         /// <summary>
         /// Options used to control how users can be auto-linked/created/updated based on the external login provider
