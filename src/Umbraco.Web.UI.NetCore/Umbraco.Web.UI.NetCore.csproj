@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -16,6 +16,7 @@
     <ProjectReference Include="../Umbraco.Web.Common/Umbraco.Web.Common.csproj" />
     <ProjectReference Include="../Umbraco.Web.Website/Umbraco.Web.Website.csproj" />
     <ProjectReference Include="../Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
+    <ProjectReference Include="../Umbraco.TestData/Umbraco.TestData.csproj" Condition="'$(Configuration)' == 'Debug'" />
   </ItemGroup>
 
   <ItemGroup>
