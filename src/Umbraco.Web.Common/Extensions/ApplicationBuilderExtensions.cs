@@ -101,7 +101,12 @@ namespace Umbraco.Extensions
             return app;
         }
 
-        public static IApplicationBuilder UseUmbracoPlugins(this IApplicationBuilder app)
+        /// <summary>
+        /// Allow static file access for App_Plugins folders
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseUmbracoPluginsStaticFiles(this IApplicationBuilder app)
         {
             var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
             var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>();

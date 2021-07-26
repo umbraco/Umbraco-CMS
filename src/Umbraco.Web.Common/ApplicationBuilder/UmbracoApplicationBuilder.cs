@@ -87,11 +87,10 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 
             AppBuilder.UseStatusCodePages();
 
-            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
-            // TODO: Since we are dependent on these we need to register them but what happens when we call this multiple times since we are dependent on this for UseUmbracoBackOffice too?
+            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.            
             AppBuilder.UseImageSharp();
             AppBuilder.UseStaticFiles();
-            AppBuilder.UseUmbracoPlugins();
+            AppBuilder.UseUmbracoPluginsStaticFiles();
 
             // UseRouting adds endpoint routing middleware, this means that middlewares registered after this one
             // will execute after endpoint routing. The ordering of everything is quite important here, see
