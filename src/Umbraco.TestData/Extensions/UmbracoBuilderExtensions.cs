@@ -15,7 +15,7 @@ namespace Umbraco.TestData.Extensions
         {
             if (builder.Services.Any(x => x.ServiceType == typeof(LoadTestController)))
             {
-                // We assume forms are composed if any implementations of LoadTestController exists
+                // We assume the test data project is composed if any implementations of LoadTestController exist.
                 return builder;
             }
 
