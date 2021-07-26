@@ -51,6 +51,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         // this controller itself doesn't require authz but it's more clear what the intention is.
 
         private readonly IBackOfficeUserManager _userManager;
+        private readonly IRuntimeState _runtimeState;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -70,6 +71,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public BackOfficeController(
             IBackOfficeUserManager userManager,
+            IRuntimeState runtimeState,
             IRuntimeMinifier runtimeMinifier,
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
@@ -88,6 +90,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ServerVariablesParser serverVariables)
         {
             _userManager = userManager;
+            _runtimeState = runtimeState;
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
@@ -448,6 +451,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 // Update any authentication tokens if succeeded
                 await _signInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
+
+                // Check if we are in an upgrade state, if so we need to redirect
+                if (_runtimeState.Level == Core.RuntimeLevel.Upgrade)
+                {
+                    // redirect to the authorize upgrade endpoint which redirect to the installer
+                    return RedirectToAction(nameof(AuthorizeUpgrade));
+                }
             }
             else if (result == SignInResult.TwoFactorRequired)
             {
