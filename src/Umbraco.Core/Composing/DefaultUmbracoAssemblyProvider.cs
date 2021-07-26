@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 
@@ -16,11 +17,17 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly Assembly _entryPointAssembly;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly IEnumerable<string> _additionalTargetAssemblies;
+        private List<Assembly> _discovered;
 
-        public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly, ILoggerFactory loggerFactory)
+        public DefaultUmbracoAssemblyProvider(
+            Assembly entryPointAssembly,
+            ILoggerFactory loggerFactory,
+            IEnumerable<string> additionalTargetAssemblies = null)
         {
             _entryPointAssembly = entryPointAssembly ?? throw new ArgumentNullException(nameof(entryPointAssembly));
             _loggerFactory = loggerFactory;
+            _additionalTargetAssemblies = additionalTargetAssemblies;
         }
 
         // TODO: It would be worth investigating a netcore3 version of this which would use
@@ -33,8 +40,21 @@ namespace Umbraco.Cms.Core.Composing
         {
             get
             {
-                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, Constants.Composing.UmbracoCoreAssemblyNames, true, _loggerFactory);
-                return finder.Find();
+                if (_discovered != null)
+                {
+                    return _discovered;
+                }
+
+                IEnumerable<string> additionalTargetAssemblies = Constants.Composing.UmbracoCoreAssemblyNames;
+                if (_additionalTargetAssemblies != null)
+                {
+                    additionalTargetAssemblies = additionalTargetAssemblies.Concat(_additionalTargetAssemblies);
+                }
+
+                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, additionalTargetAssemblies.ToArray(), true, _loggerFactory);
+                _discovered = finder.Find().ToList();
+
+                return _discovered;
             }
         }
     }

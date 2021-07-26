@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Core.Composing
         private readonly string[] _targetAssemblies;
         private readonly bool _includeTargets;
         private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<FindAssembliesWithReferencesTo> _logger;
 
         /// <summary>
         /// Constructor
@@ -32,6 +33,7 @@ namespace Umbraco.Cms.Core.Composing
             _targetAssemblies = targetAssemblyNames;
             _includeTargets = includeTargets;
             _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<FindAssembliesWithReferencesTo>();
         }
 
         public IEnumerable<Assembly> Find()
@@ -50,9 +52,10 @@ namespace Umbraco.Cms.Core.Composing
                     {
                         referenceItems.Add(Assembly.Load(target));
                     }
-                    catch (FileNotFoundException)
+                    catch (FileNotFoundException ex)
                     {
                         // occurs if we cannot load this ... for example in a test project where we aren't currently referencing Umbraco.Web, etc...
+                        _logger.LogDebug(ex, "Could not load assembly " + target);
                     }
                 }
             }

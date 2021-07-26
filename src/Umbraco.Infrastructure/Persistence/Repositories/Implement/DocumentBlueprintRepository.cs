@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             ILanguageRepository languageRepository,
             IRelationRepository relationRepository,
             IRelationTypeRepository relationTypeRepository,
-            Lazy<PropertyEditorCollection> propertyEditorCollection,
+            PropertyEditorCollection propertyEditorCollection,
             IDataTypeService dataTypeService,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IJsonSerializer serializer,

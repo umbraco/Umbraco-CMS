@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
         private PendingPackageMigrations GetPendingPackageMigrations()
             => new PendingPackageMigrations(
                 Mock.Of<ILogger<PendingPackageMigrations>>(),
-                new PackageMigrationPlanCollection(new[]
+                new PackageMigrationPlanCollection(() => new[]
                 {
                     new TestPackageMigrationPlan()
                 }));

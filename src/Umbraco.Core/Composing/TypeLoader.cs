@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
@@ -26,9 +25,8 @@ namespace Umbraco.Cms.Core.Composing
     /// on a hash of the DLLs in the ~/bin folder to check for cache expiration.</para>
     /// </remarks>
     public sealed class TypeLoader
-    {
-        internal const string CacheKey = "umbraco-types.list";
-
+    {   
+        private readonly IRuntimeHash _runtimeHash;
         private readonly IAppPolicyCache _runtimeCache;
         private readonly ILogger<TypeLoader> _logger;
         private readonly IProfilingLogger _profilingLogger;
@@ -45,7 +43,9 @@ namespace Umbraco.Cms.Core.Composing
         private bool _reportedChange;
         private readonly DirectoryInfo _localTempPath;
         private readonly Lazy<string> _fileBasePath;
-        private readonly Dictionary<(string, string), IEnumerable<string>> EmptyCache = new Dictionary<(string, string), IEnumerable<string>>();
+        private readonly Dictionary<(string, string), IEnumerable<string>> _emptyCache = new Dictionary<(string, string), IEnumerable<string>>();
+        private string _typesListFilePath;
+        private string _typesHashFilePath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
@@ -55,8 +55,8 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="localTempPath">Files storage location.</param>
         /// <param name="logger">A profiling logger.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, IEnumerable<Assembly> assembliesToScan = null)
-            : this(typeFinder, runtimeCache, localTempPath, logger, profilingLogger, true, assembliesToScan)
+        public TypeLoader(ITypeFinder typeFinder, IRuntimeHash runtimeHash, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfiler profiler, IEnumerable<Assembly> assembliesToScan = null)
+            : this(typeFinder, runtimeHash, runtimeCache, localTempPath, logger, profiler, true, assembliesToScan)
         { }
 
         /// <summary>
@@ -68,13 +68,22 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="logger">A profiling logger.</param>
         /// <param name="detectChanges">Whether to detect changes using hashes.</param>
         /// <param name="assembliesToScan"></param>
-        public TypeLoader(ITypeFinder typeFinder, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfilingLogger profilingLogger, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
+        public TypeLoader(ITypeFinder typeFinder, IRuntimeHash runtimeHash, IAppPolicyCache runtimeCache, DirectoryInfo localTempPath, ILogger<TypeLoader> logger, IProfiler profiler, bool detectChanges, IEnumerable<Assembly> assembliesToScan = null)
         {
+            if (profiler is null)
+            {
+                throw new ArgumentNullException(nameof(profiler));
+            }
+
+            var runtimeHashValue = runtimeHash.GetHashValue();
+            CacheKey = runtimeHashValue + "umbraco-types.list";
+
             TypeFinder = typeFinder ?? throw new ArgumentNullException(nameof(typeFinder));
+            _runtimeHash = runtimeHash;
             _runtimeCache = runtimeCache ?? throw new ArgumentNullException(nameof(runtimeCache));
             _localTempPath = localTempPath;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
+            _profilingLogger = new ProfilingLogger(logger, profiler);
             _assemblies = assembliesToScan;
 
             _fileBasePath = new Lazy<string>(GetFileBasePath);
@@ -87,6 +96,8 @@ namespace Umbraco.Cms.Core.Composing
                 //if they have changed, we need to write the new file
                 if (RequiresRescanning)
                 {
+                    _logger.LogDebug("Plugin types are being re-scanned. Cached hash value: {CachedHash}, Current hash value: {CurrentHash}", CachedAssembliesHash, CurrentAssembliesHash);
+
                     // if the hash has changed, clear out the persisted list no matter what, this will force
                     // rescanning of all types including lazy ones.
                     // http://issues.umbraco.org/issue/U4-4789
@@ -114,6 +125,8 @@ namespace Umbraco.Cms.Core.Composing
                 RequiresRescanning = true;
             }
         }
+
+        internal string CacheKey { get; }
 
         /// <summary>
         /// Returns the underlying <see cref="ITypeFinder"/>
@@ -198,9 +211,11 @@ namespace Umbraco.Cms.Core.Composing
             get
             {
                 if (_currentAssembliesHash != null)
+                {
                     return _currentAssembliesHash;
+                }
 
-                _currentAssembliesHash = TypeFinder.GetRuntimeHash();
+                _currentAssembliesHash = _runtimeHash.GetHashValue();
 
                 return _currentAssembliesHash;
             }
@@ -264,7 +279,7 @@ namespace Umbraco.Cms.Core.Composing
                 }
             }
 
-            return EmptyCache;
+            return _emptyCache;
         }
 
         // internal for tests
@@ -273,7 +288,7 @@ namespace Umbraco.Cms.Core.Composing
             var typesListFilePath = GetTypesListFilePath();
             if (typesListFilePath == null || File.Exists(typesListFilePath) == false)
             {
-                return EmptyCache;
+                return _emptyCache;
             }
 
             var cache = new Dictionary<(string, string), IEnumerable<string>>();
@@ -328,9 +343,9 @@ namespace Umbraco.Cms.Core.Composing
         }
 
         // internal for tests
-        public string GetTypesListFilePath() => _fileBasePath.Value == null ? null : _fileBasePath.Value + ".list";
+        public string GetTypesListFilePath() => _typesListFilePath ??= _fileBasePath.Value == null ? null : _fileBasePath.Value + ".list";
 
-        private string GetTypesHashFilePath() => _fileBasePath.Value == null ? null : _fileBasePath.Value + ".hash";
+        private string GetTypesHashFilePath() => _typesHashFilePath ??= _fileBasePath.Value == null ? null : _fileBasePath.Value + ".hash";
 
         /// <summary>
         /// Used to produce the Lazy value of _fileBasePath

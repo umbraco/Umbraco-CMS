@@ -417,7 +417,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(umbracoMembersUserManager)
                .Verify(u => u.AddToRolesAsync(membersIdentityUser, new[] { roleName }));
             Mock.Get(memberService)
-                .Verify(m => m.Save(It.IsAny<Member>(), true));
+                .Verify(m => m.Save(It.IsAny<Member>()));
             AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
         }
 
@@ -453,7 +453,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             var mockContentAppFactoryCollection = new Mock<ILogger<ContentAppFactoryCollection>>();
             var hybridBackOfficeSecurityAccessor = new BackOfficeSecurityAccessor(httpContextAccessor);
             var contentAppFactoryCollection = new ContentAppFactoryCollection(
-                contentAppFactories.Object,
+                () => contentAppFactories.Object,
                 mockContentAppFactoryCollection.Object,
                 hybridBackOfficeSecurityAccessor);
             var mockUserService = new Mock<IUserService>();
@@ -471,7 +471,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                      && x.Alias == Constants.PropertyEditors.Aliases.Label);
             Mock.Get(dataEditor).Setup(x => x.GetValueEditor()).Returns(new TextOnlyValueEditor( new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"), textService.Object, Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>()));
 
-            var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(new[] { dataEditor }));
+            var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
 
             IMapDefinition memberMapDefinition = new MemberMapDefinition(
                 commonMapper,
@@ -487,7 +487,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     contentTypeBaseServiceProvider.Object,
                     propertyEditorCollection));
 
-            var map = new MapDefinitionCollection(new List<IMapDefinition>()
+            var map = new MapDefinitionCollection(() => new List<IMapDefinition>()
             {
                 new global::Umbraco.Cms.Core.Models.Mapping.MemberMapDefinition(),
                 memberMapDefinition,

@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
@@ -64,6 +65,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
+        private readonly IManifestParser _manifestParser;
         private readonly ServerVariablesParser _serverVariables;
 
         public BackOfficeController(
@@ -82,6 +84,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeExternalLoginProviders externalLogins,
             IHttpContextAccessor httpContextAccessor,
             IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions,
+            IManifestParser manifestParser,
             ServerVariablesParser serverVariables)
         {
             _userManager = userManager;
@@ -99,6 +102,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _externalLogins = externalLogins;
             _httpContextAccessor = httpContextAccessor;
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
+            _manifestParser = manifestParser;
             _serverVariables = serverVariables;
         }
 
@@ -214,7 +218,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Application()
         {
-            var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(_globalSettings, _hostingEnvironment);
+            var result = await _runtimeMinifier.GetScriptForLoadingBackOfficeAsync(
+                _globalSettings,
+                _hostingEnvironment,
+                _manifestParser);
 
             return new JavaScriptResult(result);
         }

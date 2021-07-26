@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -26,18 +26,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         public const string ContentTypeKeyPropertyKey = "contentTypeKey";
         public const string UdiPropertyKey = "udi";
-        private readonly Lazy<PropertyEditorCollection> _propertyEditors;
 
         public BlockEditorPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
-            Lazy<PropertyEditorCollection> propertyEditors)
+            PropertyEditorCollection propertyEditors)
             : base(dataValueEditorFactory)
-        {
-            _propertyEditors = propertyEditors;
-        }
+            => PropertyEditors = propertyEditors;
 
-        // has to be lazy else circular dep in ctor
-        private PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
+        private PropertyEditorCollection PropertyEditors { get; }
 
         #region Value Editor
 

@@ -40,21 +40,48 @@ namespace Umbraco.Extensions
         /// This is so that in an operation where (for example) 2 languages are updates like french and english, it is possible that
         /// these dates assigned to them differ by a couple of Ticks, but we need to ensure they are persisted at the exact same time.
         /// </remarks>
-        public static void AdjustDates(this IContent content, DateTime date)
+        public static void AdjustDates(this IContent content, DateTime date, bool publishing)
         {
+            foreach(var culture in content.EditedCultures.ToList())
+            {
+                if (!content.CultureInfos.TryGetValue(culture, out ContentCultureInfos editedInfos))
+                {
+                    continue;
+                }
+
+                // if it's not dirty, it means it hasn't changed so there's nothing to adjust
+                if (!editedInfos.IsDirty())
+                {
+                    continue;
+                }
+
+                content.CultureInfos.AddOrUpdate(culture, editedInfos.Name, date);
+            }
+
+            if (!publishing)
+            {
+                return;
+            }
+
             foreach (var culture in content.PublishedCultures.ToList())
             {
-                if (!content.PublishCultureInfos.TryGetValue(culture, out var publishInfos))
+                if (!content.PublishCultureInfos.TryGetValue(culture, out ContentCultureInfos publishInfos))
+                {
                     continue;
+                }
 
                 // if it's not dirty, it means it hasn't changed so there's nothing to adjust
                 if (!publishInfos.IsDirty())
+                {
                     continue;
+                }
 
                 content.PublishCultureInfos.AddOrUpdate(culture, publishInfos.Name, date);
 
-                if (content.CultureInfos.TryGetValue(culture, out var infos))
+                if (content.CultureInfos.TryGetValue(culture, out ContentCultureInfos infos))
+                {
                     SetCultureInfo(content, culture, infos.Name, date);
+                }
             }
         }
 

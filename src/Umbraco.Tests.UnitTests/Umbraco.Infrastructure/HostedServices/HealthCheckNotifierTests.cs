@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                     new DisabledHealthCheckSettings { Id = Guid.Parse(Check2Id) }
                 }
             };
-            var checks = new HealthCheckCollection(new List<HealthCheck>
+            var checks = new HealthCheckCollection(() => new List<HealthCheck>
             {
                 new TestHealthCheck1(),
                 new TestHealthCheck2(),
@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             _mockNotificationMethod = new Mock<IHealthCheckNotificationMethod>();
             _mockNotificationMethod.SetupGet(x => x.Enabled).Returns(notificationEnabled);
-            var notifications = new HealthCheckNotificationMethodCollection(new List<IHealthCheckNotificationMethod> { _mockNotificationMethod.Object });
+            var notifications = new HealthCheckNotificationMethodCollection(() => new List<IHealthCheckNotificationMethod> { _mockNotificationMethod.Object });
 
             var mockRunTimeState = new Mock<IRuntimeState>();
             mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);

@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache.DistributedCache
             ServerRegistrar = new TestServerRegistrar();
             ServerMessenger = new TestServerMessenger();
 
-            var cacheRefresherCollection = new CacheRefresherCollection(new[]
+            var cacheRefresherCollection = new CacheRefresherCollection(() => new[]
             {
                 new TestCacheRefresher()
             });

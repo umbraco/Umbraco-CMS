@@ -599,7 +599,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             Mock.Get(dataTypeService).Setup(x => x.GetDataType(It.Is<int>(y => y == Constants.DataTypes.Textbox)))
                 .Returns(new DataType(textBoxEditor, serializer));
 
-            var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(new[] { textBoxEditor }));
+            var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(() => new[] { textBoxEditor }));
             return new PropertyValidationService(
                 propertyEditorCollection,
                 dataTypeService,

@@ -67,7 +67,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
         private readonly IRelationService _relationService;
         private readonly IImageUrlGenerator _imageUrlGenerator;
-        private readonly IJsonSerializer _serializer;
         private readonly IAuthorizationService _authorizationService;
         private readonly AppCaches _appCaches;
         private readonly ILogger<MediaController> _logger;
@@ -90,6 +89,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IRelationService relationService,
             PropertyEditorCollection propertyEditors,
             MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IJsonSerializer serializer,
@@ -111,10 +111,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _relationService = relationService;
             _propertyEditors = propertyEditors;
             _mediaFileManager = mediaFileManager;
+            _mediaUrlGenerators = mediaUrlGenerators;
             _hostingEnvironment = hostingEnvironment;
             _logger = loggerFactory.CreateLogger<MediaController>();
             _imageUrlGenerator = imageUrlGenerator;
-            _serializer = serializer;
             _authorizationService = authorizationService;
             _appCaches = appCaches;
         }
@@ -232,7 +232,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
-        public IEnumerable<MediaItemDisplay> GetByIds([FromQuery]int[] ids)
+        public IEnumerable<MediaItemDisplay> GetByIds([FromQuery] int[] ids)
         {
             var foundMedia = _mediaService.GetByIds(ids);
             return foundMedia.Select(media => _umbracoMapper.Map<MediaItemDisplay>(media));
@@ -289,6 +289,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly MediaFileManager _mediaFileManager;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly IHostingEnvironment _hostingEnvironment;
 
 
@@ -318,7 +319,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var nodes = _mediaService.GetByIds(UserStartNodes).ToArray();
                 if (nodes.Length == 0)
                     return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, 0, 0);
-                if (pageSize < nodes.Length) pageSize = nodes.Length; // bah
+                if (pageSize < nodes.Length)
+                    pageSize = nodes.Length; // bah
                 var pr = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(nodes.Length, pageNumber, pageSize)
                 {
                     Items = nodes.Select(_umbracoMapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>)
@@ -350,7 +352,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else
             {
                 //better to not use this without paging where possible, currently only the sort dialog does
-                children = _mediaService.GetPagedChildren(id,0, int.MaxValue, out var total).ToList();
+                children = _mediaService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
                 totalChildren = children.Count;
             }
 
@@ -496,7 +498,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (sourceParentID == destinationParentID)
             {
-                return ValidationProblem(new SimpleNotificationModel(new BackOfficeNotification("",_localizedTextService.Localize("media", "moveToSameFolderFailed"),NotificationStyle.Error)));
+                return ValidationProblem(new SimpleNotificationModel(new BackOfficeNotification("", _localizedTextService.Localize("media", "moveToSameFolderFailed"), NotificationStyle.Error)));
             }
             if (moveResult == false)
             {
@@ -668,7 +670,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public async Task<ActionResult<MediaItemDisplay>> PostAddFolder(PostedFolder folder)
         {
-            var parentIdResult = await GetParentIdAsIntAsync(folder.ParentId, validatePermissions:true);
+            var parentIdResult = await GetParentIdAsIntAsync(folder.ParentId, validatePermissions: true);
             if (!(parentIdResult.Result is null))
             {
                 return new ActionResult<MediaItemDisplay>(parentIdResult.Result);
@@ -692,7 +694,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// We cannot validate this request with attributes (nicely) due to the nature of the multi-part for data.
         /// </remarks>
-        public async Task<IActionResult> PostAddFile([FromForm]string path, [FromForm]string currentFolder, [FromForm]string contentTypeAlias, List<IFormFile> file)
+        public async Task<IActionResult> PostAddFile([FromForm] string path, [FromForm] string currentFolder, [FromForm] string contentTypeAlias, List<IFormFile> file)
         {
             var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
             //ensure it exists
@@ -705,7 +707,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //get the string json from the request
-            var parentIdResult = await GetParentIdAsIntAsync(currentFolder, validatePermissions:true);
+            var parentIdResult = await GetParentIdAsIntAsync(currentFolder, validatePermissions: true);
             if (!(parentIdResult.Result is null))
             {
                 return parentIdResult.Result;
@@ -773,7 +775,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //get the files
             foreach (var formFile in file)
             {
-                var fileName =  formFile.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
+                var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
@@ -788,11 +790,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         foreach (var mediaTypeItem in mediaTypes)
                         {
                             var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
-                            if (fileProperty != null) {
+                            if (fileProperty != null)
+                            {
                                 var dataTypeKey = fileProperty.DataTypeKey;
                                 var dataType = _dataTypeService.GetDataType(dataTypeKey);
 
-                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig) {
+                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig)
+                                {
                                     var fileExtensions = fileExtensionsConfig.FileExtensions;
                                     if (fileExtensions != null)
                                     {
@@ -824,7 +828,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     await using (var stream = formFile.OpenReadStream())
                     {
-                        f.SetValue(_mediaFileManager,_shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File,fileName, stream);
+                        f.SetValue(_mediaFileManager, _mediaUrlGenerators, _shortStringHelper, _contentTypeBaseServiceProvider, Constants.Conventions.Media.File, fileName, stream);
                     }
 
 

@@ -27,10 +27,6 @@ namespace Umbraco.Extensions
         /// </summary>
         public static IUmbracoApplicationBuilder UseUmbraco(this IApplicationBuilder app)
         {
-            IOptions<UmbracoPipelineOptions> startupOptions = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
-
-            app.RunPrePipeline(startupOptions.Value);
-
             // TODO: Should we do some checks like this to verify that the corresponding "Add" methods have been called for the
             // corresponding "Use" methods?
             // https://github.com/dotnet/aspnetcore/blob/b795ac3546eb3e2f47a01a64feb3020794ca33bb/src/Mvc/Mvc.Core/src/Builder/MvcApplicationBuilderExtensions.cs#L132
@@ -39,6 +35,9 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(app));
             }
 
+            IOptions<UmbracoPipelineOptions> startupOptions = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
+            app.RunPrePipeline(startupOptions.Value);
+            
             app.UseUmbracoCore();
             app.UseUmbracoRequestLogging();
 

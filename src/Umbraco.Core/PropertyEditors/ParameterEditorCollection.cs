@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Manifest;
 
@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class ParameterEditorCollection : BuilderCollectionBase<IDataEditor>
     {
         public ParameterEditorCollection(DataEditorCollection dataEditors, IManifestParser manifestParser)
-            : base(dataEditors
+            : base(() => dataEditors
                 .Where(x => (x.Type & EditorType.MacroParameter) > 0)
-                .Union(manifestParser.Manifest.PropertyEditors))
+                .Union(manifestParser.CombinedManifest.PropertyEditors))
         { }
 
         // note: virtual so it can be mocked
