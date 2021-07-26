@@ -9,17 +9,20 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
     /// <summary>
-    /// A builder to allow encapsulating the enabled endpoints in Umbraco
+    /// A builder used to enable middleware and endpoints required for Umbraco to operate.
     /// </summary>
+    /// <remarks>
+    /// This helps to ensure that everything is registered in the correct order.
+    /// </remarks>
     public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEndpointBuilder, IUmbracoApplicationBuilderContext
     {
         private readonly IOptions<UmbracoPipelineOptions> _umbracoPipelineStartupOptions;
 
         public UmbracoApplicationBuilder(IApplicationBuilder appBuilder)
         {
-            ApplicationServices = appBuilder.ApplicationServices;
-            RuntimeState = appBuilder.ApplicationServices.GetRequiredService<IRuntimeState>();
             AppBuilder = appBuilder ?? throw new ArgumentNullException(nameof(appBuilder));
+            ApplicationServices = appBuilder.ApplicationServices;
+            RuntimeState = appBuilder.ApplicationServices.GetRequiredService<IRuntimeState>();            
             _umbracoPipelineStartupOptions = ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
         }
 
