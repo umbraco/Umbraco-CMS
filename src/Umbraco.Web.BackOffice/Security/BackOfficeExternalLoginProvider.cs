@@ -8,7 +8,10 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     /// </summary>
     public class BackOfficeExternalLoginProvider : IEquatable<BackOfficeExternalLoginProvider>
     {
-        public BackOfficeExternalLoginProvider(string name, string authenticationType, IOptionsSnapshot<BackOfficeExternalLoginProviderOptions> properties)
+        public BackOfficeExternalLoginProvider(
+            string name,
+            string authenticationType,
+            IOptionsMonitor<BackOfficeExternalLoginProviderOptions> properties)
         {
             if (properties is null)
             {
