@@ -84,9 +84,16 @@ namespace Umbraco.Web.Models.Trees
         [DataMember(Name = "separator")]
         public bool SeparatorBefore { get; set; }
 
+        /// <summary>
+        /// Icon to use at action menu item
+        /// </summary>
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
+        /// <summary>
+        /// Used in the UI to indicate whether icons should be prefixed with "icon-".
+        /// If not legacy icon full icon name should be specified.
+        /// </summary>
         [DataMember(Name = "useLegacyIcon")]
         public bool UseLegacyIcon { get; set; } = true;
 
