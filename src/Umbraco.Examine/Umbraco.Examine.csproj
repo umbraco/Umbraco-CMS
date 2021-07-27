@@ -70,6 +70,7 @@
     <Compile Include="ExamineExtensions.cs" />
     <Compile Include="IContentValueSetBuilder.cs" />
     <Compile Include="IContentValueSetValidator.cs" />
+    <Compile Include="IIndexRebuilder.cs" />
     <Compile Include="IUmbracoContentIndex.cs" />
     <Compile Include="IUmbracoIndexConfig.cs" />
     <Compile Include="IIndexCreator.cs" />

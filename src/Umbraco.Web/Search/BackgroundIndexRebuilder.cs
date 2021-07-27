@@ -5,6 +5,7 @@ using Umbraco.Examine;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Web.Scheduling;
+using Examine;
 
 namespace Umbraco.Web.Search
 {
@@ -14,16 +15,18 @@ namespace Umbraco.Web.Search
     public sealed class BackgroundIndexRebuilder
     {
         private static readonly object RebuildLocker = new object();
-        private readonly IndexRebuilder _indexRebuilder;
+        private readonly IIndexRebuilder _indexRebuilder;
+        private readonly IExamineManager _examineManager;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
         private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
 
-        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IndexRebuilder indexRebuilder)
+        public BackgroundIndexRebuilder(IMainDom mainDom, IProfilingLogger logger, IIndexRebuilder indexRebuilder, IExamineManager examineManager)
         {
             _mainDom = mainDom;
             _logger = logger;
             _indexRebuilder = indexRebuilder;
+            _examineManager = examineManager;
         }
 
         /// <summary>
@@ -47,7 +50,7 @@ namespace Umbraco.Web.Search
 
                 _logger.Info<BackgroundIndexRebuilder>("Starting initialize async background thread.");
                 //do the rebuild on a managed background thread
-                var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _logger, onlyEmptyIndexes, waitMilliseconds);
+                var task = new RebuildOnStartupTask(_mainDom, _indexRebuilder, _examineManager, _logger, onlyEmptyIndexes, waitMilliseconds);
 
                 _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
                     "RebuildIndexesOnStartup",
@@ -64,16 +67,23 @@ namespace Umbraco.Web.Search
         {
             private readonly IMainDom _mainDom;
 
-            private readonly IndexRebuilder _indexRebuilder;
+            private readonly IIndexRebuilder _indexRebuilder;
+            private readonly IExamineManager _examineManager;
             private readonly ILogger _logger;
             private readonly bool _onlyEmptyIndexes;
             private readonly int _waitMilliseconds;
 
-            public RebuildOnStartupTask(IMainDom mainDom,
-                IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
+            public RebuildOnStartupTask(
+                IMainDom mainDom,
+                IIndexRebuilder indexRebuilder,
+                IExamineManager examineManager,
+                ILogger logger,
+                bool onlyEmptyIndexes,
+                int waitMilliseconds = 0)
             {
                 _mainDom = mainDom;
                 _indexRebuilder = indexRebuilder ?? throw new ArgumentNullException(nameof(indexRebuilder));
+                _examineManager = examineManager;
                 _logger = logger ?? throw new ArgumentNullException(nameof(logger));
                 _onlyEmptyIndexes = onlyEmptyIndexes;
                 _waitMilliseconds = waitMilliseconds;
@@ -115,7 +125,7 @@ namespace Umbraco.Web.Search
                 if (_waitMilliseconds > 0)
                     Thread.Sleep(_waitMilliseconds);
 
-                _indexRebuilder.ExamineManager.ConfigureIndexes(_mainDom, _logger);
+                _examineManager.ConfigureIndexes(_mainDom, _logger);
                 _indexRebuilder.RebuildIndexes(_onlyEmptyIndexes);
             }
         }

@@ -23,11 +23,13 @@ namespace Umbraco.Web.Editors
         private readonly IExamineManager _examineManager;
         private readonly ILogger _logger;
         private readonly IAppPolicyCache _runtimeCache;
-        private readonly IndexRebuilder _indexRebuilder;
+        private readonly IIndexRebuilder _indexRebuilder;
 
-        public ExamineManagementController(IExamineManager examineManager, ILogger logger,
+        public ExamineManagementController(
+            IExamineManager examineManager,
+            ILogger logger,
             AppCaches appCaches,
-            IndexRebuilder indexRebuilder)
+            IIndexRebuilder indexRebuilder)
         {
             _examineManager = examineManager;
             _logger = logger;

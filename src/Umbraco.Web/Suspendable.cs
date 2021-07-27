@@ -1,6 +1,7 @@
 ﻿using System;
 using Examine;
 using Examine.Providers;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Composing;
 using Umbraco.Examine;
@@ -72,7 +73,7 @@ namespace Umbraco.Web
                 _suspended = true;
             }
 
-            public static void ResumeIndexers(IndexRebuilder indexRebuilder, ILogger logger)
+            public static void ResumeIndexers(IIndexRebuilder indexRebuilder, ILogger logger)
             {
                 _suspended = false;
 
@@ -82,7 +83,7 @@ namespace Umbraco.Web
                 _tried = false;
 
                 // TODO: when resuming do we always want a full rebuild of all indexes?
-                ExamineComponent.RebuildIndexes(indexRebuilder, logger, false);
+                Current.Factory.GetInstance<BackgroundIndexRebuilder>().RebuildIndexes(false, 0);
             }
         }
 

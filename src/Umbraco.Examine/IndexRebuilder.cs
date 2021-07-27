@@ -7,12 +7,12 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Examine
-{   
-
+{
+    /// <inheritdoc />
     /// <summary>
     /// Utility to rebuild all indexes ensuring minimal data queries
     /// </summary>
-    public class IndexRebuilder
+    public class IndexRebuilder : IIndexRebuilder
     {
         private readonly IProfilingLogger _logger;
         private readonly IEnumerable<IIndexPopulator> _populators;
@@ -31,11 +31,13 @@ namespace Umbraco.Examine
             ExamineManager = examineManager;
         }
 
+        /// <inheritdoc/>
         public bool CanRebuild(IIndex index)
         {
             return _populators.Any(x => x.IsRegistered(index));
         }
 
+        /// <inheritdoc/>
         public void RebuildIndex(string indexName)
         {
             if (!ExamineManager.TryGetIndex(indexName, out var index))
@@ -47,6 +49,7 @@ namespace Umbraco.Examine
             }
         }
 
+        /// <inheritdoc/>
         public void RebuildIndexes(bool onlyEmptyIndexes)
         {
             var indexes = (onlyEmptyIndexes
@@ -61,7 +64,7 @@ namespace Umbraco.Examine
             }
 
             // run each populator over the indexes
-            foreach(var populator in _populators)
+            foreach (var populator in _populators)
             {
                 try
                 {
@@ -69,7 +72,7 @@ namespace Umbraco.Examine
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<IndexRebuilder,Type>(e, "Index populating failed for populator {Populator}", populator.GetType());                    
+                    _logger.Error<IndexRebuilder, Type>(e, "Index populating failed for populator {Populator}", populator.GetType());
                 }
             }
         }

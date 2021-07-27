@@ -29,7 +29,9 @@ namespace Umbraco.Web.Search
             composition.Register<PublishedContentIndexPopulator>(Lifetime.Singleton);
             composition.Register<MediaIndexPopulator>(Lifetime.Singleton);
 
+            // TODO: Remove this concrete registration in netcore - this is here only for backwards compat.
             composition.Register<IndexRebuilder>(Lifetime.Singleton);
+            composition.Register<IIndexRebuilder, IndexRebuilder>(Lifetime.Singleton);
             composition.RegisterUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
             composition.RegisterUnique<IUmbracoIndexesCreator, UmbracoIndexesCreator>();
             composition.RegisterUnique<IPublishedContentValueSetBuilder>(factory =>
