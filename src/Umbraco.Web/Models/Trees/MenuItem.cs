@@ -87,6 +87,9 @@ namespace Umbraco.Web.Models.Trees
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
+        [DataMember(Name = "useLegacyIcon")]
+        public bool UseLegacyIcon { get; set; } = true;
+
         /// <summary>
         /// Used in the UI to inform the user that the menu item will open a dialog/confirmation
         /// </summary>
