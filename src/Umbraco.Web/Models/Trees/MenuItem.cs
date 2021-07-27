@@ -84,7 +84,7 @@ namespace Umbraco.Web.Models.Trees
         [DataMember(Name = "separator")]
         public bool SeparatorBefore { get; set; }
 
-        [DataMember(Name = "cssclass")]
+        [DataMember(Name = "icon")]
         public string Icon { get; set; }
 
         /// <summary>
