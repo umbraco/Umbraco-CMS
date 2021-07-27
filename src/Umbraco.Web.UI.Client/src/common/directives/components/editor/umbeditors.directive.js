@@ -127,6 +127,8 @@
                 if (args && !args.editor && args.editors.length === 0) {
                     editorCount = 0;
                     scope.editors = [];
+                    // Inert content in the #mainwrapper
+                    focusLockService.addInertAttribute();
                 }
             }));
 
