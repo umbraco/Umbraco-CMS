@@ -128,7 +128,7 @@
                     editorCount = 0;
                     scope.editors = [];
                     // Inert content in the #mainwrapper
-                    focusLockService.addInertAttribute();
+                    focusLockService.removeInertAttribute();
                 }
             }));
 
