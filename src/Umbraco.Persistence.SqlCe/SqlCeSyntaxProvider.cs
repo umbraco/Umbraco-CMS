@@ -25,10 +25,10 @@ namespace Umbraco.Cms.Persistence.SqlCe
         {
             _globalSettings = globalSettings;
             BlobColumnDefinition = "IMAGE";
-            // This is silly to have to do this but the way these inherited classes are structured it's the easiest
-            // way without an overhaul in type map initialization
-            DbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
-
+            // NOTE: if this column type is used in sqlce, it will prob result in errors since
+            // SQLCE cannot support this type correctly without 2x columns and a lot of work arounds.
+            // We don't use this natively within Umbraco but 3rd parties might with SQL server.
+            DateTimeOffsetColumnDefinition = "DATETIME"; 
         }
 
         public override string ProviderName => Constants.DatabaseProviders.SqlCe;

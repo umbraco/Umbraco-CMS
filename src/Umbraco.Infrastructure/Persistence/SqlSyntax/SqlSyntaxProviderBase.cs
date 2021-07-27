@@ -24,6 +24,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
     public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         where TSyntax : ISqlSyntaxProvider
     {
+        private readonly Lazy<DbTypes> _dbTypes;
+
         protected SqlSyntaxProviderBase()
         {
             ClauseOrder = new List<Func<ColumnDefinition, string>>
@@ -42,14 +44,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
             DecimalColumnDefinition = string.Format(DecimalColumnDefinitionFormat, DefaultDecimalPrecision, DefaultDecimalScale);
 
-            InitColumnTypeMap();
-
             // ReSharper disable VirtualMemberCallInConstructor
             // ok to call virtual GetQuotedXxxName here - they don't depend on any state
             var col = Regex.Escape(GetQuotedColumnName("column")).Replace("column", @"\w+");
             var fld = Regex.Escape(GetQuotedTableName("table") + ".").Replace("table", @"\w+") + col;
             // ReSharper restore VirtualMemberCallInConstructor
             AliasRegex = new Regex("(" + fld + @")\s+AS\s+(" + col + ")", RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+            _dbTypes = new Lazy<DbTypes>(InitColumnTypeMap);
         }
 
         public Regex AliasRegex { get; }
@@ -70,64 +72,68 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         public string StringLengthColumnDefinitionFormat { get; }
 
         public string AutoIncrementDefinition { get; protected set; } = "AUTOINCREMENT";
-        public string IntColumnDefinition { get; } = "INTEGER";
-        public string LongColumnDefinition { get; } = "BIGINT";
+        public string IntColumnDefinition { get; protected set; } = "INTEGER";
+        public string LongColumnDefinition { get; protected set; } = "BIGINT";
         public string GuidColumnDefinition { get; protected set; } = "GUID";
         public string BoolColumnDefinition { get; protected set; } = "BOOL";
         public string RealColumnDefinition { get; protected set; } = "DOUBLE";
         public string DecimalColumnDefinition { get; protected set; }
         public string BlobColumnDefinition { get; protected set; } = "BLOB";
-        public string DateTimeColumnDefinition { get; } = "DATETIME";
+        public string DateTimeColumnDefinition { get; protected set; } = "DATETIME";
+        public string DateTimeOffsetColumnDefinition { get; protected set; } = "DATETIMEOFFSET(7)";
         public string TimeColumnDefinition { get; protected set; } = "DATETIME";
 
         protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
-        protected DbTypes DbTypeMap { get; } = new DbTypes();
+        protected DbTypes DbTypeMap => _dbTypes.Value;
 
-        protected void InitColumnTypeMap()
+        private DbTypes InitColumnTypeMap()
         {
-            DbTypeMap.Set<string>(DbType.String, StringColumnDefinition);
-            DbTypeMap.Set<char>(DbType.StringFixedLength, StringColumnDefinition);
-            DbTypeMap.Set<char?>(DbType.StringFixedLength, StringColumnDefinition);
-            DbTypeMap.Set<char[]>(DbType.String, StringColumnDefinition);
-            DbTypeMap.Set<bool>(DbType.Boolean, BoolColumnDefinition);
-            DbTypeMap.Set<bool?>(DbType.Boolean, BoolColumnDefinition);
-            DbTypeMap.Set<Guid>(DbType.Guid, GuidColumnDefinition);
-            DbTypeMap.Set<Guid?>(DbType.Guid, GuidColumnDefinition);
-            DbTypeMap.Set<DateTime>(DbType.DateTime, DateTimeColumnDefinition);
-            DbTypeMap.Set<DateTime?>(DbType.DateTime, DateTimeColumnDefinition);
-            DbTypeMap.Set<TimeSpan>(DbType.Time, TimeColumnDefinition);
-            DbTypeMap.Set<TimeSpan?>(DbType.Time, TimeColumnDefinition);
-            DbTypeMap.Set<DateTimeOffset>(DbType.DateTimeOffset, TimeColumnDefinition);
-            DbTypeMap.Set<DateTimeOffset?>(DbType.DateTimeOffset, TimeColumnDefinition);
+            var dbTypeMap = new DbTypesFactory();
+            dbTypeMap.Set<string>(DbType.String, StringColumnDefinition);
+            dbTypeMap.Set<char>(DbType.StringFixedLength, StringColumnDefinition);
+            dbTypeMap.Set<char?>(DbType.StringFixedLength, StringColumnDefinition);
+            dbTypeMap.Set<char[]>(DbType.String, StringColumnDefinition);
+            dbTypeMap.Set<bool>(DbType.Boolean, BoolColumnDefinition);
+            dbTypeMap.Set<bool?>(DbType.Boolean, BoolColumnDefinition);
+            dbTypeMap.Set<Guid>(DbType.Guid, GuidColumnDefinition);
+            dbTypeMap.Set<Guid?>(DbType.Guid, GuidColumnDefinition);
+            dbTypeMap.Set<DateTime>(DbType.DateTime, DateTimeColumnDefinition);
+            dbTypeMap.Set<DateTime?>(DbType.DateTime, DateTimeColumnDefinition);
+            dbTypeMap.Set<TimeSpan>(DbType.Time, TimeColumnDefinition);
+            dbTypeMap.Set<TimeSpan?>(DbType.Time, TimeColumnDefinition);
+            dbTypeMap.Set<DateTimeOffset>(DbType.DateTimeOffset, DateTimeOffsetColumnDefinition);
+            dbTypeMap.Set<DateTimeOffset?>(DbType.DateTimeOffset, DateTimeOffsetColumnDefinition);
 
-            DbTypeMap.Set<byte>(DbType.Byte, IntColumnDefinition);
-            DbTypeMap.Set<byte?>(DbType.Byte, IntColumnDefinition);
-            DbTypeMap.Set<sbyte>(DbType.SByte, IntColumnDefinition);
-            DbTypeMap.Set<sbyte?>(DbType.SByte, IntColumnDefinition);
-            DbTypeMap.Set<short>(DbType.Int16, IntColumnDefinition);
-            DbTypeMap.Set<short?>(DbType.Int16, IntColumnDefinition);
-            DbTypeMap.Set<ushort>(DbType.UInt16, IntColumnDefinition);
-            DbTypeMap.Set<ushort?>(DbType.UInt16, IntColumnDefinition);
-            DbTypeMap.Set<int>(DbType.Int32, IntColumnDefinition);
-            DbTypeMap.Set<int?>(DbType.Int32, IntColumnDefinition);
-            DbTypeMap.Set<uint>(DbType.UInt32, IntColumnDefinition);
-            DbTypeMap.Set<uint?>(DbType.UInt32, IntColumnDefinition);
+            dbTypeMap.Set<byte>(DbType.Byte, IntColumnDefinition);
+            dbTypeMap.Set<byte?>(DbType.Byte, IntColumnDefinition);
+            dbTypeMap.Set<sbyte>(DbType.SByte, IntColumnDefinition);
+            dbTypeMap.Set<sbyte?>(DbType.SByte, IntColumnDefinition);
+            dbTypeMap.Set<short>(DbType.Int16, IntColumnDefinition);
+            dbTypeMap.Set<short?>(DbType.Int16, IntColumnDefinition);
+            dbTypeMap.Set<ushort>(DbType.UInt16, IntColumnDefinition);
+            dbTypeMap.Set<ushort?>(DbType.UInt16, IntColumnDefinition);
+            dbTypeMap.Set<int>(DbType.Int32, IntColumnDefinition);
+            dbTypeMap.Set<int?>(DbType.Int32, IntColumnDefinition);
+            dbTypeMap.Set<uint>(DbType.UInt32, IntColumnDefinition);
+            dbTypeMap.Set<uint?>(DbType.UInt32, IntColumnDefinition);
 
-            DbTypeMap.Set<long>(DbType.Int64, LongColumnDefinition);
-            DbTypeMap.Set<long?>(DbType.Int64, LongColumnDefinition);
-            DbTypeMap.Set<ulong>(DbType.UInt64, LongColumnDefinition);
-            DbTypeMap.Set<ulong?>(DbType.UInt64, LongColumnDefinition);
+            dbTypeMap.Set<long>(DbType.Int64, LongColumnDefinition);
+            dbTypeMap.Set<long?>(DbType.Int64, LongColumnDefinition);
+            dbTypeMap.Set<ulong>(DbType.UInt64, LongColumnDefinition);
+            dbTypeMap.Set<ulong?>(DbType.UInt64, LongColumnDefinition);
 
-            DbTypeMap.Set<float>(DbType.Single, RealColumnDefinition);
-            DbTypeMap.Set<float?>(DbType.Single, RealColumnDefinition);
-            DbTypeMap.Set<double>(DbType.Double, RealColumnDefinition);
-            DbTypeMap.Set<double?>(DbType.Double, RealColumnDefinition);
+            dbTypeMap.Set<float>(DbType.Single, RealColumnDefinition);
+            dbTypeMap.Set<float?>(DbType.Single, RealColumnDefinition);
+            dbTypeMap.Set<double>(DbType.Double, RealColumnDefinition);
+            dbTypeMap.Set<double?>(DbType.Double, RealColumnDefinition);
 
-            DbTypeMap.Set<decimal>(DbType.Decimal, DecimalColumnDefinition);
-            DbTypeMap.Set<decimal?>(DbType.Decimal, DecimalColumnDefinition);
+            dbTypeMap.Set<decimal>(DbType.Decimal, DecimalColumnDefinition);
+            dbTypeMap.Set<decimal?>(DbType.Decimal, DecimalColumnDefinition);
 
-            DbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
+            dbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
+
+            return dbTypeMap.Create();
         }
 
         public abstract string ProviderName { get; }
@@ -484,19 +490,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
             if (type == typeof(string))
             {
-                var valueOrDefault = column.Size != default(int) ? column.Size : DefaultStringLength;
+                var valueOrDefault = column.Size != default ? column.Size : DefaultStringLength;
                 return string.Format(StringLengthColumnDefinitionFormat, valueOrDefault);
             }
 
             if (type == typeof(decimal))
             {
-                var precision = column.Size != default(int) ? column.Size : DefaultDecimalPrecision;
-                var scale = column.Precision != default(int) ? column.Precision : DefaultDecimalScale;
+                var precision = column.Size != default ? column.Size : DefaultDecimalPrecision;
+                var scale = column.Precision != default ? column.Precision : DefaultDecimalScale;
                 return string.Format(DecimalColumnDefinitionFormat, precision, scale);
             }
 
-            var definition = DbTypeMap.ColumnTypeMap.First(x => x.Key == type).Value;
-            var dbTypeDefinition = column.Size != default(int)
+            var definition = DbTypeMap.ColumnTypeMap[type];
+            var dbTypeDefinition = column.Size != default
                 ? $"{definition}({column.Size})"
                 : definition;
             //NOTE Precision is left out
