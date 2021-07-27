@@ -54,38 +54,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public Regex AliasRegex { get; }
 
-        public string GetWildcardPlaceholder()
-        {
-            return "%";
-        }
+        public string GetWildcardPlaceholder() => "%";
 
-        public string StringLengthNonUnicodeColumnDefinitionFormat = "VARCHAR({0})";
-        public string StringLengthUnicodeColumnDefinitionFormat = "NVARCHAR({0})";
-        public string DecimalColumnDefinitionFormat = "DECIMAL({0},{1})";
+        public string StringLengthNonUnicodeColumnDefinitionFormat { get; } = "VARCHAR({0})";
+        public string StringLengthUnicodeColumnDefinitionFormat { get; } = "NVARCHAR({0})";
+        public string DecimalColumnDefinitionFormat { get; } = "DECIMAL({0},{1})";
 
-        public string DefaultValueFormat = "DEFAULT ({0})";
-        public int DefaultStringLength = 255;
-        public int DefaultDecimalPrecision = 20;
-        public int DefaultDecimalScale = 9;
+        public string DefaultValueFormat { get; } = "DEFAULT ({0})";
+        public int DefaultStringLength { get; } = 255;
+        public int DefaultDecimalPrecision { get; } = 20;
+        public int DefaultDecimalScale { get; } = 9;
 
         //Set by Constructor
-        public string StringColumnDefinition;
-        public string StringLengthColumnDefinitionFormat;
+        public string StringColumnDefinition { get; }
+        public string StringLengthColumnDefinitionFormat { get; }
 
-        public string AutoIncrementDefinition = "AUTOINCREMENT";
-        public string IntColumnDefinition = "INTEGER";
-        public string LongColumnDefinition = "BIGINT";
-        public string GuidColumnDefinition = "GUID";
-        public string BoolColumnDefinition = "BOOL";
-        public string RealColumnDefinition = "DOUBLE";
-        public string DecimalColumnDefinition;
-        public string BlobColumnDefinition = "BLOB";
-        public string DateTimeColumnDefinition = "DATETIME";
-        public string TimeColumnDefinition = "DATETIME";
+        public string AutoIncrementDefinition { get; protected set; } = "AUTOINCREMENT";
+        public string IntColumnDefinition { get; } = "INTEGER";
+        public string LongColumnDefinition { get; } = "BIGINT";
+        public string GuidColumnDefinition { get; protected set; } = "GUID";
+        public string BoolColumnDefinition { get; protected set; } = "BOOL";
+        public string RealColumnDefinition { get; protected set; } = "DOUBLE";
+        public string DecimalColumnDefinition { get; protected set; }
+        public string BlobColumnDefinition { get; protected set; } = "BLOB";
+        public string DateTimeColumnDefinition { get; } = "DATETIME";
+        public string TimeColumnDefinition { get; protected set; } = "DATETIME";
 
         protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; }
 
-        protected DbTypes DbTypeMap = new DbTypes();
+        protected DbTypes DbTypeMap { get; } = new DbTypes();
+
         protected void InitColumnTypeMap()
         {
             DbTypeMap.Set<string>(DbType.String, StringColumnDefinition);
@@ -100,8 +98,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             DbTypeMap.Set<DateTime?>(DbType.DateTime, DateTimeColumnDefinition);
             DbTypeMap.Set<TimeSpan>(DbType.Time, TimeColumnDefinition);
             DbTypeMap.Set<TimeSpan?>(DbType.Time, TimeColumnDefinition);
-            DbTypeMap.Set<DateTimeOffset>(DbType.Time, TimeColumnDefinition);
-            DbTypeMap.Set<DateTimeOffset?>(DbType.Time, TimeColumnDefinition);
+            DbTypeMap.Set<DateTimeOffset>(DbType.DateTimeOffset, TimeColumnDefinition);
+            DbTypeMap.Set<DateTimeOffset?>(DbType.DateTimeOffset, TimeColumnDefinition);
 
             DbTypeMap.Set<byte>(DbType.Byte, IntColumnDefinition);
             DbTypeMap.Set<byte?>(DbType.Byte, IntColumnDefinition);
@@ -193,17 +191,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             return indexType;
         }
 
-        public virtual string GetSpecialDbType(SpecialDbTypes dbTypes)
+        public virtual string GetSpecialDbType(SpecialDbType dbType)
         {
-            if (dbTypes == SpecialDbTypes.NCHAR)
+            if (dbType == SpecialDbType.NCHAR)
             {
-                return "NCHAR";
+                return SpecialDbType.NCHAR;
             }
-            else if (dbTypes == SpecialDbTypes.NTEXT)
+            else if (dbType == SpecialDbType.NTEXT)
             {
-                return "NTEXT";
+                return SpecialDbType.NTEXT;
             }
-            else if (dbTypes == SpecialDbTypes.NVARCHARMAX)
+            else if (dbType == SpecialDbType.NVARCHARMAX)
             {
                 return "NVARCHAR(MAX)";
             }
@@ -470,14 +468,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             if (column.Type.HasValue == false && string.IsNullOrEmpty(column.CustomType) == false)
                 return column.CustomType;
 
-            if (column.HasSpecialDbType)
+            if (column.CustomDbType.HasValue)
             {
-                if (column.Size != default(int))
+                if (column.Size != default)
                 {
-                    return $"{GetSpecialDbType(column.DbType)}({column.Size})";
+                    return $"{GetSpecialDbType(column.CustomDbType.Value)}({column.Size})";
                 }
 
-                return GetSpecialDbType(column.DbType);
+                return GetSpecialDbType(column.CustomDbType.Value);
             }
 
             var type = column.Type.HasValue
