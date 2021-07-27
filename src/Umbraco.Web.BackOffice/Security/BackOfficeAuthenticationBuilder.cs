@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -45,7 +46,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             base.Services.AddSingleton(services =>
             {
                 return new BackOfficeExternalLoginProvider(
-                        displayName,
                         authenticationScheme,
                         services.GetRequiredService<IOptionsMonitor<BackOfficeExternalLoginProviderOptions>>());
             });

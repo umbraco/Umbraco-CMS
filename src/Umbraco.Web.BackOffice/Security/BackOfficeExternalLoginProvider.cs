@@ -9,7 +9,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     public class BackOfficeExternalLoginProvider : IEquatable<BackOfficeExternalLoginProvider>
     {
         public BackOfficeExternalLoginProvider(
-            string name,
             string authenticationType,
             IOptionsMonitor<BackOfficeExternalLoginProviderOptions> properties)
         {
@@ -18,31 +17,20 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 throw new ArgumentNullException(nameof(properties));
             }
 
-            Name = name ?? throw new ArgumentNullException(nameof(name));
             AuthenticationType = authenticationType ?? throw new ArgumentNullException(nameof(authenticationType));
             Options = properties.Get(authenticationType);
         }
 
-        public string Name { get; }
+        /// <summary>
+        /// The authentication "Scheme"
+        /// </summary>
         public string AuthenticationType { get; }
+
         public BackOfficeExternalLoginProviderOptions Options { get; }
 
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as BackOfficeExternalLoginProvider);
-        }
-
-        public bool Equals(BackOfficeExternalLoginProvider other)
-        {
-            return other != null &&
-                   Name == other.Name &&
-                   AuthenticationType == other.AuthenticationType;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Name, AuthenticationType);
-        }
+        public override bool Equals(object obj) => Equals(obj as BackOfficeExternalLoginProvider);
+        public bool Equals(BackOfficeExternalLoginProvider other) => other != null && AuthenticationType == other.AuthenticationType;
+        public override int GetHashCode() => HashCode.Combine(AuthenticationType);
     }
 
 }
