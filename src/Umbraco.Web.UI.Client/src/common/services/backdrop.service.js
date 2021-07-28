@@ -35,11 +35,11 @@
 		 */
         function open(options) {
 
-            if(options && options.element) {
+            if (options && options.element) {
                 args.element = options.element;
             }
 
-            if(options && options.disableEventsOnClick) {
+            if (options && options.disableEventsOnClick) {
                 args.disableEventsOnClick = options.disableEventsOnClick;
             }
 

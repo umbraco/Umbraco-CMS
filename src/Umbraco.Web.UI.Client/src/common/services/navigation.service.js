@@ -118,13 +118,19 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
     }
 
     function closeBackdrop() {
-        var aboveClass = 'above-backdrop';
-        var leftColumn = $('#leftcolumn');
-        var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
 
-        if(isLeftColumnOnTop){
+        var tourIsOpen = document.body.classList.contains("umb-tour-is-visible");
+        if (tourIsOpen) {
+            return;
+        }
+
+        var aboveClass = "above-backdrop";
+        var leftColumn = document.getElementById("leftcolumn");
+        var isLeftColumnOnTop = leftColumn.classList.contains(aboveClass);
+
+        if (isLeftColumnOnTop) {
             backdropService.close();
-            leftColumn.removeClass(aboveClass);
+            leftColumn.classList.remove(aboveClass);
         }
     }
 
