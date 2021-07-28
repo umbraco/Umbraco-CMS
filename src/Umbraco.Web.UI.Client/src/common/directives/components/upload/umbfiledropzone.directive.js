@@ -64,8 +64,7 @@ angular.module("umbraco.directives")
 
                     function _filesQueued(files, event) {
                         //Push into the queue
-                        angular.forEach(files,
-                            function(file) {
+                        Utilities.forEach(files, file => {
 
                                 if (_filterFile(file) === true) {
 
@@ -81,7 +80,7 @@ angular.module("umbraco.directives")
                         if (!scope.working) {
                             // Upload not allowed
                             if (!scope.acceptedMediatypes || !scope.acceptedMediatypes.length) {
-                                files.map(function(file) {
+                                files.map(file => {
                                     file.uploadStatus = "error";
                                     file.serverErrorMessage = "File type is not allowed here";
                                     scope.rejected.push(file);

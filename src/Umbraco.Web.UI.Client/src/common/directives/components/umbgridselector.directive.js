@@ -91,7 +91,7 @@
                 }
 
                 // update selected items
-                angular.forEach(scope.selectedItems, function (selectedItem) {
+                Utilities.forEach(scope.selectedItems, selectedItem => {
                     if (selectedItem.placeholder) {
 
                         selectedItem.name = scope.name;
@@ -99,12 +99,11 @@
                         if (scope.alias !== null && scope.alias !== undefined) {
                             selectedItem.alias = scope.alias;
                         }
-
                     }
                 });
 
                 // update availableItems
-                angular.forEach(scope.availableItems, function (availableItem) {
+                Utilities.forEach(scope.availableItems, availableItem => {
                     if (availableItem.placeholder) {
 
                         availableItem.name = scope.name;
@@ -112,7 +111,6 @@
                         if (scope.alias !== null && scope.alias !== undefined) {
                             availableItem.alias = scope.alias;
                         }
-
                     }
                 });
 

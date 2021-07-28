@@ -25,7 +25,7 @@
 
                 // set placeholder property on each group
                 if (scope.model.groups.length !== 0) {
-                    angular.forEach(scope.model.groups, function (group) {
+                    Utilities.forEach(scope.model.groups, group => {
                         addInitProperty(group);
                     });
                 }
@@ -36,11 +36,11 @@
                 activateFirstGroup(scope.model.groups);
 
                 // localize texts
-                localizationService.localize("validation_validation").then(function (value) {
+                localizationService.localize("validation_validation").then(value => {
                     validationTranslated = value;
                 });
 
-                localizationService.localize("contentTypeEditor_tabHasNoSortOrder").then(function (value) {
+                localizationService.localize("contentTypeEditor_tabHasNoSortOrder").then(value => {
                     tabNoSortOrderTranslated = value;
                 });
             }
@@ -179,12 +179,11 @@
 
             function updatePropertiesSortOrder() {
 
-                angular.forEach(scope.model.groups, function (group) {
+                Utilities.forEach(scope.model.groups, group => {
                     if (group.tabState !== "init") {
                         group.properties = contentTypeHelper.updatePropertiesSortOrder(group.properties);
                     }
                 });
-
             }
 
             function setupAvailableContentTypesModel(result) {
@@ -242,7 +241,6 @@
 
                     scope.sortingMode = true;
                     scope.sortingButtonKey = "general_reorderDone";
-
                 }
 
             };
@@ -254,20 +252,19 @@
                     compositeContentTypes: scope.model.compositeContentTypes,
                     view: "views/common/infiniteeditors/compositions/compositions.html",
                     size: "small",
-                    submit: function () {
+                    submit: () => {
 
                         // make sure that all tabs has an init property
                         if (scope.model.groups.length !== 0) {
-                            angular.forEach(scope.model.groups, function (group) {
+                            Utilities.forEach(scope.model.groups, group => {
                                 addInitProperty(group);
                             });
                         }
 
                         // remove overlay
                         editorService.close();
-
                     },
-                    close: function (oldModel) {
+                    close: oldModel => {
 
                         // reset composition changes
                         scope.model.groups = oldModel.contentType.groups;
@@ -277,7 +274,7 @@
                         editorService.close();
 
                     },
-                    selectCompositeContentType: function (selectedContentType) {
+                    selectCompositeContentType: selectedContentType => {
 
                         var deferred = $q.defer();
 
@@ -291,7 +288,7 @@
                             //use a different resource lookup depending on the content type type
                             var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getById : mediaTypeResource.getById;
 
-                            resourceLookup(selectedContentType.id).then(function (composition) {
+                            resourceLookup(selectedContentType.id).then(composition => {
                                 //based on the above filtering we shouldn't be able to select an invalid one, but let's be safe and
                                 // double check here.
                                 var overlappingAliases = contentTypeHelper.validateAddingComposition(scope.model, composition);
@@ -414,7 +411,7 @@
             scope.activateGroup = function (selectedGroup) {
 
                 // set all other groups that are inactive to active
-                angular.forEach(scope.model.groups, function (group) {
+                Utilities.forEach(scope.model.groups, group => {
                     // skip init tab
                     if (group.tabState !== "init") {
                         group.tabState = "inActive";
@@ -452,7 +449,7 @@
                 // check i init tab already exists
                 var addGroup = true;
 
-                angular.forEach(groups, function (group) {
+                Utilities.forEach(groups, group => {
                     if (group.tabState === "init") {
                         addGroup = false;
                     }
@@ -653,7 +650,7 @@
                 };
 
                 // check if there already is an init property
-                angular.forEach(group.properties, function (property) {
+                Utilities.forEach(group.properties, property => {
                     if (property.propertyState === "init") {
                         addInitPropertyBool = false;
                     }
@@ -669,8 +666,8 @@
             function updateSameDataTypes(newProperty) {
 
                 // find each property
-                angular.forEach(scope.model.groups, function (group) {
-                    angular.forEach(group.properties, function (property) {
+                Utilities.forEach(scope.model.groups, group => {
+                    Utilities.forEach(group.properties, property => {
 
                         if (property.dataTypeId === newProperty.dataTypeId) {
 
@@ -681,9 +678,7 @@
                             property.dataTypeId = newProperty.dataTypeId;
                             property.dataTypeIcon = newProperty.dataTypeIcon;
                             property.dataTypeName = newProperty.dataTypeName;
-
                         }
-
                     });
                 });
             }
@@ -691,8 +686,8 @@
             function hasPropertyOfDataTypeId(dataTypeId) {
 
                 // look at each property
-                var result = _.filter(scope.model.groups, function (group) {
-                    return _.filter(group.properties, function (property) {
+                var result = _.filter(scope.model.groups, group => {
+                    return _.filter(group.properties, property => {
                         return (property.dataTypeId === dataTypeId);
                     });
                 });
