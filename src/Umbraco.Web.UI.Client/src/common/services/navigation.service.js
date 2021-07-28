@@ -136,7 +136,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
     function showBackdrop() {
         var backDropOptions = {
-            'element': $('#leftcolumn')[0]
+            'element': document.getElementById('leftcolumn')
         };
         backdropService.open(backDropOptions);
     }
