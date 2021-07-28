@@ -19,7 +19,7 @@ namespace Umbraco.Web.Models.Trees
         public MenuItem()
         {
             AdditionalData = new Dictionary<string, object>();
-            Icon = "folder";
+            Icon = Constants.Icons.Folder.TrimStart("icon-");
         }
 
         public MenuItem(string alias, string name)
