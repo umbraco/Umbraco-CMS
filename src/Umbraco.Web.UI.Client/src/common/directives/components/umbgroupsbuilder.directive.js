@@ -34,14 +34,16 @@
                 addInitGroup(scope.model.groups);
 
                 activateFirstGroup(scope.model.groups);
+                
+                var labelKeys = [
+                    "validation_validation",
+                    "contentTypeEditor_tabHasNoSortOrder"
+                ];
 
                 // localize texts
-                localizationService.localize("validation_validation").then(value => {
-                    validationTranslated = value;
-                });
-
-                localizationService.localize("contentTypeEditor_tabHasNoSortOrder").then(value => {
-                    tabNoSortOrderTranslated = value;
+                localizationService.localizeMany(labelKeys).then(data => {
+                    validationTranslated = data[0];
+                    tabNoSortOrderTranslated = data[1];
                 });
             }
 
@@ -129,7 +131,6 @@
 
                         // store this tabs sort order as reference for the next
                         prevSortOrder = group.sortOrder;
-
                     }
 
                 });
