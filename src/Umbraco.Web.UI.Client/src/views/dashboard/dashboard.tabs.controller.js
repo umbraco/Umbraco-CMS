@@ -89,7 +89,7 @@ function startUpDynamicContentController($q, $timeout, $scope, dashboardResource
     evts.push(eventsService.on("appState.tour.complete", function (name, completedTour) {
         $timeout(function(){
             Utilities.forEach(vm.tours, tourGroup => {
-                angular.forEach(tourGroup, tour => {
+                Utilities.forEach(tourGroup, tour => {
                     if (tour.alias === completedTour.alias) {
                         tour.completed = true;
                     }
