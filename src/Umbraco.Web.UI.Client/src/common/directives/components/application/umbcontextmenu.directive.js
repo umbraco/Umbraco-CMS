@@ -7,7 +7,7 @@
  * Handles the click events on the context menu
 **/
 angular.module("umbraco.directives")
-.directive('umbContextMenu', function (navigationService, keyboardService, backdropService) {
+.directive('umbContextMenu', function (navigationService, keyboardService) {
     return {
         scope: {
             menuDialogTitle: "@",
