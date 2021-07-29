@@ -84,7 +84,7 @@ namespace Umbraco.Core.Services
         {
             if (manager is ILocalizedTextService2 manager2)
             {
-                return manager2.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, tokens);
+                return manager2.Localize(area, alias, culture, ConvertToDictionaryVars(tokens));
             }
             var fullKey = alias;
             if (area != null)
