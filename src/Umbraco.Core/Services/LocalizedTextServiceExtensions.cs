@@ -72,30 +72,6 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Localize using the current thread culture
-        /// </summary>
-        /// <param name="manager"></param>
-        /// <param name="area"></param>
-        /// <param name="alias"></param>
-        /// <param name="tokens"></param>
-        /// <returns></returns>
-        public static string Localize(this ILocalizedTextService manager, string area, string alias, IDictionary<string, string> tokens = null)
-        {
-            if (manager is ILocalizedTextService2 manager2)
-            {
-                return manager2.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, tokens);
-            }
-            var fullKey = alias;
-            if (area != null)
-            {
-                fullKey = string.Concat(area, "/", alias);
-            }
-#pragma warning disable CS0618 // Type or member is obsolete
-            return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture, tokens);
-#pragma warning restore CS0618 // Type or member is obsolete
-        }
-
-        /// <summary>
         /// Localize a key without any variables
         /// </summary>
         /// <param name="manager"></param>
@@ -108,7 +84,7 @@ namespace Umbraco.Core.Services
         {
             if (manager is ILocalizedTextService2 manager2)
             {
-                return manager2.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, tokens);
+                return manager2.Localize(area, alias, culture, ConvertToDictionaryVars(tokens));
             }
             var fullKey = alias;
             if (area != null)
