@@ -450,6 +450,13 @@ namespace Umbraco.Web.Editors
             return result;
         }
 
+        private IDictionary<Guid, ContentItemDisplay> GetEmptyByKeysInternal(Guid[] contentTypeKeys, int parentId)
+        {
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
+            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+        }
+
         /// <summary>
         /// Gets a collection of empty content items for all document types.
         /// </summary>
@@ -458,9 +465,22 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public IDictionary<Guid, ContentItemDisplay> GetEmptyByKeys([FromUri] Guid[] contentTypeKeys, [FromUri] int parentId)
         {
-            using var scope = _scopeProvider.CreateScope(autoComplete: true);
-            var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
-            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+            return GetEmptyByKeysInternal(contentTypeKeys, parentId);
+        }
+
+        /// <summary>
+        /// Gets a collection of empty content items for all document types.
+        /// </summary>
+        /// <remarks>
+        /// This is a post request in order to support a large amount of GUIDs without hitting the URL length limit.
+        /// </remarks>
+        /// <param name="contentTypeByKeys"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [OutgoingEditorModelEvent]
+        public IDictionary<Guid, ContentItemDisplay> GetEmptyByKeys(ContentTypesByKeys contentTypeByKeys)
+        {
+            return GetEmptyByKeysInternal(contentTypeByKeys.ContentTypeKeys, contentTypeByKeys.ParentId);
         }
 
         [OutgoingEditorModelEvent]
