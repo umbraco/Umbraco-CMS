@@ -1,4 +1,4 @@
-function multiUrlPickerController($scope, angularHelper, localizationService, entityResource, iconHelper, editorService) {
+function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService) {
 
     var vm = {
         labels: {
@@ -16,15 +16,16 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         $scope.model.value = [];
     }
 
-    var currentForm = angularHelper.getCurrentForm($scope);
-
     $scope.sortableOptions = {
+        axis: "y",
+        containment: "parent",
         distance: 10,
+        opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000,
         update: function () {
-            currentForm.$setDirty();
+            setDirty();
         }
     };
 
@@ -63,7 +64,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
     $scope.remove = function ($index) {
         $scope.renderModel.splice($index, 1);
 
-        currentForm.$setDirty();
+        setDirty();
     };
 
     $scope.openLinkPicker = function (link, $index) {
@@ -79,6 +80,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             currentTarget: target,
             dataTypeKey: $scope.model.dataTypeKey,
             ignoreUserStartNodes : ($scope.model.config && $scope.model.config.ignoreUserStartNodes) ? $scope.model.config.ignoreUserStartNodes : "0",
+            hideAnchor: $scope.model.config && $scope.model.config.hideAnchor ? true : false,
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed
@@ -118,7 +120,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                         link.published = true;
                     }
 
-                    currentForm.$setDirty();
+                    setDirty();
                 }
                 editorService.close();
             },
@@ -128,6 +130,12 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         };
         editorService.linkPicker(linkPicker);
     };
+
+    function setDirty() {
+        if ($scope.multiUrlPickerForm) {
+            $scope.multiUrlPickerForm.modelValue.$setDirty();
+        }
+    }
 
     function init() {
         localizationService.localizeMany(["general_recycleBin"])
@@ -140,6 +148,16 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
             $scope.model.config.minNumber = 1;
         }
+
+        _.each($scope.model.value, function (item){
+            // we must reload the "document" link URLs to match the current editor culture
+            if (item.udi && item.udi.indexOf("/document/") > 0) {
+                item.url = null;
+                entityResource.getUrlByUdi(item.udi).then(function (data) {
+                    item.url = data;
+                });
+            }
+        });
     }
 
     init();

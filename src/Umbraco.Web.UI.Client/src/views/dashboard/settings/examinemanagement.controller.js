@@ -26,17 +26,16 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
 
     function showSearchResultDialog(values) {
         if (vm.searchResults) {
-
             localizationService.localize("examineManagement_fieldValues").then(function (value) {
-
-                vm.searchResults.overlay = {
+                editorService.open({
                     title: value,
                     searchResultValues: values,
+                    size: "medium",
                     view: "views/dashboard/settings/examinemanagementresults.html",
                     close: function () {
-                        vm.searchResults.overlay = null;
+                        editorService.close();
                     }
-                };
+                });
             });
         }
     }
@@ -199,6 +198,7 @@ function ExamineManagementController($scope, $http, $q, $timeout, $location, umb
             view: "views/dashboard/settings/overlays/examinemanagement.rebuild.html",
             index: index,
             submitButtonLabelKey: "general_ok",
+            submitButtonStyle :"danger",
             submit: function (model) {
                 performRebuild(model.index);
                 overlayService.close();

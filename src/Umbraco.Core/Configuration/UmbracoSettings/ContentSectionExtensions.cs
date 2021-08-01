@@ -15,7 +15,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             if (contentConfig == null) throw new ArgumentNullException(nameof(contentConfig));
             if (extension == null) return false;
-            extension = extension.TrimStart('.');
+            extension = extension.TrimStart(Constants.CharArrays.Period);
             return contentConfig.ImageFileTypes.InvariantContains(extension);
         }
 

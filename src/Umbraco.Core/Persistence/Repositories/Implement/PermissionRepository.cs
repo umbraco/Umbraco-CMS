@@ -252,27 +252,27 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override ContentPermissionSet PerformGet(int id)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         protected override IEnumerable<ContentPermissionSet> PerformGetAll(params int[] ids)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         protected override IEnumerable<ContentPermissionSet> PerformGetByQuery(IQuery<ContentPermissionSet> query)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         protected override string GetBaseWhereClause()
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -280,11 +280,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return new List<string>();
         }
 
-        protected override Guid NodeObjectTypeId => throw new WontImplementException();
+        protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
         protected override void PersistDeletedItem(ContentPermissionSet entity)
         {
-            throw new WontImplementException();
+            throw new InvalidOperationException("This method won't be implemented.");
         }
 
         #endregion

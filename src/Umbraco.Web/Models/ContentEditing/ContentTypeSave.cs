@@ -69,6 +69,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "allowCultureVariant")]
         public bool AllowCultureVariant { get; set; }
 
+        [DataMember(Name = "allowSegmentVariant")]
+        public bool AllowSegmentVariant { get; set; }
+
         //Tabs
         [DataMember(Name = "groups")]
         public IEnumerable<PropertyGroupBasic<TPropertyType>> Groups { get; set; }

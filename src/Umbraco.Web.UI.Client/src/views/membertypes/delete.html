@@ -13,10 +13,9 @@
 
         <hr />
 
-        <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}">
-        </umb-checkbox>
+        <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}"></umb-checkbox>
 
-        <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel">
+        <umb-confirm confirm-disabled="!confirmed" confirm-label-key="delete" on-confirm="performDelete" on-cancel="cancel" confirm-button-style="danger">
         </umb-confirm>
 
 

@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Dtos
     internal class PropertyTypeDto
     {
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 50)]
+        [PrimaryKeyColumn(IdentitySeed = 100)]
         public int Id { get; set; }
 
         [Column("dataTypeId")]
@@ -43,14 +43,28 @@ namespace Umbraco.Core.Persistence.Dtos
         [Constraint(Default = "0")]
         public bool Mandatory { get; set; }
 
+        [Column("mandatoryMessage")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string MandatoryMessage { get; set; }
+
         [Column("validationRegExp")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string ValidationRegExp { get; set; }
+
+        [Column("validationRegExpMessage")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string ValidationRegExpMessage { get; set; }
 
         [Column("Description")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(2000)]
         public string Description { get; set; }
+
+        [Column("labelOnTop")]
+        [Constraint(Default = "0")]
+        public bool LabelOnTop { get; set; }
 
         [Column("variations")]
         [Constraint(Default = "1" /*ContentVariation.InvariantNeutral*/)]

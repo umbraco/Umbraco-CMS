@@ -1,4 +1,4 @@
-﻿function sliderController($scope, angularHelper) {
+﻿function sliderController($scope) {
 
     let sliderRef = null;
 
@@ -14,7 +14,13 @@
 
     function setModelValue(values) {
         $scope.model.value = values ? values.toString() : null;
-        angularHelper.getCurrentForm($scope).$setDirty();
+        setDirty();
+    }
+
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
     }
 
     $scope.setup = function(slider) {
@@ -56,7 +62,7 @@
                     return value.toFixed(stepDecimalPlaces);
                 },
                 from: function (value) {
-                    return value;
+                    return Number(value);
                 }
             },
             "range": {

@@ -1,0 +1,75 @@
+.umb-contextmenu {
+    margin: 0;
+    list-style: none;
+    user-select: none;
+    
+    overflow: hidden;
+    border-radius: 3px;
+    border: 1px solid @dropdownBorder;
+    .box-shadow(0 5px 20px rgba(0,0,0,.3));
+    border-bottom: 1px solid rgba(0,0,0,.2);
+
+    .sep {
+        display: block;
+        border-top: 1px solid @gray-9;
+
+        &:first-child {
+            border-top: none;
+        }
+    }
+
+}
+
+.umb-contextmenu-item {
+    
+    .icon {
+        font-size: 18px;
+        vertical-align: middle;
+    }
+
+    .menu-label {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 5px;
+    }
+
+    button {
+        
+        position: relative;
+
+        display: block;
+        font-weight: normal;
+        line-height: @baseLineHeight;
+        white-space: nowrap;
+
+        background-color: @ui-option;
+        border: 0;
+        padding: 7px 12px;
+        color: @ui-option-type;
+        width: 100%;
+
+        font-size: 14px;
+        text-align: left;
+        
+        &:hover {
+            text-decoration: none;
+            color: @ui-option-type-hover;
+            background-color: @ui-option-hover;
+        }
+    }
+
+    &.-opens-dialog {
+        .menu-label:after {
+            // adds an ellipsis (...) after the menu label for actions that open a dialog
+            content: '\2026';
+        }
+    }
+    button:disabled {
+        cursor: not-allowed;
+        color: @ui-option-disabled-type;
+        &:hover {
+            color: @ui-option-disabled-type-hover;
+            background-color: @ui-option;
+        }
+    }
+}

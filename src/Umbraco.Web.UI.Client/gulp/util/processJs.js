@@ -23,11 +23,12 @@ module.exports = function (files, out) {
     // sort files in stream by path or any custom sort comparator
     task = task.pipe(babel())
         .pipe(sort());
-
-    if (global.isProd === true) {
-        //in production, embed the templates
-        task = task.pipe(embedTemplates({ basePath: "./src/", minimize: { loose: true } }))
+    
+    //in production, embed the templates
+    if(config.compile.current.embedtemplates === true) {
+        task = task.pipe(embedTemplates({ basePath: "./src/", minimize: { loose: true } }));
     }
+    
     task = task.pipe(concat(out))
         .pipe(wrap('(function(){\n%= body %\n})();'))
         .pipe(gulp.dest(config.root + config.targets.js));

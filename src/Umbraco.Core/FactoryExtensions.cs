@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Composing;
@@ -77,13 +78,26 @@ namespace Umbraco.Core
 
             var ctorParameters = ctor.GetParameters();
             var ctorArgs = new object[ctorParameters.Length];
+            var availableArgs = new List<object>(args);
             var i = 0;
             foreach (var parameter in ctorParameters)
             {
                 // no! IsInstanceOfType is not ok here
                 // ReSharper disable once UseMethodIsInstanceOfType
-                var arg = args?.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
-                ctorArgs[i++] = arg ?? factory.GetInstance(parameter.ParameterType);
+                var idx = availableArgs.FindIndex(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
+                if(idx >= 0)
+                {
+                    // Found a suitable supplied argument
+                    ctorArgs[i++] = availableArgs[idx];
+
+                    // A supplied argument can be used at most once
+                    availableArgs.RemoveAt(idx);                    
+                }
+                else
+                {
+                    // None of the provided arguments is suitable: get an instance from the factory
+                    ctorArgs[i++] = factory.GetInstance(parameter.ParameterType);
+                }                
             }
             return ctor.Invoke(ctorArgs);
         }

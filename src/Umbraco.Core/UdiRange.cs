@@ -70,7 +70,7 @@ namespace Umbraco.Core
             }
 
             var udiUri = uri.Query == string.Empty ? uri : new UriBuilder(uri) { Query = string.Empty }.Uri;
-            return new UdiRange(Udi.Create(udiUri), uri.Query.TrimStart('?'));
+            return new UdiRange(Udi.Create(udiUri), uri.Query.TrimStart(Constants.CharArrays.QuestionMark));
         }
 
         public override string ToString()

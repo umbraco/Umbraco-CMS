@@ -78,7 +78,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 var response = request.GetResponse();
 
                 // Check first for header
-                success = DoHttpHeadersContainHeader(response);
+                success = HasMatchingHeader(response.Headers.AllKeys);
 
                 // If not found, and available, check for meta-tag
                 if (success == false && _metaTagOptionAvailable)
@@ -87,12 +87,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 }
 
                 message = success
-                    ? TextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderFound")
-                    : TextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderNotFound");
+                    ? TextService.Localize($"healthcheck", "{_localizedTextPrefix}CheckHeaderFound")
+                    : TextService.Localize($"healthcheck", "{_localizedTextPrefix}CheckHeaderNotFound");
             }
             catch (Exception ex)
             {
-                message = TextService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = TextService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             var actions = new List<HealthCheckAction>();
@@ -100,8 +100,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             {
                 actions.Add(new HealthCheckAction(SetHeaderInConfigAction, Id)
                 {
-                    Name = TextService.Localize("healthcheck/setHeaderInConfig"),
-                    Description = TextService.Localize($"healthcheck/{_localizedTextPrefix}SetHeaderInConfigDescription")
+                    Name = TextService.Localize("healthcheck", "setHeaderInConfig"),
+                    Description = TextService.Localize($"healthcheck", "{_localizedTextPrefix}SetHeaderInConfigDescription")
                 });
             }
 
@@ -113,9 +113,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 };
         }
 
-        private bool DoHttpHeadersContainHeader(WebResponse response)
+        private bool HasMatchingHeader(IEnumerable<string> headerKeys)
         {
-            return response.Headers.AllKeys.Contains(_header, StringComparer.InvariantCultureIgnoreCase);
+            return headerKeys.Contains(_header, StringComparer.InvariantCultureIgnoreCase);
         }
 
         private bool DoMetaTagsContainKeyForHeader(WebResponse response)
@@ -127,7 +127,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     var html = reader.ReadToEnd();
                     var metaTags = ParseMetaTags(html);
-                    return metaTags.ContainsKey(_header);
+                    return HasMatchingHeader(metaTags.Keys);
                 }
             }
         }
@@ -149,14 +149,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             if (success)
             {
                 return
-                    new HealthCheckStatus(TextService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigSuccess", _localizedTextPrefix)))
+                    new HealthCheckStatus(TextService.Localize("healthcheck", _localizedTextPrefix + "SetHeaderInConfigSuccess"))
                     {
                         ResultType = StatusResultType.Success
                     };
             }
 
             return
-                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new [] { errorMessage }))
+                new HealthCheckStatus(TextService.Localize("healthcheck", "setHeaderInConfigError", new [] { errorMessage }))
                 {
                     ResultType = StatusResultType.Error
                 };

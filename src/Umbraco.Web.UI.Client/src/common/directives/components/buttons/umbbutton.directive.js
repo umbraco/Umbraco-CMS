@@ -55,21 +55,21 @@ Use this directive to render an umbraco button. The directive can be used to gen
 </pre>
 
 @param {callback} action The button action which should be performed when the button is clicked.
-@param {string=} href Url/Path to navigato to.
-@param {string=} type Set the button type ("button" or "submit").
+@param {string=} href Url/Path to navigato to. (requires "type" to be set to "link")
+@param {string=} type Set the button type ("button", "link", "submit").
 @param {string=} buttonStyle Set the style of the button. The directive uses the default bootstrap styles ("primary", "info", "success", "warning", "danger", "inverse", "link", "block"). Pass in array to add multple styles [success,block].
 @param {string=} state Set a progress state on the button ("init", "busy", "success", "error").
 @param {string=} shortcut Set a keyboard shortcut for the button ("ctrl+c").
 @param {string=} label Set the button label.
-@param {string=} labelKey Set a localization key to make a multi lingual button ("general_buttonText").
+@param {string=} labelKey Set a localization key to make a multi-lingual button ("general_buttonText").
 @param {string=} icon Set a button icon.
-@param {string=} size Set a button icon ("xs", "m", "l", "xl").
+@param {string=} size Set a button size ("xs", "m", "l", "xl").
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
-@param {string=} addEllipsis Adds an ellipsis character (…) to the button label which means the button will open a dialog or prompt the user for more information.
-@param {string=} showCaret Shows a caret on the right side of the button label
-@param {string=} autoFocus add autoFocus to the button
-@param {string=} hasPopup Used to expose to the accessibility API whether the button will trigger a popup or not
-@param {string=]} isExpanded Used to add an aria-expanded attribute and expose whether the button has expanded a popup or not
+@param {boolean=} addEllipsis Adds an ellipsis character (…) to the button label which means the button will open a dialog or prompt the user for more information.
+@param {boolean=} showCaret Shows a caret on the right side of the button label
+@param {boolean=} autoFocus add autoFocus to the button
+@param {boolean=} hasPopup Used to expose to the accessibility API whether the button will trigger a popup or not
+@param {boolean=} isExpanded Used to add an aria-expanded attribute and expose whether the button controls collapsible content
 
 **/
 
@@ -86,6 +86,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
             bindings: {
                 action: "&?",
                 href: "@?",
+                hrefTarget: "@?",
                 type: "@",
                 buttonStyle: "@?",
                 state: "<?",
@@ -99,7 +100,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
                 alias: "@?",
                 addEllipsis: "@?",
                 showCaret: "@?",
-                autoFocus: "@?",
+                autoFocus: "<?",
                 hasPopup: "@?",
                 isExpanded: "<?"
             }
@@ -123,6 +124,10 @@ Use this directive to render an umbraco button. The directive can be used to gen
             vm.innerState = "init";
             vm.generalActions = vm.labelKey === "general_actions";
 
+            if (!vm.type) {
+                vm.type = "button"; // set the default
+            }
+
             vm.buttonLabel = vm.label;
             // is this a primary button style (i.e. anything but an 'info' button)?
             vm.isPrimaryButtonStyle = vm.buttonStyle && vm.buttonStyle !== 'info';
@@ -130,7 +135,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
             if (vm.buttonStyle) {
 
                 // make it possible to pass in multiple styles
-                if(vm.buttonStyle.startsWith("[") && vm.buttonStyle.endsWith("]")) {
+                if (vm.buttonStyle.startsWith("[") && vm.buttonStyle.endsWith("]")) {
 
                     // when using an attr it will always be a string so we need to remove square brackets
                     // and turn it into and array
@@ -138,16 +143,16 @@ Use this directive to render an umbraco button. The directive can be used to gen
                     // split array by , + make sure to catch whitespaces
                     var array = withoutBrackets.split(/\s?,\s?/g);
 
-                    angular.forEach(array, function(item){
+                    Utilities.forEach(array, item => {
                         vm.style = vm.style + " " + "btn-" + item;
-                        if(item === "block") {
+                        if (item === "block") {
                             vm.blockElement = true;
                         }
                     });
 
                 } else {
                     vm.style = "btn-" + vm.buttonStyle;
-                    if(vm.buttonStyle === "block") {
+                    if (vm.buttonStyle === "block") {
                         vm.blockElement = true;
                     }
                 }
@@ -162,11 +167,11 @@ Use this directive to render an umbraco button. The directive can be used to gen
 
             // watch for state changes
             if (changes.state) {
-                if(changes.state.currentValue) {
+                if (changes.state.currentValue) {
                     vm.innerState = changes.state.currentValue;
                 }
                 if (changes.state.currentValue === 'success' || changes.state.currentValue === 'error') {
-                    // set the state back to 'init' after a success or error 
+                    // set the state back to 'init' after a success or error
                     $timeout(function () {
                         vm.innerState = 'init';
                     }, 2000);
@@ -174,43 +179,50 @@ Use this directive to render an umbraco button. The directive can be used to gen
             }
 
             // watch for disabled changes
-            if(changes.disabled) {
-                if(changes.disabled.currentValue) {
+            if (changes.disabled) {
+                if (changes.disabled.currentValue) {
                     vm.disabled = changes.disabled.currentValue;
                 }
             }
 
             // watch for label changes
-            if(changes.label && changes.label.currentValue) {
+            if (changes.label && changes.label.currentValue) {
                 vm.buttonLabel = changes.label.currentValue;
                 setButtonLabel();
             }
 
             // watch for label key changes
-            if(changes.labelKey && changes.labelKey.currentValue) {
+            if (changes.labelKey && changes.labelKey.currentValue) {
                 setButtonLabel();
+            }
+
+            // watch for type changes
+            if (changes.type) {
+                if (!vm.type) {
+                    vm.type = "button";// set the default
+                }
             }
 
         }
 
         function clickButton(event) {
-            if(vm.action) {
+            if (vm.action) {
                 vm.action({$event: event});
             }
         }
 
         function setButtonLabel() {
             // if the button opens a dialog add "..." to the label
-            if(vm.addEllipsis === "true") {
+            if (vm.addEllipsis === "true") {
                 vm.buttonLabel = vm.buttonLabel + "...";
             }
 
             // look up localization key
-            if(vm.labelKey) {
-                localizationService.localize(vm.labelKey).then(function(value){
+            if (vm.labelKey) {
+                localizationService.localize(vm.labelKey).then(value => {
                     vm.buttonLabel = value;
                     // if the button opens a dialog add "..." to the label
-                    if(vm.addEllipsis === "true") {
+                    if (vm.addEllipsis === "true") {
                         vm.buttonLabel = vm.buttonLabel + "...";
                     }
                 });

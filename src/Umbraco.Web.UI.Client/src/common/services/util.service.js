@@ -173,9 +173,9 @@ function umbModelMapper() {
         /** This converts the source model to a basic entity model, it will throw an exception if there isn't enough data to create the model */
         convertToEntityBasic: function (source) {
             var required = ["id", "name", "icon", "parentId", "path"];
-            _.each(required, function (k) {
-                if (!_.has(source, k)) {
-                    throw "The source object does not contain the property " + k;
+            required.forEach(k => {
+                if (!hasOwnProperty.call(source, k)) {
+                    throw `The source object does not contain the property ${k}`;
                 }
             });
             var optional = ["metaData", "key", "alias"];
@@ -206,11 +206,11 @@ function umbSessionStorage($window) {
     return {
 
         get: function (key) {
-            return angular.fromJson(storage["umb_" + key]);
+            return Utilities.fromJson(storage["umb_" + key]);
         },
 
         set: function (key, value) {
-            storage["umb_" + key] = angular.toJson(value);
+            storage["umb_" + key] = Utilities.toJson(value);
         }
 
     };

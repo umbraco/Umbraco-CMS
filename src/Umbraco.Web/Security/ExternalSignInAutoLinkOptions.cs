@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -7,6 +8,7 @@ using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security
 {
+
     /// <summary>
     /// Options used to configure auto-linking external OAuth providers
     /// </summary>
@@ -23,7 +25,7 @@ namespace Umbraco.Web.Security
             string[] defaultUserGroups = null,
             string defaultCulture = null)
         {
-            _defaultUserGroups = defaultUserGroups ?? new[] { "editor" };
+            _defaultUserGroups = defaultUserGroups ?? new[] { Constants.Security.EditorGroupAlias };
             _autoLinkExternalAccount = autoLinkExternalAccount;
             _defaultCulture = defaultCulture ?? Current.Configs.Global().DefaultUILanguage;
         }
@@ -31,14 +33,22 @@ namespace Umbraco.Web.Security
         private readonly string[] _defaultUserGroups;
 
         /// <summary>
+        /// By default this is true which allows the user to manually link and unlink the external provider, if set to false the back office user
+        /// will not see and cannot perform manual linking or unlinking of the external provider.
+        /// </summary>
+        public bool AllowManualLinking { get; set; } = true;
+
+        /// <summary>
         /// A callback executed during account auto-linking and before the user is persisted
         /// </summary>
+        [IgnoreDataMember]
         public Action<BackOfficeIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
 
         /// <summary>
         /// A callback executed during every time a user authenticates using an external login.
         /// returns a boolean indicating if sign in should continue or not.
         /// </summary>
+        [IgnoreDataMember]
         public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
 
 
@@ -48,7 +58,7 @@ namespace Umbraco.Web.Security
         /// <param name="umbracoContext"></param>
         /// <param name="loginInfo"></param>
         /// <returns></returns>
-        public string[] GetDefaultUserGroups(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public virtual string[] GetDefaultUserGroups(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _defaultUserGroups;
         }
@@ -61,7 +71,7 @@ namespace Umbraco.Web.Security
         ///
         /// For public auth providers this should always be false!!!
         /// </summary>
-        public bool ShouldAutoLinkExternalAccount(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public virtual bool ShouldAutoLinkExternalAccount(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _autoLinkExternalAccount;
         }
@@ -71,7 +81,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// The default Culture to use for auto-linking users
         /// </summary>
-        public string GetDefaultCulture(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        public virtual string GetDefaultCulture(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _defaultCulture;
         }

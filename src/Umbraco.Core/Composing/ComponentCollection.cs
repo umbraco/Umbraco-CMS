@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Logging;
 
@@ -43,8 +44,15 @@ namespace Umbraco.Core.Composing
                     var componentType = component.GetType();
                     using (_logger.DebugDuration<ComponentCollection>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
-                        component.Terminate();
-                        component.DisposeIfDisposable();
+                        try
+                        {
+                            component.Terminate();
+                            component.DisposeIfDisposable();
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error<ComponentCollection,string>(ex, "Error while terminating component {ComponentType}.", componentType.FullName);
+                        }
                     }
                 }
             }

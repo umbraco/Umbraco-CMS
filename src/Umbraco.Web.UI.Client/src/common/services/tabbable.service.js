@@ -184,7 +184,13 @@
               });
               if (cached) return cached[1];
 
-              nodeComputedStyle = nodeComputedStyle || this.doc.defaultView.getComputedStyle(node);
+              if (!nodeComputedStyle) {
+                if (node instanceof DocumentFragment) {
+                  return true;// though DocumentFragment doesn't directly have display 'none', we know that it will never be visible, and therefore we return true. (and do not cache this, cause it will change if appended to the DOM)
+                } else {
+                  nodeComputedStyle = this.doc.defaultView.getComputedStyle(node);
+                }
+              }
 
               var result = false;
 

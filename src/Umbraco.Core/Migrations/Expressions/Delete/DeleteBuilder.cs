@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Exceptions;
+﻿using System;
 using Umbraco.Core.Migrations.Expressions.Common;
 using Umbraco.Core.Migrations.Expressions.Delete.Column;
 using Umbraco.Core.Migrations.Expressions.Delete.Constraint;
@@ -39,8 +39,9 @@ namespace Umbraco.Core.Migrations.Expressions.Delete
         /// <inheritdoc />
         public IExecutableBuilder KeysAndIndexes(string tableName, bool local = true, bool foreign = true)
         {
-            if (tableName.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(tableName));
+            if (tableName == null) throw new ArgumentNullException(nameof(tableName));
+            if (string.IsNullOrWhiteSpace(tableName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(tableName));
+
             return new DeleteKeysAndIndexesBuilder(_context) { TableName = tableName, DeleteLocal = local, DeleteForeign = foreign };
         }
 

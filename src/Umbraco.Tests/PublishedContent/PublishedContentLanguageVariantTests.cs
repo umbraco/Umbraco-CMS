@@ -73,14 +73,14 @@ namespace Umbraco.Tests.PublishedContent
                 yield return factory.CreatePropertyType(contentType, "noprop", 1, variations: ContentVariation.Culture);
             }
 
-            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes1);
+            var contentType1 = factory.CreateContentType(Guid.NewGuid(), 1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes1);
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes2(IPublishedContentType contentType)
             {
                 yield return factory.CreatePropertyType(contentType, "prop3", 1, variations: ContentVariation.Culture);
             }
 
-            var contentType2 = factory.CreateContentType(2, "contentType2", Enumerable.Empty<string>(), CreatePropertyTypes2);
+            var contentType2 = factory.CreateContentType(Guid.NewGuid(), 2, "contentType2", Enumerable.Empty<string>(), CreatePropertyTypes2);
 
             var prop1 = new SolidPublishedPropertyWithLanguageVariants
             {
@@ -235,7 +235,13 @@ namespace Umbraco.Tests.PublishedContent
             var value = content.Value("welcomeText", "it", fallback: Fallback.To(Fallback.Language, Fallback.Ancestors));
             Assert.AreEqual("Welcome", value);
         }
-
+        [Test]
+        public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_And_Language_Change()
+        {
+            var content = Current.UmbracoContext.Content.GetAtRoot().First();
+            var value = content.Value("welcomeText", "it", fallback: Fallback.To(Fallback.Language, Fallback.DisplayFallbackLanguage));
+            Assert.AreEqual("<span lang=\"en-US\">Welcome</span>", value);
+        }
         [Test]
         public void Do_Not_GetContent_For_Unpopulated_Requested_Language_With_Fallback_Over_That_Loops()
         {

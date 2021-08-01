@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
     [DataEditor(
         Constants.PropertyEditors.Aliases.Boolean,
         EditorType.PropertyValue | EditorType.MacroParameter,
-        "Checkbox",
+        "Toggle",
         "boolean",
         ValueType = ValueTypes.Integer,
         Group = Constants.PropertyEditors.Groups.Common,

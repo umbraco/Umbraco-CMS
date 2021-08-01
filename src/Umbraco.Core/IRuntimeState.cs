@@ -41,7 +41,7 @@ namespace Umbraco.Core
         ServerRole ServerRole { get; }
 
         /// <summary>
-        /// Gets the Umbraco application url.
+        /// Gets the Umbraco application URL.
         /// </summary>
         /// <remarks>This is eg "http://www.example.com".</remarks>
         Uri ApplicationUrl { get; }

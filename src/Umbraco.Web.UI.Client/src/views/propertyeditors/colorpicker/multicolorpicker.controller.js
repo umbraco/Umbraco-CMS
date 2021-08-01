@@ -1,5 +1,20 @@
 ﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerController",
-    function ($scope, $timeout, assetsService, angularHelper, $element, localizationService, eventsService) {
+    function ($scope, angularHelper, $element, eventsService) {
+
+        var vm = this;
+
+        vm.add = add;
+        vm.remove = remove;
+        vm.edit = edit;
+        vm.cancel = cancel;
+
+        vm.show = show;
+        vm.hide = hide;
+        vm.change = change;
+
+        vm.labelEnabled = false;
+        vm.editItem = null;
+
         //NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
         var defaultColor = "000000";
         var defaultLabel = null;
@@ -9,53 +24,40 @@
         $scope.hasError = false;
         $scope.focusOnNew = false;
 
-        $scope.labels = {};
+        $scope.options = {
+            type: "color",
+            color: defaultColor,
+            allowEmpty: false,
+            showAlpha: false
+        };
 
-        var labelKeys = [
-            "general_cancel",
-            "general_choose"
-        ];
+        function hide(color) {
+            // show the add button
+            $element.find(".btn.add").show();
+        }
 
-        $scope.labelEnabled = false;
-        eventsService.on("toggleValue", function (e, args) {
-            $scope.labelEnabled = args.value;
-        });
-        
-        localizationService.localizeMany(labelKeys).then(function (values) {
-            $scope.labels.cancel = values[0];
-            $scope.labels.choose = values[1];
-        });
+        function show(color) {
+            // hide the add button
+            $element.find(".btn.add").hide();
+        }
 
-        assetsService.load([
-            //"lib/spectrum/tinycolor.js",
-            "lib/spectrum/spectrum.js"
-        ], $scope).then(function () {
-            var elem = $element.find("input[name='newColor']");
-            elem.spectrum({
-                color: null,
-                showInitial: false,
-                chooseText: $scope.labels.choose,
-                cancelText: $scope.labels.cancel,
-                preferredFormat: "hex",
-                showInput: true,
-                clickoutFiresChange: true,
-                hide: function (color) {
-                    //show the add butotn
-                    $element.find(".btn.add").show();
-                },
-                change: function (color) {
-                    angularHelper.safeApply($scope, function () {
-                        $scope.newColor = color.toHexString().trimStart("#"); // #ff0000
-                    });
-                },
-                show: function() {
-                    //hide the add butotn
-                    $element.find(".btn.add").hide();
+        function change(color) {
+            angularHelper.safeApply($scope, function () {
+                if (color) {
+                    $scope.newColor = color.toHexString().trimStart("#");
                 }
             });
+        }
+        var evts = [];
+        evts.push(eventsService.on("toggleValue", function (e, args) {
+            vm.labelEnabled = args.value;
+        }));
+        $scope.$on('$destroy', function () {
+            for (var e in evts) {
+                eventsService.unsubscribe(evts[e]);
+            }
         });
-
-        if (!angular.isArray($scope.model.value)) {
+        if (!Utilities.isArray($scope.model.value)) {
             //make an array from the dictionary
             var items = [];
             for (var i in $scope.model.value) {
@@ -94,7 +96,7 @@
             return label !== null && typeof label !== "undefined" && label !== "" && label.length && label.length > 0;
         }
 
-        $scope.remove = function (item, evt) {
+        function remove(item, evt) {
 
             evt.preventDefault();
 
@@ -102,34 +104,63 @@
                 return x.value === item.value && x.label === item.label;
             });
 
-            angularHelper.getCurrentForm($scope).$setDirty();
-        };
+            setDirty();
+        }
 
-        $scope.add = function (evt) {
+        function add(evt) {
             evt.preventDefault();
 
             if ($scope.newColor) {
                 var newLabel = validLabel($scope.newLabel) ? $scope.newLabel : $scope.newColor;
-                var exists = _.find($scope.model.value, function(item) {
-                    return item.value.toUpperCase() === $scope.newColor.toUpperCase() || item.label.toUpperCase() === newLabel.toUpperCase();
+                var exists = _.find($scope.model.value, function (item) {
+                    return item != vm.editItem && (item.value.toUpperCase() === $scope.newColor.toUpperCase() || item.label.toUpperCase() === newLabel.toUpperCase());
                 });
                 if (!exists) {
-                    $scope.model.value.push({
-                        value: $scope.newColor,
-                        label: newLabel
-                    });
+                    if (vm.editItem == null) {
+                        $scope.model.value.push({
+                            value: $scope.newColor,
+                            label: newLabel
+                        });
+                    } else {
+                        vm.editItem.value = $scope.newColor;
+                        vm.editItem.label = newLabel;
+                        vm.editItem = null;
+                    }
+                    
                     $scope.newLabel = "";
                     $scope.hasError = false;
                     $scope.focusOnNew = true;
-                    angularHelper.getCurrentForm($scope).$setDirty();
+                    setDirty();
                     return;
                 }
 
-                //there was an error, do the highlight (will be set back by the directive)
+                // there was an error, do the highlight (will be set back by the directive)
                 $scope.hasError = true;
             }
+        }
 
-        };
+        function edit(item, evt) {
+            evt.preventDefault();
+
+            vm.editItem = item;
+
+            $scope.newColor = item.value;
+            $scope.newLabel = item.label;
+        }
+
+        function cancel(evt) {
+            evt.preventDefault();
+
+            vm.editItem = null;
+            $scope.newColor = defaultColor;
+            $scope.newLabel = defaultLabel;
+        }
+
+        function setDirty() {
+            if (vm.modelValueForm) {
+                vm.modelValueForm.selectedColor.$setDirty();
+            }
+        }
 
         $scope.sortableOptions = {
             axis: 'y',
@@ -139,10 +170,8 @@
             items: '> div.control-group',
             tolerance: 'pointer',
             update: function (e, ui) {
-                angularHelper.getCurrentForm($scope).$setDirty();
+                setDirty();
             }
         };
 
-        //load the separate css for the editor to avoid it blocking our js loading
-        assetsService.loadCss("lib/spectrum/spectrum.css", $scope);
     });

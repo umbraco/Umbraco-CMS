@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -16,6 +17,7 @@ using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -27,6 +29,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(new string[] { Constants.Trees.MemberTypes, Constants.Trees.Members})]
+    [MemberTypeControllerConfiguration]
     public class MemberTypeController : ContentTypeControllerBase<IMemberType>
     {
         public MemberTypeController(ICultureDictionaryFactory cultureDictionaryFactory, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
@@ -34,23 +37,80 @@ namespace Umbraco.Web.Editors
         {
         }
 
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class MemberTypeControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))));
+            }
+        }
+
         private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
+        /// <summary>
+        /// Gets the member type a given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
         public MemberTypeDisplay GetById(int id)
         {
-            var ct = Services.MemberTypeService.Get(id);
-            if (ct == null)
+            var memberType = Services.MemberTypeService.Get(id);
+            if (memberType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
+            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(memberType);
             return dto;
         }
 
         /// <summary>
-        /// Deletes a document type with a given ID
+        /// Gets the member type a given guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
+        public MemberTypeDisplay GetById(Guid id)
+        {
+            var memberType = Services.MemberTypeService.Get(id);
+            if (memberType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(memberType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the member type a given udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
+        public MemberTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var memberType = Services.MemberTypeService.Get(guidUdi.Guid);
+            if (memberType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(memberType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Deletes a document type with a given id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -171,12 +231,24 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<MemberTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/memberTypeSavedHeader"),
+                            Services.TextService.Localize("speechBubbles", "memberTypeSavedHeader"),
                             string.Empty);
 
             return display;
         }
 
+        /// <summary>
+        /// Copy the member type
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostCopy(MoveOrCopy copy)
+        {
+            return PerformCopy(
+                copy,
+                getContentType: i => Services.MemberTypeService.Get(i),
+                doCopy: (type, i) => Services.MemberTypeService.Copy(type, i));
+        }
 
     }
 }

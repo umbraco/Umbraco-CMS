@@ -77,7 +77,7 @@ namespace Umbraco.Core.Services.Implement
                     var children = _contentService.GetPagedChildren(content.Id, page++, pageSize, out total);
                     SerializeChildren(children, xml, published);
                 }
-                
+
             }
 
             return xml;
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Services.Implement
             var folderNames = string.Empty;
             if (dataType.Level != 1)
             {
-                //get url encoded folder names
+                //get URL encoded folder names
                 var folders = _dataTypeService.GetContainers(dataType)
                     .OrderBy(x => x.Level)
                     .Select(x => HttpUtility.UrlEncode(x.Name));
@@ -360,7 +360,10 @@ namespace Umbraco.Core.Services.Implement
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                                                   new XElement("MandatoryMessage", propertyType.MandatoryMessage),
                                                    new XElement("Validation", propertyType.ValidationRegExp),
+                                                   new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage),
+                                                   new XElement("LabelOnTop", propertyType.LabelOnTop),
                                                    new XElement("Description", new XCData(propertyType.Description)));
                 genericProperties.Add(genericProperty);
             }
@@ -432,6 +435,7 @@ namespace Umbraco.Core.Services.Implement
             var info = new XElement("Info",
                                     new XElement("Name", contentType.Name),
                                     new XElement("Alias", contentType.Alias),
+                                    new XElement("Key", contentType.Key),
                                     new XElement("Icon", contentType.Icon),
                                     new XElement("Thumbnail", contentType.Thumbnail),
                                     new XElement("Description", contentType.Description),
@@ -482,12 +486,16 @@ namespace Umbraco.Core.Services.Implement
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
+                                                   new XElement("Key", propertyType.Key),
                                                    new XElement("Type", propertyType.PropertyEditorAlias),
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
+                                                   new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),
+                                                   propertyType.MandatoryMessage != null ? new XElement("MandatoryMessage", propertyType.MandatoryMessage) : null,
                                                    propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
+                                                   propertyType.ValidationRegExpMessage != null ? new XElement("ValidationRegExpMessage", propertyType.ValidationRegExpMessage) : null,
                                                    propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null,
                                                    new XElement("Variations", propertyType.Variations.ToString()));
 
@@ -514,7 +522,7 @@ namespace Umbraco.Core.Services.Implement
             //don't add folders if this is a child doc type
             if (contentType.Level != 1 && masterContentType == null)
             {
-                //get url encoded folder names
+                //get URL encoded folder names
                 var folders = _contentTypeService.GetContainers(contentType)
                     .OrderBy(x => x.Level)
                     .Select(x => HttpUtility.UrlEncode(x.Name));
@@ -544,6 +552,13 @@ namespace Umbraco.Core.Services.Implement
                 new XAttribute("urlName", urlValue),
                 new XAttribute("path", contentBase.Path),
                 new XAttribute("isDoc", ""));
+
+
+            // Add culture specific node names
+            foreach (var culture in contentBase.AvailableCultures)
+            {
+                xml.Add(new XAttribute("nodeName-" + culture, contentBase.GetCultureName(culture)));
+            }
 
             foreach (var property in contentBase.Properties)
                 xml.Add(SerializeProperty(property, published));

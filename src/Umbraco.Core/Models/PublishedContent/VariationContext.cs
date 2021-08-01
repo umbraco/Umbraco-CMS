@@ -23,5 +23,12 @@
         /// Gets the segment.
         /// </summary>
         public string Segment { get; }
+
+        /// <summary>
+        /// Gets the segment for the content item
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        public virtual string GetSegment(int contentId) => Segment;
     }
 }

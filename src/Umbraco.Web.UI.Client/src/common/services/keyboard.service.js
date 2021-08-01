@@ -213,7 +213,7 @@ function keyboardService($window, $timeout) {
                     }
 
                     if (elt.nodeType === 3) { elt = elt.parentNode; }
-                    if (elt.tagName === 'INPUT' || elt.tagName === 'TEXTAREA') {
+                    if (elt.tagName === 'INPUT' || elt.tagName === 'TEXTAREA' || elt.hasAttribute('disable-hotkeys')) {
                         //This exits the Find loop
                         return true;
                     }
@@ -264,7 +264,7 @@ function keyboardService($window, $timeout) {
 
         var elt;
         // Initialize opt object
-        opt   = angular.extend({}, defaultOpt, opt);
+        opt   = Utilities.extend({}, defaultOpt, opt);
         label = label.toLowerCase();
         elt   = opt.target;
         if(typeof opt.target === 'string'){
@@ -320,4 +320,6 @@ function keyboardService($window, $timeout) {
     //
 
     return keyboardManagerService;
-}angular.module('umbraco.services').factory('keyboardService', ['$window', '$timeout', keyboardService]);
+}
+
+angular.module('umbraco.services').factory('keyboardService', ['$window', '$timeout', keyboardService]);

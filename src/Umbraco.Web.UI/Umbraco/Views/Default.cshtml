@@ -1,10 +1,10 @@
-﻿@using Umbraco.Core
+﻿@using System.Globalization
+@using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
 @using Umbraco.Core.Composing
 @using Umbraco.Core.IO
 @using Umbraco.Web
-@using Umbraco.Core.Configuration
 
 @inherits WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 
@@ -28,7 +28,7 @@
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="@CultureInfo.CurrentCulture.Name">
 <head>
     <base href="@Model.GlobalSettings.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
@@ -49,7 +49,7 @@
         <div style="margin: 10px;">
             <h3><img src="assets/img/application/logo.png" alt="Umbraco logo" style="vertical-align: text-bottom;" /> Umbraco</h3>
             <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
-            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
+            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
         </div>
     </noscript>
 
@@ -66,25 +66,21 @@
                 <section id="contentwrapper">
 
                     <div id="contentcolumn">
-
                         <div class="umb-editor" ng-view></div>
-                        <div class="umb-editor__overlay" ng-if="infiniteMode"></div>
-
-                        <umb-editors></umb-editors>
                     </div>
 
                 </section>
 
             </div>
 
-            <umb-tour
-                ng-if="tour.show"
-                model="tour">
-            </umb-tour>
-
             <umb-notifications></umb-notifications>
 
         </div>
+
+        <umb-tour
+            ng-if="tour.show"
+            model="tour">
+        </umb-tour>
 
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->
         <umb-drawer data-element="drawer" ng-if="drawer.show" model="drawer.model" view="drawer.view"></umb-drawer>
@@ -93,7 +89,7 @@
 
     </div>
 
-    <umb-backdrop ng-if="backdrop.show"
+    <umb-backdrop ng-if="backdrop.show || infiniteMode"
                   backdrop-opacity="backdrop.opacity"
                   highlight-element="backdrop.element"
                   highlight-prevent-click="backdrop.elementPreventClick"
@@ -103,9 +99,13 @@
     <umb-overlay ng-if="overlay.show"
                  model="overlay"
                  position="{{overlay.position}}"
+                 size="overlay.size"
                  view="overlay.view"
+                 name="overlay.name"
                  parent-scope="overlay.parentScope">
     </umb-overlay>
+
+    <umb-editors ng-show="infiniteMode"></umb-editors>
 
     <umb-login
         ng-if="login.show"
@@ -115,12 +115,10 @@
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Current.Configs.Global())
 
     <script>
-
         document.angularReady = function(app) {
-            @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())
+            @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInProviderErrors())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
             @Html.AngularValueTinyMceAssets()
-
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
         }

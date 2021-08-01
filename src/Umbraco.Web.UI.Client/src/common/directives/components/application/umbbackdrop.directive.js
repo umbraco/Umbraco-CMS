@@ -7,8 +7,8 @@
 
             var events = [];
 
-            scope.clickBackdrop = function(event) {
-                if(scope.disableEventsOnClick === true) {
+            scope.clickBackdrop = function (event) {
+                if (scope.disableEventsOnClick === true) {
                     event.preventDefault();
                     event.stopPropagation();
                 }
@@ -22,16 +22,16 @@
 
             }
 
-            function setHighlight () {
+            function setHighlight() {
 
                 scope.loading = true;
 
                 $timeout(function () {
 
                     // The element to highlight
-                    var highlightElement = angular.element(scope.highlightElement);
+                    var highlightElement = $(scope.highlightElement);
 
-                    if(highlightElement && highlightElement.length > 0) {
+                    if (highlightElement && highlightElement.length > 0) {
 
                         var offset = highlightElement.offset();
                         var width = highlightElement.outerWidth();
@@ -48,7 +48,7 @@
                         var rectRight = el.find(".umb-backdrop__rect--right");
                         var rectBottom = el.find(".umb-backdrop__rect--bottom");
                         var rectLeft = el.find(".umb-backdrop__rect--left");
-                        
+
                         // Add the css
                         scope.rectTopCss = { "height": topDistance, "left": leftDistance + "px", opacity: scope.backdropOpacity };
                         scope.rectRightCss = { "left": leftAndWidth + "px", "top": topDistance + "px", "height": height, opacity: scope.backdropOpacity };
@@ -56,14 +56,14 @@
                         scope.rectLeftCss = { "width": leftDistance, opacity: scope.backdropOpacity };
 
                         // Prevent interaction in the highlighted area
-                        if(scope.highlightPreventClick) {
+                        if (scope.highlightPreventClick) {
                             var preventClickElement = el.find(".umb-backdrop__highlight-prevent-click");
                             preventClickElement.css({ "width": width, "height": height, "left": offset.left, "top": offset.top });
                         }
 
                     }
 
-                    scope.loading = false; 
+                    scope.loading = false;
 
                 });
 
@@ -74,8 +74,8 @@
             }
 
             events.push(scope.$watch("highlightElement", function (newValue, oldValue) {
-                if(!newValue) {return;}
-                if(newValue === oldValue) {return;}
+                if (!newValue) { return; }
+                if (newValue === oldValue) { return; }
                 setHighlight();
             }));
 

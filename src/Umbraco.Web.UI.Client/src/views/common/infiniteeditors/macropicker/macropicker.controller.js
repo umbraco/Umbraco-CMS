@@ -1,16 +1,17 @@
 function MacroPickerController($scope, entityResource, macroResource, umbPropEditorHelper, macroService, formHelper, localizationService) {
 
     $scope.macros = [];
+    $scope.a11yInfo = "";
     $scope.model.selectedMacro = null;
     $scope.model.macroParams = [];
-
+    $scope.displayA11YMessageForFilter = displayA11YMessageForFilter;
     $scope.wizardStep = "macroSelect";
     $scope.noMacroParams = false;
-
+    $scope.model.searchTerm = "";
     function onInit() {
-        if(!$scope.model.title) {
-            localizationService.localize("defaultdialogs_selectMacro").then(function(value){
-                $scope.model.title = value;    
+        if (!$scope.model.title) {
+            localizationService.localize("defaultdialogs_selectMacro").then(function (value) {
+                $scope.model.title = value;
             });
         }
     }
@@ -22,12 +23,13 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
         if ($scope.wizardStep === "macroSelect") {
             editParams(true);
         } else {
+            $scope.$broadcast("formSubmitting", { scope: $scope });
             $scope.model.submit($scope.model);
         }
     };
 
-    $scope.close = function() {
-        if($scope.model.close) {
+    $scope.close = function () {
+        if ($scope.model.close) {
             $scope.model.close();
         }
     }
@@ -42,16 +44,17 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
             .then(function (data) {
 
                 //go to next page if there are params otherwise we can just exit
-                if (!angular.isArray(data) || data.length === 0) {
+                if (!Utilities.isArray(data) || data.length === 0) {
 
                     if (insertIfNoParameters) {
                         $scope.model.submit($scope.model);
                     } else {
                         $scope.wizardStep = 'macroSelect';
+                        displayA11yMessages($scope.macros);
                     }
 
                 } else {
-                    
+
                     $scope.wizardStep = "paramSelect";
                     $scope.model.macroParams = data;
 
@@ -70,8 +73,8 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
                                     //detect if it is a json string
                                     if (val.detectIsJson()) {
                                         try {
-                                            //Parse it to json
-                                            prop.value = angular.fromJson(val);
+                                            //Parse it from json
+                                            prop.value = Utilities.fromJson(val);
                                         }
                                         catch (e) {
                                             // not json
@@ -94,6 +97,28 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
             });
     }
 
+    function displayA11yMessages(macros) {
+        if ($scope.noMacroParams || !macros || macros.length === 0)
+            localizationService.localize("general_searchNoResult").then(function (value) {
+                $scope.a11yInfo = value;
+            });
+        else if (macros) {
+            if (macros.length === 1) {
+                localizationService.localize("treeSearch_searchResult").then(function(value) {
+                    $scope.a11yInfo = "1 " + value;
+                });
+            } else {
+                localizationService.localize("treeSearch_searchResults").then(function (value) {
+                    $scope.a11yInfo = macros.length + " " + value;
+                });
+            }
+        }
+    }
+
+    function displayA11YMessageForFilter() {
+        var macros = _.filter($scope.macros, v => v.name.toLowerCase().includes($scope.model.searchTerm.toLowerCase()));
+        displayA11yMessages(macros);
+    }
     //here we check to see if we've been passed a selected macro and if so we'll set the
     //editor to start with parameter editing
     if ($scope.model.dialogData && $scope.model.dialogData.macroData) {
@@ -104,13 +129,13 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
     entityResource.getAll("Macro", ($scope.model.dialogData && $scope.model.dialogData.richTextEditor && $scope.model.dialogData.richTextEditor === true) ? "UseInEditor=true" : null)
         .then(function (data) {
 
-            if (angular.isArray(data) && data.length == 0) {
+            if (Utilities.isArray(data) && data.length == 0) {
                 $scope.nomacros = true;
             }
 
             //if 'allowedMacros' is specified, we need to filter
-            if (angular.isArray($scope.model.dialogData.allowedMacros) && $scope.model.dialogData.allowedMacros.length > 0) {
-                $scope.macros = _.filter(data, function(d) {
+            if (Utilities.isArray($scope.model.dialogData.allowedMacros) && $scope.model.dialogData.allowedMacros.length > 0) {
+                $scope.macros = _.filter(data, function (d) {
                     return _.contains($scope.model.dialogData.allowedMacros, d.alias);
                 });
             }
@@ -140,10 +165,11 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
                 //we don't have a pre-selected macro so ensure the correct step is set
                 $scope.wizardStep = 'macroSelect';
             }
+            displayA11yMessages($scope.macros);
         });
 
     onInit();
-
+    
 }
 
 angular.module("umbraco").controller("Umbraco.Overlays.MacroPickerController", MacroPickerController);

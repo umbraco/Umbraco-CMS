@@ -4,7 +4,7 @@
     /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
     function tabbedContentDirective($timeout) {
 
-        function link($scope, $element, $attrs) {
+        function link($scope, $element) {
             
             var appRootNode = $element[0];
             
@@ -115,21 +115,18 @@
             
         }
 
-        function controller($scope, $element, $attrs) {
-            
+        function controller($scope) {
             
             //expose the property/methods for other directives to use
             this.content = $scope.content;
-            this.activeVariant = _.find(this.content.variants, variant => {
-                return variant.active;
-            });
-
-            $scope.activeVariant = this.activeVariant;
-
-            $scope.defaultVariant = _.find(this.content.variants, variant => {
-                return variant.language.isDefault;
-            });
-
+            
+            if($scope.contentNodeModel) {
+                $scope.defaultVariant = _.find($scope.contentNodeModel.variants, variant => {
+                    // defaultVariant will never have segment. Wether it has a language or not depends on the setup.
+                    return !variant.segment && ((variant.language && variant.language.isDefault) || (!variant.language));
+                });
+            }
+            
             $scope.unlockInvariantValue = function(property) {
                 property.unlockInvariantValue = !property.unlockInvariantValue;
             };
@@ -141,6 +138,24 @@
                     }
                 }
             );
+
+            $scope.propertyEditorDisabled = function (property) {
+                if (property.unlockInvariantValue) {
+                    return false;
+                }
+                
+                var contentLanguage = $scope.content.language;
+
+                var canEditCulture = !contentLanguage ||
+                    // If the property culture equals the content culture it can be edited
+                    property.culture === contentLanguage.culture ||
+                    // A culture-invariant property can only be edited by the default language variant
+                    (property.culture == null && contentLanguage.isDefault);                
+
+                var canEditSegment = property.segment === $scope.content.segment;
+
+                return !canEditCulture || !canEditSegment;
+            }
         }
 
         var directive = {
@@ -150,7 +165,8 @@
             controller: controller,
             link: link,
             scope: {
-                content: "="
+                content: "=", // in this context the content is the variant model.
+                contentNodeModel: "=?" //contentNodeModel is the content model for the node, 
             }
         };
 

@@ -6,7 +6,6 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Mvc
@@ -48,7 +47,8 @@ namespace Umbraco.Web.Mvc
             bool isMvc = true,
             string areaPathPrefix = "")
         {
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
             if (controllerSuffixName == null) throw new ArgumentNullException(nameof(controllerSuffixName));
 
             if (controllerType == null) throw new ArgumentNullException(nameof(controllerType));
@@ -66,11 +66,11 @@ namespace Umbraco.Web.Mvc
             //var meta = PluginController.GetMetadata(controllerType);
             if (isMvc)
             {
-                //create a new route with custom name, specified url, and the namespace of the controller plugin
+                //create a new route with custom name, specified URL, and the namespace of the controller plugin
                 controllerPluginRoute = routes.MapRoute(
                     //name
                     string.Format("umbraco-{0}-{1}", area.AreaName, controllerName),
-                    //url format
+                    //URL format
                     url,
                     //set the namespace of the controller to match
                     new[] {controllerType.Namespace});
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Mvc
                 controllerPluginRoute = routes.MapHttpRoute(
                     //name
                     string.Format("umbraco-{0}-{1}-{2}", "api", area.AreaName, controllerName),
-                    //url format
+                    //URL format
                     url,
                     new {controller = controllerName, id = defaultId});
                 //web api routes don't set the data tokens object

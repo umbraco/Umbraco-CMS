@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
                     yield break;
             }
 
-            var fileNames = selectedFiles?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var fileNames = selectedFiles?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
             if (fileNames == null || !fileNames.Any())
                 yield break;
@@ -40,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     //we only store a single value for this editor so the 'member' or 'field'
                     // we'll associate this error with will simply be called 'value'
-                    yield return new ValidationResult(Current.Services.TextService.Localize("errors/dissallowedMediaType"), new[] { "value" });
+                    yield return new ValidationResult(Current.Services.TextService.Localize("errors", "dissallowedMediaType"), new[] { "value" });
                 }
             }
         }
@@ -48,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
         internal static bool IsValidFileExtension(string fileName)
         {
             if (fileName.IndexOf('.') <= 0) return false;
-            var extension = new FileInfo(fileName).Extension.TrimStart(".");
+            var extension = fileName.GetFileExtension().TrimStart(".");
             return Current.Configs.Settings().Content.IsFileAllowedForUpload(extension);
         }
     }

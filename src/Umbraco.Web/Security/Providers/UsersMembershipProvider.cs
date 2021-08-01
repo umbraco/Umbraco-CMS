@@ -32,7 +32,7 @@ namespace Umbraco.Web.Security.Providers
         }
 
         private readonly IMemberTypeService _memberTypeService;
-        private string _defaultMemberTypeAlias = "writer";
+        private string _defaultMemberTypeAlias = Constants.Security.WriterGroupAlias;
         private volatile bool _hasDefaultMember = false;
         private static readonly object Locker = new object();
 

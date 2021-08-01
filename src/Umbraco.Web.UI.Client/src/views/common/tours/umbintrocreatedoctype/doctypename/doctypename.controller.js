@@ -2,16 +2,16 @@
     "use strict";
 
     function DocTypeNameController($scope) {
-        
+
         var vm = this;
-        var element = angular.element($scope.model.currentStep.element);
+        var element = $($scope.model.currentStep.element);
 
         vm.error = false;
-        
+
         vm.initNextStep = initNextStep;
 
         function initNextStep() {
-            if(element.val().toLowerCase() === 'home page') {
+            if (element.val().toLowerCase() === 'home page') {
                 $scope.model.nextStep();
             } else {
                 vm.error = true;

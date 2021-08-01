@@ -5,7 +5,7 @@
    border-right: 5px solid @brownGrayLight;
    display: flex;
    justify-content: space-between;
-   margin: -10px -5px 10px;
+   margin: -10px -1px 10px;
    position: relative;
    top: 0;
    box-sizing: border-box;
@@ -17,15 +17,16 @@
     }
 }
 .umb-editor-sub-header--white {
-    background-color: white;
-    border-color: white;
+    background-color: @white;
+    border-color: @white;
 }
 
 .umb-editor-sub-header.--state-selection {
     padding-left: 10px;
     padding-right: 10px;
-    background-color: @pinkLight;
-    border-color: @pinkLight;
+    background-color: @ui-selected-border;
+    border-color: @ui-selected-border;
+    color: @white;
     border-radius: 3px;
 }
 
@@ -33,11 +34,12 @@
     transition: box-shadow 240ms;
     position:sticky;
     z-index: 30;
-    
+    width: calc(100% + 2px);
+
     &.umb-sticky-bar--active {
         box-shadow: 0 6px 3px -3px rgba(0,0,0,.16);
     }
-    
+
     .umb-dashboard__content & {
         top:-20px; // umb-dashboard__content has 20px padding - offset here prevents sticky position from firing when page loads
     }
@@ -45,8 +47,8 @@
 
 .umb-sticky-sentinel {
     pointer-events: none;
-    z-index: 5050;    
-    
+    z-index: 5050;
+
     &.-top {
         height:1px;
         transform:translateY(-10px);

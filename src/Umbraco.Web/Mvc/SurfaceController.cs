@@ -59,6 +59,38 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Redirects to the Umbraco page with the given id
         /// </summary>
+        /// <param name="pageId"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid key)
+        {
+            return new RedirectToUmbracoPageResult(key, Current.UmbracoContextAccessor);
+        }
+
+        /// <summary>
+        /// Redirects to the Umbraco page with the given id and passes provided querystring
+        /// </summary>
+        /// <param name="pageId"></param>
+        /// <param name="queryStringValues"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid key, NameValueCollection queryStringValues)
+        {
+            return new RedirectToUmbracoPageResult(key, queryStringValues, Current.UmbracoContextAccessor);
+        }
+
+        /// <summary>
+        /// Redirects to the Umbraco page with the given id and passes provided querystring
+        /// </summary>
+        /// <param name="pageId"></param>
+        /// <param name="queryString"></param>
+        /// <returns></returns>
+        protected RedirectToUmbracoPageResult RedirectToUmbracoPage(Guid key, string queryString)
+        {
+            return new RedirectToUmbracoPageResult(key, queryString, Current.UmbracoContextAccessor);
+        }
+
+        /// <summary>
+        /// Redirects to the Umbraco page with the given id
+        /// </summary>
         /// <param name="publishedContent"></param>
         /// <returns></returns>
         protected RedirectToUmbracoPageResult RedirectToUmbracoPage(IPublishedContent publishedContent)

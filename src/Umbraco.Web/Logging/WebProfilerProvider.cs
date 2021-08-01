@@ -16,7 +16,7 @@ namespace Umbraco.Web.Logging
     /// </remarks>
     internal class WebProfilerProvider : AspNetRequestProvider
     {
-        private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
+        private readonly object _locker = new object();
         private MiniProfiler _startupProfiler;
         private int _first;
         private volatile BootPhase _bootPhase;
@@ -39,8 +39,7 @@ namespace Umbraco.Web.Logging
 
         public void BeginBootRequest()
         {
-            _locker.EnterWriteLock();
-            try
+            lock (_locker)
             {
                 if (_bootPhase != BootPhase.Boot)
                     throw new InvalidOperationException("Invalid boot phase.");
@@ -48,28 +47,19 @@ namespace Umbraco.Web.Logging
 
                 // assign the profiler to be the current MiniProfiler for the request
                 // is's already active, starting and all
-                HttpContext.Current.Items[":mini-profiler:"] = _startupProfiler;
-            }
-            finally
-            {
-                _locker.ExitWriteLock();
+                HttpContext.Current.Items[":mini-profiler:"] = _startupProfiler; 
             }
         }
 
         public void EndBootRequest()
         {
-            _locker.EnterWriteLock();
-            try
+            lock (_locker)
             {
                 if (_bootPhase != BootPhase.BootRequest)
-                throw new InvalidOperationException("Invalid boot phase.");
+                    throw new InvalidOperationException("Invalid boot phase.");
                 _bootPhase = BootPhase.Booted;
 
-                _startupProfiler = null;
-            }
-            finally
-            {
-                _locker.ExitWriteLock();
+                _startupProfiler = null; 
             }
         }
 
@@ -85,7 +75,11 @@ namespace Umbraco.Web.Logging
         public override MiniProfiler Start(string profilerName, MiniProfilerBaseOptions options)
         {
             var first = Interlocked.Exchange(ref _first, 1) == 0;
-            if (first == false) return base.Start(profilerName, options);
+            if (first == false)
+            {
+                var profiler = base.Start(profilerName, options);
+                return profiler;
+            }
 
             _startupProfiler = new MiniProfiler("StartupProfiler", options);
             CurrentProfiler = _startupProfiler;

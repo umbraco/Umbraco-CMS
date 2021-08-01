@@ -1,4 +1,5 @@
 ﻿.umb-property-file-upload {
+    .umb-property-editor--limit-width();
 
     .umb-upload-button-big {
         display: block;
@@ -13,7 +14,13 @@
             color: @gray-8;
         }
 
-        i.icon {
+        &:focus-within {
+            .tabbing-active & {
+                box-shadow: 0 0 2px @ui-outline, inset 0 0 2px 1px @ui-outline;
+            }
+        }
+
+        .icon {
             font-size: 55px;
             line-height: 70px
         }
@@ -23,6 +30,12 @@
             bottom: 0;
             height: 100%;
             width: 100%;
+        }
+    }
+
+    .drag-over {
+        .umb-upload-button-big {
+            border-color: @gray-1;
         }
     }
 }

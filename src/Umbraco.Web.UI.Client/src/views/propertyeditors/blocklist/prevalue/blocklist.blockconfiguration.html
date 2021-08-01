@@ -1,0 +1,30 @@
+<div
+    class="umb-block-list-block-configuration"
+    ng-controller="Umbraco.PropertyEditors.BlockList.BlockConfigurationController as vm"
+    >
+
+    <div
+        class="umb-block-card-grid"
+        ui-sortable="vm.sortableOptions"
+        ng-model="model.value"
+        >
+
+        <umb-block-card
+            block-config-model="block"
+            element-type-model="vm.getElementTypeByKey(block.contentElementTypeKey)"
+            ng-repeat="block in model.value"
+            ng-class="{'--isOpen':vm.openBlock === block}"
+            ng-click="vm.openBlockOverlay(block)">
+            <div class="__actions">
+                <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index); $event.stopPropagation();">
+                    <i class="icon icon-trash" aria-hidden="true"></i>
+                    <localize key="general_delete" class="sr-only">Delete</localize>
+                </button>
+            </div>
+        </umb-block-card>
+
+        <button id="{{model.alias}}" type="button" class="btn-reset __add-button" ng-click="vm.openAddDialog($event)">
+            <localize key="general_add">Add</localize>
+        </button>
+    </div>
+</div>

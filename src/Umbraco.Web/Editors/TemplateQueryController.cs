@@ -21,28 +21,28 @@ namespace Umbraco.Web.Editors
     {
         private IEnumerable<OperatorTerm> Terms => new List<OperatorTerm>
         {
-                new OperatorTerm(Services.TextService.Localize("template/is"), Operator.Equals, new [] {"string"}),
-                new OperatorTerm(Services.TextService.Localize("template/isNot"), Operator.NotEquals, new [] {"string"}),
-                new OperatorTerm(Services.TextService.Localize("template/before"), Operator.LessThan, new [] {"datetime"}),
-                new OperatorTerm(Services.TextService.Localize("template/beforeIncDate"), Operator.LessThanEqualTo, new [] {"datetime"}),
-                new OperatorTerm(Services.TextService.Localize("template/after"), Operator.GreaterThan, new [] {"datetime"}),
-                new OperatorTerm(Services.TextService.Localize("template/afterIncDate"), Operator.GreaterThanEqualTo, new [] {"datetime"}),
-                new OperatorTerm(Services.TextService.Localize("template/equals"), Operator.Equals, new [] {"int"}),
-                new OperatorTerm(Services.TextService.Localize("template/doesNotEqual"), Operator.NotEquals, new [] {"int"}),
-                new OperatorTerm(Services.TextService.Localize("template/contains"), Operator.Contains, new [] {"string"}),
-                new OperatorTerm(Services.TextService.Localize("template/doesNotContain"), Operator.NotContains, new [] {"string"}),
-                new OperatorTerm(Services.TextService.Localize("template/greaterThan"), Operator.GreaterThan, new [] {"int"}),
-                new OperatorTerm(Services.TextService.Localize("template/greaterThanEqual"), Operator.GreaterThanEqualTo, new [] {"int"}),
-                new OperatorTerm(Services.TextService.Localize("template/lessThan"), Operator.LessThan, new [] {"int"}),
-                new OperatorTerm(Services.TextService.Localize("template/lessThanEqual"), Operator.LessThanEqualTo, new [] {"int"})
+                new OperatorTerm(Services.TextService.Localize("template","is"), Operator.Equals, new [] {"string"}),
+                new OperatorTerm(Services.TextService.Localize("template","isNot"), Operator.NotEquals, new [] {"string"}),
+                new OperatorTerm(Services.TextService.Localize("template","before"), Operator.LessThan, new [] {"datetime"}),
+                new OperatorTerm(Services.TextService.Localize("template","beforeIncDate"), Operator.LessThanEqualTo, new [] {"datetime"}),
+                new OperatorTerm(Services.TextService.Localize("template","after"), Operator.GreaterThan, new [] {"datetime"}),
+                new OperatorTerm(Services.TextService.Localize("template","afterIncDate"), Operator.GreaterThanEqualTo, new [] {"datetime"}),
+                new OperatorTerm(Services.TextService.Localize("template","equals"), Operator.Equals, new [] {"int"}),
+                new OperatorTerm(Services.TextService.Localize("template","doesNotEqual"), Operator.NotEquals, new [] {"int"}),
+                new OperatorTerm(Services.TextService.Localize("template","contains"), Operator.Contains, new [] {"string"}),
+                new OperatorTerm(Services.TextService.Localize("template","doesNotContain"), Operator.NotContains, new [] {"string"}),
+                new OperatorTerm(Services.TextService.Localize("template","greaterThan"), Operator.GreaterThan, new [] {"int"}),
+                new OperatorTerm(Services.TextService.Localize("template","greaterThanEqual"), Operator.GreaterThanEqualTo, new [] {"int"}),
+                new OperatorTerm(Services.TextService.Localize("template","lessThan"), Operator.LessThan, new [] {"int"}),
+                new OperatorTerm(Services.TextService.Localize("template","lessThanEqual"), Operator.LessThanEqualTo, new [] {"int"})
             };
 
         private IEnumerable<PropertyModel> Properties => new List<PropertyModel>
             {
-                new PropertyModel { Name = Services.TextService.Localize("template/id"), Alias = "Id", Type = "int" },
-                new PropertyModel { Name = Services.TextService.Localize("template/name"), Alias = "Name", Type = "string" },
-                new PropertyModel { Name = Services.TextService.Localize("template/createdDate"), Alias = "CreateDate", Type = "datetime" },
-                new PropertyModel { Name = Services.TextService.Localize("template/lastUpdatedDate"), Alias = "UpdateDate", Type = "datetime" }
+                new PropertyModel { Name = Services.TextService.Localize("template","id"), Alias = "Id", Type = "int" },
+                new PropertyModel { Name = Services.TextService.Localize("template","name"), Alias = "Name", Type = "string" },
+                new PropertyModel { Name = Services.TextService.Localize("template","createdDate"), Alias = "CreateDate", Type = "datetime" },
+                new PropertyModel { Name = Services.TextService.Localize("template","lastUpdatedDate"), Alias = "UpdateDate", Type = "datetime" }
             };
 
         public QueryResultModel PostTemplateQuery(QueryModel model)
@@ -71,7 +71,11 @@ namespace Umbraco.Web.Editors
                 QueryExpression = queryExpression.ToString(),
                 ResultCount = results.Count,
                 ExecutionTime = timer.ElapsedMilliseconds,
-                SampleResults = results.Take(20).Select(x => new TemplateQueryResult { Icon = "icon-file", Name = x.Name })
+                SampleResults = results.Take(20).Select(x => new TemplateQueryResult
+                {
+                    Icon = "icon-document",
+                    Name = x.Name
+                })
             };
         }
 
@@ -202,10 +206,10 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
             var contentTypes = Services.ContentTypeService.GetAll()
-                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name }) })
+                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = Services.TextService.Localize("template", "contentOfType", tokens: new string[] { x.Name }) })
                 .OrderBy(x => x.Name).ToList();
 
-            contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = Services.TextService.Localize("template/allContent") });
+            contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = Services.TextService.Localize("template", "allContent") });
 
             return contentTypes;
         }

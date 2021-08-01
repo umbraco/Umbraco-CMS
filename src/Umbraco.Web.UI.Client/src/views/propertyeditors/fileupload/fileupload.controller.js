@@ -11,10 +11,13 @@
      *
     */
     function fileUploadController($scope, fileManager) {
-        
+
         $scope.fileChanged = onFileChanged;
         //declare a special method which will be called whenever the value has changed from the server
         $scope.model.onValueChanged = onValueChanged;
+
+
+        $scope.fileExtensionsString = $scope.model.config.fileExtensions ? $scope.model.config.fileExtensions.map(x => "."+x.value).join(",") : "";
 
         /**
          * Called when the file selection value changes
@@ -34,15 +37,16 @@
             fileManager.setFiles({
                 propertyAlias: $scope.model.alias,
                 culture: $scope.model.culture,
+                segment: $scope.model.segment,
                 files: []
             });
         }
-        
+
     };
 
     angular.module("umbraco")
         .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController)
-        .run(function (mediaHelper, umbRequestHelper, assetsService) {
+        .run(function (mediaHelper) {
             if (mediaHelper && mediaHelper.registerFileResolver) {
 
                 //NOTE: The 'entity' can be either a normal media entity or an "entity" returned from the entityResource

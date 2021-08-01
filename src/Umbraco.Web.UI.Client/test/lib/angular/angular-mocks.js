@@ -51,12 +51,12 @@ angular.mock.$Browser = function () {
 
     self.onUrlChange = function (listener) {
         self.pollFns.push(
-          function () {
-              if (self.$$lastUrl != self.$$url) {
-                  self.$$lastUrl = self.$$url;
-                  listener(self.$$url);
-              }
-          }
+            function () {
+                if (self.$$lastUrl != self.$$url) {
+                    self.$$lastUrl = self.$$url;
+                    listener(self.$$url);
+                }
+            }
         );
 
         return listener;
@@ -81,7 +81,7 @@ angular.mock.$Browser = function () {
     self.defer.cancel = function (deferId) {
         var fnIndex;
 
-        angular.forEach(self.deferredFns, function (fn, index) {
+        Utilities.forEach(self.deferredFns, function (fn, index) {
             if (fn.id === deferId) fnIndex = index;
         });
 
@@ -104,7 +104,7 @@ angular.mock.$Browser = function () {
      * @param {number=} number of milliseconds to flush. See {@link #defer.now}
      */
     self.defer.flush = function (delay) {
-        if (angular.isDefined(delay)) {
+        if (Utilities.isDefined(delay)) {
             self.defer.now += delay;
         } else {
             if (self.deferredFns.length) {
@@ -141,7 +141,7 @@ angular.mock.$Browser.prototype = {
       * run all fns in pollFns
       */
     poll: function poll() {
-        angular.forEach(this.pollFns, function (pollFn) {
+        Utilities.forEach(this.pollFns, function (pollFn) {
             pollFn();
         });
     },
@@ -165,15 +165,15 @@ angular.mock.$Browser.prototype = {
             if (value == undefined) {
                 delete this.cookieHash[name];
             } else {
-                if (angular.isString(value) &&       //strings only
+                if (Utilities.isString(value) &&       //strings only
                     value.length <= 4096) {          //strict cookie storage limits
                     this.cookieHash[name] = value;
                 }
             }
         } else {
-            if (!angular.equals(this.cookieHash, this.lastCookieHash)) {
-                this.lastCookieHash = angular.copy(this.cookieHash);
-                this.cookieHash = angular.copy(this.cookieHash);
+            if (!Utilities.equals(this.cookieHash, this.lastCookieHash)) {
+                this.lastCookieHash = Utilities.copy(this.cookieHash);
+                this.cookieHash = Utilities.copy(this.cookieHash);
             }
             return this.cookieHash;
         }
@@ -388,16 +388,16 @@ angular.mock.$LogProvider = function () {
          */
         $log.assertEmpty = function () {
             var errors = [];
-            angular.forEach(['error', 'warn', 'info', 'log'], function (logLevel) {
-                angular.forEach($log[logLevel].logs, function (log) {
-                    angular.forEach(log, function (logItem) {
+            Utilities.forEach(['error', 'warn', 'info', 'log'], function (logLevel) {
+                Utilities.forEach($log[logLevel].logs, function (log) {
+                    Utilities.forEach(log, function (logItem) {
                         errors.push('MOCK $log (' + logLevel + '): ' + String(logItem) + '\n' + (logItem.stack || ''));
                     });
                 });
             });
             if (errors.length) {
                 errors.unshift("Expected $log to be empty! Either a message was logged unexpectedly, or an expected " +
-                  "log message was not checked and removed:");
+                    "log message was not checked and removed:");
                 errors.push('');
                 throw new Error(errors.join('\n---------\n'));
             }
@@ -486,7 +486,7 @@ angular.mock.$LogProvider = function () {
      */
     angular.mock.TzDate = function (offset, timestamp) {
         var self = new Date(0);
-        if (angular.isString(timestamp)) {
+        if (Utilities.isString(timestamp)) {
             var tsStr = timestamp;
 
             self.origDate = jsonStringToDate(timestamp);
@@ -581,12 +581,12 @@ angular.mock.$LogProvider = function () {
         if (self.toISOString) {
             self.toISOString = function () {
                 return padNumber(self.origDate.getUTCFullYear(), 4) + '-' +
-                      padNumber(self.origDate.getUTCMonth() + 1, 2) + '-' +
-                      padNumber(self.origDate.getUTCDate(), 2) + 'T' +
-                      padNumber(self.origDate.getUTCHours(), 2) + ':' +
-                      padNumber(self.origDate.getUTCMinutes(), 2) + ':' +
-                      padNumber(self.origDate.getUTCSeconds(), 2) + '.' +
-                      padNumber(self.origDate.getUTCMilliseconds(), 3) + 'Z'
+                    padNumber(self.origDate.getUTCMonth() + 1, 2) + '-' +
+                    padNumber(self.origDate.getUTCDate(), 2) + 'T' +
+                    padNumber(self.origDate.getUTCHours(), 2) + ':' +
+                    padNumber(self.origDate.getUTCMinutes(), 2) + ':' +
+                    padNumber(self.origDate.getUTCSeconds(), 2) + '.' +
+                    padNumber(self.origDate.getUTCMilliseconds(), 3) + 'Z'
             }
         }
 
@@ -598,7 +598,7 @@ angular.mock.$LogProvider = function () {
             'setYear', 'toDateString', 'toGMTString', 'toJSON', 'toLocaleFormat', 'toLocaleString',
             'toLocaleTimeString', 'toSource', 'toString', 'toTimeString', 'toUTCString', 'valueOf'];
 
-        angular.forEach(unimplementedMethods, function (methodName) {
+        Utilities.forEach(unimplementedMethods, function (methodName) {
             self[methodName] = function () {
                 throw Error("Method '" + methodName + "' is not implemented in the TzDate mock");
             };
@@ -686,20 +686,20 @@ angular.mock.dump = function (object) {
         var out;
 
         if (angular.isElement(object)) {
-            object = angular.element(object);
-            out = angular.element('<div></div>');
-            angular.forEach(object, function (element) {
-                out.append(angular.element(element).clone());
+            object = $(object);
+            out = $('<div></div>');
+            Utilities.forEach(object, function (element) {
+                out.append($(element).clone());
             });
             out = out.html();
-        } else if (angular.isArray(object)) {
+        } else if (Utilities.isArray(object)) {
             out = [];
-            angular.forEach(object, function (o) {
+            Utilities.forEach(object, function (o) {
                 out.push(serialize(o));
             });
             out = '[ ' + out.join(', ') + ' ]';
-        } else if (angular.isObject(object)) {
-            if (angular.isFunction(object.$eval) && angular.isFunction(object.$apply)) {
+        } else if (Utilities.isObject(object)) {
+            if (Utilities.isFunction(object.$eval) && Utilities.isFunction(object.$apply)) {
                 out = serializeScope(object);
             } else if (object instanceof Error) {
                 out = object.stack || ('' + object.name + ': ' + object.message);
@@ -927,7 +927,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         responsesPush = angular.bind(responses, responses.push);
 
     function createResponse(status, data, headers) {
-        if (angular.isFunction(status)) return status;
+        if (Utilities.isFunction(status)) return status;
 
         return function () {
             return angular.isNumber(status)
@@ -943,7 +943,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
             wasExpected = false;
 
         function prettyPrint(data) {
-            return (angular.isString(data) || angular.isFunction(data) || data instanceof RegExp)
+            return (Utilities.isString(data) || Utilities.isFunction(data) || data instanceof RegExp)
                 ? data
                 : angular.toJson(data);
         }
@@ -1004,7 +1004,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         throw wasExpected ?
             Error('No response defined !') :
             Error('Unexpected request: ' + method + ' ' + url + '\n' +
-                  (expectation ? 'Expected ' + expectation : 'No more request expected'));
+                (expectation ? 'Expected ' + expectation : 'No more request expected'));
     }
 
     /**
@@ -1267,7 +1267,7 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
         $rootScope.$digest();
         if (!responses.length) throw Error('No pending request to flush !');
 
-        if (angular.isDefined(count)) {
+        if (Utilities.isDefined(count)) {
             while (count--) {
                 if (!responses.length) throw Error('No more pending request to flush !');
                 responses.shift()();
@@ -1343,13 +1343,13 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
 
 
     function createShortMethods(prefix) {
-        angular.forEach(['GET', 'DELETE', 'JSONP'], function (method) {
+        Utilities.forEach(['GET', 'DELETE', 'JSONP'], function (method) {
             $httpBackend[prefix + method] = function (url, headers) {
                 return $httpBackend[prefix](method, url, undefined, headers)
             }
         });
 
-        angular.forEach(['PUT', 'POST', 'PATCH'], function (method) {
+        Utilities.forEach(['PUT', 'POST', 'PATCH'], function (method) {
             $httpBackend[prefix + method] = function (url, data, headers) {
                 return $httpBackend[prefix](method, url, data, headers)
             }
@@ -1365,27 +1365,27 @@ function MockHttpExpectation(method, url, data, headers) {
     this.match = function (m, u, d, h) {
         if (method != m) return false;
         if (!this.matchUrl(u)) return false;
-        if (angular.isDefined(d) && !this.matchData(d)) return false;
-        if (angular.isDefined(h) && !this.matchHeaders(h)) return false;
+        if (Utilities.isDefined(d) && !this.matchData(d)) return false;
+        if (Utilities.isDefined(h) && !this.matchHeaders(h)) return false;
         return true;
     };
 
     this.matchUrl = function (u) {
         if (!url) return true;
-        if (angular.isFunction(url.test)) return url.test(u);
+        if (Utilities.isFunction(url.test)) return url.test(u);
         return url == u;
     };
 
     this.matchHeaders = function (h) {
-        if (angular.isUndefined(headers)) return true;
-        if (angular.isFunction(headers)) return headers(h);
-        return angular.equals(headers, h);
+        if (Utilities.isUndefined(headers)) return true;
+        if (Utilities.isFunction(headers)) return headers(h);
+        return Utilities.equals(headers, h);
     };
 
     this.matchData = function (d) {
-        if (angular.isUndefined(data)) return true;
-        if (data && angular.isFunction(data.test)) return data.test(d);
-        if (data && !angular.isString(data)) return angular.toJson(data) == d;
+        if (Utilities.isUndefined(data)) return true;
+        if (data && Utilities.isFunction(data.test)) return data.test(d);
+        if (data && !Utilities.isString(data)) return Utilities.toJson(data) == d;
         return data == d;
     };
 
@@ -1425,7 +1425,7 @@ function MockXhr() {
         if (header) return header;
 
         header = undefined;
-        angular.forEach(this.$$respHeaders, function (headerVal, headerName) {
+        Utilities.forEach(this.$$respHeaders, function (headerVal, headerName) {
             if (!header && headerName.toLowerCase() == name) header = headerVal;
         });
         return header;
@@ -1434,7 +1434,7 @@ function MockXhr() {
     this.getAllResponseHeaders = function () {
         var lines = [];
 
-        angular.forEach(this.$$respHeaders, function (value, key) {
+        Utilities.forEach(this.$$respHeaders, function (value, key) {
             lines.push(key + ': ' + value);
         });
         return lines.join('\n');
@@ -1484,7 +1484,7 @@ angular.mock.$TimeoutDecorator = function ($delegate, $browser) {
 
     function formatPendingTasksAsString(tasks) {
         var result = [];
-        angular.forEach(tasks, function (task) {
+        Utilities.forEach(tasks, function (task) {
             result.push('{id: ' + task.id + ', ' + 'time: ' + task.time + '}');
         });
 
@@ -1499,7 +1499,7 @@ angular.mock.$TimeoutDecorator = function ($delegate, $browser) {
  */
 angular.mock.$RootElementProvider = function () {
     this.$get = function () {
-        return angular.element('<div ng-app></div>');
+        return $('<div ng-app></div>');
     }
 };
 
@@ -1572,7 +1572,7 @@ angular.module('ngMockE2E', ['ng']).config(function ($provide) {
  *
  *     // adds a new phone to the phones array
  *     $httpBackend.whenPOST('/phones').respond(function(method, url, data) {
- *       phones.push(angular.fromJSON(data));
+ *       phones.push(JSON.parse(data));
  *     });
  *     $httpBackend.whenGET(/^\/templates\//).passThrough();
  *     //...
@@ -1710,7 +1710,7 @@ angular.mock.clearDataCache = function () {
         if (cache.hasOwnProperty(key)) {
             var handle = cache[key].handle;
 
-            handle && angular.element(handle.elem).unbind();
+            handle && $(handle.elem).unbind();
             delete cache[key];
         }
     }
@@ -1723,7 +1723,7 @@ window.jstestdriver && (function (window) {
      */
     window.dump = function () {
         var args = [];
-        angular.forEach(arguments, function (arg) {
+        Utilities.forEach(arguments, function (arg) {
             args.push(angular.mock.dump(arg));
         });
         jstestdriver.console.log.apply(jstestdriver.console, args);
@@ -1757,13 +1757,13 @@ window.jstestdriver && (function (window) {
         angular.mock.clearDataCache();
 
         // clean up jquery's fragment cache
-        angular.forEach(angular.element.fragments, function (val, key) {
+        Utilities.forEach(angular.element.fragments, function (val, key) {
             delete angular.element.fragments[key];
         });
 
         MockXhr.$$lastInstance = null;
 
-        angular.forEach(angular.callbacks, function (val, key) {
+        Utilities.forEach(angular.callbacks, function (val, key) {
             delete angular.callbacks[key];
         });
         angular.callbacks.counter = 0;
@@ -1798,7 +1798,7 @@ window.jstestdriver && (function (window) {
                 throw Error('Injector already created, can not register a module!');
             } else {
                 var modules = currentSpec.$modules || (currentSpec.$modules = []);
-                angular.forEach(moduleFns, function (module) {
+                Utilities.forEach(moduleFns, function (module) {
                     modules.push(module);
                 });
             }

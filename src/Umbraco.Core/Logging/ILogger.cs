@@ -52,7 +52,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
-
+       
         /// <summary>
         /// Logs a fatal message.
         /// </summary>
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
-
+       
         /// <summary>
         /// Logs an error message.
         /// </summary>
@@ -132,6 +132,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
+       
 
         /// <summary>
         /// Logs an information message.
@@ -147,6 +148,7 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Info(Type reporting, string messageTemplate, params object[] propertyValues);
+       
 
         /// <summary>
         /// Logs a debugging message.
@@ -177,5 +179,6 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A message template.</param>
         /// <param name="propertyValues">Property values.</param>
         void Verbose(Type reporting, string messageTemplate, params object[] propertyValues);
+        
     }
 }

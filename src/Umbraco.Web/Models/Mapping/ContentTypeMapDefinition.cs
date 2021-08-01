@@ -17,6 +17,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentTypeMapDefinition : IMapDefinition
     {
+        private readonly CommonMapper _commonMapper;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IFileService _fileService;
@@ -25,10 +26,11 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILogger _logger;
 
-        public ContentTypeMapDefinition(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
+        public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
             ILogger logger)
         {
+            _commonMapper = commonMapper;
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
@@ -121,6 +123,8 @@ namespace Umbraco.Web.Models.Mapping
             MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
 
             target.AllowCultureVariant = source.VariesByCulture();
+            target.AllowSegmentVariant = source.VariesBySegment();
+            target.ContentApps = _commonMapper.GetContentApps(source);
 
             //sync templates
             target.AllowedTemplates = context.MapEnumerable<ITemplate, EntityBasic>(source.AllowedTemplates);
@@ -145,6 +149,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //default listview
             target.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Media";
+            target.IsSystemMediaType = source.IsSystemMediaType();
 
             if (string.IsNullOrEmpty(source.Name)) return;
 
@@ -215,15 +220,18 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         // Umbraco.Code.MapAll -CreateDate -DeleteDate -UpdateDate
-        // Umbraco.Code.MapAll -SupportsPublishing -Key -PropertyEditorAlias -ValueStorageType
+        // Umbraco.Code.MapAll -SupportsPublishing -Key -PropertyEditorAlias -ValueStorageType -Variations
         private static void Map(PropertyTypeBasic source, PropertyType target, MapperContext context)
         {
             target.Name = source.Label;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Mandatory = source.Validation.Mandatory;
+            target.MandatoryMessage = source.Validation.MandatoryMessage;
             target.ValidationRegExp = source.Validation.Pattern;
-            target.Variations = source.AllowCultureVariant ? ContentVariation.Culture : ContentVariation.Nothing;
+            target.ValidationRegExpMessage = source.Validation.PatternMessage;
+            target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
+            target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
 
             if (source.Id > 0)
                 target.Id = source.Id;
@@ -234,6 +242,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Alias = source.Alias;
             target.Description = source.Description;
             target.SortOrder = source.SortOrder;
+            target.LabelOnTop = source.LabelOnTop;
         }
 
         // no MapAll - take care
@@ -330,11 +339,12 @@ namespace Umbraco.Web.Models.Mapping
             target.Properties = context.MapEnumerable<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>(source.Properties);
         }
 
-        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked
+        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked -DataTypeIcon -DataTypeName
         private static void Map(PropertyTypeBasic source, PropertyTypeDisplay target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
+            target.AllowSegmentVariant = source.AllowSegmentVariant;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;
@@ -344,13 +354,15 @@ namespace Umbraco.Web.Models.Mapping
             target.Label = source.Label;
             target.SortOrder = source.SortOrder;
             target.Validation = source.Validation;
+            target.LabelOnTop = source.LabelOnTop;
         }
 
-        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked
+        // Umbraco.Code.MapAll -Editor -View -Config -ContentTypeId -ContentTypeName -Locked -DataTypeIcon -DataTypeName
         private static void Map(MemberPropertyTypeBasic source, MemberPropertyTypeDisplay target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.AllowCultureVariant = source.AllowCultureVariant;
+            target.AllowSegmentVariant = source.AllowSegmentVariant;
             target.DataTypeId = source.DataTypeId;
             target.DataTypeKey = source.DataTypeKey;
             target.Description = source.Description;
@@ -363,9 +375,10 @@ namespace Umbraco.Web.Models.Mapping
             target.MemberCanViewProperty = source.MemberCanViewProperty;
             target.SortOrder = source.SortOrder;
             target.Validation = source.Validation;
+            target.LabelOnTop = source.LabelOnTop;
         }
 
-        // Umbraco.Code.MapAll -CreatorId -Level -SortOrder
+        // Umbraco.Code.MapAll -CreatorId -Level -SortOrder -Variations
         // Umbraco.Code.MapAll -CreateDate -UpdateDate -DeleteDate
         // Umbraco.Code.MapAll -ContentTypeComposition (done by AfterMapSaveToType)
         private static void MapSaveToTypeBase<TSource, TSourcePropertyType>(TSource source, IContentTypeComposition target, MapperContext context)
@@ -395,9 +408,8 @@ namespace Umbraco.Web.Models.Mapping
 
             if (!(target is IMemberType))
             {
-                target.Variations = ContentVariation.Nothing;
-                if (source.AllowCultureVariant)
-                    target.Variations |= ContentVariation.Culture;
+                target.SetVariesBy(ContentVariation.Culture, source.AllowCultureVariant);
+                target.SetVariesBy(ContentVariation.Segment, source.AllowSegmentVariant);
             }
 
             // handle property groups and property types
@@ -488,7 +500,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Udi = MapContentTypeUdi(source);
             target.UpdateDate = source.UpdateDate;
 
-            target.AllowedContentTypes = source.AllowedContentTypes.Select(x => x.Id.Value);
+            target.AllowedContentTypes = source.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value);
             target.CompositeContentTypes = source.ContentTypeComposition.Select(x => x.Alias);
             target.LockedCompositeContentTypes = MapLockedCompositions(source);
         }
@@ -549,7 +561,7 @@ namespace Umbraco.Web.Models.Mapping
                 return Enumerable.Empty<string>();
 
             var aliases = new List<string>();
-            var ancestorIds = parent.Path.Split(',').Select(int.Parse);
+            var ancestorIds = parent.Path.Split(Constants.CharArrays.Comma).Select(int.Parse);
             // loop through all content types and return ordered aliases of ancestors
             var allContentTypes = _contentTypeService.GetAll().ToArray();
             foreach (var ancestorId in ancestorIds)

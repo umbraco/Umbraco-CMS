@@ -7,6 +7,8 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Web;
 using Newtonsoft.Json;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -59,38 +61,34 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 : Crops.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
-        internal void AppendCropBaseUrl(StringBuilder url, ImageCropperCrop crop, bool defaultCrop, bool preferFocalPoint)
+        internal ImageUrlGenerationOptions GetCropBaseOptions(string url, ImageCropperCrop crop, bool defaultCrop, bool preferFocalPoint)
         {
             if (preferFocalPoint && HasFocalPoint()
                 || crop != null && crop.Coordinates == null && HasFocalPoint()
                 || defaultCrop && HasFocalPoint())
             {
-                url.Append("?center=");
-                url.Append(FocalPoint.Top.ToString(CultureInfo.InvariantCulture));
-                url.Append(",");
-                url.Append(FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
-                url.Append("&mode=crop");
+                return new ImageUrlGenerationOptions(url) { FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(FocalPoint.Top, FocalPoint.Left) };
             }
             else if (crop != null && crop.Coordinates != null && preferFocalPoint == false)
             {
-                url.Append("?crop=");
-                url.Append(crop.Coordinates.X1.ToString(CultureInfo.InvariantCulture)).Append(",");
-                url.Append(crop.Coordinates.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
-                url.Append(crop.Coordinates.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
-                url.Append(crop.Coordinates.Y2.ToString(CultureInfo.InvariantCulture));
-                url.Append("&cropmode=percentage");
+                return new ImageUrlGenerationOptions(url) { Crop = new ImageUrlGenerationOptions.CropCoordinates(crop.Coordinates.X1, crop.Coordinates.Y1, crop.Coordinates.X2, crop.Coordinates.Y2) };
             }
             else
             {
-                url.Append("?anchor=center");
-                url.Append("&mode=crop");
+                return new ImageUrlGenerationOptions(url) { DefaultCrop = true };
             }
         }
 
         /// <summary>
-        /// Gets the value image url for a specified crop.
+        /// Gets the value image URL for a specified crop.
         /// </summary>
-        public string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
+        [Obsolete("Use the overload that takes an IImageUrlGenerator")]
+        public string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null) => GetCropUrl(alias, Current.ImageUrlGenerator, useCropDimensions, useFocalPoint, cacheBusterValue);
+
+        /// <summary>
+        /// Gets the value image URL for a specified crop.
+        /// </summary>
+        public string GetCropUrl(string alias, IImageUrlGenerator imageUrlGenerator, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
         {
             var crop = GetCrop(alias);
 
@@ -98,38 +96,37 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (crop == null && !string.IsNullOrWhiteSpace(alias))
                 return null;
 
-            var url = new StringBuilder();
-
-            AppendCropBaseUrl(url, crop, string.IsNullOrWhiteSpace(alias), useFocalPoint);
+            var options = GetCropBaseOptions(string.Empty, crop, string.IsNullOrWhiteSpace(alias), useFocalPoint);
 
             if (crop != null && useCropDimensions)
             {
-                url.Append("&width=").Append(crop.Width);
-                url.Append("&height=").Append(crop.Height);
+                options.Width = crop.Width;
+                options.Height = crop.Height;
             }
 
-            if (cacheBusterValue != null)
-                url.Append("&rnd=").Append(cacheBusterValue);
+            options.CacheBusterValue = cacheBusterValue;
 
-            return url.ToString();
+            return imageUrlGenerator.GetImageUrl(options);
         }
 
         /// <summary>
-        /// Gets the value image url for a specific width and height.
+        /// Gets the value image URL for a specific width and height.
         /// </summary>
-        public string GetCropUrl(int width, int height, bool useFocalPoint = false, string cacheBusterValue = null)
+        [Obsolete("Use the overload that takes an IImageUrlGenerator")]
+        public string GetCropUrl(int width, int height, bool useFocalPoint = false, string cacheBusterValue = null) => GetCropUrl(width, height, Current.ImageUrlGenerator, useFocalPoint, cacheBusterValue);
+
+        /// <summary>
+        /// Gets the value image URL for a specific width and height.
+        /// </summary>
+        public string GetCropUrl(int width, int height, IImageUrlGenerator imageUrlGenerator, bool useFocalPoint = false, string cacheBusterValue = null)
         {
-            var url = new StringBuilder();
+            var options = GetCropBaseOptions(string.Empty, null, true, useFocalPoint);
 
-            AppendCropBaseUrl(url, null, true, useFocalPoint);
+            options.Width = width;
+            options.Height = height;
+            options.CacheBusterValue = cacheBusterValue;
 
-            url.Append("&width=").Append(width);
-            url.Append("&height=").Append(height);
-
-            if (cacheBusterValue != null)
-                url.Append("&rnd=").Append(cacheBusterValue);
-
-            return url.ToString();
+            return imageUrlGenerator.GetImageUrl(options);
         }
 
         /// <summary>
@@ -143,7 +140,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// Determines whether the value has a specified crop.
         /// </summary>
         public bool HasCrop(string alias)
-            => Crops.Any(x => x.Alias == alias);
+            => Crops != null && Crops.Any(x => x.Alias == alias);
 
         /// <summary>
         /// Determines whether the value has a source image.
@@ -151,47 +148,35 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public bool HasImage()
             => !string.IsNullOrWhiteSpace(Src);
 
-        /// <summary>
-        /// Applies a configuration.
-        /// </summary>
-        /// <remarks>Ensures that all crops defined in the configuration exists in the value.</remarks>
-        internal void ApplyConfiguration(ImageCropperConfiguration configuration)
+        internal ImageCropperValue Merge(ImageCropperValue imageCropperValue)
         {
-            // merge the crop values - the alias + width + height comes from
-            // configuration, but each crop can store its own coordinates
+            var crops = Crops?.ToList() ?? new List<ImageCropperCrop>();
 
-            if (Crops == null) return;
-
-            var configuredCrops = configuration?.Crops;
-            if (configuredCrops == null) return;
-
-            var crops = Crops.ToList();
-
-            foreach (var configuredCrop in configuredCrops)
+            var incomingCrops = imageCropperValue?.Crops;
+            if (incomingCrops != null)
             {
-                var crop = crops.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
-                if (crop != null)
+                foreach (var incomingCrop in incomingCrops)
                 {
-                    // found, apply the height & width
-                    crop.Width = configuredCrop.Width;
-                    crop.Height = configuredCrop.Height;
-                }
-                else
-                {
-                    // not found, add
-                    crops.Add(new ImageCropperCrop
+                    var crop = crops.FirstOrDefault(x => x.Alias == incomingCrop.Alias);
+                    if (crop == null)
                     {
-                        Alias = configuredCrop.Alias,
-                        Width = configuredCrop.Width,
-                        Height = configuredCrop.Height
-                    });
+                        // Add incoming crop
+                        crops.Add(incomingCrop);
+                    }
+                    else if (crop.Coordinates == null)
+                    {
+                        // Use incoming crop coordinates
+                        crop.Coordinates = incomingCrop.Coordinates;
+                    }
                 }
             }
 
-            // assume we don't have to remove the crops in value, that
-            // are not part of configuration anymore?
-
-            Crops = crops;
+            return new ImageCropperValue()
+            {
+                Src = !string.IsNullOrWhiteSpace(Src) ? Src : imageCropperValue?.Src,
+                Crops = crops,
+                FocalPoint = FocalPoint ?? imageCropperValue?.FocalPoint
+            };
         }
 
         #region IEquatable

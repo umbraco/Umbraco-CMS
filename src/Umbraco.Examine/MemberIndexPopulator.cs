@@ -7,7 +7,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Examine
 {
-    public class MemberIndexPopulator : IndexPopulator<UmbracoMemberIndex>
+    public class MemberIndexPopulator : IndexPopulator<IUmbracoMemberIndex>
     {
         private readonly IMemberService _memberService;
         private readonly IValueSetBuilder<IMember> _valueSetBuilder;

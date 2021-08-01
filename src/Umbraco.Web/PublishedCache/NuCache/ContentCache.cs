@@ -13,7 +13,7 @@ using Umbraco.Web.PublishedCache.NuCache.Navigable;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    internal class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
+    internal class ContentCache : PublishedCacheBase, IPublishedContentCache2, INavigableData, IDisposable
     {
         private readonly ContentStore.Snapshot _snapshot;
         private readonly IAppCache _snapshotCache;
@@ -79,7 +79,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
             var startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
-            var parts = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = path.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
 
             IPublishedContent content;
 
@@ -109,8 +109,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 content = FollowRoute(content, parts, 1, culture);
             }
 
-            // if hideTopLevelNodePath is true then for url /foo we looked for /*/foo
-            // but maybe that was the url of a non-default top-level node, so we also
+            // if hideTopLevelNodePath is true then for URL /foo we looked for /*/foo
+            // but maybe that was the URL of a non-default top-level node, so we also
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
@@ -141,7 +141,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             hideTopLevelNode = hideTopLevelNode ?? HideTopLevelNodeFromPath; // default = settings
 
             // walk up from that node until we hit a node with a domain,
-            // or we reach the content root, collecting urls in the way
+            // or we reach the content root, collecting URLs in the way
             var pathParts = new List<string>();
             var n = node;
             var urlSegment = n.UrlSegment(culture);
@@ -355,6 +355,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private static IEnumerable<IPublishedContent> GetByXPath(XPathNodeIterator iterator)
         {
+            iterator = iterator.Clone();
             while (iterator.MoveNext())
             {
                 var xnav = iterator.Current as NavigableNavigator;
@@ -383,15 +384,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Content types
 
-        public override IPublishedContentType GetContentType(int id)
-        {
-            return _snapshot.GetContentType(id);
-        }
+        public override IPublishedContentType GetContentType(int id) => _snapshot.GetContentType(id);
 
-        public override IPublishedContentType GetContentType(string alias)
-        {
-            return _snapshot.GetContentType(alias);
-        }
+        public override IPublishedContentType GetContentType(string alias) => _snapshot.GetContentType(alias);
+
+        public override IPublishedContentType GetContentType(Guid key) => _snapshot.GetContentType(key);
 
         #endregion
 

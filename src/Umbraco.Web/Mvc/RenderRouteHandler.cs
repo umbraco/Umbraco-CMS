@@ -155,10 +155,10 @@ namespace Umbraco.Web.Mvc
             };
         }
 
-       
+
 
         /// <summary>
-        /// Handles a posted form to an Umbraco Url and ensures the correct controller is routed to and that
+        /// Handles a posted form to an Umbraco URL and ensures the correct controller is routed to and that
         /// the right DataTokens are set.
         /// </summary>
         /// <param name="requestContext"></param>
@@ -178,37 +178,28 @@ namespace Umbraco.Web.Mvc
             using (RouteTable.Routes.GetReadLock())
             {
                 Route surfaceRoute;
-                if (postedInfo.Area.IsNullOrWhiteSpace())
+
+                //find the controller in the route table
+                var surfaceRoutes = RouteTable.Routes.OfType<Route>()
+                                        .Where(x => x.Defaults != null &&
+                                                    x.Defaults.ContainsKey("controller") &&
+                                                    x.Defaults["controller"].ToString().InvariantEquals(postedInfo.ControllerName) &&
+                                                    // Only return surface controllers
+                                                    x.DataTokens["umbraco"].ToString().InvariantEquals("surface") &&
+                                                    // Check for area token if the area is supplied
+                                                    (postedInfo.Area.IsNullOrWhiteSpace() ? !x.DataTokens.ContainsKey("area") : x.DataTokens["area"].ToString().InvariantEquals(postedInfo.Area)))
+                                        .ToList();
+
+                // If more than one route is found, find one with a matching action
+                if (surfaceRoutes.Count > 1)
                 {
-                    //find the controller in the route table without an area
-                    var surfaceRoutes = RouteTable.Routes.OfType<Route>()
-                                                  .Where(x => x.Defaults != null &&
-                                                              x.Defaults.ContainsKey("controller") &&
-                                                              x.Defaults["controller"].ToString().InvariantEquals(postedInfo.ControllerName) &&
-                                                              x.DataTokens.ContainsKey("area") == false).ToList();
-
-                    // If more than one route is found, find one with a matching action
-                    if (surfaceRoutes.Count > 1)
-                    {
-                        surfaceRoute = surfaceRoutes.FirstOrDefault(x =>
-                            x.Defaults["action"] != null &&
-                            x.Defaults["action"].ToString().InvariantEquals(postedInfo.ActionName));
-                    }
-                    else
-                    {
-                        surfaceRoute = surfaceRoutes.SingleOrDefault();
-                    }
-
+                    surfaceRoute = surfaceRoutes.FirstOrDefault(x =>
+                        x.Defaults["action"] != null &&
+                        x.Defaults["action"].ToString().InvariantEquals(postedInfo.ActionName));
                 }
                 else
                 {
-                    //find the controller in the route table with the specified area
-                    surfaceRoute = RouteTable.Routes.OfType<Route>()
-                                             .SingleOrDefault(x => x.Defaults != null &&
-                                                                   x.Defaults.ContainsKey("controller") &&
-                                                                   x.Defaults["controller"].ToString().InvariantEquals(postedInfo.ControllerName) &&
-                                                                   x.DataTokens.ContainsKey("area") &&
-                                                                   x.DataTokens["area"].ToString().InvariantEquals(postedInfo.Area));
+                    surfaceRoute = surfaceRoutes.FirstOrDefault();
                 }
 
                 if (surfaceRoute == null)
@@ -262,7 +253,7 @@ namespace Umbraco.Web.Mvc
                 //the template Alias should always be already saved with a safe name.
                 //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
                 // with the action name attribute.
-                var templateName = request.TemplateAlias.Split('.')[0].ToSafeAlias();
+                var templateName = request.TemplateAlias.Split(Umbraco.Core.Constants.CharArrays.Period)[0].ToSafeAlias();
                 def.ActionName = templateName;
             }
 

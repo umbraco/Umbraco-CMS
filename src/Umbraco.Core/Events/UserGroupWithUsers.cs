@@ -3,7 +3,7 @@ using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Events
 {
-    internal class UserGroupWithUsers
+    public class UserGroupWithUsers
     {
         public UserGroupWithUsers(IUserGroup userGroup, IUser[] addedUsers, IUser[] removedUsers)
         {

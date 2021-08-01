@@ -124,15 +124,17 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.RootString)
             {
                 nodes.Add(
-                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), Constants.Icons.MemberType, true,
+                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member", "allMembers"), Constants.Icons.MemberType, true,
                             queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
 
                 if (_isUmbracoProvider)
                 {
-                    nodes.AddRange(Services.MemberTypeService.GetAll()
-                        .Select(memberType =>
-                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, memberType.Icon.IfNullOrWhiteSpace(Constants.Icons.Member), true,
-                                queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
+                    nodes.AddRange(
+                        Services.MemberTypeService.GetAll()
+                            .OrderBy(x => x.Name)
+                            .Select(memberType =>
+                                CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, memberType.Icon.IfNullOrWhiteSpace(Constants.Icons.Member), true,
+                                    queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
                 }
             }
 

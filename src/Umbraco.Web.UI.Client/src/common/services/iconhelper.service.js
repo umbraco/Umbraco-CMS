@@ -3,9 +3,9 @@
 * @name umbraco.services.iconHelper
 * @description A helper service for dealing with icons, mostly dealing with legacy tree icons
 **/
-function iconHelper($q, $timeout) {
+function iconHelper($http, $q, $sce, $timeout) {
 
-    var converter = [
+    const converter = [
         { oldIcon: ".sprNew", newIcon: "add" },
         { oldIcon: ".sprDelete", newIcon: "remove" },
         { oldIcon: ".sprMove", newIcon: "enter" },
@@ -31,7 +31,7 @@ function iconHelper($q, $timeout) {
         { oldIcon: ".sprToPublish", newIcon: "mail-forward" },
         { oldIcon: ".sprTranslate", newIcon: "comments" },
         { oldIcon: ".sprUpdate", newIcon: "save" },
-        
+
         { oldIcon: ".sprTreeSettingDomain", newIcon: "icon-home" },
         { oldIcon: ".sprTreeDoc", newIcon: "icon-document" },
         { oldIcon: ".sprTreeDoc2", newIcon: "icon-diploma-alt" },
@@ -39,21 +39,21 @@ function iconHelper($q, $timeout) {
         { oldIcon: ".sprTreeDoc4", newIcon: "icon-newspaper-alt" },
         { oldIcon: ".sprTreeDoc5", newIcon: "icon-notepad-alt" },
 
-        { oldIcon: ".sprTreeDocPic", newIcon: "icon-picture" },        
+        { oldIcon: ".sprTreeDocPic", newIcon: "icon-picture" },
         { oldIcon: ".sprTreeFolder", newIcon: "icon-folder" },
         { oldIcon: ".sprTreeFolder_o", newIcon: "icon-folder" },
         { oldIcon: ".sprTreeMediaFile", newIcon: "icon-music" },
         { oldIcon: ".sprTreeMediaMovie", newIcon: "icon-movie" },
         { oldIcon: ".sprTreeMediaPhoto", newIcon: "icon-picture" },
-        
+
         { oldIcon: ".sprTreeMember", newIcon: "icon-user" },
         { oldIcon: ".sprTreeMemberGroup", newIcon: "icon-users" },
         { oldIcon: ".sprTreeMemberType", newIcon: "icon-users" },
-        
+
         { oldIcon: ".sprTreeNewsletter", newIcon: "icon-file-text-alt" },
         { oldIcon: ".sprTreePackage", newIcon: "icon-box" },
         { oldIcon: ".sprTreeRepository", newIcon: "icon-server-alt" },
-        
+
         { oldIcon: ".sprTreeSettingDataType", newIcon: "icon-autofill" },
 
         // TODO: Something needs to be done with the old tree icons that are commented out.
@@ -61,7 +61,7 @@ function iconHelper($q, $timeout) {
         { oldIcon: ".sprTreeSettingAgent", newIcon: "" },
         { oldIcon: ".sprTreeSettingCss", newIcon: "" },
         { oldIcon: ".sprTreeSettingCssItem", newIcon: "" },
-        
+
         { oldIcon: ".sprTreeSettingDataTypeChild", newIcon: "" },
         { oldIcon: ".sprTreeSettingDomain", newIcon: "" },
         { oldIcon: ".sprTreeSettingLanguage", newIcon: "" },
@@ -85,14 +85,64 @@ function iconHelper($q, $timeout) {
         { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" }
     ];
 
-    var imageConverter = [
-            {oldImage: "contour.png", newIcon: "icon-umb-contour"}
-            ];
+    let collectedIcons;
 
-    var collectedIcons;
-            
+    let imageConverter = [
+        {oldImage: "contour.png", newIcon: "icon-umb-contour"}
+    ];
+
+    const iconCache = [];
+    const promiseQueue = [];
+    let resourceLoadStatus = "none";
+
+    /**
+     * This is the same approach as use for loading the localized text json 
+     * We don't want multiple requests for the icon collection, so need to track
+     * the current request state, and resolve the queued requests once the icons arrive
+     * Subsequent requests are returned immediately as the icons are cached into 
+     */
+    function init() {       
+        const deferred = $q.defer();
+
+        if (resourceLoadStatus === "loaded") {
+            deferred.resolve(iconCache);
+            return deferred.promise;
+        }
+
+        if (resourceLoadStatus === "loading") {
+            promiseQueue.push(deferred);
+            return deferred.promise;
+        }
+
+        resourceLoadStatus = "loading";
+
+        $http({ method: "GET", url: Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetIcons' })
+            .then(function (response) {
+                resourceLoadStatus = "loaded";
+
+                for (const [key, value] of Object.entries(response.data.Data)) {
+                    iconCache.push({name: key, svgString: $sce.trustAsHtml(value)})
+                }
+
+                deferred.resolve(iconCache);
+
+                //ensure all other queued promises are resolved
+                for (let p in promiseQueue) {
+                    promiseQueue[p].resolve(iconCache);
+                }
+            }, function (err) {
+                deferred.reject("Something broke");
+                //ensure all other queued promises are resolved
+                for (let p in promiseQueue) {
+                    promiseQueue[p].reject("Something broke");
+                }
+            });
+
+        return deferred.promise;    
+    }
+
     return {
-        
+
         /** Used by the create dialogs for content/media types to format the data so that the thumbnails are styled properly */
         formatContentTypeThumbnails: function (contentTypes) {
             for (var i = 0; i < contentTypes.length; i++) {
@@ -154,54 +204,6 @@ function iconHelper($q, $timeout) {
             return false;
         },
 
-        /** Return a list of icons, optionally filter them */
-        /** It fetches them directly from the active stylesheets in the browser */
-        getIcons: function(){
-            var deferred = $q.defer();
-            $timeout(function(){
-                if(collectedIcons){
-                    deferred.resolve(collectedIcons);
-                }else{
-                    collectedIcons = [];
-                    var c = ".icon-";
-
-                    for (var i = document.styleSheets.length - 1; i >= 0; i--) {
-                        var classes = null;
-                        try {
-                            classes = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
-                        } catch (e) {
-                            console.warn("Can't read the css rules of: " + document.styleSheets[i].href, e);
-                            continue;
-                        }
-                        
-                        if (classes !== null) {
-                            for(var x=0;x<classes.length;x++) {
-                                var cur = classes[x];
-                                if(cur.selectorText && cur.selectorText.indexOf(c) === 0) {
-                                    var s = cur.selectorText.substring(1);
-                                    var hasSpace = s.indexOf(" ");
-                                    if(hasSpace>0){
-                                        s = s.substring(0, hasSpace);
-                                    }
-                                    var hasPseudo = s.indexOf(":");
-                                    if(hasPseudo>0){
-                                        s = s.substring(0, hasPseudo);
-                                    }
-
-                                    if(collectedIcons.indexOf(s) < 0){
-                                        collectedIcons.push(s);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    deferred.resolve(collectedIcons);
-                }
-            }, 100);
-            
-            return deferred.promise;
-        },
-
         /** Converts the icon from legacy to a new one if an old one is detected */
         convertFromLegacyIcon: function (icon) {
             if (this.isLegacyIcon(icon)) {
@@ -227,7 +229,82 @@ function iconHelper($q, $timeout) {
                 return this.convertFromLegacyIcon(treeNode.icon);
             }
             return treeNode.icon;
-        }
+        },
+
+        /** Gets a single IconModel */
+        getIcon: function(iconName) {
+            return init().then(icons => icons.find(i => i.name === iconName));
+        },
+
+        /** Gets all the available icons in the backoffice icon folder and returns them as an array of IconModels */
+         getAllIcons: function() {
+            return init().then(icons => icons);
+        },
+
+        /** LEGACY - Return a list of icons from icon fonts, optionally filter them */
+        /** It fetches them directly from the active stylesheets in the browser */
+        getIcons: function(){
+            var deferred = $q.defer();
+            $timeout(function(){
+                if(collectedIcons){
+                    deferred.resolve(collectedIcons);
+                }else{
+                    collectedIcons = [];
+                    var c = ".icon-";
+
+                    for (var i = document.styleSheets.length - 1; i >= 0; i--) {
+                        var classes = null;
+                        try {
+                            classes = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+                        } catch (e) {
+                            console.warn("Can't read the css rules of: " + document.styleSheets[i].href, e);
+                            continue;
+                        }
+
+                        if (classes !== null) {
+                            for(var x=0;x<classes.length;x++) {
+                                var cur = classes[x];
+                                if(cur.selectorText && cur.selectorText.indexOf(c) === 0) {
+                                    var s = cur.selectorText.substring(1);
+                                    var hasSpace = s.indexOf(" ");
+                                    if(hasSpace>0){
+                                        s = s.substring(0, hasSpace);
+                                    }
+                                    var hasPseudo = s.indexOf(":");
+                                    if(hasPseudo>0){
+                                        s = s.substring(0, hasPseudo);
+                                    }
+
+                                    if(collectedIcons.indexOf(s) < 0){
+                                        collectedIcons.push(s);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    deferred.resolve(collectedIcons);
+                }
+            }, 100);
+
+            return deferred.promise;
+        },
+
+        /** Creates a icon object, and caches it in a runtime cache */
+        defineIcon: function(name, svg) {
+            var icon = iconCache.find(x => x.name === name);
+            if(icon === undefined) {
+                icon = {
+                    name: name,
+                    svgString: $sce.trustAsHtml(svg)
+                };
+                iconCache.push(icon);
+            }
+            return icon;
+        },
+
+         /** Returns the cached icon or undefined */
+        _getIconFromCache: iconName => iconCache.find(icon => icon.name === iconName)
+        
     };
 }
 angular.module('umbraco.services').factory('iconHelper', iconHelper);
