@@ -13,9 +13,10 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> on top of a <see cref="ObjectCache"/>.
     /// </summary>
-    public class ObjectCacheAppCache : IAppPolicyCache
+    public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectCacheAppCache"/>.
@@ -109,18 +110,33 @@ namespace Umbraco.Core.Cache
 
             Lazy<object> result;
 
-            using (var lck = new UpgradeableReadLock(_locker))
+            try
             {
+                _locker.EnterUpgradeableReadLock();
+
                 result = MemoryCache.Get(key) as Lazy<object>;
                 if (result == null || FastDictionaryAppCacheBase.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
                     result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
                     var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
 
-                    lck.UpgradeToWriteLock();
-                    //NOTE: This does an add or update
-                    MemoryCache.Set(key, result, policy);
+                    try
+                    {
+                        _locker.EnterWriteLock();
+                        //NOTE: This does an add or update
+                        MemoryCache.Set(key, result, policy);
+                    }
+                    finally
+                    {
+                        if (_locker.IsWriteLockHeld)
+                            _locker.ExitWriteLock();
+                    }
                 }
+            }
+            finally
+            {
+                if (_locker.IsUpgradeableReadLockHeld)
+                    _locker.ExitUpgradeableReadLock();
             }
 
             //return result.Value;
@@ -359,6 +375,24 @@ namespace Umbraco.Core.Cache
                 };
             }
             return policy;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _locker.Dispose();
+                }
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

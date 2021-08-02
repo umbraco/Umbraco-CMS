@@ -5,11 +5,9 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading;
 
 namespace Umbraco.Core.Models
 {
-
     /// <summary>
     /// Represents a collection of <see cref="PropertyGroup"/> objects
     /// </summary>
@@ -18,8 +16,6 @@ namespace Umbraco.Core.Models
     // TODO: Change this to ObservableDictionary so we can reduce the INotifyCollectionChanged implementation details
     public class PropertyGroupCollection : KeyedCollection<string, PropertyGroup>, INotifyCollectionChanged, IDeepCloneable
     {
-        private readonly ReaderWriterLockSlim _addLocker = new ReaderWriterLockSlim();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyGroupCollection" /> class.
         /// </summary>
@@ -42,7 +38,7 @@ namespace Umbraco.Core.Models
         /// <remarks></remarks>
         internal void Reset(IEnumerable<PropertyGroup> groups)
         {
-            // Ccollection events will be raised in each of these calls
+            // Collection events will be raised in each of these calls
             Clear();
 
             // Collection events will be raised in each of these calls
@@ -104,50 +100,40 @@ namespace Umbraco.Core.Models
 
         internal new void Add(PropertyGroup item)
         {
-            try
+            // Ensure alias is set
+            if (string.IsNullOrEmpty(item.Alias))
             {
-                _addLocker.EnterWriteLock();
-
-                // Ensure alias is set
-                if (string.IsNullOrEmpty(item.Alias))
-                {
-                    item.Alias = item.Name.ToSafeAlias(true);
-                }
-
-                // Note this is done to ensure existing groups can be renamed
-                if (item.HasIdentity && item.Id > 0)
-                {
-                    var index = IndexOfKey(item.Id);
-                    if (index != -1)
-                    {
-                        var keyExists = Contains(item.Alias);
-                        if (keyExists)
-                            throw new ArgumentException($"Naming conflict: changing the alias of property group '{item.Name}' would result in duplicates.");
-
-                        // Collection events will be raised in SetItem
-                        SetItem(index, item);
-                        return;
-                    }
-                }
-                else
-                {
-                    var index = IndexOfKey(item.Alias);
-                    if (index != -1)
-                    {
-                        // Collection events will be raised in SetItem
-                        SetItem(index, item);
-                        return;
-                    }
-                }
-
-                // Collection events will be raised in InsertItem
-                base.Add(item);
+                item.Alias = item.Name.ToSafeAlias(true);
             }
-            finally
+
+            // Note this is done to ensure existing groups can be renamed
+            if (item.HasIdentity && item.Id > 0)
             {
-                if (_addLocker.IsWriteLockHeld)
-                    _addLocker.ExitWriteLock();
+                var index = IndexOfKey(item.Id);
+                if (index != -1)
+                {
+                    var keyExists = Contains(item.Alias);
+                    if (keyExists)
+                        throw new ArgumentException($"Naming conflict: changing the alias of property group '{item.Name}' would result in duplicates.");
+
+                    // Collection events will be raised in SetItem
+                    SetItem(index, item);
+                    return;
+                }
             }
+            else
+            {
+                var index = IndexOfKey(item.Alias);
+                if (index != -1)
+                {
+                    // Collection events will be raised in SetItem
+                    SetItem(index, item);
+                    return;
+                }
+            }
+
+            // Collection events will be raised in InsertItem
+            base.Add(item);
         }
 
         private void PropertyGroup_PropertyChanged(object sender, PropertyChangedEventArgs e)

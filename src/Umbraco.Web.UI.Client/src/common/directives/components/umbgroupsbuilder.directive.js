@@ -909,7 +909,7 @@
                 };
 
                 // check if there already is an init property
-                angular.forEach(group.properties, function (property) {
+                Utilities.forEach(group.properties, property => {
                     if (property.propertyState === "init") {
                         addInitPropertyBool = false;
                     }
@@ -925,8 +925,8 @@
             function updateSameDataTypes(newProperty) {
 
                 // find each property
-                angular.forEach(scope.model.groups, function (group) {
-                    angular.forEach(group.properties, function (property) {
+                Utilities.forEach(scope.model.groups, group => {
+                    Utilities.forEach(group.properties, property => {
 
                         if (property.dataTypeId === newProperty.dataTypeId) {
 
