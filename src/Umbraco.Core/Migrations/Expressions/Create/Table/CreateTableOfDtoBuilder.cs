@@ -9,6 +9,8 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Table
     public class CreateTableOfDtoBuilder : IExecutableBuilder
     {
         private readonly IMigrationContext _context;
+
+        // TODO: This doesn't do anything.
         private readonly DatabaseType[] _supportedDatabaseTypes;
 
         public CreateTableOfDtoBuilder(IMigrationContext context, params DatabaseType[] supportedDatabaseTypes)
