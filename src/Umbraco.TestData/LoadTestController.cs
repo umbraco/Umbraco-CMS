@@ -1,21 +1,15 @@
-﻿using System;
-using System.Configuration;
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
-using System.Web;
-using System.Web.Hosting;
-using System.Web.Mvc;
-using System.Web.Routing;
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using System.IO;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Hosting;
 
 // see https://github.com/Shazwazza/UmbracoScripts/tree/master/src/LoadTesting
 
@@ -23,27 +17,17 @@ namespace Umbraco.TestData
 {
     public class LoadTestController : Controller
     {
-        public LoadTestController(
-            ServiceContext serviceContext,
-            IShortStringHelper shortStringHelper,
-            IHostingEnvironment hostingEnvironment)
-        {
-            _serviceContext = serviceContext;
-            _shortStringHelper = shortStringHelper;
-            _hostingEnvironment = hostingEnvironment;
-        }
+        private static readonly Random s_random = new Random();
+        private static readonly object s_locko = new object();
 
-        private static readonly Random _random = new Random();
-        private static readonly object _locko = new object();
+        private static volatile int s_containerId = -1;
 
-        private static volatile int _containerId = -1;
+        private const string ContainerAlias = "LoadTestContainer";
+        private const string ContentAlias = "LoadTestContent";
+        private const int TextboxDefinitionId = -88;
+        private const int MaxCreate = 1000;
 
-        private const string _containerAlias = "LoadTestContainer";
-        private const string _contentAlias = "LoadTestContent";
-        private const int _textboxDefinitionId = -88;
-        private const int _maxCreate = 1000;
-
-        private static readonly string HeadHtml = @"<html>
+        private static readonly string s_headHtml = @"<html>
 <head>
   <title>LoadTest</title>
   <style>
@@ -67,18 +51,18 @@ namespace Umbraco.TestData
         private const string FootHtml = @"</body>
 </html>";
 
-        private static readonly string _containerTemplateText = @"
+        private static readonly string s_containerTemplateText = @"
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = null;
-    var container = Umbraco.ContentAtRoot().OfTypes(""" + _containerAlias + @""").FirstOrDefault();
+    var container = Umbraco.ContentAtRoot().OfTypes(""" + ContainerAlias + @""").FirstOrDefault();
     var contents = container.Children().ToArray();
     var groups = contents.GroupBy(x => x.Value<string>(""origin""));
     var id = contents.Length > 0 ? contents[0].Id : -1;
     var wurl = Request.QueryString[""u""] == ""1"";
     var missing = contents.Length > 0 && contents[contents.Length - 1].Id - contents[0].Id >= contents.Length;
 }
-" + HeadHtml + @"
+" + s_headHtml + @"
 <div class=""block"">
 <span @Html.Raw(missing ? ""style=\""color:red;\"""" : """")>@contents.Length items</span>
 <ul>
@@ -106,19 +90,41 @@ namespace Umbraco.TestData
 }
 </div>
 " + FootHtml;
-        private readonly ServiceContext _serviceContext;
-        private readonly IShortStringHelper _shortStringHelper;
-        private readonly IHostingEnvironment _hostingEnvironment;
 
-        private ActionResult ContentHtml(string s)
+        private readonly IContentTypeService _contentTypeService;
+        private readonly IContentService _contentService;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly IFileService _fileService;
+        private readonly IShortStringHelper _shortStringHelper;
+        private readonly Cms.Core.Hosting.IHostingEnvironment _hostingEnvironment;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
+
+        public LoadTestController(
+            IContentTypeService contentTypeService,
+            IContentService contentService,
+            IDataTypeService dataTypeService,
+            IFileService fileService,
+            IShortStringHelper shortStringHelper,
+            Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
+            IHostApplicationLifetime hostApplicationLifetime)
         {
-            return Content(HeadHtml + s + FootHtml);
+            _contentTypeService = contentTypeService;
+            _contentService = contentService;
+            _dataTypeService = dataTypeService;
+            _fileService = fileService;
+            _shortStringHelper = shortStringHelper;
+            _hostingEnvironment = hostingEnvironment;
+            _hostApplicationLifetime = hostApplicationLifetime;
         }
 
-        public ActionResult Index()
+
+        public IActionResult Index()
         {
-            var res = EnsureInitialize();
-            if (res != null) return res;
+            IActionResult res = EnsureInitialize();
+            if (res != null)
+            {
+                return res;
+            }
 
             var html = @"Welcome. You can:
 <ul>
@@ -135,68 +141,71 @@ namespace Umbraco.TestData
             return ContentHtml(html);
         }
 
-        private ActionResult EnsureInitialize()
+        private IActionResult EnsureInitialize()
         {
-            if (_containerId > 0) return null;
-
-            lock (_locko)
+            if (s_containerId > 0)
             {
-                if (_containerId > 0) return null;
+                return null;
+            }
 
-                var contentTypeService = _serviceContext.ContentTypeService;
-                var contentType = contentTypeService.Get(_contentAlias);
+            lock (s_locko)
+            {
+                if (s_containerId > 0)
+                {
+                    return null;
+                }
+
+                IContentType contentType = _contentTypeService.Get(ContentAlias);
                 if (contentType == null)
+                {
                     return ContentHtml("Not installed, first you must <a href=\"/LoadTest/Install\">install</a>.");
+                }
 
-                var containerType = contentTypeService.Get(_containerAlias);
+                IContentType containerType = _contentTypeService.Get(ContainerAlias);
                 if (containerType == null)
+                {
                     return ContentHtml("Panic! Container type is missing.");
+                }
 
-                var contentService = _serviceContext.ContentService;
-                var container = contentService.GetPagedOfType(containerType.Id, 0, 100, out _, null).FirstOrDefault();
+                IContent container = _contentService.GetPagedOfType(containerType.Id, 0, 100, out _, null).FirstOrDefault();
                 if (container == null)
+                {
                     return ContentHtml("Panic! Container is missing.");
+                }
 
-                _containerId = container.Id;
+                s_containerId = container.Id;
                 return null;
             }
         }
 
-        public ActionResult Install()
+        private IActionResult ContentHtml(string s) => Content(s_headHtml + s + FootHtml);
+
+        public IActionResult Install()
         {
-            var dataTypeService = _serviceContext.DataTypeService;
-
-            //var dataType = dataTypeService.GetAll(Constants.DataTypes.DefaultContentListView);
-
-
-            //if (!dict.ContainsKey("pageSize")) dict["pageSize"] = new PreValue("10");
-            //dict["pageSize"].Value = "200";
-            //dataTypeService.SavePreValues(dataType, dict);
-
-            var contentTypeService = _serviceContext.ContentTypeService;
-
             var contentType = new ContentType(_shortStringHelper, -1)
             {
-                Alias = _contentAlias,
+                Alias = ContentAlias,
                 Name = "LoadTest Content",
                 Description = "Content for LoadTest",
                 Icon = "icon-document"
             };
-            var def = _serviceContext.DataTypeService.GetDataType(_textboxDefinitionId);
+            IDataType def = _dataTypeService.GetDataType(TextboxDefinitionId);
             contentType.AddPropertyType(new PropertyType(_shortStringHelper, def)
             {
                 Name = "Origin",
                 Alias = "origin",
                 Description = "The origin of the content.",
             });
-            contentTypeService.Save(contentType);
+            _contentTypeService.Save(contentType);
 
-            var containerTemplate = ImportTemplate(_serviceContext, _shortStringHelper,
-                 "LoadTestContainer", "LoadTestContainer", _containerTemplateText);
+            Template containerTemplate = ImportTemplate(
+                 "LoadTestContainer",
+                 "LoadTestContainer",
+                 s_containerTemplateText);
 
             var containerType = new ContentType(_shortStringHelper, -1)
             {
-                Alias = _containerAlias,
+                Alias = ContainerAlias,
                 Name = "LoadTest Container",
                 Description = "Container for LoadTest content",
                 Icon = "icon-document",
@@ -209,59 +218,92 @@ namespace Umbraco.TestData
             });
             containerType.AllowedTemplates = containerType.AllowedTemplates.Union(new[] { containerTemplate });
             containerType.SetDefaultTemplate(containerTemplate);
-            contentTypeService.Save(containerType);
+            _contentTypeService.Save(containerType);
 
-            var contentService = _serviceContext.ContentService;
-            var content = contentService.Create("LoadTestContainer", -1, _containerAlias);
-            contentService.SaveAndPublish(content);
+            IContent content = _contentService.Create("LoadTestContainer", -1, ContainerAlias);
+            _contentService.SaveAndPublish(content);
 
             return ContentHtml("Installed.");
         }
 
-        public ActionResult Create(int n = 1, int r = 0, string o = null)
+        private Template ImportTemplate(string name, string alias, string text, ITemplate master = null)
         {
-            var res = EnsureInitialize();
-            if (res != null) return res;
+            var t = new Template(_shortStringHelper, name, alias) { Content = text };
+            if (master != null)
+            {
+                t.SetMasterTemplate(master);
+            }
 
-            if (r < 0) r = 0;
-            if (r > 100) r = 100;
+            _fileService.SaveTemplate(t);
+            return t;
+        }
+
+        public IActionResult Create(int n = 1, int r = 0, string o = null)
+        {
+            IActionResult res = EnsureInitialize();
+            if (res != null)
+            {
+                return res;
+            }
+
+            if (r < 0)
+            {
+                r = 0;
+            }
+
+            if (r > 100)
+            {
+                r = 100;
+            }
+
             var restart = GetRandom(0, 100) > (100 - r);
 
-            var contentService = _serviceContext.ContentService;
+            if (n < 1)
+            {
+                n = 1;
+            }
 
-            if (n < 1) n = 1;
-            if (n > _maxCreate) n = _maxCreate;
+            if (n > MaxCreate)
+            {
+                n = MaxCreate;
+            }
+
             for (int i = 0; i < n; i++)
             {
                 var name = Guid.NewGuid().ToString("N").ToUpper() + "-" + (restart ? "R" : "X") + "-" + o;
-                var content = contentService.Create(name, _containerId, _contentAlias);
+                IContent content = _contentService.Create(name, s_containerId, ContentAlias);
                 content.SetValue("origin", o);
-                contentService.SaveAndPublish(content);
+                _contentService.SaveAndPublish(content);
             }
 
             if (restart)
+            {
                 DoRestart();
+            }
 
             return ContentHtml("Created " + n + " content"
                 + (restart ? ", and restarted" : "")
                 + ".");
         }
 
-        private int GetRandom(int minValue, int maxValue)
+        private static int GetRandom(int minValue, int maxValue)
         {
-            lock (_locko)
+            lock (s_locko)
             {
-                return _random.Next(minValue, maxValue);
+                return s_random.Next(minValue, maxValue);
             }
         }
 
-        public ActionResult Clear()
+        public IActionResult Clear()
         {
-            var res = EnsureInitialize();
-            if (res != null) return res;
+            IActionResult res = EnsureInitialize();
+            if (res != null)
+            {
+                return res;
+            }
 
-            var contentType = _serviceContext.ContentTypeService.Get(_contentAlias);
-            _serviceContext.ContentService.DeleteOfType(contentType.Id);
+            IContentType contentType = _contentTypeService.Get(ContentAlias);
+            _contentService.DeleteOfType(contentType.Id);
 
             return ContentHtml("Cleared.");
         }
@@ -269,12 +311,11 @@ namespace Umbraco.TestData
         private void DoRestart()
         {
             HttpContext.User = null;
-            System.Web.HttpContext.Current.User = null;
             Thread.CurrentPrincipal = null;
-            HttpRuntime.UnloadAppDomain();
+            _hostApplicationLifetime.StopApplication();
         }
 
-        public ActionResult ColdBootRestart()
+        public IActionResult ColdBootRestart()
         {
             Directory.Delete(_hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.TempData,"DistCache")), true);
 
@@ -283,35 +324,38 @@ namespace Umbraco.TestData
             return Content("Cold Boot Restarted.");
         }
 
-        public ActionResult Restart()
+        public IActionResult Restart()
         {
             DoRestart();
 
             return ContentHtml("Restarted.");
         }
 
-        public ActionResult Die()
+        public IActionResult Die()
         {
-            var timer = new System.Threading.Timer(_ =>
-            {
-                throw new Exception("die!");
-            });
-            timer.Change(100, 0);
+            var timer = new Timer(_ => throw new Exception("die!"));
+            _ = timer.Change(100, 0);
 
             return ContentHtml("Dying.");
         }
 
-        public ActionResult Domains()
+        public IActionResult Domains()
         {
-            var currentDomain = AppDomain.CurrentDomain;
+            AppDomain currentDomain = AppDomain.CurrentDomain;
             var currentName = currentDomain.FriendlyName;
             var pos = currentName.IndexOf('-');
-            if (pos > 0) currentName = currentName.Substring(0, pos);
+            if (pos > 0)
+            {
+                currentName = currentName.Substring(0, pos);
+            }
 
-            var text = new System.Text.StringBuilder();
+            var text = new StringBuilder();
             text.Append("<div class=\"block\">Process ID: " + Process.GetCurrentProcess().Id + "</div>");
             text.Append("<div class=\"block\">");
-            text.Append("<div>IIS Site: " + HostingEnvironment.ApplicationHost.GetSiteName() + "</div>");
+
+            // TODO (V9): Commented out as I assume not available?
+            ////text.Append("<div>IIS Site: " + HostingEnvironment.ApplicationHost.GetSiteName() + "</div>");
+
             text.Append("<div>App ID: " + currentName + "</div>");
             //text.Append("<div>AppPool: " + Zbu.WebManagement.AppPoolHelper.GetCurrentApplicationPoolName() + "</div>");
             text.Append("</div>");
@@ -337,57 +381,6 @@ namespace Umbraco.TestData
             text.Append("</ul></div>");
 
             return ContentHtml(text.ToString());
-        }
-
-        public ActionResult Recycle()
-        {
-            return ContentHtml("Not implemented&mdash;please use IIS console.");
-        }
-
-        private static Template ImportTemplate(ServiceContext svces, IShortStringHelper shortStringHelper, string name, string alias, string text, ITemplate master = null)
-        {
-            var t = new Template(shortStringHelper, name, alias) { Content = text };
-            if (master != null)
-                t.SetMasterTemplate(master);
-            svces.FileService.SaveTemplate(t);
-            return t;
-        }
-    }
-
-    public class TestComponent : IComponent
-    {
-        public void Initialize()
-        {
-            if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
-                return;
-
-            RouteTable.Routes.MapRoute(
-               name: "LoadTest",
-               url: "LoadTest/{action}",
-               defaults: new
-               {
-                   controller = "LoadTest",
-                   action = "Index"
-               },
-               namespaces: new[] { "Umbraco.TestData" }
-           );
-        }
-
-        public void Terminate()
-        {
-        }
-    }
-
-    public class TestComposer : ComponentComposer<TestComponent>, IUserComposer
-    {
-        public override void Compose(IUmbracoBuilder builder)
-        {
-            base.Compose(builder);
-
-            if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
-                return;
-
-            builder.Services.AddScoped(typeof(LoadTestController));
         }
     }
 }
