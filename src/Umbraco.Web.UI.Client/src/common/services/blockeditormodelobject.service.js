@@ -487,7 +487,7 @@
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromKey: function (contentTypeKey) {
-                return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey);
+                return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey) || null;
             },
 
             /**
@@ -499,7 +499,7 @@
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromAlias: function (contentTypeAlias) {
-                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias);
+                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias) || null;
             },
 
             /**
@@ -609,10 +609,14 @@
                         blockObject.settingsData = settingsData;
 
                         // make basics from scaffold
-                        blockObject.settings = Utilities.copy(settingsScaffold);
-                        ensureUdiAndKey(blockObject.settings, settingsUdi);
+                        if (settingsScaffold !== null) {// We might not have settingsScaffold
+                            blockObject.settings = Utilities.copy(settingsScaffold);
+                            ensureUdiAndKey(blockObject.settings, settingsUdi);
 
-                        mapToElementModel(blockObject.settings, settingsData);
+                            mapToElementModel(blockObject.settings, settingsData);
+                        } else {
+                            blockObject.settings = null;
+                        }
 
                         // add settings content-app
                         appendSettingsContentApp(blockObject.content, this.__labels.settingsName);
