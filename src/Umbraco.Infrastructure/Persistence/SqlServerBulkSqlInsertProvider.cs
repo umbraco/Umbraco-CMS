@@ -18,14 +18,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {
-            if (!records.Any()) return 0;
+            var recordsA = records.ToArray();
+            if (recordsA.Length == 0) return 0;
 
             var pocoData = database.PocoDataFactory.ForType(typeof(T));
             if (pocoData == null) throw new InvalidOperationException("Could not find PocoData for " + typeof(T));
 
             return database.DatabaseType.IsSqlServer2008OrLater()
-                ? BulkInsertRecordsSqlServer(database, pocoData, records)
-                : BasicBulkSqlInsertProvider.BulkInsertRecordsWithCommands(database, records.ToArray());
+                ? BulkInsertRecordsSqlServer(database, pocoData, recordsA)
+                : BasicBulkSqlInsertProvider.BulkInsertRecordsWithCommands(database, recordsA);
         }
 
         /// <summary>
