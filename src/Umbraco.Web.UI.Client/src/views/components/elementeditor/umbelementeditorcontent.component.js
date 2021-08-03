@@ -26,6 +26,12 @@
         vm.setActiveTab = setActiveTab;
 
         $scope.$watchCollection('vm.model.variants[0].tabs', () => {
+
+            // Add parentAlias property to all groups aka. tabs.
+            vm.model.variants[0].tabs.forEach((group) => {
+                group.parentAlias = contentEditingHelper.getParentAlias(group.alias);
+            });
+
             vm.tabs = $filter("filter")(vm.model.variants[0].tabs, (tab) => {
                 return tab.type === 1;
             });
