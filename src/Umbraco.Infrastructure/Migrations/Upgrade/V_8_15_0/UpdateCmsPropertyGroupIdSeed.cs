@@ -1,8 +1,6 @@
-using NPoco;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_15_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_15_0
 {
     public class UpdateCmsPropertyGroupIdSeed : MigrationBase
     {
@@ -10,7 +8,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_15_0
         {
         }
 
-        public override void Migrate()
+        protected override void Migrate()
         {
             if (DatabaseType.IsSqlCe())
             {
