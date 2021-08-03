@@ -76,10 +76,10 @@ namespace Umbraco.Extensions
                 if (options.Value.NuCacheSerializerType == NuCacheSerializerType.MessagePack &&
                     options.Value.UnPublishedContentCompression)
                 {
-                    return s.GetRequiredService<UnPublishedContentPropertyCacheCompressionOptions>();
+                    return new UnPublishedContentPropertyCacheCompressionOptions();
                 }
 
-                return s.GetRequiredService<NoopPropertyCacheCompressionOptions>();
+                return new NoopPropertyCacheCompressionOptions();
             });
 
             builder.Services.AddSingleton(s => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
