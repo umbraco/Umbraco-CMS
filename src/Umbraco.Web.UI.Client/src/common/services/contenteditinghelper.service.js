@@ -216,7 +216,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 return;
             }
 
-            const hasGenericTab = groups.find(group => group.alias === null);
+            const hasGenericTab = groups.find(group => group.isGenericTab);
             if (hasGenericTab) {
                 return;
             }
@@ -228,6 +228,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             }
 
             const genericTab = {
+                isGenericTab: true,
                 type: 1,
                 label: 'Generic',
                 key: String.CreateGuid(),
