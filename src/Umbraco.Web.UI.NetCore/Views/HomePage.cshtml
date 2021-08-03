@@ -1,0 +1,10 @@
+@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.HomePage>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@{
+    Layout = null;
+}
+<h1>@Model.Name</h1>
+<p>@Model.WelcomeText</p>
+@Model.Value("welcomeText", fallback: Fallback.To(Fallback.Ancestors, Fallback.DefaultValue), defaultValue: new HtmlString("MyDefaultValue"))
+@Model.Value("writerName", fallback: Fallback.To(Fallback.Ancestors, Fallback.DefaultValue), defaultValue: new HtmlString("MyDefault"))
