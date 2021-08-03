@@ -211,7 +211,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             Merge()
                 .To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}")
                 .To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}")
-
+                .To<UpdateCmsPropertyGroupIdSeed>("{5C424554-A32D-4852-8ED1-A13508187901}")
             // to 9.0.0
                 .With()
                 .To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}")

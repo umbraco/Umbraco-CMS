@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         private readonly IMemberTypeService _memberTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IPropertyCacheCompressionOptions _compressionOptions;
-        private readonly ConcurrentDictionary<(int, string), bool> _isCompressedCache = new ConcurrentDictionary<(int, string), bool>();
+        private readonly ConcurrentDictionary<(int, string, bool), bool> _isCompressedCache = new ConcurrentDictionary<(int, string, bool), bool>();
 
         public MsgPackContentNestedDataSerializerFactory(
             IContentTypeService contentTypeService,

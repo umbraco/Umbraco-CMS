@@ -39,7 +39,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
             _options = defaultOptions
                 .WithResolver(resolver)
-                .WithCompression(MessagePackCompression.Lz4BlockArray);            
+                .WithCompression(MessagePackCompression.Lz4BlockArray)
+                .WithSecurity(MessagePackSecurity.UntrustedData);
         }
 
         public string ToJson(byte[] bin)
@@ -48,12 +49,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             return json;
         }
 
-        public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData)
+        public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData, bool published)
         {
             if (byteData != null)
             {
                 var cacheModel = MessagePackSerializer.Deserialize<ContentCacheDataModel>(byteData, _options);
-                Expand(content, cacheModel);
+                Expand(content, cacheModel, published);
                 return cacheModel;
             }
             else if (stringData != null)
@@ -61,7 +62,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
                 // NOTE: We don't really support strings but it's possible if manually used (i.e. tests)
                 var bin = Convert.FromBase64String(stringData);
                 var cacheModel = MessagePackSerializer.Deserialize<ContentCacheDataModel>(bin, _options);
-                Expand(content, cacheModel);
+                Expand(content, cacheModel, published);
                 return cacheModel;
             }
             else
@@ -70,9 +71,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             }
         }
 
-        public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model)
+        public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model, bool published)
         {
-            Compress(content, model);
+            Compress(content, model, published);
             var bytes = MessagePackSerializer.Serialize(model, _options);
             return new ContentCacheDataSerializationResult(null, bytes);
         }
@@ -80,7 +81,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         /// <summary>
         /// Used during serialization to compress properties
         /// </summary>
+        /// <param name="content"></param>
         /// <param name="model"></param>
+        /// <param name="published"></param>
         /// <remarks>
         /// This will essentially 'double compress' property data. The MsgPack data as a whole will already be compressed
         /// but this will go a step further and double compress property data so that it is stored in the nucache file
@@ -88,11 +91,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         /// read/decompressed as a string to be displayed on the front-end. This allows for potentially a significant
         /// memory savings but could also affect performance of first rendering pages while decompression occurs.
         /// </remarks>
-        private void Compress(IReadOnlyContentBase content, ContentCacheDataModel model)
+        private void Compress(IReadOnlyContentBase content, ContentCacheDataModel model, bool published)
         {
             foreach(var propertyAliasToData in model.PropertyData)
             {
-                if (_propertyOptions.IsCompressed(content, propertyAliasToData.Key))
+                if (_propertyOptions.IsCompressed(content, propertyAliasToData.Key, published))
                 {
                     foreach(var property in propertyAliasToData.Value.Where(x => x.Value != null && x.Value is string))
                     {
@@ -105,12 +108,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         /// <summary>
         /// Used during deserialization to map the property data as lazy or expand the value
         /// </summary>
+        /// <param name="content"></param>
         /// <param name="nestedData"></param>
-        private void Expand(IReadOnlyContentBase content, ContentCacheDataModel nestedData)
+        /// <param name="published"></param>
+        private void Expand(IReadOnlyContentBase content, ContentCacheDataModel nestedData, bool published)
         {
             foreach (var propertyAliasToData in nestedData.PropertyData)
             {
-                if (_propertyOptions.IsCompressed(content, propertyAliasToData.Key))
+                if (_propertyOptions.IsCompressed(content, propertyAliasToData.Key,published))
                 {
                     foreach (var property in propertyAliasToData.Value.Where(x => x.Value != null))
                     {

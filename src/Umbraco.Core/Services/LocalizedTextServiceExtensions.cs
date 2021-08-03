@@ -35,17 +35,6 @@ namespace Umbraco.Extensions
                     => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, ConvertToDictionaryVars(tokens));
 
         /// <summary>
-        /// Localize using the current thread culture
-        /// </summary>
-        /// <param name="manager"></param>
-        /// <param name="area"></param>
-        /// <param name="alias"></param>
-        /// <param name="tokens"></param>
-        /// <returns></returns>
-        public static string Localize(this ILocalizedTextService manager, string area, string alias, IDictionary<string, string> tokens = null)
-            => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, tokens);
-
-        /// <summary>
         /// Localize a key without any variables
         /// </summary>
         /// <param name="manager"></param>

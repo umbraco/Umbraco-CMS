@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
     internal class PropertyTypeGroupDto
     {
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 12)]
+        [PrimaryKeyColumn(IdentitySeed = 56)]
         public int Id { get; set; }
 
         [Column("contenttypeNodeId")]

@@ -217,8 +217,10 @@ namespace Umbraco.Extensions
             }
 
             var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            return CreateHtmlString(url, htmlEncode);
         }
+
+        private static IHtmlContent CreateHtmlString(string url, bool htmlEncode) => htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
 
         public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true)
         {
@@ -228,7 +230,7 @@ namespace Umbraco.Extensions
             }
 
             var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            return CreateHtmlString(url, htmlEncode);
         }
 
         public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper,
@@ -256,7 +258,7 @@ namespace Umbraco.Extensions
             var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
                 upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            return CreateHtmlString(url, htmlEncode);
         }
 
         public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper,
@@ -281,7 +283,7 @@ namespace Umbraco.Extensions
             var url = imageUrl.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
                 upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            return CreateHtmlString(url, htmlEncode);
         }
 
         /// <summary>
