@@ -135,11 +135,11 @@
                 var found = false;
                 scope.listViewAnimation = "out";
 
-                angular.forEach(miniListViewsHistory, function(historyItem, index){
+                Utilities.forEach(miniListViewsHistory, (historyItem, index) => {
                     // We need to make sure we can compare the two id's. 
                     // Some id's are integers and others are strings.
                     // Members have string ids like "all-members".
-                    if(historyItem.node.id.toString() === ancestor.id.toString()) {
+                    if (historyItem.node.id.toString() === ancestor.id.toString()) {
                         // load the list view from history
                         scope.miniListViews = [];
                         scope.miniListViews.push(historyItem);
@@ -149,7 +149,7 @@
                     }
                 });
 
-                if(!found) {
+                if (!found) {
                     // if we can't find the view in the history - close the list view
                     scope.exitMiniListView();
                 }
@@ -161,7 +161,7 @@
 
             scope.showBackButton = function() {
                 // don't show the back button if the start node is a list view
-                if(scope.node.metaData && scope.node.metaData.IsContainer || scope.node.isContainer) {
+                if (scope.node.metaData && scope.node.metaData.IsContainer || scope.node.isContainer) {
                     return false;
                 } else {
                     return true;
@@ -178,7 +178,7 @@
 
             function makeBreadcrumb() {
                 scope.breadcrumb = [];
-                angular.forEach(miniListViewsHistory, function(historyItem){
+                Utilities.forEach(miniListViewsHistory, historyItem => {
                     scope.breadcrumb.push(historyItem.node);
                 });
             }

@@ -89,7 +89,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             ISyncBootStateAccessor syncBootStateAccessor,
-            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory, 
+            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory,
             ContentDataSerializer contentDataSerializer = null)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
@@ -177,7 +177,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists, _contentDataSerializer);
             _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists, _contentDataSerializer);
 
-            _logger.Info<PublishedSnapshotService,bool,bool>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
+            _logger.Info<PublishedSnapshotService, bool, bool>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             if (!okMedia)
                                 _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
                         }
-                
+
                         if (!okContent)
                             LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
 
@@ -1168,7 +1168,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (Volatile.Read(ref _isReady) == false)
             {
                 throw new InvalidOperationException("The published snapshot service has not properly initialized.");
-            }   
+            }
 
             var preview = previewToken.IsNullOrWhiteSpace() == false;
             return new PublishedSnapshot(this, preview);
@@ -1491,7 +1491,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
             };
 
-            var serialized = serializer.Serialize(ReadOnlyContentBaseAdapter.Create(content), contentCacheData);
+            var serialized = serializer.Serialize(ReadOnlyContentBaseAdapter.Create(content), contentCacheData, published);
 
             var dto = new ContentNuDto
             {

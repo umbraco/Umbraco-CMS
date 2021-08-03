@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
+using System.ComponentModel;
 
 namespace Umbraco.Web.Routing
 {
      /// <summary>
     /// Provides utilities to handle site domains.
      /// </summary>
-    public class SiteDomainHelper : ISiteDomainHelper
+    public class SiteDomainHelper : ISiteDomainHelper, IDisposable
     {
         #region Configure
 
@@ -18,6 +19,7 @@ namespace Umbraco.Web.Routing
         private static Dictionary<string, string[]> _sites;
         private static Dictionary<string, List<string>> _bindings;
         private static Dictionary<string, Dictionary<string, string[]>> _qualifiedSites;
+        private bool _disposedValue;
 
         // these are for unit tests *only*
         // ReSharper disable ConvertToAutoPropertyWithPrivateSetter
@@ -30,16 +32,10 @@ namespace Umbraco.Web.Routing
         private const string DomainValidationSource = @"^(((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/)?))$";
         private static readonly Regex DomainValidation = new Regex(DomainValidationSource, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        /// <summary>
-        /// Returns a disposable object that represents safe write access to config.
-        /// </summary>
-        /// <remarks>Should be used in a <c>using(SiteDomainHelper.ConfigWriteLock) { ... }</c>  mode.</remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected static IDisposable ConfigWriteLock => new WriteLock(ConfigLock);
 
-        /// <summary>
-        /// Returns a disposable object that represents safe read access to config.
-        /// </summary>
-        /// <remarks>Should be used in a <c>using(SiteDomainHelper.ConfigWriteLock) { ... }</c>  mode.</remarks>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected static IDisposable ConfigReadLock => new ReadLock(ConfigLock);
 
         /// <summary>
@@ -313,6 +309,28 @@ namespace Umbraco.Web.Routing
             return ret;
         }
 
+
         #endregion
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    // This is pretty nasty disposing a static on an instance but it's because this whole class
+                    // is pretty fubar. I'm sure we've fixed this all up in netcore now? We need to remove all statics.
+                    ConfigLock.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+        }
     }
 }

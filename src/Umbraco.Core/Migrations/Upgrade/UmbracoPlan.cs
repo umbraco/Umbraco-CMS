@@ -207,6 +207,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             // to 8.15.0...
             To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}");
             To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}");
+            To<UpdateCmsPropertyGroupIdSeed>("{5C424554-A32D-4852-8ED1-A13508187901}");
 
             // to 8.16.0
             To<AddDomainSortOrder>("{ace18303-f74a-40d2-83c4-4ab24b33cbfb}");
