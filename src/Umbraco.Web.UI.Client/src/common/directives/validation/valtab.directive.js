@@ -20,7 +20,7 @@ function valTab($timeout) {
                 return;
             }
 
-            var tabAlias = tab.alias || tab.key;
+            var tabAlias = tab.alias || '';
 
             let closestEditor = element.closest(".blockelement-inlineblock-editor");
             closestEditor = closestEditor.length === 0 ? element.closest(".umb-editor-sub-view") : closestEditor;
