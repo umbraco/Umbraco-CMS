@@ -197,9 +197,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         },
 
         getParentAlias: function (alias) {
-            const lastIndex = alias.lastIndexOf('/');
+            if(alias) {
+                const lastIndex = alias.lastIndexOf('/');
 
-            return (lastIndex === -1) ? null : alias.substring(0, lastIndex);
+                return (lastIndex === -1) ? null : alias.substring(0, lastIndex);
+            }
+            return null;
         },
 
         updateParentAlias: function (alias, parentAlias) {
