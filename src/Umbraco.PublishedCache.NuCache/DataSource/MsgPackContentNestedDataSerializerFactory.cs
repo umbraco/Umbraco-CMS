@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
