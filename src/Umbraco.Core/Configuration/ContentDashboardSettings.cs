@@ -1,10 +1,10 @@
 ﻿
-namespace Umbraco.Core.Dashboards
+namespace Umbraco.Cms.Core.Configuration
 {
     public class ContentDashboardSettings
     {
         private const string DefaultContentDashboardPath = "cms";
-        
+
         /// <summary>
         /// Gets a value indicating whether the content dashboard should be available to all users.
         /// </summary>
