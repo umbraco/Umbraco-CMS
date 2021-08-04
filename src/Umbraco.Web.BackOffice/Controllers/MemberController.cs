@@ -368,7 +368,45 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (created.Succeeded == false)
             {
-                return ValidationProblem(created.Errors.ToErrorMessage());
+                MemberDisplay forDisplay = _umbracoMapper.Map<MemberDisplay>(contentItem.PersistedContent);
+                foreach (IdentityError error in created.Errors)
+                {
+                    switch (error.Code)
+                    {
+                        case nameof(IdentityErrorDescriber.InvalidUserName):
+                            ModelState.AddPropertyError(
+                                new ValidationResult(error.Description, new[] { "value" }),
+                                string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                            break;
+                        case nameof(IdentityErrorDescriber.PasswordMismatch):
+                        case nameof(IdentityErrorDescriber.PasswordRequiresDigit):
+                        case nameof(IdentityErrorDescriber.PasswordRequiresLower):
+                        case nameof(IdentityErrorDescriber.PasswordRequiresNonAlphanumeric):
+                        case nameof(IdentityErrorDescriber.PasswordRequiresUniqueChars):
+                        case nameof(IdentityErrorDescriber.PasswordRequiresUpper):
+                        case nameof(IdentityErrorDescriber.PasswordTooShort):
+                            ModelState.AddPropertyError(
+                                new ValidationResult(error.Description, new[] { "value" }),
+                                string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                            break;
+                        case nameof(IdentityErrorDescriber.InvalidEmail):
+                            ModelState.AddPropertyError(
+                                new ValidationResult(error.Description, new[] { "value" }),
+                                string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                            break;
+                        case nameof(IdentityErrorDescriber.DuplicateUserName):
+                            ModelState.AddPropertyError(
+                                new ValidationResult(error.Description, new[] { "value" }),
+                                string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                            break;
+                        case nameof(IdentityErrorDescriber.DuplicateEmail):
+                            ModelState.AddPropertyError(
+                                new ValidationResult(error.Description, new[] { "value" }),
+                                string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                            break;
+                    }
+                }
+                return ValidationProblem(forDisplay, ModelState);
             }
 
             // now re-look up the member, which will now exist
