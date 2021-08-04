@@ -148,7 +148,7 @@
                     tolerance : 'pointer',
                     over: (evt, ui) => {
 
-                        const hoveredTabAlias = evt.target.dataset.tabAlias || null;;
+                        const hoveredTabAlias = evt.target.dataset.tabAlias || null;
 
                         // if group
                         if (ui.draggable[0].dataset.groupKey) {
