@@ -161,6 +161,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<ITagQuery, TagQuery>();
 
             builder.Services.AddUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
+            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>();
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
