@@ -88,29 +88,28 @@ namespace Umbraco.Web.Models.ContentEditing
                 yield return validationResult;
             }
 
-            var duplicateGroupAliasses = Groups.GroupBy(x => x.Alias).Where(x => x.Count() > 1).ToArray();
-            if (duplicateGroupAliasses.Any())
+            var lastDuplicateGroupAlias = Groups.GroupBy(x => x.Alias).Where(x => x.Count() > 1).LastOrDefault();
+            if (lastDuplicateGroupAlias != null)
             {
-                //we need to return the field name with an index so it's wired up correctly
-                var lastIndex = Groups.IndexOf(duplicateGroupAliasses.Last().Last());
+                // We need to return the field name with an index so it's wired up correctly
+                var lastIndex = Groups.IndexOf(lastDuplicateGroupAlias.Last());
                 yield return new ValidationResult("Duplicate aliases are not allowed", new[]
                 {
-                    // TODO We don't display the alias yet, so add the validation message to the name
+                    // TODO: We don't display the alias yet, so add the validation message to the name
                     string.Format("Groups[{0}].Name", lastIndex)
                 });
             }
             else
             {
-                var duplicateGroupNames = Groups.GroupBy(x => (x.GetParentAlias(), x.Name)).Where(x => x.Count() > 1).ToArray();
-                if (duplicateGroupNames.Any())
+                var lastDuplicateGroupName = Groups.GroupBy(x => (x.GetParentAlias(), x.Name)).Where(x => x.Count() > 1).LastOrDefault();
+                if (lastDuplicateGroupName != null)
                 {
-                    //we need to return the field name with an index so it's wired up correctly
-                    var lastIndex = Groups.IndexOf(duplicateGroupNames.Last().Last());
+                    // We need to return the field name with an index so it's wired up correctly
+                    var lastIndex = Groups.IndexOf(lastDuplicateGroupName.Last());
                     yield return new ValidationResult("Duplicate names are not allowed", new[]
                     {
-                    // TODO We don't display the alias yet, so add the validation message to the name
-                    string.Format("Groups[{0}].Name", lastIndex)
-                });
+                        string.Format("Groups[{0}].Name", lastIndex)
+                    });
                 }
             }
 
