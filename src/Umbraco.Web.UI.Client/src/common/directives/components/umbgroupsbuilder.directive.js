@@ -565,8 +565,6 @@
                     newAlias = createUniqueAlias(newAlias);
                 }
 
-                console.log("alias", newAlias);
-
                 group.alias = newAlias;
                 group.parentAlias = contentEditingHelper.getParentAlias(newAlias);
                 updateDescendingAliases(oldAlias, newAlias);
