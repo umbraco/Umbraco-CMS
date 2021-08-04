@@ -149,8 +149,6 @@
                     tolerance : 'pointer',
                     over: (evt, ui) => {
 
-                        evt.target.classList.add("--droppableHover")
-
                         const hoveredTabAlias = evt.target.dataset.tabAlias || null;
 
                         // if group
@@ -177,9 +175,6 @@
                                 scope.openTabAlias = scope.sortableRequestedTabAlias;
                             }, 1200)
                         }
-                    },
-                    out: (evt, ui) => {
-                        evt.target.classList.remove("--droppableHover");
                     }
                 };
             }
