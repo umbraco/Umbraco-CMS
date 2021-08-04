@@ -123,7 +123,7 @@ stages:
                   displayName: dotnet test
                   inputs:
                       command: test
-                      projects: '**\Umbraco.Tests.Integration*'
+                      projects: '**\Umbraco.Tests.Integration*.csproj'
     - stage: Acceptance_Tests
       displayName: Acceptance Tests
       dependsOn: []
