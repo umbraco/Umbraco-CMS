@@ -546,16 +546,26 @@
                 return scope.model.groups.find(group => group.alias === alias) ? false : true;
             }
 
+            function createUniqueAlias(alias) {
+                let i = 1;
+                while(isAliasUnique(alias + i.toString()) === false) {
+                    i++;
+                }
+                return alias + i.toString();
+            }
+
             /** Universal method for updating group alias (for tabs, field-sets etc.) */
             function updateGroupAlias(group) {
                 const localAlias = contentEditingHelper.generateLocalAlias(group.name),
-                    oldAlias = group.alias,
-                    newAlias = contentEditingHelper.updateLocalAlias(oldAlias, localAlias);
+                    oldAlias = group.alias;
+                let newAlias = contentEditingHelper.updateLocalAlias(oldAlias, localAlias);
 
                 // Ensure unique alias, otherwise we would be transforming groups of other parents, we do not want this.
                 if(isAliasUnique(newAlias) === false) {
-                    return false;
+                    newAlias = createUniqueAlias(newAlias);
                 }
+
+                console.log("alias", newAlias);
 
                 group.alias = newAlias;
                 group.parentAlias = contentEditingHelper.getParentAlias(newAlias);
