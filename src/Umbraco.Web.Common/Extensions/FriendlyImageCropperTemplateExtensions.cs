@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -337,10 +338,14 @@ namespace Umbraco.Extensions
             );
 
 
+        [Obsolete("Use GetCrop to merge local and media crops, get automatic cache buster value and have more parameters.")]
         public static string GetLocalCropUrl(
             this MediaWithCrops mediaWithCrops,
             string alias,
             string cacheBusterValue = null)
-            => mediaWithCrops.GetLocalCropUrl(alias, cacheBusterValue);
+        {
+            return mediaWithCrops.LocalCrops.Src +
+                   mediaWithCrops.LocalCrops.GetCropUrl(alias, ImageUrlGenerator, cacheBusterValue: cacheBusterValue);
+        }
     }
 }
