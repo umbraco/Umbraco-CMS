@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         public BlockListPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
-            Lazy<PropertyEditorCollection> propertyEditors,
+            PropertyEditorCollection propertyEditors,
             IIOHelper ioHelper)
             : base(dataValueEditorFactory, propertyEditors)
         {

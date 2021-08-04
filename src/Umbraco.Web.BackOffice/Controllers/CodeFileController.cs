@@ -213,7 +213,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                     break;
                 case Constants.Trees.Scripts:
-                    var script = _fileService.GetScriptByName(virtualPath);
+                    var script = _fileService.GetScript(virtualPath);
                     if (script != null)
                     {
                         var display = _umbracoMapper.Map<IScript, CodeFileDisplay>(script);
@@ -224,7 +224,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                     break;
                 case Constants.Trees.Stylesheets:
-                    var stylesheet = _fileService.GetStylesheetByName(virtualPath);
+                    var stylesheet = _fileService.GetStylesheet(virtualPath);
                     if (stylesheet != null)
                     {
                         var display = _umbracoMapper.Map<IStylesheet, CodeFileDisplay>(stylesheet);
@@ -371,7 +371,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         _fileService.DeleteScriptFolder(virtualPath);
                         return Ok();
                     }
-                    if (_fileService.GetScriptByName(virtualPath) != null)
+                    if (_fileService.GetScript(virtualPath) != null)
                     {
                         _fileService.DeleteScript(virtualPath, currentUser.Id);
                         return Ok();
@@ -383,7 +383,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         _fileService.DeleteStyleSheetFolder(virtualPath);
                         return Ok();
                     }
-                    if (_fileService.GetStylesheetByName(virtualPath) != null)
+                    if (_fileService.GetStylesheet(virtualPath) != null)
                     {
                         _fileService.DeleteStylesheet(virtualPath, currentUser.Id);
                         return Ok();
@@ -540,7 +540,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private IScript CreateOrUpdateScript(CodeFileDisplay display)
         {
             return CreateOrUpdateFile(display, ".js", _fileSystems.ScriptsFileSystem,
-                name => _fileService.GetScriptByName(name),
+                name => _fileService.GetScript(name),
                 (script, userId) => _fileService.SaveScript(script, userId),
                 name => new Script(name));
         }
@@ -548,7 +548,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private IStylesheet CreateOrUpdateStylesheet(CodeFileDisplay display)
         {
             return CreateOrUpdateFile(display, ".css", _fileSystems.StylesheetsFileSystem,
-                name => _fileService.GetStylesheetByName(name),
+                name => _fileService.GetStylesheet(name),
                 (stylesheet, userId) => _fileService.SaveStylesheet(stylesheet, userId),
                 name => new Stylesheet(name)
             );

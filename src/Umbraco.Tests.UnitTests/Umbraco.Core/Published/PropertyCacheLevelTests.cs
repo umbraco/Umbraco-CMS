@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
         {
             var converter = new CacheConverter1(cacheLevel);
 
-            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
             {
                 converter,
             });
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
         {
             var converter = new CacheConverter1(converterCacheLevel);
 
-            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
             {
                 converter,
             });
@@ -199,7 +199,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
         {
             var converter = new CacheConverter1(PropertyCacheLevel.Unknown);
 
-            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
             {
                 converter,
             });

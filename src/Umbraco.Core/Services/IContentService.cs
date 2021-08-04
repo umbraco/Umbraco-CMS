@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -236,13 +236,13 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves documents.
         /// </summary>
         // TODO: why only 1 result not 1 per content?!
-        OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        OperationResult Save(IEnumerable<IContent> contents, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Deletes a document.
@@ -325,12 +325,12 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        OperationResult Sort(IEnumerable<int> ids, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        OperationResult Sort(IEnumerable<int> ids, int userId = Constants.Security.SuperUserId);
 
         #endregion
 
@@ -349,8 +349,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="content">The document to publish.</param>
         /// <param name="culture">The culture to publish.</param>
         /// <param name="userId">The identifier of the user performing the action.</param>
-        /// <param name="raiseEvents">A value indicating whether to raise events.</param>
-        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves and publishes a document.
@@ -363,8 +362,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="content">The document to publish.</param>
         /// <param name="cultures">The cultures to publish.</param>
         /// <param name="userId">The identifier of the user performing the action.</param>
-        /// <param name="raiseEvents">A value indicating whether to raise events.</param>
-        PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
         /// Saves and publishes a document branch.

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Services
         where TItem: class, IContentBase
     {
         TItem GetById(Guid key);
-        Attempt<OperationResult> Save(IEnumerable<TItem> contents, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
+        Attempt<OperationResult> Save(IEnumerable<TItem> contents, int userId = Constants.Security.SuperUserId);
     }
 
     /// <summary>

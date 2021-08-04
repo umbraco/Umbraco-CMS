@@ -59,4 +59,8 @@
     <ItemGroup>
       <EmbeddedResource Include="EmbeddedResources\**\*" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ContentEditing" />
+    </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Core.Models.Mapping
@@ -8,9 +8,14 @@ namespace Umbraco.Cms.Core.Models.Mapping
         public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IStylesheet, EntityBasic>((source, context) => new EntityBasic(), Map);
-            mapper.Define<IPartialView, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);
-            mapper.Define<IScript, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);
             mapper.Define<IStylesheet, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);
+
+            mapper.Define<IPartialView, EntityBasic>((source, context) => new EntityBasic(), Map);
+            mapper.Define<IPartialView, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);
+
+            mapper.Define<IScript, EntityBasic>((source, context) => new EntityBasic(), Map);
+            mapper.Define<IScript, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);
+
             mapper.Define<CodeFileDisplay, IPartialView>(Map);
             mapper.Define<CodeFileDisplay, IScript>(Map);
 
@@ -18,6 +23,28 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
         // Umbraco.Code.MapAll -Trashed -Udi -Icon
         private static void Map(IStylesheet source, EntityBasic target, MapperContext context)
+        {
+            target.Alias = source.Alias;
+            target.Id = source.Id;
+            target.Key = source.Key;
+            target.Name = source.Name;
+            target.ParentId = -1;
+            target.Path = source.Path;
+        }
+
+        // Umbraco.Code.MapAll -Trashed -Udi -Icon
+        private static void Map(IScript source, EntityBasic target, MapperContext context)
+        {
+            target.Alias = source.Alias;
+            target.Id = source.Id;
+            target.Key = source.Key;
+            target.Name = source.Name;
+            target.ParentId = -1;
+            target.Path = source.Path;
+        }
+
+        // Umbraco.Code.MapAll -Trashed -Udi -Icon
+        private static void Map(IPartialView source, EntityBasic target, MapperContext context)
         {
             target.Alias = source.Alias;
             target.Id = source.Id;

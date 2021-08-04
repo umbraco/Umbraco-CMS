@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
 
             PropertyEditorCollection editors = null;
             var editor = new NestedContentPropertyEditor(Mock.Of<IDataValueEditorFactory>(),Mock.Of<IIOHelper>());
-            editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
+            editors = new PropertyEditorCollection(new DataEditorCollection(() => new DataEditor[] { editor }));
 
             var serializer = new ConfigurationEditorJsonSerializer();
 
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
                 .Setup(x => x.PublishedSnapshot)
                 .Returns(publishedSnapshot.Object);
 
-            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
             {
                 new NestedContentSingleValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),
                 new NestedContentManyValueConverter(publishedSnapshotAccessor.Object, publishedModelFactory.Object, proflog),

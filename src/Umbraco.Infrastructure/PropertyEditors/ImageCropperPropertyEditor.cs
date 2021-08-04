@@ -68,9 +68,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
         }
 
-        public bool TryGetMediaPath(string alias, object value, out string mediaPath)
+        public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
         {
-            if (alias == Alias)
+            if (propertyEditorAlias == Alias)
             {
                 mediaPath = GetFileSrcFromPropertyValue(value, out _, false);
                 return true;

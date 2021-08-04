@@ -1,7 +1,9 @@
 using System;
-using System.Xml.Linq;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Extensions;
 
@@ -12,54 +14,35 @@ namespace Umbraco.Cms.Infrastructure.Packaging
     /// </summary>
     public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
     {
-        private XDocument _xdoc;
+        protected AutomaticPackageMigrationPlan(string packageName)
+            : this(packageName, packageName)
+        { }
 
-        protected AutomaticPackageMigrationPlan(string name)
-            : base(name)
-        {
-        }
-
-        protected AutomaticPackageMigrationPlan(string packageName, string planName) : base(packageName, planName)
-        {
-        }
+        protected AutomaticPackageMigrationPlan(string packageName, string planName)
+            : base(packageName, planName)
+        { }
 
         protected sealed override void DefinePlan()
         {
             // calculate the final state based on the hash value of the embedded resource
-            var finalId = PackageDataManifest.ToString(SaveOptions.DisableFormatting).ToGuid();
+            Type planType = GetType();
+            var hash = PackageMigrationResource.GetEmbeddedPackageDataManifestHash(planType);
+
+            var finalId = hash.ToGuid();
             To<MigrateToPackageData>(finalId);
-        }
-
-        /// <summary>
-        /// Get the extracted package data xml manifest
-        /// </summary>
-        private XDocument PackageDataManifest
-        {
-            get
-            {
-                if (_xdoc != null)
-                {
-                    return _xdoc;
-                }
-
-                Type planType = GetType();
-                _xdoc = PackageMigrationResource.GetEmbeddedPackageDataManifest(planType);
-                return _xdoc;
-            }
         }
 
         private class MigrateToPackageData : PackageMigrationBase
         {
-            public MigrateToPackageData(IPackagingService packagingService, IMigrationContext context)
-                : base(packagingService, context)
+            public MigrateToPackageData(IPackagingService packagingService, IMediaService mediaService, MediaFileManager mediaFileManager, MediaUrlGeneratorCollection mediaUrlGenerators, IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMigrationContext context) : base(packagingService, mediaService, mediaFileManager, mediaUrlGenerators, shortStringHelper, contentTypeBaseServiceProvider, context)
             {
             }
 
             protected override void Migrate()
             {
                 var plan = (AutomaticPackageMigrationPlan)Context.Plan;
-                XDocument xml = plan.PackageDataManifest;
-                ImportPackage.FromXmlDataManifest(xml).Do();
+
+                ImportPackage.FromEmbeddedResource(plan.GetType()).Do();
             }
         }
     }

@@ -1,10 +1,7 @@
-﻿## Umbraco Test Data
+## Umbraco Test Data
 
 This project is a utility to be able to generate large amounts of content and media in an
 Umbraco installation for testing.
-
-Currently this project is referenced in the Umbraco.Web.UI project but only when it's being built
-in Debug mode (i.e. when testing within Visual Studio).
 
 ## Usage
 
@@ -12,8 +9,16 @@ You must use SQL Server for this, using SQLCE will die if you try to bulk create
 
 It has to be enabled by an appSetting:
 
-```xml
-<add key="Umbraco.TestData.Enabled" value="true"/>
+```json
+{
+  "Umbraco": {
+    "CMS": {
+      "TestData": {
+        "Enabled" : true,
+      }
+    }
+  }
+}
 ```
 
 Once this is enabled this endpoint can be executed:

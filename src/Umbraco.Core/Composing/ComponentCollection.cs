@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Composing
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<ComponentCollection> _logger;
 
-        public ComponentCollection(IEnumerable<IComponent> items, IProfilingLogger profilingLogger, ILogger<ComponentCollection> logger)
+        public ComponentCollection(Func<IEnumerable<IComponent>> items, IProfilingLogger profilingLogger, ILogger<ComponentCollection> logger)
             : base(items)
         {
             _profilingLogger = profilingLogger;

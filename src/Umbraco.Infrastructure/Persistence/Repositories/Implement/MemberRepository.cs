@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             IRelationRepository relationRepository,
             IRelationTypeRepository relationTypeRepository,
             IPasswordHasher passwordHasher,
-            Lazy<PropertyEditorCollection> propertyEditors,
+            PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
             IJsonSerializer serializer,

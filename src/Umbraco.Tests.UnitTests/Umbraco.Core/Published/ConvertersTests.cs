@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
         [Test]
         public void SimpleConverter1Test()
         {
-            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
             {
                 new SimpleConverter1(),
             });
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
             IPublishedSnapshotAccessor publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
 
-            var converters = new PropertyValueConverterCollection(new IPropertyValueConverter[]
+            var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
             {
                 new SimpleConverter2(publishedSnapshotAccessor),
             });

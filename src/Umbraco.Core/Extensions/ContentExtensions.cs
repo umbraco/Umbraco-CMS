@@ -9,6 +9,8 @@ using System.Xml.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -17,6 +19,41 @@ namespace Umbraco.Extensions
 {
     public static class ContentExtensions
     {
+        /// <summary>
+        /// Returns the path to a media item stored in a property if the property editor is <see cref="IMediaUrlGenerator"/>
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="mediaUrlGenerators"></param>
+        /// <param name="mediaFilePath"></param>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <returns>True if the file path can be resolved and the property is <see cref="IMediaUrlGenerator"/></returns>
+        public static bool TryGetMediaPath(
+            this IContentBase content,
+            string propertyTypeAlias,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
+            out string mediaFilePath,
+            string culture = null,
+            string segment = null)
+        {
+            if (!content.Properties.TryGetValue(propertyTypeAlias, out IProperty property))
+            {
+                mediaFilePath = null;
+                return false;
+            }
+
+            if (!mediaUrlGenerators.TryGetMediaPath(
+                property.PropertyType.PropertyEditorAlias,
+                property.GetValue(culture, segment),
+                out mediaFilePath))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static bool IsAnyUserPropertyDirty(this IContentBase entity)
         {
             return entity.Properties.Any(x => x.IsDirty());
@@ -204,35 +241,56 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Sets the posted file value of a property.
         /// </summary>
-        public static void SetValue(this IContentBase content, MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IJsonSerializer serializer, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
+        public static void SetValue(
+            this IContentBase content,
+            MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
+            IShortStringHelper shortStringHelper,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            string propertyTypeAlias,
+            string filename,
+            Stream filestream,
+            string culture = null,
+            string segment = null)
         {
-            if (filename == null || filestream == null) return;
+            if (filename == null || filestream == null)
+                return;
 
             filename = shortStringHelper.CleanStringForSafeFileName(filename);
-            if (string.IsNullOrWhiteSpace(filename)) return;
+            if (string.IsNullOrWhiteSpace(filename))
+                return;
             filename = filename.ToLower();
 
-            SetUploadFile(content, mediaFileManager, contentTypeBaseServiceProvider, serializer, propertyTypeAlias, filename, filestream, culture, segment);
+            SetUploadFile(content, mediaFileManager, mediaUrlGenerators, contentTypeBaseServiceProvider, propertyTypeAlias, filename, filestream, culture, segment);
         }
 
-        private static void SetUploadFile(this IContentBase content, MediaFileManager mediaFileManager, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IJsonSerializer serializer, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
+        private static void SetUploadFile(
+            this IContentBase content,
+            MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            string propertyTypeAlias,
+            string filename,
+            Stream filestream,
+            string culture = null,
+            string segment = null)
         {
             var property = GetProperty(content, contentTypeBaseServiceProvider, propertyTypeAlias);
 
             // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
             // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
             string oldpath = null;
-            if (property.GetValue(culture, segment) is string svalue)
+
+            if (content.TryGetMediaPath(property.Alias, mediaUrlGenerators, out string mediaFilePath, culture, segment))
             {
-                if (svalue.DetectIsJson())
-                {
-                    // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
-                    svalue = serializer.DeserializeSubset<string>(svalue, "src");
-                }
-                oldpath = mediaFileManager.FileSystem.GetRelativePath(svalue);
+                oldpath = mediaFileManager.FileSystem.GetRelativePath(mediaFilePath);
             }
 
             var filepath = mediaFileManager.StoreFile(content, property.PropertyType, filename, filestream, oldpath);
+
+            // NOTE: Here we are just setting the value to a string which means that any file based editor
+            // will need to handle the raw string value and save it to it's correct (i.e. JSON)
+            // format. I'm unsure how this works today with image cropper but it does (maybe events?)
             property.SetValue(mediaFileManager.FileSystem.GetUrl(filepath), culture, segment);
         }
 
@@ -240,7 +298,8 @@ namespace Umbraco.Extensions
         private static IProperty GetProperty(IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias)
         {
             var property = content.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            if (property != null) return property;
+            if (property != null)
+                return property;
 
             var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
             var propertyType = contentType.CompositionPropertyTypes
@@ -274,7 +333,8 @@ namespace Umbraco.Extensions
             var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
             var propertyType = contentType
                 .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
-            if (propertyType == null) throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
+            if (propertyType == null)
+                throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
             return mediaFileManager.StoreFile(content, propertyType, filename, filestream, filepath);
         }
 

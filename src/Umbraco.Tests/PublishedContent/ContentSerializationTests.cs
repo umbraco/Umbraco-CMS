@@ -56,14 +56,14 @@ namespace Umbraco.Tests.PublishedContent
 
             var content = Mock.Of<IReadOnlyContentBase>(x => x.ContentTypeId == 1);
 
-            var json = jsonSerializer.Serialize(content, cacheModel).StringData;
-            var msgPack = msgPackSerializer.Serialize(content, cacheModel).ByteData;
+            var json = jsonSerializer.Serialize(content, cacheModel, false).StringData;
+            var msgPack = msgPackSerializer.Serialize(content, cacheModel, false).ByteData;
 
             Console.WriteLine(json);
             Console.WriteLine(msgPackSerializer.ToJson(msgPack));
 
-            var jsonContent = jsonSerializer.Deserialize(content, json, null);
-            var msgPackContent = msgPackSerializer.Deserialize(content, null, msgPack);
+            var jsonContent = jsonSerializer.Deserialize(content, json, null, false);
+            var msgPackContent = msgPackSerializer.Deserialize(content, null, msgPack, false);
 
 
             CollectionAssert.AreEqual(jsonContent.CultureData.Keys, msgPackContent.CultureData.Keys);

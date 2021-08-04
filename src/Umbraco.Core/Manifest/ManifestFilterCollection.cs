@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Manifest
@@ -8,12 +9,9 @@ namespace Umbraco.Cms.Core.Manifest
     /// </summary>
     public class ManifestFilterCollection : BuilderCollectionBase<IManifestFilter>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ManifestFilterCollection"/> class.
-        /// </summary>
-        public ManifestFilterCollection(IEnumerable<IManifestFilter> items)
-            : base(items)
-        { }
+        public ManifestFilterCollection(Func<IEnumerable<IManifestFilter>> items) : base(items)
+        {
+        }
 
         /// <summary>
         /// Filters package manifests.

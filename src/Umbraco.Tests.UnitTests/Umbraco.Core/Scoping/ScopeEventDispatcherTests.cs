@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -79,8 +80,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 Options.Create(new GlobalSettings()),
                 Mock.Of<IHostingEnvironment>());
 
-            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
-                instance.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());
+            var mediaFileManager = new MediaFileManager(
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IMediaPathScheme>(),
+                instance.CreateLogger<MediaFileManager>(),
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IServiceProvider>(),
+                Options.Create(new ContentSettings()));
 
             return new ScopeProvider(
                 Mock.Of<IUmbracoDatabaseFactory>(),

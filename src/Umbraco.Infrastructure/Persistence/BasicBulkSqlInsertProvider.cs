@@ -13,10 +13,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {
-            var recordsA = records.ToArray();
-            if (recordsA.Length == 0) return 0;
+            if (!records.Any()) return 0;
 
-            return BulkInsertRecordsWithCommands(database, recordsA);
+            return BulkInsertRecordsWithCommands(database, records.ToArray());
         }
 
         /// <summary>

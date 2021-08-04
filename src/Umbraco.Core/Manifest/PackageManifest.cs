@@ -6,6 +6,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Manifest
 {
+
     /// <summary>
     /// Represents the content of a package manifest.
     /// </summary>
@@ -47,6 +48,8 @@ namespace Umbraco.Cms.Core.Manifest
         /// </remarks>
         [IgnoreDataMember]
         public string Source { get; set; }
+        [DataMember(Name = "bundleOptions")]
+        public BundleOptions BundleOptions { get; set; }
 
         /// <summary>
         /// Gets or sets the scripts listed in the manifest.

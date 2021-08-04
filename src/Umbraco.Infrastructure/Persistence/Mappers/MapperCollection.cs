@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     public class MapperCollection : BuilderCollectionBase<BaseMapper>, IMapperCollection
     {
-        public MapperCollection(IEnumerable<BaseMapper> items)
+        public MapperCollection(Func<IEnumerable<BaseMapper>> items)
             : base(items)
         {
 
