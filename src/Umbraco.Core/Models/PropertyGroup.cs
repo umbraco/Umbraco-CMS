@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.Entities;
 
@@ -16,6 +14,7 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
+        internal PropertyGroupCollection Collection;
         private PropertyGroupType _type;
         private string _name;
         private string _alias;
@@ -72,7 +71,13 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get => _alias;
-            set => SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
+            set
+            {
+                // If added to a collection, ensure the key is changed before setting it (this ensures the lookup dictionary and child aliasses are updated)
+                Collection?.ChangeKey(this, value);
+
+                SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));
+            }
         }
 
         /// <summary>
@@ -130,6 +135,7 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedEntity = (PropertyGroup)clone;
+            clonedEntity.Collection = null;
 
             if (clonedEntity._propertyTypes != null)
             {

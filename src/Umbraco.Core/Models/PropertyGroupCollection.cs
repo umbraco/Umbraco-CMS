@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -61,11 +60,12 @@ namespace Umbraco.Core.Models
         protected override void SetItem(int index, PropertyGroup item)
         {
             var oldItem = index >= 0 ? this[index] : item;
-
-            oldItem.PropertyChanged -= PropertyGroup_PropertyChanged;
-            item.PropertyChanged += PropertyGroup_PropertyChanged;
-
+            
             base.SetItem(index, item);
+
+            oldItem.Collection = null;
+            item.Collection = this;
+
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem));
         }
 
@@ -73,17 +73,19 @@ namespace Umbraco.Core.Models
         {
             var removed = this[index];
 
-            removed.PropertyChanged -= PropertyGroup_PropertyChanged;
-
             base.RemoveItem(index);
+
+            removed.Collection = null;
+
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removed));
         }
 
         protected override void InsertItem(int index, PropertyGroup item)
         {
-            item.PropertyChanged += PropertyGroup_PropertyChanged;
-
             base.InsertItem(index, item);
+
+            item.Collection = this;
+
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
@@ -91,7 +93,7 @@ namespace Umbraco.Core.Models
         {
             foreach (var item in this)
             {
-                item.PropertyChanged -= PropertyGroup_PropertyChanged;
+                item.Collection = null;
             }
 
             base.ClearItems();
@@ -136,19 +138,14 @@ namespace Umbraco.Core.Models
             base.Add(item);
         }
 
-        private void PropertyGroup_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        internal void ChangeKey(PropertyGroup item, string newKey)
         {
-            var item = sender as PropertyGroup;
+            ChangeItemKey(item, newKey);
 
-            if (e.PropertyName == nameof(PropertyGroup.Alias))
+            // Update child aliases
+            foreach (var childItem in this.Where(x => x.GetParentAlias() == item.Alias))
             {
-                ChangeItemKey(item, item.Alias);
-
-                // Update child aliases
-                foreach (var childItem in this.Where(x => x.GetParentAlias() == item.Alias))
-                {
-                    childItem.UpdateParentAlias(item.Alias);
-                }
+                childItem.UpdateParentAlias(newKey);
             }
         }
 
