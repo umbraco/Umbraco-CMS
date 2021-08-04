@@ -94,17 +94,20 @@ Use this directive to render a tabs navigation.
 
         function link(scope, element, attrs, ctrl) {
 
-            const evts = [];
-
             var tabNavItemsWidths = [];
             // the parent is the component itself so we need to go one level higher
             var container = element.parent().parent();
+
+            const ro = new ResizeObserver(function () {
+                calculateWidth();
+            });
+
+            ro.observe(container[0]);
 
             $timeout(function(){
                 element.find("li:not(umb-tab--expand)").each(function() {
                     tabNavItemsWidths.push($(this).outerWidth());
                 });
-                calculateWidth();
             });
 
             function calculateWidth(){
@@ -133,24 +136,8 @@ Use this directive to render a tabs navigation.
                 });
             }
 
-            $(window).on('resize.tabsNav', function () {
-                calculateWidth();
-            });
-
-            evts.push(eventsService.on("app.tabChange", function (event, args) {
-                // the event it sent for both apps and tabs. We only need to calculate the width when an app changes
-                if(args.tab) {
-                    return;
-                }
-                calculateWidth();
-            }));
-
             scope.$on('$destroy', function() {
-                $(window).off('resize.tabsNav');
-
-                for (var e in evts) {
-                    eventsService.unsubscribe(evts[e]);
-                }
+                ro.unobserve(container[0]);
             });
         }
 
