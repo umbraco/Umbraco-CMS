@@ -143,10 +143,13 @@
                     }
                 };
 
+                scope.sortableRequestedTabTimeout = null;
                 scope.droppableOptionsTab = {
                     accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
                     tolerance : 'pointer',
                     over: (evt, ui) => {
+
+                        evt.target.classList.add("--droppableHover")
 
                         const hoveredTabAlias = evt.target.dataset.tabAlias || null;
 
@@ -164,8 +167,19 @@
                             }
                         }
 
-                        scope.openTabAlias = hoveredTabAlias;
-                        scope.$evalAsync();
+                        if(scope.sortableRequestedTabAlias !== hoveredTabAlias) {
+                            if(scope.sortableRequestedTabTimeout !== null) {
+                                $timeout.cancel(scope.sortableRequestedTabTimeout);
+                                scope.sortableRequestedTabTimeout = null;
+                            }
+                            scope.sortableRequestedTabAlias = hoveredTabAlias;
+                            scope.sortableRequestedTabTimeout = $timeout(() => {
+                                scope.openTabAlias = scope.sortableRequestedTabAlias;
+                            }, 1200)
+                        }
+                    },
+                    out: (evt, ui) => {
+                        evt.target.classList.remove("--droppableHover");
                     }
                 };
             }

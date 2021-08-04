@@ -121,6 +121,16 @@
     }
   }
 
+  .ui-droppable-hover & {
+      
+    animation: umb-group-builder-tab--droppable-active 800ms ease-in-out alternate infinite;
+
+    @keyframes umb-group-builder-tab--droppable-active {
+        0%  { background-color: white }
+        50%   { background-color: @gray-12 }
+    }
+  }
+
   .badge {
     background-color: @red;
     animation-duration: 1.4s;
