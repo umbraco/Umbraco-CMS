@@ -88,16 +88,30 @@ namespace Umbraco.Web.Models.ContentEditing
                 yield return validationResult;
             }
 
-            var duplicateGroups = Groups.GroupBy(x => x.Alias).Where(x => x.Count() > 1).ToArray();
-            if (duplicateGroups.Any())
+            var duplicateGroupAliasses = Groups.GroupBy(x => x.Alias).Where(x => x.Count() > 1).ToArray();
+            if (duplicateGroupAliasses.Any())
             {
                 //we need to return the field name with an index so it's wired up correctly
-                var lastIndex = Groups.IndexOf(duplicateGroups.Last().Last());
-                yield return new ValidationResult("Duplicate group aliases not allowed", new[]
+                var lastIndex = Groups.IndexOf(duplicateGroupAliasses.Last().Last());
+                yield return new ValidationResult("Duplicate aliases are not allowed", new[]
                 {
                     // TODO We don't display the alias yet, so add the validation message to the name
                     string.Format("Groups[{0}].Name", lastIndex)
                 });
+            }
+            else
+            {
+                var duplicateGroupNames = Groups.GroupBy(x => (x.GetParentAlias(), x.Name)).Where(x => x.Count() > 1).ToArray();
+                if (duplicateGroupNames.Any())
+                {
+                    //we need to return the field name with an index so it's wired up correctly
+                    var lastIndex = Groups.IndexOf(duplicateGroupNames.Last().Last());
+                    yield return new ValidationResult("Duplicate names are not allowed", new[]
+                    {
+                    // TODO We don't display the alias yet, so add the validation message to the name
+                    string.Format("Groups[{0}].Name", lastIndex)
+                });
+                }
             }
 
             var duplicateProperties = Groups.SelectMany(x => x.Properties).Where(x => x.Inherited == false).GroupBy(x => x.Alias).Where(x => x.Count() > 1).ToArray();
