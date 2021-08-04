@@ -424,7 +424,7 @@
 
             };
 
-            scope.openDocumentType = documentTypeId => {
+            scope.openDocumentType = (documentTypeId) => {
                 const editor = {
                     id: documentTypeId,
                     submit: () => {

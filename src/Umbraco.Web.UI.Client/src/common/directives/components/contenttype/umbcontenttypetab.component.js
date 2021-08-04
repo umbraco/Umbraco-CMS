@@ -15,6 +15,7 @@
     vm.whenFocus = whenFocus;
     vm.changeSortOrderValue = changeSortOrderValue;
     vm.changeName = changeName;
+    vm.clickComposition = clickComposition;
 
     function click () {
       if (vm.onClick) {
@@ -51,6 +52,11 @@
         vm.onChangeName({ key: vm.tab.key, name: vm.tab.name });
       }
     }
+    function clickComposition (documentTypeId) {
+      if (vm.onClickComposition) {
+        vm.onClickComposition({documentTypeId: documentTypeId});
+      }
+    }
 
   }
 
@@ -61,6 +67,7 @@
     bindings: {
       tab: '<',
       onClick: '&?',
+      onClickComposition: '&?',
       isOpen: '<?',
       allowRemove: '<?',
       onRemove: '&?',

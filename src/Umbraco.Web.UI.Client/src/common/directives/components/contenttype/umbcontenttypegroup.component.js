@@ -4,7 +4,7 @@
   /**
    * A component to render the content type group
    */
-  
+
   function umbContentTypeGroupController() {
 
     const vm = this;
@@ -14,6 +14,7 @@
     vm.whenNameFocus = whenNameFocus;
     vm.whenFocus = whenFocus;
     vm.changeSortOrderValue = changeSortOrderValue;
+    vm.clickComposition = clickComposition;
 
     function updateName (group) {
       if (vm.onUpdateName) {
@@ -44,6 +45,11 @@
         vm.onChangeSortOrderValue( {group: vm.group});
       }
     }
+    function clickComposition (documentTypeId) {
+      if (vm.onClickComposition) {
+        vm.onClickComposition({documentTypeId: documentTypeId});
+      }
+    }
   }
 
   const umbContentTypeGroupComponent = {
@@ -61,7 +67,8 @@
       onFocus: '&',
       onChangeSortOrderValue: '&',
       valServerFieldName: '@',
-      valTabAlias: "@"
+      valTabAlias: "@",
+      onClickComposition: '&?'
     },
     controller: umbContentTypeGroupController
   };
