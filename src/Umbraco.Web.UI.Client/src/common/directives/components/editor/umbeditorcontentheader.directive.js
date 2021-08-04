@@ -134,6 +134,14 @@
                     });
                 }
 
+                scope.editor.variantApps.forEach((app) => {
+                    // only render quick links on the content app if there are no tabs
+                    if (app.alias === "umbContent") {
+                        const hasTabs = scope.editor.content.tabs && scope.editor.content.tabs.filter(group => group.type === 1).length > 0;
+                        app.anchors = hasTabs ? [] : scope.editor.content.tabs;
+                    }
+                });
+
                 scope.content.variants.forEach(function (variant) {
 
                     // if we are looking for the variant with default language then we also want to check for invariant variant.
