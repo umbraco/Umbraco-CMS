@@ -79,11 +79,34 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
-        /// Adds the column (if it doesn't exist) and sets an updated default value.
+        /// Adds the column (if it doesn't exist) and executes an SQL query to update the default value.
         /// </summary>
         /// <typeparam name="T">The model type to get the table definition from (used for the column definition).</typeparam>
         /// <param name="columnName">The name of the column.</param>
-        /// <param name="updateAction">The update action.</param>
+        /// <param name="updateSql">The SQL query to update the default value.</param>
+        /// <param name="tableName">The name of the table (if <c>null</c>, uses the name from the table definition).</param>
+        /// <param name="columns">The existing column information to check the existance of the column against (if <c>null</c>, gets the current columns).</param>
+        /// <returns>
+        ///   <c>true</c> when the column didn't exist and was added; otherwise, <c>false</c>.
+        /// </returns>
+        protected bool AddColumn<T>(string columnName, NPoco.Sql updateSql, string tableName = null, IEnumerable<ColumnInfo> columns = null)
+        {
+            var columnAdded = AddColumn<T>(columnName, out var sqls, tableName, columns);
+            if (columnAdded)
+            {
+                Database.Execute(updateSql);
+                foreach (var sql in sqls) Database.Execute(sql);
+            }
+
+            return columnAdded;
+        }
+
+        /// <summary>
+        /// Adds the column (if it doesn't exist) and sets an updated default value for every existing row.
+        /// </summary>
+        /// <typeparam name="T">The model type to get the table definition from (used for the column definition).</typeparam>
+        /// <param name="columnName">The name of the column.</param>
+        /// <param name="updateAction">The action to set the updated default value (executed for every existing row).</param>
         /// <param name="columns">The existing column information to check the existance of the column against (if <c>null</c>, gets the current columns).</param>
         /// <returns>
         ///   <c>true</c> when the column didn't exist and was added; otherwise, <c>false</c>.
