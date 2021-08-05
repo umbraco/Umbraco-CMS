@@ -1,10 +1,12 @@
-﻿namespace Umbraco.Cms.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     public class LogLevelCounts
     {
-        public int Information { get; set; }
+        public int Verbose { get; set; }
 
         public int Debug { get; set; }
+
+        public int Information { get; set; }
 
         public int Warning { get; set; }
 

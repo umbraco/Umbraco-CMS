@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Serilog.Events;
 
 namespace Umbraco.Cms.Core.Logging.Viewer
@@ -17,6 +17,10 @@ namespace Umbraco.Cms.Core.Logging.Viewer
 
             switch (e.Level)
             {
+                case LogEventLevel.Verbose:
+                    Counts.Verbose++;
+                    break;
+
                 case LogEventLevel.Debug:
                     Counts.Debug++;
                     break;
@@ -36,8 +40,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
                 case LogEventLevel.Fatal:
                     Counts.Fatal++;
                     break;
-                case LogEventLevel.Verbose:
-                    break;
+                
                 default:
                     throw new ArgumentOutOfRangeException();
             }
