@@ -175,6 +175,12 @@
                                 scope.openTabAlias = scope.sortableRequestedTabAlias;
                             }, 1200)
                         }
+                    },
+                    out: (evt, ui) => {
+                        if(scope.sortableRequestedTabTimeout !== null) {
+                            $timeout.cancel(scope.sortableRequestedTabTimeout);
+                            scope.sortableRequestedTabTimeout = null;
+                        }
                     }
                 };
             }
