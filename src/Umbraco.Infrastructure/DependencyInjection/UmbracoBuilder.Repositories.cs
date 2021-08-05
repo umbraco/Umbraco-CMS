@@ -45,6 +45,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IServerRegistrationRepository, ServerRegistrationRepository>();
             builder.Services.AddUnique<ITagRepository, TagRepository>();
             builder.Services.AddUnique<ITemplateRepository, TemplateRepository>();
+            builder.Services.AddUnique<ITestRepository, TestRepository>();
             builder.Services.AddUnique<IUserGroupRepository, UserGroupRepository>();
             builder.Services.AddUnique<IUserRepository, UserRepository>();
             builder.Services.AddUnique<IConsentRepository, ConsentRepository>();
