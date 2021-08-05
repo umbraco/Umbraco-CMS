@@ -30,7 +30,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         var element = $(args.element);
         element.addClass('above-backdrop');
     });
-    
+
 
     //A list of query strings defined that when changed will not cause a reload of the route
     var nonRoutingQueryStrings = ["mculture", "cculture", "csegment", "lq", "sr"];
@@ -126,11 +126,14 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
         var aboveClass = "above-backdrop";
         var leftColumn = document.getElementById("leftcolumn");
-        var isLeftColumnOnTop = leftColumn.classList.contains(aboveClass);
 
-        if (isLeftColumnOnTop) {
-            backdropService.close();
-            leftColumn.classList.remove(aboveClass);
+        if(leftColumn !== null) {
+            var isLeftColumnOnTop = leftColumn.classList.contains(aboveClass);
+
+            if (isLeftColumnOnTop) {
+                backdropService.close();
+                leftColumn.classList.remove(aboveClass);
+            }
         }
     }
 
@@ -334,7 +337,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             appState.setGlobalState("showTray", false);
         },
 
-        /**     
+        /**
          * @ngdoc method
          * @name umbraco.services.navigationService#syncTree
          * @methodOf umbraco.services.navigationService
@@ -367,14 +370,14 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             });
         },
 
-        /**     
+        /**
          * @ngdoc method
          * @name umbraco.services.navigationService#hasTree
          * @methodOf umbraco.services.navigationService
          *
          * @description
          * Checks if a tree with the given alias exists.
-         * 
+         *
          * @param {String} treeAlias the tree alias to check
          */
         hasTree: function (treeAlias) {
