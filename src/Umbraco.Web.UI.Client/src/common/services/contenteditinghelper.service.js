@@ -211,6 +211,22 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             return (parentAlias == null || parentAlias === '') ? localAlias : parentAlias + '/' + localAlias;
         },
 
+        updateDescendingAliases: function (groups, oldParentAlias, newParentAlias) {
+            groups.forEach(group => {
+                const parentAlias = this.getParentAlias(group.alias);
+
+                if (parentAlias === oldParentAlias) {
+                    const oldAlias = group.alias,
+                        newAlias = this.updateParentAlias(oldAlias, newParentAlias);
+
+                    group.alias = newAlias;
+                    group.parentAlias = newParentAlias;
+                    this.updateDescendingAliases(groups, oldAlias, newAlias);
+
+                }
+            });
+        },
+
         registerGenericTab: function (groups) {
             if (!groups) {
                 return;
@@ -240,6 +256,26 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             localizationService.localize("general_generic").then(function (value) {
                 genericTab.label = value;
                 groups.unshift(genericTab);
+            });
+        },
+
+        defineParentAliasOnGroups: function (groups) {
+            groups.forEach(group => {
+                group.parentAlias = this.getParentAlias(group.alias);
+            });
+        },
+
+        relocateDisorientedGroups: function (groups) {
+            const existingAliases = groups.map(group => group.alias);
+            existingAliases.push(null);
+            const disorientedGroups = groups.filter(group => existingAliases.indexOf(group.parentAlias) === -1);
+            disorientedGroups.forEach(group => {
+                const oldAlias = group.alias,
+                        newAlias = this.updateParentAlias(oldAlias, null);
+
+                group.alias = newAlias;
+                group.parentAlias = null;
+                this.updateDescendingAliases(groups, oldAlias, newAlias);
             });
         },
 
