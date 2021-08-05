@@ -33,12 +33,12 @@
                 properties: []
             };
 
-            // Add parentAlias property to all groups
-            scope.model.groups.forEach(group => {
-                group.parentAlias = contentEditingHelper.getParentAlias(group.alias);
-            });
-
             eventBindings.push(scope.$watchCollection('model.groups', newValue => {
+
+                contentEditingHelper.defineParentAliasOnGroups(newValue);
+                console.log("relocateDisorientedGroups:")
+                contentEditingHelper.relocateDisorientedGroups(newValue);
+
                 scope.tabs = $filter("filter")(newValue, group => {
                     return group.type === TYPE_TAB && group.parentAlias == null;
                 });
@@ -46,7 +46,6 @@
                 // Update index and parentAlias properties of tabs
                 scope.tabs.forEach(tab => {
                     tab.indexInGroups = newValue.findIndex(group => group.alias === tab.alias);
-                    tab.parentAlias = contentEditingHelper.getParentAlias(tab.alias);
                 });
                 checkGenericTabVisibility();
 
@@ -122,7 +121,7 @@
 
                         group.alias = newAlias;
                         group.parentAlias = parentAlias;
-                        updateDescendingAliases(oldAlias, newAlias);
+                        contentEditingHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
 
                         const groupsInTab = scope.model.groups.filter(group => group.parentAlias === parentAlias);
                         updateSortOrder(groupsInTab);
@@ -143,6 +142,7 @@
                     }
                 };
 
+                scope.sortableRequestedTabAlias = null;
                 scope.sortableRequestedTabTimeout = null;
                 scope.droppableOptionsTab = {
                     accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
@@ -169,6 +169,7 @@
                             if(scope.sortableRequestedTabTimeout !== null) {
                                 $timeout.cancel(scope.sortableRequestedTabTimeout);
                                 scope.sortableRequestedTabTimeout = null;
+                                scope.sortableRequestedTabAlias = null;
                             }
                             scope.sortableRequestedTabAlias = hoveredTabAlias;
                             scope.sortableRequestedTabTimeout = $timeout(() => {
@@ -180,6 +181,7 @@
                         if(scope.sortableRequestedTabTimeout !== null) {
                             $timeout.cancel(scope.sortableRequestedTabTimeout);
                             scope.sortableRequestedTabTimeout = null;
+                            scope.sortableRequestedTabAlias = null;
                         }
                     }
                 };
@@ -582,24 +584,8 @@
 
                 group.alias = newAlias;
                 group.parentAlias = contentEditingHelper.getParentAlias(newAlias);
-                updateDescendingAliases(oldAlias, newAlias);
+                contentEditingHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
                 return true;
-            }
-
-            function updateDescendingAliases(oldParentAlias, newParentAlias) {
-                scope.model.groups.forEach(group => {
-                    const parentAlias = contentEditingHelper.getParentAlias(group.alias);
-
-                    if (parentAlias === oldParentAlias) {
-                        const oldAlias = group.alias,
-                            newAlias = contentEditingHelper.updateParentAlias(oldAlias, newParentAlias);
-
-                        group.alias = newAlias;
-                        group.parentAlias = newParentAlias;
-                        updateDescendingAliases(oldAlias, newAlias);
-
-                    }
-                });
             }
 
             scope.isUngroupedPropertiesVisible = ({alias, properties}) => {
