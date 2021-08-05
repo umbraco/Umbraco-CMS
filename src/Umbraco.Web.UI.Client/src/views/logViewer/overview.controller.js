@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerOverviewController($q, $location, $timeout, logViewerResource, navigationService) {
+  function LogViewerOverviewController($q, $location, $timeout, logViewerResource, navigationService, overlayService) {
 
         var vm = this;
 
@@ -13,6 +13,9 @@
         vm.commonLogMessagesCount = 10;
         vm.dateRangeLabel = "";
 
+        vm.selectedLogLevel = "";
+        vm.logLevels = ["Verbose", "Debug", "Information", "Warning", "Error", "Fatal"]
+
         vm.config = {
             enableTime: false,
             dateFormat: "Y-m-d",
@@ -23,9 +26,9 @@
         };
 
         // ChartJS Options - for count/overview of log distribution
-        vm.logTypeLabels = ["Debug", "Info", "Warning", "Error", "Fatal"];
-        vm.logTypeData = [0, 0, 0, 0, 0];
-        vm.logTypeColors = ['#2e8aea', '#2bc37c', '#ff9412', '#d42054', '#343434'];
+        vm.logTypeLabels = ["Verbose", "Debug", "Info", "Warning", "Error", "Fatal"];
+        vm.logTypeData = [0, 0, 0, 0, 0, 0];
+        vm.logTypeColors = ['#ebded6','#2e8aea', '#2bc37c', '#ff9412', '#d42054', '#343434'];
         vm.chartOptions = {
             legend: {
                 display: true,
@@ -39,6 +42,7 @@
         vm.searchErrors = searchErrors;
         vm.showMore = showMore;
         vm.dateRangeChange = dateRangeChange;
+        vm.changeLogLevel = changeLogLevel;
         
         let querystring = $location.search();
         if (querystring.startDate) {
@@ -139,7 +143,8 @@
             });
             
             var logLevel = logViewerResource.getLogLevel().then(function(data) {
-                vm.logLevel = data; 
+                vm.logLevel = data;
+                vm.selectedLogLevel = data;
                 const index = vm.logTypeLabels.findIndex(x => vm.logLevel.startsWith(x));
                 vm.logLevelColor = index > -1 ? vm.logTypeColors[index] : '#000';
             });
@@ -204,6 +209,36 @@
                 });
             }
 
+      }
+
+        function changeLogLevel(newlogLevel) {
+
+          // Prompt user with dialog with warning message
+          // This is temporary and will change next time app reboots
+          var confirmOverlay = {
+            view: "confirm",
+            title: "Are you sure you want to change log level?",
+            subtitle: `Log Level will be set to ${newlogLevel}`,
+            confirmMessage: "Note: Changing the log level will be reset back to whats definied in config, when the application restarts",
+            close: function () {
+              // If user doesn't accept or cancels it, then reset it back to the current log level
+              vm.selectedLogLevel = vm.logLevel;
+              overlayService.close();
+            },
+            submit: function () {
+              logViewerResource.setLogLevel(newlogLevel).then(function () {
+
+                // Re-init (Get number of errors, chart & current log level etc)
+                // init();
+
+                overlayService.close();
+              });
+            },
+            submitButtonStyle: "success",
+            submitButtonLabelKey: "general_confirm"
+          };
+
+          overlayService.open(confirmOverlay);
         }
     }
 

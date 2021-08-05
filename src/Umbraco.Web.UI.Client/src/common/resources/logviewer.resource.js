@@ -44,6 +44,9 @@ function logViewerResource($q, $http, umbRequestHelper) {
         deleteSavedSearch: (name, query) =>
             request('POST', 'DeleteSavedSearch', { 'name': name, 'query': query }, 'Failed to delete saved search'),
 
+        setLogLevel: (logLevel) =>
+          request('POST', 'SetLogLevel', { 'logLevel': logLevel }, 'Failed to set new log level'),
+
         getLogs: options => {
 
             var defaults = {

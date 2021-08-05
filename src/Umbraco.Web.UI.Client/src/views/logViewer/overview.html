@@ -110,6 +110,13 @@
                             </umb-box>
                         </div>
 
+                        <umb-box>
+                          <umb-box-header title="Change Log level"></umb-box-header>
+                          <umb-box-content class="block-form">
+                            <select ng-model="vm.selectedLogLevel" ng-options="level for level in vm.logLevels" ng-change="vm.changeLogLevel(vm.selectedLogLevel)"></select>
+                          </umb-box-content>
+                        </umb-box>
+
                         <!-- Chart of diff log types -->
                         <umb-box>
                             <umb-box-header title="Log Types"></umb-box-header>
