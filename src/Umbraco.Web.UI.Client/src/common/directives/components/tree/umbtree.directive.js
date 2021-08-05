@@ -358,7 +358,7 @@ function umbTreeDirective($q, treeService, navigationService, notificationsServi
             */
             $scope.select = function (n, ev) {
 
-                navigationService.closeBackdrop();
+                navigationService.hideMenu();
                 
                 if (n.metaData && n.metaData.noAccess === true) {
                     ev.preventDefault();

@@ -148,15 +148,6 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
         /**
          * @ngdoc method
-         * @name umbraco.services.navigationService#closeBackdrop
-         * @methodOf umbraco.services.navigationService
-         * @description
-         * Closes backdrop shown when navigation is open.
-        */
-        closeBackdrop: closeBackdrop,
-
-        /**
-         * @ngdoc method
          * @name umbraco.services.navigationService#isRouteChangingNavigation
          * @methodOf umbraco.services.navigationService
          *
