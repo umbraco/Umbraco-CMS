@@ -38,7 +38,7 @@ angular.module('umbraco.directives')
                 var currentIndex = 0;
                 var focusSet = false;
 
-                $timeout(function () {
+                $timeout(function() {
                     // get list of all links in the list
                     listItems = element.find("li :tabbable");
                 });
