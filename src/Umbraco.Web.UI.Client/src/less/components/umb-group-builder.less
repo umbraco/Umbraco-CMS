@@ -1,3 +1,5 @@
+@umbGroupBuilderToolbarHeight: 60px;
+
 /* ---------- TOOLBAR --------- */
 .umb-group-builder__toolbar {
   display: flex;
@@ -7,6 +9,7 @@
   margin-left: -20px;
   width: calc(100% + 40px);
   margin-top: -20px;
+  height: @umbGroupBuilderToolbarHeight;
 
   .left {
     flex: 1 1 auto;
@@ -23,7 +26,7 @@
 /* ---------- TABS ----------  */
 
 .umb-group-builder__tabs {
-  height: 60px;
+  height: @umbGroupBuilderToolbarHeight;
   position: relative;
 }
 
