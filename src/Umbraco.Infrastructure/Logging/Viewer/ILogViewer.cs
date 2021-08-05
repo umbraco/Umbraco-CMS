@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using Serilog.Events;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Logging.Viewer
@@ -45,6 +46,13 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// </summary>
         /// <returns></returns>
         string GetLogLevel();
+
+        /// <summary>
+        /// Sets the LogEvent Level Switch at runtime
+        /// Allowing until next site restart to change the minimum log level
+        /// </summary>
+        /// <param name="eventLevel"></param>
+        void SetLogLevel(LogEventLevel eventLevel);
 
         /// <summary>
         /// Returns the collection of logs

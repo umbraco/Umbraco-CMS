@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog.Core;
 using Serilog.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
@@ -11,11 +12,13 @@ namespace Umbraco.Cms.Core.Logging.Viewer
     {
         private readonly ILogViewerConfig _logViewerConfig;
         private readonly global::Serilog.ILogger _serilogLog;
+        private readonly LoggingLevelSwitch _levelSwitch;
 
-        protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, global::Serilog.ILogger serilogLog)
+        protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, global::Serilog.ILogger serilogLog, LoggingLevelSwitch levelSwitch)
         {
             _logViewerConfig = logViewerConfig;
             _serilogLog = serilogLog;
+            _levelSwitch = levelSwitch;
         }
 
         public abstract bool CanHandleLargeLogs { get; }
@@ -130,6 +133,12 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             };
         }
 
-
+        public void SetLogLevel(LogEventLevel eventLevel)
+        {
+            // change the injected logging level
+            // Next time app restarts it will read from config again
+            // Used as a temp way to change the LogLevel when needed to do investigation work
+            _levelSwitch.MinimumLevel = eventLevel;
+        }
     }
 }

@@ -22,12 +22,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class LogViewerController : BackOfficeNotificationsController
     {
         private readonly ILogViewer _logViewer;
-        private readonly LoggingLevelSwitch _levelSwitch;
 
-        public LogViewerController(ILogViewer logViewer, LoggingLevelSwitch levelSwitch)
+        public LogViewerController(ILogViewer logViewer)
         {
             _logViewer = logViewer ?? throw new ArgumentNullException(nameof(logViewer));
-            _levelSwitch = levelSwitch;
         }
 
         private bool CanViewLogs(LogTimePeriod logTimePeriod)
@@ -148,11 +146,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public ActionResult SetLogLevel(LogEventLevel eventLevel)
         {
-            // change the injected logging level
-            // Next time app restarts it will read from config again
-            // Used as a temp way to change the LogLevel when needed to do investigation work
-            _levelSwitch.MinimumLevel = eventLevel;
-
+            _logViewer.SetLogLevel(eventLevel);
             return Ok();
         }
     }
