@@ -62,7 +62,7 @@ angular.module('umbraco.directives')
                     var found = false;
 
                     // check if any element has focus
-                    angular.forEach(listItems, function (item, index) {
+                    Utilities.forEach(listItems, (item, index) => {
                         if ($(item).is(":focus")) {
                             // if an element already has focus set the
                             // currentIndex so we navigate from that element
