@@ -518,7 +518,8 @@
                         confirmMessage: data[2],
                         submitButtonLabelKey: 'contentTypeEditor_yesDelete',
                         submit: () => {
-                            scope.model.groups.splice(tab.indexInGroups, 1);
+                            const indexInGroups = scope.model.groups.findIndex(group => group.alias === tab.alias);
+                            scope.model.groups.splice(indexInGroups, 1);
 
                             // remove all child groups
                             scope.model.groups = scope.model.groups.filter(group => group.parentAlias !== tab.alias);
