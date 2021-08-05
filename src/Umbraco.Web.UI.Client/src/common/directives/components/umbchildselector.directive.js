@@ -126,14 +126,14 @@ Use this directive to render a ui component for selecting child items to a paren
             scope.dialogModel = {};
             scope.showDialog = false;
 
-            scope.removeChild = function(selectedChild, $index) {
-               if(scope.onRemove) {
+            scope.removeChild = (selectedChild, $index) => {
+               if (scope.onRemove) {
                   scope.onRemove(selectedChild, $index);
                }
             };
 
-            scope.addChild = function($event) {
-               if(scope.onAdd) {
+            scope.addChild = $event => {
+               if (scope.onAdd) {
                   scope.onAdd($event);
                }
             };
@@ -141,16 +141,16 @@ Use this directive to render a ui component for selecting child items to a paren
             function syncParentName() {
 
               // update name on available item
-              angular.forEach(scope.availableChildren, function(availableChild){
-                if(availableChild.id === scope.parentId) {
-                  availableChild.name = scope.parentName;
+              Utilities.forEach(scope.availableChildren, availableChild => {
+                if (availableChild.id === scope.parentId) {
+                   availableChild.name = scope.parentName;
                 }
               });
 
               // update name on selected child
-              angular.forEach(scope.selectedChildren, function(selectedChild){
-                if(selectedChild.id === scope.parentId) {
-                  selectedChild.name = scope.parentName;
+              Utilities.forEach(scope.selectedChildren, selectedChild => {
+                if (selectedChild.id === scope.parentId) {
+                   selectedChild.name = scope.parentName;
                 }
               });
 
@@ -159,16 +159,16 @@ Use this directive to render a ui component for selecting child items to a paren
             function syncParentIcon() {
 
               // update icon on available item
-              angular.forEach(scope.availableChildren, function(availableChild){
-                if(availableChild.id === scope.parentId) {
-                  availableChild.icon = scope.parentIcon;
+              Utilities.forEach(scope.availableChildren, availableChild => {
+                if (availableChild.id === scope.parentId) {
+                   availableChild.icon = scope.parentIcon;
                 }
               });
 
               // update icon on selected child
-              angular.forEach(scope.selectedChildren, function(selectedChild){
-                if(selectedChild.id === scope.parentId) {
-                  selectedChild.icon = scope.parentIcon;
+              Utilities.forEach(scope.selectedChildren, selectedChild => {
+                if (selectedChild.id === scope.parentId) {
+                   selectedChild.icon = scope.parentIcon;
                 }
               });
 
