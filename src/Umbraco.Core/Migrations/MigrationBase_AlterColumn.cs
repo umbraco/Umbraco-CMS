@@ -16,20 +16,21 @@ namespace Umbraco.Core.Migrations
         /// </summary>
         /// <typeparam name="T">The model type to get the table definition from (used for the table name and column definition).</typeparam>
         /// <param name="columnName">Name of the column.</param>
-        protected void AlterColumn<T>(string columnName)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AlterColumn(table, table.Name, columnName);
-        }
+        protected void AlterColumn<T>(string columnName) => AlterColumn<T>(null, columnName);
 
         /// <summary>
         /// Alters the column of the specific table.
         /// </summary>
-        /// <param name="table">The table definition.</param>
+        /// <typeparam name="T">The model type to get the table definition from (used for the table name and column definition).</typeparam>
         /// <param name="tableName">The name of the table.</param>
         /// <param name="columnName">The name of the column.</param>
-        private void AlterColumn(TableDefinition table, string tableName, string columnName)
+        protected void AlterColumn<T>(string tableName, string columnName)
         {
+            // TODO: Make tableName optional with a default null value
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+
+            if (tableName == null) tableName = table.Name;
+
             var column = table.Columns.First(x => x.Name.InvariantEquals(columnName));
             SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out var sqls);
             foreach (var sql in sqls) Execute.Sql(sql).Do();

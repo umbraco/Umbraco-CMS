@@ -19,7 +19,15 @@ namespace Umbraco.Core.Migrations
         /// </summary>
         /// <typeparam name="T">The model type to get the table definition from (used for the table name and column definition).</typeparam>
         /// <param name="columnName">The name of the column.</param>
-        protected void AddColumn<T>(string columnName) => AddColumn<T>(columnName, null, null);
+        protected void AddColumn<T>(string columnName) => AddColumn<T>(columnName, tableName: null, columns: null);
+
+        /// <summary>
+        /// Adds the column (if it doesn't exist) to the specific table.
+        /// </summary>
+        /// <typeparam name="T">The model type to get the table definition from (used for the column definition).</typeparam>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="columnName">The name of the column.</param>
+        protected void AddColumn<T>(string tableName, string columnName) => AddColumn<T>(columnName, tableName, columns: null);
 
         /// <summary>
         /// Adds the column (if it doesn't exist).
@@ -27,66 +35,72 @@ namespace Umbraco.Core.Migrations
         /// <typeparam name="T">The model type to get the table definition from (used for the table name and column definition).</typeparam>
         /// <param name="columns">The existing column information to check the existance of the column against.</param>
         /// <param name="columnName">The name of the column.</param>
-        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string columnName) => AddColumn<T>(columnName, null, columns);
+        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string columnName) => AddColumn<T>(columnName, tableName: null, columns);
+
+        [Obsolete("Use AddColumn<T>(columns, columnName) instead, because that already checks whether the column does not exist.")]
+        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string columnName) => AddColumn<T>(columnName, tableName: null, columns);
 
         /// <summary>
         /// Adds the column (if it doesn't exist) to the specific table.
         /// </summary>
-        /// <param name="table">The table definition.</param>
+        /// <typeparam name="T">The model type to get the table definition from (used for the column definition).</typeparam>
+        /// <param name="columns">The existing column information to check the existance of the column against.</param>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="columnName">The name of the column.</param>
+        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName) => AddColumn<T>(columnName, tableName, columns);
+
+        [Obsolete("Use AddColumn<T>(columns, tableName, columnName) instead, because that already checks whether the column does not exist.")]
+        protected void AddColumnIfNotExists<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName) => AddColumn<T>(columnName, tableName, columns);
+
+        /// <summary>
+        /// Adds the column (if it doesn't exist).
+        /// </summary>
+        /// <typeparam name="T">The model type to get the table definition from (used for the column definition).</typeparam>
         /// <param name="columnName">The name of the column.</param>
         /// <param name="tableName">The name of the table (if <c>null</c>, uses the name from the table definition).</param>
         /// <param name="columns">The existing column information to check the existance of the column against (if <c>null</c>, gets the current columns).</param>
-        private void AddColumn<T>(string columnName, string tableName = null, IEnumerable<ColumnInfo> columns = null)
+        /// <returns>
+        ///   <c>true</c> when the column didn't exist and was added; otherwise, <c>false</c>.
+        /// </returns>
+        private bool AddColumn<T>(string columnName, string tableName = null, IEnumerable<ColumnInfo> columns = null)
         {
+            // TODO: Make this method protected and remove all other overloads
             var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
 
             if (tableName == null) tableName = table.Name;
             if (columns == null) columns = SqlSyntax.GetColumnsInSchema(Context.Database);
-            if (ColumnExists(columns, tableName, columnName)) return;
+            if (ColumnExists(columns, tableName, columnName)) return false;
 
             var column = table.Columns.First(x => x.Name.InvariantEquals(columnName));
             var createSql = SqlSyntax.Format(column);
             Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
+
+            return true;
         }
 
-        protected void AddColumn<T>(string columnName, Func<T, T> updateAction)
+        /// <summary>
+        /// Adds the column (if it doesn't exist) and sets an updated default value.
+        /// </summary>
+        /// <typeparam name="T">The model type to get the table definition from (used for the column definition).</typeparam>
+        /// <param name="columnName">The name of the column.</param>
+        /// <param name="updateAction">The update action.</param>
+        /// <param name="columns">The existing column information to check the existance of the column against (if <c>null</c>, gets the current columns).</param>
+        /// <returns>
+        ///   <c>true</c> when the column didn't exist and was added; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// All existing rows are fetched and loaded into memory and only the added column value is updated.
+        /// </remarks>
+        protected bool AddColumn<T>(string columnName, Func<T, T> updateAction, IEnumerable<ColumnInfo> columns = null)
         {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, table.Name, columnName, updateAction);
-        }
+            var columnAdded = AddColumn<T>(columnName, out var sqls, null, columns);
+            if (columnAdded)
+            {
+                foreach (var dto in Database.Fetch<T>()) Database.Update(updateAction(dto), new[] { columnName });
+                foreach (var sql in sqls) Database.Execute(sql);
+            }
 
-        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string columnName, Func<T, T> updateAction)
-        { }
-
-        private void AddColumn<T>(TableDefinition table, string tableName, string columnName, Func<T, T> updateAction)
-        {
-            if (ColumnExists(tableName, columnName)) return;
-
-            var column = table.Columns.First(x => x.Name == columnName);
-            var createSql = SqlSyntax.Format(column);
-
-            Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database);
-            AddColumn(columns, table, tableName, columnName, updateAction);
-        }
-
-        //private void AddColumn(IEnumerable<ColumnInfo> columns, TableDefinition table, string tableName, string columnName, object defaultValue)
-        //{
-        //    AddColumn(columns, table, tableName, columnName, out var sqls);
-
-        //    Database.Execute($@"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(columnName)} = {0}", defaultValue);
-
-        //    foreach (var sql in sqls)
-        //    {
-        //        Database.Execute(sql);
-        //    }
-        //}
-
-        private void AddColumn<T>(IEnumerable<ColumnInfo> columns, TableDefinition table, string tableName, string columnName, Func<T, T> updateAction)
-        {
-            AddColumn(columns, table, tableName, columnName, out var sqls);
-            foreach (var dto in Database.Fetch<T>()) Database.Update(updateAction(dto), new[] { columnName });
-            foreach (var sql in sqls) Database.Execute(sql);
+            return columnAdded;
         }
 
         /// <summary>
@@ -95,11 +109,16 @@ namespace Umbraco.Core.Migrations
         /// <typeparam name="T">The model type to get the table definition from (used for the table name and column definition).</typeparam>
         /// <param name="columnName">The name of the column.</param>
         /// <param name="sqls">The SQL queries to run after setting the default values on existing rows.</param>
-        protected void AddColumn<T>(string columnName, out IEnumerable<string> sqls)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(table, table.Name, columnName, out sqls);
-        }
+        protected void AddColumn<T>(string columnName, out IEnumerable<string> sqls) => AddColumn<T>(columnName, out sqls, tableName: null, columns: null);
+
+        /// <summary>
+        /// Adds the column (if it doesn't exist) to the specific table, but always as nullable and returns the SQL queries to run after setting the default values on existing rows.
+        /// </summary>
+        /// <typeparam name="T">The model type to get the table definition from (used for the table name and column definition).</typeparam>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="columnName">The name of the column.</param>
+        /// <param name="sqls">The SQL queries to run after setting the default values on existing rows.</param>
+        protected void AddColumn<T>(string tableName, string columnName, out IEnumerable<string> sqls) => AddColumn<T>(columnName, out sqls, tableName, columns: null);
 
         /// <summary>
         /// Adds the column (if it doesn't exist), but always as nullable and returns the SQL queries to run after setting the default values on existing rows.
@@ -108,44 +127,47 @@ namespace Umbraco.Core.Migrations
         /// <param name="columns">The existing column information to check the existance of the column against.</param>
         /// <param name="columnName">The name of the column.</param>
         /// <param name="sqls">The SQL queries to run after setting the default values on existing rows.</param>
-        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string columnName, out IEnumerable<string> sqls)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            AddColumn(columns, table, table.Name, columnName, out sqls);
-        }
+        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string columnName, out IEnumerable<string> sqls) => AddColumn<T>(columnName, out sqls, tableName: null, columns);
 
         /// <summary>
         /// Adds the column (if it doesn't exist) to the specific table, but always as nullable and returns the SQL queries to run after setting the default values on existing rows.
         /// </summary>
-        /// <param name="table">The table definition.</param>
-        /// <param name="tableName">The name of the table.</param>
-        /// <param name="columnName">The name of the column.</param>
-        /// <param name="sqls">The SQL queries to run after setting the default values on existing rows.</param>
-        private void AddColumn(TableDefinition table, string tableName, string columnName, out IEnumerable<string> sqls)
-        {
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database);
-            AddColumn(columns, table, tableName, columnName, out sqls);
-        }
-
-        /// <summary>
-        /// Adds the column (if it doesn't exist) to the specific table, but always as nullable and returns the SQL queries to run after setting the default values on existing rows.
-        /// </summary>
+        /// <typeparam name="T">The model type to get the table definition from (used for the table name and column definition).</typeparam>
         /// <param name="columns">The existing column information to check the existance of the column against.</param>
-        /// <param name="table">The table definition.</param>
         /// <param name="tableName">The name of the table.</param>
         /// <param name="columnName">The name of the column.</param>
         /// <param name="sqls">The SQL queries to run after setting the default values on existing rows.</param>
-        private void AddColumn(IEnumerable<ColumnInfo> columns, TableDefinition table, string tableName, string columnName, out IEnumerable<string> sqls)
+        protected void AddColumn<T>(IEnumerable<ColumnInfo> columns, string tableName, string columnName, out IEnumerable<string> sqls) => AddColumn<T>(columnName, out sqls, tableName, columns);
+
+        /// <summary>
+        /// Adds the column (if it doesn't exist) to the specific table, but always as nullable and returns the SQL queries to run after setting the default values on existing rows.
+        /// </summary>
+        /// <typeparam name="T">The model type to get the table definition from (used for the table name and column definition).</typeparam>
+        /// <param name="columnName">The name of the column.</param>
+        /// <param name="sqls">The SQL queries to run after setting the default values on existing rows.</param>
+        /// <param name="tableName">The name of the table.</param>
+        /// <param name="columns">The existing column information to check the existance of the column against.</param>
+        /// <returns>
+        ///   <c>true</c> when the column didn't exist and was added; otherwise, <c>false</c>.
+        /// </returns>
+        private bool AddColumn<T>(string columnName, out IEnumerable<string> sqls, string tableName = null, IEnumerable<ColumnInfo> columns = null)
         {
+            // TODO: Make this method protected and remove all other overloads
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+
+            if (tableName == null) tableName = table.Name;
+            if (columns == null) columns = SqlSyntax.GetColumnsInSchema(Context.Database);
             if (ColumnExists(columns, tableName, columnName))
             {
                 sqls = Enumerable.Empty<string>();
-                return;
+                return false;
             }
 
             var column = table.Columns.First(x => x.Name.InvariantEquals(columnName));
             var createSql = SqlSyntax.Format(column, SqlSyntax.GetQuotedTableName(tableName), out sqls);
             Execute.Sql(string.Format(SqlSyntax.AddColumn, SqlSyntax.GetQuotedTableName(tableName), createSql)).Do();
+
+            return true;
         }
     }
 }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core.Persistence;
+﻿using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Migrations
 {
@@ -11,7 +7,7 @@ namespace Umbraco.Core.Migrations
     /// Provides a base class to all migrations.
     /// </summary>
     /// <remarks>
-    /// This file provides extra AddColumn methods for migrations.
+    /// This file provides extra ReplaceColumn methods for migrations.
     /// </remarks>
     public abstract partial class MigrationBase
     {
@@ -21,32 +17,35 @@ namespace Umbraco.Core.Migrations
         /// <typeparam name="T">The model type to get the table definition from (used for the table name and column definition).</typeparam>
         /// <param name="currentName">The current name of the column.</param>
         /// <param name="newName">The new name of the column.</param>
-        protected void ReplaceColumn<T>(string currentName, string newName)
-        {
-            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
-            ReplaceColumn(table, table.Name, currentName, newName);
-        }
+        protected void ReplaceColumn<T>(string currentName, string newName) => ReplaceColumn<T>(null, currentName, newName);
 
         /// <summary>
         /// Replaces the column.
         /// </summary>
-        /// <param name="table">The table definition.</param>
+        /// <typeparam name="T"></typeparam>
         /// <param name="tableName">The name of the table.</param>
         /// <param name="currentName">The current name of the column.</param>
         /// <param name="newName">The new name of the column.</param>
-        private void ReplaceColumn(TableDefinition table, string tableName, string currentName, string newName)
+        protected void ReplaceColumn<T>(string tableName, string currentName, string newName)
         {
+            // TODO: Make tableName optional with a default null value
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+
+            if (tableName == null) tableName = table.Name;
+
             if (DatabaseType.IsSqlCe())
             {
-                AddColumn(table, tableName, newName, out var sqls);
-                Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}").Do();
-                foreach (var sql in sqls) Execute.Sql(sql).Do();
-                Delete.Column(currentName).FromTable(tableName).Do();
+                if (AddColumn<T>(newName, out var sqls, tableName))
+                {
+                    Execute.Sql($"UPDATE {SqlSyntax.GetQuotedTableName(tableName)} SET {SqlSyntax.GetQuotedColumnName(newName)}={SqlSyntax.GetQuotedColumnName(currentName)}").Do();
+                    foreach (var sql in sqls) Execute.Sql(sql).Do();
+                    Delete.Column(currentName).FromTable(tableName).Do();
+                }
             }
             else
             {
                 Execute.Sql(SqlSyntax.FormatColumnRename(tableName, currentName, newName)).Do();
-                AlterColumn(table, tableName, newName);
+                AlterColumn<T>(tableName, newName);
             }
         }
     }
