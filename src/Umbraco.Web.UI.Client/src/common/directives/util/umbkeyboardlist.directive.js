@@ -38,14 +38,14 @@ angular.module('umbraco.directives')
                 var currentIndex = 0;
                 var focusSet = false;
 
-                $timeout(function(){
+                $timeout(function () {
                     // get list of all links in the list
                     listItems = element.find("li :tabbable");
                 });
 
                 // Handle keydown events
                 function keydown(event) {
-                    $timeout(function(){
+                    $timeout(function() {
                         checkFocus();
                         // arrow down
                         if (event.keyCode === 40) {
@@ -109,7 +109,6 @@ angular.module('umbraco.directives')
 
                 // Stop listening when scope is destroyed.
                 scope.$on('$destroy', stopListening);
-
             }
         };
     }]);
