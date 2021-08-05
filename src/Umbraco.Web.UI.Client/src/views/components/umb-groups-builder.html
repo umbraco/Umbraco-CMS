@@ -26,7 +26,7 @@
                             sorting="sortingMode"
                             allow-remove="canRemoveTab(tab) && !sortingMode"
                             on-remove="removeTab(tab, tabIndex)"
-                            val-server-field-name="{{'Groups[' + tab.indexInGroups + '].Name'}}"
+                            val-server-field-name="{{'Groups[' + tab.serverValidationIndex + '].Name'}}"
                             on-change-sort-order-value="onChangeTabSortOrderValue(tab)"
                             on-change-name="onChangeTabName(tab)">
                         </umb-content-type-tab>
@@ -99,8 +99,8 @@
                         sortable="sortingMode"
                         on-edit="editPropertyTypeSettings(property)"
                         on-remove="deleteProperty(tab.properties, property)"
-                        val-server-field-alias="{{'Groups[' + tab.indexInGroups + '].Properties[' + propertyIndex + '].Alias'}}"
-                        val-server-field-label="{{'Groups[' + tab.indexInGroups + '].Properties[' + propertyIndex + '].Label'}}"
+                        val-server-field-alias="{{'Groups[' + tab.serverValidationIndex + '].Properties[' + propertyIndex + '].Alias'}}"
+                        val-server-field-label="{{'Groups[' + tab.serverValidationIndex + '].Properties[' + propertyIndex + '].Label'}}"
                         on-change-sort-order-value="onChangePropertySortOrderValue(tab)"
                         val-tab-alias="tab-content-{{tab.alias}}">
                     </umb-content-type-property>
@@ -136,7 +136,7 @@
                 on-update-name="onChangeGroupName(group)"
                 sorting="sortingMode"
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)"
-                val-server-field-name="{{'Groups[' + groupIndex + '].Name'}}"
+                val-server-field-name="{{'Groups[' + group.serverValidationIndex + '].Name'}}"
                 val-tab-alias="tab-content-{{group.type === 0 ? group.parentAlias : group.alias}}">
 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties" ng-show="group.properties.length > 0 || sortingMode">
@@ -148,8 +148,8 @@
                             on-edit="editPropertyTypeSettings(property)"
                             on-remove="deleteProperty(group.properties, property)"
                             on-change-sort-order-value="onChangePropertySortOrderValue(group)"
-                            val-server-field-alias="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Alias'}}"
-                            val-server-field-label="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Label'}}"
+                            val-server-field-alias="{{'Groups[' + group.serverValidationIndex + '].Properties[' + propertyIndex + '].Alias'}}"
+                            val-server-field-label="{{'Groups[' + group.serverValidationIndex + '].Properties[' + propertyIndex + '].Label'}}"
                             val-tab-alias="tab-content-{{group.type === 0 ? group.parentAlias : group.alias}}">
                         </umb-content-type-property>
                     </li>

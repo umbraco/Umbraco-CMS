@@ -42,10 +42,14 @@
                     return group.type === TYPE_TAB && group.parentAlias == null;
                 });
 
-                // Update index and parentAlias properties of tabs
-                scope.tabs.forEach(tab => {
-                    tab.indexInGroups = newValue.findIndex(group => group.alias === tab.alias);
+                // set server validation index
+                // the server filters out inherited groups when returning the group index
+                const noInherited = newValue.filter(group => !group.inherited);
+                
+                noInherited.forEach((group, index) => {
+                    group.serverValidationIndex = !group.inherited ? index : undefined;
                 });
+                
                 checkGenericTabVisibility();
 
                 if (!scope.openTabAlias && scope.hasGenericTab) {
