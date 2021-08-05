@@ -10,15 +10,16 @@
       <div class="umb-group-builder__tab-title-wrapper">
           <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="vm.sorting && !vm.tab.inherited"></i>
             <ng-form name="tabNameForm" data-element="tab-name">
-                <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited || vm.sorting">{{ vm.tab.name }}</div>
+                <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited" title="{{vm.tab.alias}}">{{ vm.tab.name }}</div>
                 <input
-                    ng-if="!vm.tab.inherited && !vm.sorting"
+                    ng-if="!vm.tab.inherited"
                     class="umb-group-builder__group-title-input"
                     data-element="tab-name-field"
                     type="text"
                     localize="placeholder"
                     placeholder="@placeholders_entername"
                     name="tabName"
+                    title="{{vm.tab.alias}}"
                     ng-model="vm.tab.name"
                     ng-class="{'-placeholder': vm.tab.name == ''}"
                     ng-disabled="!vm.isOpen || vm.allowChangeName === false"
