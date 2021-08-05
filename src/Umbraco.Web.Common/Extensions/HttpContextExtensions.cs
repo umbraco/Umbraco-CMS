@@ -1,5 +1,7 @@
 using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 
@@ -7,6 +9,22 @@ namespace Umbraco.Extensions
 {
     public static class HttpContextExtensions
     {
+
+
+        /// <summary>
+        /// Runs the authentication process
+        /// </summary>
+        public static async Task<AuthenticateResult> AuthenticateBackOfficeAsync(this HttpContext httpContext)
+        {
+            if (httpContext == null)
+            {
+                return AuthenticateResult.NoResult();
+            }
+
+            var result = await httpContext.AuthenticateAsync(Cms.Core.Constants.Security.BackOfficeAuthenticationType);
+            return result;
+        }
+
         /// <summary>
         /// Get the value in the request form or query string for the key
         /// </summary>

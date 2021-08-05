@@ -34,6 +34,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         private readonly IIpResolver _ipResolver;
         private readonly ISystemClock _systemClock;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
+        private readonly IOptionsMonitor<BasicAuthSettings> _optionsSnapshot;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigureBackOfficeCookieOptions"/> class.
@@ -59,7 +60,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             IUserService userService,
             IIpResolver ipResolver,
             ISystemClock systemClock,
-            UmbracoRequestPaths umbracoRequestPaths)
+            UmbracoRequestPaths umbracoRequestPaths,
+            IOptionsMonitor<BasicAuthSettings> optionsSnapshot)
         {
             _serviceProvider = serviceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -72,6 +74,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             _ipResolver = ipResolver;
             _systemClock = systemClock;
             _umbracoRequestPaths = umbracoRequestPaths;
+            _optionsSnapshot = optionsSnapshot;
         }
 
         /// <inheritdoc />
@@ -115,7 +118,9 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             options.CookieManager = new BackOfficeCookieManager(
                 _umbracoContextAccessor,
                 _runtimeState,
-                _umbracoRequestPaths);
+                _umbracoRequestPaths,
+                _optionsSnapshot
+                );
 
             options.Events = new CookieAuthenticationEvents
             {

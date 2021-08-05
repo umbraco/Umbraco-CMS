@@ -8,6 +8,7 @@ using Umbraco.Cms.Web.BackOffice.Middleware;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Extensions;
+using Umbraco.Cms.Web.Common.Middleware;
 
 namespace Umbraco.Extensions
 {
@@ -30,6 +31,7 @@ namespace Umbraco.Extensions
                 a => a.UseMiddleware<KeepAliveMiddleware>());
 
             builder.AppBuilder.UseMiddleware<BackOfficeExternalLoginProviderErrorMiddleware>();
+            builder.AppBuilder.UseMiddleware<BasicAuthAuthenticationMiddleware>();
             return builder;
         }
 
