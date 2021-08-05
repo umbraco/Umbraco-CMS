@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog.Core;
 using Serilog.Events;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
