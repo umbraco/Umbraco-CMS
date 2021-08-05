@@ -32,7 +32,7 @@ angular.module('umbraco.directives')
 
         return {
             restrict: 'A',
-            link: function (scope, element, attr) {
+            link: function (scope, element) {
 
                 var listItems = [];
                 var currentIndex = 0;
