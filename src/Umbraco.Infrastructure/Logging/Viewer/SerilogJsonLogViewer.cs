@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             ILogViewerConfig logViewerConfig,
             ILoggingConfiguration loggingConfiguration,
             global::Serilog.ILogger serilogLog)
-            : base(logViewerConfig, serilogLog)
+            : base(logViewerConfig, serilogLog, new global::Serilog.Core.LoggingLevelSwitch())
         {
             _logger = logger;
             _logsPath = loggingConfiguration.LogDirectory;
