@@ -28,7 +28,8 @@ namespace Umbraco.Extensions
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             IHostingEnvironment hostingEnvironment,
-            ILoggingConfiguration loggingConfiguration)
+            ILoggingConfiguration loggingConfiguration,
+            LoggingLevelSwitch logLevelSwitch)
         {
             global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
@@ -38,7 +39,7 @@ namespace Umbraco.Extensions
             Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
 
-            logConfig.MinimumLevel.Verbose() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
+            logConfig.MinimumLevel.ControlledBy(logLevelSwitch)
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
                 .Enrich.WithThreadId()

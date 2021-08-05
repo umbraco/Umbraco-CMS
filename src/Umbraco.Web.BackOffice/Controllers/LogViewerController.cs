@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog.Core;
+using Serilog.Events;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
@@ -20,10 +22,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class LogViewerController : BackOfficeNotificationsController
     {
         private readonly ILogViewer _logViewer;
+        private readonly LoggingLevelSwitch _levelSwitch;
 
-        public LogViewerController(ILogViewer logViewer)
+        public LogViewerController(ILogViewer logViewer, LoggingLevelSwitch levelSwitch)
         {
             _logViewer = logViewer ?? throw new ArgumentNullException(nameof(logViewer));
+            _levelSwitch = levelSwitch;
         }
 
         private bool CanViewLogs(LogTimePeriod logTimePeriod)
@@ -139,6 +143,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public string GetLogLevel()
         {
             return _logViewer.GetLogLevel();
+        }
+
+        [HttpPost]
+        public ActionResult SetLogLevel(LogEventLevel eventLevel)
+        {
+            // change the injected logging level
+            // Next time app restarts it will read from config again
+            // Used as a temp way to change the LogLevel when needed to do investigation work
+            _levelSwitch.MinimumLevel = eventLevel;
+
+            return Ok();
         }
     }
 }

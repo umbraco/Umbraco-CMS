@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Serilog.Core;
 using Serilog.Extensions.Hosting;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
@@ -26,10 +27,11 @@ namespace Umbraco.Extensions
             this IServiceCollection services,
             IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            LoggingLevelSwitch logLevelSwitch)
         {
             // Create a serilog logger
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration, logLevelSwitch);
 
             // This is nessasary to pick up all the loggins to MS ILogger.
             Log.Logger = logger.SerilogLog;

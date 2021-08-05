@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Core;
 using Smidge;
 using Smidge.FileProcessors;
 using Smidge.InMemory;
@@ -58,6 +59,7 @@ using Umbraco.Cms.Web.Common.RuntimeMinification;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
+using Constants = Umbraco.Cms.Core.Constants;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
@@ -92,7 +94,11 @@ namespace Umbraco.Extensions
             var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
             var loggingConfig = new LoggingConfiguration(loggingDir);
 
-            services.AddLogger(tempHostingEnvironment, loggingConfig, config);
+            // Add the logging level switch so we can change it at runtime
+            var loggingLevelSwitch = new LoggingLevelSwitch(initialMinimumLevel: Serilog.Events.LogEventLevel.Verbose);
+            services.AddSingleton(loggingLevelSwitch);
+
+            services.AddLogger(tempHostingEnvironment, loggingConfig, config, loggingLevelSwitch);
 
             // Manually create and register the HttpContextAccessor. In theory this should not be registered
             // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
