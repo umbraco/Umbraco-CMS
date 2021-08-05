@@ -53,10 +53,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
             Assert.AreEqual(0, typesFound.Count()); // 0 classes in _assemblies are marked with [Tree]
 
             typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>(new[] { typeof(TreeAttribute).Assembly });
-            Assert.AreEqual(22, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
+            Assert.AreEqual(23, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
 
             typesFound = typeFinder.FindClassesWithAttribute<TreeAttribute>();
-            Assert.AreEqual(22, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
+            Assert.AreEqual(23, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
         }
 
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
