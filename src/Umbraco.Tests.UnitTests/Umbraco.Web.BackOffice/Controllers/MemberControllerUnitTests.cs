@@ -511,7 +511,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 It.IsAny<IScopedNotificationPublisher>(),
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
-                It.IsAny<bool>()) == Mock.Of<IScope>());
+                It.IsAny<bool>(),
+                It.IsAny<string>()) == Mock.Of<IScope>());
 
             _mapper = new UmbracoMapper(map, scopeProvider);
 

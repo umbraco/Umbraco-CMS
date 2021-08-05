@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core
             public static class Migrations
             {
                 public const string UmbracoUpgradePlanName = "Umbraco.Core";
+                public const string TestPlanName = "Test";
                 public const string KeyValuePrefix = "Umbraco.Core.Upgrader.State+";
                 public const string UmbracoUpgradePlanKey = KeyValuePrefix + UmbracoUpgradePlanName;
             }

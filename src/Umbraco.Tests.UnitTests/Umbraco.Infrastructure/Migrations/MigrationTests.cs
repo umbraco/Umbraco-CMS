@@ -32,7 +32,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 IScopedNotificationPublisher notificationPublisher = null,
                 bool? scopeFileSystems = null,
                 bool callContext = false,
-                bool autoComplete = false) => _scope;
+                bool autoComplete = false,
+                string connectionStringAlias = null) => _scope;
 
             public IScope CreateDetachedScope(
                 IsolationLevel isolationLevel = IsolationLevel.Unspecified,

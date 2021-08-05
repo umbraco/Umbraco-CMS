@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -91,6 +92,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
 
             return new ScopeProvider(
                 Mock.Of<IUmbracoDatabaseFactory>(),
+                new Dictionary<string, IUmbracoDatabaseFactory>(),
                 fileSystems,
                 Options.Create(new CoreDebugSettings()),
                 mediaFileManager,

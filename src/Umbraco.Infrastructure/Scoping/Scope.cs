@@ -67,7 +67,8 @@ namespace Umbraco.Cms.Core.Scoping
             IScopedNotificationPublisher notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
-            bool autoComplete = false)
+            bool autoComplete = false,
+            string connectionStringAlias = null)
         {
             _scopeProvider = scopeProvider;
             _coreDebugSettings = coreDebugSettings;
@@ -84,6 +85,7 @@ namespace Umbraco.Cms.Core.Scoping
             _scopeFileSystem = scopeFileSystems;
             _callContext = callContext;
             _autoComplete = autoComplete;
+            ConnectionStringAlias = connectionStringAlias;
 
             Detachable = detachable;
 
@@ -182,8 +184,9 @@ namespace Umbraco.Cms.Core.Scoping
             IScopedNotificationPublisher scopedNotificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
-            bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopedNotificationPublisher, scopeFileSystems, callContext, autoComplete)
+            bool autoComplete = false,
+            string connectionStringAlias = null)
+            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopedNotificationPublisher, scopeFileSystems, callContext, autoComplete, connectionStringAlias)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
@@ -201,8 +204,9 @@ namespace Umbraco.Cms.Core.Scoping
             IScopedNotificationPublisher notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
-            bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete)
+            bool autoComplete = false,
+            string connectionStringAlias = null)
+            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete, connectionStringAlias)
         { }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
@@ -210,6 +214,8 @@ namespace Umbraco.Cms.Core.Scoping
         public int CreatedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
 
         public ISqlContext SqlContext => _scopeProvider.SqlContext;
+
+        public string ConnectionStringAlias { get; }
 
         // a value indicating whether to force call-context
         public bool CallContext
@@ -325,7 +331,7 @@ namespace Umbraco.Cms.Core.Scoping
                     return _database;
                 }
 
-                if (ParentScope != null)
+                if (ParentScope != null && ParentScope.ConnectionStringAlias == ConnectionStringAlias)
                 {
                     IUmbracoDatabase database = ParentScope.Database;
                     IsolationLevel currentLevel = database.GetCurrentTransactionIsolationLevel();
@@ -338,7 +344,10 @@ namespace Umbraco.Cms.Core.Scoping
                 }
 
                 // create a new database
-                _database = _scopeProvider.DatabaseFactory.CreateDatabase();
+                IUmbracoDatabaseFactory databaseFactory = string.IsNullOrEmpty(ConnectionStringAlias)
+                    ? _scopeProvider.DatabaseFactory
+                    : _scopeProvider.NamedAdditionalDatabaseFactories[ConnectionStringAlias];
+                _database = databaseFactory.CreateDatabase();
 
                 // enter a transaction, as a scope implies a transaction, always
                 try
@@ -521,12 +530,14 @@ namespace Umbraco.Cms.Core.Scoping
                 _completed = true;
             }
 
-            if (ParentScope != null)
+            if (ParentScope != null && ParentScope.ConnectionStringAlias == ConnectionStringAlias)
             {
                 ParentScope.ChildCompleted(_completed);
             }
             else
             {
+                // If the parent scope is for a different database, we need to complete the transaction on this scope.
+                // Otherwise we commit on the completion of the parent scope.
                 DisposeLastScope();
             }
 

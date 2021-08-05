@@ -54,6 +54,8 @@ namespace Umbraco.Cms.Core
                 public const string ExternalLogin = TableNamePrefix + "ExternalLogin";
                 public const string ExternalLoginToken = TableNamePrefix + "ExternalLoginToken";
 
+                public const string Test = TableNamePrefix + "Test";
+
                 public const string Macro = /*TableNamePrefix*/ "cms" + "Macro";
                 public const string MacroProperty = /*TableNamePrefix*/ "cms" + "MacroProperty";
 

@@ -52,6 +52,9 @@ using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
+using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using Umbraco.Cms.Infrastructure.Migrations.Test;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
@@ -66,9 +69,37 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddMainDom()
                 .AddLogging();
 
+            // Default database.
             builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
             builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
             builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
+
+            // Named additional databases.
+            builder.Services.AddSingleton<Dictionary<string, IUmbracoDatabaseFactory>>(factory =>
+            {
+                var namedDatabases = new Dictionary<string, IUmbracoDatabaseFactory>();
+
+                ConnectionStrings connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
+                foreach (NamedConnectionString namedConnectionString in connectionStrings.NamedConnectionStrings)
+                {
+                    namedDatabases.Add(
+                        namedConnectionString.Alias,
+                        new UmbracoDatabaseFactory(
+                            factory.GetRequiredService<ILogger<UmbracoDatabaseFactory>>(),
+                            factory.GetRequiredService<ILoggerFactory>(),
+                            factory.GetRequiredService<IOptions<GlobalSettings>>(),
+                            factory.GetRequiredService<IOptions<ConnectionStrings>>(),
+                            factory.GetRequiredService<IMapperCollection>(),
+                            factory.GetRequiredService<IDbProviderFactoryCreator>(),
+                            factory.GetRequiredService<DatabaseSchemaCreatorFactory>(),
+                            factory.GetRequiredService<NPocoMapperCollection>(),
+                            namedConnectionString.Alias));
+                }
+
+                return namedDatabases;
+            });
+            
+
             builder.NPocoMappers().Add<NullableDateMapper>();
             builder.PackageMigrationPlans().Add(() => builder.TypeLoader.GetPackageMigrationPlans());
 
@@ -358,6 +389,10 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
                 .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
                 .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+
+            // Add notification handlers for test migration plane
+            builder
+                .AddNotificationHandler<UmbracoApplicationStartingNotification, RunTestPlan>();
 
             return builder;
         }

@@ -39,7 +39,8 @@ namespace Umbraco.Cms.Core.Scoping
             IScopedNotificationPublisher scopedNotificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
-            bool autoComplete = false);
+            bool autoComplete = false,
+            string connectionStringAlias = null);
 
         /// <summary>
         /// Creates a detached scope.
