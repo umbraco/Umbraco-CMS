@@ -144,6 +144,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_15_0\AddCmsContentNuByteColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_15_0\UpdateCmsPropertyGroupIdSeed.cs" />
     <Compile Include="Migrations\Upgrade\V_8_15_0\UpgradedIncludeIndexes.cs" />
     <Compile Include="Migrations\Upgrade\V_8_10_0\AddPropertyTypeLabelOnTopColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_9_0\ExternalLoginTableUserData.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="PropertyEditors\NoopPropertyCacheCompressionOptions.cs" />
     <Compile Include="PropertyEditors\PropertyCacheCompression.cs" />
     <Compile Include="PropertyEditors\IPropertyCacheCompression.cs" />
+    <Compile Include="PropertyEditors\UnPublishedContentPropertyCacheCompressionOptions.cs" />
     <Compile Include="Serialization\AutoInterningStringConverter.cs" />
     <Compile Include="Serialization\AutoInterningStringKeyCaseInsensitiveDictionaryConverter.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerConfiguration.cs" />
