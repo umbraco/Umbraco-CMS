@@ -36,7 +36,6 @@
             eventBindings.push(scope.$watchCollection('model.groups', newValue => {
 
                 contentEditingHelper.defineParentAliasOnGroups(newValue);
-                console.log("relocateDisorientedGroups:")
                 contentEditingHelper.relocateDisorientedGroups(newValue);
 
                 scope.tabs = $filter("filter")(newValue, group => {
