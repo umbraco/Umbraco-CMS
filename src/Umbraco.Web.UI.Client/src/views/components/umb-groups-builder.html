@@ -136,7 +136,7 @@
                 on-update-name="onChangeGroupName(group)"
                 sorting="sortingMode"
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)"
-                val-server-field-name="{{'Groups[' + $index + '].Name'}}"
+                val-server-field-name="{{'Groups[' + groupIndex + '].Name'}}"
                 val-tab-alias="tab-content-{{group.type === 0 ? group.parentAlias : group.alias}}">
 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties" ng-show="group.properties.length > 0 || sortingMode">
