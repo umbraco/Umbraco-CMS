@@ -322,6 +322,11 @@
                         scope.sortingButtonKey = "general_reorder";
                     }
 
+                    // When exiting the reorder mode while the generic tab is empty, set the active tab to the first available one
+                    if (scope.tabs.length > 0 && !scope.openTabAlias) {
+                        scope.openTabAlias = scope.tabs[0].alias;
+                    }
+
                 } else {
                     scope.sortingMode = true;
                     scope.sortingButtonKey = "general_reorderDone";
