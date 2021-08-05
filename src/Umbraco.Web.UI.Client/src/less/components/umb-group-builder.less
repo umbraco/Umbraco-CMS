@@ -87,9 +87,18 @@
     display: contents;
     > umb-button {
         white-space: nowrap;
+
+        .umb-button {
+          margin-left: 0;
+        }
+        
         .umb-button__content {
             flex-wrap: nowrap;
         }
+    }
+
+    > umb-button, .umb-button, .umb-button__button {
+      height: 100%;
     }
 }
 
