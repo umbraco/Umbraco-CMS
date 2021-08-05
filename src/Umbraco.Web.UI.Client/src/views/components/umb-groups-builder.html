@@ -27,7 +27,7 @@
                             allow-remove="canRemoveTab(tab) && !sortingMode"
                             on-remove="removeTab(tab, tabIndex)"
                             val-server-field-name="{{'Groups[' + tab.serverValidationIndex + '].Name'}}"
-                            on-change-sort-order-value="onChangeTabSortOrderValue(tab)"
+                            on-change-sort-order-value="orderTabs()"
                             on-change-name="onChangeTabName(tab)">
                         </umb-content-type-tab>
                     </li>

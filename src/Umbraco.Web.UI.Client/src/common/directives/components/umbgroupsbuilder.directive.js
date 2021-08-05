@@ -42,6 +42,9 @@
                     return group.type === TYPE_TAB && group.parentAlias == null;
                 });
 
+                // order tabs
+                scope.orderTabs();
+
                 // set server validation index
                 // the server filters out inherited groups when returning the group index
                 const noInherited = newValue.filter(group => !group.inherited);
@@ -556,7 +559,7 @@
                 el.scrollLeft += el.clientWidth * 0.5;
             }
 
-            scope.onChangeTabSortOrderValue = () => {
+            scope.orderTabs = () => {
                 scope.tabs = $filter('orderBy')(scope.tabs, 'sortOrder');
             };
 
