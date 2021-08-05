@@ -88,41 +88,35 @@ namespace Umbraco.Web.Models.ContentEditing
                 yield return validationResult;
             }
 
-            var lastDuplicateGroupAlias = Groups.GroupBy(x => x.Alias).Where(x => x.Count() > 1).LastOrDefault();
-            if (lastDuplicateGroupAlias != null)
+            foreach (var duplicateGroupAlias in Groups.GroupBy(x => x.Alias).Where(x => x.Count() > 1))
             {
-                // We need to return the field name with an index so it's wired up correctly
-                var lastIndex = Groups.IndexOf(lastDuplicateGroupAlias.Last());
-                yield return new ValidationResult("Duplicate aliases are not allowed", new[]
+                var lastGroupIndex = Groups.IndexOf(duplicateGroupAlias.Last());
+                yield return new ValidationResult("Duplicate aliases are not allowed: " + duplicateGroupAlias.Key, new[]
                 {
                     // TODO: We don't display the alias yet, so add the validation message to the name
-                    string.Format("Groups[{0}].Name", lastIndex)
+                    $"Groups[{lastGroupIndex}].Name"
                 });
             }
-            else
+
+            foreach (var duplicateGroupName in Groups.GroupBy(x => (x.GetParentAlias(), x.Name)).Where(x => x.Count() > 1))
             {
-                var lastDuplicateGroupName = Groups.GroupBy(x => (x.GetParentAlias(), x.Name)).Where(x => x.Count() > 1).LastOrDefault();
-                if (lastDuplicateGroupName != null)
+                var lastGroupIndex = Groups.IndexOf(duplicateGroupName.Last());
+                yield return new ValidationResult("Duplicate names are not allowed", new[]
                 {
-                    // We need to return the field name with an index so it's wired up correctly
-                    var lastIndex = Groups.IndexOf(lastDuplicateGroupName.Last());
-                    yield return new ValidationResult("Duplicate names are not allowed", new[]
-                    {
-                        string.Format("Groups[{0}].Name", lastIndex)
-                    });
-                }
+                    $"Groups[{lastGroupIndex}].Name"
+                });
             }
 
-            var duplicateProperties = Groups.SelectMany(x => x.Properties).Where(x => x.Inherited == false).GroupBy(x => x.Alias).Where(x => x.Count() > 1).ToArray();
-            if (duplicateProperties.Any())
+            foreach (var duplicatePropertyAlias in Groups.SelectMany(x => x.Properties).GroupBy(x => x.Alias).Where(x => x.Count() > 1))
             {
-                //we need to return the field name with an index so it's wired up correctly
-                var lastProperty = duplicateProperties.Last().Last();
+                var lastProperty = duplicatePropertyAlias.Last();
                 var propertyGroup = Groups.Single(x => x.Properties.Contains(lastProperty));
+                var lastPropertyIndex = propertyGroup.Properties.IndexOf(lastProperty);
+                var propertyGroupIndex = Groups.IndexOf(propertyGroup);
 
-                yield return new ValidationResult("Duplicate property aliases not allowed: " + lastProperty.Alias, new[]
+                yield return new ValidationResult("Duplicate property aliases not allowed: " + duplicatePropertyAlias.Key, new[]
                 {
-                    string.Format("Groups[{0}].Properties[{1}].Alias", propertyGroup.SortOrder, lastProperty.SortOrder)
+                    $"Groups[{lastPropertyIndex}].Properties[{propertyGroupIndex}].Alias"
                 });
             }
 

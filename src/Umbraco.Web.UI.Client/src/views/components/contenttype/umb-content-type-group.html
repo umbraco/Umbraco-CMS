@@ -10,6 +10,7 @@
                         localize="placeholder"
                         placeholder="@placeholders_entername"
                         name="groupName"
+                        title="{{vm.group.alias}}"
                         ng-model="vm.group.name"
                         ng-class="{'-placeholder': vm.group.name == ''}"
                         ng-change="vm.updateName(vm.group)"
