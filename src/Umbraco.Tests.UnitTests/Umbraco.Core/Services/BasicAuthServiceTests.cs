@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
 {
@@ -24,6 +24,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
         [TestCase("::1", "1.1.1.1, ::1", ExpectedResult = true)]
         [TestCase("127.0.0.1", "127.0.0.1, ::1", ExpectedResult = true)]
         [TestCase("127.0.0.1", "", ExpectedResult = false)]
+        [TestCase("125.125.125.1", "125.125.125.0/24", ExpectedResult = true)]
+        [TestCase("125.125.124.1", "125.125.125.0/24", ExpectedResult = false)]
         public bool IsBasicAuthEnabled(string clientIpAddress, string commaSeperatedAllowlist)
         {
             var allowedIPs = commaSeperatedAllowlist.Split(",").Select(x=>x.Trim()).ToArray();

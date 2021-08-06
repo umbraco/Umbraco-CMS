@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Cms.Core.Services
+namespace Umbraco.Cms.Core.Services.Implement
 {
     public class BasicAuthService : IBasicAuthService
     {
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Services
         {
             foreach (var allowedIpString in _basicAuthSettings.AllowedIPs)
             {
-                if(IPAddress.TryParse(allowedIpString, out var allowedIp) && clientIpAddress.Equals(allowedIp))
+                if(IPNetwork.TryParse(allowedIpString, out var allowedIp) && allowedIp.Contains(clientIpAddress))
                 {
                     return true;
                 };
