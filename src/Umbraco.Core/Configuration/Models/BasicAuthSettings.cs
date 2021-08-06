@@ -7,7 +7,7 @@ using System.Net;
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
-    /// Typed configuration options for security settings.
+    /// Typed configuration options for basic authentication settings.
     /// </summary>
     [UmbracoOptions(Constants.Configuration.ConfigBasicAuth)]
     public class BasicAuthSettings
