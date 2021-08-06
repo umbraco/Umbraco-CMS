@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.ComponentModel;
 using System.Net;
 
@@ -21,6 +22,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool Enabled { get; set; } = StaticEnabled;
 
 
-        public string[] AllowedIPs { get; set; } = new string[0];
+        public string[] AllowedIPs { get; set; } = Array.Empty<string>();
     }
 }

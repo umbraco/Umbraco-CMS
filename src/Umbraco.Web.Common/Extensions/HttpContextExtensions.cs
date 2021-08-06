@@ -1,5 +1,6 @@
 using System;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,36 @@ namespace Umbraco.Extensions
     public static class HttpContextExtensions
     {
 
+
+        /// <summary>
+        /// Try to get the basic auth username and password from the http context.
+        /// </summary>
+        public static bool TryGetBasicAuthCredentials(this HttpContext httpContext, out string username, out string password)
+        {
+            username = null;
+            password = null;
+
+            if ( httpContext.Request.Headers.TryGetValue("Authorization", out var authHeaders))
+            {
+                var authHeader = authHeaders.ToString();
+                if (authHeader is not null && authHeader.StartsWith("Basic"))
+                {
+                    //Extract credentials
+                    var encodedUsernamePassword = authHeader.Substring(6).Trim();
+                    var encoding = Encoding.UTF8;
+                    var usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
+
+                    var seperatorIndex = usernamePassword.IndexOf(':');
+
+                    username = usernamePassword.Substring(0, seperatorIndex);
+                    password = usernamePassword.Substring(seperatorIndex + 1);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Runs the authentication process

@@ -51,24 +51,10 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 return;
             }
 
-
-            string authHeader = context.Request.Headers["Authorization"];
-            if (authHeader != null && authHeader.StartsWith("Basic"))
+            if (context.TryGetBasicAuthCredentials(out var username, out var password))
             {
-                //Extract credentials
-                var encodedUsernamePassword = authHeader.Substring(6).Trim();
-                var encoding = Encoding.UTF8;
-                var usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
-
-                var seperatorIndex = usernamePassword.IndexOf(':');
-
-                var username = usernamePassword.Substring(0, seperatorIndex);
-                var password = usernamePassword.Substring(seperatorIndex + 1);
-
-
                 IBackOfficeSignInManager backOfficeSignInManager =
                     context.RequestServices.GetRequiredService<IBackOfficeSignInManager>();
-
 
                 SignInResult signInResult =
                     await backOfficeSignInManager.PasswordSignInAsync(username, password, false, true);
@@ -89,12 +75,10 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
         }
 
-
-
         private static void SetUnauthorizedHeader(HttpContext context)
         {
             context.Response.StatusCode = 401;
-            context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"Umbraco as a Service login\"");
+            context.Response.Headers.Add("WWW-Authenticate", "Basic realm=\"Umbraco login\"");
         }
     }
 }
