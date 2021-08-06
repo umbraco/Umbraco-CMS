@@ -13,8 +13,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Web.Common.Middleware
 {
     /// <summary>
-    ///     Ensures that preview pages (front-end routed) are authenticated with the back office identity appended to the
-    ///     principal alongside any default authentication that takes place
+    ///     Provides basic authentication via back-office credentials for public website access if configured for use and the client IP is not allow listed.
     /// </summary>
     public class BasicAuthAuthenticationMiddleware : IMiddleware
     {
