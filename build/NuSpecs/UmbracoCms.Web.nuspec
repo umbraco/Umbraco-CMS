@@ -41,7 +41,11 @@
                 <dependency id="Microsoft.Owin.Host.SystemWeb" version="[4.0.1,4.999999)" />
                 <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.1,4.999999)" />
                 <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.1,4.999999)" />
+                <dependency id="System.Buffers" version="[4.5.1,4.999999)" />
+                <dependency id="System.Numerics.Vectors" version="[4.5.0,4.999999)" />
+                <dependency id="System.Memory" version="[4.5.4,4.999999)" />
                 <dependency id="System.Threading.Tasks.Dataflow" version="[4.9.0,4.999999)" />
+                <dependency id="System.Collections.Immutable" version="[1.7.1,1.999999)" />
                 <dependency id="System.Text.Encoding.CodePages" version="[4.7.1,4.999999)" />
                 <dependency id="MessagePack" version="[2.2.85,2.999999)" />
                 <dependency id="K4os.Compression.LZ4" version="[1.1.11,1.999999)" />

@@ -185,26 +185,6 @@
     <key alias="smallSort">Seřadit</key>
     <key alias="historyIncludingVariants">Historie (všechny jazyky)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Abyste změnili typ dokumentu pro zvolený obsah, nejprve jej vyberte ze seznamu typů platných pro tohle umístění.</key>
-    <key alias="changeDocTypeInstruction2">Pak potvrďte a/nebo pozměňte mapování vlastností z aktuálního typu na nový a dejte Uložit.</key>
-    <key alias="contentRepublished">Obsah byl znovu publikován.</key>
-    <key alias="currentProperty">Aktuální vlastnost</key>
-    <key alias="currentType">Aktuální typ</key>
-    <key alias="docTypeCannotBeChanged">Typ dokumentu nemůže být změněn, neboť neexistují alternativy platné pro toto umístění.</key>
-    <key alias="docTypeChanged">Typ dokumentu byl změněn</key>
-    <key alias="mapProperties">Mapování vlastností</key>
-    <key alias="mapToProperty">Mapování na vlastnost</key>
-    <key alias="newTemplate">Nová šablona</key>
-    <key alias="newType">Nový typ</key>
-    <key alias="none">nic</key>
-    <key alias="selectedContent">Obsah</key>
-    <key alias="selectNewDocType">Vybrat nový typ dokumentu</key>
-    <key alias="successMessage">Typ dokumentu pro zvolený obsah byl úspěšně změněný na [new type] a následující vlastnosti byly namapovány:</key>
-    <key alias="to">na</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Nelze dokončit mapování vlastností, neboť nejméně jedna z vlastností má definováno více než jedno mapování.</key>
-    <key alias="validDocTypesNote">Jsou zobrazeny pouze alternativní typy platné pro aktuální umístění.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Nepodařilo se vytvořit složku pod rodičem s ID %0%</key>
     <key alias="createFolderFailedByName">Nepodařilo se vytvořit složku pod rodičem s názvem %0%</key>
