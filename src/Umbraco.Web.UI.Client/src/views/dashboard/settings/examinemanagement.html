@@ -25,7 +25,7 @@
                             <div class="umb-panel-group__details-status-icon-container">
                                 <umb-icon icon="{{indexer.isHealthy ? 'icon-check' : 'icon-delete'}}"
                                           class="umb-panel-status-icon mt1"
-                                          ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}">
+                                          ng-class="{'color-green' : indexer.isHealthy, 'color-red' : !indexer.isHealthy}">
                                 </umb-icon>
                             </div>
 
@@ -228,7 +228,7 @@
                                 <div class="umb-panel-group__details-status-icon-container">
                                     <umb-icon icon="{{vm.selectedIndex.isHealthy ? 'icon-check' : 'icon-delete'}}"
                                               class="umb-panel-status-icon mt1"
-                                              ng-class="{'icon-check color-green' : vm.selectedIndex.isHealthy, 'icon-delete color-red' : !vm.selectedIndex.isHealthy}">
+                                              ng-class="{ 'color-green' : vm.selectedIndex.isHealthy, 'color-red': !vm.selectedIndex.isHealthy}">
                                     </umb-icon>
                                 </div>
 
