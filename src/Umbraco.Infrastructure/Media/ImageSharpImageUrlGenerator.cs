@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Umbraco.Cms.Core.Media;
@@ -61,6 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Media
             imageProcessorUrl.Append(options.Crop.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
             imageProcessorUrl.Append(options.Crop.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
             imageProcessorUrl.Append(options.Crop.Y2.ToString(CultureInfo.InvariantCulture));
+            imageProcessorUrl.Append("&cropmode=percentage");
         }
     }
 }
