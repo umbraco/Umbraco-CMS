@@ -93,26 +93,6 @@
     <key alias="styleShow">顯示樣式</key>
     <key alias="tableInsert">插入表格</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">要更改所選節點的文檔類型，先在列表中選擇合適的文檔類型。</key>
-    <key alias="changeDocTypeInstruction2">然後設置當前文檔類型到新文檔類型的各欄位間的對應映射關係並保存。</key>
-    <key alias="contentRepublished">內容已被重新發佈</key>
-    <key alias="currentProperty">當前屬性</key>
-    <key alias="currentType">當前類型</key>
-    <key alias="docTypeCannotBeChanged">不能改變文檔類型，因為沒有可替代的類型。</key>
-    <key alias="docTypeChanged">文檔類型已更改</key>
-    <key alias="mapProperties">要映射的欄位</key>
-    <key alias="mapToProperty">映射欄位</key>
-    <key alias="newTemplate">新範本</key>
-    <key alias="newType">新類型</key>
-    <key alias="none">無</key>
-    <key alias="selectedContent">內容</key>
-    <key alias="selectNewDocType">選擇新的文檔類型</key>
-    <key alias="successMessage">選中文檔的類型已被成功更改為[new type]，以下欄位被映射：</key>
-    <key alias="to">至</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">不能完成欄位映射，因為存在一個欄位映射至多欄位的問題。</key>
-    <key alias="validDocTypesNote">僅顯示可作為替代的文檔類型。</key>
-  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">已發表</key>
     <key alias="about">關於本頁</key>
