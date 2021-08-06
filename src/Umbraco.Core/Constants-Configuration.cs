@@ -46,6 +46,7 @@
             public const string ConfigRuntimeMinification = ConfigPrefix + "RuntimeMinification";
             public const string ConfigRuntimeMinificationVersion = ConfigRuntimeMinification + ":Version";
             public const string ConfigSecurity = ConfigPrefix + "Security";
+            public const string ConfigBasicAuth = ConfigPrefix + "BasicAuth";
             public const string ConfigTours = ConfigPrefix + "Tours";
             public const string ConfigTypeFinder = ConfigPrefix + "TypeFinder";
             public const string ConfigWebRouting = ConfigPrefix + "WebRouting";

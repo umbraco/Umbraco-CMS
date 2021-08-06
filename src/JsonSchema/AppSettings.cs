@@ -46,6 +46,7 @@ namespace JsonSchema
                 public UnattendedSettings Unattended { get; set; }
                 public RichTextEditorSettings RichTextEditor { get; set; }
                 public RuntimeMinificationSettings RuntimeMinification { get; set; }
+                public BasicAuthSettings BasicAuth { get; set; }
             }
 
             /// <summary>
