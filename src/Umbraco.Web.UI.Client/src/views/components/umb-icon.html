@@ -1,5 +1,5 @@
 <span aria-hidden="true" class="umb-icon">
-    <span ng-if="svgString" ng-bind-html="svgString" class="umb-icon__svg"></span>
+    <span ng-if="svgString" ng-bind-html="svgString" class="umb-icon__svg {{color}}"></span>
     <span ng-if="!svgString && icon" class="umb-icon__legacy {{icon}}">
         <i class="{{icon}}"></i>
     </span>

@@ -31,10 +31,12 @@ Icon with additional attribute. It can be treated like any other dom element
             templateUrl: "views/components/umb-icon.html",
             scope: {
                 icon: "@",
+                color: "<?",
                 svgString: "=?"
             },
 
             link: function (scope, element) {
+
                 if (scope.svgString === undefined && scope.svgString !== null && scope.icon !== undefined && scope.icon !== null) {
                     const observer = new IntersectionObserver(_lazyRequestIcon, {rootMargin: "100px"});
                     const iconEl = element[0];
@@ -49,8 +51,14 @@ Icon with additional attribute. It can be treated like any other dom element
 
                 scope.$watch("icon", function (newValue, oldValue) {
                     if (newValue && oldValue) {
+
                         var newicon = newValue.split(" ")[0];
                         var oldicon = oldValue.split(" ")[0];
+
+                        var splitted = newValue.split(" ");
+                        var color = scope.color || (splitted.length > 1 ? splitted[1] : null);
+
+                        scope.color = color;
 
                         if (newicon !== oldicon) {
                             _requestIcon(newicon);
@@ -63,7 +71,12 @@ Icon with additional attribute. It can be treated like any other dom element
                         if (entry.isIntersecting === true) {
                             observer.disconnect();
 
-                            var icon = scope.icon.split(" ")[0]; // Ensure that only the first part of the icon is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
+                            var splitted = scope.icon.split(" ");
+                            var icon = splitted[0]; // Ensure that only the first part of the icon is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
+                            var color = scope.color || (splitted.length > 1 ? splitted[1] : null);
+
+                            scope.color = color;
+
                             _requestIcon(icon);
                         }
                     });
