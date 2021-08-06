@@ -12,11 +12,31 @@
             var propertyGroupNodesDictionary = {};
 
             var scrollableNode = appRootNode.closest(".umb-scrollable");
-            scrollableNode.addEventListener("scroll", onScroll);
-            scrollableNode.addEventListener("mousewheel", cancelScrollTween);
 
             $scope.activeTabAlias = null;
             $scope.tabs = [];
+
+            $scope.$watchCollection('content.tabs', () => {
+                // make a collection with only tabs and not all groups
+                $scope.tabs = $filter("filter")($scope.content.tabs, (tab) => {
+                    return tab.type === 1;
+                });
+
+                if ($scope.tabs.length > 0) {
+                    // if we have tabs and some groups that doesn't belong to a tab we need to render those on an "Other" tab.
+                    contentEditingHelper.registerGenericTab($scope.content.tabs);
+
+                    $scope.setActiveTab($scope.tabs[0]);
+
+                    scrollableNode.removeEventListener("scroll", onScroll);
+                    scrollableNode.removeEventListener("mousewheel", cancelScrollTween);
+
+                // only trigger anchor scroll when there are no tabs
+                } else {
+                    scrollableNode.addEventListener("scroll", onScroll);
+                    scrollableNode.addEventListener("mousewheel", cancelScrollTween);
+                }
+            });
 
             // Add parentAlias property to all groups
             $scope.content.tabs.forEach((group) => {
@@ -52,6 +72,7 @@
                     tab.active = true;
                 }
             }
+
             function getActiveAnchor() {
                 var i = $scope.content.tabs.length;
                 while(i--) {
@@ -60,12 +81,14 @@
                 }
                 return false;
             }
+
             function getScrollPositionFor(id) {
                 if (propertyGroupNodesDictionary[id]) {
                     return propertyGroupNodesDictionary[id].offsetTop - 20;// currently only relative to closest relatively positioned parent
                 }
                 return null;
             }
+
             function scrollTo(id) {
                 var y = getScrollPositionFor(id);
                 if (getScrollPositionFor !== null) {
@@ -87,6 +110,7 @@
 
                 }
             }
+
             function jumpTo(id) {
                 var y = getScrollPositionFor(id);
                 if (getScrollPositionFor !== null) {
@@ -94,6 +118,7 @@
                     scrollableNode.scrollTo(0, y);
                 }
             }
+
             function cancelScrollTween() {
                 if($scope.scrollTween) {
                     $scope.scrollTween.pause();
@@ -110,22 +135,9 @@
                 tab.active = true;
             };
 
-            $scope.$watchCollection('content.tabs', () => {
-                $scope.tabs = $filter("filter")($scope.content.tabs, (tab) => {
-                    return tab.type === 1;
-                });
-
-                if ($scope.tabs.length > 0) {
-                    // if we have tabs and some groups that doesn't belong to a tab we need to render those on an "Other" tab.
-                    contentEditingHelper.registerGenericTab($scope.content.tabs);
-
-                    $scope.setActiveTab($scope.tabs[0]);
-                }
-            });
-
             $scope.$on("editors.apps.appChanged", function($event, $args) {
                 // if app changed to this app, then we want to scroll to the current anchor
-                if($args.app.alias === "umbContent") {
+                if($args.app.alias === "umbContent" && $scope.tabs.length === 0) {
                     var activeAnchor = getActiveAnchor();
                     $timeout(jumpTo.bind(null, [activeAnchor.id]));
                 }
