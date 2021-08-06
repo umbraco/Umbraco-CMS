@@ -31,17 +31,17 @@
         content: none !important;
     }
 
+    &__svg,
     &__legacy {
-
-        /* Inherit font icon from parent but clear pseudo classes,
-           so it is only used on child <i> element.
-        */
-
+        // Clear pseudo classes
         &::before,
         &::after {
             content: none !important;
         }
+    }
 
+    &__legacy {
+        // Inherit font icon from parent
         > i {
             font-family: inherit;
         }
