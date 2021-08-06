@@ -135,7 +135,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
             if (vm.buttonStyle) {
 
                 // make it possible to pass in multiple styles
-                if(vm.buttonStyle.startsWith("[") && vm.buttonStyle.endsWith("]")) {
+                if (vm.buttonStyle.startsWith("[") && vm.buttonStyle.endsWith("]")) {
 
                     // when using an attr it will always be a string so we need to remove square brackets
                     // and turn it into and array
@@ -143,16 +143,16 @@ Use this directive to render an umbraco button. The directive can be used to gen
                     // split array by , + make sure to catch whitespaces
                     var array = withoutBrackets.split(/\s?,\s?/g);
 
-                    angular.forEach(array, function(item){
+                    Utilities.forEach(array, item => {
                         vm.style = vm.style + " " + "btn-" + item;
-                        if(item === "block") {
+                        if (item === "block") {
                             vm.blockElement = true;
                         }
                     });
 
                 } else {
                     vm.style = "btn-" + vm.buttonStyle;
-                    if(vm.buttonStyle === "block") {
+                    if (vm.buttonStyle === "block") {
                         vm.blockElement = true;
                     }
                 }
@@ -167,7 +167,7 @@ Use this directive to render an umbraco button. The directive can be used to gen
 
             // watch for state changes
             if (changes.state) {
-                if(changes.state.currentValue) {
+                if (changes.state.currentValue) {
                     vm.innerState = changes.state.currentValue;
                 }
                 if (changes.state.currentValue === 'success' || changes.state.currentValue === 'error') {
@@ -179,25 +179,25 @@ Use this directive to render an umbraco button. The directive can be used to gen
             }
 
             // watch for disabled changes
-            if(changes.disabled) {
-                if(changes.disabled.currentValue) {
+            if (changes.disabled) {
+                if (changes.disabled.currentValue) {
                     vm.disabled = changes.disabled.currentValue;
                 }
             }
 
             // watch for label changes
-            if(changes.label && changes.label.currentValue) {
+            if (changes.label && changes.label.currentValue) {
                 vm.buttonLabel = changes.label.currentValue;
                 setButtonLabel();
             }
 
             // watch for label key changes
-            if(changes.labelKey && changes.labelKey.currentValue) {
+            if (changes.labelKey && changes.labelKey.currentValue) {
                 setButtonLabel();
             }
 
             // watch for type changes
-            if(changes.type) {
+            if (changes.type) {
                 if (!vm.type) {
                     vm.type = "button";// set the default
                 }
@@ -206,23 +206,23 @@ Use this directive to render an umbraco button. The directive can be used to gen
         }
 
         function clickButton(event) {
-            if(vm.action) {
+            if (vm.action) {
                 vm.action({$event: event});
             }
         }
 
         function setButtonLabel() {
             // if the button opens a dialog add "..." to the label
-            if(vm.addEllipsis === "true") {
+            if (vm.addEllipsis === "true") {
                 vm.buttonLabel = vm.buttonLabel + "...";
             }
 
             // look up localization key
-            if(vm.labelKey) {
-                localizationService.localize(vm.labelKey).then(function(value){
+            if (vm.labelKey) {
+                localizationService.localize(vm.labelKey).then(value => {
                     vm.buttonLabel = value;
                     // if the button opens a dialog add "..." to the label
-                    if(vm.addEllipsis === "true") {
+                    if (vm.addEllipsis === "true") {
                         vm.buttonLabel = vm.buttonLabel + "...";
                     }
                 });
