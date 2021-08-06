@@ -27,6 +27,15 @@ namespace Umbraco.Cms.Core.Logging
             Profiler = profiler ?? throw new ArgumentNullException(nameof(profiler));
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProfilingLogger"/> class.
+        /// </summary>
+        public ProfilingLogger(ILogger logger, IProfiler profiler)
+        {
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            Profiler = profiler ?? throw new ArgumentNullException(nameof(profiler));
+        }
+
         public DisposableTimer TraceDuration<T>(string startMessage, object[] startMessageArgs = null)
             => TraceDuration<T>(startMessage, "Completed.", startMessageArgs: startMessageArgs);
 

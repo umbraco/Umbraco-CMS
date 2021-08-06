@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using System.Linq;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Kernel;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -74,7 +76,7 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
                             Options.Create(new GlobalSettings()),
                             Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                             Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run),
-                            new UmbracoApiControllerTypeCollection(Array.Empty<Type>()))));
+                            new UmbracoApiControllerTypeCollection(() => Enumerable.Empty<Type>()))));
 
                     fixture.Customize<PreviewRoutes>(u => u.FromFactory(
                         () => new PreviewRoutes(

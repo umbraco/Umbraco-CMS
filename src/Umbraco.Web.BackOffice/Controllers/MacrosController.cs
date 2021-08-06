@@ -46,8 +46,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILogger<MacrosController> logger,
             IHostingEnvironment hostingEnvironment,
-            IUmbracoMapper umbracoMapper
-            )
+            IUmbracoMapper umbracoMapper)
         {
             _parameterEditorCollection = parameterEditorCollection ?? throw new ArgumentNullException(nameof(parameterEditorCollection));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
@@ -315,6 +314,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </returns>
         private IEnumerable<string> FindPartialViewFilesInViewsFolder()
         {
+            // TODO: This is inconsistent. We have FileSystems.MacroPartialsFileSystem but we basically don't use
+            // that at all except to render the tree. In the future we may want to use it. This also means that
+            // we are storing the virtual path of the macro like ~/Views/MacroPartials/Login.cshtml instead of the
+            // relative path which would work with the FileSystems.MacroPartialsFileSystem, but these are incompatible.
+            // At some point this should all be made consistent and probably just use FileSystems.MacroPartialsFileSystem.
+
             var partialsDir = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MacroPartials);
 
             return this.FindPartialViewFilesInFolder(

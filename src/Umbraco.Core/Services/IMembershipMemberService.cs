@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -125,18 +125,14 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entity"><see cref="IMember"/> or <see cref="IUser"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(T entity, bool raiseEvents = true);
+        void Save(T entity);
 
         /// <summary>
         /// Saves a list of <see cref="IMembershipUser"/> objects
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entities"><see cref="IEnumerable{T}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(IEnumerable<T> entities, bool raiseEvents = true);
+        void Save(IEnumerable<T> entities);
 
         /// <summary>
         /// Finds a list of <see cref="IMembershipUser"/> objects by a partial email string

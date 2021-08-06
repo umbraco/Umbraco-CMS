@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         [Test]
         public void SimpleMap()
         {
-            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(() => new IMapDefinition[]
             {
                 new MapperDefinition1(),
             });
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         [Test]
         public void EnumerableMap()
         {
-            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(() => new IMapDefinition[]
             {
                 new MapperDefinition1(),
             });
@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         [Test]
         public void InheritedMap()
         {
-            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(() => new IMapDefinition[]
             {
                 new MapperDefinition1(),
             });
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         [Test]
         public void CollectionsMap()
         {
-            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(() => new IMapDefinition[]
             {
                 new MapperDefinition2(),
             });
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         [Explicit]
         public void ConcurrentMap()
         {
-            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(() => new IMapDefinition[]
             {
                 new MapperDefinition1(),
                 new MapperDefinition3(),
@@ -201,7 +201,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         [Test]
         public void EnumMap()
         {
-            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(() => new IMapDefinition[]
             {
                 new MapperDefinition4(),
             });
@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
         [Test]
         public void NullPropertyMap()
         {
-            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            var definitions = new MapDefinitionCollection(() => new IMapDefinition[]
             {
                 new MapperDefinition5(),
             });

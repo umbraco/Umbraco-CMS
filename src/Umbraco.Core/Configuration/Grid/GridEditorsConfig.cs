@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Configuration.Grid
                     }
 
                     // add manifest editors, skip duplicates
-                    foreach (var gridEditor in _manifestParser.Manifest.GridEditors)
+                    foreach (var gridEditor in _manifestParser.CombinedManifest.GridEditors)
                     {
                         if (editors.Contains(gridEditor) == false) editors.Add(gridEditor);
                     }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -92,11 +92,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             // process the file
-            var filepath = editorFile == null ? null : ProcessFile(editorValue, file, currentPath, cuid, puid);
+            var filepath = editorFile == null ? null : ProcessFile(file, cuid, puid);
 
             // remove all temp files
-            foreach (var f in uploads)
+            foreach (ContentPropertyFile f in uploads)
+            {
                 File.Delete(f.TempFilePath);
+            }
 
             // remove current file if replaced
             if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
@@ -109,16 +111,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         }
 
-        private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)
+        private string ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
         {
             // process the file
             // no file, invalid file, reject change
             if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _contentSettings) == false)
+            {
                 return null;
+            }
 
             // get the filepath
             // in case we are using the old path scheme, try to re-use numbers (bah...)
-            var filepath = _mediaFileManager.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
+            var filepath = _mediaFileManager.GetMediaPath(file.FileName, cuid, puid); // fs-relative path
 
             using (var filestream = File.OpenRead(file.TempFilePath))
             {

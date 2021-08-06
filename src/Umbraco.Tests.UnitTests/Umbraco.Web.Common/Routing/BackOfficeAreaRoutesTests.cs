@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
                 Options.Create(globalSettings),
                 Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                 Mock.Of<IRuntimeState>(x => x.Level == level),
-                new UmbracoApiControllerTypeCollection(new[] { typeof(Testing1Controller) }));
+                new UmbracoApiControllerTypeCollection(() => new[] { typeof(Testing1Controller) }));
 
             return routes;
         }

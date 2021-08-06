@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Xml.Linq;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -98,7 +100,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         public XElement Serialize(
             IMedia media,
-            bool withDescendants = false)
+            bool withDescendants = false,
+            Action<IMedia, XElement> onMediaItemSerialized = null)
         {
             if (_mediaService == null) throw new ArgumentNullException(nameof(_mediaService));
             if (_dataTypeService == null) throw new ArgumentNullException(nameof(_dataTypeService));
@@ -110,7 +113,9 @@ namespace Umbraco.Cms.Core.Services.Implement
             var nodeName = media.ContentType.Alias.ToSafeAlias(_shortStringHelper);
 
             const bool published = false; // always false for media
-            var xml = SerializeContentBase(media, media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders), nodeName, published);
+            string urlValue = media.GetUrlSegment(_shortStringHelper, _urlSegmentProviders);
+            XElement xml = SerializeContentBase(media, urlValue, nodeName, published);
+
 
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
             xml.Add(new XAttribute("nodeTypeAlias", media.ContentType.Alias));
@@ -123,6 +128,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             //xml.Add(new XAttribute("template", 0)); // no template for media
 
+            onMediaItemSerialized?.Invoke(media, xml);
+
             if (withDescendants)
             {
                 const int pageSize = 500;
@@ -131,7 +138,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 while (page * pageSize < total)
                 {
                     var children = _mediaService.GetPagedChildren(media.Id, page++, pageSize, out total);
-                    SerializeChildren(children, xml);
+                    SerializeChildren(children, xml, onMediaItemSerialized);
                 }
             }
 
@@ -257,12 +264,17 @@ namespace Umbraco.Cms.Core.Services.Implement
             return xml;
         }
 
-        public XElement Serialize(Stylesheet stylesheet)
+        public XElement Serialize(IStylesheet stylesheet, bool includeProperties)
         {
             var xml = new XElement("Stylesheet",
                 new XElement("Name", stylesheet.Alias),
                 new XElement("FileName", stylesheet.Path),
                 new XElement("Content", new XCData(stylesheet.Content)));
+
+            if (!includeProperties)
+            {
+                return xml;
+            }
 
             var props = new XElement("Properties");
             xml.Add(props);
@@ -619,12 +631,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         // exports an IMedia item descendants.
-        private void SerializeChildren(IEnumerable<IMedia> children, XElement xml)
+        private void SerializeChildren(IEnumerable<IMedia> children, XElement xml, Action<IMedia, XElement> onMediaItemSerialized)
         {
             foreach (var child in children)
             {
                 // add the child xml
-                var childXml = Serialize(child);
+                var childXml = Serialize(child, onMediaItemSerialized: onMediaItemSerialized);
                 xml.Add(childXml);
 
                 const int pageSize = 500;
@@ -634,7 +646,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 {
                     var grandChildren = _mediaService.GetPagedChildren(child.Id, page++, pageSize, out total);
                     // recurse
-                    SerializeChildren(grandChildren, childXml);
+                    SerializeChildren(grandChildren, childXml, onMediaItemSerialized);
                 }
             }
         }

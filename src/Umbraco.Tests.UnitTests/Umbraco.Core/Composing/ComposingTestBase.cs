@@ -19,15 +19,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
     {
         protected TypeLoader TypeLoader { get; private set; }
 
-        protected IProfilingLogger ProfilingLogger { get; private set; }
-
         [SetUp]
         public void Initialize()
         {
-            ProfilingLogger = new ProfilingLogger(Mock.Of<ILogger<ProfilingLogger>>(), Mock.Of<IProfiler>());
-
             var typeFinder = TestHelper.GetTypeFinder();
-            TypeLoader = new TypeLoader(typeFinder, NoAppCache.Instance, new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), ProfilingLogger, false, AssembliesToScan);
+            TypeLoader = new TypeLoader(typeFinder, new VaryingRuntimeHash(), NoAppCache.Instance, new DirectoryInfo(TestHelper.GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfiler>(), false, AssembliesToScan);
         }
 
         protected virtual IEnumerable<Assembly> AssembliesToScan

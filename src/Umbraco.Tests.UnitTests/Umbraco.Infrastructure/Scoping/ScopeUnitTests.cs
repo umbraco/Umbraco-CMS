@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CSharpTest.Net.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -13,6 +14,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -33,8 +36,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
             var loggerFactory = NullLoggerFactory.Instance;
             var fileSystems = new FileSystems(loggerFactory,
                 Mock.Of<IIOHelper>(), Mock.Of<IOptions<GlobalSettings>>(), Mock.Of<IHostingEnvironment>());
-            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
-                loggerFactory.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());
+            var mediaFileManager = new MediaFileManager(
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IMediaPathScheme>(),
+                loggerFactory.CreateLogger<MediaFileManager>(),
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IServiceProvider>(),
+                Options.Create(new ContentSettings()));
             var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
             var database = new Mock<IUmbracoDatabase>();
             var sqlContext = new Mock<ISqlContext>();

@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Manifest;
@@ -44,8 +45,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest
             NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
             _parser = new ManifestParser(
                 AppCaches.Disabled,
-                new ManifestValueValidatorCollection(validators),
-                new ManifestFilterCollection(Array.Empty<IManifestFilter>()),
+                new ManifestValueValidatorCollection(() => validators),
+                new ManifestFilterCollection(() => Enumerable.Empty<IManifestFilter>()),
                 loggerFactory.CreateLogger<ManifestParser>(),
                 _ioHelper,
                 TestHelper.GetHostingEnvironment(),

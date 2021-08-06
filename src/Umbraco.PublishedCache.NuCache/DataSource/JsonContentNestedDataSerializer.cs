@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             DateFormatString = "o"
         };
         private readonly JsonNameTable _propertyNameTable = new DefaultJsonNameTable();
-        public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData)
+        public ContentCacheDataModel Deserialize(IReadOnlyContentBase content, string stringData, byte[] byteData, bool published)
         {
             if (stringData == null && byteData != null)
                 throw new NotSupportedException($"{typeof(JsonContentNestedDataSerializer)} does not support byte[] serialization");
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             }
         }
 
-        public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model)
+        public ContentCacheDataSerializationResult Serialize(IReadOnlyContentBase content, ContentCacheDataModel model, bool published)
         {
             // note that numeric values (which are Int32) are serialized without their
             // type (eg "value":1234) and JsonConvert by default deserializes them as Int64

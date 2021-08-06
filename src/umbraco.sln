@@ -65,11 +65,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "http://localhost:58896", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
 	ProjectSection(WebsiteProperties) = preProject
-								UseIISExpress = "true"
-								TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_58896"
-		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58896\"
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_62926"
 		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
@@ -77,9 +74,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_58896"
-		Release.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58896\"
 		Release.AspNetCompiler.VirtualPath = "/localhost_62926"
 		Release.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
@@ -88,10 +82,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		SlnRelativePath = "Umbraco.Tests.AcceptanceTest\"
-								DefaultWebSiteLanguage = "Visual C#"
-								StartServerOnDebug = "false"
-		VWDPort = "58896"
-		VWDPort = "62926"
+		DefaultWebSiteLanguage = "Visual C#"
+		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378-AFE1-40A5-90BD-82833375DBFE}"
@@ -119,7 +111,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53
 		ApiDocs\toc.yml = ApiDocs\toc.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemplates", "{C7311C00-2184-409B-B506-52A5FAEA8736}"
 	ProjectSection(SolutionItems) = preProject
@@ -156,7 +148,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.UnitTests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Common", "Umbraco.Web.Common\Umbraco.Web.Common.csproj", "{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonSchema", "JsonSchema\JsonSchema.csproj", "{2A5027D9-F71D-4957-929E-F7A56AA1B95A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSchema", "JsonSchema\JsonSchema.csproj", "{2A5027D9-F71D-4957-929E-F7A56AA1B95A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Integration.SqlCe", "Umbraco.Tests.Integration.SqlCe\Umbraco.Tests.Integration.SqlCe.csproj", "{1B28FC3E-3D5B-4A46-8961-5483835548D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -228,6 +222,10 @@ Global
 		{2A5027D9-F71D-4957-929E-F7A56AA1B95A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A5027D9-F71D-4957-929E-F7A56AA1B95A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A5027D9-F71D-4957-929E-F7A56AA1B95A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B28FC3E-3D5B-4A46-8961-5483835548D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B28FC3E-3D5B-4A46-8961-5483835548D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B28FC3E-3D5B-4A46-8961-5483835548D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B28FC3E-3D5B-4A46-8961-5483835548D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -244,6 +242,7 @@ Global
 		{D6319409-777A-4BD0-93ED-B2DFD805B32C} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{A499779C-1B3B-48A8-B551-458E582E6E96} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{9102ABDF-E537-4E46-B525-C9ED4833EED0} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
+		{1B28FC3E-3D5B-4A46-8961-5483835548D7} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}

@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         private readonly ILoggerFactory _loggerFactory;
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IOptions<ConnectionStrings> _connectionStrings;
-        private readonly Lazy<IMapperCollection> _mappers;
+        private readonly IMapperCollection _mappers;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
         private readonly NPocoMapperCollection _npocoMappers;
@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
             IOptions<ConnectionStrings> connectionStrings,
-            Lazy<IMapperCollection> mappers,
+            IMapperCollection mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             NPocoMapperCollection npocoMappers)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Trees
@@ -8,8 +9,9 @@ namespace Umbraco.Cms.Core.Trees
     /// </summary>
     public class TreeCollection : BuilderCollectionBase<Tree>
     {
-        public TreeCollection(IEnumerable<Tree> items)
-            : base(items)
-        { }
+
+        public TreeCollection(Func<IEnumerable<Tree>> items) : base(items)
+        {
+        }
     }
 }

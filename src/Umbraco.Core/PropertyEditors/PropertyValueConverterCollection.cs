@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Composing;
@@ -8,9 +8,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
 {
     public class PropertyValueConverterCollection : BuilderCollectionBase<IPropertyValueConverter>
     {
-        public PropertyValueConverterCollection(IEnumerable<IPropertyValueConverter> items)
-            : base(items)
-        { }
+        public PropertyValueConverterCollection(Func<IEnumerable<IPropertyValueConverter>> items) : base(items)
+        {
+        }
 
         private readonly object _locker = new object();
         private Dictionary<IPropertyValueConverter, Type[]> _defaultConverters;

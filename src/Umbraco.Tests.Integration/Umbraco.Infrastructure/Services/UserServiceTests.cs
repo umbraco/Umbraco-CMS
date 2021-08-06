@@ -23,6 +23,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
+
     /// <summary>
     /// Tests covering the UserService
     /// </summary>

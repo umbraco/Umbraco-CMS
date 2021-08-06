@@ -60,9 +60,21 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
             // replace the default JsMinifier with NuglifyJs and CssMinifier with NuglifyCss in the default pipelines
             // for use with our bundles only (not modifying global options)
             _jsOptimizedPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultJs().Replace<JsMinifier, SmidgeNuglifyJs>(_bundles.PipelineFactory));
-            _jsNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultJs());
+            _jsNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() =>
+            {
+                PreProcessPipeline defaultJs = bundles.PipelineFactory.DefaultJs();
+                // remove minification from this pipeline
+                defaultJs.Processors.RemoveAll(x => x is JsMinifier);
+                return defaultJs;
+            });
             _cssOptimizedPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultCss().Replace<CssMinifier, NuglifyCss>(_bundles.PipelineFactory));
-            _cssNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() => bundles.PipelineFactory.DefaultCss());
+            _cssNonOptimizedPipeline = new Lazy<PreProcessPipeline>(() =>
+            {
+                PreProcessPipeline defaultCss = bundles.PipelineFactory.DefaultCss();
+                // remove minification from this pipeline
+                defaultCss.Processors.RemoveAll(x => x is CssMinifier);
+                return defaultCss;
+            });
 
             Type cacheBusterType = _runtimeMinificationSettings.CacheBuster switch
             {
@@ -78,7 +90,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         public string CacheBuster => (_cacheBuster ??= _cacheBusterResolver.GetCacheBuster(_cacheBusterType)).GetValue();
 
         // only issue with creating bundles like this is that we don't have full control over the bundle options, though that could
-        public void CreateCssBundle(string bundleName, bool optimizeOutput, params string[] filePaths)
+        public void CreateCssBundle(string bundleName, BundlingOptions bundleOptions, params string[] filePaths)
         {
             if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
             {
@@ -90,39 +102,17 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
                 throw new InvalidOperationException($"The bundle name {bundleName} already exists");
             }
 
-            if (optimizeOutput)
-            {
-                var bundle = _bundles.Create(bundleName, _cssOptimizedPipeline.Value, WebFileType.Css, filePaths)
-                    .WithEnvironmentOptions(
-                        BundleEnvironmentOptions.Create()
-                            .ForDebug(builder => builder
-                                // auto-invalidate bundle if files change in debug
-                                .EnableFileWatcher()
-                                // use the cache buster defined in config
-                                .SetCacheBusterType(_cacheBusterType))
-                            .ForProduction(builder => builder
-                                // use the cache buster defined in config
-                                .SetCacheBusterType(_cacheBusterType))
-                            .Build());
-            }
-            else
-            {
-                var bundle = _bundles.Create(bundleName, _cssNonOptimizedPipeline.Value, WebFileType.Css, filePaths)
-                    .WithEnvironmentOptions(
-                        BundleEnvironmentOptions.Create()
-                            .ForDebug(builder => builder
-                                // use the cache buster defined in config
-                                .SetCacheBusterType(_cacheBusterType))
-                            .ForProduction(builder => builder
-                                // use the cache buster defined in config
-                                .SetCacheBusterType(_cacheBusterType))
-                            .Build());
-            }
+            PreProcessPipeline pipeline = bundleOptions.OptimizeOutput
+                ? _cssOptimizedPipeline.Value
+                : _cssNonOptimizedPipeline.Value;
+
+            Bundle bundle = _bundles.Create(bundleName, pipeline, WebFileType.Css, filePaths);
+            bundle.WithEnvironmentOptions(ConfigureBundleEnvironmentOptions(bundleOptions));
         }
 
         public async Task<string> RenderCssHereAsync(string bundleName) => (await _smidge.SmidgeHelper.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
 
-        public void CreateJsBundle(string bundleName, bool optimizeOutput, params string[] filePaths)
+        public void CreateJsBundle(string bundleName, BundlingOptions bundleOptions, params string[] filePaths)
         {
             if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
             {
@@ -134,40 +124,32 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
                 throw new InvalidOperationException($"The bundle name {bundleName} already exists");
             }
 
-            if (optimizeOutput)
-            {
-                var bundle = _bundles.Create(bundleName, _jsOptimizedPipeline.Value, WebFileType.Js, filePaths)
-                    .WithEnvironmentOptions(
-                        BundleEnvironmentOptions.Create()
-                            .ForDebug(builder => builder
-                                // auto-invalidate bundle if files change in debug
-                                .EnableFileWatcher()
-                                // use the cache buster defined in config
-                                .SetCacheBusterType(_cacheBusterType))
-                            .ForProduction(builder => builder
-                                // use the cache buster defined in config
-                                .SetCacheBusterType(_cacheBusterType))
-                            .Build());
-            }
-            else
-            {
-                var bundle = _bundles.Create(bundleName, _jsNonOptimizedPipeline.Value, WebFileType.Js, filePaths)
-                    .WithEnvironmentOptions(
-                        BundleEnvironmentOptions.Create()
-                            .ForDebug(builder => builder
-                                // use the cache buster defined in config
-                                .SetCacheBusterType(_cacheBusterType))
-                            .ForProduction(builder => builder
-                                // use the cache buster defined in config
-                                .SetCacheBusterType(_cacheBusterType))
-                            .Build());
-            }
+            PreProcessPipeline pipeline = bundleOptions.OptimizeOutput
+                ? _jsOptimizedPipeline.Value
+                : _jsNonOptimizedPipeline.Value;
+
+            Bundle bundle = _bundles.Create(bundleName, pipeline, WebFileType.Js, filePaths);
+            bundle.WithEnvironmentOptions(ConfigureBundleEnvironmentOptions(bundleOptions));
+        }
+
+        private BundleEnvironmentOptions ConfigureBundleEnvironmentOptions(BundlingOptions bundleOptions)
+        {
+            var bundleEnvironmentOptions = new BundleEnvironmentOptions();
+            // auto-invalidate bundle if files change in debug
+            bundleEnvironmentOptions.DebugOptions.FileWatchOptions.Enabled = true;
+            // set cache busters
+            bundleEnvironmentOptions.DebugOptions.SetCacheBusterType(_cacheBusterType);
+            bundleEnvironmentOptions.ProductionOptions.SetCacheBusterType(_cacheBusterType);
+            // config if the files should be combined
+            bundleEnvironmentOptions.ProductionOptions.ProcessAsCompositeFile = bundleOptions.EnabledCompositeFiles;
+
+            return bundleEnvironmentOptions;
         }
 
         public async Task<string> RenderJsHereAsync(string bundleName) => (await _smidge.SmidgeHelper.JsHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
 
-
         public async Task<IEnumerable<string>> GetJsAssetPathsAsync(string bundleName) => await _smidge.SmidgeHelper.GenerateJsUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
+
         public async Task<IEnumerable<string>> GetCssAssetPathsAsync(string bundleName) => await _smidge.SmidgeHelper.GenerateCssUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
 
         /// <inheritdoc />
