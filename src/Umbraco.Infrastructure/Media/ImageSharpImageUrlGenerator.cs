@@ -37,15 +37,15 @@ namespace Umbraco.Cms.Infrastructure.Media
             }
             else if (options.DefaultCrop)
             {
-                imageUrl.Append("?anchor=center&mode=crop");
+                imageUrl.Append("?ranchor=center&rmode=crop");
             }
             else
             {
-                imageUrl.Append("?mode=").Append((options.ImageCropMode ?? ImageCropMode.Crop).ToString().ToLowerInvariant());
+                imageUrl.Append("?rmode=").Append((options.ImageCropMode ?? ImageCropMode.Crop).ToString().ToLowerInvariant());
 
                 if (options.ImageCropAnchor != null)
                 {
-                    imageUrl.Append("&anchor=").Append(options.ImageCropAnchor.ToString().ToLowerInvariant());
+                    imageUrl.Append("&ranchor=").Append(options.ImageCropAnchor.ToString().ToLowerInvariant());
                 }
             }
 

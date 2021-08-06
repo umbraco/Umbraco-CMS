@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrlEmptyTest()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(null));
-            Assert.AreEqual("?mode=crop", urlString);
+            Assert.AreEqual("?rmode=crop", urlString);
         }
 
         /// <summary>
@@ -116,11 +116,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
             var urlStringMax = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Max, Width = 300, Height = 150 });
             var urlStringStretch = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Stretch, Width = 300, Height = 150 });
 
-            Assert.AreEqual(MediaPath + "?mode=min&width=300&height=150", urlStringMin);
-            Assert.AreEqual(MediaPath + "?mode=boxpad&width=300&height=150", urlStringBoxPad);
-            Assert.AreEqual(MediaPath + "?mode=pad&width=300&height=150", urlStringPad);
-            Assert.AreEqual(MediaPath + "?mode=max&width=300&height=150", urlStringMax);
-            Assert.AreEqual(MediaPath + "?mode=stretch&width=300&height=150", urlStringStretch);
+            Assert.AreEqual(MediaPath + "?rmode=min&width=300&height=150", urlStringMin);
+            Assert.AreEqual(MediaPath + "?rmode=boxpad&width=300&height=150", urlStringBoxPad);
+            Assert.AreEqual(MediaPath + "?rmode=pad&width=300&height=150", urlStringPad);
+            Assert.AreEqual(MediaPath + "?rmode=max&width=300&height=150", urlStringMax);
+            Assert.AreEqual(MediaPath + "?rmode=stretch&width=300&height=150", urlStringStretch);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrl_UploadTypeTest()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Crop, ImageCropAnchor = ImageCropAnchor.Center, Width = 100, Height = 270 });
-            Assert.AreEqual(MediaPath + "?mode=crop&anchor=center&width=100&height=270", urlString);
+            Assert.AreEqual(MediaPath + "?rmode=crop&ranchor=center&width=100&height=270", urlString);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrl_PreferFocalPointCenter()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Width = 300, Height = 150 });
-            Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&width=300&height=150", urlString);
+            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&width=300&height=150", urlString);
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrl_PreDefinedCropNoCoordinatesWithWidth()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Width = 200, HeightRatio = 0.5962962962962962962962962963m });
-            Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&heightratio=0.5962962962962962962962962963&width=200", urlString);
+            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&heightratio=0.5962962962962962962962962963&width=200", urlString);
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrl_PreDefinedCropNoCoordinatesWithHeight()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Height = 200, WidthRatio = 1.6770186335403726708074534161m });
-            Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&widthratio=1.6770186335403726708074534161&height=200", urlString);
+            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&widthratio=1.6770186335403726708074534161&height=200", urlString);
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrl_WidthOnlyParameter()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Width = 200 });
-            Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&width=200", urlString);
+            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&width=200", urlString);
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrl_HeightOnlyParameter()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Height = 200 });
-            Assert.AreEqual(MediaPath + "?anchor=center&mode=crop&height=200", urlString);
+            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&height=200", urlString);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrl_BackgroundColorParameter()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { ImageCropMode = ImageCropMode.Pad, Width = 400, Height = 400, FurtherOptions = "&bgcolor=fff" });
-            Assert.AreEqual(MediaPath + "?mode=pad&width=400&height=400&bgcolor=fff", urlString);
+            Assert.AreEqual(MediaPath + "?rmode=pad&width=400&height=400&bgcolor=fff", urlString);
         }
     }
 }
