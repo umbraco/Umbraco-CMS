@@ -86,7 +86,7 @@
         <ul class="umb-tree">
             <li ng-repeat="item in history | orderBy:'time':true">
                 <a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
-                    <umb-icon icon="{{item.icon}}" class="{{item.icon}}"></umb-icon>
+                    <umb-icon icon="{{item.icon}}"></umb-icon>
                     {{item.name}}
                 </a>
             </li>

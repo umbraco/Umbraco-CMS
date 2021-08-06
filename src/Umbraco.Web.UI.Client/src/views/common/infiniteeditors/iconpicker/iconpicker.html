@@ -44,7 +44,7 @@
                     <ul class="umb-iconpicker" ng-class="vm.color.value" ng-show="vm.icons">
                         <li class="umb-iconpicker-item" ng-class="{'-selected': icon.name == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: { 'name': vm.filter.searchTerm } | orderBy:'name') track by $id(icon)">
                             <button type="button" title="{{icon.name}}" ng-click="vm.selectIcon(icon.name, vm.color.value)">
-                                <umb-icon class="umb-iconpicker-svg {{icon.name}} large" icon="{{icon.name}}"></umb-icon>
+                                <umb-icon icon="{{icon.name}}" class="umb-iconpicker-svg large"></umb-icon>
                                 <span class="sr-only"><localize key="buttons_select">Select</localize> {{icon.name}}</span>
                             </button>
                         </li>
