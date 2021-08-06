@@ -54,7 +54,6 @@ using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
-using Umbraco.Cms.Infrastructure.Migrations.Test;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
@@ -389,10 +388,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
                 .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
                 .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
-
-            // Add notification handlers for test migration plane
-            builder
-                .AddNotificationHandler<UmbracoApplicationStartingNotification, RunTestPlan>();
 
             return builder;
         }

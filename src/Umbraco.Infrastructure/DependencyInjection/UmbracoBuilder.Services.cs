@@ -41,7 +41,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IAuditService, AuditService>();
             builder.Services.AddUnique<ICacheInstructionService, CacheInstructionService>();
             builder.Services.AddUnique<ITagService, TagService>();
-            builder.Services.AddUnique<ITestService, TestService>();
             builder.Services.AddUnique<IContentService, ContentService>();
             builder.Services.AddUnique<IUserService, UserService>();
             builder.Services.AddUnique<IMemberService, MemberService>();
