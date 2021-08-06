@@ -10,24 +10,39 @@
         fill: currentColor;
     }
 
-    &.large{
-        width: 32px; 
+    &.large {
+        width: 32px;
         height: 32px;
     }
-    &.medium{
+
+    &.medium {
         width: 24px;
         height: 24px;
     }
-    &.small{
+
+    &.small {
         width: 14px;
         height: 14px;
     }
 
-    &:before, &:after {
+    &::before,
+    &::after {
         content: none !important;
     }
 
-    > i {
-        font-family: inherit;
+    &__legacy {
+
+        /* Inherit font icon from parent but clear pseudo classes,
+           so it is only used on child <i> element.
+        */
+
+        &::before,
+        &::after {
+            content: none !important;
+        }
+
+        > i {
+            font-family: inherit;
+        }
     }
 }
