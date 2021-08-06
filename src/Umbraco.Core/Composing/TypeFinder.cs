@@ -146,6 +146,7 @@ namespace Umbraco.Cms.Core.Composing
             "HtmlDiff,",
             "ICSharpCode.",
             "Iesi.Collections,", // used by NHibernate
+            "JetBrains.Annotations,",
             "LightInject.", // DI
             "LightInject,",
             "Lucene.",
