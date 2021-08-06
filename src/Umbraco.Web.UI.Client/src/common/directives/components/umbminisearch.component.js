@@ -18,7 +18,7 @@
         });
 
     function UmbMiniSearchController($scope, localizationService) {
-        
+
         var vm = this;
 
         vm.onKeyDown = onKeyDown;
@@ -43,7 +43,7 @@
                     break;
             }
         }
-    
+
         function onChange() {
             if (vm.onStartTyping) {
                 vm.onStartTyping();
@@ -61,9 +61,9 @@
 
             localizationService.localize(keyToLocalize).then(function (data) {
                 // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
-                    if(data.indexOf('[') === -1){
+                if(data.indexOf('[') === -1){
                     vm.text = data;
-                    }
+                }
             });
         }
     }
