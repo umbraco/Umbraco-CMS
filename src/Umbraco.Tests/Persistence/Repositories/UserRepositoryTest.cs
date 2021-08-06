@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
 using System;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Tests.Components;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor) provider;
-            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, TestObjects.GetGlobalSettings());
+            var repository = new UserRepository(accessor, AppCaches.Disabled, Logger, Mappers, TestObjects.GetGlobalSettings(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
             return repository;
         }
 
@@ -85,8 +86,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var user = MockedUser.CreateUser();
             using (var scope = provider.CreateScope(autoComplete: true))
             {
-                var repository = CreateRepository(provider);                
-                repository.Save(user);                
+                var repository = CreateRepository(provider);
+                repository.Save(user);
             }
 
             using (var scope = provider.CreateScope(autoComplete: true))
@@ -253,7 +254,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var id = user.Id;
 
-                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Mock.Of<IMapperCollection>(),TestObjects.GetGlobalSettings());
+                var repository2 = new UserRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, Mock.Of<IMapperCollection>(), TestObjects.GetGlobalSettings(), ComponentTests.MockRuntimeState(RuntimeLevel.Run));
 
                 repository2.Delete(user);
 

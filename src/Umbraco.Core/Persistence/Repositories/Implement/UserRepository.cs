@@ -28,6 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IMapperCollection _mapperCollection;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IRuntimeState _runtimeState;
         private string _passwordConfigJson;
         private bool _passwordConfigInitialized;
 
@@ -41,19 +42,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
         /// </param>
         /// <param name="globalSettings"></param>
-        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings)
+        /// <param name="runtimeState"></param>
+        public UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IGlobalSettings globalSettings, IRuntimeState runtimeState)
             : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection;
             _globalSettings = globalSettings;
+            _runtimeState = runtimeState;
         }
 
         // for tests
-        internal UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig, IGlobalSettings globalSettings)
+        internal UserRepository(IScopeAccessor scopeAccessor, AppCaches appCaches, ILogger logger, IMapperCollection mapperCollection, IDictionary<string, string> passwordConfig, IGlobalSettings globalSettings, IRuntimeState runtimeState)
             : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection;
             _globalSettings = globalSettings;
+            _runtimeState = runtimeState;
             _passwordConfigJson = JsonConvert.SerializeObject(passwordConfig);
             _passwordConfigInitialized = true;
         }
@@ -86,9 +90,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // This will never resolve to a user, yet this is asked
             // for all of the time (especially in cases of members).
             // Don't issue a SQL call for this, we know it will not exist.
-            if (id < -1)
+            if (_runtimeState.Level == RuntimeLevel.Upgrade)
             {
-                return null;
+                // when upgrading people might come from version 7 where user 0 was the default,
+                // only in upgrade mode do we want to fetch the user of Id 0
+                if (id < -1)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                if (id == default || id < -1)
+                {
+                    return null;
+                }
             }
 
             var sql = SqlContext.Sql()
