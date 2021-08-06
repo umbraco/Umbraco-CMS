@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Collections;
 using Umbraco.Cms.Web.Website.Controllers;
@@ -47,6 +48,7 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<MemberModelBuilderFactory>();
 
             builder.Services.AddSingleton<PublicAccessMiddleware>();
+            builder.Services.AddSingleton<BasicAuthenticationMiddleware>();
 
             builder
                 .AddDistributedCache()

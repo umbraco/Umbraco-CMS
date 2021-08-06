@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Website.Middleware;
 using Umbraco.Cms.Web.Website.Routing;
 
@@ -20,6 +21,7 @@ namespace Umbraco.Extensions
         public static IUmbracoMiddlewareBuilder WithWebsite(this IUmbracoMiddlewareBuilder builder)
         {
             builder.AppBuilder.UseMiddleware<PublicAccessMiddleware>();
+            builder.AppBuilder.UseMiddleware<BasicAuthenticationMiddleware>();
             return builder;
         }
 

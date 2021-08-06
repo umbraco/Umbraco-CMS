@@ -37,7 +37,7 @@ namespace Umbraco.Extensions
 
             IOptions<UmbracoPipelineOptions> startupOptions = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
             app.RunPrePipeline(startupOptions.Value);
-            
+
             app.UseUmbracoCore();
             app.UseUmbracoRequestLogging();
 
