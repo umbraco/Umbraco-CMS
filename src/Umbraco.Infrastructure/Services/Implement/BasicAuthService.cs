@@ -21,10 +21,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             foreach (var allowedIpString in _basicAuthSettings.AllowedIPs)
             {
-                if(IPNetwork.TryParse(allowedIpString, out var allowedIp) && allowedIp.Contains(clientIpAddress))
+                if (IPNetwork.TryParse(allowedIpString, out IPNetwork allowedIp) && allowedIp.Contains(clientIpAddress))
                 {
                     return true;
-                };
+                }
             }
 
             return false;

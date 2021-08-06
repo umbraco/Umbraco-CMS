@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Primitives;
 
 namespace Umbraco.Extensions
 {
     public static class HttpContextExtensions
     {
-
-
         /// <summary>
         /// Try to get the basic auth username and password from the http context.
         /// </summary>
@@ -20,14 +19,14 @@ namespace Umbraco.Extensions
             username = null;
             password = null;
 
-            if ( httpContext.Request.Headers.TryGetValue("Authorization", out var authHeaders))
+            if (httpContext.Request.Headers.TryGetValue("Authorization", out StringValues authHeaders))
             {
                 var authHeader = authHeaders.ToString();
                 if (authHeader is not null && authHeader.StartsWith("Basic"))
                 {
-                    //Extract credentials
+                    // Extract credentials.
                     var encodedUsernamePassword = authHeader.Substring(6).Trim();
-                    var encoding = Encoding.UTF8;
+                    Encoding encoding = Encoding.UTF8;
                     var usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
 
                     var seperatorIndex = usernamePassword.IndexOf(':');

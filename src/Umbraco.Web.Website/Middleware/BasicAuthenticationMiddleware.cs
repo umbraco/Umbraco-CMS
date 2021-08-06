@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -35,7 +36,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 return;
             }
 
-            var clientIPAddress = context.Connection.RemoteIpAddress;
+            IPAddress clientIPAddress = context.Connection.RemoteIpAddress;
             if (_basicAuthService.IsIpAllowListed(clientIPAddress))
             {
                 await next(context);
