@@ -1912,6 +1912,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="contextMenuDescription">Udfør handling %0% på %1% noden</key>
     <key alias="addImageCaption">Tilføj billede overskrift</key>
     <key alias="searchContentTree">Søg i indholdstræet</key>
+    <key alias="maxAmount">Maximum antal</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>
