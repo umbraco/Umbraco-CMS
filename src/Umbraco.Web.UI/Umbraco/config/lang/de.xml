@@ -181,26 +181,6 @@
     <key alias="smallSort">Sortieren</key>
     <key alias="historyIncludingVariants">Verlauf (alle Variationen)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Um den Typ des ausgewählten Dokuments zu ändern, wählen Sie bitte zunächst aus der Liste der an dieser Stelle erlaubten Dokumenttypen.</key>
-    <key alias="changeDocTypeInstruction2">Im Anschluss bestätigen oder korrigieren Sie die Zuordnung der Eigenschaften und klicken Sie auf 'Speichern'.</key>
-    <key alias="contentRepublished">Der Inhalt wurde neu veröffentlicht.</key>
-    <key alias="currentProperty">Derzeitige Eigenschaft</key>
-    <key alias="currentType">Derzeitiger Datentyp</key>
-    <key alias="docTypeCannotBeChanged">Der Typ dieses Dokuments kann nicht geändert werden, da an dieser Stelle keine Alternativen zugelassen sind. Ein alternativer Dokumenttyp kann nur dann verwendet werden, wenn er unterhalb des diesem Dokument übergeordneten Elements angelegt werden darf.</key>
-    <key alias="docTypeChanged">Dokumenttyp geändert</key>
-    <key alias="mapProperties">Eigenschaften zuordnen</key>
-    <key alias="mapToProperty">Dieser Eigenschaft zuordnen</key>
-    <key alias="newTemplate">Neue Vorlage</key>
-    <key alias="newType">Neuer Typ</key>
-    <key alias="none">keiner</key>
-    <key alias="selectedContent">Inhalt</key>
-    <key alias="selectNewDocType">Neuen Dokumenttyp auswählen</key>
-    <key alias="successMessage">Der Typ des ausgewählten Dokuments wurde erfolgreich zu [new type] geändert und die Eigenschaften wie folgend zugeordnet:</key>
-    <key alias="to">nach</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Die Zuordnung der Eigenschaften kann nicht abgeschlossen werden, da mindestens eine Eigenschaft mehrfach zugeordnet werden soll.</key>
-    <key alias="validDocTypesNote">Nur an dieser Stelle erlaubte Dokumenttypen werden angezeigt.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Es konnte kein Verzeichnis unter dem Knoten mit der ID %0% angelegt werden.</key>
     <key alias="createFolderFailedByName">Es konnte kein Verzeichnis unter dem Knoten mit dem Namen %0% angelegt werden.</key>

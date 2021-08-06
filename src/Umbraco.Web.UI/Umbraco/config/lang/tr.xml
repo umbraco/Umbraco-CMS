@@ -190,26 +190,6 @@
     <key alias="smallCustom">Özel</key>
     <key alias="historyIncludingVariants">Geçmiş (tüm varyantlar)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Seçilen içeriğin belge türünü değiştirmek için, önce bu konum için geçerli türler listesinden seçin.</key>
-    <key alias="changeDocTypeInstruction2">Ardından, mevcut türden özellik eşlemesini onaylayın ve / veya yenisiyle değiştirin ve Kaydet'i tıklayın.</key>
-    <key alias="contentRepublished">İçerik yeniden yayınlandı.</key>
-    <key alias="currentProperty">Mevcut Mülk</key>
-    <key alias="currentType">Mevcut tür</key>
-    <key alias="docTypeCannotBeChanged">Bu konum için geçerli bir alternatif olmadığından belge türü değiştirilemez. Seçilen içerik öğesinin üst öğesi altında izin verilirse ve mevcut tüm alt içerik öğelerinin onun altında oluşturulmasına izin verilirse bir alternatif geçerli olacaktır.</key>
-    <key alias="docTypeChanged">Doküman Türü Değiştirildi</key>
-    <key alias="mapProperties">Harita Özellikleri</key>
-    <key alias="mapToProperty">Mülke Eşle</key>
-    <key alias="newTemplate">Yeni Şablon</key>
-    <key alias="newType">Yeni Tür</key>
-    <key alias="none">Hiçbiri</key>
-    <key alias="selectedContent">İçerik</key>
-    <key alias="selectNewDocType">Yeni Belge Türünü Seçin</key>
-    <key alias="successMessage">Seçilen içeriğin belge türü başarıyla [yeni tür] olarak değiştirildi ve aşağıdaki özellikler eşlendi:</key>
-    <key alias="to">için</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Bir veya daha fazla özelliğin tanımlanmış birden fazla eşlemesi olduğundan özellik eşlemesi tamamlanamadı.</key>
-    <key alias="validDocTypesNote">Yalnızca mevcut konum için geçerli olan alternatif türler görüntülenir.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">%0% kimliğine sahip ebeveyn altında klasör oluşturulamadı</key>
     <key alias="createFolderFailedByName">%0% adıyla ebeveyn altında klasör oluşturulamadı</key>
