@@ -16,15 +16,19 @@
             $scope.activeTabAlias = null;
             $scope.tabs = [];
 
-            $scope.$watchCollection('content.tabs', () => {
+            $scope.$watchCollection('content.tabs', (newValue) => {
+
+                contentEditingHelper.defineParentAliasOnGroups(newValue);
+                contentEditingHelper.relocateDisorientedGroups(newValue);
+
                 // make a collection with only tabs and not all groups
-                $scope.tabs = $filter("filter")($scope.content.tabs, (tab) => {
+                $scope.tabs = $filter("filter")(newValue, (tab) => {
                     return tab.type === 1;
                 });
 
                 if ($scope.tabs.length > 0) {
                     // if we have tabs and some groups that doesn't belong to a tab we need to render those on an "Other" tab.
-                    contentEditingHelper.registerGenericTab($scope.content.tabs);
+                    contentEditingHelper.registerGenericTab(newValue);
 
                     $scope.setActiveTab($scope.tabs[0]);
 
@@ -36,11 +40,6 @@
                     scrollableNode.addEventListener("scroll", onScroll);
                     scrollableNode.addEventListener("mousewheel", cancelScrollTween);
                 }
-            });
-
-            // Add parentAlias property to all groups
-            $scope.content.tabs.forEach((group) => {
-                group.parentAlias = contentEditingHelper.getParentAlias(group.alias);
             });
 
             function onScroll(event) {

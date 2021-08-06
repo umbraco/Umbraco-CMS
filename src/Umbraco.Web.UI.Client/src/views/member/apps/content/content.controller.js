@@ -11,22 +11,20 @@
         vm.setActiveTab = setActiveTab;
         vm.hideSystemProperties = hideSystemProperties;
 
-        $scope.$watchCollection('content.tabs', () => {
+        $scope.$watchCollection('content.tabs', (newValue) => {
 
-            // Add parentAlias property to all groups aka. tabs.
-            $scope.content.tabs.forEach((group) => {
-                group.parentAlias = contentEditingHelper.getParentAlias(group.alias);
-            });
+            contentEditingHelper.defineParentAliasOnGroups(newValue);
+            contentEditingHelper.relocateDisorientedGroups(newValue);
 
-            vm.tabs = $filter("filter")($scope.content.tabs, (tab) => {
+            vm.tabs = $filter("filter")(newValue, (tab) => {
                 return tab.type === 1;
             });
 
             if (vm.tabs.length > 0) {
                 // if we have tabs and some groups that doesn't belong to a tab we need to render those on an "Other" tab.
-                contentEditingHelper.registerGenericTab($scope.content.tabs);
+                contentEditingHelper.registerGenericTab(newValue);
 
-                setActiveTab($scope.content.tabs[0]);
+                setActiveTab(vm.tabs[0]);
             }
         });
 
