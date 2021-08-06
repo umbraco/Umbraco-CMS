@@ -46,8 +46,8 @@
                 scope.orderTabs();
 
                 // set server validation index
-                // the server filters out inherited groups when returning the group index
-                const noInherited = newValue.filter(group => !group.inherited);
+                // the server filters out inherited groups if they don't have any local properties when returning the group index
+                const noInherited = newValue.filter(group => !group.inherited || (group.inherited && group.properties.filter(property => !property.inherited).length > 0));
                 
                 noInherited.forEach((group, index) => {
                     group.serverValidationIndex = !group.inherited ? index : undefined;
