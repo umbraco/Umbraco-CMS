@@ -30,7 +30,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security
             var mgr = new BackOfficeCookieManager(
                 Mock.Of<IUmbracoContextAccessor>(),
                 runtime,
-                new UmbracoRequestPaths(Options.Create(globalSettings), TestHelper.GetHostingEnvironment()));
+                new UmbracoRequestPaths(Options.Create(globalSettings), TestHelper.GetHostingEnvironment()),
+                Mock.Of<IBasicAuthService>());
 
             var result = mgr.ShouldAuthenticateRequest("/umbraco");
 
@@ -48,7 +49,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security
                 runtime,
                 new UmbracoRequestPaths(
                     Options.Create(globalSettings),
-                    Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco")));
+                    Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco")),
+                Mock.Of<IBasicAuthService>());
 
             var result = mgr.ShouldAuthenticateRequest("/umbraco");
 
@@ -69,7 +71,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security
                 runtime,
                 new UmbracoRequestPaths(
                     Options.Create(globalSettings),
-                    Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install")));
+                    Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install")),
+                Mock.Of<IBasicAuthService>());
 
             var result = mgr.ShouldAuthenticateRequest(remainingTimeoutSecondsPath);
             Assert.IsTrue(result);
@@ -90,7 +93,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security
                 runtime,
                 new UmbracoRequestPaths(
                     Options.Create(globalSettings),
-                    Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install")));
+                    Mock.Of<IHostingEnvironment>(x => x.ApplicationVirtualPath == "/" && x.ToAbsolute(globalSettings.UmbracoPath) == "/umbraco" && x.ToAbsolute(Constants.SystemDirectories.Install) == "/install")),
+                Mock.Of<IBasicAuthService>());
 
             var result = mgr.ShouldAuthenticateRequest("/notbackoffice");
             Assert.IsFalse(result);

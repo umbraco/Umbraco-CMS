@@ -1,11 +1,11 @@
-﻿using System.Configuration;
+using System.Configuration;
 using CSharpTest.Net.Collections;
 using CSharpTest.Net.Serialization;
 using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
-    internal class BTree
+    public class BTree
     {
         public static BPlusTree<int, ContentNodeKit> GetTree(string filepath, bool exists, NuCacheSettings settings, ContentDataSerializer contentDataSerializer = null)
         {

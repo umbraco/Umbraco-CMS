@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -18,20 +18,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 {
     [TestFixture]
     [UmbracoTest]
+    [Platform("Win")]
     public class DatabaseBuilderTests : UmbracoIntegrationTest
     {
         private IDbProviderFactoryCreator DbProviderFactoryCreator => GetRequiredService<IDbProviderFactoryCreator>();
         private IUmbracoDatabaseFactory UmbracoDatabaseFactory => GetRequiredService<IUmbracoDatabaseFactory>();
         private IEmbeddedDatabaseCreator EmbeddedDatabaseCreator => GetRequiredService<IEmbeddedDatabaseCreator>();
 
+        public DatabaseBuilderTests()
+        {
+            TestOptionAttributeBase.ScanAssemblies.Add(typeof(DatabaseBuilderTests).Assembly);
+        }
+
         [Test]
         public void CreateDatabase()
         {
-            if (!TestEnvironment.IsWindows)
-            {
-                return; //TODO replace with [Platform("Win")] when we update to NUnit 3.13 + .NET 5
-            }
-
             var path = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
             const string dbFile = "DatabaseContextTests.sdf";

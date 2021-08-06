@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -239,17 +238,25 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
-        public Dictionary<string, Dictionary<string, string>> LocalizedText(string culture = null)
+        public async Task<Dictionary<string, Dictionary<string, string>>> LocalizedText(string culture = null)
         {
-            var isAuthenticated = _backofficeSecurityAccessor.BackOfficeSecurity.IsAuthenticated();
+            CultureInfo cultureInfo;
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                // Force authentication to occur since this is not an authorized endpoint, we need this to get a user.
+                AuthenticateResult authenticationResult = await this.AuthenticateBackOfficeAsync();
+                // We have to get the culture from the Identity, we can't rely on thread culture
+                // It's entirely likely for a user to have a different culture in the backoffice, than their system.
+                var user = authenticationResult.Principal?.Identity;
 
-            var cultureInfo = string.IsNullOrWhiteSpace(culture)
-                //if the user is logged in, get their culture, otherwise default to 'en'
-                ? isAuthenticated
-                    //current culture is set at the very beginning of each request
-                    ? Thread.CurrentThread.CurrentCulture
-                    : CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage)
-                : CultureInfo.GetCultureInfo(culture);
+                cultureInfo = (authenticationResult.Succeeded && user is not null)
+                    ? user.GetCulture()
+                    : CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage);
+            }
+            else
+            {
+                cultureInfo = CultureInfo.GetCultureInfo(culture);
+            }
 
             var allValues = _textService.GetAllStoredValues(cultureInfo);
             var pathedValues = allValues.Select(kv =>
