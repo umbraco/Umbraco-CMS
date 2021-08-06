@@ -51,12 +51,7 @@ namespace Umbraco.Extensions
                 })
                 .SetCache<PhysicalFileSystemCache>()
                 .SetCacheHash<CacheHash>()
-                .ClearProcessors()
-                .RemoveProcessor<ResizeWebProcessor>() // The Resize processor is added by default, so remove it to ensure that the crop processor runs first
-                .AddProcessor<CropWebProcessor>()
-                .AddProcessor<ResizeWebProcessor>()
-                .AddProcessor<FormatWebProcessor>()
-                .AddProcessor<BackgroundColorWebProcessor>();
+                .AddProcessor<CropWebProcessor>();
 
             return services;
         }
