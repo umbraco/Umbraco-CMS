@@ -19,7 +19,7 @@
 
     <ItemGroup>
       <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
-      <PackageReference Include="MailKit" Version="2.13.0" />
+      <PackageReference Include="MailKit" Version="2.14.0" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
