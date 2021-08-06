@@ -115,7 +115,7 @@
             }
 
             // onLoad callbacks
-            angular.forEach(opts.callbacks, function(cb) {
+            Utilities.forEach(opts.callbacks, cb => {
                 if (Utilities.isFunction(cb)) {
                     cb(acee);
                 }

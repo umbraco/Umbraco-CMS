@@ -21,7 +21,7 @@
             push: function (retryItem) {
                 retryQueue.push(retryItem);
                 // Call all the onItemAdded callbacks
-                angular.forEach(service.onItemAddedCallbacks, function (cb) {
+                Utilities.forEach(service.onItemAddedCallbacks, cb => {
                     try {
                         cb(retryItem);
                     } catch (e) {
