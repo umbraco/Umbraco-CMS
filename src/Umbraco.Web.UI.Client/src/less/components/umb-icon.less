@@ -31,16 +31,18 @@
         content: none !important;
     }
 
-    &__svg,
-    &__legacy {
+    &__inner {
+
         // Clear pseudo classes
         &::before,
         &::after {
             content: none !important;
         }
-    }
 
-    &__legacy {
+        > span {
+            animation: inherit;
+        }
+
         // Inherit font icon from parent
         > i {
             font-family: inherit;
