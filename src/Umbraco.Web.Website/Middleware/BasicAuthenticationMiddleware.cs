@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         /// <inheritdoc />
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            if (_runtimeState.Level < RuntimeLevel.Run || !_basicAuthService.IsBasicAuthEnabled())
+            if (_runtimeState.Level < RuntimeLevel.Run || context.Request.IsBackOfficeRequest() || !_basicAuthService.IsBasicAuthEnabled())
             {
                 await next(context);
                 return;
@@ -52,14 +52,21 @@ namespace Umbraco.Cms.Web.Common.Middleware
             if (context.TryGetBasicAuthCredentials(out var username, out var password))
             {
                 IBackOfficeSignInManager backOfficeSignInManager =
-                    context.RequestServices.GetRequiredService<IBackOfficeSignInManager>();
+                    context.RequestServices.GetService<IBackOfficeSignInManager>();
 
-                SignInResult signInResult =
-                    await backOfficeSignInManager.PasswordSignInAsync(username, password, false, true);
-
-                if (signInResult.Succeeded)
+                if (backOfficeSignInManager is not null)
                 {
-                    await next.Invoke(context);
+                    SignInResult signInResult =
+                        await backOfficeSignInManager.PasswordSignInAsync(username, password, false, true);
+
+                    if (signInResult.Succeeded)
+                    {
+                        await next.Invoke(context);
+                    }
+                    else
+                    {
+                        SetUnauthorizedHeader(context);
+                    }
                 }
                 else
                 {
