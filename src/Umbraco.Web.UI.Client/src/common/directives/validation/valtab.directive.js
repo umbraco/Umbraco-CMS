@@ -20,8 +20,6 @@ function valTab($timeout) {
                 return;
             }
 
-            var tabAlias = tab.alias || '';
-
             let closestEditor = element.closest(".blockelement-inlineblock-editor");
             closestEditor = closestEditor.length === 0 ? element.closest(".umb-editor-sub-view") : closestEditor;
             closestEditor = closestEditor.length === 0 ? element.closest(".umb-editor") : closestEditor;
@@ -29,6 +27,8 @@ function valTab($timeout) {
             setSuccess();
 
             function setValidity (form) {
+                var tabAlias = tab.alias || '';
+
                 if (!form.$valid) {
                     var tabContent = closestEditor.find("[data-element='tab-content-" + tabAlias + "']");
 
