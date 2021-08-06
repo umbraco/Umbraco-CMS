@@ -58,10 +58,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<IDictionaryItem> PerformGetAll(params int[] ids)
         {
-            var sql = GetBaseQuery(false).Where("cmsDictionary.pk > 0");
+            var sql = GetBaseQuery(false).Where<DictionaryDto>(x => x.PrimaryKey > 0);
             if (ids.Any())
             {
-                sql.Where("cmsDictionary.pk in (@ids)", new { /*ids =*/ ids });
+                sql.WhereIn<DictionaryDto>(x => x.PrimaryKey, ids);
             }
 
             return Database
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "cmsDictionary.pk = @id";
+            return $"{Constants.DatabaseSchema.Tables.DictionaryEntry}.pk = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
