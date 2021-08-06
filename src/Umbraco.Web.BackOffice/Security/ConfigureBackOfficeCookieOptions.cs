@@ -34,6 +34,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         private readonly IIpResolver _ipResolver;
         private readonly ISystemClock _systemClock;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
+        private readonly IBasicAuthService _basicAuthService;
         private readonly IOptionsMonitor<BasicAuthSettings> _optionsSnapshot;
 
         /// <summary>
@@ -61,7 +62,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             IIpResolver ipResolver,
             ISystemClock systemClock,
             UmbracoRequestPaths umbracoRequestPaths,
-            IOptionsMonitor<BasicAuthSettings> optionsSnapshot)
+            IBasicAuthService basicAuthService)
         {
             _serviceProvider = serviceProvider;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -74,7 +75,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             _ipResolver = ipResolver;
             _systemClock = systemClock;
             _umbracoRequestPaths = umbracoRequestPaths;
-            _optionsSnapshot = optionsSnapshot;
+            _basicAuthService = basicAuthService;
         }
 
         /// <inheritdoc />
@@ -119,7 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 _umbracoContextAccessor,
                 _runtimeState,
                 _umbracoRequestPaths,
-                _optionsSnapshot
+                _basicAuthService
                 );
 
             options.Events = new CookieAuthenticationEvents

@@ -1,15 +1,11 @@
 using System;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
@@ -22,32 +18,28 @@ namespace Umbraco.Cms.Web.Common.Middleware
     /// </summary>
     public class BasicAuthAuthenticationMiddleware : IMiddleware
     {
-        private readonly ILogger<BasicAuthAuthenticationMiddleware> _logger;
-        private readonly IOptionsSnapshot<BasicAuthSettings> _basicAuthSettings;
         private readonly IRuntimeState _runtimeState;
+        private readonly IBasicAuthService _basicAuthService;
 
         public BasicAuthAuthenticationMiddleware(
-            ILogger<BasicAuthAuthenticationMiddleware> logger,
-            IOptionsSnapshot<BasicAuthSettings> basicAuthSettings,
-            IRuntimeState runtimeState)
+            IRuntimeState runtimeState,
+            IBasicAuthService basicAuthService)
         {
-            _logger = logger;
-            _basicAuthSettings = basicAuthSettings;
             _runtimeState = runtimeState;
+            _basicAuthService = basicAuthService;
         }
 
         /// <inheritdoc />
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var options = _basicAuthSettings.Value;
-            if (!options.Enabled || _runtimeState.Level < RuntimeLevel.Run)
+            if (_runtimeState.Level < RuntimeLevel.Run || !_basicAuthService.IsBasicAuthEnabled())
             {
                 await next(context);
                 return;
             }
 
             var clientIPAddress = context.Connection.RemoteIpAddress;
-            if (IsIpAllowListed(clientIPAddress, options.AllowedIPs))
+            if (_basicAuthService.IsIpAllowListed(clientIPAddress))
             {
                 await next(context);
                 return;
@@ -98,18 +90,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
         }
 
-        private bool IsIpAllowListed(IPAddress clientIpAddress, string[] allowlist)
-        {
-            foreach (var allowedIpString in allowlist)
-            {
-                if(IPAddress.TryParse(allowedIpString, out var allowedIp) && clientIpAddress.Equals(allowedIp))
-                {
-                    return true;
-                };
-            }
 
-            return false;
-        }
 
         private static void SetUnauthorizedHeader(HttpContext context)
         {

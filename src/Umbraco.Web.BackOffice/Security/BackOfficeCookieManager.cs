@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         private readonly IRuntimeState _runtime;
         private readonly string[] _explicitPaths;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
-        private readonly IOptionsMonitor<BasicAuthSettings> _basicAuthSettingsMonitor;
+        private readonly IBasicAuthService _basicAuthService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeCookieManager"/> class.
@@ -34,8 +34,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             IUmbracoContextAccessor umbracoContextAccessor,
             IRuntimeState runtime,
             UmbracoRequestPaths umbracoRequestPaths,
-            IOptionsMonitor<BasicAuthSettings> basicAuthSettings)
-            : this(umbracoContextAccessor, runtime, null, umbracoRequestPaths, basicAuthSettings)
+            IBasicAuthService basicAuthService)
+            : this(umbracoContextAccessor, runtime, null, umbracoRequestPaths, basicAuthService)
         {
         }
 
@@ -47,13 +47,13 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             IRuntimeState runtime,
             IEnumerable<string> explicitPaths,
             UmbracoRequestPaths umbracoRequestPaths,
-            IOptionsMonitor<BasicAuthSettings> basicAuthSettingsMonitor)
+            IBasicAuthService basicAuthService)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _runtime = runtime;
             _explicitPaths = explicitPaths?.ToArray();
             _umbracoRequestPaths = umbracoRequestPaths;
-            _basicAuthSettingsMonitor = basicAuthSettingsMonitor;
+            _basicAuthService = basicAuthService;
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 return true;
             }
 
-            if (_basicAuthSettingsMonitor.CurrentValue.Enabled)
+            if (_basicAuthService.IsBasicAuthEnabled())
             {
                 return true;
             }
