@@ -16,10 +16,10 @@
                     type="button" class="umb-panel-header-icon"
                     ng-if="!hideIcon"
                     ng-click="openIconPicker()"
-                    ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
+                    ng-class="{'-placeholder': $parent.icon === '' || $parent.icon === null}"
                     title="{{$parent.icon}}">
-                        <umb-icon icon="{{$parent.icon}}" class="icon" ng-if="$parent.icon!=='' && $parent.icon!==null"></umb-icon>
-                        <span class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                        <umb-icon icon="{{$parent.icon}}" class="icon {{$parent.icon}}" ng-if="$parent.icon !== '' && $parent.icon !== null"></umb-icon>
+                        <span class="umb-panel-header-icon-text" ng-if="$parent.icon === '' || $parent.icon === null">
                             <localize key="settings_addIcon">Add icon</localize>
                         </span>
                 </button>
