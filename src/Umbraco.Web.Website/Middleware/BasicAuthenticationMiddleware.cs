@@ -1,5 +1,3 @@
-using System;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -15,12 +13,12 @@ namespace Umbraco.Cms.Web.Common.Middleware
     /// <summary>
     ///     Provides basic authentication via back-office credentials for public website access if configured for use and the client IP is not allow listed.
     /// </summary>
-    public class BasicAuthAuthenticationMiddleware : IMiddleware
+    public class BasicAuthenticationMiddleware : IMiddleware
     {
         private readonly IRuntimeState _runtimeState;
         private readonly IBasicAuthService _basicAuthService;
 
-        public BasicAuthAuthenticationMiddleware(
+        public BasicAuthenticationMiddleware(
             IRuntimeState runtimeState,
             IBasicAuthService basicAuthService)
         {

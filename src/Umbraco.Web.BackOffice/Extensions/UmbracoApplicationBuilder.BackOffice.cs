@@ -31,7 +31,6 @@ namespace Umbraco.Extensions
                 a => a.UseMiddleware<KeepAliveMiddleware>());
 
             builder.AppBuilder.UseMiddleware<BackOfficeExternalLoginProviderErrorMiddleware>();
-            builder.AppBuilder.UseMiddleware<BasicAuthAuthenticationMiddleware>();
             return builder;
         }
 
