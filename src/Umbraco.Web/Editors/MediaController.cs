@@ -37,7 +37,6 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Editors
 {
@@ -181,7 +180,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
-        public IEnumerable<MediaItemDisplay> GetByIds([FromUri]int[] ids)
+        public IEnumerable<MediaItemDisplay> GetByIds([FromUri] int[] ids)
         {
             var foundMedia = Services.MediaService.GetByIds(ids);
             return foundMedia.Select(media => Mapper.Map<MediaItemDisplay>(media));
@@ -296,7 +295,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //better to not use this without paging where possible, currently only the sort dialog does
-                children = Services.MediaService.GetPagedChildren(id,0, int.MaxValue, out var total).ToList();
+                children = Services.MediaService.GetPagedChildren(id, 0, int.MaxValue, out var total).ToList();
                 totalChildren = children.Count;
             }
 
@@ -432,7 +431,7 @@ namespace Umbraco.Web.Editors
 
             if (sourceParentID == destinationParentID)
             {
-                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("",Services.TextService.Localize("media", "moveToSameFolderFailed"),NotificationStyle.Error)));
+                return Request.CreateValidationErrorResponse(new SimpleNotificationModel(new Notification("", Services.TextService.Localize("media", "moveToSameFolderFailed"), NotificationStyle.Error)));
             }
             if (moveResult == false)
             {
@@ -597,7 +596,7 @@ namespace Umbraco.Web.Editors
 
         public MediaItemDisplay PostAddFolder(PostedFolder folder)
         {
-            var intParentId = GetParentIdAsInt(folder.ParentId, validatePermissions:true);
+            var intParentId = GetParentIdAsInt(folder.ParentId, validatePermissions: true);
 
             var mediaService = Services.MediaService;
 
@@ -710,11 +709,13 @@ namespace Umbraco.Web.Editors
                         foreach (var mediaTypeItem in mediaTypes)
                         {
                             var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
-                            if (fileProperty != null) {
+                            if (fileProperty != null)
+                            {
                                 var dataTypeKey = fileProperty.DataTypeKey;
                                 var dataType = Services.DataTypeService.GetDataType(dataTypeKey);
 
-                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig) {
+                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig)
+                                {
                                     var fileExtensions = fileExtensionsConfig.FileExtensions;
                                     if (fileExtensions != null)
                                     {
@@ -749,7 +750,7 @@ namespace Umbraco.Web.Editors
                     if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fs)
                     {
-                        f.SetValue(Services.ContentTypeBaseServices, Constants.Conventions.Media.File,fileName, fs);
+                        f.SetValue(Services.ContentTypeBaseServices, Constants.Conventions.Media.File, fileName, fs);
                     }
 
                     var saveResult = mediaService.Save(f, Security.CurrentUser.Id);
@@ -857,7 +858,7 @@ namespace Umbraco.Web.Editors
 
             //ensure the user has access to this folder by parent id!
             if (validatePermissions && CheckPermissions(
-                    new AdaptiveCapacityDictionary<string, object>(5),
+                    new Dictionary<string, object>(),
                     Security.CurrentUser,
                     Services.MediaService,
                     Services.EntityService,

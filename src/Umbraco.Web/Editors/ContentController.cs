@@ -39,7 +39,6 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Editors
 {
@@ -426,7 +425,7 @@ namespace Umbraco.Web.Editors
             var parent = parentId > 0 ? Services.ContentService.GetById(parentId) : null;
             // Since the parent is the same and the path used to get permissions is based on the parent we only have to do it once
             var path = parent == null ? "-1" : parent.Path;
-            var permissions = new AdaptiveCapacityDictionary<string, EntityPermissionSet>(1)
+            var permissions = new Dictionary<string, EntityPermissionSet>
             {
                 [path] = Services.UserService.GetPermissionsForPath(currentUser, path)
             };
@@ -857,7 +856,7 @@ namespace Umbraco.Web.Editors
                         if (!ValidatePublishBranchPermissions(contentItem, out var noAccess))
                         {
                             globalNotifications.AddErrorNotification(
-                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize(null, "publish"),
                                 Services.TextService.Localize("publish", "invalidPublishBranchPermissions"));
                             wasCancelled = false;
                             break;
@@ -873,7 +872,7 @@ namespace Umbraco.Web.Editors
                         if (!ValidatePublishBranchPermissions(contentItem, out var noAccess))
                         {
                             globalNotifications.AddErrorNotification(
-                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize(null, "publish"),
                                 Services.TextService.Localize("publish", "invalidPublishBranchPermissions"));
                             wasCancelled = false;
                             break;
@@ -964,7 +963,7 @@ namespace Umbraco.Web.Editors
                         //if there's more than 1 variant, then we need to add the culture specific error
                         //messages based on the variants in error so that the messages show in the publish/save dialog
                         if (variants.Count > 1)
-                            AddVariantValidationError(variant.Culture, variant.Segment, "publish","contentPublishedFailedByMissingName");
+                            AddVariantValidationError(variant.Culture, variant.Segment, "publish", "contentPublishedFailedByMissingName");
                         else
                             return false; //It's invariant and is missing critical data, it cannot be saved
                     }
@@ -1030,7 +1029,7 @@ namespace Umbraco.Web.Editors
 
                         AddSuccessNotification(notifications, culture, segment,
                             Services.TextService.Localize("speechBubbles", "editContentSavedHeader"),
-                            Services.TextService.Localize(null,variantSavedLocalizationAlias, new[] { variantName }));
+                            Services.TextService.Localize(null, variantSavedLocalizationAlias, new[] { variantName }));
                     }
                 }
                 else if (ModelState.IsValid)
@@ -1505,7 +1504,7 @@ namespace Umbraco.Web.Editors
         /// <param name="cultureToken">
         /// The culture used in the localization message, null by default which means <see cref="culture"/> will be used.
         /// </param>
-        private void AddVariantValidationError(string culture, string segment, string localizationArea,string localizationAlias, string cultureToken = null)
+        private void AddVariantValidationError(string culture, string segment, string localizationArea, string localizationAlias, string cultureToken = null)
         {
             var cultureToUse = cultureToken ?? culture;
             var variantName = GetVariantName(cultureToUse, segment);
@@ -1761,7 +1760,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //we only want to unpublish some of the variants
-                var results = new AdaptiveCapacityDictionary<string, PublishResult>(model.Cultures.Length);
+                var results = new Dictionary<string, PublishResult>();
                 foreach (var c in model.Cultures)
                 {
                     var result = Services.ContentService.Unpublish(foundContent, culture: c, userId: Security.GetUserId().ResultOr(0));
@@ -2246,7 +2245,7 @@ namespace Umbraco.Web.Editors
                             //TODO: This doesn't take into account variations with the successfulCultures param
                             var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
-                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize(null, "publish"),
                                 Services.TextService.Localize("publish", "contentPublishedFailedByParent",
                                     new[] { names }).Trim());
                         }
@@ -2263,7 +2262,7 @@ namespace Umbraco.Web.Editors
                             //TODO: This doesn't take into account variations with the successfulCultures param
                             var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
-                                    Services.TextService.Localize(null,"publish"),
+                                    Services.TextService.Localize(null, "publish"),
                                     Services.TextService.Localize("publish", "contentPublishedFailedAwaitingRelease",
                                         new[] { names }).Trim());
                         }
@@ -2273,7 +2272,7 @@ namespace Umbraco.Web.Editors
                             //TODO: This doesn't take into account variations with the successfulCultures param
                             var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
-                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize(null, "publish"),
                                 Services.TextService.Localize("publish", "contentPublishedFailedExpired",
                                     new[] { names }).Trim());
                         }
@@ -2283,7 +2282,7 @@ namespace Umbraco.Web.Editors
                             //TODO: This doesn't take into account variations with the successfulCultures param
                             var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                             display.AddWarningNotification(
-                                Services.TextService.Localize(null,"publish"),
+                                Services.TextService.Localize(null, "publish"),
                                 Services.TextService.Localize("publish", "contentPublishedFailedIsTrashed",
                                     new[] { names }).Trim());
                         }
@@ -2294,7 +2293,7 @@ namespace Umbraco.Web.Editors
                             {
                                 var names = string.Join(", ", status.Select(x => $"'{x.Content.Name}'"));
                                 display.AddWarningNotification(
-                                    Services.TextService.Localize(null,"publish"),
+                                    Services.TextService.Localize(null, "publish"),
                                     Services.TextService.Localize("publish", "contentPublishedFailedInvalid",
                                         new[] { names }).Trim());
                             }
@@ -2304,7 +2303,7 @@ namespace Umbraco.Web.Editors
                                 {
                                     var names = string.Join(", ", status.Select(x => $"'{(x.Content.ContentType.VariesByCulture() ? x.Content.GetCultureName(c) : x.Content.Name)}'"));
                                     display.AddWarningNotification(
-                                        Services.TextService.Localize(null,"publish"),
+                                        Services.TextService.Localize(null, "publish"),
                                         Services.TextService.Localize("publish", "contentPublishedFailedInvalid",
                                             new[] { names }).Trim());
                                 }
@@ -2313,7 +2312,7 @@ namespace Umbraco.Web.Editors
                         break;
                     case PublishResultType.FailedPublishMandatoryCultureMissing:
                         display.AddWarningNotification(
-                            Services.TextService.Localize(null,"publish"),
+                            Services.TextService.Localize(null, "publish"),
                             "publish/contentPublishedFailedByCulture");
                         break;
                     default:

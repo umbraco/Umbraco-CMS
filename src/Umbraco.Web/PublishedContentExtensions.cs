@@ -12,7 +12,6 @@ using Umbraco.Examine;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Collections;
 
 namespace Umbraco.Web
 {
@@ -67,7 +66,7 @@ namespace Umbraco.Web
         /// <returns>Empty string if none is set.</returns>
         public static string GetTemplateAlias(this IPublishedContent content)
         {
-            if(content.TemplateId.HasValue == false)
+            if (content.TemplateId.HasValue == false)
             {
                 return string.Empty;
             }
@@ -1038,7 +1037,7 @@ namespace Umbraco.Web
             return content.EnumerateDescendants(orSelf, culture).Where(x => func == null || func(x));
         }
 
-        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, bool orSelf,  string culture = null)
+        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, bool orSelf, string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
@@ -1141,7 +1140,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent FirstChild(this IPublishedContent content, Guid uniqueId, string culture = null)
         {
-            return content.Children(x=>x.Key == uniqueId, culture).FirstOrDefault();
+            return content.Children(x => x.Key == uniqueId, culture).FirstOrDefault();
         }
 
         public static T FirstChild<T>(this IPublishedContent content, string culture = null)
@@ -1207,7 +1206,7 @@ namespace Umbraco.Web
                                 continue; //skip this one, it doesn't match the filter
                         }
 
-                        var standardVals = new AdaptiveCapacityDictionary<string, object>(8)
+                        var standardVals = new Dictionary<string, object>
                             {
                                     { "Id", n.Id },
                                     { "NodeName", n.Name() },

@@ -5,27 +5,26 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using System.ComponentModel;
-using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Routing
 {
-     /// <summary>
+    /// <summary>
     /// Provides utilities to handle site domains.
-     /// </summary>
+    /// </summary>
     public class SiteDomainHelper : ISiteDomainHelper, IDisposable
     {
         #region Configure
 
         private static readonly ReaderWriterLockSlim ConfigLock = new ReaderWriterLockSlim();
-        private static IDictionary<string, string[]> _sites;
-        private static IDictionary<string, List<string>> _bindings;
+        private static Dictionary<string, string[]> _sites;
+        private static Dictionary<string, List<string>> _bindings;
         private static Dictionary<string, Dictionary<string, string[]>> _qualifiedSites;
         private bool _disposedValue;
 
         // these are for unit tests *only*
         // ReSharper disable ConvertToAutoPropertyWithPrivateSetter
-        internal static IDictionary<string, string[]> Sites => _sites;
-        internal static IDictionary<string, List<string>> Bindings => _bindings;
+        internal static Dictionary<string, string[]> Sites => _sites;
+        internal static Dictionary<string, List<string>> Bindings => _bindings;
         // ReSharper restore ConvertToAutoPropertyWithPrivateSetter
 
         // these are for validation
@@ -57,11 +56,11 @@ namespace Umbraco.Web.Routing
             // must use authority format w/optional scheme and port, but no path
             // any domain should appear only once
             return domains.Select(domain =>
-                {
-                    if (!DomainValidation.IsMatch(domain))
-                        throw new ArgumentOutOfRangeException(nameof(domains), $"Invalid domain: \"{domain}\".");
-                    return domain;
-                });
+            {
+                if (!DomainValidation.IsMatch(domain))
+                    throw new ArgumentOutOfRangeException(nameof(domains), $"Invalid domain: \"{domain}\".");
+                return domain;
+            });
         }
 
         /// <summary>
@@ -74,7 +73,7 @@ namespace Umbraco.Web.Routing
         {
             using (ConfigWriteLock)
             {
-                _sites = _sites ?? new AdaptiveCapacityDictionary<string, string[]>(1);
+                _sites = _sites ?? new Dictionary<string, string[]>();
                 _sites[key] = ValidateDomains(domains).ToArray();
                 _qualifiedSites = null;
             }
@@ -90,7 +89,7 @@ namespace Umbraco.Web.Routing
         {
             using (ConfigWriteLock)
             {
-                _sites = _sites ?? new AdaptiveCapacityDictionary<string, string[]>(1);
+                _sites = _sites ?? new Dictionary<string, string[]>();
                 _sites[key] = ValidateDomains(domains).ToArray();
                 _qualifiedSites = null;
             }
@@ -132,18 +131,18 @@ namespace Umbraco.Web.Routing
         /// Binds some sites.
         /// </summary>
         /// <param name="keys">The keys uniquely identifying the sites to bind.</param>
-         /// <remarks>
+        /// <remarks>
         /// <para>At the moment there is no public way to unbind sites. Clear and reconfigure.</para>
         /// <para>If site1 is bound to site2 and site2 is bound to site3 then site1 is bound to site3.</para>
-         /// </remarks>
+        /// </remarks>
         public static void BindSites(params string[] keys)
-         {
+        {
             using (ConfigWriteLock)
             {
                 foreach (var key in keys.Where(key => !_sites.ContainsKey(key)))
                     throw new ArgumentException($"Not an existing site key: {key}.", nameof(keys));
 
-                _bindings = _bindings ?? new AdaptiveCapacityDictionary<string, List<string>>(0);
+                _bindings = _bindings ?? new Dictionary<string, List<string>>();
 
                 var allkeys = _bindings
                     .Where(kvp => keys.Contains(kvp.Key))
@@ -182,7 +181,7 @@ namespace Umbraco.Web.Routing
 
             var currentAuthority = current.GetLeftPart(UriPartial.Authority);
             KeyValuePair<string, string[]>[] candidateSites = null;
-             IEnumerable<DomainAndUri> ret = domainAndUris;
+            IEnumerable<DomainAndUri> ret = domainAndUris;
 
             using (ConfigReadLock) // so nothing changes between GetQualifiedSites and access to bindings
             {
@@ -232,10 +231,10 @@ namespace Umbraco.Web.Routing
 
             // if we are able to filter, then filter, else return the whole lot
             return candidateSites == null ? ret : ret.Where(d =>
-                {
-                    var authority = d.Uri.GetLeftPart(UriPartial.Authority);
-                    return candidateSites.Any(site => site.Value.Contains(authority));
-                });
+            {
+                var authority = d.Uri.GetLeftPart(UriPartial.Authority);
+                return candidateSites.Any(site => site.Value.Contains(authority));
+            });
         }
 
         private static Dictionary<string, string[]> GetQualifiedSites(Uri current)

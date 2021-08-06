@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install;
@@ -58,7 +57,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
         {
             // Create lists of paths to check along with a flag indicating if modify rights are required
             // in ALL circumstances or just some
-            var pathsToCheck = new AdaptiveCapacityDictionary<string, PermissionCheckRequirement>(10)
+            var pathsToCheck = new Dictionary<string, PermissionCheckRequirement>
             {
                 { SystemDirectories.Data, PermissionCheckRequirement.Required },
                 { SystemDirectories.Packages, PermissionCheckRequirement.Required},
@@ -74,7 +73,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
 
             //These are special paths to check that will restart an app domain if a file is written to them,
             //so these need to be tested differently
-            var pathsToCheckWithRestarts = new AdaptiveCapacityDictionary<string, PermissionCheckRequirement>(2)
+            var pathsToCheckWithRestarts = new Dictionary<string, PermissionCheckRequirement>
             {
                 { SystemDirectories.AppCode, PermissionCheckRequirement.Optional },
                 { SystemDirectories.Bin, PermissionCheckRequirement.Optional }
@@ -88,7 +87,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
 
             //now check the special folders
             var requiredPathCheckResult2 = FilePermissionHelper.EnsureDirectories(
-                GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out var requiredFailedPaths2, writeCausesRestart:true);
+                GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out var requiredFailedPaths2, writeCausesRestart: true);
             var optionalPathCheckResult2 = FilePermissionHelper.EnsureDirectories(
                 GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Optional), out var optionalFailedPaths2, writeCausesRestart: true);
 
@@ -106,7 +105,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
         {
             // Create lists of paths to check along with a flag indicating if modify rights are required
             // in ALL circumstances or just some
-            var pathsToCheck = new AdaptiveCapacityDictionary<string, PermissionCheckRequirement>(1)
+            var pathsToCheck = new Dictionary<string, PermissionCheckRequirement>
             {
                 { "~/Web.config", PermissionCheckRequirement.Optional },
             };
@@ -120,7 +119,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             return GetStatus(requiredPathCheckResult, requiredFailedPaths, optionalPathCheckResult, optionalFailedPaths, PermissionCheckFor.File);
         }
 
-        private static string[] GetPathsToCheck(IDictionary<string, PermissionCheckRequirement> pathsToCheck,
+        private static string[] GetPathsToCheck(Dictionary<string, PermissionCheckRequirement> pathsToCheck,
             PermissionCheckRequirement requirement)
         {
             return pathsToCheck
@@ -161,7 +160,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 };
         }
 
-        private string GetMessageForPathCheckFailure(string messageArea,string messageAlias, IEnumerable<string> failedPaths)
+        private string GetMessageForPathCheckFailure(string messageArea, string messageAlias, IEnumerable<string> failedPaths)
         {
             var rootFolder = IOHelper.MapPath("/");
             var failedFolders = failedPaths

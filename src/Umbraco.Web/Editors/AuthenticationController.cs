@@ -28,7 +28,6 @@ using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Web.Editors.Filters;
 using Microsoft.Owin.Security;
-using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Editors
 {
@@ -80,7 +79,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [ValidateAngularAntiForgeryToken]
         [DenyLocalLoginAuthorization]
-        public async Task<UserDisplay> PostVerifyInvite([FromUri]int id, [FromUri]string token)
+        public async Task<UserDisplay> PostVerifyInvite([FromUri] int id, [FromUri] string token)
         {
             if (string.IsNullOrWhiteSpace(token))
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
@@ -224,10 +223,10 @@ namespace Umbraco.Web.Editors
         // TODO: This should be on the CurrentUserController?
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
-        public async Task<IDictionary<string, string>> GetCurrentUserLinkedLogins()
+        public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
             var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId().ResultOr(0));
-            var result = identityUser != null && identityUser.Logins != null ? new AdaptiveCapacityDictionary<string, string>(identityUser.Logins.Count) : new AdaptiveCapacityDictionary<string, string>(0);
+            var result = new Dictionary<string, string>();
             foreach (var l in identityUser.Logins)
             {
                 result[l.LoginProvider] = l.ProviderKey;
@@ -368,7 +367,7 @@ namespace Umbraco.Web.Editors
         }
 
         [SetAngularAntiForgeryTokens]
-        public async Task<IHttpActionResult> PostSend2FACode([FromBody]string provider)
+        public async Task<IHttpActionResult> PostSend2FACode([FromBody] string provider)
         {
             if (provider.IsNullOrWhiteSpace())
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -434,19 +433,19 @@ namespace Umbraco.Web.Editors
                 var lockedOut = await UserManager.IsLockedOutAsync(model.UserId);
                 if (lockedOut)
                 {
-                    Logger.Info<AuthenticationController,int>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
+                    Logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
 
                     //// var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController, int, string>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
                     }
 
                     var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController,int, string>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
                     }
                 }
 
@@ -500,7 +499,7 @@ namespace Umbraco.Web.Editors
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
-            Logger.Info<AuthenticationController, string, string>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, owinContext.Request.RemoteIpAddress);
+            Logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, owinContext.Request.RemoteIpAddress);
 
             if (UserManager != null)
             {

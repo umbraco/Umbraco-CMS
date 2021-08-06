@@ -5,7 +5,6 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.WebApi;
 
@@ -74,11 +73,11 @@ namespace Umbraco.Web.Mvc
                     //URL format
                     url,
                     //set the namespace of the controller to match
-                    new[] {controllerType.Namespace});
+                    new[] { controllerType.Namespace });
 
                 //set defaults
                 controllerPluginRoute.Defaults = new RouteValueDictionary(
-                    new AdaptiveCapacityDictionary<string, object>(3)
+                    new Dictionary<string, object>
                     {
                         {"controller", controllerName},
                         {"action", defaultAction},
@@ -92,7 +91,7 @@ namespace Umbraco.Web.Mvc
                     string.Format("umbraco-{0}-{1}-{2}", "api", area.AreaName, controllerName),
                     //URL format
                     url,
-                    new {controller = controllerName, id = defaultId});
+                    new { controller = controllerName, id = defaultId });
                 //web api routes don't set the data tokens object
                 if (controllerPluginRoute.DataTokens == null)
                 {
@@ -100,7 +99,7 @@ namespace Umbraco.Web.Mvc
                 }
 
                 //look in this namespace to create the controller
-                controllerPluginRoute.DataTokens.Add("Namespaces", new[] {controllerType.Namespace});
+                controllerPluginRoute.DataTokens.Add("Namespaces", new[] { controllerType.Namespace });
 
                 //Special case! Check if the controller type implements IRequiresSessionState and if so use our
                 //custom webapi session handler
@@ -117,7 +116,7 @@ namespace Umbraco.Web.Mvc
             if (controllerSuffixName.IsNullOrWhiteSpace() == false)
             {
                 controllerPluginRoute.Constraints = new RouteValueDictionary(
-                    new AdaptiveCapacityDictionary<string, object>(1)
+                    new Dictionary<string, object>
                     {
                         {"controller", @"(\w+)" + controllerSuffixName}
                     });

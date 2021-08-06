@@ -10,7 +10,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -142,7 +141,7 @@ namespace Umbraco.Web.Models.Mapping
                     Label = _localizedTextService.Localize(null,"password"),
                     // NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
                     // only when creating a new member and we want to have a generated password pre-filled.
-                    Value = new AdaptiveCapacityDictionary<string, object>(2)
+                    Value = new Dictionary<string, object>
                     {
                         // TODO: why ignoreCase, what are we doing here?!
                         {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
@@ -163,7 +162,7 @@ namespace Umbraco.Web.Models.Mapping
                     Label = _localizedTextService.Localize("content","membergroup"),
                     Value = GetMemberGroupValue(member.Username),
                     View = "membergroups",
-                    Config = new AdaptiveCapacityDictionary<string, object>(1) {{"IsRequired", true}}
+                    Config = new Dictionary<string, object> {{"IsRequired", true}}
                 }
             };
 
@@ -224,7 +223,7 @@ namespace Umbraco.Web.Models.Mapping
             var prop = new ContentPropertyDisplay
             {
                 Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login",
-                Label = localizedText.Localize(null,"login"),
+                Label = localizedText.Localize(null, "login"),
                 Value = member.Username
             };
 

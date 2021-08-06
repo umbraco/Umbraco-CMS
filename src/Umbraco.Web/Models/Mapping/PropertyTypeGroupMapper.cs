@@ -130,7 +130,7 @@ namespace Umbraco.Web.Models.Mapping
                 var definingContentType = GetContentTypeForPropertyType(source, compositionGenericProperty.Id);
                 if (definingContentType == null)
                     throw new Exception("PropertyType with id=" + compositionGenericProperty.Id + " was not found on any of the content type's compositions.");
-                genericProperties.AddRange(MapProperties(new [] { compositionGenericProperty }, definingContentType, PropertyGroupBasic.GenericPropertiesGroupId, true));
+                genericProperties.AddRange(MapProperties(new[] { compositionGenericProperty }, definingContentType, PropertyGroupBasic.GenericPropertiesGroupId, true));
             }
 
             // if there are any generic properties, add the corresponding tab
@@ -226,12 +226,12 @@ namespace Umbraco.Web.Models.Mapping
                     LabelOnTop = p.LabelOnTop,
                     Editor = p.PropertyEditorAlias,
                     Validation = new PropertyTypeValidation
-                        {
-                            Mandatory = p.Mandatory,
-                            MandatoryMessage = p.MandatoryMessage,
-                            Pattern = p.ValidationRegExp,
-                            PatternMessage = p.ValidationRegExpMessage,
-                        },
+                    {
+                        Mandatory = p.Mandatory,
+                        MandatoryMessage = p.MandatoryMessage,
+                        Pattern = p.ValidationRegExp,
+                        PatternMessage = p.ValidationRegExpMessage,
+                    },
                     Label = p.Name,
                     View = propertyEditor.GetValueEditor().View,
                     Config = config,

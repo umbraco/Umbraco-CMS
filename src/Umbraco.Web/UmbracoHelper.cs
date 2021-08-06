@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Xml.XPath;
 using Umbraco.Core;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -835,7 +834,7 @@ namespace Umbraco.Web
                 return false;
             }
             var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
-            parts = new AdaptiveCapacityDictionary<string, string>(parsedQueryString.AllKeys.Length);
+            parts = new Dictionary<string, string>();
             foreach (var key in parsedQueryString.AllKeys)
             {
                 parts[key] = parsedQueryString[key];
