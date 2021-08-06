@@ -38,11 +38,16 @@
   display: flex;
   align-items: center;
   overflow-x: auto;
+  overflow-y: visible;
   scroll-behavior: smooth;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  margin-bottom: -100px; // allow validation messages to overflow container
+  padding-bottom: 100px; // allow validation messages to overflow container
+  pointer-events: none; // allow validation messages to overflow container
 
   li {
+    pointer-events: auto;
     height: 100%;
 
     &:only-of-type {
@@ -251,9 +256,8 @@
 
 .umb-group-builder__tab-val-message {
   position: absolute;
-  top: 0;
+  top: calc(100% + 5px);
   left: 20px;
-  transform: translate(0, -10px);
 }
 
 .umb-group-builder__tab--placeholder {
