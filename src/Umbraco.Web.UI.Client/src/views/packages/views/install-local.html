@@ -19,11 +19,13 @@
                      ngf-max-size="{{ maxFileSize }}"
                      ng-class="{'is-small': compact!=='false' || (done.length+queue.length) > 0 }">
 
-                    <div class="content">
+                    <div class="content" draggable="false">
 
                         <!-- Drag and drop illustration -->
-                        <i class="icon-box" draggable="false"></i>
-                        <small class="faded" draggable="false"><strong><localize key="packager_dropHere">Drop to upload</localize></strong></small>
+                        <umb-icon icon="icon-box"></umb-icon>
+                        <small class="faded">
+                            <strong><localize key="packager_dropHere">Drop to upload</localize></strong>
+                        </small>
 
                         <!-- Select files -->
                         <div class="umb-upload-local__select-file"
