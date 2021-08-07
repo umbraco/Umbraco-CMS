@@ -55,7 +55,7 @@
                                     <button type="button" class="btn-reset td uSky-templates-column add"
                                             ng-click="vm.configureCell(null, currentRow)"
                                             ng-style="{width: vm.percentage(availableRowSpace) + '%'}">
-                                        <i class="icon icon-add" aria-hidden="true"></i>
+                                        <umb-icon icon="icon-add" class="icon"></umb-icon>
                                         <span class="sr-only">
                                             <localize key="grid_addRowConfiguration">Add row configuration</localize>
                                         </span>
@@ -69,11 +69,11 @@
                             <umb-control-group label="@general_width">
                                 <div class="grid-size-scaler">
                                     <button type="button" class="btn-link" ng-click="vm.scaleDown(currentCell)">
-                                        <i class="icon icon-remove" aria-hidden="true"></i>
+                                        <umb-icon icon="icon-remove" class="icon"></umb-icon>
                                     </button>
                                     <span>{{currentCell.grid}}</span>
                                     <button type="button" class="btn-link" ng-click="vm.scaleUp(currentCell, availableRowSpace, true)">
-                                        <i class="icon icon-add" aria-hidden="true"></i>
+                                        <umb-icon icon="icon-add" class="icon"></umb-icon>
                                     </button>
                                 </div>
                             </umb-control-group>
