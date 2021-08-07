@@ -32,19 +32,22 @@
     }
 
     &__inner {
-
         // Clear pseudo classes
         &::before,
         &::after {
             content: none !important;
         }
 
-        > span {
+        ng-transclude {
             animation: inherit;
+
+            > span {
+                animation: inherit;
+            }
         }
 
-        // Inherit font icon from parent
         > i {
+            // Inherit font icon from parent
             font-family: inherit;
         }
     }
