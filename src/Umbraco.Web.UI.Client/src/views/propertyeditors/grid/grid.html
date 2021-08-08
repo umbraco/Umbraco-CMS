@@ -136,20 +136,17 @@
 
                                                  <!-- Cell -->
                                                  <div class="umb-cell-content"
-                                                      ng-class="
-                                                        {'-active': area === active,
-                                                        '-has-editors': area.controls.length > 0,
-                                                        '-collapsed': sortMode}">
+                                                      ng-class="{'-active': area === active, '-has-editors': area.controls.length > 0, '-collapsed': sortMode}">
 
                                                       <!-- disable drop overlay -->
                                                       <div class="drop-overlay -disable" ng-if="area.dropNotAllowed">
-                                                          <i class="icon-delete drop-icon" aria-hidden="true"></i>
+                                                          <umb-icon icon="icon-delete" class="drop-icon"></umb-icon>
                                                           <p><localize key="grid_contentNotAllowed">This content is not allowed here</localize></p>
                                                       </div>
 
                                                       <!-- allow drop overlay -->
                                                       <div class="drop-overlay -allow" ng-if="area.dropOnEmpty">
-                                                          <i class="icon-download drop-icon" aria-hidden="true"></i>
+                                                          <umb-icon icon="icon-download" class="drop-icon"></umb-icon>
                                                           <p><localize key="grid_contentAllowed">This content is allowed here</localize></p>
                                                       </div>
 
