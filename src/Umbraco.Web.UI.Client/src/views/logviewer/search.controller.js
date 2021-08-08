@@ -311,7 +311,6 @@
             updateAllLogLevelFilterCheckboxes(true);
 
             getLogs();
-
         }
 
         function deselectAllLogLevelFilters() {
