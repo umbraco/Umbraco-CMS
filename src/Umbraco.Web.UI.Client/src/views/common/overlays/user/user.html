@@ -58,8 +58,7 @@
                     <button class="btn btn-block btn-social"
                             ng-class="login.properties.SocialStyle"
                             id="{{login.authType}}">
-
-                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                        <umb-icon icon="fa {{login.properties.SocialIcon}}"></umb-icon>
                         <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
                     </button>
                 </form>
@@ -71,7 +70,7 @@
                         id="{{login.authType}}"
                         name="provider"
                         value="{{login.authType}}">
-                    <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                    <umb-icon icon="fa {{login.properties.SocialIcon}}"></umb-icon>
                     <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
                 </button>
             </div>
