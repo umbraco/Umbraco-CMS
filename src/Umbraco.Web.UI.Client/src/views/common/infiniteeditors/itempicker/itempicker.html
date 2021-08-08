@@ -28,8 +28,8 @@
                         <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm">
                             <button type="button" class="btn-reset umb-card-grid-item" title="{{ availableItem.name }}" ng-click="vm.selectItem(availableItem)">
                                 <span>
-                                    <i class="{{ availableItem.icon }}" aria-hidden="true"></i>
-                                    {{ availableItem.name }}
+                                    <umb-icon icon="{{availableItem.icon}}"></umb-icon>
+                                    {{availableItem.name}}
                                 </span>
                             </button>
                         </li>

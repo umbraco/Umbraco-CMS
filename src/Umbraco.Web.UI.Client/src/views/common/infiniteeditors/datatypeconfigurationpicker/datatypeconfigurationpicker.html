@@ -26,7 +26,7 @@
                                 </div>
                                 <button umb-auto-focus="{{$index === 0}}" class="btn-reset umb-card-grid-item" type="button" ng-click="vm.pickDataType(dataTypeConfig)" title="Select {{ dataTypeConfig.name }}">
                                     <span>
-                                        <i class="{{ dataTypeConfig.icon }}" ng-class="{'icon-autofill': dataTypeConfig.icon == null}" aria-hidden="true"></i>
+                                        <umb-icon icon="{{dataTypeConfig.icon}}" ng-class="{ 'icon-autofill': dataTypeConfig.icon == null }"></umb-icon>
                                         <span class="sr-only">Select</span> {{ dataTypeConfig.name }}
                                     </span>
                                 </button>
