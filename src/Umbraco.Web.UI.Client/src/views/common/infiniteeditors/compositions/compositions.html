@@ -75,10 +75,10 @@
                                 </div>
 
                                 <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed === false && !compositeContentType.selected}">
-                                    <div class="umb-checkbox-list__item-icon-wrapper">
+                                    <span class="umb-checkbox-list__item-icon-wrapper">
                                         <umb-icon icon="{{compositeContentType.contentType.icon}}" class="umb-checkbox-list__item-icon" ng-class="{'o-0': compositeContentType.contentType.alias === vm.loadingAlias}"></umb-icon>
-                                        <div ng-if="compositeContentType.contentType.alias === vm.loadingAlias" class="umb-button__progress -black umb-checkbox-list__item-checkbox-progress"></div>
-                                    </div>
+                                        <span ng-if="compositeContentType.contentType.alias === vm.loadingAlias" class="umb-button__progress -black umb-checkbox-list__item-checkbox-progress"></span>
+                                    </span>
                                     {{ compositeContentType.contentType.name }}
                                     <span class="umb-checkbox-list__item-caption" ng-if="compositeContentType.inherited">(inherited)</span>
                                 </label>
