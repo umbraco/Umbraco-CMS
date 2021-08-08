@@ -156,6 +156,8 @@
         vm.search = search;
         vm.getFilterName = getFilterName;
         vm.setLogLevelFilter = setLogLevelFilter;
+        vm.selectAllLogLevelFilters = selectAllLogLevelFilters;
+        vm.deselectAllLogLevelFilters = deselectAllLogLevelFilters;
         vm.toggleOrderBy = toggleOrderBy;
         vm.selectSearch = selectSearch;
         vm.resetSearch = resetSearch;
@@ -291,6 +293,30 @@
                 var index = vm.logOptions.logLevels.indexOf(logLevel.name);
                 vm.logOptions.logLevels.splice(index, 1);
             }
+
+            getLogs();
+        }
+
+        function updateAllLogLevelFilterCheckboxes(bool) {
+            for (var i = 0; i < vm.logLevels.length; i++) {
+                vm.logLevels[i].selected = bool;
+            }
+        }
+
+        function selectAllLogLevelFilters() {
+            vm.logOptions.logLevels = [];
+            for (var i = 0; i < vm.logLevels.length; i++) {
+                vm.logOptions.logLevels.push(vm.logLevels[i].name);
+            }
+            updateAllLogLevelFilterCheckboxes(true);
+
+            getLogs();
+
+        }
+
+        function deselectAllLogLevelFilters() {
+            vm.logOptions.logLevels = [];
+            updateAllLogLevelFilterCheckboxes(false);
 
             getLogs();
         }
