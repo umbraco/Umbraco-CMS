@@ -24,7 +24,7 @@
             },
             {
                 name: 'Information',
-                logTypeColor: 'success' 
+                logTypeColor: 'success'
             },
             {
                 name: 'Warning',
@@ -44,7 +44,7 @@
             enabled: false,
             interval: 0,
             promise: null,
-            
+
             defaultButton: {
                 labelKey: "logViewer_polling",
                 handler: function() {
@@ -259,7 +259,7 @@
         }
 
         function setLogTypeColor(logItems) {
-            logItems.forEach(logItem => 
+            logItems.forEach(logItem =>
                 logItem.logTypeColor = vm.logLevels.find(x => x.name === logItem.Level).logTypeColor);
         }
 
