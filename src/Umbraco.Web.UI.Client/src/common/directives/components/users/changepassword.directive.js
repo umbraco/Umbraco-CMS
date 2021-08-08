@@ -83,7 +83,7 @@
                 vm.passwordValues.answer = null;
             }
 
-            // set initial value for current password
+            // set initial value for new password value
             vm.passwordVal = vm.passwordValues.newPassword;
 
             //the value to compare to match passwords
