@@ -8,9 +8,9 @@
             scope.dataType = {};
             scope.customListViewCreated = false;
 
-            const listViewNamePrefix = "List View";
+            const listViewPrefix = "List View - ";
             
-            const checkForCustomListView = () => invariantEquals(scope.dataType.name, listViewNamePrefix + " - " + scope.modelAlias);
+            const checkForCustomListView = () => invariantEquals(scope.dataType.name, listViewPrefix + scope.modelAlias);
 
             // We also use "localeCompare" a few other places. Should probably be moved to a utility/helper function in future.
             function invariantEquals(a, b) {
