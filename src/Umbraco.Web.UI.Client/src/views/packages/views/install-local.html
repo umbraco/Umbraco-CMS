@@ -102,7 +102,7 @@
 
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.iconUrl" class="icon-box"></i>
+                            <umb-icon ng-if="!vm.localPackage.iconUrl" icon="icon-box"></umb-icon>
                             <img ng-if="vm.localPackage.iconUrl" ng-src="{{vm.localPackage.iconUrl}}" alt="" />
                         </div>
 
