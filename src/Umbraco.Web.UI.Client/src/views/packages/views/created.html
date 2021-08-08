@@ -19,7 +19,7 @@
             <tr ng-repeat="createdPackage in vm.createdPackages track by createdPackage.id" style="cursor: pointer;" ng-click="vm.goToPackage(createdPackage)">
                 <td class="flex items-center">
                     <div class="umb-package-list__item-icon">
-                        <umb-icon icon="icon-box" ng-if="!createdPackage.iconUrl"></umb-icon>
+                        <umb-icon ng-if="!createdPackage.iconUrl" icon="icon-box"></umb-icon>
                         <img ng-if="createdPackage.iconUrl" ng-src="{{createdPackage.iconUrl}}" alt="" />
                     </div>
                     <div class="umb-package-list__item-content">
