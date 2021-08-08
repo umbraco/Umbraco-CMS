@@ -55,7 +55,7 @@
 
                     <ng-form name="groupNameForm" data-element="group-name">
                         <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited}">
-                            <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
+                            <umb-icon icon="icon-navigation" class="umb-group-builder__group-title-icon" ng-if="sortingMode && !tab.inherited"></umb-icon>
                             <input data-element="group-name-field"
                                    class="umb-group-builder__group-title-input"
                                    type="text"
@@ -80,7 +80,7 @@
                     </ng-form>
 
                     <div class="umb-group-builder__group-inherited-label" ng-if="tab.inherited">
-                        <i class="icon icon-merge"></i>
+                        <umb-icon icon="icon-merge" class="icon"></umb-icon>
                         <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ tab.inheritedFromName }}
                         <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
                             <button type="button" class="btn-link btn-small p0" ng-click="openDocumentType(tab.parentTabContentTypes[$index])">{{ contentTypeName }}</button>
@@ -101,7 +101,7 @@
                     </ng-form>
 
                     <div class="umb-group-builder__group-remove" ng-if="!sortingMode && canRemoveGroup(tab)">
-                        <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
+                        <umb-icon icon="icon-trash" ng-click="togglePrompt(tab)"></umb-icon>
                         <umb-confirm-action
                             ng-if="tab.deletePrompt"
                             direction="left"
@@ -175,9 +175,9 @@
                                 </ng-form>
 
                                 <div ng-if="sortingMode" class="flex items-center">
-                                    <i class="icon icon-navigation" ng-if="!property.inherited" style="margin-right: 10px;"></i>
-                                    <span class="umb-group-builder__property-meta-label">{{ property.label }}</span>
-                                    <span class="umb-group-builder__property-meta-alias" style="margin-bottom: 0; margin-left: 5px; margin-top: 1px;">({{ property.alias }})</span>
+                                    <umb-icon icon="icon-navigation" class="icon" ng-if="!property.inherited" style="margin-right: 10px;"></umb-icon>
+                                    <span class="umb-group-builder__property-meta-label">{{property.label}}</span>
+                                    <span class="umb-group-builder__property-meta-alias" style="margin-bottom: 0; margin-left: 5px; margin-top: 1px;">({{property.alias}})</span>
                                     <input name="propertySortOrder" type="number" class="umb-group-builder__group-sort-value umb-property-editor-tiny" ng-model="property.sortOrder" ng-disabled="property.inherited" />
                                 </div>
 
@@ -199,27 +199,27 @@
                                     </div>
 
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.showOnMemberProfile">
-                                        <i class="icon-eye umb-group-builder__property-tag-icon"></i>
+                                        <umb-icon icon="icon-eye" class="umb-group-builder__property-tag-icon"></umb-icon>
                                         <localize key="contentTypeEditor_showOnMemberProfile"></localize>
                                     </div>
 
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.memberCanEdit">
-                                        <i class="icon-edit umb-group-builder__property-tag-icon"></i>
+                                        <umb-icon icon="icon-edit" class="umb-group-builder__property-tag-icon"></umb-icon>
                                         <localize key="contentTypeEditor_memberCanEdit"></localize>
                                     </div>
 
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.isSensitiveData">
-                                        <i class="icon-lock umb-group-builder__property-tag-icon"></i>
+                                        <umb-icon icon="icon-lock" class="umb-group-builder__property-tag-icon"></umb-icon>
                                         <localize key="contentTypeEditor_isSensitiveData"></localize>
                                     </div>
 
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.allowCultureVariant">
-                                        <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
+                                        <umb-icon icon="icon-shuffle" class="umb-group-builder__property-tag-icon"></umb-icon>
                                         <localize key="contentTypeEditor_cultureVariantLabel"></localize>
                                     </div>
 
                                     <div class="umb-group-builder__property-tag -white" ng-if="property.allowSegmentVariant">
-                                        <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
+                                        <umb-icon icon="icon-shuffle" class="umb-group-builder__property-tag-icon"></umb-icon>
                                         <localize key="contentTypeEditor_segmentVariantLabel"></localize>
                                     </div>
 
