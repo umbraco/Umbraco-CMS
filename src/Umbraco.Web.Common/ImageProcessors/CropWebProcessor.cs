@@ -88,19 +88,4 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
         private static CropMode GetMode(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
             => parser.ParseValue<CropMode>(commands.GetValueOrDefault(Mode), culture);
     }
-
-    /// <summary>
-    /// Enumerated cop modes to apply to cropped images.
-    /// </summary>
-    public enum CropMode
-    {
-        /// <summary>
-        /// Crops the image using the standard rectangle model of x, y, width, height.
-        /// </summary>
-        Pixels,
-        /// <summary>
-        /// Crops the image using percentages model left, top, right, bottom.
-        /// </summary>
-        Percentage
-    }
 }
