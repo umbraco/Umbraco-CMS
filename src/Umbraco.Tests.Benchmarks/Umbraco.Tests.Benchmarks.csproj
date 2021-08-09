@@ -9,7 +9,7 @@
     <None Remove="ReflectionUtilities-Unused.cs.bak" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />

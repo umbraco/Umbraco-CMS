@@ -12,7 +12,6 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class FileServiceTests : UmbracoIntegrationTest
     {
