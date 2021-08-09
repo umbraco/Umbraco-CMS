@@ -38,40 +38,34 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
             if (GetCrop(commands, parser, culture) is RectangleF crop)
             {
                 Size size = image.Image.Size();
+                CropMode mode = GetMode(commands, parser, culture);
 
-                // Convert from percentages to pixels based on crop mode
-                if (GetMode(commands, parser, culture) is CropMode.Percentage)
+                if (mode == CropMode.Percentage)
                 {
-                    // Fix for whole numbers
-                    float percentageLeft = crop.Left > 1 ? crop.Left / 100 : crop.Left;
-                    float percentageRight = crop.Right > 1 ? crop.Right / 100 : crop.Right;
-                    float percentageTop = crop.Top > 1 ? crop.Top / 100 : crop.Top;
-                    float percentageBottom = crop.Bottom > 1 ? crop.Bottom / 100 : crop.Bottom;
+                    // Convert the percentage based model of left, top, right, bottom to x, y, width, height
+                    float x = crop.Left * size.Width;
+                    float y = crop.Top * size.Height;
+                    float width = crop.Right < 1 ? (1 - crop.Left - crop.Right) * size.Width : size.Width;
+                    float height = crop.Bottom < 1 ? (1 - crop.Top - crop.Bottom) * size.Height : size.Height;
 
-                    // Work out the percentages
-                    float left = percentageLeft * size.Width;
-                    float top = percentageTop * size.Height;
-                    float width = percentageRight < 1 ? (1 - percentageLeft - percentageRight) * size.Width : size.Width;
-                    float height = percentageBottom < 1 ? (1 - percentageTop - percentageBottom) * size.Height : size.Height;
-
-                    crop = new RectangleF(left, top, width, height);
+                    crop = new RectangleF(x, y, width, height);
                 }
 
-                // Round and validate crop rectangle
-                var rectangle = Rectangle.Round(crop);
-                if (rectangle.X < size.Width && rectangle.Y < size.Height)
+                // Round and validate/clamp crop rectangle
+                var cropRectangle = Rectangle.Round(crop);
+                if (cropRectangle.X < size.Width && cropRectangle.Y < size.Height)
                 {
-                    if (rectangle.Width > (size.Width - rectangle.X))
+                    if (cropRectangle.Width > (size.Width - cropRectangle.X))
                     {
-                        rectangle.Width = size.Width - rectangle.X;
+                        cropRectangle.Width = size.Width - cropRectangle.X;
                     }
 
-                    if (rectangle.Height > (size.Height - rectangle.Y))
+                    if (cropRectangle.Height > (size.Height - cropRectangle.Y))
                     {
-                        rectangle.Height = size.Height - rectangle.Y;
+                        cropRectangle.Height = size.Height - cropRectangle.Y;
                     }
 
-                    image.Image.Mutate(x => x.Crop(rectangle));
+                    image.Image.Mutate(x => x.Crop(cropRectangle));
                 }
             }
 
@@ -80,9 +74,14 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
 
         private static RectangleF? GetCrop(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
         {
-            float[] crops = parser.ParseValue<float[]>(commands.GetValueOrDefault(Crop), culture);
+            float[] coordinates = parser.ParseValue<float[]>(commands.GetValueOrDefault(Crop), culture);
 
-            return (crops.Length != 4) ? null : new RectangleF(crops[0], crops[1], crops[2], crops[3]);
+            if (coordinates.Length != 4)
+            {
+                return null;
+            }
+
+            return new RectangleF(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
         }
 
         private static CropMode GetMode(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
