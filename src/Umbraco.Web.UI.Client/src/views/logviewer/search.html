@@ -48,21 +48,29 @@
                                             </label>
                                         </div>
                                     </umb-dropdown-item>
-                                    <umb-button action="vm.selectAllLogLevelFilters()"
-                                                label="Select all"
-                                                label-key="logViewer_selectAllLogLevelFilters"
-                                                type="button"
-                                                button-style="link"
-                                                size="xs">
-                                    </umb-button>
-                                    <br />
-                                    <umb-button action="vm.deselectAllLogLevelFilters()"
-                                                label="Deselect all"
-                                                label-key="logViewer_deselectAllLogLevelFilters"
-                                                type="button"
-                                                button-style="link"
-                                                size="xs">
-                                    </umb-button>
+
+                                    <!-- Select all log level filters -->
+                                    <umb-dropdown-item>
+                                        <umb-button action="vm.selectAllLogLevelFilters()"
+                                                    label="Select all"
+                                                    label-key="logViewer_selectAllLogLevelFilters"
+                                                    type="button"
+                                                    button-style="link"
+                                                    size="xs">
+                                        </umb-button>
+                                    </umb-dropdown-item>
+
+                                    <!-- Deselect all log level filters -->
+                                    <umb-dropdown-item>
+                                        <umb-button action="vm.deselectAllLogLevelFilters()"
+                                                    label="Deselect all"
+                                                    label-key="logViewer_deselectAllLogLevelFilters"
+                                                    type="button"
+                                                    button-style="link"
+                                                    size="xs">
+                                        </umb-button>
+                                    </umb-dropdown-item>
+
                                 </umb-dropdown>
                             </div>
 
