@@ -49,7 +49,9 @@ namespace Umbraco.Extensions
                 })
                 .SetCache<PhysicalFileSystemCache>()
                 .SetCacheHash<CacheHash>()
-                .AddProcessor<CropWebProcessor>();
+                .RemoveProcessor<ResizeWebProcessor>()
+                .AddProcessor<CropWebProcessor>()
+                .AddProcessor<ResizeWebProcessor>();
 
             return services;
         }
