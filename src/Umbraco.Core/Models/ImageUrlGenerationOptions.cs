@@ -1,55 +1,71 @@
-﻿namespace Umbraco.Cms.Core.Models
+using System;
+
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
-    /// These are options that are passed to the IImageUrlGenerator implementation to determine
-    /// the propery URL that is needed
+    /// These are options that are passed to the IImageUrlGenerator implementation to determine the URL that is generated.
     /// </summary>
     public class ImageUrlGenerationOptions
     {
-        public ImageUrlGenerationOptions (string imageUrl)
-        {
-            ImageUrl = imageUrl;
-        }
+        public ImageUrlGenerationOptions(string imageUrl) => ImageUrl = imageUrl;
 
         public string ImageUrl { get; }
+
         public int? Width { get; set; }
+
         public int? Height { get; set; }
+
+        [Obsolete("This property is unsupported by the default implementation, manually calculate the width based on the height instead.")]
         public decimal? WidthRatio { get; set; }
+
+        [Obsolete("This property is unsupported by the default implementation, manually calculate the height based on the width instead.")]
         public decimal? HeightRatio { get; set; }
+
         public int? Quality { get; set; }
+
         public ImageCropMode? ImageCropMode { get; set; }
+
         public ImageCropAnchor? ImageCropAnchor { get; set; }
+
+        [Obsolete("Images are already cropped from the center to the specified width/height by default.")]
         public bool DefaultCrop { get; set; }
+
         public FocalPointPosition FocalPoint { get; set; }
+
         public CropCoordinates Crop { get; set; }
+
         public string CacheBusterValue { get; set; }
+
         public string FurtherOptions { get; set; }
+
+        [Obsolete("This property is unsupported by the default implementation, images should always be resized to the specified dimensions (within the configured maximums) to prevent different sizes depending on the source image.")]
         public bool UpScale { get; set; } = true;
+
+        [Obsolete("This property is unsupported by the default implementation, all frames should be processed by default.")]
         public string AnimationProcessMode { get; set; }
 
         /// <summary>
-        /// The focal point position, in whatever units the registered IImageUrlGenerator uses,
-        /// typically a percentage of the total image from 0.0 to 1.0.
+        /// The focal point position, in whatever units the registered IImageUrlGenerator uses, typically a percentage of the total image from 0.0 to 1.0.
         /// </summary>
         public class FocalPointPosition
         {
-            public FocalPointPosition (decimal top, decimal left)
+            public FocalPointPosition(decimal top, decimal left)
             {
                 Left = left;
                 Top = top;
             }
 
             public decimal Left { get; }
+
             public decimal Top { get; }
         }
 
         /// <summary>
-        /// The bounds of the crop within the original image, in whatever units the registered
-        /// IImageUrlGenerator uses, typically a percentage between 0 and 100.
+        /// The bounds of the crop within the original image, in whatever units the registered IImageUrlGenerator uses, typically a percentage between 0.0 and 1.0.
         /// </summary>
         public class CropCoordinates
         {
-            public CropCoordinates (decimal x1, decimal y1, decimal x2, decimal y2)
+            public CropCoordinates(decimal x1, decimal y1, decimal x2, decimal y2)
             {
                 X1 = x1;
                 Y1 = y1;
@@ -58,8 +74,11 @@
             }
 
             public decimal X1 { get; }
+
             public decimal Y1 { get; }
+
             public decimal X2 { get; }
+
             public decimal Y2 { get; }
         }
     }

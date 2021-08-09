@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core;
@@ -449,16 +449,17 @@ namespace Umbraco.Extensions
                     height = crop.Height;
                 }
 
-                // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a width parameter has been passed we can get the crop ratio for the height
-                if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width != null && height == null)
+                // Calculate missing dimension if a predefined crop has been specified, there are no coordinates and no ratio mode
+                if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null)
                 {
-                    options.HeightRatio = (decimal)crop.Height / crop.Width;
-                }
-
-                // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a height parameter has been passed we can get the crop ratio for the width
-                if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width == null && height != null)
-                {
-                    options.WidthRatio = (decimal)crop.Width / crop.Height;
+                    if (width != null && height == null)
+                    {
+                        height = (int)MathF.Round(width.Value * ((float)crop.Height / crop.Width));
+                    }
+                    else if (width == null && height != null)
+                    {
+                        width = (int)MathF.Round(height.Value * ((float)crop.Width / crop.Height));
+                    }
                 }
             }
             else
@@ -477,16 +478,28 @@ namespace Umbraco.Extensions
 
             if (ratioMode == ImageCropRatioMode.Width && height != null)
             {
-                // if only height specified then assume a square
-                if (width == null) width = height;
-                options.WidthRatio = (decimal)width / (decimal)height;
+                // If only height specified then assume a square
+                if (width == null)
+                {
+                    options.Width = height;
+                }
+                else
+                {
+                    options.Width = (int)MathF.Round(height.Value * ((float)width.Value / height.Value));
+                }
             }
 
             if (ratioMode == ImageCropRatioMode.Height && width != null)
             {
-                // if only width specified then assume a square
-                if (height == null) height = width;
-                options.HeightRatio = (decimal)height / (decimal)width;
+                // If only width specified then assume a square
+                if (height == null)
+                {
+                    options.Height = width;
+                }
+                else
+                {
+                    options.Height = (int)MathF.Round(width.Value * ((float)height.Value / width.Value));
+                }
             }
 
             options.UpScale = upScale;

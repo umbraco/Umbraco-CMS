@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         }
 
         /// <summary>
-        /// Test that if a crop alias has been specified that doesn't exist the method returns null
+        /// Test that if options is null, the generated image URL is also null.
         /// </summary>
         [Test]
         public void GetCropUrlNullTest()
@@ -55,13 +55,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         }
 
         /// <summary>
-        /// Test that if a crop alias has been specified that doesn't exist the method returns null
+        /// Test that if the image URL is null, the generated image URL is empty.
         /// </summary>
         [Test]
         public void GetCropUrlEmptyTest()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(null));
-            Assert.AreEqual("?rmode=crop", urlString);
+            Assert.AreEqual(string.Empty, urlString);
         }
 
         /// <summary>
@@ -74,35 +74,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
             Assert.AreEqual("?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
         }
 
-        /// <summary>
-        /// Test the height ratio mode with predefined crop dimensions
-        /// </summary>
-        [Test]
-        public void GetCropUrl_CropAliasHeightRatioModeTest()
-        {
-            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Crop = s_crop, Width = 100, HeightRatio = 1 });
-            Assert.AreEqual(MediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&heightratio=1&width=100", urlString);
-        }
-
-        /// <summary>
-        /// Test the height ratio mode with manual width/height dimensions
-        /// </summary>
-        [Test]
-        public void GetCropUrl_WidthHeightRatioModeTest()
-        {
-            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus1, Width = 300, HeightRatio = 0.5m });
-            Assert.AreEqual(MediaPath + "?rxy=0.80827067669172936,0.96&heightratio=0.5&width=300", urlString);
-        }
-
-        /// <summary>
-        /// Test the height ratio mode with width/height dimensions
-        /// </summary>
-        [Test]
-        public void GetCropUrl_HeightWidthRatioModeTest()
-        {
-            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus1, Height = 150, WidthRatio = 2 });
-            Assert.AreEqual(MediaPath + "?rxy=0.80827067669172936,0.96&widthratio=2&height=150", urlString);
-        }
 
         /// <summary>
         /// Test that if Crop mode is specified as anything other than Crop the image doesn't use the crop
@@ -139,28 +110,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         [Test]
         public void GetCropUrl_PreferFocalPointCenter()
         {
-            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Width = 300, Height = 150 });
-            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&width=300&height=150", urlString);
-        }
-
-        /// <summary>
-        /// Test to check if height ratio is returned for a predefined crop without coordinates and focal point in centre when a width parameter is passed
-        /// </summary>
-        [Test]
-        public void GetCropUrl_PreDefinedCropNoCoordinatesWithWidth()
-        {
-            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Width = 200, HeightRatio = 0.5962962962962962962962962963m });
-            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&heightratio=0.5962962962962962962962962963&width=200", urlString);
-        }
-
-        /// <summary>
-        /// Test to check if height ratio is returned for a predefined crop without coordinates and focal point is custom when a width parameter is passed
-        /// </summary>
-        [Test]
-        public void GetCropUrl_PreDefinedCropNoCoordinatesWithWidthAndFocalPoint()
-        {
-            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus2, Width = 200, HeightRatio = 0.5962962962962962962962962963m });
-            Assert.AreEqual(MediaPath + "?rxy=0.41,0.4275&heightratio=0.5962962962962962962962962963&width=200", urlString);
+            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Width = 300, Height = 150 });
+            Assert.AreEqual(MediaPath + "?width=300&height=150", urlString);
         }
 
         /// <summary>
@@ -174,23 +125,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         }
 
         /// <summary>
-        /// Test to check if width ratio is returned for a predefined crop without coordinates and focal point in centre when a height parameter is passed
-        /// </summary>
-        [Test]
-        public void GetCropUrl_PreDefinedCropNoCoordinatesWithHeight()
-        {
-            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Height = 200, WidthRatio = 1.6770186335403726708074534161m });
-            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&widthratio=1.6770186335403726708074534161&height=200", urlString);
-        }
-
-        /// <summary>
         /// Test to check result when only a width parameter is passed, effectivly a resize only
         /// </summary>
         [Test]
         public void GetCropUrl_WidthOnlyParameter()
         {
-            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Width = 200 });
-            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&width=200", urlString);
+            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Width = 200 });
+            Assert.AreEqual(MediaPath + "?width=200", urlString);
         }
 
         /// <summary>
@@ -199,8 +140,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         [Test]
         public void GetCropUrl_HeightOnlyParameter()
         {
-            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { DefaultCrop = true, Height = 200 });
-            Assert.AreEqual(MediaPath + "?ranchor=center&rmode=crop&height=200", urlString);
+            var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Height = 200 });
+            Assert.AreEqual(MediaPath + "?height=200", urlString);
         }
 
         /// <summary>
