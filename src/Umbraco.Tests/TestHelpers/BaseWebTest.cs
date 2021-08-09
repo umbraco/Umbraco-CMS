@@ -27,7 +27,6 @@ using Umbraco.Web.Composing;
 namespace Umbraco.Tests.TestHelpers
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     public abstract class BaseWebTest : TestWithDatabaseBase
     {
         protected override void Compose()

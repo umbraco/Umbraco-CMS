@@ -28,7 +28,6 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     {

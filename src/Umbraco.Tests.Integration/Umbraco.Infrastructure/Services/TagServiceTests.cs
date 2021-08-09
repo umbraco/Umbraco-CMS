@@ -22,7 +22,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     /// Involves multiple layers as well as configuration.
     /// </summary>
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class TagServiceTests : UmbracoIntegrationTest
     {
