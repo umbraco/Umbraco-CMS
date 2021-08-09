@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         [TearDown]
         public void DeleteTestFolder() =>
             Directory.Delete(HostingEnvironment.MapPathContentRoot("~/" + _testBaseFolder), true);
-        
+
         private IContentService ContentService => GetRequiredService<IContentService>();
 
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -164,7 +164,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         {
             var parent = new DictionaryItem("Parent")
             {
-                Key = Guid.NewGuid()                
+                Key = Guid.NewGuid()
             };
             LocalizationService.Save(parent);
             var child1 = new DictionaryItem(parent.Key, "Child1")
@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             };
 
             PackageBuilder.SavePackage(def);
-            
+
             string packageXmlPath = PackageBuilder.ExportPackage(def);
 
             using (var packageZipStream = File.OpenRead(packageXmlPath))
