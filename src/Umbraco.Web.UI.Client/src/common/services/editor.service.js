@@ -906,6 +906,50 @@ When building a custom infinite editor view you can use the same components as a
         }
 
         /**
+        * @ngdoc method
+        * @name umbraco.services.editorService#filePicker
+        * @methodOf umbraco.services.editorService
+        *
+        * @description
+        * Opens a file picker in infinite editing, the submit callback returns an array of selected items.
+        * 
+        * @param {object} editor rendering options.
+        * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+        * @param {function} editor.close Callback function when the close button is clicked.
+        * @returns {object} editor object.
+        */
+        function filePicker(editor) {
+          editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+          if (!editor.size) editor.size = "small";
+          editor.section = "settings";
+          editor.treeAlias = "files";
+          editor.entityType = "file";
+          open(editor);
+        }
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.editorService#staticFilePicker
+        * @methodOf umbraco.services.editorService
+        *
+        * @description
+        * Opens a static file picker in infinite editing, the submit callback returns an array of selected items.
+        * 
+        * @param {object} editor rendering options.
+        * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+        * @param {function} editor.close Callback function when the close button is clicked.
+        * @returns {object} editor object.
+        */
+        function staticFilePicker(editor) {
+          editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+          if (!editor.size) editor.size = "small";
+          editor.section = "settings";
+          editor.treeAlias = "staticFiles";
+          editor.entityType = "file";
+          open(editor);
+        }
+
+        /**
          * @ngdoc method
          * @name umbraco.services.editorService#itemPicker
          * @methodOf umbraco.services.editorService
@@ -1069,6 +1113,7 @@ When building a custom infinite editor view you can use the same components as a
             move: move,
             embed: embed,
             rollback: rollback,
+            filePicker: filePicker,
             linkPicker: linkPicker,
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
