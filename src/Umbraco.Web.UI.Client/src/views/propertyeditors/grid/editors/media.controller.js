@@ -73,25 +73,22 @@ angular.module("umbraco")
                         url += `?crop=${coords.x1},${coords.y1},${coords.x2},${coords.y2}&cropmode=percentage`;
                     } else {
                         // Here in order not to break existing content where focalPoint were used.
-                        // For some reason width/height have to come first when mode=crop.
                         if ($scope.control.value.focalPoint) {
-                            url += `?center=${$scope.control.value.focalPoint.top},${$scope.control.value.focalPoint.left}`;
-                            url += '&mode=crop';
+                            url += `?rxy=${$scope.control.value.focalPoint.top},${$scope.control.value.focalPoint.left}`;
                         } else {
                             // Prevent black padding and no crop when focal point not set / changed from default
-                            url += '?center=0.5,0.5&mode=crop';
+                            url += '?rxy=0.5,0.5';
                         }
                     }
 
                     url += '&width=' + $scope.control.editor.config.size.width;
                     url += '&height=' + $scope.control.editor.config.size.height;
-                    url += '&animationprocessmode=first';
                 }
 
                 // set default size if no crop present (moved from the view)
                 if (url.includes('?') === false)
                 {
-                    url += '?width=800&upscale=false&animationprocessmode=false'
+                    url += '?width=800'
                 }
 
                 return url;
