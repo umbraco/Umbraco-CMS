@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @ngdoc service
  * @name umbraco.resources.imageUrlGeneratorResource
  * @function
@@ -11,14 +11,14 @@
 
     function imageUrlGeneratorResource($http, umbRequestHelper) {
 
-        function getCropUrl(mediaPath, width, height, imageCropMode, animationProcessMode) {
+        function getCropUrl(mediaPath, width, height, imageCropMode) {
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "imageUrlGeneratorApiBaseUrl",
                         "GetCropUrl",
-                        { mediaPath, width, height, imageCropMode, animationProcessMode })),
+                        { mediaPath, width, height, imageCropMode })),
                 'Failed to get crop URL');
         }
 

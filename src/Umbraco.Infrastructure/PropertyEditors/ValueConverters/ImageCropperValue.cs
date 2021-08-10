@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             }
             else
             {
-                return new ImageUrlGenerationOptions(url) { DefaultCrop = true };
+                return new ImageUrlGenerationOptions(url);
             }
         }
 

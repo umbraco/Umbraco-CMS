@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.IO;
@@ -76,9 +76,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
             var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath)
             {
-                UpScale = false,
                 Width = width,
-                AnimationProcessMode = "first",
                 ImageCropMode = ImageCropMode.Max,
                 CacheBusterValue = rnd
             });
@@ -94,9 +92,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="height"></param>
         /// <param name="focalPointLeft"></param>
         /// <param name="focalPointTop"></param>
-        /// <param name="animationProcessMode"></param>
         /// <param name="mode"></param>
-        /// <param name="upscale"></param>
         /// <returns></returns>
         /// <remarks>
         /// If there is no media, image property or image file is found then this will return not found.
@@ -106,9 +102,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             int? height = null,
             decimal? focalPointLeft = null,
             decimal? focalPointTop = null,
-            string animationProcessMode = "first",
             ImageCropMode mode = ImageCropMode.Max,
-            bool upscale = false,
             string cacheBusterValue = "",
             decimal? cropX1 = null,
             decimal? cropX2 = null,
@@ -116,45 +110,24 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             decimal? cropY2 = null
             )
         {
-
-
             var options = new ImageUrlGenerationOptions(imagePath)
             {
-                AnimationProcessMode = animationProcessMode,
-                CacheBusterValue = cacheBusterValue,
+                Width = width,
                 Height = height,
                 ImageCropMode = mode,
-                UpScale = upscale,
-                Width = width,
-                Crop = (cropX1.HasValue && cropX2.HasValue && cropY1.HasValue && cropY2.HasValue) ? new ImageUrlGenerationOptions.CropCoordinates(cropX1.Value, cropY1.Value, cropX2.Value, cropY2.Value) : null,
-                FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(focalPointTop.GetValueOrDefault(0.5m), focalPointLeft.GetValueOrDefault(0.5m)),
+                CacheBusterValue = cacheBusterValue
             };
+
             if (focalPointLeft.HasValue && focalPointTop.HasValue)
             {
-                options.FocalPoint =
-                    new ImageUrlGenerationOptions.FocalPointPosition(focalPointTop.Value, focalPointLeft.Value);
+                options.FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(focalPointTop.Value, focalPointLeft.Value);
+            }
+            else if (cropX1.HasValue && cropX2.HasValue && cropY1.HasValue && cropY2.HasValue)
+            {
+                options.Crop = new ImageUrlGenerationOptions.CropCoordinates(cropX1.Value, cropY1.Value, cropX2.Value, cropY2.Value);
             }
 
             return _imageUrlGenerator.GetImageUrl(options);
-        }
-
-        public class FocalPointPositionModel
-        {
-            public decimal Left { get; set; }
-            public decimal Top { get; set; }
-        }
-
-        /// <summary>
-        /// The bounds of the crop within the original image, in whatever units the registered
-        /// IImageUrlGenerator uses, typically a percentage between 0 and 100.
-        /// </summary>
-        public class CropCoordinatesModel
-        {
-
-            public decimal X1 { get; set; }
-            public decimal Y1 { get; set; }
-            public decimal X2 { get; set;}
-            public decimal Y2 { get; set;}
         }
     }
 }
