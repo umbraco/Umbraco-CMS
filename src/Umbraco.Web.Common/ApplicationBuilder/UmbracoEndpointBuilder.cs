@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
     /// <summary>
     /// A builder to allow encapsulating the enabled endpoints in Umbraco
     /// </summary>
-    internal class UmbracoEndpointBuilder : IUmbracoEndpointBuilder
+    internal class UmbracoEndpointBuilder : IUmbracoEndpointBuilderContext
     {
         public UmbracoEndpointBuilder(IServiceProvider services, IRuntimeState runtimeState, IApplicationBuilder appBuilder, IEndpointRouteBuilder endpointRouteBuilder)
         {

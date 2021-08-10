@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
-using SixLabors.ImageSharp.Web.DependencyInjection;
 using StackExchange.Profiling;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -26,63 +25,7 @@ namespace Umbraco.Extensions
         /// Configures and use services required for using Umbraco
         /// </summary>
         public static IUmbracoApplicationBuilder UseUmbraco(this IApplicationBuilder app)
-        {
-            // TODO: Should we do some checks like this to verify that the corresponding "Add" methods have been called for the
-            // corresponding "Use" methods?
-            // https://github.com/dotnet/aspnetcore/blob/b795ac3546eb3e2f47a01a64feb3020794ca33bb/src/Mvc/Mvc.Core/src/Builder/MvcApplicationBuilderExtensions.cs#L132
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            IOptions<UmbracoPipelineOptions> startupOptions = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
-            app.RunPrePipeline(startupOptions.Value);
-
-            app.UseUmbracoCore();
-            app.UseUmbracoRequestLogging();
-
-            // We need to add this before UseRouting so that the UmbracoContext and other middlewares are executed
-            // before endpoint routing middleware.
-            app.UseUmbracoRouting();
-
-            app.UseStatusCodePages();
-
-            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
-            // TODO: Since we are dependent on these we need to register them but what happens when we call this multiple times since we are dependent on this for UseUmbracoBackOffice too?
-            app.UseImageSharp();
-            app.UseStaticFiles();
-            app.UseUmbracoPlugins();
-
-            // UseRouting adds endpoint routing middleware, this means that middlewares registered after this one
-            // will execute after endpoint routing. The ordering of everything is quite important here, see
-            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-5.0
-            // where we need to have UseAuthentication and UseAuthorization proceeding this call but before
-            // endpoints are defined.
-            app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            // This must come after auth because the culture is based on the auth'd user
-            app.UseRequestLocalization();
-
-            // Must be called after UseRouting and before UseEndpoints
-            app.UseSession();
-
-            // DO NOT PUT ANY UseEndpoints declarations here!! Those must all come very last in the pipeline,
-            // endpoints are terminating middleware. All of our endpoints are declared in ext of IUmbracoApplicationBuilder
-
-            return ActivatorUtilities.CreateInstance<UmbracoApplicationBuilder>(
-                app.ApplicationServices,
-                new object[] { app });
-        }
-
-        private static void RunPrePipeline(this IApplicationBuilder app, UmbracoPipelineOptions startupOptions)
-        {
-            foreach (IUmbracoPipelineFilter filter in startupOptions.PipelineFilters)
-            {
-                filter.OnPrePipeline(app);
-            }
-        }
+            => new UmbracoApplicationBuilder(app);
 
         /// <summary>
         /// Returns true if Umbraco <see cref="IRuntimeState"/> is greater than <see cref="RuntimeLevel.BootFailed"/>
@@ -158,7 +101,12 @@ namespace Umbraco.Extensions
             return app;
         }
 
-        public static IApplicationBuilder UseUmbracoPlugins(this IApplicationBuilder app)
+        /// <summary>
+        /// Allow static file access for App_Plugins folders
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseUmbracoPluginsStaticFiles(this IApplicationBuilder app)
         {
             var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
             var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>();
