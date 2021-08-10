@@ -142,7 +142,7 @@ function entityResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetUrl",
-                       [{ udi: udi }, {culture: culture }])),
+                       [{ id: udi }, {culture: culture }])),
                'Failed to retrieve url for UDI:' + udi);
         },
 

@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
@@ -35,6 +36,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website
             Assert.AreEqual("~/Views/Template.cshtml", PathUtility.EnsurePathIsApplicationRootPrefixed("Views/Template.cshtml"));
             Assert.AreEqual("~/Views/Template.cshtml", PathUtility.EnsurePathIsApplicationRootPrefixed("/Views/Template.cshtml"));
             Assert.AreEqual("~/Views/Template.cshtml", PathUtility.EnsurePathIsApplicationRootPrefixed("~/Views/Template.cshtml"));
+        }
+
+        [AutoMoqData]
+        [Test]
+        public void EnsureApplicationMainUrl(AspNetCoreHostingEnvironment sut)
+        {
+            var url = new Uri("http://localhost:5000");
+            sut.EnsureApplicationMainUrl(url);
+            Assert.AreEqual(sut.ApplicationMainUrl, url);
+
         }
     }
 }

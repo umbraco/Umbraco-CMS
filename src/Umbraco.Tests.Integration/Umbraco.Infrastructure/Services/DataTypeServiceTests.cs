@@ -20,7 +20,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     /// Tests covering the DataTypeService
     /// </summary>
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class DataTypeServiceTests : UmbracoIntegrationTest
     {

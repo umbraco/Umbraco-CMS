@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -25,10 +25,10 @@ namespace Umbraco.Cms.Persistence.SqlCe
         {
             _globalSettings = globalSettings;
             BlobColumnDefinition = "IMAGE";
-            // This is silly to have to do this but the way these inherited classes are structured it's the easiest
-            // way without an overhaul in type map initialization
-            DbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
-
+            // NOTE: if this column type is used in sqlce, it will prob result in errors since
+            // SQLCE cannot support this type correctly without 2x columns and a lot of work arounds.
+            // We don't use this natively within Umbraco but 3rd parties might with SQL server.
+            DateTimeOffsetColumnDefinition = "DATETIME"; 
         }
 
         public override string ProviderName => Constants.DatabaseProviders.SqlCe;
@@ -300,10 +300,14 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
                                  GetQuotedTableName(index.TableName), columns);
         }
 
-        public override string GetSpecialDbType(SpecialDbTypes dbTypes)
+        public override string GetSpecialDbType(SpecialDbType dbTypes)
         {
-            if (dbTypes == SpecialDbTypes.NVARCHARMAX) // SqlCE does not have nvarchar(max) for now
+            // SqlCE does not have nvarchar(max) for now
+            if (dbTypes == SpecialDbType.NVARCHARMAX)
+            {
                 return "NTEXT";
+            }
+
             return base.GetSpecialDbType(dbTypes);
         }
         public override SqlDbType GetSqlDbType(DbType dbType)

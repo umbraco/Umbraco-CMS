@@ -1,22 +1,24 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Web.Mvc;
 using Bogus;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.Mvc;
+using Umbraco.TestData.Configuration;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.TestData
@@ -33,13 +35,25 @@ namespace Umbraco.TestData
         private readonly IScopeProvider _scopeProvider;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly TestDataSettings _testDataSettings;
 
-        public UmbracoTestDataController(IScopeProvider scopeProvider, PropertyEditorCollection propertyEditors, IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IShortStringHelper shortStringHelper)
-            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger)
+        public UmbracoTestDataController(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IUmbracoDatabaseFactory databaseFactory,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger profilingLogger,
+            IPublishedUrlProvider publishedUrlProvider,
+            IScopeProvider scopeProvider,
+            PropertyEditorCollection propertyEditors,
+            IShortStringHelper shortStringHelper,
+            IOptions<TestDataSettings> testDataSettings)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
             _scopeProvider = scopeProvider;
             _propertyEditors = propertyEditors;
             _shortStringHelper = shortStringHelper;
+            _testDataSettings = testDataSettings.Value;
         }
 
         /// <summary>
@@ -52,18 +66,22 @@ namespace Umbraco.TestData
         /// <remarks>
         /// Each content item created is associated to a media item via a media picker and therefore a relation is created between the two
         /// </remarks>
-        public ActionResult CreateTree(int count, int depth, string locale = "en")
+        public IActionResult CreateTree(int count, int depth, string locale = "en")
         {
-            if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
-                return HttpNotFound();
+            if (_testDataSettings.Enabled == false)
+            {
+                return NotFound();
+            }
 
             if (!Validate(count, depth, out var message, out var perLevel))
+            {
                 throw new InvalidOperationException(message);
+            }
 
             var faker = new Faker(locale);
             var company = faker.Company.CompanyName();
 
-            using (var scope = _scopeProvider.CreateScope())
+            using (IScope scope = _scopeProvider.CreateScope())
             {
                 var imageIds = CreateMediaTree(company, faker, count, depth).ToList();
                 var contentIds = CreateContentTree(company, faker, count, depth, imageIds, out var root).ToList();
@@ -77,7 +95,7 @@ namespace Umbraco.TestData
             return Content("Done");
         }
 
-        private bool Validate(int count, int depth, out string message, out int perLevel)
+        private static bool Validate(int count, int depth, out string message, out int perLevel)
         {
             perLevel = 0;
             message = null;
@@ -128,8 +146,8 @@ namespace Umbraco.TestData
 
             for (int i = 0; i < count; i++)
             {
-                var created = create(parent);
-                var contentItem = created.content;
+                (T content, Func<T> container) created = create(parent);
+                T contentItem = created.content;
 
                 yield return contentItem.GetUdi();
 
@@ -139,7 +157,7 @@ namespace Umbraco.TestData
                 {
                     // move back up...
 
-                    var prev = tracked.Pop();
+                    (T parent, int childCount) prev = tracked.Pop();
 
                     // restore child count
                     currChildCount = prev.childCount;
@@ -171,7 +189,7 @@ namespace Umbraco.TestData
         /// <returns></returns>
         private IEnumerable<Udi> CreateMediaTree(string company, Faker faker, int count, int depth)
         {
-            var parent = Services.MediaService.CreateMediaWithIdentity(company, -1, Constants.Conventions.MediaTypes.Folder);
+            IMedia parent = Services.MediaService.CreateMediaWithIdentity(company, -1, Constants.Conventions.MediaTypes.Folder);
 
             return CreateHierarchy(parent, count, depth, currParent =>
             {
@@ -185,13 +203,13 @@ namespace Umbraco.TestData
                 // if we don't do this we don't get thumbnails in the back office.
                 imageUrl += "&ext=.jpg";
 
-                var media = Services.MediaService.CreateMedia(faker.Commerce.ProductName(), currParent, Constants.Conventions.MediaTypes.Image);
+                IMedia media = Services.MediaService.CreateMedia(faker.Commerce.ProductName(), currParent, Constants.Conventions.MediaTypes.Image);
                 media.SetValue(Constants.Conventions.Media.File, imageUrl);
                 Services.MediaService.Save(media);
                 return (media, () =>
                 {
                     // create a folder to contain child media
-                    var container = Services.MediaService.CreateMediaWithIdentity(faker.Commerce.Department(), currParent, Constants.Conventions.MediaTypes.Folder);
+                    IMedia container = Services.MediaService.CreateMediaWithIdentity(faker.Commerce.Department(), currParent, Constants.Conventions.MediaTypes.Folder);
                     return container;
                 });
             });
@@ -210,9 +228,10 @@ namespace Umbraco.TestData
         {
             var random = new Random(company.GetHashCode());
 
-            var docType = GetOrCreateContentType();
+            IContentType docType = GetOrCreateContentType();
 
-            var parent = Services.ContentService.Create(company, -1, docType.Alias);
+            IContent parent = Services.ContentService.Create(company, -1, docType.Alias);
+
             // give it some reasonable data (100 reviews)
             parent.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));
             parent.SetValue("desc", company);
@@ -223,7 +242,8 @@ namespace Umbraco.TestData
 
             return CreateHierarchy(parent, count, depth, currParent =>
             {
-                var content = Services.ContentService.Create(faker.Commerce.ProductName(), currParent, docType.Alias);
+                IContent content = Services.ContentService.Create(faker.Commerce.ProductName(), currParent, docType.Alias);
+
                 // give it some reasonable data (100 reviews)
                 content.SetValue("review", string.Join(" ", Enumerable.Range(0, 100).Select(x => faker.Rant.Review())));
                 content.SetValue("desc", string.Join(", ", Enumerable.Range(0, 5).Select(x => faker.Commerce.ProductAdjective())));
@@ -237,9 +257,11 @@ namespace Umbraco.TestData
 
         private IContentType GetOrCreateContentType()
         {
-            var docType = Services.ContentTypeService.Get(TestDataContentTypeAlias);
+            IContentType docType = Services.ContentTypeService.Get(TestDataContentTypeAlias);
             if (docType != null)
+            {
                 return docType;
+            }
 
             docType = new ContentType(_shortStringHelper, -1)
             {
@@ -274,12 +296,17 @@ namespace Umbraco.TestData
 
         private IDataType GetOrCreateDataType(string name, string editorAlias)
         {
-            var dt = Services.DataTypeService.GetDataType(name);
-            if (dt != null) return dt;
+            IDataType dt = Services.DataTypeService.GetDataType(name);
+            if (dt != null)
+            {
+                return dt;
+            }
 
-            var editor = _propertyEditors.FirstOrDefault(x => x.Alias == editorAlias);
+            IDataEditor editor = _propertyEditors.FirstOrDefault(x => x.Alias == editorAlias);
             if (editor == null)
+            {
                 throw new InvalidOperationException($"No {editorAlias} editor found");
+            }
 
             var serializer = new ConfigurationEditorJsonSerializer();
 

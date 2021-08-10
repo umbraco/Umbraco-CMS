@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
@@ -21,9 +21,9 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <param name="loginProviderOptions"></param>
         /// <param name="build"></param>
         /// <returns></returns>
-        public BackOfficeExternalLoginsBuilder AddBackOfficeLogin(
-            BackOfficeExternalLoginProviderOptions loginProviderOptions,
-            Action<BackOfficeAuthenticationBuilder> build)
+        public BackOfficeExternalLoginsBuilder AddBackOfficeLogin(            
+            Action<BackOfficeAuthenticationBuilder> build,
+            Action<BackOfficeExternalLoginProviderOptions> loginProviderOptions = null)
         {
             build(new BackOfficeAuthenticationBuilder(_services, loginProviderOptions));
             return this;

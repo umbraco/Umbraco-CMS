@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     /// <summary>
     /// Serializes/Deserializes data to BTree data source for <see cref="ContentData"/>
     /// </summary>
-    internal class ContentDataSerializer : ISerializer<ContentData>
+    public class ContentDataSerializer : ISerializer<ContentData>
     {
         public ContentDataSerializer(IDictionaryOfPropertyDataSerializer dictionaryOfPropertyDataSerializer = null)
         {

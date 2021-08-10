@@ -258,16 +258,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the URL of an entity
         /// </summary>
-        /// <param name="udi">UDI of the entity to fetch URL for</param>
+        /// <param name="id">UDI of the entity to fetch URL for</param>
         /// <param name="culture">The culture to fetch the URL for</param>
         /// <returns>The URL or path to the item</returns>
-        public IActionResult GetUrl(Udi udi, string culture = "*")
+        public IActionResult GetUrl(Udi id, string culture = "*")
         {
-            var intId = _entityService.GetId(udi);
+            var intId = _entityService.GetId(id);
             if (!intId.Success)
                 return NotFound();
             UmbracoEntityTypes entityType;
-            switch (udi.EntityType)
+            switch (id.EntityType)
             {
                 case Constants.UdiEntityType.Document:
                     entityType = UmbracoEntityTypes.Document;

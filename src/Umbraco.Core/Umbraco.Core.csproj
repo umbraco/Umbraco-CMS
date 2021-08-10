@@ -17,7 +17,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.7" />
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.8" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
@@ -58,5 +58,9 @@
 
     <ItemGroup>
       <EmbeddedResource Include="EmbeddedResources\**\*" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ContentEditing" />
     </ItemGroup>
 </Project>

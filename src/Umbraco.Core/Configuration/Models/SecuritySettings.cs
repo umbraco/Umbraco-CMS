@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const bool StaticHideDisabledUsersInBackOffice = false;
         internal const bool StaticAllowPasswordReset = true;
         internal const string StaticAuthCookieName = "UMB_UCONTEXT";
+        internal const string StaticAllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+\\";
 
         /// <summary>
         /// Gets or sets a value indicating whether to keep the user logged in.
@@ -49,6 +50,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets or sets a value indicating whether the user's email address is to be considered as their username.
         /// </summary>
         public bool UsernameIsEmail { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the set of allowed characters for a username
+        /// </summary>
+        [DefaultValue(StaticAllowedUserNameCharacters)]
+        public string AllowedUserNameCharacters { get; set; } = StaticAllowedUserNameCharacters;
 
         /// <summary>
         /// Gets or sets a value for the user password settings.

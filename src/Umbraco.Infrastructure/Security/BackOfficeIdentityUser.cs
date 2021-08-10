@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Core.Security
         private string[] _allowedSections;
         private int[] _startMediaIds;
         private int[] _startContentIds;
+        private DateTime? _inviteDateUtc;
 
         private static readonly DelegateEqualityComparer<int[]> s_startIdsComparer = new DelegateEqualityComparer<int[]>(
             (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
@@ -74,6 +75,15 @@ namespace Umbraco.Cms.Core.Security
 
         public int[] CalculatedMediaStartNodeIds { get; set; }
         public int[] CalculatedContentStartNodeIds { get; set; }
+
+        /// <summary>
+        /// Gets or sets invite date
+        /// </summary>
+        public DateTime? InviteDateUtc
+        {
+            get => _inviteDateUtc;
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _inviteDateUtc, nameof(InviteDateUtc));
+        }
 
         /// <summary>
         /// Gets or sets content start nodes assigned to the User (not ones assigned to the user's groups)

@@ -14,7 +14,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     /// Tests covering methods in the KeyValueService class.
     /// </summary>
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class KeyValueServiceTests : UmbracoIntegrationTest
     {

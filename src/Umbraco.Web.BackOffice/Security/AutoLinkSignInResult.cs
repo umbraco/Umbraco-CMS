@@ -9,12 +9,12 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     /// </summary>
     public class AutoLinkSignInResult : SignInResult
     {
-        public static AutoLinkSignInResult FailedNotLinked => new AutoLinkSignInResult()
+        public static AutoLinkSignInResult FailedNotLinked { get; } = new AutoLinkSignInResult()
         {
             Succeeded = false
         };
 
-        public static AutoLinkSignInResult FailedNoEmail => new AutoLinkSignInResult()
+        public static AutoLinkSignInResult FailedNoEmail { get; } = new AutoLinkSignInResult()
         {
             Succeeded = false
         };

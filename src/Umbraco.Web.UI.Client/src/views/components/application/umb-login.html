@@ -124,14 +124,14 @@
 
                             <div ng-if="!login.customView">
                                 <form method="POST" action="{{vm.externalLoginFormAction}}">
-                                    <button type="submit"
-                                            class="btn btn-block btn-social"
-                                            ng-class="login.properties.ButtonStyle"
-                                            id="{{login.authType}}" name="provider" value="{{login.authType}}"
-                                            title="Log in using your {{login.caption}} account">
-                                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                                        <localize key="login_signInWith">Sign in with</localize>&nbsp;{{login.caption}}
-                                    </button>
+                                  <button type="submit"
+                                          class="btn btn-block btn-social"
+                                          ng-class="login.properties.ButtonStyle"
+                                          id="{{login.authType}}" name="provider" value="{{login.authType}}"
+                                          title="Log in using your {{login.caption}} account">
+                                    <umb-icon icon="{{login.properties.Icon}}" class="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
+                                    <localize key="login_signInWith">Sign in with</localize>&nbsp;{{login.caption}}
+                                  </button>
                                 </form>
                                 <div ng-if="login.errors">
                                     <div class="text-error" ng-repeat="error in login.errors">

@@ -33,7 +33,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     // causing it, getting into __sysObjects locks, no idea why
 
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
     public class ThreadSafetyServiceTest : UmbracoIntegrationTest
     {
