@@ -81,6 +81,7 @@
                 const settingsTypePicker = {
                     title: localizedTitle,
                     entityType: "documentType",
+                    isDialog: true,
                     filter: node => {
                         if (node.metaData.isElement === true) {
                             return false;
@@ -166,6 +167,7 @@
 
                 const filePicker = {
                     title: localizedTitle,
+                    isDialog: true,
                     filter: i => {
                         return !(i.name.indexOf(".html") !== -1);
                     },
@@ -208,6 +210,7 @@
 
                 const filePicker = {
                     title: localizedTitle,
+                    isDialog: true,
                     filter: i => {
                         return !(i.name.indexOf(".css") !== -1);
                     },
@@ -253,6 +256,7 @@
 
                 const thumbnailPicker = {
                     title: localizedTitle,
+                    isDialog: true,
                     filter: i => {
                         let ext = i.name.substr((i.name.lastIndexOf('.') + 1));
                         return allowedFileExtensions.includes(ext) === false;
