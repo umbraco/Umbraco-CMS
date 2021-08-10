@@ -277,29 +277,25 @@
     }
 
     function openViewPicker() {
-      const controlPicker = {
-        title: "Select view",
-        section: "settings",
-        treeAlias: "files",
-        entityType: "file",
-        onlyInitialized: false,
-        filter: function (i) {
-          if (i.name.indexOf(".html") === -1 &&
-            i.name.indexOf(".htm") === -1) {
-            return true;
-          }
-        },
-        filterCssClass: "not-allowed",
-        select: function (node) {
-          const id = decodeURIComponent(node.id.replace(/\+/g, " "));
-          vm.package.packageView = id;
-          editorService.close();
-        },
-        close: function () {
-          editorService.close();
-        }
-      };
-      editorService.treePicker(controlPicker);
+        
+        const controlPicker = {
+          title: "Select view",
+          onlyInitialized: false,
+          filter: i => {
+            if (i.name.indexOf(".html") === -1 && i.name.indexOf(".htm") === -1) {
+              return true;
+            }
+          },
+          filterCssClass: "not-allowed",
+          select: node => {
+              const id = decodeURIComponent(node.id.replace(/\+/g, " "));
+              vm.package.packageView = id;
+              editorService.close();
+          },
+          close: () => editorService.close()
+        };
+
+        editorService.filePicker(controlPicker);
     }
 
     function removePackageView() {
