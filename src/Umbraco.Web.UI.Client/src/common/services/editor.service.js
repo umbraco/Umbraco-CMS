@@ -1114,6 +1114,7 @@ When building a custom infinite editor view you can use the same components as a
             embed: embed,
             rollback: rollback,
             filePicker: filePicker,
+            staticFilePicker: staticFilePicker,
             linkPicker: linkPicker,
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
