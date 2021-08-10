@@ -162,7 +162,7 @@
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         vm.addViewForBlock = function(block) {
-            localizationService.localize("blockEditor_headlineAddCustomView").then(function (localizedTitle) {
+            localizationService.localize("blockEditor_headlineAddCustomView").then(localizedTitle => {
 
                 const filePicker = {
                     title: localizedTitle,
@@ -204,11 +204,10 @@
         };
 
         vm.addStylesheetForBlock = function(block) {
-            localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(function (localizedTitle) {
+            localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(localizedTitle => {
 
                 const filePicker = {
                     title: localizedTitle,
-                    isDialog: true,
                     filter: i => {
                         return !(i.name.indexOf(".css") !== -1);
                     },
@@ -248,7 +247,7 @@
 
         vm.addThumbnailForBlock = function(block) {
 
-          localizationService.localize("blockEditor_headlineAddThumbnail").then(function (localizedTitle) {
+          localizationService.localize("blockEditor_headlineAddThumbnail").then(localizedTitle => {
                 
                 let allowedFileExtensions = ['jpg', 'jpeg', 'png', 'svg', 'webp', 'gif'];
 
