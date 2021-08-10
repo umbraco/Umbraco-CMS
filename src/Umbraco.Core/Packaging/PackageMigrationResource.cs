@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Packaging
 
             if (xml is not null)
             {
-                return stream.GetStreamHash();
+                return xml.ToString();
             }
 
             throw new IOException("Missing embedded files for planType: " + planType);
