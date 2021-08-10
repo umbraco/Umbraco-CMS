@@ -134,7 +134,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 Logger.LogInformation($"Package migration executed. Summary: {installationSummary}");
             }
-            throw new InvalidOperationException($"The package zip or xml found.");
         }
     }
 }
