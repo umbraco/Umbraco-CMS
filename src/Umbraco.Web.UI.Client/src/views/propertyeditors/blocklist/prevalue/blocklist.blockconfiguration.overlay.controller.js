@@ -266,7 +266,7 @@
                 const thumbnailPicker = {
                     title: localizedTitle,
                     section: "settings",
-                    treeAlias: "files",
+                    treeAlias: "staticFiles",
                     entityType: "file",
                     isDialog: true,
                     filter: function (i) {
@@ -275,7 +275,7 @@
                     filterCssClass: "not-allowed",
                     select: function (file) {
                         const id = decodeURIComponent(file.id.replace(/\+/g, " "));
-                        block.thumbnail = "~/" + id;
+                        block.thumbnail = "~/" + id.replace("wwwroot/", "");
                         editorService.close();
                     },
                     close: function () {

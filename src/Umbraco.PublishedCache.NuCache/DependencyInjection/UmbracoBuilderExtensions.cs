@@ -68,7 +68,20 @@ namespace Umbraco.Extensions
                         throw new IndexOutOfRangeException();
                 }
             });
-            builder.Services.AddSingleton<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
+
+            builder.Services.AddSingleton<IPropertyCacheCompressionOptions>(s =>
+            {
+                IOptions<NuCacheSettings> options = s.GetRequiredService<IOptions<NuCacheSettings>>();
+
+                if (options.Value.NuCacheSerializerType == NuCacheSerializerType.MessagePack &&
+                    options.Value.UnPublishedContentCompression)
+                {
+                    return new UnPublishedContentPropertyCacheCompressionOptions();
+                }
+
+                return new NoopPropertyCacheCompressionOptions();
+            });
+
             builder.Services.AddSingleton(s => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
 
             // add the NuCache health check (hidden from type finder)

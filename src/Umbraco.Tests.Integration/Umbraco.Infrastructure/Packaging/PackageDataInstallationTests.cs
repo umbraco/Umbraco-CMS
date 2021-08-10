@@ -25,7 +25,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
 {
     [TestFixture]
     [Category("Slow")]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
     public class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
     {

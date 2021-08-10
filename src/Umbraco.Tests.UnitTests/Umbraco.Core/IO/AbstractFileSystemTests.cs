@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.IO;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.IO
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     public abstract class AbstractFileSystemTests
     {
         protected IFileSystem _fileSystem;

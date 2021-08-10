@@ -24,7 +24,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     /// Tests covering the EntityService
     /// </summary>
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class EntityServiceTests : UmbracoIntegrationTest
     {

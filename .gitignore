@@ -207,6 +207,7 @@ src/Umbraco.Tests/TEMP/
 
 src/Umbraco.Tests.UnitTests/umbraco/Data/TEMP/
 /src/Umbraco.Web.UI.NetCore/appsettings.Local.json
-src/Umbraco.Tests.Integration/DatabaseContextTests.sdf
+src/Umbraco.Tests.Integration.SqlCe/umbraco/Data/TEMP/
+src/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
 
 src/Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json

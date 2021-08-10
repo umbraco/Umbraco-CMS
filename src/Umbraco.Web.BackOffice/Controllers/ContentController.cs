@@ -28,12 +28,9 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Authorization;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -478,6 +475,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return result;
         }
 
+        private ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeysInternal(Guid[] contentTypeKeys, int parentId)
+        {
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = _contentTypeService.GetAll(contentTypeKeys).ToList();
+            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+        }
+
         /// <summary>
         /// Gets a collection of empty content items for all document types.
         /// </summary>
@@ -486,9 +490,22 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         public ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeys([FromQuery] Guid[] contentTypeKeys, [FromQuery] int parentId)
         {
-            using var scope = _scopeProvider.CreateScope(autoComplete: true);
-            var contentTypes = _contentTypeService.GetAll(contentTypeKeys).ToList();
-            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+            return GetEmptyByKeysInternal(contentTypeKeys, parentId);
+        }
+
+        /// <summary>
+        /// Gets a collection of empty content items for all document types.
+        /// </summary>
+        /// <remarks>
+        /// This is a post request in order to support a large amount of GUIDs without hitting the URL length limit.
+        /// </remarks>
+        /// <param name="contentTypeByKeys"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [OutgoingEditorModelEvent]
+        public ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeys(ContentTypesByKeys contentTypeByKeys)
+        {
+            return GetEmptyByKeysInternal(contentTypeByKeys.ContentTypeKeys, contentTypeByKeys.ParentId);
         }
 
         [OutgoingEditorModelEvent]

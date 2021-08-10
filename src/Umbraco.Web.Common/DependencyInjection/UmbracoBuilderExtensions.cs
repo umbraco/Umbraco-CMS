@@ -101,10 +101,10 @@ namespace Umbraco.Extensions
             services.AddSingleton(httpContextAccessor);
 
             var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
-            var appCaches = AppCaches.Create(requestCache);            
+            var appCaches = AppCaches.Create(requestCache);
 
             IProfiler profiler = GetWebProfiler(config);
-            
+
             ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
 
             TypeLoader typeLoader = services.AddTypeLoader(

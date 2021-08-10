@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
@@ -13,7 +15,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreHostingEnvironment : IHostingEnvironment
     {
-        private readonly ISet<Uri> _applicationUrls = new HashSet<Uri>();
+        private readonly ConcurrentHashSet<Uri> _applicationUrls = new ConcurrentHashSet<Uri>();
         private readonly IServiceProvider _serviceProvider;
         private readonly IOptionsMonitor<HostingSettings> _hostingSettings;
         private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
@@ -168,6 +170,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             // (this is a simplified version of what was in 7.x)
             // note: should this be optional? is it expensive?
 
+            
             if (currentApplicationUrl is null)
             {
                 return;
@@ -181,9 +184,10 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             var change = !_applicationUrls.Contains(currentApplicationUrl);
             if (change)
             {
-                _applicationUrls.Add(currentApplicationUrl);
-
-                ApplicationMainUrl = currentApplicationUrl;
+                if (_applicationUrls.TryAdd(currentApplicationUrl))
+                {
+                    ApplicationMainUrl = currentApplicationUrl;
+                }
             }
         }
     }

@@ -17,13 +17,12 @@ namespace Umbraco.Cms.Persistence.SqlCe
 
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {
-            var recordsA = records.ToArray();
-            if (recordsA.Length == 0) return 0;
+            if (!records.Any()) return 0;
 
             var pocoData = database.PocoDataFactory.ForType(typeof(T));
             if (pocoData == null) throw new InvalidOperationException("Could not find PocoData for " + typeof(T));
 
-            return BulkInsertRecordsSqlCe(database, pocoData, recordsA);
+            return BulkInsertRecordsSqlCe(database, pocoData, records.ToArray());
 
         }
 

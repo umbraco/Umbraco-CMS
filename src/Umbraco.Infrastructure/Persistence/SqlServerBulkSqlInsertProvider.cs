@@ -39,6 +39,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <returns>The number of records that were inserted.</returns>
         private int BulkInsertRecordsSqlServer<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
         {
+            // TODO: The main reason this exists is because the NPoco InsertBulk method doesn't return the number of items.
+            // It is worth investigating the performance of this vs NPoco's because we use a custom BulkDataReader
+            // which in theory should be more efficient than NPocos way of building up an in-memory DataTable.
+
             // create command against the original database.Connection
             using (var command = database.CreateCommand(database.Connection, CommandType.Text, string.Empty))
             {
@@ -50,7 +54,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 var syntax = database.SqlContext.SqlSyntax as SqlServerSyntaxProvider;
                 if (syntax == null) throw new NotSupportedException("SqlSyntax must be SqlServerSyntaxProvider.");
 
-                using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction) { BulkCopyTimeout = 10000, DestinationTableName = tableName })
+                using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction)
+                {
+                    BulkCopyTimeout = 0, // 0 = no bulk copy timeout. If a timeout occurs it will be an connection/command timeout.
+                    DestinationTableName = tableName,
+                    // be consistent with NPoco: https://github.com/schotime/NPoco/blob/5117a55fde57547e928246c044fd40bd00b2d7d1/src/NPoco.SqlServer/SqlBulkCopyHelper.cs#L50
+                    BatchSize = 4096
+                })
                 using (var bulkReader = new PocoDataDataReader<T, SqlServerSyntaxProvider>(records, pocoData, syntax))
                 {
                     //we need to add column mappings here because otherwise columns will be matched by their order and if the order of them are different in the DB compared

@@ -503,7 +503,7 @@
     Pop-Location
 
     # change baseUrl
-    $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
+    $BaseUrl = "https://apidocs.umbraco.com/v9/ui/"
     $IndexPath = "./api/index.html"
     (Get-Content $IndexPath).replace('origin + location.href.substr(origin.length).replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
 
