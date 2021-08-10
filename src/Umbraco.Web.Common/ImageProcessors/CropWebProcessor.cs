@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
@@ -15,43 +16,31 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
     public class CropWebProcessor : IImageWebProcessor
     {
         /// <summary>
-        /// The command constant for the crop definition.
+        /// The command constant for the crop coordinates.
         /// </summary>
-        public const string Crop = "crop";
-
-        /// <summary>
-        /// The command constant for the crop mode.
-        /// </summary>
-        public const string Mode = "cropmode";
-
+        public const string Coordinates = "cc";
 
         /// <inheritdoc/>
         public IEnumerable<string> Commands { get; } = new[]
         {
-            Crop,
-            Mode
+            Coordinates
         };
 
         /// <inheritdoc/>
         public FormattedImage Process(FormattedImage image, ILogger logger, IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
         {
-            if (GetCrop(commands, parser, culture) is RectangleF crop)
+            RectangleF? coordinates = GetCoordinates(commands, parser, culture);
+            if (coordinates != null)
             {
-                if (GetMode(commands, parser, culture) == CropMode.Percentage)
-                {
-                    // Convert the percentage based model of left, top, right, bottom to x, y, width, height
-                    int sourceWidth = image.Image.Width;
-                    int sourceHeight = image.Image.Height;
+                // Convert the percentage based model of left, top, right, bottom to x, y, width, height
+                int sourceWidth = image.Image.Width;
+                int sourceHeight = image.Image.Height;
+                int x = (int)MathF.Round(coordinates.Value.Left * sourceWidth);
+                int y = (int)MathF.Round(coordinates.Value.Top * sourceHeight);
+                int width = sourceWidth - (int)MathF.Round(coordinates.Value.Right * sourceWidth);
+                int height = sourceHeight - (int)MathF.Round(coordinates.Value.Bottom * sourceHeight);
 
-                    float left = crop.Left * sourceWidth;
-                    float top = crop.Top * sourceHeight;
-                    float width = sourceWidth - (sourceWidth * crop.Width) - left;
-                    float height = sourceHeight - (sourceHeight * crop.Height) - top;
-
-                    crop = new RectangleF(left, top, width, height);
-                }
-
-                var cropRectangle = Rectangle.Round(crop);
+                var cropRectangle = new Rectangle(x, y, width, height);
                 
                 image.Image.Mutate(x => x.Crop(cropRectangle));
             }
@@ -59,9 +48,9 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
             return image;
         }
 
-        private static RectangleF? GetCrop(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
+        private static RectangleF? GetCoordinates(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
         {
-            float[] coordinates = parser.ParseValue<float[]>(commands.GetValueOrDefault(Crop), culture);
+            float[] coordinates = parser.ParseValue<float[]>(commands.GetValueOrDefault(Coordinates), culture);
 
             if (coordinates.Length != 4)
             {
@@ -70,8 +59,5 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
 
             return new RectangleF(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
         }
-
-        private static CropMode GetMode(IDictionary<string, string> commands, CommandParser parser, CultureInfo culture)
-            => parser.ParseValue<CropMode>(commands.GetValueOrDefault(Mode), culture);
     }
 }

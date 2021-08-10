@@ -42,8 +42,7 @@ namespace Umbraco.Cms.Infrastructure.Media
 
             if (options.Crop != null)
             {
-                AddQueryString("crop", options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
-                AddQueryString("cropmode", "percentage");
+                AddQueryString("cc", options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
             }
 
             if (options.ImageCropMode.HasValue)
