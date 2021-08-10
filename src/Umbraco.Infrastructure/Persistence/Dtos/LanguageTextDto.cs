@@ -4,11 +4,13 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.DictionaryValue)]
+    [TableName(TableName)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     public class LanguageTextDto
     {
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.DictionaryValue;
+
         [Column("pk")]
         [PrimaryKeyColumn]
         public int PrimaryKey { get; set; }
@@ -21,9 +23,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [ForeignKey(typeof(DictionaryDto), Column = "id")]
         public Guid UniqueId { get; set; }
 
-        // TODO: Need a unique constraint on LanguageId, UniqueId, Value
         [Column("value")]
         [Length(1000)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_value", ForColumns = "languageId,UniqueId,value")]
         public string Value { get; set; }
     }
 }
