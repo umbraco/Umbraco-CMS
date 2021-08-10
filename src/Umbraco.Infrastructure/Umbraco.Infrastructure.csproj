@@ -46,6 +46,7 @@
       <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
       <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
+      <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
       <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
       <PackageReference Include="System.Text.Encodings.Web" Version="5.0.1" /> <!-- Explicit updated this nested dependency due to this https://github.com/dotnet/announcements/issues/178-->
