@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (focalPointLeft.HasValue && focalPointTop.HasValue)
             {
-                options.FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(focalPointTop.Value, focalPointLeft.Value);
+                options.FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(focalPointLeft.Value, focalPointTop.Value);
             }
             else if (cropX1.HasValue && cropX2.HasValue && cropY1.HasValue && cropY2.HasValue)
             {

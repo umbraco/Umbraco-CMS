@@ -364,7 +364,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
                 }
                 else if (options.Crop != null)
                 {
-                    AddQueryString("c", options.Crop.X1, options.Crop.Y1, options.Crop.X2, options.Crop.Y2);
+                    AddQueryString("c", options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
                 }
 
                 if (options.ImageCropMode.HasValue)

@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         {
             if ((preferFocalPoint && HasFocalPoint()) || (crop != null && crop.Coordinates == null && HasFocalPoint()))
             {
-                return new ImageUrlGenerationOptions(url) { FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(FocalPoint.Top, FocalPoint.Left) };
+                return new ImageUrlGenerationOptions(url) { FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(FocalPoint.Left, FocalPoint.Top) };
             }
             else if (crop != null && crop.Coordinates != null && preferFocalPoint == false)
             {

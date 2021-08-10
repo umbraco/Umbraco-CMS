@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         public class FocalPointPosition
         {
-            public FocalPointPosition(decimal top, decimal left)
+            public FocalPointPosition(decimal left, decimal top)
             {
                 Left = left;
                 Top = top;
@@ -48,21 +48,21 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         public class CropCoordinates
         {
-            public CropCoordinates(decimal x1, decimal y1, decimal x2, decimal y2)
+            public CropCoordinates(decimal left, decimal top, decimal right, decimal bottom)
             {
-                X1 = x1;
-                Y1 = y1;
-                X2 = x2;
-                Y2 = y2;
+                Left = left;
+                Top = top;
+                Right = right;
+                Bottom = bottom;
             }
 
-            public decimal X1 { get; }
+            public decimal Left { get; }
 
-            public decimal Y1 { get; }
+            public decimal Top { get; }
 
-            public decimal X2 { get; }
+            public decimal Right { get; }
 
-            public decimal Y2 { get; }
+            public decimal Bottom { get; }
         }
     }
 }

@@ -12,8 +12,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
     {
         private const string MediaPath = "/media/1005/img_0671.jpg";
         private static readonly ImageUrlGenerationOptions.CropCoordinates s_crop = new ImageUrlGenerationOptions.CropCoordinates(0.58729977382575338m, 0.055768992440203169m, 0m, 0.32457553600198386m);
-        private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus1 = new ImageUrlGenerationOptions.FocalPointPosition(0.80827067669172936m, 0.96m);
-        private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus2 = new ImageUrlGenerationOptions.FocalPointPosition(0.41m, 0.4275m);
+        private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus1 = new ImageUrlGenerationOptions.FocalPointPosition(0.96m, 0.80827067669172936m);
+        private static readonly ImageUrlGenerationOptions.FocalPointPosition s_focus2 = new ImageUrlGenerationOptions.FocalPointPosition(0.4275m, 0.41m);
         private static readonly ImageSharpImageUrlGenerator s_generator = new ImageSharpImageUrlGenerator();
 
         [Test]
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetBaseCropUrlFromModelTest()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(null) { Crop = s_crop, Width = 100, Height = 100 });
-            Assert.AreEqual("?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
+            Assert.AreEqual("?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100", urlString);
         }
 
 
