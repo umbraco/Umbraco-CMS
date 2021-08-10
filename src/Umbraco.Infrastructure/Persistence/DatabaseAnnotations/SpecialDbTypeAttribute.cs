@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
 {
@@ -12,13 +12,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
     public class SpecialDbTypeAttribute : Attribute
     {
         public SpecialDbTypeAttribute(SpecialDbTypes databaseType)
-        {
-            DatabaseType = databaseType;
-        }
+            => DatabaseType = new SpecialDbType(databaseType);
+
+        public SpecialDbTypeAttribute(string databaseType)
+            => DatabaseType = new SpecialDbType(databaseType);
 
         /// <summary>
-        /// Gets or sets the <see cref="SpecialDbTypes"/> for this column
+        /// Gets or sets the <see cref="SpecialDbType"/> for this column
         /// </summary>
-        public SpecialDbTypes DatabaseType { get; private set; }
+        public SpecialDbType DatabaseType { get; private set; }
     }
 }

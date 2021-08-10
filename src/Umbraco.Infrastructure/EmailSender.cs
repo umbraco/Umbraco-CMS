@@ -3,6 +3,7 @@
 
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -23,12 +24,14 @@ namespace Umbraco.Cms.Infrastructure
         private readonly IEventAggregator _eventAggregator;
         private readonly GlobalSettings _globalSettings;
         private readonly bool _notificationHandlerRegistered;
+        private readonly ILogger<EmailSender> _logger;
 
-        public EmailSender(IOptions<GlobalSettings> globalSettings, IEventAggregator eventAggregator)
+        public EmailSender(
+            ILogger<EmailSender> logger,
+            IOptions<GlobalSettings> globalSettings,
+            IEventAggregator eventAggregator)
             : this(globalSettings, eventAggregator, null)
-        {
-
-        }
+            => _logger = logger;
 
         public EmailSender(IOptions<GlobalSettings> globalSettings, IEventAggregator eventAggregator, INotificationHandler<SendEmailNotification> handler)
         {
@@ -49,39 +52,47 @@ namespace Umbraco.Cms.Infrastructure
 
         private async Task SendAsyncInternal(EmailMessage message, bool enableNotification)
         {
+            if (enableNotification)
+            {
+                var notification = new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From));
+                await _eventAggregator.PublishAsync(notification);
+
+                // if a handler handled sending the email then don't continue.
+                if (notification.IsHandled)
+                {
+                    _logger.LogDebug("The email sending for {Subject} was handled by a notification handler", notification.Message.Subject);
+                    return;
+                }
+            }
+
             if (_globalSettings.IsSmtpServerConfigured == false)
             {
-                if (enableNotification)
-                {
-                    await _eventAggregator.PublishAsync(
-                        new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From)));
-                }
+                _logger.LogDebug("Could not send email for {Subject}. It was not handled by a notification handler and there is no SMTP configured.", message.Subject);
                 return;
             }
 
-            using (var client = new SmtpClient())
+            using var client = new SmtpClient();
+
+            await client.ConnectAsync(_globalSettings.Smtp.Host,
+                _globalSettings.Smtp.Port,
+                (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
+
+            if (!(_globalSettings.Smtp.Username is null && _globalSettings.Smtp.Password is null))
             {
-                await client.ConnectAsync(_globalSettings.Smtp.Host,
-                    _globalSettings.Smtp.Port,
-                    (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
-
-                if (!(_globalSettings.Smtp.Username is null && _globalSettings.Smtp.Password is null))
-                {
-                    await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
-                }
-
-                var mailMessage = message.ToMimeMessage(_globalSettings.Smtp.From);
-                if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
-                {
-                    await client.SendAsync(mailMessage);
-                }
-                else
-                {
-                    client.Send(mailMessage);
-                }
-
-                await client.DisconnectAsync(true);
+                await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
             }
+
+            var mailMessage = message.ToMimeMessage(_globalSettings.Smtp.From);
+            if (_globalSettings.Smtp.DeliveryMethod == SmtpDeliveryMethod.Network)
+            {
+                await client.SendAsync(mailMessage);
+            }
+            else
+            {
+                client.Send(mailMessage);
+            }
+
+            await client.DisconnectAsync(true);
         }
 
         /// <summary>

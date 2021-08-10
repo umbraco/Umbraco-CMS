@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Returns the server variables for authenticated users
         /// </summary>
         /// <returns></returns>
-        internal Task<Dictionary<string, object>> GetServerVariablesAsync()
+        internal async Task<Dictionary<string, object>> GetServerVariablesAsync()
         {
             var globalSettings = _globalSettings;
             var backOfficeControllerName = ControllerExtensions.GetControllerName<BackOfficeController>();
@@ -432,12 +432,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             // TODO: It would be nicer to not have to manually translate these properties
                             // but then needs to be changed in quite a few places in angular
-                            "providers", _externalLogins.GetBackOfficeProviders()
+                            "providers", (await _externalLogins.GetBackOfficeProvidersAsync())
                                 .Select(p => new
                                 {
-                                    authType = p.AuthenticationType,
-                                    caption = p.Name,
-                                    properties = p.Options
+                                    authType = p.ExternalLoginProvider.AuthenticationType,
+                                    caption = p.AuthenticationScheme.DisplayName,
+                                    properties = p.ExternalLoginProvider.Options
                                 })
                                 .ToArray()
                         }
@@ -456,7 +456,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
             };
-            return Task.FromResult(defaultVals);
+
+            return defaultVals;
         }
 
         [DataContract]

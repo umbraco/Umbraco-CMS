@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
 {
+
     public class ExternalLoginTableIndexes : MigrationBase
     {
         public ExternalLoginTableIndexes(IMigrationContext context)

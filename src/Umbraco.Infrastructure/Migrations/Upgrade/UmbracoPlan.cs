@@ -212,7 +212,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
                 .To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}")
                 .To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}")
                 .To<UpdateCmsPropertyGroupIdSeed>("{5C424554-A32D-4852-8ED1-A13508187901}")
-            // to 9.0.0
+            // to 9.0.0 RC
                 .With()
                 .To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}")
                 .To<ExternalLoginTableIndexes>("{50A43237-A6F4-49E2-A7A6-5DAD65C84669}")
@@ -223,12 +223,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             //FINAL
             .As("{5060F3D2-88BE-4D30-8755-CF51F28EAD12}");
 
+            // TO 9.0.0
+            
 
             // This should be safe to execute again. We need it with a new name to ensure updates from all the following has executed this step.
             // - 8.15 RC    - Current state: {4695D0C9-0729-4976-985B-048D503665D8}
             // - 8.15 Final - Current state: {5C424554-A32D-4852-8ED1-A13508187901}
             // - 9.0 RC1    - Current state: {5060F3D2-88BE-4D30-8755-CF51F28EAD12}
             To<UpdateCmsPropertyGroupIdSeed>("{622E5172-42E1-4662-AD80-9504AF5A4E53}");
+            
+            To<ExternalLoginTableIndexesFixup>("{10F7BB61-C550-426B-830B-7F954F689CDF}");
         }
     }
 }
