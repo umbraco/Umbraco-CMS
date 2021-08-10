@@ -229,6 +229,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             // - 8.15 Final - Current state: {5C424554-A32D-4852-8ED1-A13508187901}
             // - 9.0 RC1    - Current state: {5060F3D2-88BE-4D30-8755-CF51F28EAD12}
             To<UpdateCmsPropertyGroupIdSeed>("{622E5172-42E1-4662-AD80-9504AF5A4E53}");
+            To<DictionaryTablesIndexes>("{12DCDE7F-9AB7-4617-804F-AB66BF360980}");
         }
     }
 }
