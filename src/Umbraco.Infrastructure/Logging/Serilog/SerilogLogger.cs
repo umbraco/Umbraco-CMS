@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -14,17 +14,6 @@ namespace Umbraco.Cms.Core.Logging.Serilog
     public class SerilogLogger : IDisposable
     {
         public global::Serilog.ILogger SerilogLog { get; }
-
-        /// <summary>
-        /// Initialize a new instance of the <see cref="SerilogLogger"/> class with a configuration file.
-        /// </summary>
-        /// <param name="logConfigFile"></param>
-        public SerilogLogger(FileInfo logConfigFile)
-        {
-            SerilogLog = new LoggerConfiguration()
-                .ReadFrom.AppSettings(filePath: logConfigFile.FullName)
-                .CreateLogger();
-        }
 
         public SerilogLogger(LoggerConfiguration logConfig)
         {
