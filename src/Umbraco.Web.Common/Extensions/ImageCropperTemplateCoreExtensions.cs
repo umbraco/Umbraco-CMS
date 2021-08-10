@@ -332,7 +332,7 @@ namespace Umbraco.Extensions
                     return null;
                 }
 
-                options = cropDataSet.GetCropBaseOptions(imageUrl, crop, string.IsNullOrWhiteSpace(cropAlias), preferFocalPoint);
+                options = cropDataSet.GetCropBaseOptions(imageUrl, crop, preferFocalPoint || string.IsNullOrWhiteSpace(cropAlias));
 
                 if (crop != null & useCropDimensions)
                 {

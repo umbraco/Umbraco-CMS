@@ -1,5 +1,3 @@
-using System;
-
 namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
@@ -15,20 +13,11 @@ namespace Umbraco.Cms.Core.Models
 
         public int? Height { get; set; }
 
-        [Obsolete("This property is unsupported by the default implementation, manually calculate the width based on the height instead.")]
-        public decimal? WidthRatio { get; set; }
-
-        [Obsolete("This property is unsupported by the default implementation, manually calculate the height based on the width instead.")]
-        public decimal? HeightRatio { get; set; }
-
         public int? Quality { get; set; }
 
         public ImageCropMode? ImageCropMode { get; set; }
 
         public ImageCropAnchor? ImageCropAnchor { get; set; }
-
-        [Obsolete("Images are already cropped from the center to the specified width/height by default.")]
-        public bool DefaultCrop { get; set; }
 
         public FocalPointPosition FocalPoint { get; set; }
 
@@ -37,12 +26,6 @@ namespace Umbraco.Cms.Core.Models
         public string CacheBusterValue { get; set; }
 
         public string FurtherOptions { get; set; }
-
-        [Obsolete("This property is unsupported by the default implementation, images should always be resized to the specified dimensions (within the configured maximums) to prevent different sizes depending on the source image.")]
-        public bool UpScale { get; set; } = true;
-
-        [Obsolete("This property is unsupported by the default implementation, all frames should be processed by default.")]
-        public string AnimationProcessMode { get; set; }
 
         /// <summary>
         /// The focal point position, in whatever units the registered IImageUrlGenerator uses, typically a percentage of the total image from 0.0 to 1.0.

@@ -63,11 +63,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 : Crops.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
-        public ImageUrlGenerationOptions GetCropBaseOptions(string url, ImageCropperCrop crop, bool defaultCrop, bool preferFocalPoint)
+        public ImageUrlGenerationOptions GetCropBaseOptions(string url, ImageCropperCrop crop, bool preferFocalPoint)
         {
-            if (preferFocalPoint && HasFocalPoint()
-                || crop != null && crop.Coordinates == null && HasFocalPoint()
-                || defaultCrop && HasFocalPoint())
+            if ((preferFocalPoint && HasFocalPoint()) || (crop != null && crop.Coordinates == null && HasFocalPoint()))
             {
                 return new ImageUrlGenerationOptions(url) { FocalPoint = new ImageUrlGenerationOptions.FocalPointPosition(FocalPoint.Top, FocalPoint.Left) };
             }
@@ -92,7 +90,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             if (crop == null && !string.IsNullOrWhiteSpace(alias))
                 return null;
 
-            var options = GetCropBaseOptions(string.Empty, crop, string.IsNullOrWhiteSpace(alias), useFocalPoint);
+            var options = GetCropBaseOptions(null, crop, useFocalPoint || string.IsNullOrWhiteSpace(alias));
 
             if (crop != null && useCropDimensions)
             {
@@ -108,9 +106,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         /// <summary>
         /// Gets the value image URL for a specific width and height.
         /// </summary>
-        public string GetCropUrl(int width, int height, IImageUrlGenerator imageUrlGenerator, bool useFocalPoint = false, string cacheBusterValue = null)
+        public string GetCropUrl(int width, int height, IImageUrlGenerator imageUrlGenerator, string cacheBusterValue = null)
         {
-            var options = GetCropBaseOptions(string.Empty, null, true, useFocalPoint);
+            var options = GetCropBaseOptions(null, null, false);
 
             options.Width = width;
             options.Height = height;
