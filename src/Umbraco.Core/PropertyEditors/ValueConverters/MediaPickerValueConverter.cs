@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,11 +73,15 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
             if (udis.Any())
             {
+                if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+                {
+                    throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+                }
                 foreach (var udi in udis)
                 {
                     var guidUdi = udi as GuidUdi;
                     if (guidUdi == null) continue;
-                    var item = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(guidUdi.Guid);
+                    var item = publishedSnapshot.Media.GetById(guidUdi.Guid);
                     if (item != null)
                         mediaItems.Add(item);
                 }

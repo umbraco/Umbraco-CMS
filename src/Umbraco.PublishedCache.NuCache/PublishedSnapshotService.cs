@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _publishedModelFactory = publishedModelFactory;
         }
 
-        protected PublishedSnapshot CurrentPublishedSnapshot => (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
+        protected PublishedSnapshot CurrentPublishedSnapshot { get { _publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot); return (PublishedSnapshot)publishedSnapshot; } }
 
         // NOTE: These aren't used within this object but are made available internally to improve the IdKey lookup performance
         // when nucache is enabled.

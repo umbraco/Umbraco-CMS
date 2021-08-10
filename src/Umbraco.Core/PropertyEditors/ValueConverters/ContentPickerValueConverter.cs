@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -57,9 +57,15 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             if ((propertyType.Alias != null && PropertiesToExclude.Contains(propertyType.Alias.ToLower(CultureInfo.InvariantCulture))) == false)
             {
                 IPublishedContent content;
+                if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+                {
+                    throw new InvalidOperationException("Wasn't possible to get a published snapshot");
+                }
                 if (inter is int id)
                 {
-                    content = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(id);
+                    
+
+                    content = publishedSnapshot.Content.GetById(id);
                     if (content != null)
                         return content;
                 }
@@ -68,7 +74,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     var udi = inter as GuidUdi;
                     if (udi == null)
                         return null;
-                    content = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(udi.Guid);
+                    content = publishedSnapshot.Content.GetById(udi.Guid);
                     if (content != null && content.ContentType.ItemType == PublishedItemType.Content)
                         return content;
                 }

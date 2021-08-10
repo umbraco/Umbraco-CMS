@@ -2,6 +2,7 @@ namespace Umbraco.Cms.Web.Common
 {
     public interface IUmbracoHelperAccessor
     {
-        UmbracoHelper UmbracoHelper { get;}
+        bool TryGetUmbracoHelper(out UmbracoHelper umbracoHelper);
+
     }
 }

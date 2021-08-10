@@ -86,7 +86,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         var multiNodeTreePicker = new List<IPublishedContent>();
 
                         var objectType = UmbracoObjectTypes.Unknown;
-
+                        if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+                        {
+                            throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+                        }
                         foreach (var udi in udis)
                         {
                             var guidUdi = udi as GuidUdi;
@@ -96,10 +99,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                             switch (udi.EntityType)
                             {
                                 case Constants.UdiEntityType.Document:
-                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(guidUdi.Guid));
+                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => publishedSnapshot.Content.GetById(guidUdi.Guid));
                                     break;
                                 case Constants.UdiEntityType.Media:
-                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(guidUdi.Guid));
+                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => publishedSnapshot.Media.GetById(guidUdi.Guid));
                                     break;
                                 case Constants.UdiEntityType.Member:
                                     multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id =>
@@ -109,7 +112,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                                         {
                                             return null;
                                         }
-                                        IPublishedContent member = _publishedSnapshotAccessor.PublishedSnapshot.Members.Get(m);
+                                        IPublishedContent member = publishedSnapshot.Members.Get(m);
                                         return member;
                                     });
                                     break;

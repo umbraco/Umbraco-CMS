@@ -122,9 +122,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
 
             // mocked published snapshot accessor returns a facade
+            var localPublishedSnapshot = publishedSnapshot.Object;
             publishedSnapshotAccessor
-                .Setup(x => x.PublishedSnapshot)
-                .Returns(publishedSnapshot.Object);
+                .Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot))
+                .Returns(true);
 
             var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
             {

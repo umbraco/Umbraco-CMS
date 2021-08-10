@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -26,8 +26,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             BlockItemData data,
             PropertyCacheLevel referenceCacheLevel, bool preview)
         {
+            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
             // hack! we need to cast, we have no choice beacuse we cannot make breaking changes.
-            var publishedContentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
+            var publishedContentCache = publishedSnapshot.Content;
 
             // only convert element types - content types will cause an exception when PublishedModelFactory creates the model
             var publishedContentType = publishedContentCache.GetContentType(data.ContentTypeKey);

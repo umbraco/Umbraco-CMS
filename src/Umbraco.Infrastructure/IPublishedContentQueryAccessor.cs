@@ -1,7 +1,9 @@
+using Umbraco.Cms.Infrastructure;
+
 namespace Umbraco.Cms.Core
 {
     public interface IPublishedContentQueryAccessor
     {
-        IPublishedContentQuery PublishedContentQuery { get;}
+        bool TryGetValue(out IPublishedContentQuery publishedContentQuery);
     }
 }

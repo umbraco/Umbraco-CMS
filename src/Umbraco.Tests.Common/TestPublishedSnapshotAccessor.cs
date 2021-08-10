@@ -7,6 +7,10 @@ namespace Umbraco.Cms.Tests.Common
 {
     public class TestPublishedSnapshotAccessor : IPublishedSnapshotAccessor
     {
-        public IPublishedSnapshot PublishedSnapshot { get; set; }
+        public bool TryGetPublishedSnapshot(out IPublishedSnapshot publishedSnapshot)
+        {
+            publishedSnapshot = null;
+            return false;
+        }
     }
 }

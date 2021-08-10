@@ -87,7 +87,11 @@ namespace Umbraco.Cms.Core.Routing
 
         private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)
         {
-            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
+            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
+            var contentCache = publishedSnapshot.Content;
             var entityContent = contentCache.GetById(entity.Id);
             if (entityContent == null)
                 return;
@@ -112,7 +116,11 @@ namespace Umbraco.Cms.Core.Routing
 
         private void CreateRedirects(OldRoutesDictionary oldRoutes)
         {
-            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
+            if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
+            var contentCache = publishedSnapshot.Content;
 
             foreach (var oldRoute in oldRoutes)
             {

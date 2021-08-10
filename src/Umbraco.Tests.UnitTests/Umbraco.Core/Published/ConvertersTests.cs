@@ -104,7 +104,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
             publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-            publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
+            var localPublishedSnapshot = publishedSnapshotMock.Object;
+            publishedSnapshotAccessorMock.Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot)).Returns(true);
             IPublishedSnapshotAccessor publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
 
             var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
@@ -170,7 +171,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
                 => int.TryParse(source as string, out int i) ? i : -1;
 
             public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-                => _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById((int)inter);
+            {
+                if(!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+                {
+                    throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+                }
+                return publishedSnapshot.Content.GetById((int)inter);
+            }
 
             public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int)inter).ToString();

@@ -27,5 +27,12 @@ namespace Umbraco.Cms.Core.PublishedCache
 
             set => throw new NotSupportedException(); // not ok to set
         }
+
+        public bool TryGetPublishedSnapshot(out IPublishedSnapshot publishedSnapshot)
+        {
+            publishedSnapshot = _umbracoContextAccessor.UmbracoContext?.PublishedSnapshot;
+
+            return publishedSnapshot is not null;
+        }
     }
 }

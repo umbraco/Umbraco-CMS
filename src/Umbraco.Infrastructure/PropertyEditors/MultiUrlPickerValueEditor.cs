@@ -95,13 +95,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         {
                             continue;
                         }
-
+                        if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+                        {
+                            throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+                        }
                         if (entity is IDocumentEntitySlim documentEntity)
                         {
                             icon = documentEntity.ContentTypeIcon;
                             published = culture == null ? documentEntity.Published : documentEntity.PublishedCultures.Contains(culture);
                             udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
+                            url = publishedSnapshot.Content.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = documentEntity.Trashed;
                         }
                         else if(entity is IContentEntitySlim contentEntity)
@@ -109,7 +112,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             icon = contentEntity.ContentTypeIcon;
                             published = !contentEntity.Trashed;
                             udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
+                            url = publishedSnapshot.Media.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = contentEntity.Trashed;
                         }
                         else

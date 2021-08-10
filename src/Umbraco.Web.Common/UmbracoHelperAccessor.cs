@@ -12,11 +12,13 @@ namespace Umbraco.Cms.Web.Common
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UmbracoHelperAccessor(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-        public UmbracoHelper UmbracoHelper => _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<UmbracoHelper>();
+        public UmbracoHelperAccessor(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
+        public bool TryGetUmbracoHelper(out UmbracoHelper umbracoHelper)
+        {
+            umbracoHelper = _httpContextAccessor.HttpContext.RequestServices.GetService<UmbracoHelper>();
+
+            return umbracoHelper is not null;
+        }
     }
 }

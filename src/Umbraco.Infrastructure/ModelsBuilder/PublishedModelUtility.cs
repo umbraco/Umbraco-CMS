@@ -32,15 +32,18 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 
         public static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor, PublishedItemType itemType, string alias)
         {
-            var facade = publishedSnapshotAccessor.PublishedSnapshot;
+            if (!publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
             switch (itemType)
             {
                 case PublishedItemType.Content:
-                    return facade.Content.GetContentType(alias);
+                    return publishedSnapshot.Content.GetContentType(alias);
                 case PublishedItemType.Media:
-                    return facade.Media.GetContentType(alias);
+                    return publishedSnapshot.Media.GetContentType(alias);
                 case PublishedItemType.Member:
-                    return facade.Members.GetContentType(alias);
+                    return publishedSnapshot.Members.GetContentType(alias);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(itemType));
             }

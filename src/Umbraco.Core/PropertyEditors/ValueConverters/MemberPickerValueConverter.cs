@@ -57,6 +57,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             if (_umbracoContextAccessor.UmbracoContext != null)
             {
                 IPublishedContent member;
+                if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+                {
+                    throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+                }
                 if (source is int id)
                 {
                     IMember m = _memberService.GetById(id);
@@ -64,7 +68,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     {
                         return null;
                     }
-                    member = _publishedSnapshotAccessor.PublishedSnapshot?.Members.Get(m);
+                    member = publishedSnapshot.Members.Get(m);
                     if (member != null)
                     {
                         return member;
@@ -81,7 +85,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         return null;
                     }
 
-                    member = _publishedSnapshotAccessor.PublishedSnapshot?.Members.Get(m);
+                    member = publishedSnapshot.Members.Get(m);
 
                     if (member != null)
                     {

@@ -624,7 +624,11 @@ namespace Umbraco.Cms.Core.Security
             {
                 return null;
             }
-            return _publishedSnapshotAccessor.PublishedSnapshot?.Members.Get(member);
+            if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
+            return publishedSnapshot.Members.Get(member);
         }
 
         private enum MemberDataChangeType
