@@ -1,15 +1,16 @@
 ﻿<div data-element="editor-header" class="umb-editor-header" ng-class="{'-split-view-active': splitViewOpen === true}">
     <umb-loader ng-show="loading"></umb-loader>
-    <div class="flex items-center" style="height: 100%;" ng-hide="loading">
+    <div class="flex items-center h-100" ng-hide="loading">
 
-        <div ng-if="showBackButton === true && splitViewOpen !== true" style="margin-right: 15px;">
-            <button type="button" class="umb-editor-header__back" ng-click="goBack()" prevent-default>
-                <i class="fa fa-arrow-left" aria-hidden="true"></i>
-                <span class="sr-only"><localize key="visuallyHiddenTexts_goBack">Go back</localize></span>
-            </button>
-        </div>
+        <button type="button"  
+                class="btn-reset umb-editor-header__back"
+                ng-if="showBackButton === true && splitViewOpen !== true" 
+                ng-click="goBack()">
+            <umb-icon icon="icon-arrow-left"></umb-icon>
+            <span class="sr-only"><localize key="visuallyHiddenTexts_goBack">Go back</localize></span>
+        </button>
 
-        <div class="flex items-center" style="flex: 1;">
+        <div class="flex flex-1">
 
             <ng-form data-element="editor-icon" name="iconForm">
                 <button
@@ -25,7 +26,7 @@
                 </button>
             </ng-form>
 
-            <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1 1 auto;">
+            <div id="nameField" class="umb-editor-header__name-and-description">
                 <div>
                     <p tabindex="0" class="sr-only" ng-show="accessibility.a11yMessageVisible">
                         {{accessibility.a11yMessage}}

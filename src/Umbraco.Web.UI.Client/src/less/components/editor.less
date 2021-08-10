@@ -79,12 +79,16 @@
 }
 
 .umb-editor-header__back {
-    background: transparent;
-    border: 0;
+	font-size:20px;
+	display:flex;
     color: @gray-6;
-    margin: 0 0 1px 0;
+    margin-right: 15px;
     padding: 0;
 	transition: color 0.1s ease-in-out;
+
+	&:hover {
+		color:@gray-7;
+	}
 }
 
 .umb-editor-header__name-wrapper {
@@ -97,6 +101,7 @@
 }
 
 .umb-editor-header__name-and-description {
+	flex:1 1 auto;
     margin-right: 20px;
     .umb-panel-header-description {
     	padding: 0 10px;
