@@ -20,28 +20,28 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrl_CropAliasTest()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { Crop = s_crop, Width = 100, Height = 100 });
-            Assert.AreEqual(MediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
+            Assert.AreEqual(MediaPath + "?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100", urlString);
         }
 
         [Test]
         public void GetCropUrl_WidthHeightTest()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus1, Width = 200, Height = 300 });
-            Assert.AreEqual(MediaPath + "?rxy=0.80827067669172936,0.96&width=200&height=300", urlString);
+            Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=200&height=300", urlString);
         }
 
         [Test]
         public void GetCropUrl_FocalPointTest()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus1, Width = 100, Height = 100 });
-            Assert.AreEqual(MediaPath + "?rxy=0.80827067669172936,0.96&width=100&height=100", urlString);
+            Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=100&height=100", urlString);
         }
 
         [Test]
         public void GetCropUrlFurtherOptionsTest()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus1, Width = 200, Height = 300, FurtherOptions = "&filter=comic&roundedcorners=radius-26|bgcolor-fff" });
-            Assert.AreEqual(MediaPath + "?rxy=0.80827067669172936,0.96&width=200&height=300&filter=comic&roundedcorners=radius-26|bgcolor-fff", urlString);
+            Assert.AreEqual(MediaPath + "?rxy=0.96,0.80827067669172936&width=200&height=300&filter=comic&roundedcorners=radius-26|bgcolor-fff", urlString);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
         public void GetCropUrl_PreDefinedCropNoCoordinatesWithWidthAndFocalPointIgnore()
         {
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(MediaPath) { FocalPoint = s_focus2, Width = 270, Height = 161 });
-            Assert.AreEqual(MediaPath + "?rxy=0.41,0.4275&width=270&height=161", urlString);
+            Assert.AreEqual(MediaPath + "?rxy=0.4275,0.41&width=270&height=161", urlString);
         }
 
         /// <summary>

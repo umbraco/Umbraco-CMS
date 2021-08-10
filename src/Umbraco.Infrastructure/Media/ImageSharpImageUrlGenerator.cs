@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Media
 
             if (options.FocalPoint != null)
             {
-                AddQueryString("rxy", options.FocalPoint.Top, options.FocalPoint.Left);
+                AddQueryString("rxy", options.FocalPoint.Left, options.FocalPoint.Top);
             }
 
             if (options.Crop != null)
