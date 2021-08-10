@@ -129,7 +129,7 @@ namespace Umbraco.Cms.Core.Routing
                 return;
             }
 
-            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot?.Content;
+            var contentCache = publishedSnapshot.Content;
 
             if (contentCache == null)
             {
