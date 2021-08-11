@@ -55,11 +55,11 @@
                 // set server validation index
                 // the server filters out inherited groups if they don't have any local properties when returning the group index
                 const noInherited = newValue.filter(group => !group.inherited || (group.inherited && group.properties.filter(property => !property.inherited).length > 0));
-                
+
                 noInherited.forEach((group, index) => {
                     group.serverValidationIndex = !group.inherited ? index : undefined;
                 });
-                
+
                 checkGenericTabVisibility();
 
                 if (!scope.openTabAlias && scope.hasGenericTab) {
@@ -130,17 +130,17 @@
                             const parentAlias = scope.openTabAlias,
                                 oldAlias = group.alias || null, // null when group comes from root aka. 'generic'
                                 newAlias = contentEditingHelper.updateParentAlias(oldAlias, parentAlias);
-    
+
                             // Check alias is unique
                             // TODO: we should properly do this on hover, to let user know it cant be moved.
                             if (isAliasUnique(newAlias) === false) {
                                 return;
                             }
-    
+
                             group.alias = newAlias;
                             group.parentAlias = parentAlias;
                             contentEditingHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
-    
+
                             const groupsInTab = scope.model.groups.filter(group => group.parentAlias === parentAlias);
                             updateSortOrder(groupsInTab);
                         }
@@ -174,15 +174,15 @@
                     }
                 };
 
-                scope.sortableRequestedTabAlias = null;
+                scope.sortableRequestedTabAlias = undefined;//set to undefined as null is the generic group.
                 scope.sortableRequestedTabTimeout = null;
                 scope.droppableOptionsTab = {
                     accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
                     tolerance : 'pointer',
                     over: (evt, ui) => {
-                        const hoveredTabAlias = evt.target.dataset.tabAlias || null;
+                        const hoveredTabAlias = evt.target.dataset.tabAlias === "" ? null : evt.target.dataset.tabAlias;
 
-                        // if group
+                        // if dragging a group
                         if (ui.draggable[0].dataset.groupKey) {
 
                             const groupKey = ui.draggable[0].dataset.groupKey ? ui.draggable[0].dataset.groupKey : false;
@@ -200,16 +200,18 @@
                             if(scope.sortableRequestedTabTimeout !== null) {
                                 $timeout.cancel(scope.sortableRequestedTabTimeout);
                                 scope.sortableRequestedTabTimeout = null;
-                                scope.sortableRequestedTabAlias = null;
+                                scope.sortableRequestedTabAlias = undefined;
                             }
                             scope.sortableRequestedTabAlias = hoveredTabAlias;
                             scope.sortableRequestedTabTimeout = $timeout(() => {
                                 scope.openTabAlias = scope.sortableRequestedTabAlias;
-                            }, 1200)
+                                scope.sortableRequestedTabTimeout = null;
+                            }, 1200);
                         }
                     },
                     out: (evt, ui) => {
-                        if(scope.sortableRequestedTabTimeout !== null) {
+                        const hoveredTabAlias = evt.target.dataset.tabAlias === "" ? null : evt.target.dataset.tabAlias;
+                        if(scope.sortableRequestedTabTimeout !== null && (hoveredTabAlias === undefined || scope.sortableRequestedTabAlias === hoveredTabAlias)) {
                             $timeout.cancel(scope.sortableRequestedTabTimeout);
                             scope.sortableRequestedTabTimeout = null;
                             scope.sortableRequestedTabAlias = null;
