@@ -1,17 +1,18 @@
+using System;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
-    public class MemberCache : IPublishedMemberCache
+    public class MemberCache : IPublishedMemberCache, IDisposable
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly bool _previewDefault;
-
+        private bool _disposedValue;
         public MemberCache(
             bool previewDefault,
             PublishedContentTypeCache contentTypeCache,
@@ -34,6 +35,29 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public IPublishedContent Get(IMember member)
             => PublishedMember.Create(member, GetContentType(member.ContentTypeId), _previewDefault, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory);
+
+        #endregion
+
+        #region IDisposable
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _contentTypeCache.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+        }
 
         #endregion
     }

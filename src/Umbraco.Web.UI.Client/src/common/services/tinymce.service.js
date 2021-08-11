@@ -357,18 +357,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     return plugin.name;
                 });
 
-                //plugins that must always be active
+                // Plugins that must always be active
                 plugins.push("autoresize");
                 plugins.push("noneditable");
+
+                // Table plugin use color picker plugin in table properties
+                if (plugins.includes("table")) {
+                    plugins.push("colorpicker");
+                }
 
                 var modeTheme = '';
                 var modeInline = false;
 
-
-                //Based on mode set
-                //classic = Theme: modern, inline: false
-                //inline = Theme: modern, inline: true,
-                //distraction-free = Theme: inlite, inline: true
+                // Based on mode set
+                // classic = Theme: modern, inline: false
+                // inline = Theme: modern, inline: true,
+                // distraction-free = Theme: inlite, inline: true
                 switch (args.mode) {
                     case "classic":
                         modeTheme  = "modern";

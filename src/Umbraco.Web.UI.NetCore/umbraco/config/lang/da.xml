@@ -195,26 +195,6 @@
     <key alias="smallCustom">Brugerdefineret</key>
     <key alias="historyIncludingVariants">Historik (alle sprog)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
-    <key alias="changeDocTypeInstruction2">Kontroller derefter, at alle egenskaber bliver overført rigtigt til den nye dokumenttype, og klik derefter på Gem.</key>
-    <key alias="contentRepublished">Indholdet er blevet genudgivet.</key>
-    <key alias="currentProperty">Nuværende egenskab</key>
-    <key alias="currentType">Nuværende type</key>
-    <key alias="docTypeCannotBeChanged">Du kan ikke skifte dokumenttype, da der ikke er andre gyldige dokumenttyper på denne placering.</key>
-    <key alias="docTypeChanged">Dokumenttype skiftet</key>
-    <key alias="mapProperties">Overfør egenskaber</key>
-    <key alias="mapToProperty">Overfør til egenskab</key>
-    <key alias="newTemplate">Ny skabelon</key>
-    <key alias="newType">Ny type</key>
-    <key alias="none">ingen</key>
-    <key alias="selectedContent">Indhold</key>
-    <key alias="selectNewDocType">Vælg ny dokumenttype</key>
-    <key alias="successMessage">Dokumenttypen på detvalgte indhold blev skiftet til [new type], og følgende egenskaber blev overført:</key>
-    <key alias="to">til</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Overførsel af egenskaber kunne ikke fuldføres, da en eller flere egenskaber er indstillet til at blive overført mere end én gang.</key>
-    <key alias="validDocTypesNote">Kun andre dokumenttyper, der er gyldige på denne placering, vises.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Oprettelse af mappen under parent med ID %0% fejlede</key>
     <key alias="createFolderFailedByName">Oprettelse af mappen under parent med navnet %0% fejlede</key>
@@ -1918,6 +1898,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="contextMenuDescription">Udfør handling %0% på %1% noden</key>
     <key alias="addImageCaption">Tilføj billede overskrift</key>
     <key alias="searchContentTree">Søg i indholdstræet</key>
+    <key alias="maxAmount">Maximum antal</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>

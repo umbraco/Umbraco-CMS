@@ -425,14 +425,15 @@ ORDER BY colName";
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoUser.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.User}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
             {
-                $"DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
+                $"DELETE FROM umbracoUserLogin WHERE userId = @id",
+                "DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
@@ -574,7 +575,7 @@ ORDER BY colName";
             {
                 userDto.EmailConfirmedDate = null;
                 changedCols.Add("emailConfirmedDate");
-                
+
                 // If the security stamp hasn't already updated we need to force it
                 if (entity.IsPropertyDirty("SecurityStamp") == false)
                 {

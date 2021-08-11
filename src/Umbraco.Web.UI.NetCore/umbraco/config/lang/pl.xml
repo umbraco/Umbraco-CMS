@@ -130,26 +130,6 @@
     <key alias="undo">Cofnij</key>
     <key alias="redo">Powtórz</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Aby zmienić typ dokumentu dla wybranej treści, najpierw wybierz typ z listy typów obowiązujących dla tej lokalizacji.</key>
-    <key alias="changeDocTypeInstruction2">Następnie potwierdź i/lub zmień mapowanie właściwości z bieżącego typu do nowego i kliknij "Zapisz".</key>
-    <key alias="contentRepublished">Treść została opublikowana ponownie.</key>
-    <key alias="currentProperty">Bieżąca właściwość</key>
-    <key alias="currentType">Bieżący typ</key>
-    <key alias="docTypeCannotBeChanged">Typ dokumentu nie może być zmieniony, ponieważ nie istnieją obowiązujące alternatywy dla tej lokalizacji. Alternatywa będzie dostępna, jeśli będzie dozwolona pod rodzicem wybranego elementu zawartości i jeśli wszystkie istniejące dzieci elementu zawartości będą mieć pozwolenie na bycie tworzonym pod rodzicem.</key>
-    <key alias="docTypeChanged">Typ dokumentu został zmieniony</key>
-    <key alias="mapProperties">Mapuj Właściwości</key>
-    <key alias="mapToProperty">Mapuj do Właściwości</key>
-    <key alias="newTemplate">Nowy Szablon</key>
-    <key alias="newType">Nowy typ</key>
-    <key alias="none">Nic</key>
-    <key alias="selectedContent">Zawartość</key>
-    <key alias="selectNewDocType">Wybierz Nowy Typ Dokumentu</key>
-    <key alias="successMessage">Typ dokumentu wybranej zawartości został zmieniony z powodzeniem do [new type] i następujące właściwości zostały zmapowane:</key>
-    <key alias="to">do</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Nie można dokończyć mapowania właściwości, ponieważ jedna lub więcej właściwości mają zdefiniowane więcej niż jedno mapowanie.</key>
-    <key alias="validDocTypesNote">Wyświetlane są tylko alternatywne typy obowiązujące dla obecnej lokalizacji.</key>
-  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Jest Opublikowany</key>
     <key alias="about">O tej stronie</key>

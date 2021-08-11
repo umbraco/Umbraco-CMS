@@ -15,7 +15,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// myFieldName_en-us will match the "en-us"
         /// </remarks>
-        internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new Regex("^([_\\w]+)_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
+        internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new Regex("^(?<FieldName>[_\\w]+)_(?<CultureName>[a-z]{2,3}(-[a-z0-9]{2,4})?)$", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
         //TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
 
@@ -33,7 +33,7 @@ namespace Umbraco.Extensions
             foreach (var field in allFields)
             {
                 var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
-                if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
+                if (match.Success && culture.InvariantEquals(match.Groups["CultureName"].Value))
                 {
                     results.Add(field);
                 }
@@ -55,7 +55,7 @@ namespace Umbraco.Extensions
             foreach (var field in allFields)
             {
                 var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
-                if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
+                if (match.Success && culture.InvariantEquals(match.Groups["CultureName"].Value))
                 {
                     yield return field; //matches this culture field
                 }

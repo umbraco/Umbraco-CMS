@@ -536,9 +536,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             foreach (var batch in inGroups)
             {
                 var memberIdBatch = batch.Select(x => x.Id);
+
                 var sql = Sql().SelectAll().From<Member2MemberGroupDto>()
                     .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id)
-                    .Where("Member IN (@memberIds)", new { memberIds = memberIdBatch });
+                    .WhereIn<Member2MemberGroupDto>(dto => dto.Member, memberIdBatch);
+
                 var memberIdsInGroup = Database.Fetch<Member2MemberGroupDto>(sql)
                     .Select(x => x.Member).ToArray();
 

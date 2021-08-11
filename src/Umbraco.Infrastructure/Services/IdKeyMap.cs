@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services
 {
-    public class IdKeyMap : IIdKeyMap
+    public class IdKeyMap : IIdKeyMap,IDisposable
     {
         private readonly IScopeProvider _scopeProvider;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -46,6 +46,7 @@ namespace Umbraco.Cms.Core.Services
 
         private readonly ConcurrentDictionary<UmbracoObjectTypes, (Func<int, Guid> id2key, Func<Guid, int> key2id)> _dictionary
             = new ConcurrentDictionary<UmbracoObjectTypes, (Func<int, Guid> id2key, Func<Guid, int> key2id)>();
+        private bool _disposedValue;
 
         public void SetMapper(UmbracoObjectTypes umbracoObjectType, Func<int, Guid> id2key, Func<Guid, int> key2id)
         {
@@ -106,8 +107,8 @@ namespace Umbraco.Cms.Core.Services
             }
             finally
             {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
+                if (_locker.IsWriteLockHeld)
+                    _locker.ExitWriteLock();
             }
         }
 
@@ -125,8 +126,8 @@ namespace Umbraco.Cms.Core.Services
             }
             finally
             {
-                if (_locker.IsReadLockHeld)
-                    _locker.ExitReadLock();
+                if (_locker.IsWriteLockHeld)
+                    _locker.ExitWriteLock();
             }
         }
 #endif
@@ -368,6 +369,24 @@ namespace Umbraco.Cms.Core.Services
             public UmbracoObjectTypes UmbracoObjectType { get; }
 
             public T Id { get; }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _locker.Dispose();
+                }
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }
