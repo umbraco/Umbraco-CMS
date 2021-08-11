@@ -115,8 +115,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
         [Test]
         public async Task Noop_When_Not_Document_Request()
         {
+            var umbracoContext = Mock.Of<IUmbracoContext>();
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
-                Mock.Of<IUmbracoContextAccessor>(x => x.UmbracoContext == Mock.Of<IUmbracoContext>()),
+                Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
                 Mock.Of<IRoutableDocumentFilter>(x => x.IsDocumentRequest(It.IsAny<string>()) == false));
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
