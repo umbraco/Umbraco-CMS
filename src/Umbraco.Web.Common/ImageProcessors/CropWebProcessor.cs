@@ -32,13 +32,13 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
             RectangleF? coordinates = GetCoordinates(commands, parser, culture);
             if (coordinates != null)
             {
-                // Convert the percentage based model of left, top, right, bottom to x, y, width, height
+                // Convert the coordinates to a pixel based rectangle
                 int sourceWidth = image.Image.Width;
                 int sourceHeight = image.Image.Height;
-                int x = (int)MathF.Round(coordinates.Value.Left * sourceWidth);
-                int y = (int)MathF.Round(coordinates.Value.Top * sourceHeight);
-                int width = sourceWidth - (int)MathF.Round(coordinates.Value.Right * sourceWidth);
-                int height = sourceHeight - (int)MathF.Round(coordinates.Value.Bottom * sourceHeight);
+                int x = (int)MathF.Round(coordinates.Value.X * sourceWidth);
+                int y = (int)MathF.Round(coordinates.Value.Y * sourceHeight);
+                int width = (int)MathF.Round(coordinates.Value.Width * sourceWidth);
+                int height = (int)MathF.Round(coordinates.Value.Height * sourceHeight);
 
                 var cropRectangle = new Rectangle(x, y, width, height);
                 
@@ -57,7 +57,8 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
                 return null;
             }
 
-            return new RectangleF(coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
+            // The right and bottom values are actually the distance from those sides, so convert them into real coordinates
+            return RectangleF.FromLTRB(coordinates[0], coordinates[1], 1 - coordinates[2], 1 - coordinates[3]);
         }
     }
 }
