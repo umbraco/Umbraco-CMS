@@ -44,7 +44,7 @@ namespace Umbraco.TestData
 <body>
   <div class=""head"">
   <h1><a href=""/LoadTest"">LoadTest</a></h1>
-  <div class=""ver"">@_umbracoVersion.SemanticVersion</div>
+  <div class=""ver"">@_umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild()</div>
   </div>
 ";
 
