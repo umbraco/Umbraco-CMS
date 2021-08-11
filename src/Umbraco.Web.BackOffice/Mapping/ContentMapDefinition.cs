@@ -240,10 +240,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             {
                 return Array.Empty<UrlInfo>();
             }
-
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-
-            if (umbracoContext == null)
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
                 return new[] { UrlInfo.Message("Cannot generate URLs without a current Umbraco Context") };
             }
@@ -261,7 +258,8 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         private DateTime GetUpdateDate(IContent source, MapperContext context)
         {
             // invariant = global date
-            if (!source.ContentType.VariesByCulture()) return source.UpdateDate;
+            if (!source.ContentType.VariesByCulture())
+                return source.UpdateDate;
 
             // variant = depends on culture
             var culture = context.GetCulture();
@@ -279,7 +277,8 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         private string GetName(IContent source, MapperContext context)
         {
             // invariant = only 1 name
-            if (!source.ContentType.VariesByCulture()) return source.Name;
+            if (!source.ContentType.VariesByCulture())
+                return source.Name;
 
             // variant = depends on culture
             var culture = context.GetCulture();

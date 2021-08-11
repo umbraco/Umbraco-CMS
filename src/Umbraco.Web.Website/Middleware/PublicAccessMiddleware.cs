@@ -126,7 +126,11 @@ namespace Umbraco.Cms.Web.Website.Middleware
         {
             if (pageId != publishedRequest.PublishedContent.Id)
             {
-                IPublishedContent publishedContent = _umbracoContextAccessor.UmbracoContext.PublishedSnapshot.Content.GetById(pageId);
+                if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+                {
+                    throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+                }
+                IPublishedContent publishedContent = umbracoContext.PublishedSnapshot.Content.GetById(pageId);
                 if (publishedContent == null)
                 {
                     throw new InvalidOperationException("No content found by id " + pageId);

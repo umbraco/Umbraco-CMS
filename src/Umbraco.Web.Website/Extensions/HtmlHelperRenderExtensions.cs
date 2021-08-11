@@ -66,15 +66,18 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static IHtmlContent PreviewBadge(this IHtmlHelper helper, IUmbracoContextAccessor umbracoContextAccessor, IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IIOHelper ioHelper, ContentSettings contentSettings)
         {
-            var umbrcoContext = umbracoContextAccessor.UmbracoContext;
-            if (umbrcoContext.InPreviewMode)
+            if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
+            if (umbracoContext.InPreviewMode)
             {
                 var htmlBadge =
                     string.Format(
                         contentSettings.PreviewBadge,
                         ioHelper.ResolveUrl(globalSettings.UmbracoPath),
                         WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
-                        umbrcoContext.PublishedRequest.PublishedContent.Id);
+                        umbracoContext.PublishedRequest.PublishedContent.Id);
                 return new HtmlString(htmlBadge);
             }
 
@@ -102,8 +105,7 @@ namespace Umbraco.Extensions
             if (cacheByPage)
             {
                 var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(htmlHelper);
-                var umbracoContext = umbracoContextAccessor.UmbracoContext;
-                if (umbracoContext == null)
+                if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
                 }
@@ -667,7 +669,11 @@ namespace Umbraco.Extensions
             }
 
             IUmbracoContextAccessor umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
-            var formAction = umbracoContextAccessor.UmbracoContext.OriginalRequestUrl.PathAndQuery;
+            if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
+            var formAction = umbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);
         }
 

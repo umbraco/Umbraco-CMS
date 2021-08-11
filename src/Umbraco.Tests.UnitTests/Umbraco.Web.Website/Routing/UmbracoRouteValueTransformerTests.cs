@@ -129,7 +129,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
             IUmbracoContext umbracoContext = GetUmbracoContext(false);
 
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
-                Mock.Of<IUmbracoContextAccessor>(x => x.UmbracoContext == umbracoContext));
+                Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)));
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
             Assert.AreEqual(2, result.Count);
@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
             IPublishedRequest request = Mock.Of<IPublishedRequest>();
 
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
-                Mock.Of<IUmbracoContextAccessor>(x => x.UmbracoContext == umbracoContext),
+                Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
                 router: GetRouter(request),
                 routeValuesFactory: GetRouteValuesFactory(request));
 
@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
             IPublishedRequest request = Mock.Of<IPublishedRequest>();
 
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
-                Mock.Of<IUmbracoContextAccessor>(x => x.UmbracoContext == umbracoContext),
+                Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
                 router: GetRouter(request),
                 routeValuesFactory: GetRouteValuesFactory(request));
 
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
             UmbracoRouteValues routeValues = GetRouteValues(request);
 
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
-                Mock.Of<IUmbracoContextAccessor>(x => x.UmbracoContext == umbracoContext),
+                Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
                 router: GetRouter(request),
                 routeValuesFactory: GetRouteValuesFactory(request));
 

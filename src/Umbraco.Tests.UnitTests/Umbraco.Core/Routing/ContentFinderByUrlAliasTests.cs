@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using AutoFixture.NUnit3;
 using Moq;
 using NUnit.Framework;
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             VariationContext variationContext = new VariationContext();
 
             var contentItem = rootContents[0];
-            Mock.Get(umbracoContextAccessor).Setup(x => x.UmbracoContext).Returns(umbracoContext);
+            Mock.Get(umbracoContextAccessor).Setup(x => x.TryGetUmbracoContext(out umbracoContext)).Returns(true);
             Mock.Get(umbracoContext).Setup(x => x.Content).Returns(publishedContentCache);
             Mock.Get(publishedContentCache).Setup(x => x.GetAtRoot(null)).Returns(rootContents);
             Mock.Get(contentItem).Setup(x => x.Id).Returns(nodeMatch);

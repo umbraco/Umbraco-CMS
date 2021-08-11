@@ -75,8 +75,11 @@ namespace Umbraco.Extensions
                 .Field(UmbracoExamineFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
                 .And()
                 .ManagedQuery(term);
-
-            return query.Execute().ToPublishedSearchResults(umbracoContextAccessor.UmbracoContext.Content);
+            if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
+            return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
         }
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term, string indexName = null)
@@ -94,8 +97,12 @@ namespace Umbraco.Extensions
                 .Field("parentID", content.Id)
                 .And()
                 .ManagedQuery(term);
+            if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
 
-            return query.Execute().ToPublishedSearchResults(umbracoContextAccessor.UmbracoContext.Content);
+            return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
         }
 
         #endregion

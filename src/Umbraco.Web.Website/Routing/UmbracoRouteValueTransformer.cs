@@ -94,11 +94,11 @@ namespace Umbraco.Cms.Web.Website.Routing
             {
                 return values;
             }
-
             // will be null for any client side requests like JS, etc...
-            if (_umbracoContextAccessor.UmbracoContext == null)
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
                 return values;
+                ;
             }
 
             if (!_routableDocumentFilter.IsDocumentRequest(httpContext.Request.Path))
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             }
 
             // Check if there is no existing content and return the no content controller
-            if (!_umbracoContextAccessor.UmbracoContext.Content.HasContent())
+            if (!umbracoContext.Content.HasContent())
             {
                 values[ControllerToken] = ControllerExtensions.GetControllerName<RenderNoContentController>();
                 values[ActionToken] = nameof(RenderNoContentController.Index);
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 return values;
             }
 
-            IPublishedRequest publishedRequest = await RouteRequestAsync(httpContext, _umbracoContextAccessor.UmbracoContext);
+            IPublishedRequest publishedRequest = await RouteRequestAsync(httpContext, umbracoContext);
 
             UmbracoRouteValues umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
 

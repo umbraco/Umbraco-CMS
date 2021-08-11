@@ -25,5 +25,6 @@ namespace Umbraco.Cms.Tests.Common
         }
 
         public void Clear() => UmbracoContext = null;
+        public void Set(IUmbracoContext umbracoContext) => UmbracoContext = umbracoContext;
     }
 }

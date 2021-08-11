@@ -31,5 +31,6 @@ namespace Umbraco.Cms.Core.Web
             return umbracoContext is not null;
         }
         public void Clear() => Value = null;
+        public void Set(IUmbracoContext umbracoContext) => Value = umbracoContext;
     }
 }

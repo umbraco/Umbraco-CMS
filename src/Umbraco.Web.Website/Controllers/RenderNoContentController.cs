@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -23,7 +23,11 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
         public ActionResult Index()
         {
-            var store = _umbracoContextAccessor.UmbracoContext.Content;
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
+            var store = umbracoContext.Content;
             if (store.HasContent())
             {
                 // If there is actually content, go to the root.
