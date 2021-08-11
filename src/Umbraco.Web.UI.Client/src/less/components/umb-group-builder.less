@@ -930,20 +930,22 @@ input.umb-group-builder__group-sort-value {
 
 // Convert to tab dropzone
 .umb-group-builder__convert-dropzone {
-  display: inline-block;
+    display: inline-flex;
   border: 1px dashed @gray-7;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 2px 15px;
   border-radius: @baseBorderRadius;
-  opacity: 0;
+  // Hack for hiding as a droppable element:
+  visibility: hidden;
+  position: absolute;
 
   &.ui-droppable-hover {
     border-color: @black;
   }
 
   &.ui-droppable-active {
-    opacity: 1;
+    visibility: visible;
+    position: relative;
   }
 }
