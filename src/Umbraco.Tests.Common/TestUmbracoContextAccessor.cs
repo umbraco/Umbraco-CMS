@@ -7,24 +7,21 @@ namespace Umbraco.Cms.Tests.Common
 {
     public class TestUmbracoContextAccessor : IUmbracoContextAccessor
     {
-        public IUmbracoContext UmbracoContext { get; set; }
+        private IUmbracoContext _umbracoContext;
 
         public TestUmbracoContextAccessor()
         {
         }
 
-        public TestUmbracoContextAccessor(IUmbracoContext umbracoContext)
-        {
-            UmbracoContext = umbracoContext;
-        }
+        public TestUmbracoContextAccessor(IUmbracoContext umbracoContext) => _umbracoContext = umbracoContext;
 
         public bool TryGetUmbracoContext(out IUmbracoContext umbracoContext)
         {
-            umbracoContext = UmbracoContext;
+            umbracoContext = _umbracoContext;
             return umbracoContext is not null;
         }
 
-        public void Clear() => UmbracoContext = null;
-        public void Set(IUmbracoContext umbracoContext) => UmbracoContext = umbracoContext;
+        public void Clear() => _umbracoContext = null;
+        public void Set(IUmbracoContext umbracoContext) => _umbracoContext = umbracoContext;
     }
 }
