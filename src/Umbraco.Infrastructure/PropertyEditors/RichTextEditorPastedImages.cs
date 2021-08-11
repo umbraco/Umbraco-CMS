@@ -123,7 +123,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 img.SetAttributeValue("data-udi", udi.ToString());
 
                 // Get the new persisted image URL
-                var mediaTyped = _umbracoContextAccessor?.UmbracoContext?.Media.GetById(udi.Guid);
+                _umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext);
+                var mediaTyped = umbracoContext?.Media.GetById(udi.Guid);
                 if (mediaTyped == null)
                     throw new PanicException($"Could not find media by id {udi.Guid} or there was no UmbracoContext available.");
 

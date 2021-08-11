@@ -115,8 +115,12 @@ namespace Umbraco.Cms.Web.Common.Macros
         // ensuring that it is appropriate to use the cache
         private MacroContent GetMacroContentFromCache(MacroModel model)
         {
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                return null;
+            }
             // only if cache is enabled
-            if (_umbracoContextAccessor.UmbracoContext.InPreviewMode || model.CacheDuration <= 0)
+            if (umbracoContext.InPreviewMode || model.CacheDuration <= 0)
                 return null;
 
             var cache = _appCaches.RuntimeCache;
@@ -151,8 +155,12 @@ namespace Umbraco.Cms.Web.Common.Macros
         // stores macro content into the cache
         private async Task AddMacroContentToCacheAsync(MacroModel model, MacroContent macroContent)
         {
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
             // only if cache is enabled
-            if (_umbracoContextAccessor.UmbracoContext.InPreviewMode || model.CacheDuration <= 0)
+            if (umbracoContext.InPreviewMode || model.CacheDuration <= 0)
                 return;
 
             // just make sure...

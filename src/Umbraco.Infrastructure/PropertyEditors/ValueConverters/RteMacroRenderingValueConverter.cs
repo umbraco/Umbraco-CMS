@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Linq;
 using System.Text;
 using HtmlAgilityPack;
@@ -50,7 +51,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         // different preview modes.
         private string RenderRteMacros(string source, bool preview)
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
             using (umbracoContext.ForcedPreview(preview)) // force for macro rendering
             {
                 var sb = new StringBuilder();

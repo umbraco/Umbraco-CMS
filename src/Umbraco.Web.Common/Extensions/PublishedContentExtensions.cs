@@ -48,7 +48,13 @@ namespace Umbraco.Extensions
         /// a culture to that document.</para>
         /// </remarks>
         public static string GetCultureFromDomains(this IPublishedContent content, IUmbracoContextAccessor umbracoContextAccessor, ISiteDomainMapper siteDomainHelper, Uri current = null)
-            => DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContextAccessor.UmbracoContext, siteDomainHelper);
+        {
+                if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+                {
+                    throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+                }
+                return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
+        }
 
         #endregion
 

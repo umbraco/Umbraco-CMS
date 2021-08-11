@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using Examine;
@@ -50,7 +50,17 @@ namespace Umbraco.Extensions
         private static IPublishedValueFallback PublishedValueFallback { get; } =
             StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
 
-        private static IPublishedSnapshot PublishedSnapshot => UmbracoContextAccessor.UmbracoContext?.PublishedSnapshot;
+        private static IPublishedSnapshot PublishedSnapshot
+        {
+            get
+            {
+                if (!UmbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+                {
+                    return null;
+                }
+                return umbracoContext.PublishedSnapshot;
+            }
+        }
 
         private static IMediaTypeService MediaTypeService { get; } =
             StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>();

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,17 @@ namespace Umbraco.Cms.Web.Common.Controllers
         /// <summary>
         /// Gets the umbraco context
         /// </summary>
-        protected IUmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
+        protected IUmbracoContext UmbracoContext
+        {
+            get
+            {
+                if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+                {
+                    throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+                }
+                return umbracoContext;
+            }
+        }
 
         /// <summary>
         /// The default action to render the front-end view.

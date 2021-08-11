@@ -187,8 +187,12 @@ namespace Umbraco.Cms.Web.Common.Templates
 
         private void SetNewItemsOnContextObjects(IPublishedRequest request)
         {
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
             // now, set the new ones for this page execution
-            _umbracoContextAccessor.UmbracoContext.PublishedRequest = request;
+            umbracoContext.PublishedRequest = request;
         }
 
         /// <summary>
@@ -196,9 +200,13 @@ namespace Umbraco.Cms.Web.Common.Templates
         /// </summary>
         private void SaveExistingItems(out IPublishedRequest oldPublishedRequest)
         {
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
             // Many objects require that these legacy items are in the http context items... before we render this template we need to first
             // save the values in them so that we can re-set them after we render so the rest of the execution works as per normal
-            oldPublishedRequest = _umbracoContextAccessor.UmbracoContext.PublishedRequest;
+            oldPublishedRequest = umbracoContext.PublishedRequest;
         }
 
         /// <summary>
@@ -206,7 +214,11 @@ namespace Umbraco.Cms.Web.Common.Templates
         /// </summary>
         private void RestoreItems(IPublishedRequest oldPublishedRequest)
         {
-            _umbracoContextAccessor.UmbracoContext.PublishedRequest = oldPublishedRequest;
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
+            umbracoContext.PublishedRequest = oldPublishedRequest;
         }
     }
 }

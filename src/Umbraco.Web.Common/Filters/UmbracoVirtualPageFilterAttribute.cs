@@ -53,9 +53,13 @@ namespace Umbraco.Cms.Web.Common.Filters
         {
             if (content != null)
             {
-                IUmbracoContextAccessor umbracoContext = context.HttpContext.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
+                IUmbracoContextAccessor umbracoContextAccessor = context.HttpContext.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
                 IPublishedRouter router = context.HttpContext.RequestServices.GetRequiredService<IPublishedRouter>();
-                IPublishedRequestBuilder requestBuilder = await router.CreateRequestAsync(umbracoContext.UmbracoContext.CleanedUmbracoUrl);
+                if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+                {
+                    throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+                }
+                IPublishedRequestBuilder requestBuilder = await router.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
                 requestBuilder.SetPublishedContent(content);
                 IPublishedRequest publishedRequest = requestBuilder.Build();
 
