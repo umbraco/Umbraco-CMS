@@ -88,7 +88,7 @@ namespace Umbraco.Extensions
             this IHtmlHelper htmlHelper,
             string partialViewName,
             object model,
-            int cachedSeconds,
+            TimeSpan cacheTimeout,
             bool cacheByPage = false,
             bool cacheByMember = false,
             ViewDataDictionary viewData = null,
@@ -129,7 +129,7 @@ namespace Umbraco.Extensions
             var appCaches = GetRequiredService<AppCaches>(htmlHelper);
             var hostingEnvironment = GetRequiredService<IHostingEnvironment>(htmlHelper);
 
-            return appCaches.CachedPartialView(hostingEnvironment, htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
+            return appCaches.CachedPartialView(hostingEnvironment, htmlHelper, partialViewName, model, cacheTimeout, cacheKey.ToString(), viewData);
         }
 
         // public static IHtmlContent EditorFor<T>(this IHtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
