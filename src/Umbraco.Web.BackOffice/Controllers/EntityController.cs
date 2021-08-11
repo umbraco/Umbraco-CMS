@@ -503,7 +503,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //all udi types will need to be the same in this list so we'll determine by the first
-            //currently we only support GuidIdi for this method
+            //currently we only support GuidUdi for this method
 
             var guidUdi = ids[0] as GuidUdi;
             if (guidUdi != null)
@@ -1183,16 +1183,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         private static readonly string[] _postFilterSplitStrings = new[]
-            {
-                "=",
-                "==",
-                "!=",
-                "<>",
-                ">",
-                "<",
-                ">=",
-                "<="
-            };
+        {
+            "=",
+            "==",
+            "!=",
+            "<>",
+            ">",
+            "<",
+            ">=",
+            "<="
+        };
+
         private static QueryCondition BuildQueryCondition<T>(string postFilter)
         {
             var postFilterParts = postFilter.Split(_postFilterSplitStrings, 2, StringSplitOptions.RemoveEmptyEntries);

@@ -40,6 +40,8 @@
 
         vm.$onInit = onInit;
         vm.change = change;
+        vm.keyDown = keyDown;
+        vm.blur = blur;
 
         function onInit() {
             vm.inputId = vm.inputId || "umb-search-filter_" + String.CreateGuid();
@@ -63,6 +65,23 @@
                 }, 0);
             }
         }
+
+        function blur() {
+            if (vm.onBlur) {
+                vm.onBlur();
+            }
+        }
+
+        function keyDown(evt) {
+            //13: enter
+            switch (evt.keyCode) {
+                case 13:
+                    if (vm.onSearch) {
+                        vm.onSearch();
+                    }
+                    break;
+            }
+        }
     }
 
     var component = {
@@ -76,6 +95,8 @@
             text: "@",
             labelKey: "@?",
             onChange: "&?",
+            onSearch: "&?",
+            onBlur: "&?",
             autoFocus: "<?",
             preventSubmitOnEnter: "<?",
             cssClass: "@?"

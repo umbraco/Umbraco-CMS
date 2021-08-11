@@ -574,6 +574,8 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                             var listViewResults = vm.searchInfo.selectedSearchResults.filter(i => i.parentId === child.id);
 
                             listViewResults.forEach(item => {
+                                if (!child.children) return;
+
                                 var childExists = child.children.find(c => c.id === item.id);
 
                                 if (!childExists) {

@@ -71,13 +71,13 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 return true;
 
             //before we use regex to match do some faster simple matching since this is going to execute quite a lot
-            if (!fieldName.Contains("_") || !fieldName.Contains("-"))
+            if (!fieldName.Contains("_"))
                 return false;
 
             var match = UmbracoExamineExtensions.CultureIsoCodeFieldNameMatchExpression.Match(fieldName);
-            if (match.Success && match.Groups.Count == 3)
+            if (match.Success)
             {
-                var nonCultureFieldName = match.Groups[1].Value;
+                var nonCultureFieldName = match.Groups["FieldName"].Value;
                 //check if there's a definition for this and if so return the field definition for the culture field based on the non-culture field
                 if (base.TryGetValue(nonCultureFieldName, out var existingFieldDefinition))
                 {

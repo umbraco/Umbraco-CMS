@@ -29,7 +29,7 @@ angular.module("umbraco.directives")
                                 var childInputs = tabbableService.tabbable(mutation.target);
 
                                 //For each item in childInputs - override or set HTML attribute tabindex="-1"
-                                angular.forEach(childInputs, function (element) {
+                                Utilities.forEach(childInputs, element => {
                                     $(element).attr('tabindex', '-1');
                                 });
                             }

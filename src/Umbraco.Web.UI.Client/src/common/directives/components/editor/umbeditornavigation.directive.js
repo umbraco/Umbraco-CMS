@@ -17,19 +17,19 @@
                 name: "More"
             };
 
-            scope.openNavigationItem = function(item) {
+            scope.openNavigationItem = item => {
                 
                 scope.showDropdown = false;
                 runItemAction(item);
                 setItemToActive(item);
-                if(scope.onSelect) {
+                if (scope.onSelect) {
                     scope.onSelect({"item": item});
                 }
                 eventsService.emit("app.tabChange", item);
             };
 
-            scope.openAnchorItem = function(item, anchor) {
-                if(scope.onAnchorSelect) {
+            scope.openAnchorItem = (item, anchor) => {
+                if (scope.onAnchorSelect) {
                     scope.onAnchorSelect({"item": item, "anchor": anchor});
                 }
                 if (item.active !== true) {
@@ -37,11 +37,11 @@
                 }
             };
 
-            scope.toggleDropdown = function () {
+            scope.toggleDropdown = () => {
                 scope.showDropdown = !scope.showDropdown;
             };
 
-            scope.hideDropdown = function() {
+            scope.hideDropdown = () => {
                 scope.showDropdown = false;
             };
 
@@ -60,7 +60,7 @@
             function calculateVisibleItems(windowWidth) {
 
                 // if we don't get a windowWidth stick with the default item limit
-                if(!windowWidth) {
+                if (!windowWidth) {
                     return;
                 }
 
@@ -94,7 +94,7 @@
                 if (selectedItem.view) {
                     
                     // deselect all items
-                    angular.forEach(scope.navigation, function(item, index){
+                    Utilities.forEach(scope.navigation, item => {
                         item.active = false;
                     });
                     
@@ -112,8 +112,8 @@
                 }
             }
 
-            var resizeCallback = function(size) {
-                if(size && size.width) {
+            var resizeCallback = size => {
+                if (size && size.width) {
                     calculateVisibleItems(size.width);
                 }
             };
