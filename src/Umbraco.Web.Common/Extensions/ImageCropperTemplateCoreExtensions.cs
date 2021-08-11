@@ -324,7 +324,7 @@ namespace Umbraco.Extensions
             ImageUrlGenerationOptions options;
             if (cropDataSet != null && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
-                var crop = cropDataSet.GetCrop(cropAlias);
+                ImageCropperValue.ImageCropperCrop crop = cropDataSet.GetCrop(cropAlias);
 
                 // If a crop was specified, but not found, return null
                 if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))

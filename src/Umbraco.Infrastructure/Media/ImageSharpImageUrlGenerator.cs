@@ -70,12 +70,12 @@ namespace Umbraco.Cms.Infrastructure.Media
                 AddQueryString("quality", options.Quality.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(options.FurtherOptions))
+            if (string.IsNullOrWhiteSpace(options.FurtherOptions) == false)
             {
                 AppendQueryString(options.FurtherOptions.TrimStart('?', '&'));
             }
 
-            if (!string.IsNullOrWhiteSpace(options.CacheBusterValue))
+            if (string.IsNullOrWhiteSpace(options.CacheBusterValue) == false)
             {
                 AddQueryString("rnd", options.CacheBusterValue);
             }
