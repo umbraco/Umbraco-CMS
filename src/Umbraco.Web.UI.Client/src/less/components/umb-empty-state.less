@@ -1,23 +1,29 @@
 .umb-empty-state {
-	font-size: @fontSizeMedium;
-	line-height: 1.8em;
-	color: @gray-4;
-	text-align: center;
-}
+    font-size: @fontSizeMedium;
+    line-height: 1.5;
+    color: @gray-4;
+    text-align: center;
 
-.umb-empty-state.-small {
-	font-size: 14px;
-}
+    small {
+        display: inline-block;
+        margin-top: 0.5rem;
+        line-height: 1.6;
+    }
 
-.umb-empty-state.-large {
-	font-size: @fontSizeLarge;
-}
+    &.-small {
+        font-size: 14px;
+    }
 
-.umb-empty-state.-center {
-	position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    width: 80%;
-    max-width: 400px;
+    &.-large {
+        font-size: @fontSizeLarge;
+    }
+
+    &.-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-width: 400px;
+    }
 }
