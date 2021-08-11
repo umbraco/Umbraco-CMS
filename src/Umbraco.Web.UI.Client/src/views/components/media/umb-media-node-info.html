@@ -18,7 +18,7 @@
                 <ul ng-if="nodeUrl" class="nav nav-stacked mb0">
                     <li>
                         <a href="" ng-attr-href="{{node.extension !== 'svg' ? nodeUrl : undefined}}" ng-click="node.extension === 'svg' && openSVG()" target="_blank" rel="noopener" class="umb-outline">
-                            <i class="icon icon-out" aria-hidden="true"></i>
+                            <umb-icon icon="icon-out" class="icon"></umb-icon>
                             <span>{{nodeFileName}}</span>
                         </a>
                     </li>
@@ -57,7 +57,7 @@
                     </div>
                     <div class="umb-table-body">
                         <div class="umb-table-row" ng-repeat="reference in contentReferences.items">
-                            <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                            <div class="umb-table-cell"><umb-icon icon="{{reference.icon}}" class="umb-table-body__icon"></umb-icon></div>
                             <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                             <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                             <div class="umb-table-cell umb-table-cell--nano"><a ng-href="#/content/content/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
@@ -93,7 +93,7 @@
                     </div>
                     <div class="umb-table-body">
                         <div class="umb-table-row" ng-repeat="reference in memberReferences.items">
-                            <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                            <div class="umb-table-cell"><umb-icon icon="{{reference.icon}}" class="umb-table-body__icon"></umb-icon></div>
                             <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                             <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                             <div class="umb-table-cell umb-table-cell--nano"><a href="#/member/member/edit/{{::reference.key}}"><localize key="general_open">Open</localize></a></div>
@@ -129,7 +129,7 @@
                     </div>
                     <div class="umb-table-body">
                         <div class="umb-table-row" ng-repeat="reference in mediaReferences.items">
-                            <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                            <div class="umb-table-cell"><umb-icon icon="{{reference.icon}}" class="umb-table-body__icon"></umb-icon></div>
                             <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                             <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                             <div class="umb-table-cell umb-table-cell--nano"><a href="#/media/media/edit/{{::reference.id}}"><localize key="general_open">Open</localize></a></div>
