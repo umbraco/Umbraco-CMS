@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.DataProtection;
@@ -18,6 +19,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Web.Mvc;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -82,7 +84,7 @@ namespace Umbraco.Extensions
 
         }
 
-        public static IHtmlContent CachedPartial(
+        public static async Task<IHtmlContent> CachedPartialAsync(
             this IHtmlHelper htmlHelper,
             string partialViewName,
             object model,
@@ -113,11 +115,9 @@ namespace Umbraco.Extensions
 
             if (cacheByMember)
             {
-                // TODO reintroduce when members are migrated
-                throw new NotImplementedException("Reintroduce when members are migrated");
-                // var helper = Current.MembershipHelper;
-                // var currentMember = helper.GetCurrentMember();
-                // cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
+                var memberManager = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
+                var currentMember = await memberManager.GetCurrentMemberAsync();
+                cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? "0");
             }
 
             if (contextualKeyBuilder != null)
