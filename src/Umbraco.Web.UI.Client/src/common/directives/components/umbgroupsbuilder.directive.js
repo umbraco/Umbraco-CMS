@@ -174,20 +174,6 @@
                     }
                 };
 
-                scope.convertGroupToTab = function (group) {
-                    if (!group) {
-                        return;
-                    }
-
-                    group.type = TYPE_TAB;
-                    const newAlias = contentEditingHelper.generateLocalAlias(group.name);
-                    group.alias = createUniqueAlias(newAlias);
-                    group.parentAlias = null;
-                    scope.tabs.push(group);
-                    scope.$broadcast('umbOverflowChecker.checkOverflow');
-                    scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
-                }
-
                 scope.sortableRequestedTabAlias = null;
                 scope.sortableRequestedTabTimeout = null;
                 scope.droppableOptionsTab = {
@@ -793,6 +779,20 @@
                 const sortedGroups = $filter('orderBy')(groupsInTab, 'sortOrder');
                 scope.model.groups = [...otherGroups, ...sortedGroups];
             };
+
+            scope.convertGroupToTab = function (group) {
+                if (!group) {
+                    return;
+                }
+
+                group.type = TYPE_TAB;
+                const newAlias = contentEditingHelper.generateLocalAlias(group.name);
+                group.alias = createUniqueAlias(newAlias);
+                group.parentAlias = null;
+                scope.tabs.push(group);
+                scope.$broadcast('umbOverflowChecker.checkOverflow');
+                scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
+            }
 
             /* ---------- PROPERTIES ---------- */
             scope.addPropertyToActiveGroup = () => {
