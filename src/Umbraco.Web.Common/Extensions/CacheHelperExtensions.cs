@@ -20,7 +20,7 @@ namespace Umbraco.Extensions
         /// <param name="htmlHelper"></param>
         /// <param name="partialViewName"></param>
         /// <param name="model"></param>
-        /// <param name="cachedSeconds"></param>
+        /// <param name="cacheTimeout"></param>
         /// <param name="cacheKey">used to cache the partial view, this key could change if it is cached by page or by member</param>
         /// <param name="viewData"></param>
         /// <returns></returns>
@@ -30,7 +30,7 @@ namespace Umbraco.Extensions
             IHtmlHelper htmlHelper,
             string partialViewName,
             object model,
-            int cachedSeconds,
+            TimeSpan cacheTimeout,
             string cacheKey,
             ViewDataDictionary viewData = null)
         {
@@ -41,10 +41,12 @@ namespace Umbraco.Extensions
                 return htmlHelper.Partial(partialViewName, model, viewData);
             }
 
-            return appCaches.RuntimeCache.GetCacheItem<IHtmlContent>(
+            var result = appCaches.RuntimeCache.GetCacheItem<IHtmlContent>(
                 CoreCacheHelperExtensions.PartialViewCacheKey + cacheKey,
-                () => htmlHelper.Partial(partialViewName, model, viewData),
-                timeout: new TimeSpan(0, 0, 0, cachedSeconds));
+                () => new HtmlString(htmlHelper.Partial(partialViewName, model, viewData).ToHtmlString()),
+                timeout: cacheTimeout);
+
+            return result;
         }
 
     }
