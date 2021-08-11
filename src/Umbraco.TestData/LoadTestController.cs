@@ -44,7 +44,7 @@ namespace Umbraco.TestData
 <body>
   <div class=""head"">
   <h1><a href=""/LoadTest"">LoadTest</a></h1>
-  <div class=""ver"">" + System.Configuration.ConfigurationManager.AppSettings["umbracoConfigurationStatus"] + @"</div>
+  <div class=""ver"">@_umbracoVersion.SemanticVersion</div>
   </div>
 ";
 
@@ -53,13 +53,14 @@ namespace Umbraco.TestData
 
         private static readonly string s_containerTemplateText = @"
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@inject Umbraco.Cms.Core.Configuration.IUmbracoVersion _umbracoVersion
 @{
     Layout = null;
     var container = Umbraco.ContentAtRoot().OfTypes(""" + ContainerAlias + @""").FirstOrDefault();
     var contents = container.Children().ToArray();
     var groups = contents.GroupBy(x => x.Value<string>(""origin""));
     var id = contents.Length > 0 ? contents[0].Id : -1;
-    var wurl = Request.QueryString[""u""] == ""1"";
+    var wurl = Context.Request.Query[""u""] == ""1"";
     var missing = contents.Length > 0 && contents[contents.Length - 1].Id - contents[0].Id >= contents.Length;
 }
 " + s_headHtml + @"
@@ -81,7 +82,7 @@ namespace Umbraco.TestData
 	}
     if (wurl)
     {
-        <div>@content.Id :: @content.Name :: @content.Url</div>
+        <div>@content.Id :: @content.Name :: @content.Url()</div>
     }
     else
     {
@@ -178,7 +179,7 @@ namespace Umbraco.TestData
             }
         }
 
-        private IActionResult ContentHtml(string s) => Content(s_headHtml + s + FootHtml);
+        private IActionResult ContentHtml(string s) => Content(s_headHtml + s + FootHtml, "text/html");
 
         public IActionResult Install()
         {
