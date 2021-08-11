@@ -1,7 +1,7 @@
 using System;
-using System.Configuration;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -11,25 +11,30 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
+using Umbraco.TestData.Configuration;
 
 namespace Umbraco.TestData
 {
     public class SegmentTestController : SurfaceController
     {
+        private IOptions<TestDataSettings> _testDataSettings;
+
         public SegmentTestController(
             IUmbracoContextAccessor umbracoContextAccessor,
             IUmbracoDatabaseFactory databaseFactory,
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IOptions<TestDataSettings> testDataSettings)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
+            _testDataSettings = testDataSettings;
         }
 
         public IActionResult EnableDocTypeSegments(string alias, string propertyTypeAlias)
         {
-            if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
+            if(_testDataSettings.Value.Enabled != true)
             {
                 return HttpNotFound();
             }
@@ -62,7 +67,7 @@ namespace Umbraco.TestData
 
         public IActionResult DisableDocTypeSegments(string alias)
         {
-            if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
+            if (_testDataSettings.Value.Enabled != true)
             {
                 return HttpNotFound();
             }
