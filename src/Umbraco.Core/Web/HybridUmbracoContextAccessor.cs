@@ -17,10 +17,18 @@ namespace Umbraco.Cms.Core.Web
         /// <summary>
         /// Gets or sets the <see cref="UmbracoContext"/> object.
         /// </summary>
+        ///
         public IUmbracoContext UmbracoContext
         {
             get => Value;
             set => Value = value;
+        }
+
+        public bool TryGetUmbracoContext(out IUmbracoContext umbracoContext)
+        {
+            umbracoContext = Value;
+
+            return umbracoContext is not null;
         }
     }
 }

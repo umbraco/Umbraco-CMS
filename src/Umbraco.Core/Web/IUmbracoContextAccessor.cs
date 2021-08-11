@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Web
+namespace Umbraco.Cms.Core.Web
 {
     /// <summary>
     /// Provides access to UmbracoContext.
@@ -6,5 +6,6 @@
     public interface IUmbracoContextAccessor
     {
         IUmbracoContext UmbracoContext { get; set;  }
+        bool TryGetUmbracoContext(out IUmbracoContext umbracoContext);
     }
 }

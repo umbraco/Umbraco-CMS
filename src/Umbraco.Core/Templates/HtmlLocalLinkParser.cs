@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Routing;
@@ -41,13 +41,14 @@ namespace Umbraco.Cms.Core.Templates
         /// <returns></returns>
         public string EnsureInternalLinks(string text, bool preview)
         {
-            if (_umbracoContextAccessor.UmbracoContext == null)
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
                 throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
-
+            }
             if (!preview)
                 return EnsureInternalLinks(text);
 
-            using (_umbracoContextAccessor.UmbracoContext.ForcedPreview(preview)) // force for URL provider
+            using (umbracoContext.ForcedPreview(preview)) // force for URL provider
             {
                 return EnsureInternalLinks(text);
             }
@@ -61,9 +62,10 @@ namespace Umbraco.Cms.Core.Templates
         /// <returns></returns>
         public string EnsureInternalLinks(string text)
         {
-            if (_umbracoContextAccessor.UmbracoContext == null)
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out _))
+            {
                 throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
-
+            }
 
             foreach((int? intId, GuidUdi udi, string tagValue) in FindLocalLinkIds(text))
             {

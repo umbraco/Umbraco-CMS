@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
@@ -48,9 +48,30 @@ namespace Umbraco.Cms.Core.Routing
 
         #region GetUrl
 
-        private IPublishedContent GetDocument(int id) => _umbracoContextAccessor.UmbracoContext.Content.GetById(id);
-        private IPublishedContent GetDocument(Guid id) => _umbracoContextAccessor.UmbracoContext.Content.GetById(id);
-        private IPublishedContent GetMedia(Guid id) => _umbracoContextAccessor.UmbracoContext.Media.GetById(id);
+        private IPublishedContent GetDocument(int id)
+        {
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("A current Umbraco context is not available");
+            }
+            return umbracoContext.Content.GetById(id);
+        }
+        private IPublishedContent GetDocument(Guid id)
+        {
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("A current Umbraco context is not available");
+            }
+            return umbracoContext.Content.GetById(id);
+        }
+        private IPublishedContent GetMedia(Guid id)
+        {
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("A current Umbraco context is not available");
+            }
+            return umbracoContext.Media.GetById(id);
+        }
 
         /// <summary>
         /// Gets the URL of a published content.
@@ -106,7 +127,14 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             if (current == null)
-                current = _umbracoContextAccessor.UmbracoContext.CleanedUmbracoUrl;
+            {
+                if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+                {
+                    throw new InvalidOperationException("A current Umbraco context is not available");
+                }
+                current = umbracoContext.CleanedUmbracoUrl;
+            }
+            
 
             var url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
                 .FirstOrDefault(u => u != null);
@@ -115,10 +143,14 @@ namespace Umbraco.Cms.Core.Routing
 
         public string GetUrlFromRoute(int id, string route, string culture)
         {
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("A current Umbraco context is not available");
+            }
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
-                : provider.GetUrlFromRoute(route, _umbracoContextAccessor.UmbracoContext, id, _umbracoContextAccessor.UmbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
+                : provider.GetUrlFromRoute(route, umbracoContext, id, umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Text;
             return url ?? "#";
         }
 
@@ -138,7 +170,11 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id)
         {
-            return GetOtherUrls(id, _umbracoContextAccessor.UmbracoContext.CleanedUmbracoUrl);
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("A current Umbraco context is not available");
+            }
+            return GetOtherUrls(id, umbracoContext.CleanedUmbracoUrl);
         }
 
         /// <summary>
@@ -189,7 +225,8 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         public string GetMediaUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
         {
-            if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
+            if (propertyAlias == null)
+                throw new ArgumentNullException(nameof(propertyAlias));
 
             if (content == null)
                 return "";
@@ -207,7 +244,14 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             if (current == null)
-                current = _umbracoContextAccessor.UmbracoContext.CleanedUmbracoUrl;
+            {
+                if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+                {
+                    throw new InvalidOperationException("A current Umbraco context is not available");
+                }
+                current = umbracoContext.CleanedUmbracoUrl;
+            }
+                
 
             var url = _mediaUrlProviders.Select(provider =>
                     provider.GetMediaUrl(content, propertyAlias, mode, culture, current))

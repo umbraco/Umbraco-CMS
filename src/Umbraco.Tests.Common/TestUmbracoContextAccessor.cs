@@ -17,5 +17,11 @@ namespace Umbraco.Cms.Tests.Common
         {
             UmbracoContext = umbracoContext;
         }
+
+        public bool TryGetUmbracoContext(out IUmbracoContext umbracoContext)
+        {
+            umbracoContext = UmbracoContext;
+            return umbracoContext is not null;
+        }
     }
 }

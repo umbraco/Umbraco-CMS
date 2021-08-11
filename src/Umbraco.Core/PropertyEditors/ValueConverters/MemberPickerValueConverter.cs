@@ -32,11 +32,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => PropertyCacheLevel.Snapshot;
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-            => typeof (IPublishedContent);
+            => typeof(IPublishedContent);
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
-            if (source == null) return null;
+            if (source == null)
+                return null;
 
             var attemptConvertInt = source.TryConvertTo<int>();
             if (attemptConvertInt.Success)
@@ -54,43 +55,44 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 return null;
             }
 
-            if (_umbracoContextAccessor.UmbracoContext != null)
+
+
+            IPublishedContent member;
+
+            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
             {
-                IPublishedContent member;
-                if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+            }
+            if (source is int id)
+            {
+                IMember m = _memberService.GetById(id);
+                if (m == null)
                 {
-                    throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
+                    return null;
                 }
-                if (source is int id)
+                member = publishedSnapshot.Members.Get(m);
+                if (member != null)
                 {
-                    IMember m = _memberService.GetById(id);
-                    if (m == null)
-                    {
-                        return null;
-                    }
-                    member = publishedSnapshot.Members.Get(m);
-                    if (member != null)
-                    {
-                        return member;
-                    }
+                    return member;
                 }
-                else
+            }
+            else
+            {
+                var sourceUdi = source as GuidUdi;
+                if (sourceUdi == null)
+                    return null;
+
+                IMember m = _memberService.GetByKey(sourceUdi.Guid);
+                if (m == null)
                 {
-                    var sourceUdi = source as GuidUdi;
-                    if (sourceUdi == null) return null;
+                    return null;
+                }
 
-                    IMember m = _memberService.GetByKey(sourceUdi.Guid);
-                    if (m == null)
-                    {
-                        return null;
-                    }
+                member = publishedSnapshot.Members.Get(m);
 
-                    member = publishedSnapshot.Members.Get(m);
-
-                    if (member != null)
-                    {
-                        return member;
-                    }
+                if (member != null)
+                {
+                    return member;
                 }
             }
 

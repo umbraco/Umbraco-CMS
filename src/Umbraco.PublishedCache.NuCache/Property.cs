@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     // elements cache (if we don't want to pollute the elements cache with short-lived
                     // data) depending on settings
                     // for members, always cache in the snapshot cache - never pollute elements cache
-                    if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out publishedSnapshot))
+                    if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out publishedSnapshot))
                     {
                         throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
                     }
