@@ -432,8 +432,7 @@ ORDER BY colName";
         {
             var list = new List<string>
             {
-                $"DELETE FROM umbracoUserLogin WHERE userId = @id",
-                "DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
                 $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
