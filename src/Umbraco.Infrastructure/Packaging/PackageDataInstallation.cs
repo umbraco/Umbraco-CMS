@@ -222,13 +222,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                TContentBase content = CreateContentFromXml(root, importedContentTypes[contentTypeAlias], default, parentId, service);
-                if (content == null)
+                if (TryCreateContentFromXml(root, importedContentTypes[contentTypeAlias], default, parentId, service,
+                    out TContentBase content))
                 {
-                    continue;
+                    contents.Add(content);
                 }
-
-                contents.Add(content);
 
                 var children = root.Elements().Where(doc => (string)doc.Attribute("isDoc") == string.Empty)
                     .ToList();
@@ -262,8 +260,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
 
                 //Create and add the child to the list
-                var content = CreateContentFromXml(child, importedContentTypes[contentTypeAlias], parent, default, service);
-                list.Add(content);
+                if (TryCreateContentFromXml(child, importedContentTypes[contentTypeAlias], parent, default, service, out var content))
+                {
+                    list.Add(content);
+                }
 
                 //Recursive call
                 var child1 = child;
@@ -278,21 +278,24 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return list;
         }
 
-        private T CreateContentFromXml<T, S>(
+        private bool TryCreateContentFromXml<T, S>(
             XElement element,
             S contentType,
             T parent,
             int parentId,
-            IContentServiceBase<T> service)
+            IContentServiceBase<T> service,
+            out T output)
             where T : class, IContentBase
             where S : IContentTypeComposition
         {
             Guid key = element.RequiredAttributeValue<Guid>("key");
 
             // we need to check if the content already exists and if so we ignore the installation for this item
-            if (service.GetById(key) != null)
+            var value = service.GetById(key);
+            if (value != null)
             {
-                return null;
+                output = value;
+                return false;
             }
 
             var level = element.Attribute("level").Value;
@@ -383,7 +386,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
             }
 
-            return content;
+            output = content;
+            return true;
         }
 
         private T CreateContent<T, S>(string name, T parent, int parentId, S contentType, Guid key, int level, int sortOrder, int? templateId)
@@ -498,7 +502,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             //Iterate the sorted document types and create them as IContentType objects
             foreach (XElement documentType in documentTypes)
             {
-                var alias = documentType.Element("Info").Element("Alias").Value;                
+                var alias = documentType.Element("Info").Element("Alias").Value;
 
                 if (importedContentTypes.ContainsKey(alias) == false)
                 {
@@ -1142,7 +1146,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDictionaryItem dictionaryItem;
             var itemName = dictionaryItemElement.Attribute("Name").Value;
             Guid key = dictionaryItemElement.RequiredAttributeValue<Guid>("Key");
-            
+
             dictionaryItem = _localizationService.GetDictionaryItemById(key);
             if (dictionaryItem != null)
             {
@@ -1277,7 +1281,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     throw new InvalidOperationException("No path attribute found");
                 }
                 var contents = element.Value ?? string.Empty;
-                
+
                 var physicalPath = _hostingEnvironment.MapPathContentRoot(path);
                 // TODO: Do we overwrite? IMO I don't think so since these will be views a user will change.
                 if (!System.IO.File.Exists(physicalPath))
@@ -1419,7 +1423,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 if (partialView == null)
                 {
                     var content = partialViewXml.Value ?? string.Empty;
-                    
+
                     partialView = new PartialView(PartialViewType.PartialView, path) { Content = content };
                     _fileService.SavePartialView(partialView, userId);
                     result.Add(partialView);

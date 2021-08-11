@@ -209,29 +209,46 @@ namespace Umbraco.Cms.Core.Packaging
                 PackageDataTypes(definition, root);
                 Dictionary<string, Stream> mediaFiles = PackageMedia(definition, root);
 
-                var tempPackagePath = temporaryPath + "/package.zip";
-
-                using (FileStream fileStream = File.OpenWrite(tempPackagePath))
-                using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
+                string fileName;
+                string tempPackagePath;
+                if (mediaFiles.Count > 0)
                 {
-                    ZipArchiveEntry packageXmlEntry = archive.CreateEntry("package.xml");
-                    using (Stream entryStream = packageXmlEntry.Open())
+                    fileName = "package.zip";
+                    tempPackagePath = Path.Combine(temporaryPath, fileName);
+                    using (FileStream fileStream = File.OpenWrite(tempPackagePath))
+                    using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                     {
-                        compiledPackageXml.Save(entryStream);
-                    }
-
-                    foreach (KeyValuePair<string, Stream> mediaFile in mediaFiles)
-                    {
-                        var entryPath = $"media{mediaFile.Key.EnsureStartsWith('/')}";
-                        ZipArchiveEntry mediaEntry = archive.CreateEntry(entryPath);
-                        using (Stream entryStream = mediaEntry.Open())
-                        using (mediaFile.Value)
+                        ZipArchiveEntry packageXmlEntry = archive.CreateEntry("package.xml");
+                        using (Stream entryStream = packageXmlEntry.Open())
                         {
-                            mediaFile.Value.Seek(0, SeekOrigin.Begin);
-                            mediaFile.Value.CopyTo(entryStream);
+                            compiledPackageXml.Save(entryStream);
+                        }
+
+                        foreach (KeyValuePair<string, Stream> mediaFile in mediaFiles)
+                        {
+                            var entryPath = $"media{mediaFile.Key.EnsureStartsWith('/')}";
+                            ZipArchiveEntry mediaEntry = archive.CreateEntry(entryPath);
+                            using (Stream entryStream = mediaEntry.Open())
+                            using (mediaFile.Value)
+                            {
+                                mediaFile.Value.Seek(0, SeekOrigin.Begin);
+                                mediaFile.Value.CopyTo(entryStream);
+                            }
                         }
                     }
                 }
+                else
+                {
+                    fileName = "package.xml";
+                    tempPackagePath = Path.Combine(temporaryPath, fileName);
+
+                    using (FileStream fileStream = File.OpenWrite(tempPackagePath))
+                    {
+                        compiledPackageXml.Save(fileStream);
+                    }
+                }
+
+
 
                 var directoryName =
                     _hostingEnvironment.MapPathWebRoot(Path.Combine(_mediaFolderPath, definition.Name.Replace(' ', '_')));
@@ -241,7 +258,7 @@ namespace Umbraco.Cms.Core.Packaging
                     Directory.CreateDirectory(directoryName);
                 }
 
-                var finalPackagePath = Path.Combine(directoryName, "package.zip");
+                var finalPackagePath = Path.Combine(directoryName, fileName);
 
                 if (File.Exists(finalPackagePath))
                 {
@@ -347,7 +364,7 @@ namespace Umbraco.Cms.Core.Packaging
                         }
                         else if (items.ContainsKey(dictionaryItem.ParentId.Value))
                         {
-                            // we know the parent exists in the dictionary but 
+                            // we know the parent exists in the dictionary but
                             // we haven't processed it yet so we'll leave it for the next loop
                             continue;
                         }
