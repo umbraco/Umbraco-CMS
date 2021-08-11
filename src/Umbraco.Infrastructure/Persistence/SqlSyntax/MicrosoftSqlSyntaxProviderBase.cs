@@ -22,8 +22,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
             DecimalColumnDefinition = "DECIMAL(38,6)";
             TimeColumnDefinition = "TIME"; //SQLSERVER 2008+
             BlobColumnDefinition = "VARBINARY(MAX)";
-
-            InitColumnTypeMap();
         }
 
         public override string RenameTable => "sp_rename '{0}', '{1}'";
@@ -78,7 +76,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         /// <returns></returns>
         public virtual SqlDbType GetSqlDbType(Type clrType)
         {
-            var dbType = DbTypeMap.ColumnDbTypeMap.First(x => x.Key == clrType).Value;
+            var dbType = DbTypeMap.ColumnDbTypeMap[clrType];
             return GetSqlDbType(dbType);
         }
 

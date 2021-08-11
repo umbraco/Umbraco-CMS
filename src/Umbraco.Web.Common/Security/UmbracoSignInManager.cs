@@ -198,6 +198,9 @@ namespace Umbraco.Cms.Web.Common.Security
             // code taken from aspnetcore: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
             // we also override to set the current HttpContext principal since this isn't done by default
 
+            // we also need to call our handle login to ensure all date/events are set
+            await HandleSignIn(user, user.UserName, SignInResult.Success);
+
             var userPrincipal = await CreateUserPrincipalAsync(user);
             foreach (var claim in additionalClaims)
             {
@@ -363,7 +366,7 @@ namespace Umbraco.Cms.Web.Common.Security
                 await Context.SignOutAsync(ExternalAuthenticationType);
             }
             if (loginProvider == null)
-            {
+            {                
                 await SignInWithClaimsAsync(user, isPersistent, new Claim[] { new Claim("amr", "pwd") });
             }
             else

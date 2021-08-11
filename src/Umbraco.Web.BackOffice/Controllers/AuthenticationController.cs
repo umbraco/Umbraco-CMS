@@ -181,14 +181,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                var opt = _externalAuthenticationOptions.Get(authType.Name);
+                BackOfficeExternaLoginProviderScheme opt = await _externalAuthenticationOptions.GetAsync(authType.Name);
                 if (opt == null)
                 {
                     return BadRequest($"Could not find external authentication options registered for provider {unlinkLoginModel.LoginProvider}");
                 }
                 else
                 {
-                    if (!opt.Options.AutoLinkOptions.AllowManualLinking)
+                    if (!opt.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking)
                     {
                         // If AllowManualLinking is disabled for this provider we cannot unlink
                         return BadRequest();
