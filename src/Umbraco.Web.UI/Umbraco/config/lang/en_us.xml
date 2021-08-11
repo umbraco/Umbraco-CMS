@@ -1758,6 +1758,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmDeleteTabNotice">This will also delete all items below this tab.</key>
     <key alias="confirmDeleteGroupNotice">This will also delete all items below this group.</key>
     <key alias="addTab">Add tab</key>
+    <key alias="convertToTab">Convert to tab</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

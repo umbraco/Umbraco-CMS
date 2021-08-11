@@ -1,10 +1,12 @@
 angular.module("umbraco.directives")
-    .directive('umbDroppable', function () {
+    .directive('umbDroppable', function ($timeout) {
         return {
-            restrict: 'A',            
+            restrict: 'A',
             link: function (scope, element, attrs) {
-                const options = scope.$eval(attrs.umbDroppable)
-                element.droppable(options);
+                $timeout(() => {
+                    const options = scope.$eval(attrs.umbDroppable)
+                    element.droppable(options);
+                });
             }
         }
     });

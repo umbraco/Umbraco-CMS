@@ -33,7 +33,14 @@
                 properties: []
             };
 
-            eventBindings.push(scope.$watchCollection('model.groups', newValue => {
+            let tabsInitialized = false;
+
+            eventBindings.push(scope.$watchCollection('model.groups', (newValue, oldValue) => {
+                // we only want to run this logic when new groups are added or removed
+                if (newValue.length === oldValue.length && tabsInitialized) {
+                    tabsInitialized = true;
+                    return;
+                }
 
                 contentEditingHelper.defineParentAliasOnGroups(newValue);
                 contentEditingHelper.relocateDisorientedGroups(newValue);
@@ -60,6 +67,8 @@
                 } else if (!scope.openTabAlias && scope.tabs.length > 0) {
                     scope.openTabAlias = scope.tabs[0].alias;
                 }
+
+                tabsInitialized = true;
             }));
 
             function activate() {
@@ -110,27 +119,31 @@
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
                     stop: (e, ui) => {
-
                         const groupKey = ui.item[0].dataset.groupKey ? ui.item[0].dataset.groupKey : false;
                         const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
 
-                        // Update aliases
-                        const parentAlias = scope.openTabAlias,
-                            oldAlias = group.alias || null, // null when group comes from root aka. 'generic'
-                            newAlias = contentEditingHelper.updateParentAlias(oldAlias, parentAlias);
+                        // the code also runs when you convert a group to a tab.
+                        // We want to make sure it only run when groups are reordered
+                        if (group && group.type === TYPE_GROUP) {
 
-                        // Check alias is unique
-                        // TODO: we should properly do this on hover, to let user know it cant be moved.
-                        if (isAliasUnique(newAlias) === false) {
-                            return;
+                            // Update aliases
+                            const parentAlias = scope.openTabAlias,
+                                oldAlias = group.alias || null, // null when group comes from root aka. 'generic'
+                                newAlias = contentEditingHelper.updateParentAlias(oldAlias, parentAlias);
+    
+                            // Check alias is unique
+                            // TODO: we should properly do this on hover, to let user know it cant be moved.
+                            if (isAliasUnique(newAlias) === false) {
+                                return;
+                            }
+    
+                            group.alias = newAlias;
+                            group.parentAlias = parentAlias;
+                            contentEditingHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
+    
+                            const groupsInTab = scope.model.groups.filter(group => group.parentAlias === parentAlias);
+                            updateSortOrder(groupsInTab);
                         }
-
-                        group.alias = newAlias;
-                        group.parentAlias = parentAlias;
-                        contentEditingHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
-
-                        const groupsInTab = scope.model.groups.filter(group => group.parentAlias === parentAlias);
-                        updateSortOrder(groupsInTab);
                     }
                 };
 
@@ -148,13 +161,39 @@
                     }
                 };
 
+                scope.droppableOptionsConvert = {
+                    accept: '.umb-group-builder__group-sortable',
+                    tolerance : 'pointer',
+                    drop: (evt, ui) => {
+                        const groupKey = ui.draggable[0].dataset.groupKey ? ui.draggable[0].dataset.groupKey : false;
+                        const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
+
+                        if (group) {
+                            scope.convertGroupToTab(group);
+                        }
+                    }
+                };
+
+                scope.convertGroupToTab = function (group) {
+                    if (!group) {
+                        return;
+                    }
+
+                    group.type = TYPE_TAB;
+                    const newAlias = contentEditingHelper.generateLocalAlias(group.name);
+                    group.alias = createUniqueAlias(newAlias);
+                    group.parentAlias = null;
+                    scope.tabs.push(group);
+                    scope.$broadcast('umbOverflowChecker.checkOverflow');
+                    scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
+                }
+
                 scope.sortableRequestedTabAlias = null;
                 scope.sortableRequestedTabTimeout = null;
                 scope.droppableOptionsTab = {
                     accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
                     tolerance : 'pointer',
                     over: (evt, ui) => {
-
                         const hoveredTabAlias = evt.target.dataset.tabAlias || null;
 
                         // if group
@@ -339,7 +378,7 @@
                 }
 
                 checkGenericTabVisibility();
-
+                scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
             scope.openCompositionsDialog = () => {
@@ -502,8 +541,8 @@
 
                 scope.openTabAlias = tab.alias;
 
-                scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
+                scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
             };
 
             scope.removeTab = (tab, indexInTabs) => {

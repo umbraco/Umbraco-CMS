@@ -927,3 +927,23 @@ input.umb-group-builder__group-sort-value {
         width: 100%;
     }
 }
+
+// Convert to tab dropzone
+.umb-group-builder__convert-dropzone {
+  display: inline-block;
+  border: 1px dashed @gray-7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 15px;
+  border-radius: @baseBorderRadius;
+  opacity: 0;
+
+  &.ui-droppable-hover {
+    border-color: @black;
+  }
+
+  &.ui-droppable-active {
+    opacity: 1;
+  }
+}
