@@ -14,7 +14,7 @@
                         ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
                         ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
                     <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
-                        <i class="icon icon-add" aria-hidden="true"></i>
+                        <umb-icon icon="icon-add" class="icon"></umb-icon>
                     </div>
                 </button>
 
@@ -36,15 +36,14 @@
                 <localize ng-if="vm.availableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
                 <localize ng-if="vm.availableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.availableBlockTypes[0].elementTypeModel.name]">Add content</localize>
             </button>
-            <button
-                type="button"
-                class="btn-reset umb-block-list__clipboard-button umb-outline"
-                ng-class="{'--jump': vm.jumpClipboardButton}"
-                ng-disabled="vm.clipboardItems.length === 0"
-                ng-click="vm.requestShowClipboard(vm.layout.length, $event)"
-                localize="title"
-                title="@blockEditor_tabClipboard">
-                <i class="icon icon-paste-in" aria-hidden="true"></i>
+            <button type="button"
+                    class="btn-reset umb-block-list__clipboard-button umb-outline"
+                    ng-class="{'--jump': vm.jumpClipboardButton}"
+                    ng-disabled="vm.clipboardItems.length === 0"
+                    ng-click="vm.requestShowClipboard(vm.layout.length, $event)"
+                    localize="title"
+                    title="@blockEditor_tabClipboard">
+                <umb-icon icon="icon-paste-in" class="icon"></umb-icon>
                 <span class="sr-only">
                     <localize key="blockEditor_tabClipboard">Clipboard</localize>
                 </span>

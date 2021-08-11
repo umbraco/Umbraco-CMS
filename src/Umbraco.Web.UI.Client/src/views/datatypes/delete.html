@@ -50,8 +50,18 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="relation in vm.references.documentTypes">
-                                        <td><a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</a></td>
-                                        <td><div><p class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}</p></div></td>
+                                        <td>
+                                            <a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)">
+                                                <umb-icon icon="{{relation.icon}}" class="umb-table-body__icon"></umb-icon> {{::relation.name}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <p class="red" ng-repeat="property in relation.properties">
+                                                    <umb-icon icon="icon-alert" class="icon red"></umb-icon> {{::property.name}}
+                                                </p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -74,8 +84,18 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="relation in vm.references.mediaTypes">
-                                        <td><a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</a></td>
-                                        <td><div><p class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}</p></div></td>
+                                        <td>
+                                            <a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)">
+                                                <umb-icon icon="{{relation.icon}}" class="umb-table-body__icon"></umb-icon> {{::relation.name}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <p class="red" ng-repeat="property in relation.properties">
+                                                    <umb-icon icon="icon-alert" class="icon red"></umb-icon> {{::property.name}}
+                                                </p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -98,8 +118,18 @@
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="relation in vm.references.memberTypes">
-                                            <td><a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</a></td>
-                                            <td><div><p class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}</p></div></td>
+                                            <td>
+                                                <a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)">
+                                                    <umb-icon icon="{{relation.icon}}" class="umb-table-body__icon"></umb-icon> {{::relation.name}}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <p class="red" ng-repeat="property in relation.properties">
+                                                        <umb-icon icon="icon-alert" class="icon red"></umb-icon> {{::property.name}}
+                                                    </p>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>

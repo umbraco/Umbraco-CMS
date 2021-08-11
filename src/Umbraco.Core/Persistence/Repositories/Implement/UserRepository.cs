@@ -420,13 +420,14 @@ ORDER BY colName";
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoUser.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.User}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
             {
+                "DELETE FROM umbracoUserLogin WHERE userId = @id",
                 "DELETE FROM umbracoUser2UserGroup WHERE userId = @id",
                 "DELETE FROM umbracoUser2NodeNotify WHERE userId = @id",
                 "DELETE FROM umbracoUserStartNode WHERE userId = @id",

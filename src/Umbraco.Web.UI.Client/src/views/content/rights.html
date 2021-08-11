@@ -40,7 +40,7 @@
                         <umb-dropdown ng-if="vm.groupsDropdownOpen" on-close="vm.groupsDropdownOpen = false" deep-blur="vm.groupsDropdownOpen = !vm.groupsDropdownOpen">
                             <umb-dropdown-item ng-repeat="group in vm.availableUserGroups | filter:{selected: '!true'}">
                                 <button type="button" ng-click="vm.editPermissions(group)">
-                                    <i class="{{group.icon}}" aria-hidden="true"></i>
+                                    <umb-icon icon="{{group.icon}}"></umb-icon>
                                     {{group.name}}
                                 </button>
                             </umb-dropdown-item>
