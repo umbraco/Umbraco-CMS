@@ -265,8 +265,11 @@ namespace Umbraco.Cms.Core.Routing
 
             // note - we are not handling schemes nor ports here.
             _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
-
-            IDomainCache domainsCache = _umbracoContextAccessor.UmbracoContext.PublishedSnapshot.Domains;
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
+            IDomainCache domainsCache = umbracoContext.PublishedSnapshot.Domains;
             var domains = domainsCache.GetAll(includeWildcards: false).ToList();
 
             // determines whether a domain corresponds to a published document, since some
@@ -276,7 +279,7 @@ namespace Umbraco.Cms.Core.Routing
             bool IsPublishedContentDomain(Domain domain)
             {
                 // just get it from content cache - optimize there, not here
-                IPublishedContent domainDocument = _umbracoContextAccessor.UmbracoContext.PublishedSnapshot.Content.GetById(domain.ContentId);
+                IPublishedContent domainDocument = umbracoContext.PublishedSnapshot.Content.GetById(domain.ContentId);
 
                 // not published - at all
                 if (domainDocument == null)
@@ -344,7 +347,11 @@ namespace Umbraco.Cms.Core.Routing
             var nodePath = request.PublishedContent.Path;
             _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
             var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
-            Domain domain = DomainUtilities.FindWildcardDomainInPath(_umbracoContextAccessor.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
+            Domain domain = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
 
             // always has a contentId and a culture
             if (domain != null)
@@ -497,12 +504,16 @@ namespace Umbraco.Cms.Core.Routing
             var valid = false;
             IPublishedContent internalRedirectNode = null;
             var internalRedirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
 
             if (internalRedirectId > 0)
             {
                 // try and get the redirect node from a legacy integer ID
                 valid = true;
-                internalRedirectNode = _umbracoContextAccessor.UmbracoContext.Content.GetById(internalRedirectId);
+                internalRedirectNode = umbracoContext.Content.GetById(internalRedirectId);
             }
             else
             {
@@ -511,7 +522,7 @@ namespace Umbraco.Cms.Core.Routing
                 {
                     // try and get the redirect node from a UDI Guid
                     valid = true;
-                    internalRedirectNode = _umbracoContextAccessor.UmbracoContext.Content.GetById(udiInternalRedirectId.Guid);
+                    internalRedirectNode = umbracoContext.Content.GetById(udiInternalRedirectId.Guid);
                 }
             }
 

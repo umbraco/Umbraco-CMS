@@ -23,5 +23,7 @@ namespace Umbraco.Cms.Tests.Common
             umbracoContext = UmbracoContext;
             return umbracoContext is not null;
         }
+
+        public void Clear() => UmbracoContext = null;
     }
 }

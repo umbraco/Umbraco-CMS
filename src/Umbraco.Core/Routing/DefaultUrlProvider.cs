@@ -34,8 +34,10 @@ namespace Umbraco.Cms.Core.Routing
         public virtual UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             if (!current.IsAbsoluteUri) throw new ArgumentException("Current URL must be absolute.", nameof(current));
-
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
             // will not use cache if previewing
             var route = umbracoContext.Content.GetRouteById(content.Id, culture);
 
@@ -81,7 +83,10 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
+            }
             var node = umbracoContext.Content.GetById(id);
             if (node == null)
             {

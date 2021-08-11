@@ -1,4 +1,5 @@
 
+using System;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
 
@@ -28,15 +29,14 @@ namespace Umbraco.Cms.Core.Routing
         /// <inheritdoc/>
         public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            IUmbracoContext umbCtx = _umbracoContextAccessor.UmbracoContext;
-            if (umbCtx == null)
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
-                return false;
+                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
             }
 
             if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"), out int pageId))
             {
-                IPublishedContent doc = umbCtx.Content.GetById(pageId);
+                IPublishedContent doc = umbracoContext.Content.GetById(pageId);
 
                 if (doc != null)
                 {

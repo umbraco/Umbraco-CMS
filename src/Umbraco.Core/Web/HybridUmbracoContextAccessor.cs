@@ -30,5 +30,6 @@ namespace Umbraco.Cms.Core.Web
 
             return umbracoContext is not null;
         }
+        public void Clear() => Value = null;
     }
 }
