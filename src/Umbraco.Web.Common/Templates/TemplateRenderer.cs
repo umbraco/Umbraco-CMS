@@ -152,8 +152,8 @@ namespace Umbraco.Cms.Web.Common.Templates
         {
             var httpContext = _httpContextAccessor.GetRequiredHttpContext();
 
-            // isMainPage is set to true here in order for the _ViewStart.cshtml to be rendered
-            var viewResult = _viewEngine.GetView(null, $"~/Views/{request.GetTemplateAlias()}.cshtml", true);
+            // isMainPage is set to true here to ensure ViewStart(s) found in the view hierarchy are rendered
+            var viewResult = _viewEngine.GetView(null, $"~/Views/{request.GetTemplateAlias()}.cshtml", isMainPage: true);
 
             if (viewResult.Success == false)
             {
