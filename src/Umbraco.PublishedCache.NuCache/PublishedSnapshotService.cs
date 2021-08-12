@@ -212,36 +212,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return path;
         }
 
-        private void DeleteLocalFilesForContent()
-        {
-            if (Volatile.Read(ref _isReady) && _localContentDb != null)
-            {
-                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-            }
-
-            var path = GetLocalFilesPath();
-            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
-            if (File.Exists(localContentDbPath))
-            {
-                File.Delete(localContentDbPath);
-            }
-        }
-
-        private void DeleteLocalFilesForMedia()
-        {
-            if (Volatile.Read(ref _isReady) && _localMediaDb != null)
-            {
-                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-            }
-
-            var path = GetLocalFilesPath();
-            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-            if (File.Exists(localMediaDbPath))
-            {
-                File.Delete(localMediaDbPath);
-            }
-        }
-
         /// <summary>
         /// Lazily populates the stores only when they are first requested
         /// </summary>
@@ -511,13 +481,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
-            // no cache, trash everything
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                DeleteLocalFilesForContent();
-                draftChanged = publishedChanged = true;
-                return;
-            }
+            EnsureCaches();
 
             using (_contentStore.GetScopedWriteLock(_scopeProvider))
             {
@@ -612,13 +576,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <inheritdoc />
         public void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
-            // no cache, trash everything
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                DeleteLocalFilesForMedia();
-                anythingChanged = true;
-                return;
-            }
+            EnsureCaches();
 
             using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
@@ -710,11 +668,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <inheritdoc />
         public void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                return;
-            }
+            EnsureCaches();
 
             foreach (var payload in payloads)
             {
@@ -810,11 +764,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                return;
-            }
+            EnsureCaches();
 
             var idsA = payloads.Select(x => x.Id).ToArray();
 
@@ -854,11 +804,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public void Notify(DomainCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                return;
-            }
+            EnsureCaches();
 
             // see note in LockAndLoadContent
             using (_domainStore.GetScopedWriteLock(_scopeProvider))
