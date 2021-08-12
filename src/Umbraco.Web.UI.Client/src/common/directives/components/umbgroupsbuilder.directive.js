@@ -534,16 +534,20 @@
             };
 
             scope.removeTab = (tab, indexInTabs) => {
-                localizationService.localizeMany([
-                    'general_delete',
-                    'defaultdialogs_confirmdelete',
-                    'contentTypeEditor_confirmDeleteTabNotice'
-                ]).then(data => {
+                const tabName = tab.name || "";
+
+                const localizeMany = localizationService.localizeMany(['general_delete', 'contentTypeEditor_confirmDeleteTabNotice']);
+                const localize =  localizationService.localize('contentTypeEditor_confirmDeleteTabMessage',  [tabName]);
+                
+                $q.all([localizeMany, localize]).then(values => {
+                    const translations = values[0];
+                    const message = values[1];
+
                     overlayService.confirmDelete({
-                        title: data[0],
-                        content: data[1] + ' "' + tab.name + '"?',
-                        confirmMessage: data[2],
-                        submitButtonLabelKey: 'contentTypeEditor_yesDelete',
+                        title: `${translations[0]} ${tabName}`,
+                        content: message,
+                        confirmMessage: translations[1],
+                        submitButtonLabelKey: 'actions_delete',
                         submit: () => {
                             const indexInGroups = scope.model.groups.findIndex(group => group.alias === tab.alias);
                             scope.model.groups.splice(indexInGroups, 1);
@@ -742,16 +746,20 @@
             };
 
             scope.removeGroup = (selectedGroup) => {
-                localizationService.localizeMany([
-                    'general_delete',
-                    'defaultdialogs_confirmdelete',
-                    'contentTypeEditor_confirmDeleteGroupNotice'
-                ]).then(data => {
+                const groupName = selectedGroup.name || "";
+
+                const localizeMany = localizationService.localizeMany(['general_delete', 'contentTypeEditor_confirmDeleteGroupNotice']);
+                const localize =  localizationService.localize('contentTypeEditor_confirmDeleteGroupMessage',  [groupName]);
+                
+                $q.all([localizeMany, localize]).then(values => {
+                    const translations = values[0];
+                    const message = values[1];
+
                     overlayService.confirmDelete({
-                        title: data[0],
-                        content: data[1] + ' "' + selectedGroup.name + '"?',
-                        confirmMessage: data[2],
-                        submitButtonLabelKey: 'contentTypeEditor_yesDelete',
+                        title: `${translations[0]} ${groupName}`,
+                        content: message,
+                        confirmMessage: translations[1],
+                        submitButtonLabelKey: 'actions_delete',
                         submit: () => {
                             const index = scope.model.groups.findIndex(group => group.alias === selectedGroup.alias);
                             scope.model.groups.splice(index, 1);
@@ -940,14 +948,19 @@
             };
 
             scope.deleteProperty = (properties, { id, label }) => {
-                localizationService.localizeMany([
-                    'general_delete',
-                    'defaultdialogs_confirmdelete'
-                ]).then(data => {
+                const propertyName = label || "";
+
+                const localizeMany = localizationService.localizeMany(['general_delete']);
+                const localize =  localizationService.localize('contentTypeEditor_confirmDeletePropertyMessage',  [propertyName]);
+                
+                $q.all([localizeMany, localize]).then(values => {
+                    const translations = values[0];
+                    const message = values[1];
+
                     overlayService.confirmDelete({
-                        title: data[0],
-                        content: data[1] + ' "' + label + '"?',
-                        submitButtonLabelKey: 'contentTypeEditor_yesDelete',
+                        title: `${translations[0]} ${propertyName}`,
+                        content: message,
+                        submitButtonLabelKey: 'actions_delete',
                         submit: () => {
                             const index = properties.findIndex(property => property.id === id);
                             properties.splice(index, 1);

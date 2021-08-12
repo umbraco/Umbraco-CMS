@@ -1755,6 +1755,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
     <key alias="displaySettingsHeadline">Appearance</key>
     <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
+    <key alias="confirmDeleteTabMessage"><![CDATA[Are you sure you want to delete the tab <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteGroupMessage"><![CDATA[Are you sure you want to delete the group <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeletePropertyMessage"><![CDATA[Are you sure you want to delete the property <strong>%0%</strong>?]]></key>
     <key alias="confirmDeleteTabNotice">This will also delete all items below this tab.</key>
     <key alias="confirmDeleteGroupNotice">This will also delete all items below this group.</key>
     <key alias="addTab">Add tab</key>
