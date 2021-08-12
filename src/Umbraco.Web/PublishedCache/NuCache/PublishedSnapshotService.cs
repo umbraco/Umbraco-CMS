@@ -347,28 +347,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return path;
         }
 
-        private void DeleteLocalFilesForContent()
-        {
-            if (_isReady && _localContentDb != null)
-                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-
-            var path = GetLocalFilesPath();
-            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
-            if (File.Exists(localContentDbPath))
-                File.Delete(localContentDbPath);
-        }
-
-        private void DeleteLocalFilesForMedia()
-        {
-            if (_isReady && _localMediaDb != null)
-                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-
-            var path = GetLocalFilesPath();
-            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-            if (File.Exists(localMediaDbPath))
-                File.Delete(localMediaDbPath);
-        }
-
         #endregion
 
         #region Environment
@@ -685,13 +663,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
-            // no cache, trash everything
-            if (_isReady == false)
-            {
-                DeleteLocalFilesForContent();
-                draftChanged = publishedChanged = true;
-                return;
-            }
+            EnsureCaches();
 
             using (_contentStore.GetScopedWriteLock(_scopeProvider))
             {
@@ -785,13 +757,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
-            // no cache, trash everything
-            if (_isReady == false)
-            {
-                DeleteLocalFilesForMedia();
-                anythingChanged = true;
-                return;
-            }
+            EnsureCaches();
 
             using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
@@ -878,9 +844,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (_isReady == false)
-                return;
+            EnsureCaches();
 
             foreach (var payload in payloads)
                 _logger.Debug<PublishedSnapshotService, ContentTypeChangeTypes, string,int>("Notified {ChangeTypes} for {ItemType} {ItemId}", payload.ChangeTypes, payload.ItemType, payload.Id);
@@ -960,9 +924,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (_isReady == false)
-                return;
+            EnsureCaches();
 
             var idsA = payloads.Select(x => x.Id).ToArray();
 
@@ -1000,9 +962,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (_isReady == false)
-                return;
+            EnsureCaches();
 
             // see note in LockAndLoadContent
             using (_domainStore.GetScopedWriteLock(_scopeProvider))
