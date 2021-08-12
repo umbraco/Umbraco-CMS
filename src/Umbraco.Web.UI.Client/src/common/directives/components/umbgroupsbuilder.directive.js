@@ -206,7 +206,7 @@
                             scope.sortableRequestedTabTimeout = $timeout(() => {
                                 scope.openTabAlias = scope.sortableRequestedTabAlias;
                                 scope.sortableRequestedTabTimeout = null;
-                            }, 1200);
+                            }, 600);
                         }
                     },
                     out: (evt, ui) => {
