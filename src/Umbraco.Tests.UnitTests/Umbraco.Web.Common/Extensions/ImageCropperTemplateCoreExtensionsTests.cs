@@ -101,44 +101,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Extensions
                                                           y.Height == 50)));
         }
 
-        [Test]
-        public void GetCropUrl_WithCropSpecifiedAndWidthRatioModeProvidedWithWidthAndHeight_CallsImageGeneratorWithCorrectParameters()
-        {
-            var imageUrl = "/test.jpg";
-            Mock<IImageUrlGenerator> imageUrlGenerator = CreateMockImageUrlGenerator();
-            var result = imageUrl.GetCropUrl(
-                imageUrlGenerator.Object,
-                CreateImageCropperValueWithCrops(),
-                imageCropMode: ImageCropMode.Crop,
-                cropAlias: "TestCrop",
-                width: 35,
-                height: 50);
-
-            imageUrlGenerator
-                .Verify(x => x.GetImageUrl(
-                    It.Is<ImageUrlGenerationOptions>(y => y.Width == 35 &&
-                                                          y.Height == 50)));
-        }
-
-        [Test]
-        public void GetCropUrl_WithCropSpecifiedAndHeightRatioModeProvidedWithWidthAndHeight_CallsImageGeneratorWithCorrectParameters()
-        {
-            var imageUrl = "/test.jpg";
-            Mock<IImageUrlGenerator> imageUrlGenerator = CreateMockImageUrlGenerator();
-            var result = imageUrl.GetCropUrl(
-                imageUrlGenerator.Object,
-                CreateImageCropperValueWithCrops(),
-                imageCropMode: ImageCropMode.Crop,
-                cropAlias: "TestCrop",
-                width: 60,
-                height: 40);
-
-            imageUrlGenerator
-                .Verify(x => x.GetImageUrl(
-                    It.Is<ImageUrlGenerationOptions>(y => y.Width == 60 &&
-                                                          y.Height == 40)));
-        }
-
         private static Mock<IImageUrlGenerator> CreateMockImageUrlGenerator() => new Mock<IImageUrlGenerator>();
 
         private static ImageCropperValue CreateImageCropperValueWithCrops() => new ImageCropperValue
