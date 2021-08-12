@@ -33,7 +33,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
                     typeof(System.Guid).Assembly,
                     typeof(NUnit.Framework.Assert).Assembly,
                     typeof(System.Xml.NameTable).Assembly,
-                    typeof(System.Configuration.GenericEnumConverter).Assembly,
                     typeof(TypeFinder).Assembly,
                 };
 
