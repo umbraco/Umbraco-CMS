@@ -103,9 +103,8 @@ namespace Umbraco.Extensions
         /// <param name="cacheBuster">Add a serialized date of the last edit of the item to ensure client cache refresh when updated.</param>
         /// <param name="furtherOptions">These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
         /// <example><![CDATA[
-        /// furtherOptions: "&bgcolor=fff"
+        /// furtherOptions: "bgcolor=fff"
         /// ]]></example></param>
-        /// <param name="ratioMode">Use a dimension as a ratio.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
@@ -124,8 +123,7 @@ namespace Umbraco.Extensions
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
              bool cacheBuster = true,
-             string furtherOptions = null,
-             ImageCropRatioMode? ratioMode = null) => mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, null, false, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode);
+             string furtherOptions = null) => mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, null, false, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions);
 
         public static string GetCropUrl(
              this MediaWithCrops mediaWithCrops,
@@ -142,15 +140,14 @@ namespace Umbraco.Extensions
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
              bool cacheBuster = true,
-             string furtherOptions = null,
-             ImageCropRatioMode? ratioMode = null)
+             string furtherOptions = null)
         {
             if (mediaWithCrops == null)
             {
                 throw new ArgumentNullException(nameof(mediaWithCrops));
             }
 
-            return mediaWithCrops.Content.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, mediaWithCrops.LocalCrops, false, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode);
+            return mediaWithCrops.Content.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, mediaWithCrops.LocalCrops, false, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions);
         }
 
         private static string GetCropUrl(
@@ -170,8 +167,7 @@ namespace Umbraco.Extensions
              bool preferFocalPoint = false,
              bool useCropDimensions = false,
              bool cacheBuster = true,
-             string furtherOptions = null,
-             ImageCropRatioMode? ratioMode = null)
+             string furtherOptions = null)
         {
             if (mediaItem == null)
             {
@@ -219,7 +215,7 @@ namespace Umbraco.Extensions
 
             return GetCropUrl(
                 mediaItemUrl, imageUrlGenerator, localCrops, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                cacheBusterValue, furtherOptions, ratioMode);
+                cacheBusterValue, furtherOptions);
         }
 
         /// <summary>
@@ -239,9 +235,8 @@ namespace Umbraco.Extensions
         /// <param name="cacheBusterValue">Add a serialized date of the last edit of the item to ensure client cache refresh when updated.</param>
         /// <param name="furtherOptions">These are any query string parameters (formatted as query strings) that the underlying image processing service supports. For example:
         /// <example><![CDATA[
-        /// furtherOptions: "&bgcolor=fff"
+        /// furtherOptions: "bgcolor=fff"
         /// ]]></example></param>
-        /// <param name="ratioMode">Use a dimension as a ratio.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
@@ -258,8 +253,7 @@ namespace Umbraco.Extensions
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
             string cacheBusterValue = null,
-            string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null)
+            string furtherOptions = null)
         {
             if (string.IsNullOrWhiteSpace(imageUrl))
             {
@@ -274,7 +268,7 @@ namespace Umbraco.Extensions
 
             return GetCropUrl(
                 imageUrl, imageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode);
+                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions);
         }
 
         /// <summary>
@@ -294,9 +288,8 @@ namespace Umbraco.Extensions
         /// <param name="cacheBusterValue">Add a serialized date of the last edit of the item to ensure client cache refresh when updated.</param>
         /// <param name="furtherOptions">These are any query string parameters (formatted as query strings) that the underlying image processing service supports. For example:
         /// <example><![CDATA[
-        /// furtherOptions: "&bgcolor=fff"
+        /// furtherOptions: "bgcolor=fff"
         /// ]]></example></param>
-        /// <param name="ratioMode">Use a dimension as a ratio.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
@@ -313,8 +306,7 @@ namespace Umbraco.Extensions
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
             string cacheBusterValue = null,
-            string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null)
+            string furtherOptions = null)
         {
             if (string.IsNullOrWhiteSpace(imageUrl))
             {
@@ -334,14 +326,14 @@ namespace Umbraco.Extensions
 
                 options = cropDataSet.GetCropBaseOptions(imageUrl, crop, preferFocalPoint || string.IsNullOrWhiteSpace(cropAlias));
 
-                if (crop != null & useCropDimensions)
+                if (crop != null && useCropDimensions)
                 {
                     width = crop.Width;
                     height = crop.Height;
                 }
 
-                // Calculate missing dimension if a predefined crop has been specified, there are no coordinates and no ratio mode
-                if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null)
+                // Calculate missing dimension if a predefined crop has been specified, but has no coordinates
+                if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null)
                 {
                     if (width != null && height == null)
                     {
@@ -357,41 +349,14 @@ namespace Umbraco.Extensions
             {
                 options = new ImageUrlGenerationOptions(imageUrl)
                 {
-                    ImageCropMode = (imageCropMode ?? ImageCropMode.Pad),
+                    ImageCropMode = (imageCropMode ?? ImageCropMode.Pad), // Not sure why we default to Pad
                     ImageCropAnchor = imageCropAnchor
                 };
             }
 
             options.Quality = quality;
-            options.Width = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Width ? null : width;
-            options.Height = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Height ? null : height;
-
-            if (ratioMode == ImageCropRatioMode.Width && height != null)
-            {
-                // If only height specified then assume a square
-                if (width == null)
-                {
-                    options.Width = height;
-                }
-                else
-                {
-                    options.Width = (int)MathF.Round(height.Value * ((float)width.Value / height.Value));
-                }
-            }
-
-            if (ratioMode == ImageCropRatioMode.Height && width != null)
-            {
-                // If only width specified then assume a square
-                if (height == null)
-                {
-                    options.Height = width;
-                }
-                else
-                {
-                    options.Height = (int)MathF.Round(width.Value * ((float)height.Value / width.Value));
-                }
-            }
-
+            options.Width = width;
+            options.Height = height;
             options.FurtherOptions = furtherOptions;
             options.CacheBusterValue = cacheBusterValue;
 

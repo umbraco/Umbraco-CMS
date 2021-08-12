@@ -102,25 +102,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Extensions
         }
 
         [Test]
-        public void GetCropUrl_WithCropSpecifiedAndWidthRatioModeProvidedWithHeight_CallsImageGeneratorWithCorrectParameters()
-        {
-            var imageUrl = "/test.jpg";
-            Mock<IImageUrlGenerator> imageUrlGenerator = CreateMockImageUrlGenerator();
-            var result = imageUrl.GetCropUrl(
-                imageUrlGenerator.Object,
-                CreateImageCropperValueWithCrops(),
-                imageCropMode: ImageCropMode.Crop,
-                cropAlias: "TestCrop",
-                ratioMode: ImageCropRatioMode.Width,
-                height: 50);
-
-            imageUrlGenerator
-                .Verify(x => x.GetImageUrl(
-                    It.Is<ImageUrlGenerationOptions>(y => y.Width == 50 &&
-                                                          y.Height == 50)));
-        }
-
-        [Test]
         public void GetCropUrl_WithCropSpecifiedAndWidthRatioModeProvidedWithWidthAndHeight_CallsImageGeneratorWithCorrectParameters()
         {
             var imageUrl = "/test.jpg";
@@ -130,7 +111,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Extensions
                 CreateImageCropperValueWithCrops(),
                 imageCropMode: ImageCropMode.Crop,
                 cropAlias: "TestCrop",
-                ratioMode: ImageCropRatioMode.Width,
                 width: 35,
                 height: 50);
 
@@ -138,25 +118,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Extensions
                 .Verify(x => x.GetImageUrl(
                     It.Is<ImageUrlGenerationOptions>(y => y.Width == 35 &&
                                                           y.Height == 50)));
-        }
-
-        [Test]
-        public void GetCropUrl_WithCropSpecifiedAndHeightRatioModeProvidedWithWidth_CallsImageGeneratorWithCorrectParameters()
-        {
-            var imageUrl = "/test.jpg";
-            Mock<IImageUrlGenerator> imageUrlGenerator = CreateMockImageUrlGenerator();
-            var result = imageUrl.GetCropUrl(
-                imageUrlGenerator.Object,
-                CreateImageCropperValueWithCrops(),
-                imageCropMode: ImageCropMode.Crop,
-                cropAlias: "TestCrop",
-                ratioMode: ImageCropRatioMode.Height,
-                width: 60);
-
-            imageUrlGenerator
-                .Verify(x => x.GetImageUrl(
-                    It.Is<ImageUrlGenerationOptions>(y => y.Width == 60 &&
-                                                          y.Height == 60)));
         }
 
         [Test]
@@ -169,7 +130,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Extensions
                 CreateImageCropperValueWithCrops(),
                 imageCropMode: ImageCropMode.Crop,
                 cropAlias: "TestCrop",
-                ratioMode: ImageCropRatioMode.Height,
                 width: 60,
                 height: 40);
 

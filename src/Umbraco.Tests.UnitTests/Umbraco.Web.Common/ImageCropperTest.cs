@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void GetCropUrlFurtherOptionsTest()
         {
-            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 200, height: 300, furtherOptions: "&filter=comic&roundedcorners=radius-26|bgcolor-fff");
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 200, height: 300, furtherOptions: "filter=comic&roundedcorners=radius-26|bgcolor-fff");
             Assert.AreEqual(MediaPath + "?f=0.80827067669172936,0.96&w=200&h=300&filter=comic&roundedcorners=radius-26|bgcolor-fff", urlString);
         }
 
@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void GetCropUrl_CropAliasHeightRatioModeTest()
         {
-            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true, ratioMode: ImageCropRatioMode.Height);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, cropAlias: "Thumb", useCropDimensions: true);
             Assert.AreEqual(MediaPath + "?c=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&w=100&h=100", urlString);
         }
 
@@ -186,7 +186,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void GetCropUrl_WidthHeightRatioModeTest()
         {
-            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode: ImageCropRatioMode.Height);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150);
             Assert.AreEqual(MediaPath + "?f=0.80827067669172936,0.96&w=300&h=150", urlString);
         }
 
@@ -196,7 +196,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
         [Test]
         public void GetCropUrl_HeightWidthRatioModeTest()
         {
-            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150, ratioMode: ImageCropRatioMode.Width);
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), imageCropperValue: CropperJson1, width: 300, height: 150);
             Assert.AreEqual(MediaPath + "?f=0.80827067669172936,0.96&w=300&h=150", urlString);
         }
 
@@ -321,7 +321,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
         {
             var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"" + MediaPath + "\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
 
-            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), 400, 400, cropperJson, imageCropMode: ImageCropMode.Pad, furtherOptions: "&bgcolor=fff");
+            var urlString = MediaPath.GetCropUrl(new TestImageUrlGenerator(), 400, 400, cropperJson, imageCropMode: ImageCropMode.Pad, furtherOptions: "bgcolor=fff");
             Assert.AreEqual(MediaPath + "?m=pad&w=400&h=400&bgcolor=fff", urlString);
         }
 

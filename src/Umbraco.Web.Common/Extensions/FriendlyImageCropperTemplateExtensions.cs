@@ -82,9 +82,8 @@ namespace Umbraco.Extensions
         /// <param name="cacheBuster">Add a serialized date of the last edit of the item to ensure client cache refresh when updated.</param>
         /// <param name="furtherOptions">These are any query string parameters (formatted as query strings) that the underlying image processing service supports. For example:
         /// <example><![CDATA[
-        /// furtherOptions: "&bgcolor=fff"
+        /// furtherOptions: "bgcolor=fff"
         /// ]]></example></param>
-        /// <param name="ratioMode">Use a dimension as a ratio.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
@@ -100,8 +99,7 @@ namespace Umbraco.Extensions
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
             bool cacheBuster = true,
-            string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null)
+            string furtherOptions = null)
             => mediaItem.GetCropUrl(
                 ImageUrlGenerator,
                 PublishedValueFallback,
@@ -116,8 +114,7 @@ namespace Umbraco.Extensions
                 preferFocalPoint,
                 useCropDimensions,
                 cacheBuster,
-                furtherOptions,
-                ratioMode
+                furtherOptions
             );
 
         /// <summary>
@@ -136,9 +133,8 @@ namespace Umbraco.Extensions
         /// <param name="cacheBusterValue">Add a serialized date of the last edit of the item to ensure client cache refresh when updated.</param>
         /// <param name="furtherOptions">These are any query string parameters (formatted as query strings) that the underlying image processing service supports. For example:
         /// <example><![CDATA[
-        /// furtherOptions: "&bgcolor=fff"
+        /// furtherOptions: "bgcolor=fff"
         /// ]]></example></param>
-        /// <param name="ratioMode">Use a dimension as a ratio.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
@@ -154,8 +150,7 @@ namespace Umbraco.Extensions
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
             string cacheBusterValue = null,
-            string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null)
+            string furtherOptions = null)
             => imageUrl.GetCropUrl(
                 ImageUrlGenerator,
                 width,
@@ -168,8 +163,7 @@ namespace Umbraco.Extensions
                 preferFocalPoint,
                 useCropDimensions,
                 cacheBusterValue,
-                furtherOptions,
-                ratioMode
+                furtherOptions
             );
 
         /// <summary>
@@ -188,9 +182,8 @@ namespace Umbraco.Extensions
         /// <param name="cacheBusterValue">Add a serialized date of the last edit of the item to ensure client cache refresh when updated.</param>
         /// <param name="furtherOptions">These are any query string parameters (formatted as query strings) that the underlying image processing service supports. For example:
         /// <example><![CDATA[
-        /// furtherOptions: "&bgcolor=fff"
+        /// furtherOptions: "bgcolor=fff"
         /// ]]></example></param>
-        /// <param name="ratioMode">Use a dimension as a ratio</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
@@ -206,8 +199,7 @@ namespace Umbraco.Extensions
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
             string cacheBusterValue = null,
-            string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null)
+            string furtherOptions = null)
             => imageUrl.GetCropUrl(
                 ImageUrlGenerator,
                 cropDataSet,
@@ -219,8 +211,7 @@ namespace Umbraco.Extensions
                 preferFocalPoint,
                 useCropDimensions,
                 cacheBusterValue,
-                furtherOptions,
-                ratioMode
+                furtherOptions
             );
 
 
