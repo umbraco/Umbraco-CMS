@@ -5,9 +5,11 @@
    * A component to render the content type tab
    */
 
-  function umbContentTypeTabController() {
+  function umbContentTypeTabController($timeout) {
 
     const vm = this;
+
+    vm.compositionLabelIsVisible = false;
 
     vm.click = click;
     vm.removeTab = removeTab;
@@ -16,6 +18,10 @@
     vm.changeSortOrderValue = changeSortOrderValue;
     vm.changeName = changeName;
     vm.clickComposition = clickComposition;
+    vm.mouseenter = mouseenter;
+    vm.mouseleave = mouseleave;
+    
+    let timeout = null;
 
     function click () {
       if (vm.onClick) {
@@ -52,9 +58,25 @@
         vm.onChangeName({ key: vm.tab.key, name: vm.tab.name });
       }
     }
+
     function clickComposition (documentTypeId) {
       if (vm.onClickComposition) {
         vm.onClickComposition({documentTypeId: documentTypeId});
+      }
+    }
+
+    function mouseenter () {
+      if (vm.tab.inherited) {
+        vm.compositionLabelIsVisible = true;
+        $timeout.cancel(timeout);
+      }
+    }
+
+    function mouseleave () {
+      if (vm.tab.inherited) {
+        timeout = $timeout(() => {
+          vm.compositionLabelIsVisible = false;
+        }, 300);
       }
     }
 

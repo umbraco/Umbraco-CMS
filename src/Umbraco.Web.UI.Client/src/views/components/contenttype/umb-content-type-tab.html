@@ -7,9 +7,11 @@
         'is-deletable': vm.allowRemove,
         'umb-group-builder__tab-handle -sortable': vm.sorting && !vm.tab.inherited,
         'has-error': vm.tab.hasError }"
-    val-tab="vm.tab">
+    val-tab="vm.tab"
+    ng-mouseenter="vm.mouseenter()"
+    ng-mouseleave="vm.mouseleave()">
   <div>
-      <div class="umb-group-builder__tab-inherited-label" ng-if="vm.tab.inherited">
+      <div class="umb-group-builder__tab-inherited-label" ng-if="vm.compositionLabelIsVisible">
           <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ vm.tab.inheritedFromName }}
           <span ng-repeat="contentTypeName in vm.tab.parentTabContentTypeNames">
               <button type="button" class="btn-link btn-small p0" ng-click="vm.clickComposition(vm.tab.parentTabContentTypes[$index])">{{ contentTypeName }}</button>
@@ -17,7 +19,8 @@
           </span>
       </div>
       <div class="umb-group-builder__tab-title-wrapper">
-          <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="vm.sorting && !vm.tab.inherited"></i>
+            <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="vm.sorting && !vm.tab.inherited"></i>
+            <i class="umb-group-builder__tab-title-icon icon-merge" ng-if="vm.tab.inherited"></i>
             <ng-form name="tabNameForm" data-element="tab-name">
                 <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited" title="{{vm.tab.alias}}">{{ vm.tab.name }}</div>
                 <input
@@ -40,8 +43,8 @@
                     required />
 
                 <div class="umb-group-builder__tab-val-message" ng-messages="tabNameForm.tabName.$error" show-validation-on-submit>
-                    <div class="umb-validation-label -arrow-top" ng-message="valServerField">{{tabNameForm.tabName.errorMsg}}</div>
-                    <div class="umb-validation-label -arrow-top" ng-message="required"><localize key="required"></localize></div>
+                    <div class="umb-validation-label" ng-message="valServerField">{{tabNameForm.tabName.errorMsg}}</div>
+                    <div class="umb-validation-label" ng-message="required"><localize key="required"></localize></div>
                 </div>
             </ng-form>
 

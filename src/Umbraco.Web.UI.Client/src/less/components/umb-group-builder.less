@@ -133,10 +133,6 @@
     .umb-group-builder__tab-remove {
       display: block;
     }
-
-    .umb-group-builder__tab-inherited-label{
-        visibility: visible;
-    }
   }
 
   .ui-droppable-hover & {
@@ -198,6 +194,8 @@
   }
 
   &.is-inherited {
+    padding-right: 22px;
+
     .umb-group-builder__group-title-input {
       padding: 0;
     }
@@ -276,24 +274,38 @@
 }
 
 .umb-group-builder__tab-inherited-label {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+  display: block;
+  white-space: nowrap;
+  padding: 0 4px;
+  color: @black;
+  font-size: 12px;
+  background-color: @gray-8;
+  border-radius: @baseBorderRadius;
+  margin-top: 5px;
+
+  &:after {
+    bottom: 100%;
+    left: 10px;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
     position: absolute;
-    z-index: 1;
-    display: block;
-    top: 2px;
-    left: 0;
-    white-space: nowrap;
-    margin-left: 4px;
-    padding: 0 4px;
-    visibility: hidden;
-    
-    color: black;
-    font-size: 12px;
-    background-color: #d8d7d9;
-    border-radius: 3px;
+    pointer-events: none;
+    border-color: rgba(255, 255, 255, 0);
+    border-bottom-color: @gray-8;
+    border-width: 4px;
+    margin-left: -4px;
+  }
 
   button {
     font-size: 12px;
-    color: @gray-6;
+    color: @black;
+    text-decoration: underline;
   }
 }
 
