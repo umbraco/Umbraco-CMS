@@ -1,9 +1,10 @@
-﻿using System.IO;
+using System.Drawing;
+using System.IO;
 
 namespace Umbraco.Cms.Core.Media
 {
     public interface IImageDimensionExtractor
     {
-        public ImageSize GetDimensions(Stream stream);
+        public Size? GetDimensions(Stream stream);
     }
 }

@@ -145,6 +145,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .Remove<SimpleTinyMceValueConverter>();
 
             builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+            builder.Services.AddUnique<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
@@ -179,8 +180,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<UploadAutoFillProperties>();
 
             builder.Services.AddUnique<ICronTabParser, NCronTabParser>();
-
-            builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
 
             builder.Services.AddUnique<PackageDataInstallation>();
 
