@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
@@ -22,6 +23,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         private readonly IWebHostEnvironment _webHostEnvironment;
         private string _applicationId;
         private string _localTempPath;
+        private UrlMode _urlProviderMode;
 
         public AspNetCoreHostingEnvironment(
             IServiceProvider serviceProvider,
@@ -33,6 +35,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
+            _urlProviderMode = _webRoutingSettings.CurrentValue.UrlProviderMode;
 
             SiteName = webHostEnvironment.ApplicationName;
             ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
@@ -144,7 +147,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         /// <inheritdoc/>
         public string ToAbsolute(string virtualPath)
         {
-            if (!virtualPath.StartsWith("~/") && !virtualPath.StartsWith("/"))
+            if (!virtualPath.StartsWith("~/") && !virtualPath.StartsWith("/") && _urlProviderMode != UrlMode.Absolute)
             {
                 throw new InvalidOperationException($"The value {virtualPath} for parameter {nameof(virtualPath)} must start with ~/ or /");
             }
