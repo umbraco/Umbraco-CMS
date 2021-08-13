@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.ColorPickerEyeDropper);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-            => typeof (string);
+            => typeof(string);
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
