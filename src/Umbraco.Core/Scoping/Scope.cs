@@ -366,7 +366,7 @@ namespace Umbraco.Core.Scoping
         /// When we require a ReadLock or a WriteLock we don't immediately request these locks from the database,
         /// instead we only request them when necessary (lazily).
         /// To do this, we queue requests for read/write locks.
-        /// This is so that if there'a request for either of these
+        /// This is so that if there's a request for either of these
         /// locks, but the service/repository returns an item from the cache, we don't end up making a DB call to make the
         /// read/write lock.
         /// This executes the queue of requested locks in order in an efficient way lazily whenever the database instance is
