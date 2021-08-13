@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
     /// Contains culture specific values for <see cref="IPublishedContent"/>.
     /// </summary>
+    [DebuggerDisplay("{Culture}")]
     public class PublishedCultureInfo
     {
         /// <summary>
