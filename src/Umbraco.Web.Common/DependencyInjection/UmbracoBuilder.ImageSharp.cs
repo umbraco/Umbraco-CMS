@@ -27,14 +27,27 @@ namespace Umbraco.Extensions
 
             services.AddImageSharp(options =>
             {
+                // We use the same default configuration instance in ImageSharpImageUrlGenerator, so we don't want to create a new instance here
                 options.Configuration = SixLabors.ImageSharp.Configuration.Default;
                 options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
                 options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
                 options.CachedNameLength = imagingSettings.Cache.CachedNameLength;
+
+                // Use configurable maximum width and height (overwrite ImageSharps default)
                 options.OnParseCommandsAsync = context =>
                 {
-                    RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Width, imagingSettings.Resize.MaxWidth);
-                    RemoveIntParamenterIfValueGreatherThen(context.Commands, ResizeWebProcessor.Height, imagingSettings.Resize.MaxHeight);
+                    if (context.Commands.Count == 0)
+                    {
+                        return Task.CompletedTask;
+                    }
+
+                    uint width = context.Parser.ParseValue<uint>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Width), context.Culture);
+                    uint height = context.Parser.ParseValue<uint>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Height), context.Culture);
+                    if (width > imagingSettings.Resize.MaxWidth && height > imagingSettings.Resize.MaxHeight)
+                    {
+                        context.Commands.Remove(ResizeWebProcessor.Width);
+                        context.Commands.Remove(ResizeWebProcessor.Height);
+                    }
 
                     return Task.CompletedTask;
                 };
@@ -54,20 +67,6 @@ namespace Umbraco.Extensions
                 .AddProcessor<ResizeWebProcessor>();
 
             return services;
-        }
-
-        private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)
-        {
-            if (commands.TryGetValue(parameter, out var command))
-            {
-                if (int.TryParse(command, out var i))
-                {
-                    if (i > maxValue)
-                    {
-                        commands.Remove(parameter);
-                    }
-                }
-            }
         }
     }
 }

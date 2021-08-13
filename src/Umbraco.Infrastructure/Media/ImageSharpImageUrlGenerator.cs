@@ -9,12 +9,21 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Infrastructure.Media
 {
+    /// <summary>
+    /// Exposes a method that generates an image URL based on the specified options that can be processed by ImageSharp.
+    /// </summary>
+    /// <seealso cref="Umbraco.Cms.Core.Media.IImageUrlGenerator" />
     public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     {
         private static readonly string[] s_supportedImageFileTypes = Configuration.Default.ImageFormats.SelectMany(f => f.FileExtensions).ToArray();
 
+        /// <inheritdoc />
+        /// <remarks>
+        /// This uses the default instance of the ImageSharp configuration, so we need to ensure we don't new up a different instance when configuring the middleware.
+        /// </remarks>
         public IEnumerable<string> SupportedImageFileTypes { get; } = s_supportedImageFileTypes;
 
+        /// <inheritdoc/>
         public string GetImageUrl(ImageUrlGenerationOptions options)
         {
             if (options == null)
@@ -82,7 +91,5 @@ namespace Umbraco.Cms.Infrastructure.Media
 
             return imageUrl.ToString();
         }
-
-        
     }
 }
