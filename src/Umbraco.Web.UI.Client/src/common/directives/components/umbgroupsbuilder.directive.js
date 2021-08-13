@@ -206,7 +206,11 @@
                             scope.sortableRequestedTabTimeout = $timeout(() => {
                                 scope.openTabAlias = scope.sortableRequestedTabAlias;
                                 scope.sortableRequestedTabTimeout = null;
-                            }, 600);
+                                /* hack to update sortable positions when switching from one tab to another. 
+                                without this sorting direct properties doesn't work correctly */
+                                scope.$apply();
+                                $('.umb-group-builder__ungrouped-properties .umb-group-builder__properties').sortable('refresh');
+                            }, 400);
                         }
                     },
                     out: (evt, ui) => {
