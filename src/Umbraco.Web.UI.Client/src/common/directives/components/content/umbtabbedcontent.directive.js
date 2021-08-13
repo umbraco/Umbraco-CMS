@@ -2,7 +2,7 @@
     'use strict';
 
     /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
-    function tabbedContentDirective($timeout, $filter, contentEditingHelper) {
+    function tabbedContentDirective($timeout, $filter, contentEditingHelper, contentTypeHelper) {
 
         function link($scope, $element) {
 
@@ -18,8 +18,8 @@
 
             $scope.$watchCollection('content.tabs', (newValue) => {
 
-                contentEditingHelper.defineParentAliasOnGroups(newValue);
-                contentEditingHelper.relocateDisorientedGroups(newValue);
+                contentTypeHelper.defineParentAliasOnGroups(newValue);
+                contentTypeHelper.relocateDisorientedGroups(newValue);
 
                 // make a collection with only tabs and not all groups
                 $scope.tabs = $filter("filter")(newValue, (tab) => {

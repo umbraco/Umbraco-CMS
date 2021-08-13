@@ -14,7 +14,7 @@
             }
         });
 
-    function ElementEditorContentComponentController($scope, $filter, contentEditingHelper) {
+    function ElementEditorContentComponentController($scope, $filter, contentEditingHelper, contentTypeHelper) {
 
         // We need a controller for the component to work.
         var vm = this;
@@ -27,8 +27,8 @@
 
         $scope.$watchCollection('vm.model.variants[0].tabs', (newValue) => {
 
-            contentEditingHelper.defineParentAliasOnGroups(newValue);
-            contentEditingHelper.relocateDisorientedGroups(newValue);
+            contentTypeHelper.defineParentAliasOnGroups(newValue);
+            contentTypeHelper.relocateDisorientedGroups(newValue);
 
             vm.tabs = $filter("filter")(newValue, (tab) => {
                 return tab.type === 1;

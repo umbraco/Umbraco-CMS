@@ -3,7 +3,7 @@
 
     function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource,
         $filter, iconHelper, $q, $timeout, notificationsService,
-        localizationService, editorService, eventsService, overlayService, contentEditingHelper) {
+        localizationService, editorService, eventsService, overlayService) {
 
         function link(scope, element) {
 
@@ -42,8 +42,8 @@
                     return;
                 }
 
-                contentEditingHelper.defineParentAliasOnGroups(newValue);
-                contentEditingHelper.relocateDisorientedGroups(newValue);
+                contentTypeHelper.defineParentAliasOnGroups(newValue);
+                contentTypeHelper.relocateDisorientedGroups(newValue);
 
                 scope.tabs = $filter("filter")(newValue, group => {
                     return group.type === TYPE_TAB && group.parentAlias == null;
@@ -129,7 +129,7 @@
                             // Update aliases
                             const parentAlias = scope.openTabAlias,
                                 oldAlias = group.alias || null, // null when group comes from root aka. 'generic'
-                                newAlias = contentEditingHelper.updateParentAlias(oldAlias, parentAlias);
+                                newAlias = contentTypeHelper.updateParentAlias(oldAlias, parentAlias);
 
                             // Check alias is unique
                             // TODO: we should properly do this on hover, to let user know it cant be moved.
@@ -139,7 +139,7 @@
 
                             group.alias = newAlias;
                             group.parentAlias = parentAlias;
-                            contentEditingHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
+                            contentTypeHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
 
                             const groupsInTab = scope.model.groups.filter(group => group.parentAlias === parentAlias);
                             updateSortOrder(groupsInTab);
@@ -188,7 +188,7 @@
                             const groupKey = ui.draggable[0].dataset.groupKey ? ui.draggable[0].dataset.groupKey : false;
                             const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
 
-                            const newAlias = contentEditingHelper.updateParentAlias(group.alias || null, hoveredTabAlias);
+                            const newAlias = contentTypeHelper.updateParentAlias(group.alias || null, hoveredTabAlias);
                             // Check alias is unique
                             if (group.alias !== newAlias && isAliasUnique(newAlias) === false) {
                                 // TODO: Missing UI indication of why you cant move here.
@@ -524,7 +524,7 @@
                     scope.model.groups.forEach(group => {
                         if (!group.inherited && group.parentAlias == null) {
                             group.parentAlias = tab.alias;
-                            group.alias = contentEditingHelper.updateParentAlias(group.alias, group.parentAlias);
+                            group.alias = contentTypeHelper.updateParentAlias(group.alias, group.parentAlias);
                         }
                     });
                 }
@@ -620,9 +620,9 @@
 
             /** Universal method for updating group alias (for tabs, field-sets etc.) */
             function updateGroupAlias(group) {
-                const localAlias = contentEditingHelper.generateLocalAlias(group.name),
+                const localAlias = contentTypeHelper.generateLocalAlias(group.name),
                     oldAlias = group.alias;
-                let newAlias = contentEditingHelper.updateLocalAlias(oldAlias, localAlias);
+                let newAlias = contentTypeHelper.updateLocalAlias(oldAlias, localAlias);
 
                 // Ensure unique alias, otherwise we would be transforming groups of other parents, we do not want this.
                 if(isAliasUnique(newAlias) === false) {
@@ -630,8 +630,8 @@
                 }
 
                 group.alias = newAlias;
-                group.parentAlias = contentEditingHelper.getParentAlias(newAlias);
-                contentEditingHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
+                group.parentAlias = contentTypeHelper.getParentAlias(newAlias);
+                contentTypeHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
                 return true;
             }
 
@@ -712,7 +712,7 @@
                     key: key,
                     type: TYPE_GROUP,
                     name: '',
-                    alias: contentEditingHelper.updateParentAlias(key, tabAlias), // Temporarily set alias to key, because the name is empty
+                    alias: contentTypeHelper.updateParentAlias(key, tabAlias), // Temporarily set alias to key, because the name is empty
                     parentAlias: tabAlias || null,
                     sortOrder: lastGroupSortOrder,
                     properties: [],
@@ -800,7 +800,7 @@
                 }
 
                 group.type = TYPE_TAB;
-                const newAlias = contentEditingHelper.generateLocalAlias(group.name);
+                const newAlias = contentTypeHelper.generateLocalAlias(group.name);
                 group.alias = createUniqueAlias(newAlias);
                 group.parentAlias = null;
                 scope.tabs.push(group);

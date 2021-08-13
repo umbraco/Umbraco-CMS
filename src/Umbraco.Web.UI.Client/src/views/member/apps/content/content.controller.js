@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function MemberAppContentController($scope, $filter, contentEditingHelper) {
+    function MemberAppContentController($scope, $filter, contentEditingHelper, contentTypeHelper) {
 
         var vm = this;
 
@@ -13,8 +13,8 @@
 
         $scope.$watchCollection('content.tabs', (newValue) => {
 
-            contentEditingHelper.defineParentAliasOnGroups(newValue);
-            contentEditingHelper.relocateDisorientedGroups(newValue);
+            contentTypeHelper.defineParentAliasOnGroups(newValue);
+            contentTypeHelper.relocateDisorientedGroups(newValue);
 
             vm.tabs = $filter("filter")(newValue, (tab) => {
                 return tab.type === 1;

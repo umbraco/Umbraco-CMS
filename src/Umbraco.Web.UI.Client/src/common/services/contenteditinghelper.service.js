@@ -180,53 +180,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         },
 
-        generateLocalAlias: function(name) {
-            return name ? name.toUmbracoAlias() : String.CreateGuid();
-        },
-
-        getLocalAlias: function (alias) {
-            const lastIndex = alias.lastIndexOf('/');
-
-            return (lastIndex === -1) ? alias : alias.substring(lastIndex + 1);
-        },
-
-        updateLocalAlias: function (alias, localAlias) {
-            const parentAlias = this.getParentAlias(alias);
-
-            return (parentAlias == null || parentAlias === '') ? localAlias : parentAlias + '/' + localAlias;
-        },
-
-        getParentAlias: function (alias) {
-            if(alias) {
-                const lastIndex = alias.lastIndexOf('/');
-
-                return (lastIndex === -1) ? null : alias.substring(0, lastIndex);
-            }
-            return null;
-        },
-
-        updateParentAlias: function (alias, parentAlias) {
-            const localAlias = this.getLocalAlias(alias);
-
-            return (parentAlias == null || parentAlias === '') ? localAlias : parentAlias + '/' + localAlias;
-        },
-
-        updateDescendingAliases: function (groups, oldParentAlias, newParentAlias) {
-            groups.forEach(group => {
-                const parentAlias = this.getParentAlias(group.alias);
-
-                if (parentAlias === oldParentAlias) {
-                    const oldAlias = group.alias,
-                        newAlias = this.updateParentAlias(oldAlias, newParentAlias);
-
-                    group.alias = newAlias;
-                    group.parentAlias = newParentAlias;
-                    this.updateDescendingAliases(groups, oldAlias, newAlias);
-
-                }
-            });
-        },
-
         registerGenericTab: function (groups) {
             if (!groups) {
                 return;
@@ -256,26 +209,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             localizationService.localize("general_generic").then(function (value) {
                 genericTab.label = value;
                 groups.unshift(genericTab);
-            });
-        },
-
-        defineParentAliasOnGroups: function (groups) {
-            groups.forEach(group => {
-                group.parentAlias = this.getParentAlias(group.alias);
-            });
-        },
-
-        relocateDisorientedGroups: function (groups) {
-            const existingAliases = groups.map(group => group.alias);
-            existingAliases.push(null);
-            const disorientedGroups = groups.filter(group => existingAliases.indexOf(group.parentAlias) === -1);
-            disorientedGroups.forEach(group => {
-                const oldAlias = group.alias,
-                        newAlias = this.updateParentAlias(oldAlias, null);
-
-                group.alias = newAlias;
-                group.parentAlias = null;
-                this.updateDescendingAliases(groups, oldAlias, newAlias);
             });
         },
 
