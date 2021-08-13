@@ -29,7 +29,6 @@ namespace Umbraco.Extensions
 
             services.AddImageSharp(options =>
             {
-                options.Configuration = SixLabors.ImageSharp.Configuration.Default;
                 options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
                 options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
                 options.CachedNameLength = imagingSettings.Cache.CachedNameLength;
@@ -52,17 +51,12 @@ namespace Umbraco.Extensions
 
                     return Task.CompletedTask;
                 };
-                options.OnBeforeSaveAsync = _ => Task.CompletedTask;
-                options.OnProcessedAsync = _ => Task.CompletedTask;
-                options.OnPrepareResponseAsync = _ => Task.CompletedTask;
             })
-                .SetRequestParser<QueryCollectionRequestParser>()
                 .Configure<PhysicalFileSystemCacheOptions>(options =>
                 {
                     options.CacheFolder = imagingSettings.Cache.CacheFolder;
                 })
-                .SetCache<PhysicalFileSystemCache>()
-                .SetCacheHash<CacheHash>()
+                // We need to add CropWebProcessor before ResizeWebProcessor (until https://github.com/SixLabors/ImageSharp.Web/issues/182 is fixed)
                 .RemoveProcessor<ResizeWebProcessor>()
                 .AddProcessor<CropWebProcessor>()
                 .AddProcessor<ResizeWebProcessor>();
