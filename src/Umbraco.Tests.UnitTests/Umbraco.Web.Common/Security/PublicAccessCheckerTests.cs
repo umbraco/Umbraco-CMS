@@ -117,6 +117,23 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
 
         [AutoMoqData]
         [Test]
+        public async Task GivenMemberLoggedIn_WhenMemberHasNoRoles_ThenAccessDeniedResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, new MemberIdentityUser());
+            MockGetRolesAsync(memberManager, Enumerable.Empty<string>());
+
+            var result = await sut.HasMemberAccessToContentAsync(123);
+            Assert.AreEqual(PublicAccessStatus.AccessDenied, result);
+        }
+
+        [AutoMoqData]
+        [Test]
         public async Task GivenMemberLoggedIn_WhenMemberIsLockedOut_ThenLockedOutResult(
             IMemberManager memberManager,
             IPublicAccessService publicAccessService,
