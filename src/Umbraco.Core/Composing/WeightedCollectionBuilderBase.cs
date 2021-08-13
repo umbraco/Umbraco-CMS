@@ -16,6 +16,8 @@ namespace Umbraco.Core.Composing
     {
         protected abstract TBuilder This { get; }
 
+        private readonly Dictionary<Type, int> _customWeights = new Dictionary<Type, int>();
+
         /// <summary>
         /// Clears all types in the collection.
         /// </summary>
@@ -107,6 +109,18 @@ namespace Umbraco.Core.Composing
             return This;
         }
 
+        /// <summary>
+        /// Changes the default weight of an item
+        /// </summary>
+        /// <typeparam name="T">The type of item</typeparam>
+        /// <param name="weight">The new weight</param>
+        /// <returns></returns>
+        public TBuilder SetWeight<T>(int weight) where T : TItem
+        {
+            _customWeights[typeof(T)] = weight;
+            return This;
+        }
+
         protected override IEnumerable<Type> GetRegisteringTypes(IEnumerable<Type> types)
         {
             var list = types.ToList();
@@ -118,6 +132,8 @@ namespace Umbraco.Core.Composing
 
         protected virtual int GetWeight(Type type)
         {
+            if (_customWeights.ContainsKey(type))
+                return _customWeights[type];
             var attr = type.GetCustomAttributes(typeof(WeightAttribute), false).OfType<WeightAttribute>().SingleOrDefault();
             return attr?.Weight ?? DefaultWeight;
         }

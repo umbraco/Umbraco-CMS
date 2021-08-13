@@ -2083,32 +2083,6 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Copy_Recursive_Preserves_Sort_Order()
-        {
-            // Arrange
-            var contentService = ServiceContext.ContentService;
-            var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(3, contentService.CountChildren(temp.Id));
-            var reversedChildren = contentService.GetPagedChildren(temp.Id, 0, 10, out var total1).Reverse().ToArray();
-            contentService.Sort(reversedChildren);
-
-            // Act
-            var copy = contentService.Copy(temp, temp.ParentId, false, true, Constants.Security.SuperUserId);
-            var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
-
-            // Assert
-            Assert.That(copy, Is.Not.Null);
-            Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
-            Assert.AreNotSame(content, copy);
-            Assert.AreEqual(3, contentService.CountChildren(copy.Id));
-
-            var copiedChildren = contentService.GetPagedChildren(copy.Id, 0, 10, out var total2).OrderBy(c => c.SortOrder).ToArray();
-            Assert.AreEqual(reversedChildren.First().Name, copiedChildren.First().Name);
-            Assert.AreEqual(reversedChildren.Last().Name, copiedChildren.Last().Name);
-        }
-
-        [Test]
         public void Can_Rollback_Version_On_Content()
         {
             // Arrange
@@ -2496,7 +2470,7 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
             Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
             Assert.That(sut.GetValue<Udi>("contentPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
-            Assert.That(sut.GetValue<Udi>("mediaPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691"))));
+            Assert.That(sut.GetValue("mediapicker3"), Is.EqualTo("[{\"key\": \"8f78ce9e-8fe0-4500-a52d-4c4f35566ba9\",\"mediaKey\": \"44CB39C8-01E5-45EB-9CF8-E70AAF2D1691\",\"crops\": [],\"focalPoint\": {\"left\": 0.5,\"top\": 0.5}}]"));
             Assert.That(sut.GetValue<Udi>("memberPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
             Assert.That(sut.GetValue<string>("multiUrlPicker"), Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
             Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));

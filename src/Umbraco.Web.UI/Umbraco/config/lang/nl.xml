@@ -193,26 +193,6 @@
     <key alias="submitChanges">Indienen</key>
     <key alias="submitChangesAndClose">Indienen en sluiten</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Om het documenttype voor de geselecteerde inhoud te wijzigen, selecteert u eerst uit de lijst van geldige types voor deze locatie.</key>
-    <key alias="changeDocTypeInstruction2">Bevestig en/of wijzig vervolgens de toewijzing van eigenschappen van het huidige naar het nieuwe type en klik op Opslaan.</key>
-    <key alias="contentRepublished">De inhoud is opnieuw gepubliceerd.</key>
-    <key alias="currentProperty">Huidige eigenschap</key>
-    <key alias="currentType">Huidig type</key>
-    <key alias="docTypeCannotBeChanged">Het documenttype kan niet worden gewijzigd, omdat er geen alternatieven geldig zijn voor deze locatie.</key>
-    <key alias="docTypeChanged">Documenttype gewijzigd</key>
-    <key alias="mapProperties">Eigenschappen toewijzen</key>
-    <key alias="mapToProperty">Toewijzen aan eigenschap</key>
-    <key alias="newTemplate">Nieuw sjabloon</key>
-    <key alias="newType">Nieuw type</key>
-    <key alias="none">geen</key>
-    <key alias="selectedContent">Inhoud</key>
-    <key alias="selectNewDocType">Selecteer nieuw documenttype</key>
-    <key alias="successMessage">Het documenttype van de geselecteerde inhoud is succesvol gewijzigd naar [new type] en de volgende eigenschappen zijn toegekend:</key>
-    <key alias="to">aan</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Toewijzen van eigenschappen kan niet worden afgerond, omdat één of meer eigenschappen meer dan één toewijzing hebben.</key>
-    <key alias="validDocTypesNote">Alleen alternatieve types geldig voor de huidige locatie worden weergegeven.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Het maken van een map onder de bovenliggende map met ID %0% is mislukt</key>
     <key alias="createFolderFailedByName">Het maken van een map onder de bovenliggende map met de naam %0% is mislukt</key>

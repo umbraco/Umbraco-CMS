@@ -6,44 +6,52 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>
+    /// <summary>
+    /// Serializes/Deserializes property data as a dictionary for BTree
+    /// </summary>
+    internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>, IDictionaryOfPropertyDataSerializer
     {
+        private static readonly PropertyData[] Empty = Array.Empty<PropertyData>();
         public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
         {
-            var dict = new Dictionary<string, PropertyData[]>(StringComparer.InvariantCultureIgnoreCase);
-
             // read properties count
-            var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+            var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);            
+            var dict = new Dictionary<string, PropertyData[]>(pcount,StringComparer.InvariantCultureIgnoreCase);
 
             // read each property
             for (var i = 0; i < pcount; i++)
             {
                 // read property alias
-                var key = PrimitiveSerializer.String.ReadFrom(stream);
+                var key = string.Intern(PrimitiveSerializer.String.ReadFrom(stream));
 
                 // read values count
                 var vcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+                if(vcount == 0)
+                {
+                    dict[key] = Empty;
+                    continue;
+                }
 
                 // create pdata and add to the dictionary
-                var pdatas = new List<PropertyData>();
+                var pdatas = new PropertyData[vcount];
 
                 // for each value, read and add to pdata
                 for (var j = 0; j < vcount; j++)
                 {
                     var pdata = new PropertyData();
-                    pdatas.Add(pdata);
+                    pdatas[j] = pdata;
 
                     // everything that can be null is read/written as object
                     //  even though - culture and segment should never be null here, as 'null' represents
                     //  the 'current' value, and string.Empty should be used to represent the invariant or
                     //  neutral values - PropertyData throws when getting nulls, so falling back to
                     //  string.Empty here - what else?
-                    pdata.Culture = ReadStringObject(stream) ?? string.Empty;
-                    pdata.Segment = ReadStringObject(stream) ?? string.Empty;
+                    pdata.Culture = ReadStringObject(stream, true) ?? string.Empty;
+                    pdata.Segment = ReadStringObject(stream, true) ?? string.Empty;
                     pdata.Value = ReadObject(stream);
                 }
 
-                dict[key] = pdatas.ToArray();
+                dict[key] = pdatas;
             }
             return dict;
         }

@@ -57,7 +57,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         *       Do stuff...
         *    });
         * </pre>
-        * 
+        *
         * @returns {Promise} resourcePromise object.
         *
         */
@@ -688,6 +688,25 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 });
         },
 
+        getScaffoldByKeys: function (parentId, scaffoldKeys) {
+
+            return umbRequestHelper.resourcePromise(
+                    $http.post(
+                        umbRequestHelper.getApiUrl(
+                            "contentApiBaseUrl",
+                            "GetEmptyByKeys"),
+                        { contentTypeKeys: scaffoldKeys, parentId: parentId }
+                    ),
+                    'Failed to retrieve data for empty content items ids' + scaffoldKeys.join(", "))
+                .then(function (result) {
+                    Object.keys(result).map(function(key) {
+                        result[key] = umbDataFormatter.formatContentGetData(result[key]);
+                    });
+
+                    return $q.when(result);
+                });
+        },
+
         getBlueprintScaffold: function (parentId, blueprintId) {
 
             return umbRequestHelper.resourcePromise(
@@ -776,7 +795,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct
@@ -786,7 +805,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
-            
+
             //converts the value to a js bool
             function toBool(v) {
                 if (Utilities.isNumber(v)) {

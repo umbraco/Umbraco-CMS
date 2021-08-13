@@ -2,6 +2,12 @@
 //with a specified callback, this callback will receive an object with a selection on it
 function memberGroupPicker($scope, editorService, memberGroupResource){
 
+    var vm = this;
+
+    vm.openMemberGroupPicker = openMemberGroupPicker;
+    vm.remove = remove;
+    vm.clear = clear;
+
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
         return str.replace(rgxtrim, '');
@@ -18,7 +24,13 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         });
     }
 
-    $scope.openMemberGroupPicker = function() {
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
+
+    function openMemberGroupPicker() {
         var memberGroupPicker = {
             multiPicker: true,
             submit: function (model) {
@@ -32,6 +44,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
                 if (newGroupIds && newGroupIds.length) {
                     memberGroupResource.getByIds(newGroupIds).then(function (groups) {
                         $scope.renderModel = _.union($scope.renderModel, groups);
+                        setDirty();
                         editorService.close();
                     });
                 }
@@ -45,25 +58,17 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
             }
         };
         editorService.memberGroupPicker(memberGroupPicker);
-    };
+    }
 
-    $scope.remove =function(index){
+    function remove(index) {
         $scope.renderModel.splice(index, 1);
-    };
+        setDirty();
+    }
 
-    $scope.add = function (item) {
-        var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
-        });
-
-        if (currIds.indexOf(item) < 0) {
-            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
-        }	
-    };
-
-    $scope.clear = function() {
+    function clear() {
         $scope.renderModel = [];
-    };
+        setDirty();
+    }
 
     function renderModelIds() {
         return _.map($scope.renderModel, function (i) {

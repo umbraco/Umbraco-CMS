@@ -19,11 +19,13 @@
                      ngf-max-size="{{ maxFileSize }}"
                      ng-class="{'is-small': compact!=='false' || (done.length+queue.length) > 0 }">
 
-                    <div class="content">
+                    <div class="content" draggable="false">
 
                         <!-- Drag and drop illustration -->
-                        <i class="icon-box" draggable="false"></i>
-                        <small class="faded" draggable="false"><strong><localize key="packager_dropHere">Drop to upload</localize></strong></small>
+                        <umb-icon icon="icon-box"></umb-icon>
+                        <small class="faded">
+                            <strong><localize key="packager_dropHere">Drop to upload</localize></strong>
+                        </small>
 
                         <!-- Select files -->
                         <div class="umb-upload-local__select-file"
@@ -62,7 +64,7 @@
             <div class="flex items-center justify-center">
                 <div class="umb-info-local-items">
                     <div class="umb-package-icon">
-                        <i ng-if="!vm.localPackage.iconUrl" class="icon-box" aria-hidden="true"></i>
+                        <umb-icon icon="icon-box" ng-if="!vm.localPackage.iconUrl"></umb-icon>
                     </div>
                     <div class="umb-package-info">
 
@@ -100,7 +102,7 @@
 
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.iconUrl" class="icon-box" aria-hidden="true"></i>
+                            <umb-icon ng-if="!vm.localPackage.iconUrl" icon="icon-box"></umb-icon>
                             <img ng-if="vm.localPackage.iconUrl" ng-src="{{vm.localPackage.iconUrl}}" alt="" />
                         </div>
 

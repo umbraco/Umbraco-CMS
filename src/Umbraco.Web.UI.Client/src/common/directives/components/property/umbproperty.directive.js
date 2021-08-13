@@ -35,6 +35,12 @@
 
         vm.$onInit = onInit;
 
+        vm.setDirty = function () {
+            // NOTE: We need to use scope because we haven't changd it to vm.propertyForm in the html and that
+            // might mean a breaking change.
+            $scope.propertyForm.$setDirty();
+        }
+
         vm.setPropertyError = function (errorMsg) {
             vm.property.propertyErrorMessage = errorMsg;
         };

@@ -1,13 +1,6 @@
-<div
-    class="umb-block-list-block-configuration"
-    ng-controller="Umbraco.PropertyEditors.BlockList.BlockConfigurationController as vm"
-    >
+<div class="umb-block-list-block-configuration" ng-controller="Umbraco.PropertyEditors.BlockList.BlockConfigurationController as vm">
 
-    <div
-        class="umb-block-card-grid"
-        ui-sortable="vm.sortableOptions"
-        ng-model="model.value"
-        >
+    <div class="umb-block-card-grid" ui-sortable="vm.sortableOptions" ng-model="model.value">
 
         <umb-block-card
             block-config-model="block"
@@ -17,7 +10,7 @@
             ng-click="vm.openBlockOverlay(block)">
             <div class="__actions">
                 <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveBlockByIndex($index); $event.stopPropagation();">
-                    <i class="icon icon-trash" aria-hidden="true"></i>
+                    <umb-icon icon="icon-trash" class="icon"></umb-icon>
                     <localize key="general_delete" class="sr-only">Delete</localize>
                 </button>
             </div>

@@ -279,7 +279,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dataTypeDefinitions, Is.Not.Null);
                 Assert.That(dataTypeDefinitions.Any(), Is.True);
                 Assert.That(dataTypeDefinitions.Any(x => x == null), Is.False);
-                Assert.That(dataTypeDefinitions.Length, Is.EqualTo(29));
+                Assert.That(dataTypeDefinitions.Length, Is.EqualTo(37));
             }
         }
 
