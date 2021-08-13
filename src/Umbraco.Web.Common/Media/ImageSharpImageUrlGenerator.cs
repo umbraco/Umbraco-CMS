@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using SixLabors.ImageSharp;
+using Microsoft.Extensions.Options;
+using SixLabors.ImageSharp.Web.Middleware;
+using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Web.Common.ImageProcessors;
 
-namespace Umbraco.Cms.Infrastructure.Media
+namespace Umbraco.Cms.Web.Common.Media
 {
     /// <summary>
     /// Exposes a method that generates an image URL based on the specified options that can be processed by ImageSharp.
@@ -15,13 +18,25 @@ namespace Umbraco.Cms.Infrastructure.Media
     /// <seealso cref="Umbraco.Cms.Core.Media.IImageUrlGenerator" />
     public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     {
-        private static readonly string[] s_supportedImageFileTypes = Configuration.Default.ImageFormats.SelectMany(f => f.FileExtensions).ToArray();
-
         /// <inheritdoc />
+        public IEnumerable<string> SupportedImageFileTypes { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
+        /// </summary>
+        /// <param name="options">The options.</param>
+        public ImageSharpImageUrlGenerator(IOptions<ImageSharpMiddlewareOptions> options)
+            : this(options.Value.Configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray())
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
+        /// </summary>
+        /// <param name="supportedImageFileTypes">The supported image file types/extensions.</param>
         /// <remarks>
-        /// This uses the default instance of the ImageSharp configuration, so we need to ensure we don't new up a different instance when configuring the middleware.
+        /// This constructor is only used for testing.
         /// </remarks>
-        public IEnumerable<string> SupportedImageFileTypes { get; } = s_supportedImageFileTypes;
+        internal ImageSharpImageUrlGenerator(IEnumerable<string> supportedImageFileTypes) => SupportedImageFileTypes = supportedImageFileTypes;
 
         /// <inheritdoc/>
         public string GetImageUrl(ImageUrlGenerationOptions options)
@@ -46,37 +61,37 @@ namespace Umbraco.Cms.Infrastructure.Media
 
             if (options.FocalPoint != null)
             {
-                AddQueryString("rxy", options.FocalPoint.Left, options.FocalPoint.Top);
+                AddQueryString(ResizeWebProcessor.Xy, options.FocalPoint.Left, options.FocalPoint.Top);
             }
 
             if (options.Crop != null)
             {
-                AddQueryString("cc", options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
+                AddQueryString(CropWebProcessor.Coordinates, options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
             }
 
             if (options.ImageCropMode.HasValue)
             {
-                AddQueryString("rmode", options.ImageCropMode.Value.ToString().ToLowerInvariant());
+                AddQueryString(ResizeWebProcessor.Mode, options.ImageCropMode.Value.ToString().ToLowerInvariant());
             }
 
             if (options.ImageCropAnchor.HasValue)
             {
-                AddQueryString("ranchor", options.ImageCropAnchor.Value.ToString().ToLowerInvariant());
+                AddQueryString(ResizeWebProcessor.Anchor, options.ImageCropAnchor.Value.ToString().ToLowerInvariant());
             }
 
             if (options.Width.HasValue)
             {
-                AddQueryString("width", options.Width.Value);
+                AddQueryString(ResizeWebProcessor.Width, options.Width.Value);
             }
 
             if (options.Height.HasValue)
             {
-                AddQueryString("height", options.Height.Value);
+                AddQueryString(ResizeWebProcessor.Height, options.Height.Value);
             }
 
             if (options.Quality.HasValue)
             {
-                AddQueryString("quality", options.Quality.Value);
+                AddQueryString(JpegQualityWebProcessor.Quality, options.Quality.Value);
             }
 
             if (string.IsNullOrWhiteSpace(options.FurtherOptions) == false)

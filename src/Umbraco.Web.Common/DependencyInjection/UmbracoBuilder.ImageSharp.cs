@@ -8,7 +8,9 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Web.Common.ImageProcessors;
+using Umbraco.Cms.Web.Common.Media;
 
 namespace Umbraco.Extensions
 {
@@ -27,7 +29,6 @@ namespace Umbraco.Extensions
 
             services.AddImageSharp(options =>
             {
-                // We use the same default configuration instance in ImageSharpImageUrlGenerator, so we don't want to create a new instance here
                 options.Configuration = SixLabors.ImageSharp.Configuration.Default;
                 options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
                 options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
@@ -65,6 +66,8 @@ namespace Umbraco.Extensions
                 .RemoveProcessor<ResizeWebProcessor>()
                 .AddProcessor<CropWebProcessor>()
                 .AddProcessor<ResizeWebProcessor>();
+
+            builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
             return services;
         }

@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.PropertyValueConverters()
                 .Remove<SimpleTinyMceValueConverter>();
 
-            builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+            builder.Services.AddUnique<IImageUrlGenerator, NoopImageUrlGenerator>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
