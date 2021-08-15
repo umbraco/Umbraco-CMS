@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Routing
             // and then the comparisons in IsMatch can be way faster - and allocate way less strings
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;
 
-            var test1 = alias.TrimStart('/') + ",";
+            var test1 = alias.TrimStart(Constants.CharArrays.ForwardSlash) + ",";
             var test2 = ",/" + test1; // test2 is ",/alias,"
             test1 = "," + test1; // test1 is ",alias,"
 

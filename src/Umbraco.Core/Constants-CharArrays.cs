@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -77,6 +77,12 @@
             /// Char array containing ~ /
             /// </summary>
             public static readonly char[] TildeForwardSlash = new char[] { '~', '/' };
+
+
+            /// <summary>
+            /// Char array containing ~ / \
+            /// </summary>
+            public static readonly char[] TildeForwardSlashBackSlash = new char[] { '~', '/', "\\" };
 
             /// <summary>
             /// Char array containing only ?

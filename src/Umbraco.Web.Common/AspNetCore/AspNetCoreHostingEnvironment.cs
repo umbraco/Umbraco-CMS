@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
                 throw new ArgumentException("The path appears to already be fully qualified.  Please remove the call to MapPath");
             }
 
-            return Path.Combine(root, newPath.TrimStart('~', '/', '\\'));
+            return Path.Combine(root, newPath.TrimStart(Core.Constants.CharArrays.TildeForwardSlashBackSlash));
         }
 
         /// <inheritdoc/>
