@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core
             /// <summary>
             /// Char array containing ~ / \
             /// </summary>
-            public static readonly char[] TildeForwardSlashBackSlash = new char[] { '~', '/', "\\" };
+            public static readonly char[] TildeForwardSlashBackSlash = new char[] { '~', '/', '\\' };
 
             /// <summary>
             /// Char array containing only ?
