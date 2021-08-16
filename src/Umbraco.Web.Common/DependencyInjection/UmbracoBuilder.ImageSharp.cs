@@ -42,7 +42,7 @@ namespace Umbraco.Extensions
 
                     uint width = context.Parser.ParseValue<uint>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Width), context.Culture);
                     uint height = context.Parser.ParseValue<uint>(context.Commands.GetValueOrDefault(ResizeWebProcessor.Height), context.Culture);
-                    if (width > imagingSettings.Resize.MaxWidth && height > imagingSettings.Resize.MaxHeight)
+                    if (width > imagingSettings.Resize.MaxWidth || height > imagingSettings.Resize.MaxHeight)
                     {
                         context.Commands.Remove(ResizeWebProcessor.Width);
                         context.Commands.Remove(ResizeWebProcessor.Height);
