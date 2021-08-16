@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
 {
@@ -22,6 +23,7 @@ namespace Umbraco.Cms.Core.Routing
         private readonly ContentSettings _contentSettings;
         private readonly IExamineManager _examineManager;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByConfigured404"/> class.
@@ -31,12 +33,14 @@ namespace Umbraco.Cms.Core.Routing
             IEntityService entityService,
             IOptions<ContentSettings> contentConfigSettings,
             IExamineManager examineManager,
+            IVariationContextAccessor variationContextAccessor,
             IUmbracoContextAccessor umbracoContextAccessor)
         {
             _logger = logger;
             _entityService = entityService;
             _contentSettings = contentConfigSettings.Value;
             _examineManager = examineManager;
+            _variationContextAccessor = variationContextAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
@@ -47,11 +51,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                return false;
-            }
-
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             _logger.LogDebug("Looking for a page to handle 404.");
 
             int? domainContentId = null;
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Core.Routing
             var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentSettings.Error404Collection.ToArray(),
                 _entityService,
-                new PublishedContentQuery(umbracoContext.PublishedSnapshot, umbracoContext.VariationContextAccessor, _examineManager),
+                new PublishedContentQuery(umbracoContext.PublishedSnapshot, _variationContextAccessor, _examineManager),
                 errorCulture,
                 domainContentId);
 
