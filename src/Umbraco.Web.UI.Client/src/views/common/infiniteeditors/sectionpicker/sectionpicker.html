@@ -23,10 +23,11 @@
                             <div class="umb-tree-item__inner" style="padding: 5px 10px;">
                                 <button type="button"
                                         class="btn-reset text-left flex-auto"
-                                        ng-class="{'umb-tree-node-checked': section.selected }"
+                                        ng-class="{ 'umb-tree-node-checked': section.selected }"
                                         ng-click="vm.selectSection(section)">
                                     <umb-icon icon="{{section.selected ? 'icon-check' : section.icon}}"
-                                              class="icon umb-tree-icon {{section.selected ? 'icon-check color-green' : section.icon}}">
+                                              class="icon umb-tree-icon"
+                                              ng-class="{ 'color-green': section.selected }">
                                     </umb-icon>
                                     <span>{{ section.name }}</span>
                                 </button>

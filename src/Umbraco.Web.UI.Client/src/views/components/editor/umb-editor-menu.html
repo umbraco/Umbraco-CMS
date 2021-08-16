@@ -15,7 +15,7 @@
     <umb-dropdown ng-if="dropdown.isOpen" class="umb-actions" on-close="dropdown.isOpen = false" deep-blur="dropdown.isOpen = false">
         <umb-dropdown-item class="umb-action" ng-class="{'sep':action.separatorm, '-opens-dialog': action.opensDialog}" ng-repeat="action in actions">
             <button type="button" ng-click="executeMenuItem(action)">
-                <i class="icon icon-{{action.cssclass}}" aria-hidden="true"></i>
+                <umb-icon icon="icon-{{action.cssclass}}" class="icon"></umb-icon>
                 <!-- Render the text that will be visually displayed -->
                 <span class="menu-label" aria-hidden="true">{{action.name}}</span>
                 <!-- Render the textDescription from the language files if it's attached to the action object-->

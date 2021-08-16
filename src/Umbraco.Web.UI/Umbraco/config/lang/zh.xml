@@ -96,26 +96,6 @@
     <key alias="styleShow">显示样式</key>
     <key alias="tableInsert">插入表格</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">要更改所选节点的文档类型，先在列表中选择合适的文档类型。</key>
-    <key alias="changeDocTypeInstruction2">然后设置当前文档类型到新文档类型的各字段间的对应映射关系并保存。</key>
-    <key alias="contentRepublished">内容已被重新发布</key>
-    <key alias="currentProperty">当前属性</key>
-    <key alias="currentType">当前类型</key>
-    <key alias="docTypeCannotBeChanged">不能改变文档类型，因为没有可替代的类型。</key>
-    <key alias="docTypeChanged">文档类型已更改</key>
-    <key alias="mapProperties">要映射的字段</key>
-    <key alias="mapToProperty">映射字段</key>
-    <key alias="newTemplate">新模板</key>
-    <key alias="newType">新类型</key>
-    <key alias="none">无</key>
-    <key alias="selectedContent">内容</key>
-    <key alias="selectNewDocType">选择新的文档类型</key>
-    <key alias="successMessage">选中文档的类型已被成功更改为[new type]，以下字段被映射：</key>
-    <key alias="to">至</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">不能完成字段映射，因为存在一个字段映射至多字段的问题。</key>
-    <key alias="validDocTypesNote">仅显示可作为替代的文档类型。</key>
-  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">已发布</key>
     <key alias="about">关于本页</key>
