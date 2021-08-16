@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -766,7 +767,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
                 new DictionaryItem("Parent")
                 {
                     // This matches what is in the package.xml file
-                    Key = new System.Guid("28f2e02a-8c66-4fcd-85e3-8524d551c0d3"),
+                    Key = new Guid("28f2e02a-8c66-4fcd-85e3-8524d551c0d3"),
                     Translations = new List<IDictionaryTranslation>
                                     {
                                             new DictionaryTranslation(englishLanguage, expectedEnglishParentValue),
@@ -782,6 +783,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             LocalizationService.Save(
                 new DictionaryItem("Parent")
                 {
+                    // This matches what is in the package.xml file
+                    Key = new Guid("28f2e02a-8c66-4fcd-85e3-8524d551c0d3"),
                     Translations = new List<IDictionaryTranslation>
                                     {
                                             new DictionaryTranslation(englishLanguage, expectedEnglishParentValue),
