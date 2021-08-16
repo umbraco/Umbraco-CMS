@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.Routing
         private readonly ContentSettings _contentSettings;
         private readonly IExamineManager _examineManager;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByConfigured404"/> class.
@@ -30,12 +31,14 @@ namespace Umbraco.Cms.Core.Routing
             IEntityService entityService,
             IOptions<ContentSettings> contentConfigSettings,
             IExamineManager examineManager,
+            IVariationContextAccessor variationContextAccessor,
             IUmbracoContextAccessor umbracoContextAccessor)
         {
             _logger = logger;
             _entityService = entityService;
             _contentSettings = contentConfigSettings.Value;
             _examineManager = examineManager;
+            _variationContextAccessor = variationContextAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
@@ -93,7 +96,7 @@ namespace Umbraco.Cms.Core.Routing
             var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentSettings.Error404Collection.ToArray(),
                 _entityService,
-                new PublishedContentQuery(umbCtx.PublishedSnapshot, umbCtx.VariationContextAccessor, _examineManager),
+                new PublishedContentQuery(umbCtx.PublishedSnapshot, _variationContextAccessor, _examineManager),
                 errorCulture,
                 domainContentId);
 
