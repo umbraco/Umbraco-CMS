@@ -26,12 +26,21 @@ function booleanEditorController($scope) {
         $scope.renderModel = {
             value: false
         };
-
-        if ($scope.model.config && $scope.model.config.default && Object.toBoolean($scope.model.config.default) && $scope.model && !$scope.model.value) {
-            $scope.renderModel.value = true;
+        
+        // if no model, the subsequent conditions will both fail
+        // so instead let's exit early
+        if (!$scope.model) {
+            return;
         }
 
-        if ($scope.model && $scope.model.value && Object.toBoolean($scope.model.value)) {
+        if ($scope.model.config && $scope.model.config.default && Object.toBoolean($scope.model.config.default) && !$scope.model.value) {
+            $scope.renderModel.value = true;
+            // no need to check the final condition as
+            // the value is already set to true
+            return;
+        }
+
+        if ($scope.model.value && Object.toBoolean($scope.model.value)) {
             $scope.renderModel.value = true;
         }
     }
