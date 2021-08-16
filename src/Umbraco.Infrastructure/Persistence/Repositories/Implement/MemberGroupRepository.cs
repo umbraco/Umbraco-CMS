@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
 
             if (ids.Any())
-                sql.Where("umbracoNode.id in (@ids)", new { /*ids =*/ ids });
+                sql.WhereIn<NodeDto>(x => x.NodeId, ids);
 
             return Database.Fetch<NodeDto>(sql).Select(x => MemberGroupFactory.BuildEntity(x));
         }
@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public IMemberGroup Get(Guid uniqueId)
         {
             var sql = GetBaseQuery(false);
-            sql.Where("umbracoNode.uniqueId = @uniqueId", new { uniqueId });
+            sql.Where<NodeDto>(x => x.UniqueId == uniqueId);
 
             var dto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
 
@@ -260,7 +260,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     .InnerJoin<Member2MemberGroupDto>()
                     .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
                     .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where("cmsMember2MemberGroup.Member in (@ids)", new { ids = memberIds });
+                    .WhereIn<Member2MemberGroupDto>(x => x.Member, memberIds);
 
                 currentlyAssigned = Database.Fetch<AssignedRolesDto>(assignedSql).ToArray();
             }

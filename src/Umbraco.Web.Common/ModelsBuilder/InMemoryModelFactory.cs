@@ -26,7 +26,7 @@ using File = System.IO.File;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
-    internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject
+    internal class InMemoryModelFactory : IAutoPublishedModelFactory, IRegisteredObject, IDisposable
     {
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
         private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
         private readonly Lazy<string> _pureLiveDirectory;
-
+        private bool _disposedValue;
 
 
         public InMemoryModelFactory(
@@ -788,10 +788,30 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
         public void Stop(bool immediate)
         {
-            _watcher.EnableRaisingEvents = false;
-            _watcher.Dispose();
-            _locker.Dispose();
+            Dispose();
+
             _hostingLifetime.UnregisterObject(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _watcher.EnableRaisingEvents = false;
+                    _watcher.Dispose();
+                    _locker.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
 
         internal class Infos

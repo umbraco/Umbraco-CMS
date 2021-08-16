@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -108,7 +109,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoRelationType.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.RelationType}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

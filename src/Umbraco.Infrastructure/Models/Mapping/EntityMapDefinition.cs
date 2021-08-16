@@ -39,7 +39,6 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Trashed = source.Trashed;
             target.Udi = Udi.Create(ObjectTypes.GetUdiType(source.NodeObjectType), source.Key);
 
-
             if (source is IContentEntitySlim contentSlim)
             {
                 source.AdditionalData["ContentTypeAlias"] = contentSlim.ContentTypeAlias;
@@ -149,6 +148,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             if (target.Icon.IsNullOrWhiteSpace())
             {
+                if (source.NodeObjectType == Constants.ObjectTypes.Document)
+                    target.Icon = Constants.Icons.Content;
+                if (source.NodeObjectType == Constants.ObjectTypes.Media)
+                    target.Icon = Constants.Icons.Content;
                 if (source.NodeObjectType == Constants.ObjectTypes.Member)
                     target.Icon = Constants.Icons.Member;
                 else if (source.NodeObjectType == Constants.ObjectTypes.DataType)
@@ -157,6 +160,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     target.Icon = Constants.Icons.ContentType;
                 else if (source.NodeObjectType == Constants.ObjectTypes.MediaType)
                     target.Icon = Constants.Icons.MediaType;
+                else if (source.NodeObjectType == Constants.ObjectTypes.MemberType)
+                    target.Icon = Constants.Icons.MemberType;
                 else if (source.NodeObjectType == Constants.ObjectTypes.TemplateType)
                     target.Icon = Constants.Icons.Template;
             }
@@ -242,7 +247,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             switch (entity)
             {
                 case IMemberEntitySlim memberEntity:
-                    return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(Constants.Icons.Member);
+                    return memberEntity.ContentTypeIcon;
                 case IContentEntitySlim contentEntity:
                     // NOTE: this case covers both content and media entities
                     return contentEntity.ContentTypeIcon;

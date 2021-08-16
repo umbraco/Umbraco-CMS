@@ -35,6 +35,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             {
                 ContentCache.Dispose();
                 MediaCache.Dispose();
+                MemberCache.Dispose();
             }
         }
 

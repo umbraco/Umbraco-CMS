@@ -425,7 +425,7 @@ ORDER BY colName";
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoUser.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.User}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -574,7 +574,7 @@ ORDER BY colName";
             {
                 userDto.EmailConfirmedDate = null;
                 changedCols.Add("emailConfirmedDate");
-                
+
                 // If the security stamp hasn't already updated we need to force it
                 if (entity.IsPropertyDirty("SecurityStamp") == false)
                 {

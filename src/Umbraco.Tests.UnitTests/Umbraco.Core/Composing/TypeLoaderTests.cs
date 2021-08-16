@@ -40,7 +40,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
                     typeof(Guid).Assembly,
                     typeof(Assert).Assembly,
                     typeof(System.Xml.NameTable).Assembly,
-                    typeof(System.Configuration.GenericEnumConverter).Assembly,
                     ////typeof(TabPage).Assembly,
                     typeof(TypeFinder).Assembly,
                     typeof(UmbracoContext).Assembly,

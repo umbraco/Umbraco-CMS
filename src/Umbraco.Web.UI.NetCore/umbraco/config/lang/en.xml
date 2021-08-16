@@ -189,26 +189,6 @@
     <key alias="smallCustom">Custom</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">To change the Document Type for the selected content, first select from the list of valid types for this location.</key>
-    <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
-    <key alias="contentRepublished">The content has been re-published.</key>
-    <key alias="currentProperty">Current Property</key>
-    <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The Document Type cannot be changed, as there are no alternatives valid for this location.  An alternative will be valid if it is allowed under the parent of the selected content item and that all existing child content items are allowed to be created under it.</key>
-    <key alias="docTypeChanged">Document Type Changed</key>
-    <key alias="mapProperties">Map Properties</key>
-    <key alias="mapToProperty">Map to Property</key>
-    <key alias="newTemplate">New Template</key>
-    <key alias="newType">New Type</key>
-    <key alias="none">none</key>
-    <key alias="selectedContent">Content</key>
-    <key alias="selectNewDocType">Select New Document Type</key>
-    <key alias="successMessage">The Document Type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
-    <key alias="to">to</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
-    <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
     <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
@@ -2325,6 +2305,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
+    <key alias="maxAmount">Maximum amount</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>

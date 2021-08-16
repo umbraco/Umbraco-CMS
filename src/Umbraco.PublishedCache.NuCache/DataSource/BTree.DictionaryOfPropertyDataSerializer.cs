@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     /// </summary>
     internal class DictionaryOfPropertyDataSerializer : SerializerBase, ISerializer<IDictionary<string, PropertyData[]>>, IDictionaryOfPropertyDataSerializer
     {
+        private static readonly PropertyData[] Empty = Array.Empty<PropertyData>();
         public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
         {
 
@@ -26,6 +27,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
                 // read values count
                 var vcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+                if(vcount == 0)
+                {
+                    dict[key] = Empty;
+                    continue;
+                }
 
                 // create pdata and add to the dictionary
                 var pdatas = new PropertyData[vcount];

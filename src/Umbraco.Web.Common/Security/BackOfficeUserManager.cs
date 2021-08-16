@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Web.Common.Security
             IdentityResult result = await base.SetLockoutEndDateAsync(user, lockoutEnd);
 
             // The way we unlock is by setting the lockoutEnd date to the current datetime
-            if (result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
+            if (result.Succeeded && lockoutEnd > DateTimeOffset.UtcNow)
             {
                 NotifyAccountLocked(_httpContextAccessor.HttpContext?.User, user.Id);
             }

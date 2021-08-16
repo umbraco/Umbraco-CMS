@@ -91,7 +91,7 @@ namespace Umbraco.Extensions
             this IHtmlHelper htmlHelper,
             string partialViewName,
             object model,
-            int cachedSeconds,
+            TimeSpan cacheTimeout,
             bool cacheByPage = false,
             bool cacheByMember = false,
             ViewDataDictionary viewData = null,
@@ -104,10 +104,13 @@ namespace Umbraco.Extensions
             {
                 cacheKey.AppendFormat("{0}-", cultureName);
             }
+
+            var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(htmlHelper);
+            var umbracoContext = umbracoContextAccessor.UmbracoContext;
+
             if (cacheByPage)
             {
-                var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(htmlHelper);
-                if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+                if (umbracoContext == null)
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
                 }
@@ -131,7 +134,7 @@ namespace Umbraco.Extensions
             var appCaches = GetRequiredService<AppCaches>(htmlHelper);
             var hostingEnvironment = GetRequiredService<IHostingEnvironment>(htmlHelper);
 
-            return appCaches.CachedPartialView(hostingEnvironment, htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
+            return appCaches.CachedPartialView(hostingEnvironment, umbracoContext, htmlHelper, partialViewName, model, cacheTimeout, cacheKey.ToString(), viewData);
         }
 
         // public static IHtmlContent EditorFor<T>(this IHtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)

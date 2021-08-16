@@ -39,11 +39,6 @@ namespace Umbraco.Cms.Web.Common.Security
             var username = currentMember.UserName;
             IList<string> userRoles = await memberManager.GetRolesAsync(currentMember);
 
-            if (userRoles.Count == 0)
-            {
-                return PublicAccessStatus.AccessDenied;
-            }
-
             if (!currentMember.IsApproved)
             {
                 return PublicAccessStatus.NotApproved;

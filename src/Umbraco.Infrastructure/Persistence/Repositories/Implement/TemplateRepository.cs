@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -123,7 +124,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return sql;
         }
 
-        protected override string GetBaseWhereClause() => Cms.Core.Constants.DatabaseSchema.Tables.Node + ".id = @id";
+        protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
