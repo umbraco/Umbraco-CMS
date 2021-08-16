@@ -44,10 +44,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
             IPublishedContent node = null;
 

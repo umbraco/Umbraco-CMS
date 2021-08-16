@@ -66,10 +66,7 @@ namespace Umbraco.Cms.Core.Templates
             {
                 throw new ArgumentException("Invalid content id " + contentId);
             }
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("A current Umbraco context is not available");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var content = umbracoContext.Content?.GetById(contentId);
 
             if (content == null)

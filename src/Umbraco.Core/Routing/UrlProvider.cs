@@ -50,26 +50,17 @@ namespace Umbraco.Cms.Core.Routing
 
         private IPublishedContent GetDocument(int id)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("A current Umbraco context is not available");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             return umbracoContext.Content.GetById(id);
         }
         private IPublishedContent GetDocument(Guid id)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("A current Umbraco context is not available");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             return umbracoContext.Content.GetById(id);
         }
         private IPublishedContent GetMedia(Guid id)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("A current Umbraco context is not available");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             return umbracoContext.Media.GetById(id);
         }
 
@@ -128,10 +119,7 @@ namespace Umbraco.Cms.Core.Routing
 
             if (current == null)
             {
-                if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-                {
-                    throw new InvalidOperationException("A current Umbraco context is not available");
-                }
+                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
             
@@ -143,10 +131,7 @@ namespace Umbraco.Cms.Core.Routing
 
         public string GetUrlFromRoute(int id, string route, string culture)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("A current Umbraco context is not available");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
@@ -170,10 +155,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("A current Umbraco context is not available");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             return GetOtherUrls(id, umbracoContext.CleanedUmbracoUrl);
         }
 
@@ -245,10 +227,7 @@ namespace Umbraco.Cms.Core.Routing
 
             if (current == null)
             {
-                if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-                {
-                    throw new InvalidOperationException("A current Umbraco context is not available");
-                }
+                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
                 

@@ -51,10 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         // different preview modes.
         private string RenderRteMacros(string source, bool preview)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             using (umbracoContext.ForcedPreview(preview)) // force for macro rendering
             {
                 var sb = new StringBuilder();

@@ -166,10 +166,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
-                if (!umbCtx.TryGetUmbracoContext(out var umbracoContext))
-                {
-                    throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-                }
+                var umbracoContext = umbCtx.GetRequiredUmbracoContext();
                 return new PublishedContentQuery(umbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
             });
 

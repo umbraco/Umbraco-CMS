@@ -41,10 +41,7 @@ namespace Umbraco.Cms.Core.Templates
         /// <returns></returns>
         public string EnsureInternalLinks(string text, bool preview)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             if (!preview)
                 return EnsureInternalLinks(text);
 

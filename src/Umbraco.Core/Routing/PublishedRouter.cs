@@ -265,10 +265,7 @@ namespace Umbraco.Cms.Core.Routing
 
             // note - we are not handling schemes nor ports here.
             _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             IDomainCache domainsCache = umbracoContext.PublishedSnapshot.Domains;
             var domains = domainsCache.GetAll(includeWildcards: false).ToList();
 
@@ -347,10 +344,7 @@ namespace Umbraco.Cms.Core.Routing
             var nodePath = request.PublishedContent.Path;
             _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
             var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             Domain domain = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
 
             // always has a contentId and a culture
@@ -504,10 +498,7 @@ namespace Umbraco.Cms.Core.Routing
             var valid = false;
             IPublishedContent internalRedirectNode = null;
             var internalRedirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
 
             if (internalRedirectId > 0)
             {
