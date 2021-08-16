@@ -205,10 +205,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 PropertyCacheLevel referenceCacheLevel,
                 object inter,
                 bool preview) {
-                if(!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-                {
-                    throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-                }
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 return ((int[])inter).Select(x =>
                 (PublishedSnapshotTestObjects.TestContentModel1)publishedSnapshot.Content
                     .GetById(x)).ToArray();

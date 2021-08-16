@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
@@ -32,10 +33,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 
         public static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor, PublishedItemType itemType, string alias)
         {
-            if (!publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-            {
-                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-            }
+            var publishedSnapshot = publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             switch (itemType)
             {
                 case PublishedItemType.Content:

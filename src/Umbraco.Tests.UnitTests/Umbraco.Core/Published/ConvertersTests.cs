@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -13,9 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
-using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
@@ -172,10 +169,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
 
             public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
-                if(!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-                {
-                    throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-                }
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 return publishedSnapshot.Content.GetById((int)inter);
             }
 

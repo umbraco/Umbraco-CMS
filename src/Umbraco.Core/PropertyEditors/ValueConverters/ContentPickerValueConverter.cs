@@ -17,10 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
         };
 
-        public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
-        {
-            _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        }
+        public ContentPickerValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor) => _publishedSnapshotAccessor = publishedSnapshotAccessor;
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ContentPicker);
@@ -57,10 +54,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             if ((propertyType.Alias != null && PropertiesToExclude.Contains(propertyType.Alias.ToLower(CultureInfo.InvariantCulture))) == false)
             {
                 IPublishedContent content;
-                if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-                {
-                    throw new InvalidOperationException("Wasn't possible to get a published snapshot");
-                }
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 if (inter is int id)
                 {
                     

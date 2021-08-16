@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -18,7 +17,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -95,10 +93,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         {
                             continue;
                         }
-                        if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-                        {
-                            throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-                        }
+                        var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                         if (entity is IDocumentEntitySlim documentEntity)
                         {
                             icon = documentEntity.ContentTypeIcon;

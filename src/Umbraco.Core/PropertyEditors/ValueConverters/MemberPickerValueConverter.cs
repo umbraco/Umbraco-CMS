@@ -58,11 +58,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
 
             IPublishedContent member;
-
-            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-            {
-                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-            }
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             if (source is int id)
             {
                 IMember m = _memberService.GetById(id);

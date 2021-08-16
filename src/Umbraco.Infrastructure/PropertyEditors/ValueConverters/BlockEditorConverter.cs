@@ -5,6 +5,7 @@ using System;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
@@ -26,10 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             BlockItemData data,
             PropertyCacheLevel referenceCacheLevel, bool preview)
         {
-            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-            {
-                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-            }
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             // hack! we need to cast, we have no choice beacuse we cannot make breaking changes.
             var publishedContentCache = publishedSnapshot.Content;
 

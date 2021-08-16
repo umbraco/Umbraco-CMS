@@ -63,10 +63,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var mediaItems = new List<MediaWithCrops>();
             var dtos = MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(_jsonSerializer, inter);
             var configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
-            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-            {
-                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-            }
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             foreach (var dto in dtos)
             {
                 var mediaItem = publishedSnapshot.Media.GetById(preview, dto.MediaKey);

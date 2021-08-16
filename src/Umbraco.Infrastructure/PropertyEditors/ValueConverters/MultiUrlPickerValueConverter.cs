@@ -58,10 +58,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
                 var links = new List<Link>();
                 var dtos = _jsonSerializer.Deserialize<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter.ToString());
-                if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-                {
-                    throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-                }
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 foreach (var dto in dtos)
                 {
                     var type = LinkType.External;

@@ -142,10 +142,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     // elements cache (if we don't want to pollute the elements cache with short-lived
                     // data) depending on settings
                     // for members, always cache in the snapshot cache - never pollute elements cache
-                    if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out publishedSnapshot))
-                    {
-                        throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-                    }
+                    publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                     cache = publishedSnapshot == null
                         ? null
                         : ((_isPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (_isMember == false)
@@ -155,10 +152,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     break;
                 case PropertyCacheLevel.Snapshot:
                     // cache within the snapshot cache
-                    if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out publishedSnapshot))
-                    {
-                        throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-                    }
+                    publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                     cache = publishedSnapshot?.SnapshotCache;
                     cacheValues = GetCacheValues(cache);
                     break;
