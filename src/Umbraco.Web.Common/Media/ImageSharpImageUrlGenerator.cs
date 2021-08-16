@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Microsoft.Extensions.Options;
-using SixLabors.ImageSharp.Web.Middleware;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -24,9 +23,9 @@ namespace Umbraco.Cms.Web.Common.Media
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
         /// </summary>
-        /// <param name="options">The options.</param>
-        public ImageSharpImageUrlGenerator(IOptions<ImageSharpMiddlewareOptions> options)
-            : this(options.Value.Configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray())
+        /// <param name="configuration">The ImageSharp configuration.</param>
+        public ImageSharpImageUrlGenerator(Configuration configuration)
+            : this(configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray())
         { }
 
         /// <summary>

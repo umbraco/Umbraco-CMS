@@ -180,6 +180,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<ICronTabParser, NCronTabParser>();
 
+            // Add default ImageSharp configuration
+            builder.Services.AddUnique(SixLabors.ImageSharp.Configuration.Default);
             builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
 
             builder.Services.AddUnique<PackageDataInstallation>();

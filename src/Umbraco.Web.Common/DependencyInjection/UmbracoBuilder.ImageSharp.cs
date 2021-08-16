@@ -2,13 +2,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
 using Umbraco.Cms.Web.Common.Media;
 
@@ -29,6 +32,7 @@ namespace Umbraco.Extensions
 
             services.AddImageSharp(options =>
             {
+                // The configuration is set using ImageSharpConfigurationOptions
                 options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
                 options.CacheMaxAge = imagingSettings.Cache.CacheMaxAge;
                 options.CachedNameLength = imagingSettings.Cache.CachedNameLength;
@@ -52,15 +56,13 @@ namespace Umbraco.Extensions
                     return Task.CompletedTask;
                 };
             })
-                .Configure<PhysicalFileSystemCacheOptions>(options =>
-                {
-                    options.CacheFolder = imagingSettings.Cache.CacheFolder;
-                })
+                .Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = imagingSettings.Cache.CacheFolder)
                 // We need to add CropWebProcessor before ResizeWebProcessor (until https://github.com/SixLabors/ImageSharp.Web/issues/182 is fixed)
                 .RemoveProcessor<ResizeWebProcessor>()
                 .AddProcessor<CropWebProcessor>()
                 .AddProcessor<ResizeWebProcessor>();
 
+            builder.Services.AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ImageSharpConfigurationOptions>();
             builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
             return services;
