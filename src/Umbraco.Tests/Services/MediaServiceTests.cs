@@ -163,9 +163,9 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var mediaService = ServiceContext.MediaService;
-            var mediaType = MockedContentTypes.CreateVideoMediaType();
+            var mediaType = MockedContentTypes.CreateNewMediaType();
             ServiceContext.MediaTypeService.Save(mediaType);
-            var media = mediaService.CreateMedia(string.Empty, -1, "video");
+            var media = mediaService.CreateMedia(string.Empty, -1, Constants.Conventions.MediaTypes.VideoAlias);
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => mediaService.Save(media));
@@ -175,9 +175,9 @@ namespace Umbraco.Tests.Services
         public void Ensure_Content_Xml_Created()
         {
             var mediaService = ServiceContext.MediaService;
-            var mediaType = MockedContentTypes.CreateVideoMediaType();
+            var mediaType = MockedContentTypes.CreateNewMediaType();
             ServiceContext.MediaTypeService.Save(mediaType);
-            var media = mediaService.CreateMedia("Test", -1, "video");
+            var media = mediaService.CreateMedia("Test", -1, Constants.Conventions.MediaTypes.VideoAlias);
 
             mediaService.Save(media);
 

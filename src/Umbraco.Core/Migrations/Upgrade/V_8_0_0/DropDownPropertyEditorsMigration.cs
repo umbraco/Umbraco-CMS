@@ -46,7 +46,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error<DropDownPropertyEditorsMigration>(
+                        Logger.Error<DropDownPropertyEditorsMigration, string>(
                             ex, "Invalid configuration: \"{Configuration}\", cannot convert editor.",
                             dataType.Configuration);
 

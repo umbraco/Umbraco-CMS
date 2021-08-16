@@ -6,8 +6,8 @@
             <ul class="umb-actions umb-actions-child">
 
                 <li class="umb-action" ng-repeat="docType in allowedTypes">
-                    <button class="umb-action-link umb-outline btn-reset" ng-click="createMemberType(docType)">
-                        <i class="large icon {{docType.icon}}"></i>
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createMemberType(docType)">
+                        <umb-icon icon="{{docType.icon}}" class="icon large"></umb-icon>
                         <span class="menu-label">
                             {{docType.name}}
                             <small>{{docType.description}}</small>

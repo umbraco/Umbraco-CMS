@@ -24,10 +24,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
             new AcceptableConfiguration { IsRecommended = true, Value = bool.FalseString.ToLower() }
         };
 
-        public override string CheckSuccessMessage => TextService.Localize("healthcheck/traceModeCheckSuccessMessage");
+        public override string CheckSuccessMessage => TextService.Localize("healthcheck", "traceModeCheckSuccessMessage");
 
-        public override string CheckErrorMessage => TextService.Localize("healthcheck/traceModeCheckErrorMessage");
+        public override string CheckErrorMessage => TextService.Localize("healthcheck", "traceModeCheckErrorMessage");
 
-        public override string RectifySuccessMessage => TextService.Localize("healthcheck/traceModeCheckRectifySuccessMessage");
+        public override string RectifySuccessMessage => TextService.Localize("healthcheck", "traceModeCheckRectifySuccessMessage");
     }
 }

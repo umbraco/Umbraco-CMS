@@ -133,26 +133,6 @@
     <key alias="undo">Deshacer</key>
     <key alias="redo">Rehacer</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Para cambiar el tipo de documento al contenido seleccionado, primero selecciona uno de la lista de tipos válidos.</key>
-        <key alias="changeDocTypeInstruction2">Entonces confirma el mapeo de propiedades del tipo actual al nuevo y haz clic en Guardar.</key>
-    <key alias="contentRepublished">El contenido se ha vuelto a publicar.</key>
-    <key alias="currentProperty">Propiedad actual</key>
-    <key alias="currentType">Tipo actual</key>
-    <key alias="docTypeCannotBeChanged">El tipo de contenido no se puede cambiar, porque no hay alternativas válidas para este contenido.</key>
-    <key alias="docTypeChanged">Tipo de documento cambiado</key>
-    <key alias="mapProperties">Mapeo de propiedades</key>
-    <key alias="mapToProperty">Mapea a la propiedad</key>
-    <key alias="newTemplate">Nueva plantilla</key>
-    <key alias="newType">Nuevo tipo</key>
-    <key alias="none">ninguno</key>
-    <key alias="selectedContent">Contenido</key>
-    <key alias="selectNewDocType">Selecciona un nuevo Tipo de Documento</key>
-    <key alias="successMessage">El tipo de documento del contenido seleccionado ha sido cambiado correctamente a [new type] y las siguientes propiedades mapeadas:</key>
-    <key alias="to">a</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">No se ha podido completar el mapeo de propiedades porque uno o más propiedades tienen más de un mapeo definido.</key>
-    <key alias="validDocTypesNote">Solo se muestran otros tipos válidos para el contenido actual.</key>
-  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Está publicado</key>
     <key alias="about">Acerca de</key>
@@ -208,7 +188,7 @@
     <key alias="childItems" version="7.0">Nodos hijo</key>
         <key alias="target" version="7.0">Destino</key>
     <key alias="scheduledPublishServerTime">Esto se traduce en la siguiente hora en el servidor:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">¿Esto qué significa?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">¿Esto qué significa?</a>]]></key>
     <key alias="nestedContentDeleteItem">¿Estás seguro que quieres eliminar este elemento?</key>
     <key alias="nestedContentEditorNotSupported">Propiedad %0% utiliza editor %1% que no está soportado por Nested Content.</key>
     <key alias="addTextBox">Añadir otra caja de texto</key>
@@ -320,7 +300,7 @@
         <key alias="recycleBinDeleting">Se está vaciando la papelera. No cierres esta ventana mientras se ejecuta este proceso</key>
     <key alias="recycleBinIsEmpty">La papelera está vacía</key>
         <key alias="recycleBinWarning">No podrás recuperar los elementos una vez sean borrados de la papelera</key>
-    <key alias="regexSearchError"><![CDATA[El servicio web <a target='_blank' href='http://regexlib.com'>regexlib.com</a> está experimentando algunos problemas en estos momentos, de los cuales no somos responsables. Pedimos disculpas por las molestias.]]></key>
+    <key alias="regexSearchError"><![CDATA[El servicio web <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> está experimentando algunos problemas en estos momentos, de los cuales no somos responsables. Pedimos disculpas por las molestias.]]></key>
     <key alias="regexSearchHelp">Buscar una expresión regular para agregar validación a un campo de formulario. Ejemplo: 'correo electrónico', 'código postal', 'URL'.</key>
     <key alias="removeMacro">Eliminar macro</key>
     <key alias="requiredField">Campo obligatorio</key>
@@ -671,7 +651,7 @@
     <key alias="theEndHeader">Umbraco %0% ha sido instalado y está listo para ser usado</key>
     <key alias="theEndInstallFailed"><![CDATA[Para completar la instalación, necesitaras editar de forma manual el <strong>archivo /web.config</strong> y actualizar la clave del AppSetting <strong>UmbracoConfigurationStatus</strong> del final al valor <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Puedes <strong>empezar inmediatamente</strong> pulsando el botón "Lanzar Umbraco" de debajo. <br />Si eres <strong>nuevo con Umbraco</strong>, puedes encontrar cantidad de recursos en nuestras páginas de cómo empezar.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lanzar Umbraco</h3> Para administrar tu sitio web, simplemente abre el back office de Umbraco y empieza a añadir contenido, a actualizar plantillas y hojas de estilo o a añadir nueva funcionalidad]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lanzar Umbraco</h3> Para administrar tu sitio web, simplemente abre el backoffice de Umbraco y empieza a añadir contenido, a actualizar plantillas y hojas de estilo o a añadir nueva funcionalidad]]></key>
     <key alias="Unavailable">No se ha podido establecer la conexión con la base de datos</key>
     <key alias="Version3">Umbraco versión 3</key>
     <key alias="Version4">Umbraco versión 4</key>
@@ -696,7 +676,7 @@
     <key alias="greeting6">Resplandeciente sábado</key>
     <key alias="instruction">Iniciar sesión</key>
     <key alias="timeout">La sesión ha caducado</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">¿Olvidaste tu contraseña?</key>
     <key alias="forgottenPasswordInstruction">Enviaremos un email a la dirección especificada con un enlace para restaurar tu contraseña</key>
         <key alias="requestPasswordResetConfirmation">Un email con instrucciones para restaurar tu contraseña será enviado a la dirección especificada si ésta está registrada.</key>
@@ -752,7 +732,7 @@
 																<tbody>
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Pulsa este enlace para restaurar tu contraseña
 																			</a>
 																		</td>
@@ -989,7 +969,6 @@
     <key alias="tabs">Pestañas</key>
     <key alias="contentTypeEnabled">Tipo de Contenido Maestro activado</key>
     <key alias="contentTypeUses">Este Tipo de Contenido usa</key>
-    <key alias="asAContentMasterType">como Tipo de Contenido Maestro. Las pestañas para los Tipos de Contenido Maestros no se muestran y solo se pueden modificar desde el Tipo de Contenido Maestro</key>
     <key alias="noPropertiesDefinedOnTab">No existen propiedades para esta pestaña. Haz clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.</key>
     <key alias="addIcon">Añadir icono</key>
   </area>
@@ -1114,9 +1093,9 @@
       ]]></key>
     <key alias="sectionName">Nombre de sección</key>
     <key alias="sectionMandatory">Sección es obligatoria</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
             Si está marcada como obligatoria, la plantilla hija debe contener una definición de <code>@section</code> o se mostrará un error.
-        </key>
+    ]]></key>
     <key alias="queryBuilder">Constructor de consultas</key>
     <key alias="itemsReturned">elementos devueltos, en</key>
     <key alias="iWant">Quiero</key>
@@ -1284,7 +1263,7 @@
 
         Este mail se ha generado automáticamente para informale que %2% has solicitado que el documento '%1%' sea traducido en '%5%'.
 
-        Para editarlo, vaya a la dirección http://%3%/translation/details.aspx?id=%4% o inicia sesión en umbraco y ve a http://%3% para ver las tareas pendientes de traducir.
+        Para editarlo, vaya a la dirección http://%3%/translation/details.aspx?id=%4% o inicia sesión en Umbraco y ve a http://%3% para ver las tareas pendientes de traducir.
 
         Espero que tenga un buen dia.
 
@@ -1485,7 +1464,7 @@
 																			<tbody>
 																				<tr>
 																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																							Pulsa este enlace para aceptar la invitación
 																						</a>
 																					</td>

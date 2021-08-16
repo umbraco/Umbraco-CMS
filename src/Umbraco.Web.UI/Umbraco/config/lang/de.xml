@@ -181,26 +181,6 @@
     <key alias="smallSort">Sortieren</key>
     <key alias="historyIncludingVariants">Verlauf (alle Variationen)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Um den Typ des ausgewählten Dokuments zu ändern, wählen Sie bitte zunächst aus der Liste der an dieser Stelle erlaubten Dokumenttypen.</key>
-    <key alias="changeDocTypeInstruction2">Im Anschluss bestätigen oder korrigieren Sie die Zuordnung der Eigenschaften und klicken Sie auf 'Speichern'.</key>
-    <key alias="contentRepublished">Der Inhalt wurde neu veröffentlicht.</key>
-    <key alias="currentProperty">Derzeitige Eigenschaft</key>
-    <key alias="currentType">Derzeitiger Datentyp</key>
-    <key alias="docTypeCannotBeChanged">Der Typ dieses Dokuments kann nicht geändert werden, da an dieser Stelle keine Alternativen zugelassen sind. Ein alternativer Dokumenttyp kann nur dann verwendet werden, wenn er unterhalb des diesem Dokument übergeordneten Elements angelegt werden darf.</key>
-    <key alias="docTypeChanged">Dokumenttyp geändert</key>
-    <key alias="mapProperties">Eigenschaften zuordnen</key>
-    <key alias="mapToProperty">Dieser Eigenschaft zuordnen</key>
-    <key alias="newTemplate">Neue Vorlage</key>
-    <key alias="newType">Neuer Typ</key>
-    <key alias="none">keiner</key>
-    <key alias="selectedContent">Inhalt</key>
-    <key alias="selectNewDocType">Neuen Dokumenttyp auswählen</key>
-    <key alias="successMessage">Der Typ des ausgewählten Dokuments wurde erfolgreich zu [new type] geändert und die Eigenschaften wie folgend zugeordnet:</key>
-    <key alias="to">nach</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Die Zuordnung der Eigenschaften kann nicht abgeschlossen werden, da mindestens eine Eigenschaft mehrfach zugeordnet werden soll.</key>
-    <key alias="validDocTypesNote">Nur an dieser Stelle erlaubte Dokumenttypen werden angezeigt.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Es konnte kein Verzeichnis unter dem Knoten mit der ID %0% angelegt werden.</key>
     <key alias="createFolderFailedByName">Es konnte kein Verzeichnis unter dem Knoten mit dem Namen %0% angelegt werden.</key>
@@ -284,7 +264,7 @@
     <key alias="scheduledPublishServerTime">Dies führt zur folgenden Zeit auf dem Server:</key>
     <key alias="scheduledPublishDocumentation">
       <![CDATA[
-    	<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Was bedeutet dies?</a>
+    	<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Was bedeutet dies?</a>
     ]]>
     </key>
     <key alias="nestedContentDeleteItem">Wollen Sie dieses Element wirklich entfernen?</key>
@@ -445,7 +425,7 @@
     <key alias="recycleBinDeleting">Der Papierkorb wird geleert. Bitte warten Sie und schließen Sie das Fenster erst, wenn der Vorgang abgeschlossen ist.</key>
     <key alias="recycleBinIsEmpty">Der Papierkorb ist leer</key>
     <key alias="recycleBinWarning">Wenn Sie den Papierkorb leeren, werden die enthaltenen Elemente endgültig gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.</key>
-    <key alias="regexSearchError">Der Webservice von &lt;a target='_blank' href='http://regexlib.com'&gt;regexlib.com&lt;/a&gt; ist zur Zeit nicht erreichbar. Bitte versuchen Sie es später erneut.</key>
+    <key alias="regexSearchError">Der Webservice von &lt;a target='_blank' rel='noopener' href='http://regexlib.com'&gt;regexlib.com&lt;/a&gt; ist zur Zeit nicht erreichbar. Bitte versuchen Sie es später erneut.</key>
     <key alias="regexSearchHelp">Finden Sie einen vorbereiteten regulären Ausdruck zur Validierung der Werte, die in dieses Feld eingegeben werden - zum Beispiel 'email, 'plz', 'URL' oder ähnlich.</key>
     <key alias="removeMacro">Macro entfernen</key>
     <key alias="requiredField">Pflichtfeld</key>
@@ -927,7 +907,7 @@
     <key alias="instruction">Hier anmelden:</key>
     <key alias="signInWith">Anmelden mit</key>
     <key alias="timeout">Sitzung abgelaufen</key>
-    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="https://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
+    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
     <key alias="forgottenPassword">Kennwort vergessen?</key>
     <key alias="forgottenPasswordInstruction">Es wird eine E-Mail mit einem Kennwort-Zurücksetzen-Link an die angegebene Adresse geschickt.</key>
     <key alias="requestPasswordResetConfirmation">Es wird eine E-Mail mit Anweisungen zum Zurücksetzen des Kennwortes an die angegebene Adresse geschickt sofern diese im Datenbestand gefunden wurde.</key>
@@ -986,7 +966,7 @@
 														<tbody>
 															<tr>
 																<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																	<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																	<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																		Klicken Sie hier, um Ihr Kennwort zurück zu setzen
 																	</a>
 																</td>
@@ -1104,7 +1084,7 @@
 															<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
 																<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
 																	<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																		<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>Bearbeiten</a> </td> </tr></tbody></table>
+																		<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>Bearbeiten</a> </td> </tr></tbody></table>
 															</td>
 														</tr>
 													</tbody>
@@ -1388,7 +1368,6 @@
     <key alias="tabs">Registerkarten</key>
     <key alias="contentTypeEnabled">Masterdokumenttyp aktiviert</key>
     <key alias="contentTypeUses">Dieser Dokumenttyp verwendet</key>
-    <key alias="asAContentMasterType">als Masterdokumenttyp. Register vom Masterdokumenttyp werden nicht angezeigt und können nur im Masterdokumenttyp selbst bearbeitet werden</key>
     <key alias="noPropertiesDefinedOnTab">Für dieses Register sind keine Eigenschaften definiert. Klicken Sie oben auf "neue Eigenschaft hinzufügen", um eine neue Eigenschaft hinzuzufügen.</key>
     <key alias="createMatchingTemplate">Zugehörige Vorlage anlegen</key>
     <key alias="addIcon">Bildsymbol hinzufügen</key>
@@ -1558,10 +1537,10 @@
     </key>
     <key alias="sectionName">Bereichsname</key>
     <key alias="sectionMandatory">Bereich ist notwendig</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Wenn notwendig, dann muss die untergeordnete Vorlage eine <code>@section</code> Definition gleichen Namens enthalten,
       anderfalls tritt ein Fehler auf.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Abfrage-Generator</key>
     <key alias="itemsReturned">zurückgegebene Elemente, in</key>
     <key alias="iWant">Ich möchte</key>
@@ -2006,7 +1985,7 @@
 																	<tbody>
 																		<tr>
 																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																				<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Um diese Einladung anzunehmen,<br>klicken Sie diese Schaltfläche
 																				</a>
 																			</td>

@@ -1,7 +1,7 @@
 <div class="umb-user-group-preview">
-    
-    <i ng-if="icon" class="umb-user-group-preview__icon {{ icon }}"></i>
-    
+
+    <umb-icon icon="{{icon}}" class="umb-user-group-preview__icon"></umb-icon>
+
     <div class="umb-user-group-preview__content">
         <div class="umb-user-group-preview__name">{{ name }}</div>
 
@@ -20,7 +20,7 @@
                 <span ng-if="contentStartNode">{{ contentStartNode.name }}</span>
             </span>
         </div>
-        
+
         <div class="umb-user-group-preview__permissions" ng-if="!hideMediaStartNode">
             <span>
                 <span class="bold"><localize key="user_mediastartnode">Media start node</localize>:</span>

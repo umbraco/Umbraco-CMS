@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.Linq;
 using System.Threading;
@@ -280,7 +279,7 @@ namespace Umbraco.Tests.Persistence
 
         [Test]
         public void Throws_When_Lock_Timeout_Is_Exceeded()
-        {   
+        {
             var t1 = Task.Run(() =>
             {
                 using (var scope = ScopeProvider.CreateScope())
@@ -288,7 +287,7 @@ namespace Umbraco.Tests.Persistence
                     var realScope = (Scope)scope;
 
                     Console.WriteLine("Write lock A");
-                    // This will acquire right away 
+                    // This will acquire right away
                     realScope.WriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
                     Thread.Sleep(6000); // Wait longer than the Read Lock B timeout
                     scope.Complete();
@@ -349,7 +348,7 @@ namespace Umbraco.Tests.Persistence
                     var realScope = (Scope)scope;
 
                     Console.WriteLine("Write lock A");
-                    // This will acquire right away 
+                    // This will acquire right away
                     realScope.WriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
                     Thread.Sleep(4000); // Wait less than the Read Lock B timeout
                     scope.Complete();
@@ -377,7 +376,7 @@ namespace Umbraco.Tests.Persistence
                     scope.Complete();
                     Interlocked.Increment(ref locksCompleted);
                     Console.WriteLine("Finished Read lock B");
-                }                
+                }
             });
 
             var t3 = Task.Run(() =>

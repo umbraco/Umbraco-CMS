@@ -19,6 +19,7 @@ using Umbraco.Core.Composing;
 using System.ComponentModel;
 using System.Threading;
 using Umbraco.Web.Scheduling;
+using Examine.Search;
 
 namespace Umbraco.Web.Search
 {
@@ -39,6 +40,7 @@ namespace Umbraco.Web.Search
         private readonly IProfilingLogger _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
         private readonly BackgroundTaskRunner<IBackgroundTask> _indexItemTaskRunner;
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
 
 
         // the default enlist priority is 100
@@ -107,7 +109,7 @@ namespace Umbraco.Web.Search
 
             var registeredIndexers = _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
-            _logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            _logger.Info<ExamineComponent,int>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
@@ -271,10 +273,20 @@ namespace Umbraco.Web.Search
                     break;
                 case MessageType.RefreshByPayload:
                     var payload = (MemberCacheRefresher.JsonPayload[])args.MessageObject;
-                    var members = payload.Select(x => _services.MemberService.GetById(x.Id));
-                    foreach(var m in members)
+                    foreach(var p in payload)
                     {
-                        ReIndexForMember(m);
+                        if (p.Removed)
+                        {
+                            DeleteIndexForEntity(p.Id, false);
+                        }
+                        else
+                        {
+                            var m = _services.MemberService.GetById(p.Id);
+                            if (m != null)
+                            {
+                                ReIndexForMember(m);
+                            }
+                        }
                     }
                     break;
                 case MessageType.RefreshAll:
@@ -425,7 +437,7 @@ namespace Umbraco.Web.Search
                         while (page * pageSize < total)
                         {
                             //paging with examine, see https://shazwazza.com/post/paging-with-examine/
-                            var results = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).Execute(maxResults: pageSize * (page + 1));
+                            var results = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).SelectFields(_idOnlyFieldSet).Execute(maxResults: pageSize * (page + 1));
                             total = results.TotalItemCount;
                             var paged = results.Skip(page * pageSize);
 

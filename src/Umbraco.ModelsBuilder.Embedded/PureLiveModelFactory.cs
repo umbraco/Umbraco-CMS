@@ -21,7 +21,7 @@ using File = System.IO.File;
 
 namespace Umbraco.ModelsBuilder.Embedded
 {
-    internal class PureLiveModelFactory : ILivePublishedModelFactory2, IRegisteredObject
+    internal class PureLiveModelFactory : ILivePublishedModelFactory2, IRegisteredObject, IDisposable
     {
         private Assembly _modelsAssembly;
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
@@ -33,6 +33,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         private int _ver, _skipver;
         private readonly int _debugLevel;
         private BuildManager _theBuildManager;
+        private bool _disposedValue;
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
@@ -308,7 +309,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     {
                         try
                         {
-                            _logger.Error<PureLiveModelFactory>("Failed to build models.", e);
+                            _logger.Error<PureLiveModelFactory>(e, "Failed to build models.");
                             _logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
                             _errors.Report("Failed to build PureLive models.", e);
                         }
@@ -677,9 +678,29 @@ namespace Umbraco.ModelsBuilder.Embedded
 
         public void Stop(bool immediate)
         {
-            _watcher.EnableRaisingEvents = false;
-            _watcher.Dispose();
+            Dispose();
             HostingEnvironment.UnregisterObject(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _watcher.EnableRaisingEvents = false;
+                    _watcher.Dispose();
+                    _locker.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
 
         #endregion

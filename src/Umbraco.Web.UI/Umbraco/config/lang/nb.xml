@@ -89,26 +89,6 @@
     <key alias="styleShow">Vis stiler</key>
     <key alias="tableInsert">Sett inn tabell</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">For å endre det valge innholdets dokumenttype, velger du først en ny dokumenttype som er gyldig på gjeldende plassering.</key>
-    <key alias="changeDocTypeInstruction2">Kontroller deretter at alle egenskaper blir overført riktig til den nye dokumenttypen og klikk på Lagre.</key>
-    <key alias="contentRepublished">Innholdet har blitt republisert.</key>
-    <key alias="currentProperty">Nåværende egenskap</key>
-    <key alias="currentType">Nåværende type</key>
-    <key alias="docTypeCannotBeChanged">Du kan ikke endre dokumenttype, ettersom det ikke er andre gyldige dokumenttyper på denne plasseringen.</key>
-    <key alias="docTypeChanged">Dokumenttype endret</key>
-    <key alias="mapProperties">Overfør egenskaper</key>
-    <key alias="mapToProperty">Overfør til egenskap</key>
-    <key alias="newTemplate">Ny mal</key>
-    <key alias="newType">Ny type</key>
-    <key alias="none">ingen</key>
-    <key alias="selectedContent">Innhold</key>
-    <key alias="selectNewDocType">Velg ny dokumenttype</key>
-    <key alias="successMessage">Dokumenttypen på det valgte innhold ble endret til [new type], og følgende egenskaper ble overført:</key>
-    <key alias="to">til</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Overføringen av egenskaper kunne ikke fullføres da en eller flere egenskaper er satt til å bli overført mer enn en gang.</key>
-    <key alias="validDocTypesNote">Kun andre dokumenttyper som er gyldige for denne plasseringen vises.</key>
-  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Publisert</key>
     <key alias="about">Om siden</key>
@@ -240,7 +220,7 @@
     <key alias="recycleBinDeleting">Innholdet i papirkurven blir nå slettet. Vennligst ikke lukk dette vinduet mens denne operasjonen foregår</key>
     <key alias="recycleBinIsEmpty">Papirkurven er nå tom</key>
     <key alias="recycleBinWarning">Når elementer blir slettet fra papirkurven vil de være slettet for alltid</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a> tjenesten opplever for tiden problemer som vi ikke har kontroll over. Vi beklager denne ubeleiligheten.]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> tjenesten opplever for tiden problemer som vi ikke har kontroll over. Vi beklager denne ubeleiligheten.]]></key>
     <key alias="regexSearchHelp">Søk etter et regulært uttrykk for å legge inn validering til et felt. Eksempel: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
@@ -509,7 +489,7 @@
     <key alias="instruction">Logg på nedenfor</key>
     <key alias="signInWith">Logg på med</key>
     <key alias="timeout">Din sesjon er utløpt</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>
@@ -689,7 +669,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="tabs">Arkfaner</key>
     <key alias="contentTypeEnabled">Hovedinnholdstype aktivert</key>
     <key alias="contentTypeUses">Denne dokumenttypen bruker</key>
-    <key alias="asAContentMasterType">som hoveddokumenttype. Arkfaner fra hoveddokumenttyper vises ikke og kan kun endres på hoveddokumenttypen selv.</key>
     <key alias="noPropertiesDefinedOnTab">Ingen egenskaper definert i denne arkfanen. Klikk på "legg til ny egenskap" lenken i toppen for å opprette en ny egenskap.</key>
   </area>
   <area alias="sort">

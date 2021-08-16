@@ -63,16 +63,22 @@
   <ItemGroup>
     <PackageReference Include="ClientDependency" Version="1.9.9" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.1.0" />
+    <PackageReference Include="Examine" Version="1.2.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
-      <Version>2.7.0.100</Version>
+      <Version>2.9.1</Version>
+    </PackageReference>
+    <PackageReference Include="K4os.Compression.LZ4">
+      <Version>1.1.11</Version>
     </PackageReference>
     <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
     <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
     <PackageReference Include="Markdown" Version="2.2.1" />
+    <PackageReference Include="MessagePack">
+      <Version>2.2.85</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.0" />
@@ -95,6 +101,18 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Semver" Version="2.0.4" />
+    <PackageReference Include="System.Buffers">
+      <Version>4.5.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.Memory">
+      <Version>4.5.4</Version>
+    </PackageReference>
+    <PackageReference Include="System.Numerics.Vectors">
+      <Version>4.5.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Immutable">
+      <Version>1.7.1</Version>
+    </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
     <PackageReference Include="Umbraco.Code">
       <Version>1.0.5</Version>
@@ -132,6 +150,7 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Compose\BlockEditorComponent.cs" />
     <Compile Include="Compose\BlockEditorComposer.cs" />
+    <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Compose\NotificationsComposer.cs" />
     <Compile Include="Compose\PublicAccessComposer.cs" />
@@ -167,6 +186,7 @@
     <Compile Include="Editors\KeepAliveController.cs" />
     <Compile Include="Editors\MacrosController.cs" />
     <Compile Include="Editors\RelationTypeController.cs" />
+    <Compile Include="HealthCheck\Checks\Config\ProvidedValueValidation.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
@@ -233,6 +253,7 @@
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
     <Compile Include="Models\AnchorsModel.cs" />
+    <Compile Include="Models\ContentEditing\ContentTypesByKeys.cs" />
     <Compile Include="Models\ContentEditing\DataTypeReferences.cs" />
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
@@ -254,9 +275,28 @@
     <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfigItem.cs" />
+    <Compile Include="PropertyEditors\FileExtensionConfigItem.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfig.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
+    <Compile Include="PropertyEditors\FileUploadConfiguration.cs" />
+    <Compile Include="PropertyEditors\FileUploadConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3Configuration.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3ConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializationResult.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializerEntityType.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IDictionaryOfPropertyDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializer.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\JsonContentNestedDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\LazyCompressedString.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializer.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorElementTypeValidationResult.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorPropertyTypeValidationResult.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorValidationResult.cs" />
@@ -264,6 +304,10 @@
     <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComponent.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComposer.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MediaPickerWithCropsValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
@@ -281,10 +325,12 @@
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
+    <Compile Include="Search\IUmbracoTreeSearcherFields2.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrorMiddlware.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrors.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderOptions.cs" />
+    <Compile Include="Security\ClaimsIdentityExtensions.cs" />
     <Compile Include="Security\SignOutAuditEventArgs.cs" />
     <Compile Include="Security\UserInviteEventArgs.cs" />
     <Compile Include="Services\DashboardService.cs" />
@@ -583,7 +629,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfPropertyDataSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\ContentNestedData.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataModel.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\CultureVariation.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IDataSource.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
@@ -1136,9 +1182,7 @@
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
-    <Compile Include="FormlessPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="FormlessPage.cs" />
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="ModelStateExtensions.cs" />
@@ -1293,7 +1337,7 @@
     </PropertyGroup>
     <ItemGroup>
       <!-- we want to exclude all facade references ?! -->
-      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http'" />
+      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'Microsoft.Bcl.AsyncInterfaces' and '%(ReferencePath.FileName)' != 'System.Buffers' and '%(ReferencePath.FileName)' != 'System.Numerics.Vectors' and '%(ReferencePath.FileName)' != 'System.Runtime.CompilerServices.Unsafe'" />
     </ItemGroup>
     <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />
     <!--

@@ -39,7 +39,7 @@
                         </div>
                         <div class="umb-table-body">
                             <div class="umb-table-row" ng-repeat="reference in vm.references.documentTypes">
-                                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                                <div class="umb-table-cell"><umb-icon icon="{{reference.icon}}" class="umb-table-body__icon"></umb-icon></div>
                                 <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                                 <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                                 <div class="umb-table-cell --noOverflow"><span>{{::reference.properties | umbCmsJoinArray:', ':'name'}}</span></div>
@@ -69,7 +69,7 @@
                         </div>
                         <div class="umb-table-body">
                             <div class="umb-table-row" ng-repeat="reference in vm.references.mediaTypes">
-                                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                                <div class="umb-table-cell"><umb-icon icon="{{reference.icon}}" class="umb-table-body__icon"></umb-icon></div>
                                 <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                                 <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                                 <div class="umb-table-cell --noOverflow"><span>{{::reference.properties | umbCmsJoinArray:', ':'name'}}</span></div>
@@ -100,7 +100,7 @@
                         </div>
                         <div class="umb-table-body">
                             <div class="umb-table-row" ng-repeat="reference in vm.references.memberTypes">
-                                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                                <div class="umb-table-cell"><umb-icon icon="{{reference.icon}}" class="umb-table-body__icon"></umb-icon></div>
                                 <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                                 <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                                 <div class="umb-table-cell --noOverflow"><span>{{::reference.properties | umbCmsJoinArray:', ':'name'}}</span></div>

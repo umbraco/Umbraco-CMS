@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Umbraco.Core.Services.Changes
 {
-    internal class TreeChange<TItem>
+    public class TreeChange<TItem>
     {
         public TreeChange(TItem changedItem, TreeChangeTypes changeTypes)
         {

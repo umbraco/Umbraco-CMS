@@ -4,7 +4,7 @@
                 class="umb-tree-item__arrow umb-outline btn-reset"
                 ng-style="{'visibility': (scope.enablelistviewexpand === 'true' || node.hasChildren && (!node.metaData.isContainer || isDialog)) ? 'visible' : 'hidden'}"
                 ng-click="load(node)">
-                <umb-icon icon="{{(node.expanded && !node.metaData.isContainer) ? 'icon-navigation-down' : 'icon-navigation-right'}}" ng-class="{'icon-navigation-right': !node.expanded || node.metaData.isContainer, 'icon-navigation-down': node.expanded && !node.metaData.isContainer}"></umb-icon>
+                <umb-icon icon="{{(node.expanded && !node.metaData.isContainer) ? 'icon-navigation-down' : 'icon-navigation-right'}}"></umb-icon>
             <!-- TODO: Use localization for this text -->
             <span class="sr-only">Expand child items for {{node.name}}</span>
         </button>

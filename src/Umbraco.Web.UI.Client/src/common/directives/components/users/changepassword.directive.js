@@ -11,6 +11,7 @@
         vm.cancelChange = cancelChange;
         vm.showOldPass = showOldPass;
         vm.showCancelBtn = showCancelBtn;
+        vm.newPasswordKeyUp = newPasswordKeyUp;
 
         var unsubscribe = [];
 
@@ -57,6 +58,11 @@
             }
 
             vm.config.maxPasswordLength = 256;
+
+            // Check non-alpha pwd settings for tooltip display
+            if (vm.config.minNonAlphaNumericChars === undefined) {
+                vm.config.minNonAlphaNumericChars = 0;
+            }
 
             //set the model defaults
             if (!Utilities.isObject(vm.passwordValues)) {
@@ -155,6 +161,9 @@
             return vm.config.disableToggle !== true && vm.config.hasPassword;
         };
 
+        function newPasswordKeyUp(event) {
+            vm.passwordVal = event.target.value;
+        }
     }
 
     var component = {

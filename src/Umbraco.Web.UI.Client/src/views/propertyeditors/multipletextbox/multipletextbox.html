@@ -9,11 +9,11 @@
                  focus-when="{{item.hasFocus}}" />
 
           <div class="icon-wrapper">
-              <i class="icon icon-navigation handle" aria-hidden="true" localize="title" title="@general_move"></i>
+              <umb-icon icon="icon-navigation" class="icon handle" localize="title" title="@general_move"></umb-icon>
   
               <div class="umb-multiple-textbox__confirm" ng-show="model.value.length > model.config.min">
                   <button type="button" class="umb-multiple-textbox__confirm-action" ng-click="showPrompt($index, item)" localize="title" title="@content_removeTextBox">
-                      <i class="icon-trash" aria-hidden="true"></i>
+                      <umb-icon icon="icon-trash"></umb-icon>
                   </button>
   
                   <umb-confirm-action
