@@ -59,7 +59,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects
             var umbracoContextFactory = new UmbracoContextFactory(
                 umbracoContextAccessor,
                 snapshotService.Object,
-                new TestDefaultCultureAccessor(),
                 new UmbracoRequestPaths(Options.Create(globalSettings), hostingEnvironment),
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
