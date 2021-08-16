@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("languageId")]
         [ForeignKey(typeof(LanguageDto), Column = "id")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_languageId", ForColumns = "languageId,UniqueId")]
         public int LanguageId { get; set; }
 
         [Column("UniqueId")]
@@ -25,7 +26,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 
         [Column("value")]
         [Length(1000)]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_value", ForColumns = "languageId,UniqueId,value")]
         public string Value { get; set; }
     }
 }

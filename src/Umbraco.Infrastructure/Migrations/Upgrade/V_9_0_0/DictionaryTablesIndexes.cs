@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
     public class DictionaryTablesIndexes : MigrationBase
     {
         private const string IndexedDictionaryColumn = "key";
-        private const string IndexedLanguageTextColumn = "value";
+        private const string IndexedLanguageTextColumn = "languageId";
 
         public DictionaryTablesIndexes(IMigrationContext context)
             : base(context)
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             // Delete existing
             DeleteIndex<LanguageTextDto>(indexLanguageTextDto);
 
-            var langTextcolumns = new[] { "languageId", "UniqueId", IndexedLanguageTextColumn };
+            var langTextcolumns = new[] { IndexedLanguageTextColumn, "UniqueId" };
 
             // Re-create/Add
             AddUniqueConstraint<LanguageTextDto>(langTextcolumns, indexLanguageTextDto);
