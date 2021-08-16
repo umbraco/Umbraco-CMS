@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Core.Routing
             var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentSettings.Error404Collection.ToArray(),
                 _entityService,
-                new PublishedContentQuery(umbCtx.PublishedSnapshot, umbCtx.VariationContextAccessor, _examineManager),
+                new PublishedContentQuery(umbracoContext.PublishedSnapshot, umbracoContext.VariationContextAccessor, _examineManager),
                 errorCulture,
                 domainContentId);
 

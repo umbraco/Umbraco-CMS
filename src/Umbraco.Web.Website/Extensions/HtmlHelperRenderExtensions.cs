@@ -106,7 +106,7 @@ namespace Umbraco.Extensions
             }
 
             var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(htmlHelper);
-            var umbracoContext = umbracoContextAccessor.UmbracoContext;
+            umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext);
 
             if (cacheByPage)
             {
