@@ -4,12 +4,10 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Web.Common.ImageProcessors;
 
-namespace Umbraco.Cms.Web.Common.Media
+namespace Umbraco.Cms.Infrastructure.Media
 {
     /// <summary>
     /// Exposes a method that generates an image URL based on the specified options that can be processed by ImageSharp.
@@ -60,37 +58,37 @@ namespace Umbraco.Cms.Web.Common.Media
 
             if (options.FocalPoint != null)
             {
-                AddQueryString(ResizeWebProcessor.Xy, options.FocalPoint.Left, options.FocalPoint.Top);
+                AddQueryString("rxy", options.FocalPoint.Left, options.FocalPoint.Top);
             }
 
             if (options.Crop != null)
             {
-                AddQueryString(CropWebProcessor.Coordinates, options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
+                AddQueryString("cc", options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
             }
 
             if (options.ImageCropMode.HasValue)
             {
-                AddQueryString(ResizeWebProcessor.Mode, options.ImageCropMode.Value.ToString().ToLowerInvariant());
+                AddQueryString("rmode", options.ImageCropMode.Value.ToString().ToLowerInvariant());
             }
 
             if (options.ImageCropAnchor.HasValue)
             {
-                AddQueryString(ResizeWebProcessor.Anchor, options.ImageCropAnchor.Value.ToString().ToLowerInvariant());
+                AddQueryString("ranchor", options.ImageCropAnchor.Value.ToString().ToLowerInvariant());
             }
 
             if (options.Width.HasValue)
             {
-                AddQueryString(ResizeWebProcessor.Width, options.Width.Value);
+                AddQueryString("width", options.Width.Value);
             }
 
             if (options.Height.HasValue)
             {
-                AddQueryString(ResizeWebProcessor.Height, options.Height.Value);
+                AddQueryString("height", options.Height.Value);
             }
 
             if (options.Quality.HasValue)
             {
-                AddQueryString(JpegQualityWebProcessor.Quality, options.Quality.Value);
+                AddQueryString("quality", options.Quality.Value);
             }
 
             if (string.IsNullOrWhiteSpace(options.FurtherOptions) == false)

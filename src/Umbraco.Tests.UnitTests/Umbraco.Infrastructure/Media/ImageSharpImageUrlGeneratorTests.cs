@@ -3,9 +3,9 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Web.Common.Media;
+using Umbraco.Cms.Infrastructure.Media;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Media
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
 {
     [TestFixture]
     public class ImageSharpImageUrlGeneratorTests
@@ -73,7 +73,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Media
             var urlString = s_generator.GetImageUrl(new ImageUrlGenerationOptions(null) { Crop = s_crop, Width = 100, Height = 100 });
             Assert.AreEqual("?cc=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&width=100&height=100", urlString);
         }
-
 
         /// <summary>
         /// Test that if Crop mode is specified as anything other than Crop the image doesn't use the crop

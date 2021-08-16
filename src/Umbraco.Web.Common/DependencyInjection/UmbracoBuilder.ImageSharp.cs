@@ -10,10 +10,8 @@ using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ImageProcessors;
-using Umbraco.Cms.Web.Common.Media;
 
 namespace Umbraco.Extensions
 {
@@ -24,13 +22,10 @@ namespace Umbraco.Extensions
         /// </summary>
         public static IServiceCollection AddUmbracoImageSharp(this IUmbracoBuilder builder)
         {
-            IConfiguration configuration = builder.Config;
-            IServiceCollection services = builder.Services;
-
-            ImagingSettings imagingSettings = configuration.GetSection(Cms.Core.Constants.Configuration.ConfigImaging)
+            ImagingSettings imagingSettings = builder.Config.GetSection(Cms.Core.Constants.Configuration.ConfigImaging)
                 .Get<ImagingSettings>() ?? new ImagingSettings();
 
-            services.AddImageSharp(options =>
+            builder.Services.AddImageSharp(options =>
             {
                 // The configuration is set using ImageSharpConfigurationOptions
                 options.BrowserMaxAge = imagingSettings.Cache.BrowserMaxAge;
@@ -63,9 +58,8 @@ namespace Umbraco.Extensions
                 .AddProcessor<ResizeWebProcessor>();
 
             builder.Services.AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ImageSharpConfigurationOptions>();
-            builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
-            return services;
+            return builder.Services;
         }
     }
 }

@@ -144,8 +144,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.PropertyValueConverters()
                 .Remove<SimpleTinyMceValueConverter>();
 
-            builder.Services.AddUnique<IImageUrlGenerator, NoopImageUrlGenerator>();
-
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
@@ -180,9 +178,10 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<ICronTabParser, NCronTabParser>();
 
-            // Add default ImageSharp configuration
+            // Add default ImageSharp configuration and service implementations
             builder.Services.AddUnique(SixLabors.ImageSharp.Configuration.Default);
             builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
+            builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
             builder.Services.AddUnique<PackageDataInstallation>();
 
