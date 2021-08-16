@@ -18,7 +18,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IUmbracoMiddlewareBuilder WithWebsite(this IUmbracoMiddlewareBuilder builder)
+        public static IUmbracoApplicationBuilderContext UseWebsite(this IUmbracoApplicationBuilderContext builder)
         {
             builder.AppBuilder.UseMiddleware<PublicAccessMiddleware>();
             builder.AppBuilder.UseMiddleware<BasicAuthenticationMiddleware>();
@@ -28,7 +28,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Sets up routes for the front-end umbraco website
         /// </summary>
-        public static IUmbracoEndpointBuilder UseWebsiteEndpoints(this IUmbracoEndpointBuilder builder)
+        public static IUmbracoEndpointBuilderContext UseWebsiteEndpoints(this IUmbracoEndpointBuilderContext builder)
         {
             if (builder == null)
             {

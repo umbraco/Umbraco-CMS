@@ -163,27 +163,6 @@
     <key alias="tableInsert">Вставить таблицу</key>
     <key alias="undo">Отменить</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Чтобы сменить тип документа для выбранного узла, сначала выберите тип из списка разрешенных для данного расположения.</key>
-    <key alias="changeDocTypeInstruction2">Затем подтвердите и/или исправьте сопоставление свойств текущего типа документа свойствам нового и нажмите "Сохранить".</key>
-    <key alias="contentRepublished">Документ переопубликован.</key>
-    <key alias="currentProperty">Текущее свойство</key>
-    <key alias="currentType">Текущий тип</key>
-    <key alias="docTypeCannotBeChanged">Тип документа не может быть изменен, так как для данного расположения нет разрешенных альтернатив.
-		Альтернативный тип станет доступным, если его разрешить как тип, пригодный для создания дочерних узлов внутри родительского узла данного документа.</key>
-    <key alias="docTypeChanged">Тип документа изменен</key>
-    <key alias="mapProperties">Сопоставление свойств</key>
-    <key alias="mapToProperty">Сопоставлено свойству</key>
-    <key alias="newTemplate">Новый шаблон</key>
-    <key alias="newType">Новый тип</key>
-    <key alias="none">нет</key>
-    <key alias="selectedContent">Узел</key>
-    <key alias="selectNewDocType">Выберите новый тип документа</key>
-    <key alias="successMessage">Тип документа выбранного узла успешно изменен на [new type] и следующие свойства были перенесены:</key>
-    <key alias="to">в</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Невозможно закончить перенос свойств, так как одно или более свойства имеют больше чем одно сопоставление.</key>
-    <key alias="validDocTypesNote">Показаны только допустимые для данного расположения альтернативные типы.</key>
-  </area>
   <area alias="colorpicker">
     <key alias="noColors">Вы не указали ни одного допустимого цвета</key>
   </area>

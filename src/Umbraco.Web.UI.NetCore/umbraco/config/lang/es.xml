@@ -133,26 +133,6 @@
     <key alias="undo">Deshacer</key>
     <key alias="redo">Rehacer</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Para cambiar el tipo de documento al contenido seleccionado, primero selecciona uno de la lista de tipos válidos.</key>
-        <key alias="changeDocTypeInstruction2">Entonces confirma el mapeo de propiedades del tipo actual al nuevo y haz clic en Guardar.</key>
-    <key alias="contentRepublished">El contenido se ha vuelto a publicar.</key>
-    <key alias="currentProperty">Propiedad actual</key>
-    <key alias="currentType">Tipo actual</key>
-    <key alias="docTypeCannotBeChanged">El tipo de contenido no se puede cambiar, porque no hay alternativas válidas para este contenido.</key>
-    <key alias="docTypeChanged">Tipo de documento cambiado</key>
-    <key alias="mapProperties">Mapeo de propiedades</key>
-    <key alias="mapToProperty">Mapea a la propiedad</key>
-    <key alias="newTemplate">Nueva plantilla</key>
-    <key alias="newType">Nuevo tipo</key>
-    <key alias="none">ninguno</key>
-    <key alias="selectedContent">Contenido</key>
-    <key alias="selectNewDocType">Selecciona un nuevo Tipo de Documento</key>
-    <key alias="successMessage">El tipo de documento del contenido seleccionado ha sido cambiado correctamente a [new type] y las siguientes propiedades mapeadas:</key>
-    <key alias="to">a</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">No se ha podido completar el mapeo de propiedades porque uno o más propiedades tienen más de un mapeo definido.</key>
-    <key alias="validDocTypesNote">Solo se muestran otros tipos válidos para el contenido actual.</key>
-  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Está publicado</key>
     <key alias="about">Acerca de</key>

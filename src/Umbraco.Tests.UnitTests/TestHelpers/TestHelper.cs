@@ -8,9 +8,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Castle.Core.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -137,7 +139,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 
         public static UriUtility UriUtility => s_testHelperInternal.UriUtility;
 
-        public static IEmailSender EmailSender { get; } = new EmailSender(Options.Create(new GlobalSettings()), Mock.Of<IEventAggregator>());
+        public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), Options.Create(new GlobalSettings()), Mock.Of<IEventAggregator>());
 
         /// <summary>
         /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name

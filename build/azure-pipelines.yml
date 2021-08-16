@@ -48,42 +48,60 @@ stages:
                 vmImage: ubuntu-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net Core sdk 5.x
+                  displayName: Use .Net 5.x
                   inputs:
                       version: 5.x
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet build
+                  inputs:
+                      command: build
+                      projects: '**/umbraco-netcore-only.sln'
                 - task: DotNetCoreCLI@2
                   displayName: dotnet test
                   inputs:
                       command: test
                       projects: '**/*.Tests.UnitTests.csproj'
+                      arguments: '--no-build'
           - job: MacOS_Unit_Tests
             displayName: Mac OS
             pool:
                 vmImage: macOS-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net Core sdk 5.x
+                  displayName: Use .Net 5.x
                   inputs:
                       version: 5.x
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet build
+                  inputs:
+                      command: build
+                      projects: '**/umbraco-netcore-only.sln'
                 - task: DotNetCoreCLI@2
                   displayName: dotnet test
                   inputs:
                       command: test
                       projects: '**/*.Tests.UnitTests.csproj'
+                      arguments: '--no-build'
           - job: Windows_Unit_Tests
             displayName: Windows
             pool:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net Core sdk 5.x
+                  displayName: Use .Net 5.x
                   inputs:
                       version: 5.x
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet build
+                  inputs:
+                      command: build
+                      projects: '**/umbraco.sln'
                 - task: DotNetCoreCLI@2
                   displayName: dotnet test
                   inputs:
                       command: test
                       projects: '**/*.Tests.UnitTests.csproj'
+                      arguments: '--no-build'
     - stage: Integration_Tests
       displayName: Integration Tests
       dependsOn: []
@@ -97,14 +115,20 @@ stages:
                 vmImage: ubuntu-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net Core sdk 5.x
+                  displayName: Use .Net 5.x
                   inputs:
                       version: 5.x
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet build
+                  inputs:
+                      command: build
+                      projects: '**/umbraco-netcore-only.sln'
                 - task: DotNetCoreCLI@2
                   displayName: dotnet test
                   inputs:
                       command: test
                       projects: '**/Umbraco.Tests.Integration.csproj'
+                      arguments: '--no-build'
                   env:
                       UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
           - job: Windows_Integration_Tests
@@ -114,16 +138,22 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net Core sdk 5.x
+                  displayName: Use .Net 5.x
                   inputs:
                       version: 5.x
                 - powershell: sqllocaldb start mssqllocaldb
                   displayName: Start MSSQL LocalDb
                 - task: DotNetCoreCLI@2
+                  displayName: dotnet build
+                  inputs:
+                      command: build
+                      projects: '**/umbraco.sln'
+                - task: DotNetCoreCLI@2
                   displayName: dotnet test
                   inputs:
                       command: test
                       projects: '**\Umbraco.Tests.Integration*.csproj'
+                      arguments: '--no-build'
     - stage: Acceptance_Tests
       displayName: Acceptance Tests
       dependsOn: []
@@ -150,7 +180,7 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net Core sdk 5.x
+                  displayName: Use .Net 5.x
                   inputs:
                       version: 5.x
 
@@ -245,7 +275,7 @@ stages:
                 vmImage: ubuntu-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net Core sdk 5.x
+                  displayName: Use .Net 5.x
                   inputs:
                       version: 5.x
                 - task: Bash@3
@@ -335,7 +365,7 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net Core sdk 5.x
+                  displayName: Use .Net 5.x
                   inputs:
                       version: 5.x
                 - task: NuGetToolInstaller@1
@@ -487,7 +517,7 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net Core sdk 5.x
+                  displayName: Use .Net 5.x
                   inputs:
                       version: 5.x
                 - task: PowerShell@2

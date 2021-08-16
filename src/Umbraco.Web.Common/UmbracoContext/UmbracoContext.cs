@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -36,7 +35,6 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             IPublishedSnapshotService publishedSnapshotService,
             UmbracoRequestPaths umbracoRequestPaths,
             IHostingEnvironment hostingEnvironment,
-            IVariationContextAccessor variationContextAccessor,
             UriUtility uriUtility,
             ICookieManager cookieManager,
             IHttpContextAccessor httpContextAccessor)
@@ -45,8 +43,6 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             {
                 throw new ArgumentNullException(nameof(publishedSnapshotService));
             }
-
-            VariationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _uriUtility = uriUtility;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
@@ -102,9 +98,6 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
 
         /// <inheritdoc/>
         public IPublishedRequest PublishedRequest { get; set; }
-
-        /// <inheritdoc/>
-        public IVariationContextAccessor VariationContextAccessor { get; }
 
         /// <inheritdoc/>
         public bool IsDebug => // NOTE: the request can be null during app startup!

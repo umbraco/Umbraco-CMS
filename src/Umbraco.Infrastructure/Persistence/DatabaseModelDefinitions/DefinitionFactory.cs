@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using NPoco;
@@ -75,8 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
             var databaseTypeAttribute = propertyInfo.FirstAttribute<SpecialDbTypeAttribute>();
             if (databaseTypeAttribute != null)
             {
-                definition.HasSpecialDbType = true;
-                definition.DbType = databaseTypeAttribute.DatabaseType;
+                definition.CustomDbType = databaseTypeAttribute.DatabaseType;
             }
             else
             {

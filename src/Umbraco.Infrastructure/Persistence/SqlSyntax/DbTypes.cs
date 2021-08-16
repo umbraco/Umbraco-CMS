@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -6,24 +6,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
     public class DbTypes
     {
-        public DbType DbType;
-        public string TextDefinition;
-        public bool ShouldQuoteValue;
-        public Dictionary<Type, string> ColumnTypeMap = new Dictionary<Type, string>();
-        public Dictionary<Type, DbType> ColumnDbTypeMap = new Dictionary<Type, DbType>();
-
-        public void Set<T>(DbType dbType, string fieldDefinition)
+        public DbTypes(IReadOnlyDictionary<Type, string> columnTypeMap, IReadOnlyDictionary<Type, DbType> columnDbTypeMap)
         {
-            DbType = dbType;
-            TextDefinition = fieldDefinition;
-            ShouldQuoteValue = fieldDefinition != "INTEGER"
-                && fieldDefinition != "BIGINT"
-                && fieldDefinition != "DOUBLE"
-                && fieldDefinition != "DECIMAL"
-                && fieldDefinition != "BOOL";
-
-            ColumnTypeMap[typeof(T)] = fieldDefinition;
-            ColumnDbTypeMap[typeof(T)] = dbType;
+            ColumnTypeMap = columnTypeMap;
+            ColumnDbTypeMap = columnDbTypeMap;
         }
+
+        public IReadOnlyDictionary<Type, string> ColumnTypeMap { get; }
+        public IReadOnlyDictionary<Type, DbType> ColumnDbTypeMap { get; }
     }
 }

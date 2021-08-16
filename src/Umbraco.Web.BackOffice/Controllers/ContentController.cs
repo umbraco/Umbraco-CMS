@@ -913,9 +913,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     v.Notifications.AddRange(n.Notifications);
             }
 
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
             HandleInvalidModelState(display, cultureForInvariantErrors);
 
-            //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(display, ModelState);
