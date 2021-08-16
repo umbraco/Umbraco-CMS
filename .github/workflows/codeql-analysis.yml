@@ -63,6 +63,6 @@ jobs:
     name: Always run job
     runs-on: ubuntu-latest    
     steps:
-      - name Always run
+      - name: Always run
         run: echo "This job is to prevent the workflow status from showing as failed when all other jobs are skipped"
 
