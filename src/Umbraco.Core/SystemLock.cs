@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Cms.Core
 {
-    // http://blogs.msdn.com/b/pfxteam/archive/2012/02/12/10266988.aspx
+    // https://devblogs.microsoft.com/pfxteam/building-async-coordination-primitives-part-6-asynclock/
     //
     // notes:
     // - this is NOT a reader/writer lock
