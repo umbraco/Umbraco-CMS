@@ -72,15 +72,17 @@ namespace Umbraco.Cms.Infrastructure.Sync
             GlobalSettings = globalSettings.Value;
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
-
-            // See notes on _localIdentity
-            LocalIdentity = Environment.MachineName // eg DOMAIN\SERVER
-                + "/" + hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
-                + " [P" + Process.GetCurrentProcess().Id // eg 1234
-                + "/D" + AppDomain.CurrentDomain.Id // eg 22
-                + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
-
+            using (var process = Process.GetCurrentProcess())
+            {
+                // See notes on _localIdentity
+                LocalIdentity = Environment.MachineName // eg DOMAIN\SERVER
+                    + "/" + hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
+                    + " [P" + process.Id // eg 1234
+                    + "/D" + AppDomain.CurrentDomain.Id // eg 22
+                    + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
+            }
             _initialized = new Lazy<SyncBootState?>(InitializeWithMainDom);
+
         }
 
         public GlobalSettings GlobalSettings { get; }
