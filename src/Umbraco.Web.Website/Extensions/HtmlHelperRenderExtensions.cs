@@ -68,10 +68,8 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static IHtmlContent PreviewBadge(this IHtmlHelper helper, IUmbracoContextAccessor umbracoContextAccessor, IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IIOHelper ioHelper, ContentSettings contentSettings)
         {
-            if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+
             if (umbracoContext.InPreviewMode)
             {
                 var htmlBadge =
@@ -672,10 +670,7 @@ namespace Umbraco.Extensions
             }
 
             IUmbracoContextAccessor umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
-            if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
             var formAction = umbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);
         }

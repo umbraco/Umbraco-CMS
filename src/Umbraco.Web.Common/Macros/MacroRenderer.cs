@@ -155,10 +155,8 @@ namespace Umbraco.Cms.Web.Common.Macros
         // stores macro content into the cache
         private async Task AddMacroContentToCacheAsync(MacroModel model, MacroContent macroContent)
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+
             // only if cache is enabled
             if (umbracoContext.InPreviewMode || model.CacheDuration <= 0)
                 return;

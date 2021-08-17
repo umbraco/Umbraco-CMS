@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Website.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Controllers
 {
@@ -23,10 +24,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
         public ActionResult Index()
         {
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var store = umbracoContext.Content;
             if (store.HasContent())
             {

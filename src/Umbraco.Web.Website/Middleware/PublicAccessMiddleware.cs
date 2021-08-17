@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Routing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Middleware
 {
@@ -126,10 +127,7 @@ namespace Umbraco.Cms.Web.Website.Middleware
         {
             if (pageId != publishedRequest.PublishedContent.Id)
             {
-                if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-                {
-                    throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-                }
+                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 IPublishedContent publishedContent = umbracoContext.PublishedSnapshot.Content.GetById(pageId);
                 if (publishedContent == null)
                 {
