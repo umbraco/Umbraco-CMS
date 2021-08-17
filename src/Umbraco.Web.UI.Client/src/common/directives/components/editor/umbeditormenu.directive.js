@@ -36,7 +36,6 @@
                 if (!scope.currentNode) {
                     return;
                 }
-				
 
                 if (!scope.actions) {
                     treeService.getMenu({ treeNode: scope.currentNode })
