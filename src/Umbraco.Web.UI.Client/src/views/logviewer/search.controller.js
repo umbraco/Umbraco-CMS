@@ -298,16 +298,11 @@
         }
 
         function updateAllLogLevelFilterCheckboxes(bool) {
-            for (var i = 0; i < vm.logLevels.length; i++) {
-                vm.logLevels[i].selected = bool;
-            }
+            vm.logLevels.forEach(logLevel => logLevel.selected = bool);
         }
 
         function selectAllLogLevelFilters() {
-            vm.logOptions.logLevels = [];
-            for (var i = 0; i < vm.logLevels.length; i++) {
-                vm.logOptions.logLevels.push(vm.logLevels[i].name);
-            }
+            vm.logOptions.logLevels = vm.logLevels.map(logLevel => logLevel.name);
             updateAllLogLevelFilterCheckboxes(true);
 
             getLogs();
