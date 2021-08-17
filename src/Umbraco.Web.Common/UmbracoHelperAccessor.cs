@@ -16,11 +16,7 @@ namespace Umbraco.Cms.Web.Common
 
         public bool TryGetUmbracoHelper(out UmbracoHelper umbracoHelper)
         {
-            umbracoHelper = _httpContextAccessor.HttpContext.RequestServices.GetService<UmbracoHelper>();
-            if(umbracoHelper == null)
-            {
-                return false;
-            }
+            umbracoHelper = _httpContextAccessor.HttpContext?.RequestServices.GetService<UmbracoHelper>();
             return umbracoHelper is not null;
         }
     }
