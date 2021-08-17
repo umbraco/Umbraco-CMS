@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                 plan.ThrowOnUnknownInitialState(origState);
             }
 
-            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true, connectionStringAlias: plan.ConnectionStringAlias))
             {
                 var context = new MigrationContext(plan, scope.Database, _loggerFactory.CreateLogger<MigrationContext>());
 

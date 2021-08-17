@@ -59,6 +59,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
             return new ScopeProvider(
                 databaseFactory.Object,
+                new Dictionary<string, IUmbracoDatabaseFactory>(),
                 fileSystems,
                 Options.Create(new CoreDebugSettings()),
                 mediaFileManager,

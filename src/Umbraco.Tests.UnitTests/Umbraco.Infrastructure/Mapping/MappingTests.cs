@@ -33,7 +33,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Mapping
                     It.IsAny<IScopedNotificationPublisher>(),
                     It.IsAny<bool?>(),
                     It.IsAny<bool>(),
-                    It.IsAny<bool>()))
+                    It.IsAny<bool>(),
+                    It.IsAny<string>()))
                 .Returns(Mock.Of<IScope>);
 
             _scopeProvider = scopeMock.Object;

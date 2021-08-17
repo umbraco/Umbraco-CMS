@@ -92,7 +92,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
                         It.IsAny<IScopedNotificationPublisher>(),
                         It.IsAny<bool?>(),
                         It.IsAny<bool>(),
-                        It.IsAny<bool>()))
+                        It.IsAny<bool>(),
+                        It.IsAny<string>()))
                     .Returns(Mock.Of<IScope>);
 
                 validator = new ContentValueSetValidator(

@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Generic;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -27,5 +29,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets or sets a value for the Umbraco database connection string..
         /// </summary>
         public ConfigConnectionString UmbracoConnectionString { get; set; }
+
+        public List<NamedConnectionString> NamedConnectionStrings { get; set; } = new List<NamedConnectionString>();
     }
 }

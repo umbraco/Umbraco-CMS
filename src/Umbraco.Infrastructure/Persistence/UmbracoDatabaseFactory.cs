@@ -1,11 +1,13 @@
 using System;
 using System.Data.Common;
+using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
@@ -75,7 +77,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
-        /// <remarks>Used by the other ctor and in tests.</remarks>
         public UmbracoDatabaseFactory(
             ILogger<UmbracoDatabaseFactory> logger,
             ILoggerFactory loggerFactory,
@@ -85,17 +86,37 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             NPocoMapperCollection npocoMappers)
+            : this(logger, loggerFactory, globalSettings, connectionStrings, mappers, dbProviderFactoryCreator, databaseSchemaCreatorFactory, npocoMappers, null)
         {
 
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/> using a named connection string/
+        /// </summary>
+        /// <remarks>Used by the other ctor and in tests.</remarks>
+        public UmbracoDatabaseFactory(
+            ILogger<UmbracoDatabaseFactory> logger,
+            ILoggerFactory loggerFactory,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<ConnectionStrings> connectionStrings,
+            IMapperCollection mappers,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            NPocoMapperCollection npocoMappers,
+            string connectionStringAlias)
+        {
             _globalSettings = globalSettings;
             _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
-            _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
+            _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ?? throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
             _npocoMappers = npocoMappers;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory;
 
-            var settings = connectionStrings.Value.UmbracoConnectionString;
+            ConfigConnectionString settings = string.IsNullOrEmpty(connectionStringAlias)
+                ? connectionStrings.Value.UmbracoConnectionString
+                : GetNamedConnectionString(connectionStrings.Value, connectionStringAlias);
 
             if (settings == null)
             {
@@ -114,6 +135,18 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             }
 
             Configure(settings.ConnectionString, settings.ProviderName);
+        }
+
+        private ConfigConnectionString GetNamedConnectionString(ConnectionStrings connectionStrings, string connectionStringAlias)
+        {
+            NamedConnectionString namedConnectionString = connectionStrings.NamedConnectionStrings
+                .SingleOrDefault(x => x.Alias == connectionStringAlias);
+            if (namedConnectionString == null)
+            {
+                throw new InvalidOperationException($"Cannot create database factory for the named connection string '{connectionStringAlias}', as it was not found in configuration.");
+            }
+
+            return namedConnectionString.ConfigConnectionString;
         }
 
         #endregion

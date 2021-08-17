@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -56,6 +56,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// Gets the name of the plan.
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// Gets or sets the connection string alias to use for executing the plan.
+        /// If not set the default database is used.
+        /// </summary>
+        public virtual string ConnectionStringAlias { get; } = null;
 
         // adds a transition
         private MigrationPlan Add(string sourceState, string targetState, Type migration)

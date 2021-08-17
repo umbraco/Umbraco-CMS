@@ -36,9 +36,10 @@ namespace Umbraco.Cms.Core.Scoping
         private static readonly string s_contextItemKey = typeof(ScopeProvider).FullName;
         private readonly IEventAggregator _eventAggregator;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, IOptions<CoreDebugSettings> coreDebugSettings, MediaFileManager mediaFileManager, ILogger<ScopeProvider> logger, ILoggerFactory loggerFactory, IRequestCache requestCache, IEventAggregator eventAggregator)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, Dictionary<string, IUmbracoDatabaseFactory> namedAdditionalDatabaseFactories, FileSystems fileSystems, IOptions<CoreDebugSettings> coreDebugSettings, MediaFileManager mediaFileManager, ILogger<ScopeProvider> logger, ILoggerFactory loggerFactory, IRequestCache requestCache, IEventAggregator eventAggregator)
         {
             DatabaseFactory = databaseFactory;
+            NamedAdditionalDatabaseFactories = namedAdditionalDatabaseFactories;
             _fileSystems = fileSystems;
             _coreDebugSettings = coreDebugSettings.Value;
             _mediaFileManager = mediaFileManager;
@@ -51,6 +52,8 @@ namespace Umbraco.Cms.Core.Scoping
         }
 
         public IUmbracoDatabaseFactory DatabaseFactory { get; }
+
+        public Dictionary<string, IUmbracoDatabaseFactory> NamedAdditionalDatabaseFactories { get; }
 
         public ISqlContext SqlContext => DatabaseFactory.SqlContext;
 
@@ -455,14 +458,15 @@ namespace Umbraco.Cms.Core.Scoping
             IScopedNotificationPublisher notificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
-            bool autoComplete = false)
+            bool autoComplete = false,
+            string connectionStringAlias = null)
         {
             Scope ambientScope = AmbientScope;
             if (ambientScope == null)
             {
                 IScopeContext ambientContext = AmbientContext;
                 ScopeContext newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+                var scope = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete, connectionStringAlias);
                 // assign only if scope creation did not throw!
                 PushAmbientScope(scope);
                 if (newContext != null)
@@ -472,7 +476,7 @@ namespace Umbraco.Cms.Core.Scoping
                 return scope;
             }
 
-            var nested = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(this, _coreDebugSettings, _mediaFileManager, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, notificationPublisher, scopeFileSystems, callContext, autoComplete, connectionStringAlias);
             PushAmbientScope(nested);
             return nested;
         }
