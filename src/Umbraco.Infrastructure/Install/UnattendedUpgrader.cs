@@ -102,33 +102,26 @@ namespace Umbraco.Cms.Infrastructure.Install
                         // all executed in a single transaction.
                         using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
                         {
-                            // We want to suppress scope (service, etc...) notifications during a migration plan
-                            // execution. This is because if a package that doesn't have their migration plan
-                            // executed is listening to service notifications to perform some persistence logic,
-                            // that packages notification handlers may explode because that package isn't fully installed yet.
-                            using (scope.Notifications.Suppress())
+                            foreach (var migrationName in pendingMigrations)
                             {
-                                foreach (var migrationName in pendingMigrations)
+                                if (!packageMigrationsPlans.TryGetValue(migrationName, out PackageMigrationPlan plan))
                                 {
-                                    if (!packageMigrationsPlans.TryGetValue(migrationName, out PackageMigrationPlan plan))
+                                    throw new InvalidOperationException("Cannot find package migration plan " + migrationName);
+                                }
+
+                                using (_profilingLogger.TraceDuration<UnattendedUpgrader>(
+                                    "Starting unattended package migration for " + migrationName,
+                                    "Unattended upgrade completed for " + migrationName))
+                                {
+                                    var upgrader = new Upgrader(plan);
+
+                                    try
                                     {
-                                        throw new InvalidOperationException("Cannot find package migration plan " + migrationName);
+                                        await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService);
                                     }
-
-                                    using (_profilingLogger.TraceDuration<UnattendedUpgrader>(
-                                        "Starting unattended package migration for " + migrationName,
-                                        "Unattended upgrade completed for " + migrationName))
+                                    catch (Exception ex)
                                     {
-                                        var upgrader = new Upgrader(plan);
-
-                                        try
-                                        {
-                                            await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            exceptions.Add(new UnattendedInstallException("Unattended package migration failed for " + migrationName, ex));
-                                        }
+                                        exceptions.Add(new UnattendedInstallException("Unattended package migration failed for " + migrationName, ex));
                                     }
                                 }
                             }
