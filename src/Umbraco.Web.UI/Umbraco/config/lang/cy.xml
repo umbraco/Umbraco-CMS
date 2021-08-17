@@ -2544,6 +2544,8 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <area alias="logViewer">
         <key alias="deleteSavedSearch">Dileu Chwiliad Cadwedig</key>
         <key alias="logLevels">Lefelau Log</key>
+        <key alias="selectAllLogLevelFilters">Dewiswch y cyfan</key>
+        <key alias="deselectAllLogLevelFilters">Dad-ddewiswch bawb</key>
         <key alias="savedSearches">Chwiliadau Cadwedig</key>
         <key alias="saveSearch">Arbed Chwiliad</key>
         <key alias="saveSearchDescription">Rhoi enw cyfeillgar am eich ymholiad chwilio</key>

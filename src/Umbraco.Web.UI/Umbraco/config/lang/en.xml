@@ -2329,6 +2329,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="logViewer">
       <key alias="deleteSavedSearch">Delete Saved Search</key>
       <key alias="logLevels">Log Levels</key>
+      <key alias="selectAllLogLevelFilters">Select all</key>
+      <key alias="deselectAllLogLevelFilters">Deselect all</key>
       <key alias="savedSearches">Saved Searches</key>
       <key alias="saveSearch">Save Search</key>
       <key alias="saveSearchDescription">Enter a friendly name for your search query</key>
