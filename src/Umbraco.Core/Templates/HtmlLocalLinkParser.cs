@@ -42,9 +42,15 @@ namespace Umbraco.Cms.Core.Templates
         /// <returns></returns>
         public string EnsureInternalLinks(string text, bool preview)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                throw new InvalidOperationException("Could not parse internal links, there is no current UmbracoContext");
+            }
+
             if (!preview)
+            {
                 return EnsureInternalLinks(text);
+            }
 
             using (umbracoContext.ForcedPreview(preview)) // force for URL provider
             {

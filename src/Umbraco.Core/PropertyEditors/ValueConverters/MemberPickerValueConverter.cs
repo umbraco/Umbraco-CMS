@@ -55,8 +55,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 return null;
             }
 
-
-
             IPublishedContent member;
             var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             if (source is int id)

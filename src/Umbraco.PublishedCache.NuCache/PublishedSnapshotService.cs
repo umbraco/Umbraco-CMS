@@ -117,7 +117,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _publishedModelFactory = publishedModelFactory;
         }
 
-        protected PublishedSnapshot CurrentPublishedSnapshot { get { _publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot); return (PublishedSnapshot)publishedSnapshot; } }
+        protected PublishedSnapshot CurrentPublishedSnapshot
+        {
+            get
+            {
+                _publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot);
+                return (PublishedSnapshot)publishedSnapshot;
+            }
+        }
 
         // NOTE: These aren't used within this object but are made available internally to improve the IdKey lookup performance
         // when nucache is enabled.
@@ -880,9 +887,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                             break;
                         case DomainChangeTypes.Refresh:
                             var domain = _serviceContext.DomainService.GetById(payload.Id);
-                            if (domain == null) continue;
-                            if (domain.RootContentId.HasValue == false) continue; // anomaly
-                            if (domain.LanguageIsoCode.IsNullOrWhiteSpace()) continue; // anomaly
+                            if (domain == null)
+                                continue;
+                            if (domain.RootContentId.HasValue == false)
+                                continue; // anomaly
+                            if (domain.LanguageIsoCode.IsNullOrWhiteSpace())
+                                continue; // anomaly
                             var culture = domain.LanguageIsoCode;
                             _domainStore.SetLocked(domain.Id, new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard));
                             break;

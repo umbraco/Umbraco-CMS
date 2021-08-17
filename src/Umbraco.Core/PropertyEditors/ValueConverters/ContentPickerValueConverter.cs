@@ -57,8 +57,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 if (inter is int id)
                 {
-                    
-
                     content = publishedSnapshot.Content.GetById(id);
                     if (content != null)
                         return content;
