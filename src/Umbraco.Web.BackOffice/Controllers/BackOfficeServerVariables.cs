@@ -365,7 +365,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {
                             "imageUrlGeneratorApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ImageUrlGeneratorController>(
-                                controller => controller.GetCropUrl(null, null, null, null, null))
+                                controller => controller.GetCropUrl(null, null, null, null))
                         },
                         {
                             "elementTypeApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ElementTypeController>(

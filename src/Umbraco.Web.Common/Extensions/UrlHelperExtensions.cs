@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -246,8 +246,6 @@ namespace Umbraco.Extensions
             bool useCropDimensions = false,
             bool cacheBuster = true,
             string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null,
-            bool upScale = true,
             bool htmlEncode = true)
         {
             if (mediaItem == null)
@@ -256,8 +254,8 @@ namespace Umbraco.Extensions
             }
 
             var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
-                upScale);
+                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions);
+
             return CreateHtmlString(url, htmlEncode);
         }
 
@@ -273,16 +271,14 @@ namespace Umbraco.Extensions
             bool useCropDimensions = true,
             string cacheBusterValue = null,
             string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null,
-            bool upScale = true,
             bool htmlEncode = true)
         {
             if (imageCropperValue == null) return HtmlString.Empty;
 
             var imageUrl = imageCropperValue.Src;
             var url = imageUrl.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
-                upScale);
+                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions);
+
             return CreateHtmlString(url, htmlEncode);
         }
 

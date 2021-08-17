@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Routing
         public UmbracoRequestPaths(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
         {
             var applicationPath = hostingEnvironment.ApplicationVirtualPath;
-            _appPath = applicationPath.TrimStart('/');
+            _appPath = applicationPath.TrimStart(Constants.CharArrays.ForwardSlash);
 
             _backOfficePath = globalSettings.Value.GetBackOfficePath(hostingEnvironment)
                 .EnsureStartsWith('/').TrimStart(_appPath.EnsureStartsWith('/')).EnsureStartsWith('/');
@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         public bool IsBackOfficeRequest(string absPath)
         {
-            var fullUrlPath = absPath.TrimStart('/');
+            var fullUrlPath = absPath.TrimStart(Constants.CharArrays.ForwardSlash);
             var urlPath = fullUrlPath.TrimStart(_appPath).EnsureStartsWith('/');
 
             // check if this is in the umbraco back office
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Core.Routing
             // Umbraco/MYPLUGINAREA/MYCONTROLLERNAME/{action}/{id}
             // so if the path contains at a minimum 3 parts: Umbraco + MYPLUGINAREA + MYCONTROLLERNAME then we will have to assume it is a
             // plugin controller for the front-end.
-            if (urlPath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries).Length >= 3)
+            if (urlPath.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries).Length >= 3)
             {
                 return false;
             }

@@ -906,7 +906,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                 return -1;
             }
 
-            var p = new Process
+            using (var p = new Process
             {
                 StartInfo =
                 {
@@ -918,13 +918,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence
                     CreateNoWindow = true,
                     WindowStyle = ProcessWindowStyle.Hidden
                 }
-            };
-            p.Start();
-            output = p.StandardOutput.ReadToEnd();
-            error = p.StandardError.ReadToEnd();
-            p.WaitForExit();
+            })
+            {
+                p.Start();
+                output = p.StandardOutput.ReadToEnd();
+                error = p.StandardError.ReadToEnd();
+                p.WaitForExit();
 
-            return p.ExitCode;
+                return p.ExitCode;
+            }
         }
 
         /// <summary>
