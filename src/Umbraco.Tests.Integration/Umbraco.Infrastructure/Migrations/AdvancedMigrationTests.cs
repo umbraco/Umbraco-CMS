@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -31,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         private IMigrationPlanExecutor MigrationPlanExecutor => GetRequiredService<IMigrationPlanExecutor>();
 
         [Test]
-        public void CreateTableOfTDto()
+        public async Task CreateTableOfTDto()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -53,7 +54,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("done"));
 
-                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
 
                 var helper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator);
                 bool exists = helper.TableExists("umbracoUser");
@@ -64,7 +65,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         }
 
         [Test]
-        public void DeleteKeysAndIndexesOfTDto()
+        public async Task DeleteKeysAndIndexesOfTDto()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -90,13 +91,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<DeleteKeysAndIndexesMigration>("done"));
 
-                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
 
         [Test]
-        public void CreateKeysAndIndexesOfTDto()
+        public async Task CreateKeysAndIndexesOfTDto()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -125,13 +126,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<DeleteKeysAndIndexesMigration>("b")
                         .To<CreateKeysAndIndexesOfTDtoMigration>("done"));
 
-                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
 
         [Test]
-        public void CreateKeysAndIndexes()
+        public async Task CreateKeysAndIndexes()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -160,13 +161,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<DeleteKeysAndIndexesMigration>("b")
                         .To<CreateKeysAndIndexesMigration>("done"));
 
-                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
 
         [Test]
-        public void CreateColumn()
+        public async Task CreateColumn()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -192,7 +193,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<CreateColumnMigration>("done"));
 
-                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }

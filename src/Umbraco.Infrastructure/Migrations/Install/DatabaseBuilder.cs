@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
@@ -412,7 +413,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public Result UpgradeSchemaAndData(UmbracoPlan plan)
+        public async Task<Result> UpgradeSchemaAndDataAsync(UmbracoPlan plan)
         {
             try
             {
@@ -426,7 +427,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 // upgrade
                 var upgrader = new Upgrader(plan);
-                upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
+                await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService);
 
                 var message = "<p>Upgrade completed!</p>";
 

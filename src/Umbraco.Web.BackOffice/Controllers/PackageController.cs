@@ -22,6 +22,7 @@ using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Microsoft.Extensions.Logging;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -117,7 +118,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        public ActionResult<IEnumerable<InstalledPackage>> RunMigrations([FromQuery]string packageName)
+        public async Task<ActionResult<IEnumerable<InstalledPackage>>> RunMigrations([FromQuery]string packageName)
         {
             IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
             IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
@@ -129,7 +130,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     try
                     {
-                        upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
+                        await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService);
                     }
                     catch (Exception ex)
                     {
