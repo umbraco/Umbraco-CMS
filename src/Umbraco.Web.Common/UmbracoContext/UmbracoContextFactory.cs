@@ -53,16 +53,15 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         /// <inheritdoc />
         public UmbracoContextReference EnsureUmbracoContext()
         {
-            IUmbracoContext currentUmbracoContext = _umbracoContextAccessor.UmbracoContext;
-            if (currentUmbracoContext != null)
+            if (_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
-                return new UmbracoContextReference(currentUmbracoContext, false, _umbracoContextAccessor);
+                return new UmbracoContextReference(umbracoContext, false, _umbracoContextAccessor);
             }
 
-            IUmbracoContext umbracoContext = CreateUmbracoContext();
-            _umbracoContextAccessor.UmbracoContext = umbracoContext;
+            IUmbracoContext createdUmbracoContext = CreateUmbracoContext();
 
-            return new UmbracoContextReference(umbracoContext, true, _umbracoContextAccessor);
+            _umbracoContextAccessor.Set(createdUmbracoContext);
+            return new UmbracoContextReference(createdUmbracoContext, true, _umbracoContextAccessor);
         }
 
     }

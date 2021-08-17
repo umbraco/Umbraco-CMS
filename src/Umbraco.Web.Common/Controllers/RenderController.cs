@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Controllers
 {
@@ -37,7 +39,14 @@ namespace Umbraco.Cms.Web.Common.Controllers
         /// <summary>
         /// Gets the umbraco context
         /// </summary>
-        protected IUmbracoContext UmbracoContext => _umbracoContextAccessor.UmbracoContext;
+        protected IUmbracoContext UmbracoContext
+        {
+            get
+            {
+                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+                return umbracoContext;
+            }
+        }
 
         /// <summary>
         /// The default action to render the front-end view.

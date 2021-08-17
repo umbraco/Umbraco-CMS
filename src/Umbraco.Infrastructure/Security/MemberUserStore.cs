@@ -624,10 +624,7 @@ namespace Umbraco.Cms.Core.Security
             {
                 return null;
             }
-            if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-            {
-                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-            }
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             return publishedSnapshot.Members.Get(member);
         }
 

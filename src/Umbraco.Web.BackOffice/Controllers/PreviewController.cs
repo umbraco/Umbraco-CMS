@@ -71,7 +71,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var availableLanguages = _localizationService.GetAllLanguages();
             if (id.HasValue)
             {
-                var content = _umbracoContextAccessor.UmbracoContext.Content.GetById(true, id.Value);
+                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+                var content = umbracoContext.Content.GetById(true, id.Value);
                 if (content is null)
                     return NotFound();
 

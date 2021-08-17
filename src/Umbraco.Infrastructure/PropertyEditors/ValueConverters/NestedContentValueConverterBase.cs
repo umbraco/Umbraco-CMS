@@ -46,10 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var elementTypeAlias = sourceObject[NestedContentPropertyEditor.ContentTypeAliasPropertyKey]?.ToObject<string>();
             if (string.IsNullOrEmpty(elementTypeAlias))
                 return null;
-            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-            {
-                throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-            }
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             // only convert element types - content types will cause an exception when PublishedModelFactory creates the model
             var publishedContentType = publishedSnapshot.Content.GetContentType(elementTypeAlias);
             if (publishedContentType == null || publishedContentType.IsElement == false)

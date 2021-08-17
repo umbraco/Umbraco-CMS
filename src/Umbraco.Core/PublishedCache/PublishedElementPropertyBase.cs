@@ -2,6 +2,7 @@ using System;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache
 {
@@ -74,10 +75,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             public object XPathValue;
         }
 
-        public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
-        {
-            return "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
-        }
+        public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing) => "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
 
         private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
         {
@@ -140,10 +138,7 @@ namespace Umbraco.Cms.Core.PublishedCache
                     cacheValues = (CacheValues) snapshotCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 case PropertyCacheLevel.Snapshot:
-                    if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-                    {
-                        throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-                    }
+                    var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                     // cache within the snapshot cache
                     var facadeCache = publishedSnapshot.SnapshotCache;
                     cacheValues = (CacheValues) facadeCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();

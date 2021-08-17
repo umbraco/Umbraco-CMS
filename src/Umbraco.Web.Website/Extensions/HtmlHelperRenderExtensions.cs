@@ -68,15 +68,16 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static IHtmlContent PreviewBadge(this IHtmlHelper helper, IUmbracoContextAccessor umbracoContextAccessor, IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IIOHelper ioHelper, ContentSettings contentSettings)
         {
-            var umbrcoContext = umbracoContextAccessor.UmbracoContext;
-            if (umbrcoContext.InPreviewMode)
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+
+            if (umbracoContext.InPreviewMode)
             {
                 var htmlBadge =
                     string.Format(
                         contentSettings.PreviewBadge,
                         ioHelper.ResolveUrl(globalSettings.UmbracoPath),
                         WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
-                        umbrcoContext.PublishedRequest.PublishedContent.Id);
+                        umbracoContext.PublishedRequest.PublishedContent.Id);
                 return new HtmlString(htmlBadge);
             }
 
@@ -103,7 +104,7 @@ namespace Umbraco.Extensions
             }
 
             var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(htmlHelper);
-            var umbracoContext = umbracoContextAccessor.UmbracoContext;
+            umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext);
 
             if (cacheByPage)
             {
@@ -669,7 +670,8 @@ namespace Umbraco.Extensions
             }
 
             IUmbracoContextAccessor umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
-            var formAction = umbracoContextAccessor.UmbracoContext.OriginalRequestUrl.PathAndQuery;
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+            var formAction = umbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);
         }
 

@@ -52,6 +52,7 @@ using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
+using System;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
@@ -163,7 +164,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
-                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
+                var umbracoContext = umbCtx.GetRequiredUmbracoContext();
+                return new PublishedContentQuery(umbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
             });
 
             // register accessors for cultures

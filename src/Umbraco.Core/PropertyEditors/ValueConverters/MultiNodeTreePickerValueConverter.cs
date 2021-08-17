@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             }
 
             // TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
-            if (_umbracoContextAccessor.UmbracoContext != null)
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out _))
             {
                 if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
                 {
@@ -86,10 +86,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         var multiNodeTreePicker = new List<IPublishedContent>();
 
                         var objectType = UmbracoObjectTypes.Unknown;
-                        if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
-                        {
-                            throw new InvalidOperationException("Wasn't possible to a get a valid Snapshot");
-                        }
+                        var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                         foreach (var udi in udis)
                         {
                             var guidUdi = udi as GuidUdi;
@@ -169,9 +166,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return content;
         }
 
-        private static bool IsSingleNodePicker(IPublishedPropertyType propertyType)
-        {
-            return propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>().MaxNumber == 1;
-        }
+        private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) => propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>().MaxNumber == 1;
     }
 }
