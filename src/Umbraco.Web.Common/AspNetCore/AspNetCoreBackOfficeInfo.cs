@@ -16,7 +16,6 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         {
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnviroment;
-            //GetAbsoluteUrl= WebPath.Combine(hostingEnviroment.ApplicationMainUrl.ToString(), globalSettings.CurrentValue.UmbracoPath.TrimStart(CharArrays.TildeForwardSlash));
 
         }
 
