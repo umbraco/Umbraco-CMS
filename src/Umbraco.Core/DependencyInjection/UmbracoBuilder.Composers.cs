@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+using System.Reflection;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.DependencyInjection
@@ -15,13 +15,32 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddComposers(this IUmbracoBuilder builder)
         {
-            // TODO: Should have a better name
+            builder.WithCollectionBuilder<ComponentCollectionBuilder>();
 
             IEnumerable<Type> composerTypes = builder.TypeLoader.GetTypes<IComposer>();
-            IEnumerable<Attribute> enableDisable = builder.TypeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
-            new Composers(builder, composerTypes, enableDisable, builder.BuilderLoggerFactory.CreateLogger<Composers>()).Compose();
+            IEnumerable<IComposer> composers = GetComposers(composerTypes);
+
+            foreach (IComposer composer in composers)
+            {
+                composer.Compose(builder);
+            }
 
             return builder;
+        }
+
+        private static IEnumerable<IComposer> GetComposers(IEnumerable<Type> types)
+        {
+            foreach (Type type in types)
+            {
+                ConstructorInfo ctor = type.GetConstructor(Array.Empty<Type>());
+
+                if (ctor == null)
+                {
+                    throw new InvalidOperationException($"Composer {type.FullName} does not have a parameter-less constructor.");
+                }
+
+                yield return (IComposer) ctor.Invoke(Array.Empty<object>());
+            }
         }
     }
 }
