@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Controllers
 {
@@ -42,10 +43,7 @@ namespace Umbraco.Cms.Web.Common.Controllers
         {
             get
             {
-                if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-                {
-                    throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-                }
+                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 return umbracoContext;
             }
         }

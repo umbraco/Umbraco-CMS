@@ -49,11 +49,8 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static string GetCultureFromDomains(this IPublishedContent content, IUmbracoContextAccessor umbracoContextAccessor, ISiteDomainMapper siteDomainHelper, Uri current = null)
         {
-                if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-                {
-                    throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-                }
-                return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+            return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
         }
 
         #endregion
@@ -75,10 +72,7 @@ namespace Umbraco.Extensions
                 .Field(UmbracoExamineFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
                 .And()
                 .ManagedQuery(term);
-            if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
             return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
         }
 
@@ -97,10 +91,7 @@ namespace Umbraco.Extensions
                 .Field("parentID", content.Id)
                 .And()
                 .ManagedQuery(term);
-            if (!umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-            {
-                throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-            }
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
             return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
         }

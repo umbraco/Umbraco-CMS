@@ -31,10 +31,7 @@ namespace Umbraco.Cms.Web.Common.Controllers
         {
             get
             {
-                if (!UmbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
-                {
-                    throw new InvalidOperationException("Wasn't able to get an UmbracoContext");
-                }
+                var umbracoContext = UmbracoContextAccessor.GetRequiredUmbracoContext();
                 return umbracoContext;
             }
         }
