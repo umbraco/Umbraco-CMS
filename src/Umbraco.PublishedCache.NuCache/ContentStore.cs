@@ -524,7 +524,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             parent = GetParentLink(kit.Node, null);
             if (parent == null)
             {
-                _logger.LogWarning($"Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.");
+                _logger.LogWarning("Skip item id={kit.Node.Id}, could not find parent id={kit.Node.ParentContentId}.", kit.Node.Id, kit.Node.ParentContentId);
                 return false;
             }
 
@@ -533,21 +533,21 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // because the data sort operation is by path.
             if (parent.Value == null)
             {
-                _logger.LogWarning($"Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}. See the Health Check dashboard in Settings to resolve data integrity issues.");
+                _logger.LogWarning("Skip item id={kit.Node.Id}, no Data assigned for linked node with path {kit.Node.Path} and parent id {kit.Node.ParentContentId}. This can indicate data corruption for the Path value for node {kit.Node.Id}. See the Health Check dashboard in Settings to resolve data integrity issues.", kit.Node.Id, kit.Node.ParentContentId);
                 return false;
             }
 
             // make sure the kit is valid
             if (kit.DraftData == null && kit.PublishedData == null)
             {
-                _logger.LogWarning($"Skip item id={kit.Node.Id}, both draft and published data are null.");
+                _logger.LogWarning("Skip item id={kit.Node.Id}, both draft and published data are null.", kit.Node.Id);
                 return false;
             }
 
             // unknown = bad
             if (_contentTypesById.TryGetValue(kit.ContentTypeId, out var link) == false || link.Value == null)
             {
-                _logger.LogWarning($"Skip item id={kit.Node.Id}, could not find content type id={kit.ContentTypeId}.");
+                _logger.LogWarning("Skip item id={kit.Node.Id}, could not find content type id={kit.ContentTypeId}.", kit.Node.Id, kit.ContentTypeId);
                 return false;
             }
 
@@ -723,7 +723,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     previousNode = null; // there is no previous sibling
                 }
 
-                _logger.LogDebug($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
+                _logger.LogDebug("Set {thisNode.Id} with parent {thisNode.ParentContentId}", thisNode.Id, thisNode.ParentContentId);
                 SetValueLocked(_contentNodes, thisNode.Id, thisNode);
 
                 // if we are initializing from the database source ensure the local db is updated
@@ -780,7 +780,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     ok = false;
                     continue; // skip that one
                 }
-                _logger.LogDebug($"Set {kit.Node.Id} with parent {kit.Node.ParentContentId}");
+                _logger.LogDebug("Set {kit.Node.Id} with parent {kit.Node.ParentContentId}", kit.Node.Id, kit.Node.ParentContentId);
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
                 if (_localDb != null) RegisterChange(kit.Node.Id, kit);
