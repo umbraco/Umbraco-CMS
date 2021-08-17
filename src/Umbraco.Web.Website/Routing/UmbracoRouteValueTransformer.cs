@@ -98,7 +98,6 @@ namespace Umbraco.Cms.Web.Website.Routing
             if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
                 return values;
-                ;
             }
 
             if (!_routableDocumentFilter.IsDocumentRequest(httpContext.Request.Path))

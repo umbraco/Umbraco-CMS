@@ -28,8 +28,10 @@ namespace Umbraco.Cms.Core.Routing
         /// <inheritdoc/>
         public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-
+            if(!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                return false;
+            }
             if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"), out int pageId))
             {
                 IPublishedContent doc = umbracoContext.Content.GetById(pageId);

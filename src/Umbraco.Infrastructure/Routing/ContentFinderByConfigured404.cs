@@ -51,7 +51,10 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                return false;
+            }
             _logger.LogDebug("Looking for a page to handle 404.");
 
             int? domainContentId = null;

@@ -44,8 +44,10 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                return false;
+            }
             IPublishedContent node = null;
 
             // no alias if "/"
