@@ -9,6 +9,17 @@ namespace Umbraco.Cms.Infrastructure.Media
     internal class ImageDimensionExtractor : IImageDimensionExtractor
     {
         /// <summary>
+        /// The ImageSharp configuration.
+        /// </summary>
+        private readonly Configuration _configuration;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageDimensionExtractor" /> class.
+        /// </summary>
+        /// <param name="configuration">The ImageSharp configuration.</param>
+        public ImageDimensionExtractor(Configuration configuration) => _configuration = configuration;
+
+        /// <summary>
         /// Gets the dimensions of an image.
         /// </summary>
         /// <param name="stream">A stream containing the image bytes.</param>
@@ -39,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.Media
                     stream.Seek(0, SeekOrigin.Begin);
                 }
 
-                using (var image = Image.Load(stream))
+                using (var image = Image.Load(_configuration, stream))
                 {
                     var fileWidth = image.Width;
                     var fileHeight = image.Height;

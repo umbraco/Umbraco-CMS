@@ -193,6 +193,8 @@ src/Umbraco.Web.UI/Umbraco/telemetrics-id.umb
 /src/Umbraco.Web.UI.NetCore/[Uu]mbraco/[Ll]ogs
 /src/Umbraco.Web.UI.NetCore/[Uu]mbraco/[Dd]ata/*
 /src/Umbraco.Web.UI.NetCore/[Uu]mbraco/[Mm]odels/*
+/src/Umbraco.Web.UI.NetCore/appsettings.json
+/src/Umbraco.Web.UI.NetCore/appsettings.Development.json
 
 
 src/Umbraco.Tests.Integration/umbraco/Data/

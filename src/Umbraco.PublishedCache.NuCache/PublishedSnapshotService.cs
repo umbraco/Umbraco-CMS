@@ -463,7 +463,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 // Update: We will still return false here even though the above mentioned race condition has been fixed since we now
                 // lock the entire operation of creating/populating the cache file with the same lock as releasing/closing the cache file
 
-                _logger.LogInformation($"Tried to load {entityType} from the local cache file but it was empty.");
+                _logger.LogInformation("Tried to load {entityType} from the local cache file but it was empty.", entityType);
                 return false;
             }
 

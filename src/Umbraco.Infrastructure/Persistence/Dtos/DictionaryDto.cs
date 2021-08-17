@@ -11,6 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
     public class DictionaryDto  // public as required to be accessible from Deploy for the RepairDictionaryIdsWorkItem.
     {
         public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.DictionaryEntry;
+
         [Column("pk")]
         [PrimaryKeyColumn]
         public int PrimaryKey { get; set; }
@@ -25,10 +26,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Parent")]
         public Guid? Parent { get; set; }
 
-        // TODO: This needs to have a unique index.
         [Column("key")]
         [Length(450)]
-        [Index(IndexTypes.NonClustered, Name = "IX_cmsDictionary_key")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_key")]
         public string Key { get; set; }
 
         [ResultColumn]

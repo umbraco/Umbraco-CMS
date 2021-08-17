@@ -1,68 +1,107 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
+using SixLabors.ImageSharp;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Media
 {
+    /// <summary>
+    /// Exposes a method that generates an image URL based on the specified options that can be processed by ImageSharp.
+    /// </summary>
+    /// <seealso cref="Umbraco.Cms.Core.Media.IImageUrlGenerator" />
     public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     {
-        public IEnumerable<string> SupportedImageFileTypes => new[] { "jpeg", "jpg", "gif", "bmp", "png" };
+        /// <inheritdoc />
+        public IEnumerable<string> SupportedImageFileTypes { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
+        /// </summary>
+        /// <param name="configuration">The ImageSharp configuration.</param>
+        public ImageSharpImageUrlGenerator(Configuration configuration)
+            : this(configuration.ImageFormats.SelectMany(f => f.FileExtensions).ToArray())
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
+        /// </summary>
+        /// <param name="supportedImageFileTypes">The supported image file types/extensions.</param>
+        /// <remarks>
+        /// This constructor is only used for testing.
+        /// </remarks>
+        internal ImageSharpImageUrlGenerator(IEnumerable<string> supportedImageFileTypes) => SupportedImageFileTypes = supportedImageFileTypes;
+
+        /// <inheritdoc/>
         public string GetImageUrl(ImageUrlGenerationOptions options)
         {
-            if (options == null) return null;
-
-            var imageProcessorUrl = new StringBuilder(options.ImageUrl ?? string.Empty);
-
-            if (options.FocalPoint != null) AppendFocalPoint(imageProcessorUrl, options);
-            else if (options.Crop != null) AppendCrop(imageProcessorUrl, options);
-            else if (options.DefaultCrop) imageProcessorUrl.Append("?anchor=center&mode=crop");
-            else
+            if (options == null)
             {
-                imageProcessorUrl.Append("?mode=").Append((options.ImageCropMode ?? ImageCropMode.Crop).ToString().ToLower());
-
-                if (options.ImageCropAnchor != null) imageProcessorUrl.Append("&anchor=").Append(options.ImageCropAnchor.ToString().ToLower());
+                return null;
             }
 
-            var hasFormat = options.FurtherOptions != null && options.FurtherOptions.InvariantContains("&format=");
+            var imageUrl = new StringBuilder(options.ImageUrl);
 
-            //Only put quality here, if we don't have a format specified.
-            //Otherwise we need to put quality at the end to avoid it being overridden by the format.
-            if (options.Quality.HasValue && hasFormat == false) imageProcessorUrl.Append("&quality=").Append(options.Quality);
-            if (options.HeightRatio.HasValue) imageProcessorUrl.Append("&heightratio=").Append(options.HeightRatio.Value.ToString(CultureInfo.InvariantCulture));
-            if (options.WidthRatio.HasValue) imageProcessorUrl.Append("&widthratio=").Append(options.WidthRatio.Value.ToString(CultureInfo.InvariantCulture));
-            if (options.Width.HasValue) imageProcessorUrl.Append("&width=").Append(options.Width);
-            if (options.Height.HasValue) imageProcessorUrl.Append("&height=").Append(options.Height);
-            if (options.UpScale == false) imageProcessorUrl.Append("&upscale=false");
-            if (!string.IsNullOrWhiteSpace(options.AnimationProcessMode)) imageProcessorUrl.Append("&animationprocessmode=").Append(options.AnimationProcessMode);
-            if (!string.IsNullOrWhiteSpace(options.FurtherOptions)) imageProcessorUrl.Append(options.FurtherOptions);
+            bool queryStringHasStarted = false;
+            void AppendQueryString(string value)
+            {
+                imageUrl.Append(queryStringHasStarted ? '&' : '?');
+                queryStringHasStarted = true;
 
-            //If furtherOptions contains a format, we need to put the quality after the format.
-            if (options.Quality.HasValue && hasFormat) imageProcessorUrl.Append("&quality=").Append(options.Quality);
-            if (!string.IsNullOrWhiteSpace(options.CacheBusterValue)) imageProcessorUrl.Append("&rnd=").Append(options.CacheBusterValue);
+                imageUrl.Append(value);
+            }
+            void AddQueryString(string key, params IConvertible[] values)
+                => AppendQueryString(key + '=' + string.Join(",", values.Select(x => x.ToString(CultureInfo.InvariantCulture))));
 
-            return imageProcessorUrl.ToString();
-        }
+            if (options.FocalPoint != null)
+            {
+                AddQueryString("rxy", options.FocalPoint.Left, options.FocalPoint.Top);
+            }
 
-        private void AppendFocalPoint(StringBuilder imageProcessorUrl, ImageUrlGenerationOptions options)
-        {
-            imageProcessorUrl.Append("?center=");
-            imageProcessorUrl.Append(options.FocalPoint.Top.ToString(CultureInfo.InvariantCulture)).Append(",");
-            imageProcessorUrl.Append(options.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
-            imageProcessorUrl.Append("&mode=crop");
-        }
+            if (options.Crop != null)
+            {
+                AddQueryString("cc", options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
+            }
 
-        private void AppendCrop(StringBuilder imageProcessorUrl, ImageUrlGenerationOptions options)
-        {
-            imageProcessorUrl.Append("?crop=");
-            imageProcessorUrl.Append(options.Crop.X1.ToString(CultureInfo.InvariantCulture)).Append(",");
-            imageProcessorUrl.Append(options.Crop.Y1.ToString(CultureInfo.InvariantCulture)).Append(",");
-            imageProcessorUrl.Append(options.Crop.X2.ToString(CultureInfo.InvariantCulture)).Append(",");
-            imageProcessorUrl.Append(options.Crop.Y2.ToString(CultureInfo.InvariantCulture));
-            imageProcessorUrl.Append("&cropmode=percentage");
+            if (options.ImageCropMode.HasValue)
+            {
+                AddQueryString("rmode", options.ImageCropMode.Value.ToString().ToLowerInvariant());
+            }
+
+            if (options.ImageCropAnchor.HasValue)
+            {
+                AddQueryString("ranchor", options.ImageCropAnchor.Value.ToString().ToLowerInvariant());
+            }
+
+            if (options.Width.HasValue)
+            {
+                AddQueryString("width", options.Width.Value);
+            }
+
+            if (options.Height.HasValue)
+            {
+                AddQueryString("height", options.Height.Value);
+            }
+
+            if (options.Quality.HasValue)
+            {
+                AddQueryString("quality", options.Quality.Value);
+            }
+
+            if (string.IsNullOrWhiteSpace(options.FurtherOptions) == false)
+            {
+                AppendQueryString(options.FurtherOptions.TrimStart('?', '&'));
+            }
+
+            if (string.IsNullOrWhiteSpace(options.CacheBusterValue) == false)
+            {
+                AddQueryString("rnd", options.CacheBusterValue);
+            }
+
+            return imageUrl.ToString();
         }
     }
 }
