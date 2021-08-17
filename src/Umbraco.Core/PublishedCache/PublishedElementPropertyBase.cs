@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache
 {
@@ -74,10 +75,7 @@ namespace Umbraco.Cms.Core.PublishedCache
             public object XPathValue;
         }
 
-        public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
-        {
-            return "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
-        }
+        public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing) => "PublishedSnapshot.Property.CacheValues[" + (previewing ? "D:" : "P:") + contentUid + ":" + typeAlias + "]";
 
         private void GetCacheLevels(out PropertyCacheLevel cacheLevel, out PropertyCacheLevel referenceCacheLevel)
         {
@@ -112,8 +110,10 @@ namespace Umbraco.Cms.Core.PublishedCache
             // elements cache (if we don't want to pollute the elements cache with short-lived
             // data) depending on settings
             // for members, always cache in the snapshot cache - never pollute elements cache
-            var publishedSnapshot = _publishedSnapshotAccessor?.PublishedSnapshot;
-            if (publishedSnapshot == null) return null;
+            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                return null;
+            }
             return (IsPreviewing == false || FullCacheWhenPreviewing) && IsMember == false
                 ? publishedSnapshot.ElementsCache
                 : publishedSnapshot.SnapshotCache;
@@ -138,8 +138,9 @@ namespace Umbraco.Cms.Core.PublishedCache
                     cacheValues = (CacheValues) snapshotCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 case PropertyCacheLevel.Snapshot:
+                    var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                     // cache within the snapshot cache
-                    var facadeCache = _publishedSnapshotAccessor?.PublishedSnapshot?.SnapshotCache;
+                    var facadeCache = publishedSnapshot.SnapshotCache;
                     cacheValues = (CacheValues) facadeCache?.Get(ValuesCacheKey, () => new CacheValues()) ?? new CacheValues();
                     break;
                 default:

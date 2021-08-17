@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Website.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Controllers
 {
@@ -23,7 +24,8 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
         public ActionResult Index()
         {
-            var store = _umbracoContextAccessor.UmbracoContext.Content;
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            var store = umbracoContext.Content;
             if (store.HasContent())
             {
                 // If there is actually content, go to the root.

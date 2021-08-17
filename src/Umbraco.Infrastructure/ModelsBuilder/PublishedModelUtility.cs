@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
@@ -32,15 +33,15 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 
         public static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor, PublishedItemType itemType, string alias)
         {
-            var facade = publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             switch (itemType)
             {
                 case PublishedItemType.Content:
-                    return facade.Content.GetContentType(alias);
+                    return publishedSnapshot.Content.GetContentType(alias);
                 case PublishedItemType.Media:
-                    return facade.Media.GetContentType(alias);
+                    return publishedSnapshot.Media.GetContentType(alias);
                 case PublishedItemType.Member:
-                    return facade.Members.GetContentType(alias);
+                    return publishedSnapshot.Members.GetContentType(alias);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(itemType));
             }

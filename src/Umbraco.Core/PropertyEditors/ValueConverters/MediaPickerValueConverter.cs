@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
@@ -27,10 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             _publishedModelFactory = publishedModelFactory;
         }
 
-        public override bool IsConverter(IPublishedPropertyType propertyType)
-        {
-            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MediaPicker);
-        }
+        public override bool IsConverter(IPublishedPropertyType propertyType) => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MediaPicker);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
         {
@@ -73,11 +71,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
             if (udis.Any())
             {
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 foreach (var udi in udis)
                 {
                     var guidUdi = udi as GuidUdi;
                     if (guidUdi == null) continue;
-                    var item = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(guidUdi.Guid);
+                    var item = publishedSnapshot.Media.GetById(guidUdi.Guid);
                     if (item != null)
                         mediaItems.Add(item);
                 }
@@ -88,9 +87,6 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return source;
         }
 
-        private object FirstOrDefault(IList mediaItems)
-        {
-            return mediaItems.Count == 0 ? null : mediaItems[0];
-        }
+        private object FirstOrDefault(IList mediaItems) => mediaItems.Count == 0 ? null : mediaItems[0];
     }
 }

@@ -1,10 +1,11 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
@@ -26,8 +27,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             BlockItemData data,
             PropertyCacheLevel referenceCacheLevel, bool preview)
         {
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             // hack! we need to cast, we have no choice beacuse we cannot make breaking changes.
-            var publishedContentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
+            var publishedContentCache = publishedSnapshot.Content;
 
             // only convert element types - content types will cause an exception when PublishedModelFactory creates the model
             var publishedContentType = publishedContentCache.GetContentType(data.ContentTypeKey);

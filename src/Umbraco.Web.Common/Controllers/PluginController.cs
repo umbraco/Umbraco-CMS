@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Cache;
@@ -27,7 +27,14 @@ namespace Umbraco.Cms.Web.Common.Controllers
         /// <summary>
         /// Gets the Umbraco context.
         /// </summary>
-        public virtual IUmbracoContext UmbracoContext => UmbracoContextAccessor.UmbracoContext;
+        public virtual IUmbracoContext UmbracoContext
+        {
+            get
+            {
+                var umbracoContext = UmbracoContextAccessor.GetRequiredUmbracoContext();
+                return umbracoContext;
+            }
+        }
 
         /// <summary>
         /// Gets the database context accessor.

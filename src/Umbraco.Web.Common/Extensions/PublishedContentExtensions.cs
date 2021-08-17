@@ -48,7 +48,10 @@ namespace Umbraco.Extensions
         /// a culture to that document.</para>
         /// </remarks>
         public static string GetCultureFromDomains(this IPublishedContent content, IUmbracoContextAccessor umbracoContextAccessor, ISiteDomainMapper siteDomainHelper, Uri current = null)
-            => DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContextAccessor.UmbracoContext, siteDomainHelper);
+        {
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+            return DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContext, siteDomainHelper);
+        }
 
         #endregion
 
@@ -69,8 +72,8 @@ namespace Umbraco.Extensions
                 .Field(UmbracoExamineFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
                 .And()
                 .ManagedQuery(term);
-
-            return query.Execute().ToPublishedSearchResults(umbracoContextAccessor.UmbracoContext.Content);
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+            return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
         }
 
         public static IEnumerable<PublishedSearchResult> SearchChildren(this IPublishedContent content, IExamineManager examineManager, IUmbracoContextAccessor umbracoContextAccessor, string term, string indexName = null)
@@ -88,8 +91,9 @@ namespace Umbraco.Extensions
                 .Field("parentID", content.Id)
                 .And()
                 .ManagedQuery(term);
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
-            return query.Execute().ToPublishedSearchResults(umbracoContextAccessor.UmbracoContext.Content);
+            return query.Execute().ToPublishedSearchResults(umbracoContext.Content);
         }
 
         #endregion

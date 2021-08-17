@@ -109,8 +109,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         string Microsoft.AspNetCore.Authentication.Cookies.ICookieManager.GetRequestCookie(HttpContext context, string key)
         {
             var absPath = context.Request.Path;
-
-            if (_umbracoContextAccessor.UmbracoContext == null || _umbracoRequestPaths.IsClientSideRequest(absPath))
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out _) || _umbracoRequestPaths.IsClientSideRequest(absPath))
             {
                 return null;
             }

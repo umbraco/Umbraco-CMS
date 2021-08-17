@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -46,9 +46,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var elementTypeAlias = sourceObject[NestedContentPropertyEditor.ContentTypeAliasPropertyKey]?.ToObject<string>();
             if (string.IsNullOrEmpty(elementTypeAlias))
                 return null;
-
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             // only convert element types - content types will cause an exception when PublishedModelFactory creates the model
-            var publishedContentType = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetContentType(elementTypeAlias);
+            var publishedContentType = publishedSnapshot.Content.GetContentType(elementTypeAlias);
             if (publishedContentType == null || publishedContentType.IsElement == false)
                 return null;
 

@@ -66,8 +66,8 @@ namespace Umbraco.Cms.Core.Templates
             {
                 throw new ArgumentException("Invalid content id " + contentId);
             }
-
-            var content = _umbracoContextAccessor.UmbracoContext.Content?.GetById(contentId);
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+            var content = umbracoContext.Content.GetById(contentId);
 
             if (content == null)
             {

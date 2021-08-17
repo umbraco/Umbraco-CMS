@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -13,9 +12,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache.Internal;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
-using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
@@ -104,7 +101,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
             publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-            publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
+            var localPublishedSnapshot = publishedSnapshotMock.Object;
+            publishedSnapshotAccessorMock.Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot)).Returns(true);
             IPublishedSnapshotAccessor publishedSnapshotAccessor = publishedSnapshotAccessorMock.Object;
 
             var converters = new PropertyValueConverterCollection(() => new IPropertyValueConverter[]
@@ -170,7 +168,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
                 => int.TryParse(source as string, out int i) ? i : -1;
 
             public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-                => _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById((int)inter);
+            {
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+                return publishedSnapshot.Content.GetById((int)inter);
+            }
 
             public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
                 => ((int)inter).ToString();

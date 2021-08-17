@@ -78,7 +78,17 @@ namespace Umbraco.Cms.Web.Common.Views
         /// <summary>
         /// Gets the <see cref="IUmbracoContext"/>
         /// </summary>
-        protected IUmbracoContext UmbracoContext => _umbracoContext ??= UmbracoContextAccessor.UmbracoContext;
+        protected IUmbracoContext UmbracoContext
+        {
+            get
+            {
+                if (!UmbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+                {
+                    return null;
+                }
+                return umbracoContext;
+            }
+        }
 
         /// <inheritdoc/>
         public override ViewContext ViewContext

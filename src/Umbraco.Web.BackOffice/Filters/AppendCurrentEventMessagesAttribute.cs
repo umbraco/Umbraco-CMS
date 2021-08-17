@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -35,8 +35,10 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             {
                 if (context.HttpContext.Response == null) return;
                 if (context.HttpContext.Request.Method.Equals(HttpMethod.Get.ToString(), StringComparison.InvariantCultureIgnoreCase)) return;
-                var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-                if (umbracoContext == null) return;
+                if (!_umbracoContextAccessor.TryGetUmbracoContext(out _))
+                {
+                    return;
+                }
 
                 if (!(context.Result is ObjectResult obj)) return;
 

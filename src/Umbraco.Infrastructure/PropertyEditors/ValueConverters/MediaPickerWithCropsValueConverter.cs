@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -63,10 +63,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             var mediaItems = new List<MediaWithCrops>();
             var dtos = MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(_jsonSerializer, inter);
             var configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
-
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             foreach (var dto in dtos)
             {
-                var mediaItem = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(preview, dto.MediaKey);
+                var mediaItem = publishedSnapshot.Media.GetById(preview, dto.MediaKey);
                 if (mediaItem != null)
                 {
                     var localCrops = new ImageCropperValue
