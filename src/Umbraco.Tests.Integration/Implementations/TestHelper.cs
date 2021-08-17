@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
             {
                 var globalSettings = new GlobalSettings();
                 IOptionsMonitor<GlobalSettings> mockedOptionsMonitorOfGlobalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
-                _backOfficeInfo = new AspNetCoreBackOfficeInfo(mockedOptionsMonitorOfGlobalSettings, null);
+                _backOfficeInfo = new AspNetCoreBackOfficeInfo(mockedOptionsMonitorOfGlobalSettings, GetHostingEnvironment());
             }
 
             return _backOfficeInfo;
