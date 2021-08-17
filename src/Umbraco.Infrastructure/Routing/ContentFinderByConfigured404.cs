@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.Routing
         private readonly ContentSettings _contentSettings;
         private readonly IExamineManager _examineManager;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IVariationContextAccessor _variationContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByConfigured404"/> class.
@@ -30,12 +31,14 @@ namespace Umbraco.Cms.Core.Routing
             IEntityService entityService,
             IOptions<ContentSettings> contentConfigSettings,
             IExamineManager examineManager,
+            IVariationContextAccessor variationContextAccessor,
             IUmbracoContextAccessor umbracoContextAccessor)
         {
             _logger = logger;
             _entityService = entityService;
             _contentSettings = contentConfigSettings.Value;
             _examineManager = examineManager;
+            _variationContextAccessor = variationContextAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
@@ -54,11 +57,14 @@ namespace Umbraco.Cms.Core.Routing
 
             _logger.LogDebug("Looking for a page to handle 404.");
 
+            int? domainContentId = null;
+
             // try to find a culture as best as we can
             string errorCulture = CultureInfo.CurrentUICulture.Name;
             if (frequest.Domain != null)
             {
                 errorCulture = frequest.Domain.Culture;
+                domainContentId = frequest.Domain.ContentId;
             }
             else
             {
@@ -90,8 +96,9 @@ namespace Umbraco.Cms.Core.Routing
             var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
                 _contentSettings.Error404Collection.ToArray(),
                 _entityService,
-                new PublishedContentQuery(umbCtx.PublishedSnapshot, umbCtx.VariationContextAccessor, _examineManager),
-                errorCulture);
+                new PublishedContentQuery(umbCtx.PublishedSnapshot, _variationContextAccessor, _examineManager),
+                errorCulture,
+                domainContentId);
 
             IPublishedContent content = null;
 

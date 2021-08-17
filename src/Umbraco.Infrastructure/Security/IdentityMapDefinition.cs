@@ -74,6 +74,7 @@ namespace Umbraco.Cms.Core.Security
             target.UserName = source.Username;
             target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
             target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
+            target.InviteDateUtc = source.InvitedDate?.ToUniversalTime();
             target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
             target.Name = source.Name;
             target.AccessFailedCount = source.FailedPasswordAttempts;
@@ -87,7 +88,7 @@ namespace Umbraco.Cms.Core.Security
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
         }
 
-        // TODO: We need to validate this mapping is OK, we need to get Umbraco.Code working
+        // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
         private void Map(IMember source, MemberIdentityUser target)
         {
             target.Email = source.Email;

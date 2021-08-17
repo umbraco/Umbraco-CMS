@@ -438,6 +438,13 @@ namespace Umbraco.Cms.Core.Security
                 user.LastLoginDate = dt;
             }
 
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.InviteDateUtc))
+                || (user.InvitedDate?.ToUniversalTime() != identityUser.InviteDateUtc))
+            {
+                anythingChanged = true;                
+                user.InvitedDate = identityUser.InviteDateUtc?.ToLocalTime();
+            }
+
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.LastPasswordChangeDateUtc))
                 || (user.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
                 || (identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))

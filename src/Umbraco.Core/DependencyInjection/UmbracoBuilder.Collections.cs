@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media.EmbedProviders;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -203,6 +204,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <param name="builder">The builder.</param>
         public static CacheRefresherCollectionBuilder CacheRefreshers(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the map definitions collection builder.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        public static MapDefinitionCollectionBuilder MapDefinitions(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>();
 
         /// <summary>
         /// Gets the data editor collection builder.

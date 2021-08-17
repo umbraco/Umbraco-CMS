@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
@@ -7,7 +8,7 @@ namespace Umbraco.Cms.Core.Cache
     /// Provides a base class for implementing a dictionary of <see cref="IAppPolicyCache"/>.
     /// </summary>
     /// <typeparam name="TKey">The type of the dictionary key.</typeparam>
-    public abstract class AppPolicedCacheDictionary<TKey>
+    public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
     {
         private readonly ConcurrentDictionary<TKey, IAppPolicyCache> _caches = new ConcurrentDictionary<TKey, IAppPolicyCache>();
 
@@ -24,6 +25,7 @@ namespace Umbraco.Cms.Core.Cache
         /// Gets the internal cache factory, for tests only!
         /// </summary>
         private readonly Func<TKey, IAppPolicyCache> _cacheFactory;
+        private bool _disposedValue;
 
         /// <summary>
         /// Gets or creates a cache.
@@ -69,6 +71,28 @@ namespace Umbraco.Cms.Core.Cache
         {
             foreach (var cache in _caches.Values)
                 cache.Clear();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    foreach(var value in _caches.Values)
+                    {
+                        value.DisposeIfDisposable();
+                    }
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

@@ -306,8 +306,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             if (imgUrl) {
                 mediaHelper.getProcessedImageUrl(imgUrl,
                     {
-                        height: newSize.height,
-                        width: newSize.width
+                        width: newSize.width,
+                        height: newSize.height
                     })
                     .then(function (resizedImgUrl) {
                         editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
@@ -357,18 +357,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     return plugin.name;
                 });
 
-                //plugins that must always be active
+                // Plugins that must always be active
                 plugins.push("autoresize");
                 plugins.push("noneditable");
+
+                // Table plugin use color picker plugin in table properties
+                if (plugins.includes("table")) {
+                    plugins.push("colorpicker");
+                }
 
                 var modeTheme = '';
                 var modeInline = false;
 
-
-                //Based on mode set
-                //classic = Theme: modern, inline: false
-                //inline = Theme: modern, inline: true,
-                //distraction-free = Theme: inlite, inline: true
+                // Based on mode set
+                // classic = Theme: modern, inline: false
+                // inline = Theme: modern, inline: true,
+                // distraction-free = Theme: inlite, inline: true
                 switch (args.mode) {
                     case "classic":
                         modeTheme  = "modern";
@@ -1522,15 +1526,13 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             args.editor.on('ObjectResized', function (e) {
                 var srcAttr = $(e.target).attr("src");
                 var path = srcAttr.split("?")[0];
-                mediaHelper.getProcessedImageUrl(path,
-                    {
-                        height: e.height,
-                        moded: "max",
-                        width: e.width
-                    })
-                    .then(function (resizedPath) {
-                        $(e.target).attr("data-mce-src", resizedPath);
-                    });
+                mediaHelper.getProcessedImageUrl(path, {
+                    width: e.width,
+                    height: e.height,
+                    mode: "max"
+                }).then(function (resizedPath) {
+                    $(e.target).attr("data-mce-src", resizedPath);
+                });
 
                 syncContent();
             });

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -12,9 +12,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
         //When DbType isn't set explicitly the Type will be used to find the right DbType in the SqlSyntaxProvider.
         //This type is typically used as part of an initial table creation
         public Type PropertyType { get; set; }
-        //Only used for special cases as part of an initial table creation
-        public bool HasSpecialDbType { get; set; }
-        public SpecialDbTypes DbType { get; set; }
+
+        /// <summary>
+        /// Used for column types that cannot be natively mapped.
+        /// </summary>
+        public SpecialDbType? CustomDbType { get; set; }
+
         public virtual int Seeding { get; set; }
         public virtual int Size { get; set; }
         public virtual int Precision { get; set; }

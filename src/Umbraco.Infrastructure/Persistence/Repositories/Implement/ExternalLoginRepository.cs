@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var toInsert = new List<IExternalLogin>(logins);
 
             var existingLogins = Database.Fetch<ExternalLoginDto>(sql);
-            
+
             foreach (var existing in existingLogins)
             {
                 var found = logins.FirstOrDefault(x =>
@@ -151,7 +152,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return sql;
         }
 
-        protected override string GetBaseWhereClause() => "umbracoExternalLogin.id = @id";
+        protected override string GetBaseWhereClause() => $"{Constants.DatabaseSchema.Tables.ExternalLogin}.id = @id";
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
@@ -237,7 +238,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var toInsert = new List<IExternalLoginToken>(tokens);
 
             var existingTokens = Database.Fetch<ExternalLoginTokenDto>(sql);
-            
+
             foreach (ExternalLoginTokenDto existing in existingTokens)
             {
                 IExternalLoginToken found = tokens.FirstOrDefault(x =>
@@ -275,13 +276,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     throw new InvalidOperationException($"A token was attempted to be saved for login provider {t.LoginProvider} which is not assigned to this user");
                 }
                 insertDtos.Add(ExternalLoginFactory.BuildDto(externalLoginId, t));
-            } 
+            }
             Database.InsertBulk(insertDtos);
         }
 
         private Sql<ISqlContext> GetBaseTokenQuery(bool forUpdate)
             => forUpdate ? Sql()
-                .Select<ExternalLoginTokenDto>(r => r.Select(x => x.ExternalLoginDto))                
+                .Select<ExternalLoginTokenDto>(r => r.Select(x => x.ExternalLoginDto))
                 .From<ExternalLoginTokenDto>()
                 .Append(" WITH (UPDLOCK)") // ensure these table values are locked for updates, the ForUpdate ext method does not work here
                 .InnerJoin<ExternalLoginDto>()

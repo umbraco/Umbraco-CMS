@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
             // to be able to deal with auto-linking and reduce duplicate lookups
 
-            var autoLinkOptions = _externalLogins.Get(loginInfo.LoginProvider)?.Options?.AutoLinkOptions;
+            var autoLinkOptions = (await _externalLogins.GetAsync(loginInfo.LoginProvider))?.ExternalLoginProvider?.Options?.AutoLinkOptions;
             var user = await UserManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
             if (user == null)
             {

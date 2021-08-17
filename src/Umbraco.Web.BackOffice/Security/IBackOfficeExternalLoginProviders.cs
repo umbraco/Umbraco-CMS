@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
 {
@@ -13,13 +14,13 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// </summary>
         /// <param name="authenticationType"></param>
         /// <returns></returns>
-        BackOfficeExternalLoginProvider Get(string authenticationType);
+        Task<BackOfficeExternaLoginProviderScheme> GetAsync(string authenticationType);
 
         /// <summary>
         /// Get all registered <see cref="BackOfficeExternalLoginProvider"/>
         /// </summary>
         /// <returns></returns>
-        IEnumerable<BackOfficeExternalLoginProvider> GetBackOfficeProviders();
+        Task<IEnumerable<BackOfficeExternaLoginProviderScheme>> GetBackOfficeProvidersAsync();
 
         /// <summary>
         /// Returns the authentication type for the last registered external login (oauth) provider that specifies an auto-login redirect option

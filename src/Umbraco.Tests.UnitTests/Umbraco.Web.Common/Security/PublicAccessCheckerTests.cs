@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -117,15 +118,28 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
 
         [AutoMoqData]
         [Test]
-        public async Task GivenMemberLoggedIn_WhenMemberHasNoRoles_ThenAccessDeniedResult(
+        public async Task GivenMemberLoggedIn_WhenMemberHasNoRolesAndWrongUsername_ThenAccessDeniedResult(
             IMemberManager memberManager,
             IPublicAccessService publicAccessService,
-            IContentService contentService)
+            IContentService contentService,
+            IContent protectedNode,
+            IContent loginNode,
+            IContent noAccessNode,
+            string username)
         {
             PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
 
+            Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(It.IsAny<IContent>()))
+                .Returns(new PublicAccessEntry(protectedNode, loginNode, noAccessNode, new []
+                {
+                    new PublicAccessRule(Guid.Empty, Guid.Empty)
+                    {
+                        RuleType = Constants.Conventions.PublicAccess.MemberUsernameRuleType,
+                        RuleValue = "AnotherUsername"
+                    }
+                }));
             httpContext.User = GetLoggedInUser();
-            MockGetUserAsync(memberManager, new MemberIdentityUser());
+            MockGetUserAsync(memberManager, new MemberIdentityUser(){IsApproved = true, UserName = username});
             MockGetRolesAsync(memberManager, Enumerable.Empty<string>());
 
             var result = await sut.HasMemberAccessToContentAsync(123);

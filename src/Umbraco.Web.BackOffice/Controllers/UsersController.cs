@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MimeKit;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -551,7 +552,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
 
-            var mailMessage = new EmailMessage(fromEmail, to.Email, emailSubject, emailBody, true);
+            // This needs to be in the correct mailto format including the name, else
+            // the name cannot be captured in the email sending notification.
+            // i.e. "Some Person" <hello@example.com>            
+            var toMailBoxAddress = new MailboxAddress(to.Name, to.Email);
+
+            var mailMessage = new EmailMessage(fromEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
 
             await _emailSender.SendAsync(mailMessage, true);
         }

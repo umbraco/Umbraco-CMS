@@ -157,17 +157,18 @@
                     </umb-node-preview>
                 </umb-control-group>
 
-                <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template">
+                <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template" alias="template">
 
                     <div class="flex items-center">
                         <select class="input-block-level"
+                                id="template"
                                 ng-model="node.template"
                                 ng-options="key as value for (key, value) in availableTemplates"
                                 ng-change="updateTemplate(node.template)">
                             <option value="">{{chooseLabel}}...</option>
                         </select>
                         <button type="button" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
-                            <localize key="general_open">Open</localize>
+                            <localize key="general_open">Open</localize><span class="sr-only">&nbsp;{{node.template}} <localize key="template_template"></localize></span>
                         </button>
                     </div>
                 </umb-control-group>

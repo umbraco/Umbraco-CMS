@@ -68,6 +68,12 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 var model = (ContentItemSave) context.ActionArguments["contentItem"];
                 var contentItemValidator = new ContentSaveModelValidator(_loggerFactory.CreateLogger<ContentSaveModelValidator>(), _propertyValidationService);
 
+                if (context.ModelState.ContainsKey("contentItem"))
+                {
+                    // if the entire model is marked as error, remove it, we handle everything separately
+                    context.ModelState.Remove("contentItem");
+                }
+
                 if (!ValidateAtLeastOneVariantIsBeingSaved(model, context)) return;
                 if (!contentItemValidator.ValidateExistingContent(model, context)) return;
                 if (!await ValidateUserAccessAsync(model, context)) return;

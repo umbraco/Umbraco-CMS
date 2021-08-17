@@ -1,41 +1,71 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
 {
+
     /// <inheritdoc />
     public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProviders
     {
-        public BackOfficeExternalLoginProviders(IEnumerable<BackOfficeExternalLoginProvider> externalLogins)
+        private readonly Dictionary<string, BackOfficeExternalLoginProvider> _externalLogins;
+        private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
+
+        public BackOfficeExternalLoginProviders(
+            IEnumerable<BackOfficeExternalLoginProvider> externalLogins,
+            IAuthenticationSchemeProvider authenticationSchemeProvider)
         {
-            _externalLogins = externalLogins;
+            _externalLogins = externalLogins.ToDictionary(x => x.AuthenticationType);
+            _authenticationSchemeProvider = authenticationSchemeProvider;
         }
 
-        private readonly IEnumerable<BackOfficeExternalLoginProvider> _externalLogins;
-
         /// <inheritdoc />
-        public BackOfficeExternalLoginProvider Get(string authenticationType)
+        public async Task<BackOfficeExternaLoginProviderScheme> GetAsync(string authenticationType)
         {
-            return _externalLogins.FirstOrDefault(x => x.AuthenticationType == authenticationType);
+            if (!_externalLogins.TryGetValue(authenticationType, out BackOfficeExternalLoginProvider provider))
+            {
+                return null;
+            }
+
+            // get the associated scheme
+            AuthenticationScheme associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(provider.AuthenticationType);
+
+            if (associatedScheme == null)
+            {
+                throw new InvalidOperationException("No authentication scheme registered for " + provider.AuthenticationType);
+            }
+
+            return new BackOfficeExternaLoginProviderScheme(provider, associatedScheme);
         }
 
         /// <inheritdoc />
         public string GetAutoLoginProvider()
         {
-            var found = _externalLogins.Where(x => x.Options.AutoRedirectLoginToExternalProvider).ToList();
+            var found = _externalLogins.Values.Where(x => x.Options.AutoRedirectLoginToExternalProvider).ToList();
             return found.Count > 0 ? found[0].AuthenticationType : null;
         }
 
         /// <inheritdoc />
-        public IEnumerable<BackOfficeExternalLoginProvider> GetBackOfficeProviders()
+        public async Task<IEnumerable<BackOfficeExternaLoginProviderScheme>> GetBackOfficeProvidersAsync()
         {
-            return _externalLogins;
+            var providersWithSchemes = new List<BackOfficeExternaLoginProviderScheme>();
+            foreach (BackOfficeExternalLoginProvider login in _externalLogins.Values)
+            {
+                // get the associated scheme
+                AuthenticationScheme associatedScheme = await _authenticationSchemeProvider.GetSchemeAsync(login.AuthenticationType);
+
+                providersWithSchemes.Add(new BackOfficeExternaLoginProviderScheme(login, associatedScheme));
+            }
+
+            return providersWithSchemes;
         }
 
         /// <inheritdoc />
         public bool HasDenyLocalLogin()
         {
-            var found = _externalLogins.Where(x => x.Options.DenyLocalLogin).ToList();
+            var found = _externalLogins.Values.Where(x => x.Options.DenyLocalLogin).ToList();
             return found.Count > 0;
         }
     }

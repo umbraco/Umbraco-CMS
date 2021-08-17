@@ -5,6 +5,8 @@
         <input type="text"
                id="{{vm.inputId}}"
                ng-change="vm.change()"
+               ng-keydown="vm.keyDown($event)"
+               ng-blur="vm.blur($event)"
                ng-model="vm.model"
                class="umb-search-filter__input"
                placeholder="{{vm.text}}"

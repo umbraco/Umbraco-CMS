@@ -58,9 +58,15 @@ namespace Umbraco.Cms.Web.Common.Security
 
             var auth = await Context.AuthenticateAsync(ExternalAuthenticationType);
             var items = auth?.Properties?.Items;
-            if (auth?.Principal == null || items == null || !items.ContainsKey(UmbracoSignInMgrLoginProviderKey))
+            if (auth?.Principal == null || items == null)
             {
+                Logger.LogDebug("The external login authentication failed. No user Principal or authentication items was resolved.");
                 return null;
+            }
+
+            if (!items.ContainsKey(UmbracoSignInMgrLoginProviderKey))
+            {
+                throw new InvalidOperationException($"The external login authenticated successfully but the key {UmbracoSignInMgrLoginProviderKey} was not found in the authentication properties. Ensure you call SignInManager.ConfigureExternalAuthenticationProperties before issuing a ChallengeResult.");
             }
 
             if (expectedXsrf != null)
@@ -197,6 +203,9 @@ namespace Umbraco.Cms.Web.Common.Security
             // override to replace IdentityConstants.ApplicationScheme with custom AuthenticationType
             // code taken from aspnetcore: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
             // we also override to set the current HttpContext principal since this isn't done by default
+
+            // we also need to call our handle login to ensure all date/events are set
+            await HandleSignIn(user, user.UserName, SignInResult.Success);
 
             var userPrincipal = await CreateUserPrincipalAsync(user);
             foreach (var claim in additionalClaims)
@@ -363,7 +372,7 @@ namespace Umbraco.Cms.Web.Common.Security
                 await Context.SignOutAsync(ExternalAuthenticationType);
             }
             if (loginProvider == null)
-            {
+            {                
                 await SignInWithClaimsAsync(user, isPersistent, new Claim[] { new Claim("amr", "pwd") });
             }
             else

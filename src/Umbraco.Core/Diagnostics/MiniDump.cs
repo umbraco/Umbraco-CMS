@@ -79,26 +79,28 @@ namespace Umbraco.Cms.Core.Diagnostics
 
         private static bool Write(IMarchal marchal, SafeHandle fileHandle, Option options, bool withException = false)
         {
-            var currentProcess = Process.GetCurrentProcess();
-            var currentProcessHandle = currentProcess.Handle;
-            var currentProcessId = (uint)currentProcess.Id;
-
-            MiniDumpExceptionInformation exp;
-
-            exp.ThreadId = GetCurrentThreadId();
-            exp.ClientPointers = false;
-            exp.ExceptionPointers = IntPtr.Zero;
-
-            if (withException)
+            using (var currentProcess = Process.GetCurrentProcess())
             {
-                exp.ExceptionPointers = marchal.GetExceptionPointers();
+                var currentProcessHandle = currentProcess.Handle;
+                var currentProcessId = (uint)currentProcess.Id;
+
+                MiniDumpExceptionInformation exp;
+
+                exp.ThreadId = GetCurrentThreadId();
+                exp.ClientPointers = false;
+                exp.ExceptionPointers = IntPtr.Zero;
+
+                if (withException)
+                {
+                    exp.ExceptionPointers = marchal.GetExceptionPointers();
+                }
+
+                var bRet = exp.ExceptionPointers == IntPtr.Zero
+                    ? MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint)options, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero)
+                    : MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint)options, ref exp, IntPtr.Zero, IntPtr.Zero);
+
+                return bRet;
             }
-
-            var bRet = exp.ExceptionPointers == IntPtr.Zero
-                ? MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint) options, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero)
-                : MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint) options, ref exp, IntPtr.Zero, IntPtr.Zero);
-
-            return bRet;
         }
 
         public static bool Dump(IMarchal marchal, IHostingEnvironment hostingEnvironment, Option options = Option.WithFullMemory, bool withException = false)

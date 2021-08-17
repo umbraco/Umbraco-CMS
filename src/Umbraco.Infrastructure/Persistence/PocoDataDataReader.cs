@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -6,6 +6,7 @@ using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
 {
@@ -69,22 +70,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             foreach (var col in _columnDefinitions)
             {
                 SqlDbType sqlDbType;
-                if (col.HasSpecialDbType)
+                if (col.CustomDbType.HasValue)
                 {
                     //get the SqlDbType from the 'special type'
-                    switch (col.DbType)
+                    switch (col.CustomDbType)
                     {
-                        case SpecialDbTypes.NTEXT:
+                        case var x when x == SpecialDbType.NTEXT:
                             sqlDbType = SqlDbType.NText;
                             break;
-                        case SpecialDbTypes.NCHAR:
+                        case var x when x == SpecialDbType.NCHAR:
                             sqlDbType = SqlDbType.NChar;
                             break;
-                        case SpecialDbTypes.NVARCHARMAX:
+                        case var x when x == SpecialDbType.NVARCHARMAX:
                             sqlDbType = SqlDbType.NVarChar;
                             break;
                         default:
-                            throw new ArgumentOutOfRangeException();
+                            throw new ArgumentOutOfRangeException("The custom DB type " + col.CustomDbType + " is not supported for bulk import statements.");
                     }
                 }
                 else if (col.Type.HasValue)

@@ -1,12 +1,15 @@
 ﻿using System;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Represents the application caches.
     /// </summary>
-    public class AppCaches
+    public class AppCaches : IDisposable
     {
+        private bool _disposedValue;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AppCaches"/> with cache providers.
         /// </summary>
@@ -71,6 +74,27 @@ namespace Umbraco.Cms.Core.Cache
                 new DeepCloneAppCache(new ObjectCacheAppCache()),
                 requestCache,
                 new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    RuntimeCache.DisposeIfDisposable();
+                    RequestCache.DisposeIfDisposable();
+                    IsolatedCaches.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

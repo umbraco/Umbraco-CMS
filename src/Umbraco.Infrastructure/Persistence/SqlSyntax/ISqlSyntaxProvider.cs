@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text.RegularExpressions;
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         string GetQuotedName(string name);
         bool DoesTableExist(IDatabase db, string tableName);
         string GetIndexType(IndexTypes indexTypes);
-        string GetSpecialDbType(SpecialDbTypes dbTypes);
+        string GetSpecialDbType(SpecialDbType dbType);
         string CreateTable { get; }
         string DropTable { get; }
         string AddColumn { get; }

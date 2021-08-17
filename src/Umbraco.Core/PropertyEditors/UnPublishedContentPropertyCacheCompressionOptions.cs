@@ -14,6 +14,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 //Only compress non published content that supports publishing and the property is text
                 return true;
             }
+            if (propertyType.ValueStorageType == ValueStorageType.Integer && Constants.PropertyEditors.Aliases.Boolean.Equals(dataEditor.Alias))
+            {
+                //Compress boolean values from int to bool
+                return true;
+            }
             return false;
         }
     }
