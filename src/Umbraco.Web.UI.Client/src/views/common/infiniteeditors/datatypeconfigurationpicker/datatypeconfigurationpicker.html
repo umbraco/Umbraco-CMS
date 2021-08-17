@@ -26,7 +26,7 @@
                                 </div>
                                 <button umb-auto-focus="{{$index === 0}}" class="btn-reset umb-card-grid-item" type="button" ng-click="vm.pickDataType(dataTypeConfig)" title="Select {{ dataTypeConfig.name }}">
                                     <span>
-                                        <i class="{{ dataTypeConfig.icon }}" ng-class="{'icon-autofill': dataTypeConfig.icon == null}" aria-hidden="true"></i>
+                                        <umb-icon icon="{{dataTypeConfig.icon || 'icon-autofill'}}"></umb-icon>
                                         <span class="sr-only">Select</span> {{ dataTypeConfig.name }}
                                     </span>
                                 </button>
@@ -36,7 +36,7 @@
                             <li>
                                 <button umb-auto-focus="{{vm.configs.length === 0}}" class="btn-reset umb-card-grid-item-slot" type="button" ng-click="vm.newDataType()" title="Create a new configuration of {{ model.editor.name }}">
                                     <span>
-                                        <i class="icon icon-add" aria-hidden="true"></i>
+                                        <umb-icon icon="icon-add" class="icon"></umb-icon>
                                         Create new <span class="sr-only">configuration of {{ model.editor.name }}</span>
                                     </span>
                                 </button>

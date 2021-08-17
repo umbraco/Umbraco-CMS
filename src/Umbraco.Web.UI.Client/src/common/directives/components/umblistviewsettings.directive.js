@@ -7,8 +7,17 @@
 
             scope.dataType = {};
             scope.customListViewCreated = false;
+
+            const listViewPrefix = "List View - ";
             
-            const checkForCustomListView = () => scope.dataType.name === "List View - " + scope.modelAlias;
+            const checkForCustomListView = () => invariantEquals(scope.dataType.name, listViewPrefix + scope.modelAlias);
+
+            // We also use "localeCompare" a few other places. Should probably be moved to a utility/helper function in future.
+            function invariantEquals(a, b) {
+                return typeof a === "string" && typeof b === "string"
+                    ? a.localeCompare(b, undefined, { sensitivity: "base" }) === 0
+                    : a === b;
+            }
 
             /* ---------- INIT ---------- */ 
 
