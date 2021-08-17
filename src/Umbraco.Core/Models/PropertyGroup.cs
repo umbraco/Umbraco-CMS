@@ -73,7 +73,7 @@ namespace Umbraco.Core.Models
             get => _alias;
             set
             {
-                // If added to a collection, ensure the key is changed before setting it (this ensures the lookup dictionary and child aliasses are updated)
+                // If added to a collection, ensure the key is changed before setting it (this ensures the internal lookup dictionary is updated)
                 Collection?.ChangeKey(this, value);
 
                 SetPropertyValueAndDetectChanges(value, ref _alias, nameof(Alias));

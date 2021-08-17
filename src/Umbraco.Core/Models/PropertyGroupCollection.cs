@@ -141,12 +141,6 @@ namespace Umbraco.Core.Models
         internal void ChangeKey(PropertyGroup item, string newKey)
         {
             ChangeItemKey(item, newKey);
-
-            // Update child aliases
-            foreach (var childItem in this.Where(x => x.GetParentAlias() == item.Alias))
-            {
-                childItem.UpdateParentAlias(newKey);
-            }
         }
 
         // TODO Remove this method in v9 (only needed for backwards compatibility with names)
