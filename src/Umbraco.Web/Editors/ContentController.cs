@@ -364,6 +364,20 @@ namespace Umbraco.Web.Editors
             return GetEmpty(contentType, parentId);
         }
 
+        [OutgoingEditorModelEvent]
+        [HttpPost]
+        public IDictionary<string, ContentItemDisplay> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
+        {
+            List<IContentType> contentTypes = new();
+
+            foreach (var alias in contentTypesByAliases.ContentTypeAliases)
+            {
+                contentTypes.Add(Services.ContentTypeService.Get(alias));
+            }
+
+            return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
+        }
+
 
         /// <summary>
         /// Gets an empty content item for the document type.

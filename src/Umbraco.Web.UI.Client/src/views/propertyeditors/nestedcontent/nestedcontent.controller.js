@@ -524,8 +524,19 @@
         // Initialize
         var scaffoldsLoaded = 0;
         vm.scaffolds = [];
-        _.each(model.config.contentTypes, function (contentType) {
-            contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
+
+        var scaffoldAliases = [];
+        // Gather all aliases
+        model.config.contentTypes.forEach(function(contentType){
+            scaffoldAliases.push(contentType.ncAlias);
+        });
+
+        contentResource.getScaffolds(-20, scaffoldAliases).then(function (scaffolds){
+            // Loop through all the content types
+            _.each(model.config.contentTypes, function (contentType){
+                // Get the scaffold from the result
+                var scaffold = scaffolds[contentType.ncAlias];
+
                 // make sure it's an element type before allowing the user to create new ones
                 if (scaffold.isElement) {
                     // remove all tabs except the specified tab
@@ -557,11 +568,48 @@
 
                 scaffoldsLoaded++;
                 initIfAllScaffoldsHaveLoaded();
-            }, function (error) {
-                scaffoldsLoaded++;
-                initIfAllScaffoldsHaveLoaded();
-            });
+            })
         });
+
+        // _.each(model.config.contentTypes, function (contentType) {
+        //     // Get the scaffold for the contentType
+        //     contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
+        //         // make sure it's an element type before allowing the user to create new ones
+        //         if (scaffold.isElement) {
+        //             // remove all tabs except the specified tab
+        //             var tabs = scaffold.variants[0].tabs;
+        //             var tab = _.find(tabs, function (tab) {
+        //                 return tab.id !== 0 && (tab.alias.toLowerCase() === contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias === "");
+        //             });
+        //             scaffold.variants[0].tabs = [];
+        //             if (tab) {
+        //                 scaffold.variants[0].tabs.push(tab);
+        //
+        //                 tab.properties.forEach(
+        //                     function (property) {
+        //                         if (_.find(notSupported, function (x) { return x === property.editor; })) {
+        //                             property.notSupported = true;
+        //                             // TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
+        //                             property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
+        //                         }
+        //                     }
+        //                 );
+        //             }
+        //
+        //             // Ensure Culture Data for Complex Validation.
+        //             ensureCultureData(scaffold);
+        //
+        //             // Store the scaffold object
+        //             vm.scaffolds.push(scaffold);
+        //         }
+        //
+        //         scaffoldsLoaded++;
+        //         initIfAllScaffoldsHaveLoaded();
+        //     }, function (error) {
+        //         scaffoldsLoaded++;
+        //         initIfAllScaffoldsHaveLoaded();
+        //     });
+        // });
 
         /**
          * Ensure that the containing content variant language and current property culture is transferred along
