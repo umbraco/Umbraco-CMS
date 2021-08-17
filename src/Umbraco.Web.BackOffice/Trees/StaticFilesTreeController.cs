@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 var hasChildren = _fileSystem.GetFiles(directory).Any() || _fileSystem.GetDirectories(directory).Any();
 
                 var name = Path.GetFileName(directory);
-                var node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, "icon-folder", hasChildren);
+                var node = CreateTreeNode(WebUtility.UrlEncode(directory), path, queryStrings, name, Constants.Icons.Folder, hasChildren);
 
                 if (node != null)
                 {
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             foreach (var file in files)
             {
                 var name = Path.GetFileName(file);
-                var node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, "icon-document", false);
+                var node = CreateTreeNode(WebUtility.UrlEncode(file), path, queryStrings, name, Constants.Icons.DefaultIcon, false);
 
                 if (node != null)
                 {
