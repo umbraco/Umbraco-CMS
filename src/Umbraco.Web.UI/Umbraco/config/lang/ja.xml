@@ -1085,4 +1085,8 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="enterCustomValidation">... またはカスタム検証を入力</key>
     <key alias="fieldIsMandatory">必須フィールドです</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">すべて選択</key>
+    <key alias="deselectAllLogLevelFilters">すべての選択を解除</key>
+  </area>
 </language>

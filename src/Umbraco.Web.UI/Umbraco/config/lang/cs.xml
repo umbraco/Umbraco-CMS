@@ -2195,6 +2195,8 @@
   </area>
   <area alias="logViewer">
       <key alias="logLevels">Úrovně logování</key>
+      <key alias="selectAllLogLevelFilters">Vybrat vše</key>
+      <key alias="deselectAllLogLevelFilters">Odznačit vše</key>
       <key alias="savedSearches">Uložená vyhledávání</key>
       <key alias="totalItems">Celkem položek</key>
       <key alias="timestamp">Časové razítko</key>
