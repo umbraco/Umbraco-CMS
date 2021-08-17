@@ -22,19 +22,29 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
         {
             var indexDictionaryDto = $"IX_{DictionaryDto.TableName}_{IndexedDictionaryColumn}";
             var indexLanguageTextDto = $"IX_{LanguageTextDto.TableName}_{IndexedLanguageTextColumn}";
+            var dictionaryColumnsToBeIndexed = new[] { IndexedDictionaryColumn };
+            var langTextColumnsToBeIndexed = new[] { IndexedLanguageTextColumn, "UniqueId" };
 
-            // Delete existing
-            DeleteIndex<DictionaryDto>(indexDictionaryDto);
-            // Re-create/Add
-            AddUniqueConstraint<DictionaryDto>(new[] { IndexedDictionaryColumn }, indexDictionaryDto);
+            var dictionaryTableHasDuplicates = ContainsDuplicates<DictionaryDto>(dictionaryColumnsToBeIndexed);
+            var langTextTableHasDuplicates = ContainsDuplicates<LanguageTextDto>(langTextColumnsToBeIndexed);
 
-            // Delete existing
-            DeleteIndex<LanguageTextDto>(indexLanguageTextDto);
+            // Check if there are any duplicates before we delete and re-create the indexes since
+            // if there are duplicates we won't be able to create the new unique indexes
+            if (!dictionaryTableHasDuplicates)
+            {
+                // Delete existing
+                DeleteIndex<DictionaryDto>(indexDictionaryDto);
+            }
 
-            var langTextcolumns = new[] { IndexedLanguageTextColumn, "UniqueId" };
+            if (!langTextTableHasDuplicates)
+            {
+                // Delete existing
+                DeleteIndex<LanguageTextDto>(indexLanguageTextDto);
+            }
 
-            // Re-create/Add
-            AddUniqueConstraint<LanguageTextDto>(langTextcolumns, indexLanguageTextDto);
+            // Try to re-create/add
+            TryAddUniqueConstraint<DictionaryDto>(dictionaryColumnsToBeIndexed, indexDictionaryDto, dictionaryTableHasDuplicates);
+            TryAddUniqueConstraint<LanguageTextDto>(langTextColumnsToBeIndexed, indexLanguageTextDto, langTextTableHasDuplicates);
         }
 
         private void DeleteIndex<TDto>(string indexName)
@@ -56,7 +66,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             new ExecuteSqlStatementExpression(Context) { SqlStatement = Context.SqlContext.SqlSyntax.Format(index) }.Execute();
         }
 
-        private void AddUniqueConstraint<TDto>(string[] columns, string index)
+        private void TryAddUniqueConstraint<TDto>(string[] columns, string index, bool containsDuplicates)
         {
             var tableDef = DefinitionFactory.GetTableDefinition(typeof(TDto), Context.SqlContext.SqlSyntax);
 
@@ -64,7 +74,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             // This seems to be better than relying on catching an exception as this leads to
             // transaction errors: "This SqlTransaction has completed; it is no longer usable".
             var columnsDescription = string.Join("], [", columns);
-            if (ContainsDuplicates<TDto>(columns))
+            if (containsDuplicates)
             {
                 var message = $"Could not create unique constraint on [{tableDef.Name}] due to existing " +
                               $"duplicate records across the column{(columns.Length > 1 ? "s" : string.Empty)}: [{columnsDescription}].";
@@ -126,8 +136,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
             return Database.ExecuteScalar<int>(distinctCountQuery);
         }
 
-        private void LogIncompleteMigrationStep(string message) =>
-            Logger.LogError($"Database migration step failed: {message}");
+        private void LogIncompleteMigrationStep(string message) => Logger.LogError($"Database migration step failed: {message}");
 
         private string StringConvertedAndQuotedColumnName(string column) => $"CONVERT(nvarchar(1000),{QuoteColumnName(column)})";
 
