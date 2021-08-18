@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, $timeout, mediaTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
+    function PermissionsController($scope, $timeout, mediaTypeResource, iconHelper, contentTypeHelper, editorService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -39,29 +39,30 @@
         }
 
         function addChild($event) {
-            
-            var dialog = {
-                view: "itempicker",
-                availableItems: vm.mediaTypes,
-                selectedItems: vm.selectedChildren,
-                position: "target",
-                event: $event,
-                submit: function (model) {
-                    if (model.selectedItem) {
-                        vm.selectedChildren.push(model.selectedItem);
-                        $scope.model.allowedContentTypes.push(model.selectedItem.id);
-                    }
-                    overlayService.close();
+
+            var editor = {
+                multiPicker: true,
+                filterCssClass: "not-allowed not-published",
+                filter: function (item) {
+                    return !_.findWhere(vm.mediaTypes, { udi: item.udi }) || !!_.findWhere(vm.selectedChildren, { udi: item.udi });
                 },
-                close: function() {
-                    overlayService.close();
+                submit: function (model) {
+                    Utilities.forEach(model.selection,
+                        function (item) {
+                            mediaTypeResource.getById(item.id).then(function (contentType) {
+                                vm.selectedChildren.push(contentType);
+                                $scope.model.allowedContentTypes.push(item.id);
+                            });
+                        });
+
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
                 }
             };
 
-            localizationService.localize("contentTypeEditor_chooseChildNode").then(value => {
-                dialog.title = value;
-                overlayService.open(dialog);
-            });
+            editorService.mediaTypePicker(editor);
         }
 
         function removeChild(selectedChild, index) {

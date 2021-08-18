@@ -6,10 +6,10 @@
  * @description
  * The controller for the content type editor property dialog
  */
-(function() {
+(function () {
     'use strict';
 
-    function PermissionsController($scope, $timeout, contentTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
+    function PermissionsController($scope, $timeout, contentTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService, editorService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -34,21 +34,21 @@
 
         function init() {
 
-            contentTypeResource.getAll().then(function(contentTypes){
-                vm.contentTypes = _.where(contentTypes, {isElement: false});
+            contentTypeResource.getAll().then(function (contentTypes) {
+                vm.contentTypes = _.where(contentTypes, { isElement: false });
 
                 // convert legacy icons
                 iconHelper.formatContentTypeIcons(vm.contentTypes);
 
                 vm.selectedChildren = contentTypeHelper.makeObjectArrayFromId($scope.model.allowedContentTypes, contentTypes);
 
-                if($scope.model.id === 0) {
-                   contentTypeHelper.insertChildNodePlaceholder(vm.contentTypes, $scope.model.name, $scope.model.icon, $scope.model.id);
+                if ($scope.model.id === 0) {
+                    contentTypeHelper.insertChildNodePlaceholder(vm.contentTypes, $scope.model.name, $scope.model.icon, $scope.model.id);
                 }
             });
 
             // Can only switch to an element type if there are no content nodes already created from the type.
-            if ($scope.model.id > 0 && !$scope.model.isElement ) {
+            if ($scope.model.id > 0 && !$scope.model.isElement) {
                 contentTypeResource.hasContentNodes($scope.model.id).then(function (result) {
                     vm.canToggleIsElement = !result;
                 });
@@ -58,38 +58,39 @@
         }
 
         function addChild($event) {
-            
-            const dialog = {
-                view: "itempicker",
-                availableItems: vm.contentTypes,
-                selectedItems: vm.selectedChildren,
-                position: "target",
-                event: $event,
-                submit: function (model) {
-                    if (model.selectedItem) {
-                        vm.selectedChildren.push(model.selectedItem);
-                        $scope.model.allowedContentTypes.push(model.selectedItem.id);
-                    }
-                    overlayService.close();
+
+            var editor = {
+                multiPicker: true,
+                filterCssClass: "not-allowed not-published",
+                filter: function (item) {
+                    return !_.findWhere(vm.contentTypes, { udi: item.udi }) || !!_.findWhere(vm.selectedChildren, { udi: item.udi });
                 },
-                close: function() {
-                    overlayService.close();
+                submit: function (model) {
+                    Utilities.forEach(model.selection,
+                        function (item) {
+                            contentTypeResource.getById(item.id).then(function (contentType) {
+                                vm.selectedChildren.push(contentType);
+                                $scope.model.allowedContentTypes.push(item.id);
+                            });
+                        });
+
+                    editorService.close();
+                },
+                close: function () {
+                    editorService.close();
                 }
             };
 
-            localizationService.localize("contentTypeEditor_chooseChildNode").then(value => {
-                dialog.title = value;
-                overlayService.open(dialog);
-            });
+            editorService.contentTypePicker(editor);
         }
 
         function removeChild(selectedChild, index) {
-           // remove from vm
-           vm.selectedChildren.splice(index, 1);
+            // remove from vm
+            vm.selectedChildren.splice(index, 1);
 
-           // remove from content type model
-           var selectedChildIndex = $scope.model.allowedContentTypes.indexOf(selectedChild.id);
-           $scope.model.allowedContentTypes.splice(selectedChildIndex, 1);
+            // remove from content type model
+            var selectedChildIndex = $scope.model.allowedContentTypes.indexOf(selectedChild.id);
+            $scope.model.allowedContentTypes.splice(selectedChildIndex, 1);
         }
 
         function sortChildren() {
