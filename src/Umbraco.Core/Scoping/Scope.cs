@@ -46,12 +46,15 @@ namespace Umbraco.Core.Scoping
 
         private object _dictionaryLocker;
         private readonly object _lockQueueLocker = new object();
+
+        // This is all used to safely track read/write locks at given Scope levels so that
+        // when we dispose we can verify that everything has been cleaned up correctly.
         private HashSet<int> _readLocks;
         private HashSet<int> _writeLocks;
         private Dictionary<Guid, Dictionary<int, int>> _readLocksDictionary;
         private Dictionary<Guid, Dictionary<int, int>> _writeLocksDictionary;
 
-        private List<(LockType lockType, TimeSpan timeout, Guid instanceId, int lockId)> _queuedLocks;
+        private Queue<(LockType lockType, TimeSpan timeout, Guid instanceId, int lockId)> _queuedLocks;
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
@@ -158,7 +161,15 @@ namespace Umbraco.Core.Scoping
         internal Dictionary<Guid, Dictionary<int, int>> GetReadLocks()
         {
             EnsureDbLocks();
-            return _readLocksDictionary;
+            // always delegate to root/parent scope.
+            if (ParentScope is not null)
+            {
+                return ParentScope.GetReadLocks();
+            }
+            else
+            {
+                return _readLocksDictionary;
+            }
         }
 
         /// <summary>
@@ -168,7 +179,15 @@ namespace Umbraco.Core.Scoping
         internal Dictionary<Guid, Dictionary<int, int>> GetWriteLocks()
         {
             EnsureDbLocks();
-            return _writeLocksDictionary;
+            // always delegate to root/parent scope.
+            if (ParentScope is not null)
+            {
+                return ParentScope.GetWriteLocks();
+            }
+            else
+            {
+                return _writeLocksDictionary;
+            }
         }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
@@ -407,58 +426,69 @@ namespace Umbraco.Core.Scoping
         /// </summary>
         private void EnsureDbLocks()
         {
-            lock (_lockQueueLocker)
+            // always delegate to the root parent
+            if (ParentScope is not null)
             {
-                if (_queuedLocks?.Count > 0)
-                {
-                    var currentType = LockType.ReadLock;
-                    var currentTimeout = TimeSpan.Zero;
-                    var currentInstanceId = InstanceId;
-                    var collectedIds = new HashSet<int>();
-                    for (int i = 0; i < _queuedLocks.Count; i++)
-                    {
-                        var entry = _queuedLocks[i];
-                        if (i == 0)
-                        {
-                            currentType = entry.lockType;
-                            currentTimeout = entry.timeout;
-                            currentInstanceId = entry.instanceId;
-                        }
-                        else if (entry.lockType != currentType || entry.timeout != currentTimeout || entry.instanceId != currentInstanceId)
-                        {
-                            // the lock type, instanceId or timeout switched.
-                            // process the lock ids collected
-                            switch (currentType)
-                            {
-                                case LockType.ReadLock:
-                                    EagerReadLockInner(_database, currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
-                                    break;
-                                case LockType.WriteLock:
-                                    EagerWriteLockInner(_database, currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
-                                    break;
-                            }
-                            // clear the collected and set new type
-                            collectedIds.Clear();
-                            currentType = entry.lockType;
-                            currentTimeout = entry.timeout;
-                            currentInstanceId = entry.instanceId;
-                        }
-                        collectedIds.Add(entry.lockId);
-                    }
-                    // process the remaining
-                    switch (currentType)
-                    {
-                        case LockType.ReadLock:
-                            EagerReadLockInner(_database, currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
-                            break;
-                        case LockType.WriteLock:
-                            EagerWriteLockInner(_database, currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
-                            break;
-                    }
-
-                    _queuedLocks.Clear();
-                }
+                ParentScope.EnsureDbLocks();
             }
+            else
+            {
+                lock (_lockQueueLocker)
+                {
+                    if (_queuedLocks?.Count > 0)
+                    {
+                        var currentType = LockType.ReadLock;
+                        var currentTimeout = TimeSpan.Zero;
+                        var currentInstanceId = InstanceId;
+                        var collectedIds = new HashSet<int>();
+
+                        var i = 0;
+                        while (_queuedLocks.Count > 0)
+                        {
+                            var (lockType, timeout, instanceId, lockId) = _queuedLocks.Dequeue();
+
+                            if (i == 0)
+                            {
+                                currentType = lockType;
+                                currentTimeout = timeout;
+                                currentInstanceId = instanceId;
+                            }
+                            else if (lockType != currentType || timeout != currentTimeout || instanceId != currentInstanceId)
+                            {
+                                // the lock type, instanceId or timeout switched.
+                                // process the lock ids collected
+                                switch (currentType)
+                                {
+                                    case LockType.ReadLock:
+                                        EagerReadLockInner(_database, currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                                        break;
+                                    case LockType.WriteLock:
+                                        EagerWriteLockInner(_database, currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                                        break;
+                                }
+                                // clear the collected and set new type
+                                collectedIds.Clear();
+                                currentType = lockType;
+                                currentTimeout = timeout;
+                                currentInstanceId = instanceId;
+                            }
+                            collectedIds.Add(lockId);
+                            i++;
+                        }
+
+                        // process the remaining
+                        switch (currentType)
+                        {
+                            case LockType.ReadLock:
+                                EagerReadLockInner(_database, currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                                break;
+                            case LockType.WriteLock:
+                                EagerWriteLockInner(_database, currentInstanceId, currentTimeout == TimeSpan.Zero ? null : currentTimeout, collectedIds.ToArray());
+                                break;
+                        }
+                    }
+                }
+            }            
         }
 
         private void EnsureNotDisposed()
@@ -723,6 +753,20 @@ namespace Umbraco.Core.Scoping
                 {
                     _readLocksDictionary?.Remove(instanceId);
                     _writeLocksDictionary?.Remove(instanceId);
+
+                    // remove any queued locks for this instance that weren't used.
+                    while (_queuedLocks?.Count > 0)
+                    {
+                        var top = _queuedLocks.Peek();
+                        if (top.instanceId == instanceId)
+                        {
+                            _queuedLocks.Dequeue();
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -801,11 +845,11 @@ namespace Umbraco.Core.Scoping
             {
                 if (_queuedLocks == null)
                 {
-                    _queuedLocks = new List<(LockType, TimeSpan, Guid, int)>();
+                    _queuedLocks = new Queue<(LockType, TimeSpan, Guid, int)>();
                 }
                 foreach (var lockId in lockIds)
                 {
-                    _queuedLocks.Add((lockType, TimeSpan.Zero, instanceId, lockId));
+                    _queuedLocks.Enqueue((lockType, TimeSpan.Zero, instanceId, lockId));
                 }
             }
         }
@@ -816,9 +860,9 @@ namespace Umbraco.Core.Scoping
             {
                 if (_queuedLocks == null)
                 {
-                    _queuedLocks = new List<(LockType, TimeSpan, Guid, int)>();
+                    _queuedLocks = new Queue<(LockType, TimeSpan, Guid, int)>();
                 }
-                _queuedLocks.Add((lockType, timeout, instanceId, lockId));
+                _queuedLocks.Enqueue((lockType, timeout, instanceId, lockId));
             }
         }
 
