@@ -290,7 +290,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                     Assert.IsNull(packageXml.DocumentType);
                     Assert.IsNull(packageXml.NextNode);
                     Assert.IsNull(packageXml.Parent);
-                    Assert.IsNull(packageXml.NextNode);
+                    Assert.IsNull(packageXml.PreviousNode);
                     Assert.AreEqual(test, zipArchive.Entries.Last().Name);
                     Assert.AreEqual(7, zipArchive.Entries.Last().Length);
                 });
@@ -325,12 +325,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                 var xml = XDocument.Load(packageXmlStream);
                 Assert.Multiple(() =>
                 {
-                    string xmlContent = xml.Root.Value.Remove(0, 21).Replace("\n", "").Replace("\r", "");
-                    string templateContent = template.Content.Replace("\n", "").Replace("\r", "");
                     Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
                     Assert.AreEqual($"<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
-                    Assert.AreEqual(templateContent, xmlContent);
-
+                    Assert.AreEqual(xml.FirstNode, xml.LastNode);
+                    Assert.IsNull(xml.DocumentType);
+                    Assert.IsNull(xml.Parent);
+                    Assert.IsNull(xml.NextNode);
+                    Assert.IsNull(xml.PreviousNode);
                 });
             }
         }
