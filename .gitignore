@@ -1,8 +1,8 @@
 #
-# Umbraco Cms Git Ignore
+# Umbraco CMS .gitignore
 #
 
-# common files
+# Common files
 *.obj
 *.pdb
 *.user
@@ -15,19 +15,19 @@
 *.ndproj
 *.ignorer.*
 
-# common directories
+# Common directories
 .DS_Store
 ._.DS_Store
 .vs/
 /local/
 
-# build directories
+# Build directories
 [Bb]in/
 [Db]ebug*/
 [Rr]elease*/
 obj/
 
-# tools
+# Tools
 _ReSharper*/
 _NCrunch_*/
 *.ncrunchsolution
@@ -35,9 +35,6 @@ _NCrunch_*/
 *.ncrunchproject
 *.crunchsolution.cache
 tools/NDepend/
-
-
-
 
 [Tt]est[Rr]esult*
 [Bb]uild[Ll]og.*
@@ -133,10 +130,10 @@ src/Umbraco.Web.UI.Client/bower_components/*
 /src/Umbraco.Web.UI/[Uu]mbraco/preview
 /src/Umbraco.Web.UI/[Uu]mbraco/preview.old
 
-# ignore rule for clearing out Belle (avoid rebuilding all the time)
+# Ignore rule for clearing out Belle (avoid rebuilding all the time)
 preserve.belle
 
-#Ignore Rule for output of generated documentation files from Grunt docserve
+# Ignore rule for output of generated documentation files from grunt docserve
 src/Umbraco.Web.UI.Docs/api
 src/Umbraco.Web.UI.Docs/package-lock.json
 src/*.boltdata/
@@ -157,12 +154,11 @@ build/csharp-docs.zip
 src/packages/
 src/PrecompiledWeb/*
 
-# build
+# Build
 build.out/
 build.tmp/
 build/hooks/
 build/temp/
-
 
 # Acceptance tests
 cypress.env.json
@@ -172,13 +168,10 @@ cypress.env.json
 /src/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
 src/Umbraco.Web.UI/Umbraco/telemetrics-id.umb
 
-
-# eof
 /src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/ApiDocs/api/*
 /src/Umbraco.Web.UI.Client/package-lock.json
 /src/Umbraco.Web.UI.NetCore/wwwroot/Media/*
-/src/Umbraco.Web.UI.NetCore/wwwroot/is-cache/*
 /src/Umbraco.Tests.Integration/App_Data/*
 /src/Umbraco.Tests.Integration/TEMP/*
 /src/Umbraco.Web.UI.NetCore/wwwroot/[Uu]mbraco/assets/*
@@ -203,7 +196,6 @@ src/Umbraco.Tests.Integration/umbraco/logs/
 src/Umbraco.Tests.Integration/Views/
 
 src/Umbraco.Tests/TEMP/
-
 
 /src/Umbraco.Web.UI/config/umbracoSettings.config
 
