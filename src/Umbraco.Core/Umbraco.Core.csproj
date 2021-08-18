@@ -1502,6 +1502,7 @@
     <Compile Include="Services\Implement\ConsentService.cs" />
     <Compile Include="Services\Implement\ContentService.cs" />
     <Compile Include="Services\ContentServiceExtensions.cs" />
+    <Compile Include="Services\MediaServiceExtensions.cs" />
     <Compile Include="Services\Implement\ContentTypeService.cs" />
     <Compile Include="Services\Implement\ContentTypeServiceBase.cs" />
     <Compile Include="Services\Implement\ContentTypeServiceBaseOfTItemTService.cs" />
