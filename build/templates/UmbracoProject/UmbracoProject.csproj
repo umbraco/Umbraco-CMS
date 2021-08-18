@@ -39,6 +39,10 @@
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
+        <None Include="App_Plugins\**\*.*">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        </None>
         <None Remove="umbraco\Data\**" />
         <None Remove="umbraco\logs\**" />
         <None Remove="umbraco\MediaCache\**" />
