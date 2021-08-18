@@ -7,22 +7,14 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using Umbraco.Extensions;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Constants = Umbraco.Cms.Core.Constants;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
-using Umbraco.Cms.Core.Migrations;
-using Umbraco.Cms.Core.Scoping;
 using Microsoft.Extensions.Logging;
-using System.Numerics;
-using System.Threading.Tasks;
 using Umbraco.Cms.Infrastructure.Install;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -36,33 +28,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     {
         private readonly IPackagingService _packagingService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly IKeyValueService _keyValueService;
-        private readonly PendingPackageMigrations _pendingPackageMigrations;
-        private readonly PackageMigrationPlanCollection _packageMigrationPlans;
-        private readonly IMigrationPlanExecutor _migrationPlanExecutor;
         private readonly PackageMigrationRunner _packageMigrationRunner;
-        private readonly IScopeProvider _scopeProvider;
         private readonly ILogger<PackageController> _logger;
 
         public PackageController(
             IPackagingService packagingService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IKeyValueService keyValueService,
-            PendingPackageMigrations pendingPackageMigrations,
-            PackageMigrationPlanCollection packageMigrationPlans,
-            IMigrationPlanExecutor migrationPlanExecutor,
             PackageMigrationRunner packageMigrationRunner,
-            IScopeProvider scopeProvider,
             ILogger<PackageController> logger)
         {
             _packagingService = packagingService ?? throw new ArgumentNullException(nameof(packagingService));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
-            _keyValueService = keyValueService;
-            _pendingPackageMigrations = pendingPackageMigrations;
-            _packageMigrationPlans = packageMigrationPlans;
-            _migrationPlanExecutor = migrationPlanExecutor;
             _packageMigrationRunner = packageMigrationRunner;
-            _scopeProvider = scopeProvider;
             _logger = logger;
         }
 
