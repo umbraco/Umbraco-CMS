@@ -560,7 +560,7 @@
                 }
             });
 
-            // Initialize once all scaffolds has been loaded
+            // Initialize once all scaffolds have been loaded
             initNestedContent();
         });
 
