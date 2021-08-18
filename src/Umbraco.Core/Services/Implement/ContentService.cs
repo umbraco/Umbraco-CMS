@@ -934,7 +934,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = 0, bool raiseEvents = true)
+        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (cultures == null) throw new ArgumentNullException(nameof(cultures));
