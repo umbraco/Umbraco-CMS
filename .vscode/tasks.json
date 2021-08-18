@@ -50,7 +50,7 @@
         },
         {
             "label": "Dotnet watch",
-            "detail": "Dotnet run and watch of Web.UI.NetCore",
+            "detail": "Dotnet run and watch of Web.UI",
             "promptOnClose": true,
             "command": "dotnet",
             "type": "process",
