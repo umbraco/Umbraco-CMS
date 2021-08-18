@@ -5,6 +5,6 @@ namespace Umbraco.Cms.Core.Migrations
 {
     public interface IMigrationPlanExecutor
     {
-        Task<string> ExecuteAsync(MigrationPlan plan, string fromState);
+        string Execute(MigrationPlan plan, string fromState);
     }
 }

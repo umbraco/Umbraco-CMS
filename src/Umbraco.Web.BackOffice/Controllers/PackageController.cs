@@ -23,6 +23,7 @@ using Umbraco.Cms.Core.Scoping;
 using Microsoft.Extensions.Logging;
 using System.Numerics;
 using System.Threading.Tasks;
+using Umbraco.Cms.Infrastructure.Install;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -39,6 +40,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly PendingPackageMigrations _pendingPackageMigrations;
         private readonly PackageMigrationPlanCollection _packageMigrationPlans;
         private readonly IMigrationPlanExecutor _migrationPlanExecutor;
+        private readonly PackageMigrationRunner _packageMigrationRunner;
         private readonly IScopeProvider _scopeProvider;
         private readonly ILogger<PackageController> _logger;
 
@@ -49,6 +51,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             PendingPackageMigrations pendingPackageMigrations,
             PackageMigrationPlanCollection packageMigrationPlans,
             IMigrationPlanExecutor migrationPlanExecutor,
+            PackageMigrationRunner packageMigrationRunner,
             IScopeProvider scopeProvider,
             ILogger<PackageController> logger)
         {
@@ -58,6 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _pendingPackageMigrations = pendingPackageMigrations;
             _packageMigrationPlans = packageMigrationPlans;
             _migrationPlanExecutor = migrationPlanExecutor;
+            _packageMigrationRunner = packageMigrationRunner;
             _scopeProvider = scopeProvider;
             _logger = logger;
         }
@@ -118,35 +122,24 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<IEnumerable<InstalledPackage>>> RunMigrations([FromQuery]string packageName)
+        public ActionResult<IEnumerable<InstalledPackage>> RunMigrations([FromQuery]string packageName)
         {
-            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
-            IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
-            foreach(PackageMigrationPlan plan in _packageMigrationPlans.Where(x => x.PackageName.InvariantEquals(packageName)))
+            try
             {
-                if (pendingMigrations.Contains(plan.Name))
-                {
-                    var upgrader = new Upgrader(plan);
-
-                    try
-                    {
-                        await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Package migration failed on package {Package} for plan {Plan}", packageName, plan.Name);
-
-                        return ValidationErrorResult.CreateNotificationValidationErrorResult(
-                            $"Package migration failed on package {packageName} for plan {plan.Name} with error: {ex.Message}. Check log for full details.");
-                    }
-                }
+                _packageMigrationRunner.RunPackageMigrationsIfPending(packageName);
+                return _packagingService.GetAllInstalledPackages().ToList();
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Package migration failed on package {Package}", packageName);
 
-            return _packagingService.GetAllInstalledPackages().ToList();
+                return ValidationErrorResult.CreateNotificationValidationErrorResult(
+                    $"Package migration failed on package {packageName} with error: {ex.Message}. Check log for full details.");
+            }            
         }
 
         [HttpGet]
-        public IActionResult DownloadCreatedPackage(int id)
+        public IActionResult DownloadCreatedPackage(int id) 
         {
             var package = _packagingService.GetCreatedPackageById(id);
             if (package == null)

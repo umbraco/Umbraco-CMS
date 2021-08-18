@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
     public class MigrationPlanTests
     {
         [Test]
-        public async Task CanExecute()
+        public void CanExecute()
         {
             NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
 
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                     }
                 });
 
-            var executor = new MigrationPlanExecutor(scopeProvider, loggerFactory, migrationBuilder, Mock.Of<IEventAggregator>());
+            var executor = new MigrationPlanExecutor(scopeProvider, loggerFactory, migrationBuilder);
 
             MigrationPlan plan = new MigrationPlan("default")
                 .From(string.Empty)
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
                 // execute plan                
-                state = await executor.ExecuteAsync(plan, sourceState);
+                state = executor.Execute(plan, sourceState);
 
                 // save new state
                 kvs.SetValue("Umbraco.Tests.MigrationPlan", sourceState, state);

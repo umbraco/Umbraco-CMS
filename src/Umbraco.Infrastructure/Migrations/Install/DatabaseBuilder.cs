@@ -413,7 +413,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public async Task<Result> UpgradeSchemaAndDataAsync(UmbracoPlan plan)
+        public Result UpgradeSchemaAndData(UmbracoPlan plan)
         {
             try
             {
@@ -427,7 +427,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
                 // upgrade
                 var upgrader = new Upgrader(plan);
-                await upgrader.ExecuteAsync(_migrationPlanExecutor, _scopeProvider, _keyValueService);
+                upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
 
                 var message = "<p>Upgrade completed!</p>";
 

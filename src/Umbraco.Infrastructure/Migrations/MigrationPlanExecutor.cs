@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Migrations;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 using Type = System.Type;
@@ -17,19 +14,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         private readonly IScopeProvider _scopeProvider;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IMigrationBuilder _migrationBuilder;
-        private readonly IEventAggregator _eventAggregator;
         private readonly ILogger<MigrationPlanExecutor> _logger;
 
         public MigrationPlanExecutor(
             IScopeProvider scopeProvider,
             ILoggerFactory loggerFactory,
-            IMigrationBuilder migrationBuilder,
-            IEventAggregator eventAggregator)
+            IMigrationBuilder migrationBuilder)
         {
             _scopeProvider = scopeProvider;
             _loggerFactory = loggerFactory;
             _migrationBuilder = migrationBuilder;
-            _eventAggregator = eventAggregator;
             _logger = _loggerFactory.CreateLogger<MigrationPlanExecutor>();
         }
 
@@ -43,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         /// <param name="loggerFactory"></param>
         /// <returns>The final state.</returns>
         /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
-        public async Task<string> ExecuteAsync(MigrationPlan plan, string fromState)
+        public string Execute(MigrationPlan plan, string fromState)
         {
             plan.Validate();
 
@@ -102,8 +96,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations
                         postMigration.Run();
                     }
                 }
-
-                await _eventAggregator.PublishAsync(new MigrationPlanExecuted(plan.Name, fromState, nextState));
             }
 
             _logger.LogInformation("Done (pending scope completion).");

@@ -27,10 +27,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
     {
         private static readonly ILoggerFactory s_loggerFactory = NullLoggerFactory.Instance;
         private IMigrationPlanExecutor GetMigrationPlanExecutor(IScopeProvider scopeProvider, IMigrationBuilder builder)
-            => new MigrationPlanExecutor(scopeProvider, s_loggerFactory, builder, Mock.Of<IEventAggregator>());
+            => new MigrationPlanExecutor(scopeProvider, s_loggerFactory, builder);
 
         [Test]
-        public async Task ExecutesPlanPostMigration()
+        public void ExecutesPlanPostMigration()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 
             var upgrader = new Upgrader(plan);
             IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, builder);
-            await upgrader.ExecuteAsync(
+            upgrader.Execute(
                 executor,
                 scopeProvider,
                 Mock.Of<IKeyValueService>());
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
         }
 
         [Test]
-        public async Task MigrationCanAddPostMigration()
+        public void MigrationCanAddPostMigration()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
 
             var upgrader = new Upgrader(plan);
             IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, builder);
-            await upgrader.ExecuteAsync(
+            upgrader.Execute(
                 executor,
                 scopeProvider,
                 Mock.Of<IKeyValueService>());

@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
         }
 
-        public override async Task<InstallSetupResult> ExecuteAsync(object model)
+        public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 var plan = new UmbracoPlan(_umbracoVersion);
                 plan.AddPostMigration<ClearCsrfCookies>(); // needed when running installer (back-office)
 
-                var result = await _databaseBuilder.UpgradeSchemaAndDataAsync(plan);
+                var result = _databaseBuilder.UpgradeSchemaAndData(plan);
 
                 if (result.Success == false)
                 {
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 }
             }
 
-            return null;
+            return Task.FromResult((InstallSetupResult)null);
         }
 
         public override bool RequiresExecution(object model)

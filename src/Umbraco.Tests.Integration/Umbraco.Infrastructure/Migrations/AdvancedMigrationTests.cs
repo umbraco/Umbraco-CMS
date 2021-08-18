@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         private IMigrationPlanExecutor MigrationPlanExecutor => GetRequiredService<IMigrationPlanExecutor>();
 
         [Test]
-        public async Task CreateTableOfTDto()
+        public void CreateTableOfTDto()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("done"));
 
-                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
 
                 var helper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator);
                 bool exists = helper.TableExists("umbracoUser");
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         }
 
         [Test]
-        public async Task DeleteKeysAndIndexesOfTDto()
+        public void DeleteKeysAndIndexesOfTDto()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -91,13 +91,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<DeleteKeysAndIndexesMigration>("done"));
 
-                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
 
         [Test]
-        public async Task CreateKeysAndIndexesOfTDto()
+        public void CreateKeysAndIndexesOfTDto()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -126,13 +126,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<DeleteKeysAndIndexesMigration>("b")
                         .To<CreateKeysAndIndexesOfTDtoMigration>("done"));
 
-                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
 
         [Test]
-        public async Task CreateKeysAndIndexes()
+        public void CreateKeysAndIndexes()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -161,13 +161,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<DeleteKeysAndIndexesMigration>("b")
                         .To<CreateKeysAndIndexesMigration>("done"));
 
-                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
 
         [Test]
-        public async Task CreateColumn()
+        public void CreateColumn()
         {
             IMigrationBuilder builder = Mock.Of<IMigrationBuilder>();
             Mock.Get(builder)
@@ -193,7 +193,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<CreateColumnMigration>("done"));
 
-                await upgrader.ExecuteAsync(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
+                upgrader.Execute(MigrationPlanExecutor, ScopeProvider, Mock.Of<IKeyValueService>());
                 scope.Complete();
             }
         }
