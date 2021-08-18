@@ -127,25 +127,26 @@ cypress.env.json
 /src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/ApiDocs/api/*
 /src/Umbraco.Web.UI.Client/package-lock.json
-/src/Umbraco.Web.UI.NetCore/wwwroot/Media/*
-/src/Umbraco.Web.UI.NetCore/wwwroot/is-cache/*
+/src/Umbraco.Web.UI/wwwroot/Media/*
+/src/Umbraco.Web.UI/wwwroot/is-cache/*
 /src/Umbraco.Tests.Integration/App_Data/*
 /src/Umbraco.Tests.Integration/TEMP/*
-/src/Umbraco.Web.UI.NetCore/wwwroot/[Uu]mbraco/assets/*
-/src/Umbraco.Web.UI.NetCore/wwwroot/[Uu]mbraco/js/*
-/src/Umbraco.Web.UI.NetCore/wwwroot/[Uu]mbraco/lib/*
-/src/Umbraco.Web.UI.NetCore/wwwroot/[Uu]mbraco/views/*
-/src/Umbraco.Web.UI.NetCore/wwwroot/App_Data/TEMP/*
-/src/Umbraco.Web.UI.NetCore/App_Data/Logs/*
-/src/Umbraco.Web.UI.NetCore/App_Data/TEMP/TypesCache/*
-/src/Umbraco.Web.UI.NetCore/App_Data/TEMP/*
-/src/Umbraco.Web.UI.NetCore/App_Data/Smidge/Cache/*
-/src/Umbraco.Web.UI.NetCore/[Uu]mbraco/[Ll]ogs
-/src/Umbraco.Web.UI.NetCore/[Uu]mbraco/[Dd]ata/*
-/src/Umbraco.Web.UI.NetCore/[Uu]mbraco/[Mm]odels/*
+/src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/assets/*
+/src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/js/*
+/src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/lib/*
+/src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/views/*
+/src/Umbraco.Web.UI/wwwroot/App_Data/TEMP/*
+/src/Umbraco.Web.UI/App_Data/Logs/*
+/src/Umbraco.Web.UI/App_Data/TEMP/TypesCache/*
+/src/Umbraco.Web.UI/App_Data/TEMP/*
+/src/Umbraco.Web.UI/App_Data/Smidge/Cache/*
+/src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs
+/src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/*
+/src/Umbraco.Web.UI/[Uu]mbraco/[Mm]odels/*
 /src/Umbraco.Web.UI/[Vv]iews/*.vbhtml
-/src/Umbraco.Web.UI.NetCore/appsettings.json
-/src/Umbraco.Web.UI.NetCore/appsettings.Development.json
+/src/Umbraco.Web.UI/appsettings.json
+/src/Umbraco.Web.UI/appsettings.Development.json
+/src/Umbraco.Web.UI/appsettings.Local.json
 
 
 src/Umbraco.Tests.Integration/umbraco/Data/
@@ -157,8 +158,7 @@ src/Umbraco.Tests/TEMP/
 
 
 src/Umbraco.Tests.UnitTests/umbraco/Data/TEMP/
-/src/Umbraco.Web.UI.NetCore/appsettings.Local.json
 src/Umbraco.Tests.Integration.SqlCe/umbraco/Data/TEMP/
 src/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
 
-src/Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json
+src/Umbraco.Web.UI/umbraco/config/appsettings-schema.json
