@@ -208,7 +208,7 @@ namespace Umbraco.Web.Trees
 
         protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
         {
-            var result = base.GetChildEntities(id, queryStrings).ToArray(;
+            var result = base.GetChildEntities(id, queryStrings).ToArray();
             var culture = queryStrings["culture"].TryConvertTo<string>();
 
             //if this is null we'll set it to the default.
