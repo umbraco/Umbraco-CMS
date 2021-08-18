@@ -53,7 +53,7 @@
 
     $port = "" + $semver.Major + $semver.Minor + ("" + $semver.Patch).PadLeft(2, '0')
     Write-Host "Update port in launchSettings.json to $port"
-    $filePath = "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Properties\launchSettings.json"
+    $filePath = "$($this.SolutionRoot)\src\Umbraco.Web.UI\Properties\launchSettings.json"
     $this.ReplaceFileText($filePath, `
       "http://localhost:(\d+)?", `
       "http://localhost:$port")
@@ -178,13 +178,13 @@
     Write-Host "Compile Umbraco"
     Write-Host "Logging to $log"
 
-   & dotnet build "$src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" `
+   & dotnet build "$src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" `
       --configuration $buildConfiguration `
       --output "$($this.BuildTemp)\bin\\" `
       > $log
 
    # get files into WebApp\bin
-    & dotnet publish "$src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" `
+    & dotnet publish "$src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" `
       --configuration Release --output "$($this.BuildTemp)\WebApp\bin\\" `
       > $log
 
@@ -200,13 +200,13 @@
     $this.RemoveFile($excludeFiles)
 
     # copy rest of the files into WebApp
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
     $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\lib")
     $this.RemoveDirectory($excludeUmbracoDirs)
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Views", "*", "$($this.BuildTemp)\WebApp\Views")
-    Copy-Item "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\appsettings.json" "$($this.BuildTemp)\WebApp"
+    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI\Views", "*", "$($this.BuildTemp)\WebApp\Views")
+    Copy-Item "$($this.SolutionRoot)\src\Umbraco.Web.UI\appsettings.json" "$($this.BuildTemp)\WebApp"
 
-    if (-not $?) { throw "Failed to compile Umbraco.Web.UI.NetCore." }
+    if (-not $?) { throw "Failed to compile Umbraco.Web.UI." }
 
     # /p:UmbracoBuild tells the csproj that we are building from PS, not VS
   })
@@ -338,10 +338,10 @@
 
     # copy Belle
     Write-Host "Copy Belle"
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\assets", "*", "$tmp\WebApp\wwwroot\umbraco\assets")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
+    $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\assets", "*", "$tmp\WebApp\wwwroot\umbraco\assets")
+    $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\js", "*", "$tmp\WebApp\wwwroot\umbraco\js")
+    $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\lib", "*", "$tmp\WebApp\wwwroot\umbraco\lib")
+    $this.CopyFiles("$src\Umbraco.Web.UI\wwwroot\umbraco\views", "*", "$tmp\WebApp\wwwroot\umbraco\views")
 
 
 
@@ -350,9 +350,9 @@
     $this.CopyFiles("$templates", "*", "$tmp\Templates")
 
     Write-Host "Copy files for dotnet templates"
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\UmbracoProject")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoProject")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\Views", "*", "$tmp\Templates\UmbracoProject\Views")
+    $this.CopyFiles("$src\Umbraco.Web.UI", "Program.cs", "$tmp\Templates\UmbracoProject")
+    $this.CopyFiles("$src\Umbraco.Web.UI", "Startup.cs", "$tmp\Templates\UmbracoProject")
+    $this.CopyFiles("$src\Umbraco.Web.UI\Views", "*", "$tmp\Templates\UmbracoProject\Views")
 
   $this.RemoveDirectory("$tmp\Templates\UmbracoProject\bin")
   })
@@ -443,7 +443,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("UmbracoCms"),
-      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Persistence.SqlCe"))
+      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Persistence.SqlCe"))
     if ($this.OnError()) { return }
   })
 
