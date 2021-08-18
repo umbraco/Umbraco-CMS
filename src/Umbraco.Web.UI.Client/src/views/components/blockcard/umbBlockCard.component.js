@@ -47,7 +47,7 @@
             if (path.toLowerCase().endsWith(".svg") === false) {
                 path += "?upscale=false&width=400";
             }
-            vm.styleBackgroundImage = 'url(\'' + path + '\')';
+            vm.styleBackgroundImage = `url('${path}')`;
         };
 
     }
