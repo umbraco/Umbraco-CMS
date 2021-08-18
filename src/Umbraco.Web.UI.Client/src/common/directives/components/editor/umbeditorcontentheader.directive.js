@@ -105,8 +105,8 @@
                     }
                 });
 
-                scope.vm.hasVariants = (scope.vm.hasCulture || scope.vm.hasSegments);
-                scope.vm.hasSubVariants = (scope.vm.hasCulture && scope.vm.hasSegments);
+                scope.vm.hasVariants = scope.content.variants.length > 1 && (scope.vm.hasCulture || scope.vm.hasSegments);
+                scope.vm.hasSubVariants = scope.content.variants.length > 1 &&(scope.vm.hasCulture && scope.vm.hasSegments);
 
                 updateVaraintErrors();
 
