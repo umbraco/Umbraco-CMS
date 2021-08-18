@@ -1,7 +1,7 @@
-
+<div>
     <div class="__showcase"
-        ng-class="{'--error':vm.elementTypeModel === null}"
-        ng-style="{'background-color': vm.blockConfigModel ? vm.blockConfigModel.backgroundColor : '', 'background-image': vm.styleBackgroundImage}">
+         ng-class="{'--error':vm.elementTypeModel === null}"
+         ng-style="{'background-color': vm.blockConfigModel ? vm.blockConfigModel.backgroundColor : '', 'background-image': vm.styleBackgroundImage}">
         <div class="__icon">
             <umb-icon icon="{{vm.icon}}"
                       ng-attr-style="{{'color:' + vm.blockConfigModel.iconColor}}"
@@ -19,4 +19,4 @@
     </div>
 
     <ng-transclude></ng-transclude>
-
+</div>
