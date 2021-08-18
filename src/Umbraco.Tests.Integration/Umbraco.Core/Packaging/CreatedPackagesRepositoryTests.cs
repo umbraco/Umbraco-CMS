@@ -148,16 +148,33 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                 Name = "test",
             };
             bool result = PackageBuilder.SavePackage(def);
-
+            //Update Values and save
             def.Name = "updated";
+            def.ContentNodeId = "test";
+            def.Languages.Add("Danish");
+            def.Languages.Add("English");
+            def.Scripts.Add("TestScript1");
+            def.Scripts.Add("TestScript2");
             result = PackageBuilder.SavePackage(def);
             Assert.IsTrue(result);
-
             // re-get
             def = PackageBuilder.GetById(def.Id);
-            Assert.AreEqual("updated", def.Name);
-
-            // TODO: There's a whole lot more assertions to be done
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual("updated", def.Name);
+                Assert.AreEqual("test", def.ContentNodeId);
+                Assert.AreEqual(2, def.Languages.Count());
+                Assert.AreEqual(2, def.Scripts.Count());
+                Assert.AreEqual(0, def.DataTypes.Count());
+                Assert.AreEqual(0, def.DictionaryItems.Count());
+                Assert.AreEqual(0, def.DocumentTypes.Count());
+                Assert.AreEqual(0, def.Macros.Count());
+                Assert.AreEqual(0, def.MediaTypes.Count());
+                Assert.AreEqual(0, def.MediaUdis.Count());
+                Assert.AreEqual(0, def.PartialViews.Count());
+                Assert.AreEqual(0, def.Stylesheets.Count());
+                Assert.AreEqual(0, def.Templates.Count());
+            });
         }
 
         [Test]
@@ -244,7 +261,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var def = new PackageDefinition
             {
                 Name = "test",
-                MediaUdis = new List<GuidUdi>(){m1.GetUdi()}
+                MediaUdis = new List<GuidUdi>() { m1.GetUdi() }
             };
 
             bool result = PackageBuilder.SavePackage(def);
@@ -259,15 +276,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             using (FileStream packageZipStream = File.OpenRead(packageXmlPath))
             using (ZipArchive zipArchive = PackageMigrationResource.GetPackageDataManifest(packageZipStream, out XDocument packageXml))
             {
-                Assert.AreEqual("umbPackage", packageXml.Root.Name.ToString());
-                Assert.IsNotNull(zipArchive.GetEntry("media/media/test-file.txt"));
-
-                Assert.AreEqual(
-                    $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate.ToString("s")}\" updateDate=\"{m1.UpdateDate.ToString("s")}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"\" writerID=\"0\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
-                    packageXml.Element("umbPackage").Element("MediaItems").ToString(SaveOptions.DisableFormatting));
-
-                // TODO: There's a whole lot more assertions to be done
-
+                string test = "test-file.txt";
+                Assert.Multiple(() =>
+                {
+                    Assert.AreEqual("umbPackage", packageXml.Root.Name.ToString());
+                    Assert.IsNotNull(zipArchive.GetEntry("media/media/test-file.txt"));
+                    Assert.IsNotNull(zipArchive.GetEntry("package.xml"));
+                    Assert.AreEqual(
+                        $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate.ToString("s")}\" updateDate=\"{m1.UpdateDate.ToString("s")}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"\" writerID=\"0\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
+                        packageXml.Element("umbPackage").Element("MediaItems").ToString(SaveOptions.DisableFormatting));
+                    Assert.AreEqual(2, zipArchive.Entries.Count());
+                    Assert.AreEqual(ZipArchiveMode.Read, zipArchive.Mode);
+                    Assert.IsNull(packageXml.DocumentType);
+                    Assert.IsNull(packageXml.NextNode);
+                    Assert.IsNull(packageXml.Parent);
+                    Assert.IsNull(packageXml.NextNode);
+                    Assert.AreEqual(test, zipArchive.Entries.Last().Name);
+                    Assert.AreEqual(7, zipArchive.Entries.Last().Length);
+                });
             }
         }
 
@@ -283,7 +309,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var def = new PackageDefinition
             {
                 Name = "test",
-                Templates = new []{template.Id.ToString()}
+                Templates = new[] { template.Id.ToString() }
             };
             bool result = PackageBuilder.SavePackage(def);
             Assert.IsTrue(result);
@@ -297,12 +323,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             using (var packageXmlStream = File.OpenRead(packageXmlPath))
             {
                 var xml = XDocument.Load(packageXmlStream);
-                Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
+                Assert.Multiple(() =>
+                {
+                    string xmlContent = xml.Root.Value.Remove(0, 21).Replace("\n", "").Replace("\r", "");
+                    string templateContent = template.Content.Replace("\n", "").Replace("\r", "");
+                    Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
+                    Assert.AreEqual($"<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
+                    Assert.AreEqual(templateContent, xmlContent);
 
-                Assert.AreEqual($"<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
-
-                // TODO: There's a whole lot more assertions to be done
-
+                });
             }
         }
     }
