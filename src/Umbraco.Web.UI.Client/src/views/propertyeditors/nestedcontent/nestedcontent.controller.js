@@ -589,8 +589,7 @@
 
         var initNestedContent = function () {
             // Initialize when all scaffolds have loaded
-            // Because we're loading the scaffolds async one at a time, we need to
-            // sort them explicitly according to the sort order defined by the data type.
+            // Sort the scaffold explicitly according the the sort order define by the data type.
             vm.scaffolds = $filter("orderBy")(vm.scaffolds, function (s) {
                 return contentTypeAliases.indexOf(s.contentTypeAlias);
             });

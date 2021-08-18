@@ -368,13 +368,8 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IDictionary<string, ContentItemDisplay> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
         {
-            List<IContentType> contentTypes = new();
-
-            foreach (var alias in contentTypesByAliases.ContentTypeAliases)
-            {
-                contentTypes.Add(Services.ContentTypeService.Get(alias));
-            }
-
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = contentTypesByAliases.ContentTypeAliases.Select(alias => Services.ContentTypeService.Get(alias));
             return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
         }
 
