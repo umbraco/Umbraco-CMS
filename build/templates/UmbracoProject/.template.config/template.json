@@ -35,7 +35,7 @@
             "type": "generated",
             "generator": "regex",
             "dataType": "string",
-            "replaces": "Umbraco.Cms.Web.UI.NetCore",
+            "replaces": "Umbraco.Cms.Web.UI",
             "parameters": {
                 "source": "name",
                 "steps": [
