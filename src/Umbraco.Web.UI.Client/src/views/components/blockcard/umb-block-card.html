@@ -3,8 +3,8 @@
         ng-class="{'--error':vm.elementTypeModel === null}"
         ng-style="{'background-color': vm.blockConfigModel ? vm.blockConfigModel.backgroundColor : '', 'background-image': vm.styleBackgroundImage}">
         <div class="__icon">
-            <umb-icon icon="{{vm.elementTypeModel ? vm.elementTypeModel.icon : 'icon-block'}}"
-                      ng-attr-style="{{'color:' + vm.blockConfigModel.iconColor + ' !important'}}"
+            <umb-icon icon="{{vm.icon}}"
+                      ng-attr-style="{{'color:' + vm.blockConfigModel.iconColor}}"
                       ng-if="vm.blockConfigModel == null || vm.blockConfigModel.thumbnail == null">
             </umb-icon>
         </div>
