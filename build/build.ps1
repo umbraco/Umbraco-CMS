@@ -296,9 +296,6 @@
 
     $buildConfiguration = "Release"
 
-    # restore web.config
-    #$this.TempRestoreFile("$src\Umbraco.Web.UI\web.config")
-
     # cleanup build
     Write-Host "Clean build"
     $this.RemoveFile("$tmp\bin\*.dll.config")
@@ -318,9 +315,6 @@
     # copy various files
     Write-Host "Copy xml documentation"
     Copy-Item -force "$tmp\bin\*.xml" "$tmp\WebApp\bin"
-
-    # Write-Host "Copy transformed web.config"
-    # $this.CopyFile("$src\Umbraco.Web.UI\web.$buildConfiguration.Config.transformed", "$tmp\WebApp\web.config")
 
     # offset the modified timestamps on all umbraco dlls, as WebResources
     # break if date is in the future, which, due to timezone offsets can happen.
@@ -366,10 +360,6 @@
 
   $ubuild.DefineMethod("PrepareBuild",
   {
-    # $this.TempStoreFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
-    # Write-Host "Create clean web.config"
-    # $this.CopyFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.Template.config", "$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
-
     Write-host "Set environment"
     $env:UMBRACO_VERSION=$this.Version.Semver.ToString()
     $env:UMBRACO_RELEASE=$this.Version.Release
