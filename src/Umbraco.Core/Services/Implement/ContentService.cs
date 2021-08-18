@@ -2175,6 +2175,9 @@ namespace Umbraco.Core.Services.Implement
                 copy.CreatorId = userId;
                 copy.WriterId = userId;
 
+                // ensure any content schedule is not copied
+                copy.ContentSchedule = new ContentScheduleCollection();
+
                 //get the current permissions, if there are any explicit ones they need to be copied
                 var currentPermissions = GetPermissions(content);
                 currentPermissions.RemoveWhere(p => p.IsDefaultPermissions);
