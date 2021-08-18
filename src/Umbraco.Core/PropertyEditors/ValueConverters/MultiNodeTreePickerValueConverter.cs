@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             }
 
             // TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out _))
+            if (_umbracoContextAccessor.TryGetUmbracoContext(out _))
             {
                 if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
                 {
