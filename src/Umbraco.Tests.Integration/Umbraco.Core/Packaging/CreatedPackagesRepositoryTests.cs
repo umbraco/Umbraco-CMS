@@ -280,8 +280,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                 string test = "test-file.txt";
                 Assert.Multiple(() =>
                 {
+                    var mediaEntry = zipArchive.GetEntry("media/media/test-file.txt");
                     Assert.AreEqual("umbPackage", packageXml.Root.Name.ToString());
-                    Assert.IsNotNull(zipArchive.GetEntry("media/media/test-file.txt"));
+                    Assert.IsNotNull(mediaEntry);
+                    Assert.AreEqual(test, mediaEntry.Name);
                     Assert.IsNotNull(zipArchive.GetEntry("package.xml"));
                     Assert.AreEqual(
                         $"<MediaItems><MediaSet><testImage id=\"{m1.Id}\" key=\"{m1.Key}\" parentID=\"-1\" level=\"1\" creatorID=\"-1\" sortOrder=\"0\" createDate=\"{m1.CreateDate.ToString("s")}\" updateDate=\"{m1.UpdateDate.ToString("s")}\" nodeName=\"Test File\" urlName=\"test-file\" path=\"{m1.Path}\" isDoc=\"\" nodeType=\"{mt.Id}\" nodeTypeAlias=\"testImage\" writerName=\"\" writerID=\"0\" udi=\"{m1.GetUdi()}\" mediaFilePath=\"/media/test-file.txt\"><umbracoFile><![CDATA[/media/test-file.txt]]></umbracoFile><umbracoBytes><![CDATA[100]]></umbracoBytes><umbracoExtension><![CDATA[png]]></umbracoExtension></testImage></MediaSet></MediaItems>",
@@ -292,8 +294,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                     Assert.IsNull(packageXml.NextNode);
                     Assert.IsNull(packageXml.Parent);
                     Assert.IsNull(packageXml.PreviousNode);
-                    Assert.AreEqual(test, zipArchive.Entries.Last().Name);
-                    Assert.AreEqual(7, zipArchive.Entries.Last().Length);
                 });
             }
         }
@@ -328,7 +328,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                 {
                     Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
                     Assert.AreEqual($"<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
-                    Assert.AreEqual(xml.FirstNode, xml.LastNode);
                     Assert.IsNull(xml.DocumentType);
                     Assert.IsNull(xml.Parent);
                     Assert.IsNull(xml.NextNode);
