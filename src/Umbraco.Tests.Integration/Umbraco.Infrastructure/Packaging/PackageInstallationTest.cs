@@ -32,13 +32,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
             using var fileStream = testPackageFile.OpenRead();
             CompiledPackage package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
-            Assert.Multiple(() =>
-            {
-                Assert.IsNotNull(package);
-                Assert.AreEqual("Document Type Picker", package.Name);
-                Assert.AreEqual(1, package.DataTypes.Count());
-            });
-
+            Assert.IsNotNull(package);
+            Assert.AreEqual("Document Type Picker", package.Name);
+            Assert.AreEqual(1, package.DataTypes.Count());
         }
 
         [Test]
@@ -47,16 +43,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), HelloPackage));
             using var fileStream = testPackageFile.OpenRead();
             CompiledPackage package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
-            Assert.Multiple(() =>
-            {
-                Assert.IsNotNull(package);
-                Assert.AreEqual("Hello", package.Name);
-                Assert.AreEqual(1, package.Documents.Count());
-                Assert.AreEqual(1, package.DocumentTypes.Count());
-                Assert.AreEqual(1, package.Templates.Count());
-                Assert.AreEqual(1, package.DataTypes.Count());
-            });
-
+            Assert.IsNotNull(package);
+            Assert.AreEqual("Hello", package.Name);
+            Assert.AreEqual(1, package.Documents.Count());
+            Assert.AreEqual(1, package.DocumentTypes.Count());
+            Assert.AreEqual(1, package.Templates.Count());
+            Assert.AreEqual(1, package.DataTypes.Count());
         }
 
         [Test]
@@ -74,17 +66,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             using var fileStream = File.OpenRead(packageFile);
             CompiledPackage package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
             InstallWarnings preInstallWarnings = package.Warnings;
-            var dataType = package.DataTypes.First();
-            Assert.Multiple(() =>
-            {
-                Assert.AreEqual("Document Type Picker", package.Name);
-                Assert.AreEqual("3593d8e7-8b35-47b9-beda-5e830ca8c93c", dataType.LastAttribute.Value);
-                Assert.AreEqual("Document Type Picker", dataType.FirstAttribute.Value);
-                Assert.IsNotNull(preInstallWarnings);
-                Assert.AreEqual(0, preInstallWarnings.ConflictingMacros.Count());
-                Assert.AreEqual(0, preInstallWarnings.ConflictingStylesheets.Count());
-                Assert.AreEqual(0, preInstallWarnings.ConflictingTemplates.Count());
-            });
+            Assert.IsNotNull(preInstallWarnings);
+
+            // TODO: More Asserts
         }
 
         [Test]
