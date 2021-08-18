@@ -84,10 +84,15 @@
                         <div class="umb-table-cell">
                             <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon" ng-if="item.selected"></umb-icon>
                             <umb-icon icon="{{item.icon}}" class="umb-table-body__icon" ng-if="!item.thumbnail && item.extension != 'svg' && !item.selected"></umb-icon>
-                            <umb-icon icon="icon-picture" ng-if="item.thumbnail && !item.selected"></umb-icon>
+                            <umb-icon icon="icon-picture" class="umb-table-body__icon" ng-if="item.thumbnail && !item.selected"></umb-icon>
                         </div>
-                        <div class="umb-table-cell  umb-table__name">
-                            <ins ng-show="item.isFolder" ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}" ng-click="clickItemName(item, $event, $index)" class="icon-navigation-right"></ins> <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
+                        <div class="umb-table-cell umb-table__name">
+                            <umb-icon icon="icon-navigation-right"
+                                      ng-show="item.isFolder"
+                                      ng-class="{'-locked': item.selected || !item.file || !item.thumbnail}"
+                                      ng-click="clickItemName(item, $event, $index)">
+                            </umb-icon> 
+                            <span data-src="{{item.value.src}}" class="item-name">{{item.name}}</span>
                         </div>
                         <div class="umb-table-cell">
                             <span class="muted small" style="font-size:0.8em">{{item.updateDate | date:'medium'}}</span>
