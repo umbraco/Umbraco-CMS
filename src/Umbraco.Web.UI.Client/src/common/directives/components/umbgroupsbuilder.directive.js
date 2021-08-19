@@ -148,9 +148,6 @@
                     handle: ".umb-group-builder__property-handle",
                     items: ".umb-group-builder__property-sortable",
                     stop: (e, ui) => {
-
-                        // TODO: Ensure moving of properties works..
-
                         updatePropertiesSortOrder();
                     }
                 };
