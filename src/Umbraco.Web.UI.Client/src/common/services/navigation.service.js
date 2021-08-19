@@ -148,26 +148,6 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
 
         /**
          * @ngdoc method
-         * @name umbraco.services.navigationService#hideBackdrop
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * hide backdrop
-         */
-        hideBackdrop: closeBackdrop,
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.navigationService#showBackdrop
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * show backdrop
-         */
-        showBackdrop: showBackdrop,
-
-        /**
-         * @ngdoc method
          * @name umbraco.services.navigationService#isRouteChangingNavigation
          * @methodOf umbraco.services.navigationService
          *
