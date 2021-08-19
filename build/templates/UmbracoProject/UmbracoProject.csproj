@@ -31,6 +31,10 @@
         <EmbeddedResource Remove="umbraco\MediaCache\**" />
     </ItemGroup>
     <ItemGroup>
+		<None Include="App_Plugins\**\*.*">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        </None>	
         <None Include="config\**\*.*">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
