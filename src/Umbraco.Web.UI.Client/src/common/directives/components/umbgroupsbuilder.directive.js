@@ -210,6 +210,7 @@
                                 without this sorting direct properties doesn't work correctly */
                                 scope.$apply();
                                 $('.umb-group-builder__ungrouped-properties .umb-group-builder__properties').sortable('refresh');
+                                $('.umb-group-builder__groups').sortable('refresh');
                             }, 400);
                         }
                     },
