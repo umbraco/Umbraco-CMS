@@ -127,15 +127,9 @@
                         if (group && group.type === TYPE_GROUP) {
 
                             // Update aliases
-                            const parentAlias = scope.openTabAlias,
-                                oldAlias = group.alias || null, // null when group comes from root aka. 'generic'
-                                newAlias = contentTypeHelper.updateParentAlias(oldAlias, parentAlias);
-
-                            // Check alias is unique
-                            // TODO: we should properly do this on hover, to let user know it cant be moved.
-                            if (isAliasUnique(newAlias) === false) {
-                                return;
-                            }
+                            const parentAlias = scope.openTabAlias;
+                            const oldAlias = group.alias || null; // null when group comes from root aka. 'generic'
+                            const newAlias = contentTypeHelper.updateParentAlias(oldAlias, parentAlias);
 
                             group.alias = newAlias;
                             group.parentAlias = parentAlias;
