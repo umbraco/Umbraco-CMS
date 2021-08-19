@@ -2,7 +2,7 @@
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_16_0
+namespace Umbraco.Core.Migrations.Upgrade.V_8_17_0
 {
     public class AddPropertyTypeGroupColumns : MigrationBase
     {
