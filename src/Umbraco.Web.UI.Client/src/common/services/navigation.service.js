@@ -127,7 +127,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         var aboveClass = "above-backdrop";
         var leftColumn = document.getElementById("leftcolumn");
 
-        if(leftColumn) {
+        if (leftColumn) {
             var isLeftColumnOnTop = leftColumn.classList.contains(aboveClass);
 
             if (isLeftColumnOnTop) {
@@ -145,6 +145,26 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
     }
 
     var service = {
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#hideBackdrop
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * hide backdrop
+         */
+        hideBackdrop: closeBackdrop,
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#showBackdrop
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * show backdrop
+         */
+        showBackdrop: showBackdrop,
 
         /**
          * @ngdoc method
