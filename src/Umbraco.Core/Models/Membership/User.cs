@@ -366,41 +366,6 @@ namespace Umbraco.Cms.Core.Models.Membership
             }
         }
 
-        public T FromUserCache<T>(string cacheKey)
-            where T : class
-        {
-            lock (_additionalDataLock)
-            {
-                return AdditionalData.TryGetValue(cacheKey, out var data)
-                    ? data as T
-                    : null;
-            }
-        }
-
-        public void ToUserCache<T>(string cacheKey, T vals)
-            where T : class
-        {
-            lock (_additionalDataLock)
-            {
-                AdditionalData[cacheKey] = vals;
-            }
-        }
-
-        [IgnoreDataMember]
-        [DoNotClone]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This should not be used, it's currently used for only a single edge case - should probably be removed for netcore")]
-        internal IDictionary<string, object> AdditionalData
-        {
-            get
-            {
-                lock (_additionalDataLock)
-                {
-                    return _additionalData ?? (_additionalData = new Dictionary<string, object>());
-                }
-            }
-        }
-
         protected override void PerformDeepClone(object clone)
         {
             base.PerformDeepClone(clone);
