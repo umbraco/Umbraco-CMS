@@ -38,7 +38,7 @@
 
                 <li class="umb-action" data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes">
                     <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" umb-auto-focus ng-if="$index === 0">
-                        <umb-icon icon="{{docType.icon}}" class="{{docType.icon}} icon large"></umb-icon>
+                        <umb-icon icon="{{docType.icon}}" class="icon large"></umb-icon>
                         <span class="menu-label">
                             {{docType.name}}
                             <small>
@@ -47,7 +47,7 @@
                         </span>
                     </button>
                     <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createOrSelectBlueprintIfAny(docType)" ng-if="$index !== 0">
-                        <umb-icon icon="{{docType.icon}}" class="{{docType.icon}} icon large"></umb-icon>
+                        <umb-icon icon="{{docType.icon}}" class="icon large"></umb-icon>
                         <span class="menu-label">
                             {{docType.name}}
                             <small>
@@ -63,7 +63,7 @@
 
                 <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false track by $index">
                     <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createFromBlueprint(blueprint.id)">
-                        <umb-icon icon="{{docType.icon}}" class="{{docType.icon}} icon large"></umb-icon>
+                        <umb-icon icon="{{docType.icon}}" class="icon large"></umb-icon>
                         <span class="menu-label">
                             {{blueprint.name}}
                         </span>
@@ -72,7 +72,7 @@
 
                 <li class="umb-action sep" ng-show="allowBlank">
                     <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createBlank(docType)">
-                        <umb-icon icon="{{docType.icon}}" class="{{docType.icon}} icon large"></umb-icon>
+                        <umb-icon icon="{{docType.icon}}" class="icon large"></umb-icon>
                         <span class="menu-label">
                             <localize key="blueprints_blankBlueprint">Blank</localize>
                         </span>
