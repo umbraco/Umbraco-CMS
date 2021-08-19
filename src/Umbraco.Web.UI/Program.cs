@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Cms.Web.UI.NetCore
+namespace Umbraco.Cms.Web.UI
 {
     public class Program
     {

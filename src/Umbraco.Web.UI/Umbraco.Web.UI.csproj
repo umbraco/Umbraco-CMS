@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>Umbraco.Cms.Web.UI.NetCore</RootNamespace>
+    <RootNamespace>Umbraco.Cms.Web.UI</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DocumentationFile>bin/Release/Umbraco.Web.UI.NetCore.xml</DocumentationFile>
+    <DocumentationFile>bin/Release/Umbraco.Web.UI.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
@@ -66,7 +66,7 @@
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -111,7 +111,7 @@
 <!--    <Exec WorkingDirectory="$(ProjectDir)/../../src/Umbraco.Web.UI.Client/" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;{ npm install ; npm run build }'" />-->
   </Target>
   <Target Name="JsonSchemaBuild">
-<!--    <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;dotnet run &#45;&#45;project $pwd/src/JsonSchema/JsonSchema.csproj -c Release &#45;&#45; &#45;&#45;outputFile $pwd/src/Umbraco.Web.UI.NetCore/$(JsonSchemaPath)'" />-->
+<!--    <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;dotnet run &#45;&#45;project $pwd/src/JsonSchema/JsonSchema.csproj -c Release &#45;&#45; &#45;&#45;outputFile $pwd/src/Umbraco.Web.UI/$(JsonSchemaPath)'" />-->
   </Target>
   <Target Name="AppsettingsBuild">
      <Message Text="Generating appsettings.json because it doesnt exist" Importance="High" />
