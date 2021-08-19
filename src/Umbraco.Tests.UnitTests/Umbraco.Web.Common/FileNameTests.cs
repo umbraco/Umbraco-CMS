@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
         private IEnumerable<string> GetUiFiles(IEnumerable<string> pathFromNetCore)
         {
             var sourceRoot = TestContext.CurrentContext.TestDirectory.Split("Umbraco.Tests.UnitTests")[0];
-            var pathToFiles = Path.Combine(sourceRoot, "Umbraco.Web.UI.NetCore");
+            var pathToFiles = Path.Combine(sourceRoot, "Umbraco.Web.UI");
             foreach (var pathSection in pathFromNetCore)
             {
                 pathToFiles = Path.Combine(pathToFiles, pathSection);
