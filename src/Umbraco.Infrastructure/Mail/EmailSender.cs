@@ -13,7 +13,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Extensions;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
-namespace Umbraco.Cms.Infrastructure
+namespace Umbraco.Cms.Infrastructure.Mail
 {
     /// <summary>
     /// A utility class for sending emails
