@@ -189,10 +189,10 @@ stages:
                 - powershell:  Invoke-Sqlcmd -Query "CREATE DATABASE $env:UmbracoDatabaseName" -ServerInstance $env:UmbracoDatabaseServer
                   displayName: Create database
 #                - task: DotNetCoreCLI@2
-#                  displayName: dotnet build (Netcore)
+#                  displayName: dotnet build
 #                  inputs:
 #                      command: build
-#                      projects: '**/Umbraco.Web.UI.Netcore.csproj'
+#                      projects: '**/Umbraco.Web.UI.csproj'
                 - task: NodeTool@0
                   displayName: Use Node 11.x
                   inputs:
@@ -208,10 +208,10 @@ stages:
                     gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
                     targets: build
                     workingDirectory: src\Umbraco.Web.UI.Client
-                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
-                  displayName: dotnet run (Netcore)
-#                - powershell: dotnet run --no-build -p .\src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj
-#                  displayName: dotnet run (Netcore)
+                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
+                  displayName: dotnet run
+#                - powershell: dotnet run --no-build -p .\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj
+#                  displayName: dotnet run
                 - task: PowerShell@1
                   displayName: Generate Cypress.env.json
                   inputs:
@@ -302,10 +302,10 @@ stages:
                       targets: build
                       workingDirectory: src/Umbraco.Web.UI.Client
                 - task: Bash@3
-                  displayName: dotnet run (Netcore)
+                  displayName: dotnet run
                   inputs:
                     targetType: 'inline'
-                    script: 'nohup dotnet run  -p ./src/Umbraco.Web.UI.NetCore/Umbraco.Web.UI.NetCore.csproj &'
+                    script: 'nohup dotnet run  -p ./src/Umbraco.Web.UI/Umbraco.Web.UI.csproj &'
                 - task: Bash@3
                   displayName: Generate Cypress.env.json
                   inputs:

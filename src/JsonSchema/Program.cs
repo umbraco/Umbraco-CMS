@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using CommandLine;
@@ -9,7 +9,7 @@ namespace JsonSchema
     {
         private class Options
         {
-            [Option('o', "outputFile", Required = false, HelpText = "Set path of the output file.", Default = "../../../../Umbraco.Web.UI.NetCore/umbraco/config/appsettings-schema.json")]
+            [Option('o', "outputFile", Required = false, HelpText = "Set path of the output file.", Default = "../../../../Umbraco.Web.UI/umbraco/config/appsettings-schema.json")]
             public string OutputFile { get; set; }
         }
 

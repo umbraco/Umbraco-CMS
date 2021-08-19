@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "Dotnet build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/Umbraco.Web.UI.NetCore/bin/Debug/net5.0/Umbraco.Web.UI.NetCore.dll",
+            "program": "${workspaceFolder}/src/Umbraco.Web.UI/bin/Debug/net5.0/Umbraco.Web.UI.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/Umbraco.Web.UI.NetCore",
+            "cwd": "${workspaceFolder}/src/Umbraco.Web.UI",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {
