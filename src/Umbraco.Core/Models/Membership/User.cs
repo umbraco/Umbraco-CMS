@@ -119,8 +119,6 @@ namespace Umbraco.Cms.Core.Models.Membership
         private DateTime _lastPasswordChangedDate;
         private DateTime _lastLoginDate;
         private DateTime _lastLockoutDate;
-        private IDictionary<string, object> _additionalData;
-        private object _additionalDataLock = new object();
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<int>> IntegerEnumerableComparer =
