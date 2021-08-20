@@ -373,29 +373,6 @@ namespace Umbraco.Cms.Core.Models.Membership
             //manually clone the start node props
             clonedEntity._startContentIds = _startContentIds.ToArray();
             clonedEntity._startMediaIds = _startMediaIds.ToArray();
-
-            // this value has been cloned and points to the same object
-            // which obviously is bad - needs to point to a new object
-            clonedEntity._additionalDataLock = new object();
-
-            if (_additionalData != null)
-            {
-                // clone._additionalData points to the same dictionary, which is bad, because
-                // changing one clone impacts all of them - so we need to reset it with a fresh
-                // dictionary that will contain the same values - and, if some values are deep
-                // cloneable, they should be deep-cloned too
-                var cloneAdditionalData = clonedEntity._additionalData = new Dictionary<string, object>();
-
-                lock (_additionalDataLock)
-                {
-                    foreach (var kvp in _additionalData)
-                    {
-                        var deepCloneable = kvp.Value as IDeepCloneable;
-                        cloneAdditionalData[kvp.Key] = deepCloneable == null ? kvp.Value : deepCloneable.DeepClone();
-                    }
-                }
-            }
-
             //need to create new collections otherwise they'll get copied by ref
             clonedEntity._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);
             clonedEntity._allowedSections = _allowedSections != null ? new List<string>(_allowedSections) : null;
