@@ -108,7 +108,9 @@
                     handle: ".umb-group-builder__tab-handle",
                     items: ".umb-group-builder__tab-sortable",
                     stop: (event, ui) => {
-                        updateSortOrder(scope.tabs);
+                        const tabKey = ui.item[0].dataset.tabKey ? ui.item[0].dataset.tabKey : false;
+                        const dropIndex = scope.tabs.findIndex(tab => tab.key === tabKey);
+                        updateSortOrder(scope.tabs, dropIndex);
                     }
                 };
 
@@ -136,7 +138,9 @@
                             contentTypeHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
 
                             const groupsInTab = scope.model.groups.filter(group => group.parentAlias === parentAlias);
-                            updateSortOrder(groupsInTab);
+                            const dropIndex = groupsInTab.findIndex(group => group.key === groupKey);
+
+                            updateSortOrder(groupsInTab, dropIndex);
                         }
                     }
                 };
@@ -216,43 +220,37 @@
                 };
             }
 
-            function updateSortOrder(items) {
-                let first = true;
-                let prevSortOrder = 0;
+            function updateSortOrder(items, movedIndex) {
+                if (items && items.length <= 1) {
+                    return;
+                }
+                
+                // update the moved item sort order to fit into where it is dragged
+                const movedItem = items[movedIndex];
 
-                items.forEach((item, index) => {
-                    if (item.tabState !== "init" && item.propertyState !== "init") {
+                if (movedIndex === 0) {
+                    const nextItem =  items[movedIndex + 1];
+                    movedItem.sortOrder = nextItem.sortOrder - 1;
+                } else {
+                    const prevItem =  items[movedIndex - 1];
+                    movedItem.sortOrder = prevItem.sortOrder + 1;
+                }
 
-                        // set the first not inherited tab to sort order 0
-                        if (!item.inherited && first) {
+                /* After the above two items next to each other might have the same sort order 
+                 to prevent this we run through the rest of the 
+                 items and update the sort order if they are next to each other.
+                 This will make it possible to make gaps without the number being updated */
+                for (let i = movedIndex; i < items.length; i++) {
+                    const item = items[i];
 
-                            // set the first tab sort order to 0 if prev is 0
-                            if (prevSortOrder === 0) {
-                                item.sortOrder = 0;
-                                // when the first tab is inherited and sort order is not 0
-                            } else {
-                                item.sortOrder = prevSortOrder + 1;
-                            }
+                    if (!item.inherited && i !== 0) {
+                        const prev = items[i - 1];
 
-                            first = false;
-
-                        } else if (!item.inherited && !first) {
-                            // find next item
-                            const nextItem = items[index + 1];
-
-                            // if an item is dropped in the middle of the collection with
-                            // same sort order. Give it the dropped item same sort order
-                            if (nextItem && nextItem.sortOrder === prevSortOrder) {
-                                item.sortOrder = prevSortOrder;
-                            } else {
-                                item.sortOrder = prevSortOrder + 1;
-                            }
+                        if (item.sortOrder === prev.sortOrder) {
+                            item.sortOrder = item.sortOrder + 1;
                         }
-
-                        // store this tabs sort order as reference for the next
-                        prevSortOrder = item.sortOrder;
                     }
-                });
+                }
             }
 
             function filterAvailableCompositions(selectedContentType, selecting) {
