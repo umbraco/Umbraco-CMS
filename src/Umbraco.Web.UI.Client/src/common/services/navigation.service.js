@@ -127,7 +127,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         var aboveClass = "above-backdrop";
         var leftColumn = document.getElementById("leftcolumn");
 
-        if(leftColumn) {
+        if (leftColumn) {
             var isLeftColumnOnTop = leftColumn.classList.contains(aboveClass);
 
             if (isLeftColumnOnTop) {
