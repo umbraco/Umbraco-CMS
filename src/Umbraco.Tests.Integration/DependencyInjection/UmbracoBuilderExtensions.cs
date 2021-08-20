@@ -85,8 +85,8 @@ namespace Umbraco.Cms.Tests.Integration.DependencyInjection
                         currFolder = currFolder.Parent;
                     }
 
-                    DirectoryInfo netcoreUI = currFolder.GetDirectories("Umbraco.Web.UI.NetCore", SearchOption.TopDirectoryOnly).First();
-                    var mainLangFolder = new DirectoryInfo(Path.Combine(netcoreUI.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
+                    DirectoryInfo uiProject = currFolder.GetDirectories("Umbraco.Web.UI", SearchOption.TopDirectoryOnly).First();
+                    var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
 
                     return new LocalizedTextServiceFileSources(
                         loggerFactory.CreateLogger<LocalizedTextServiceFileSources>(),

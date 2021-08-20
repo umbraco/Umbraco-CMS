@@ -50,14 +50,14 @@
         },
         {
             "label": "Dotnet watch",
-            "detail": "Dotnet run and watch of Web.UI.NetCore",
+            "detail": "Dotnet run and watch of Web.UI",
             "promptOnClose": true,
             "command": "dotnet",
             "type": "process",
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/src/Umbraco.Web.UI.NetCore/Umbraco.Web.UI.NetCore.csproj",
+                "${workspaceFolder}/src/Umbraco.Web.UI/Umbraco.Web.UI.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
