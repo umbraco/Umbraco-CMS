@@ -851,14 +851,23 @@ namespace Umbraco.Core.Packaging
                 if (property.Element("Key") != null)
                     propertyType.Key = new Guid(property.Element("Key").Value);
 
-                var tab = (string)property.Element("Tab");
-                if (string.IsNullOrEmpty(tab))
+                var tabElement = property.Element("Tab");
+                if (tabElement == null || string.IsNullOrEmpty(tabElement.Value))
                 {
                     contentType.AddPropertyType(propertyType);
                 }
                 else
                 {
-                    contentType.AddPropertyType(propertyType, tab);
+                    var tabName = tabElement.Value;
+                    var tabAlias = tabElement.Attribute("Alias")?.Value;
+                    if (string.IsNullOrEmpty(tabAlias))
+                    {
+                        contentType.AddPropertyType(propertyType, tabName);
+                    }
+                    else
+                    {
+                        contentType.AddPropertyType(propertyType, tabAlias, tabName);
+                    }
                 }
             }
         }

@@ -487,7 +487,7 @@ namespace Umbraco.Core.Services.Implement
                     new XElement("Key", propertyType.Key),
                     new XElement("Type", propertyType.PropertyEditorAlias),
                     new XElement("Definition", definition.Key),
-                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Alias), // TODO Rename to PropertyGroupAlias
+                    propertyGroup != null ? new XElement("Tab", propertyGroup.Name, new XAttribute("Alias", propertyGroup.Alias)) : null, // TODO Replace with PropertyGroupAlias
                     new XElement("SortOrder", propertyType.SortOrder),
                     new XElement("Mandatory", propertyType.Mandatory.ToString()),
                     new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),
