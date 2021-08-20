@@ -253,6 +253,7 @@
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
     <Compile Include="Models\AnchorsModel.cs" />
+    <Compile Include="Models\ContentEditing\ContentTypesByAliases.cs" />
     <Compile Include="Models\ContentEditing\ContentTypesByKeys.cs" />
     <Compile Include="Models\ContentEditing\DataTypeReferences.cs" />
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
