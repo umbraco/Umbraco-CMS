@@ -553,7 +553,6 @@
   # run
   if (-not $get)
   {
-cd
     if ($command.Length -eq 0)
     {
       $command = @( "Build" )
