@@ -506,6 +506,7 @@ namespace Umbraco.Core.Services.Implement
             foreach (var propertyGroup in propertyGroups)
             {
                 yield return new XElement("Tab", // TODO Rename to PropertyGroup
+                    new XElement("Id", propertyGroup.Id),
                     new XElement("Key", propertyGroup.Key),
                     new XElement("Type", propertyGroup.Type.ToString()),
                     new XElement("Caption", propertyGroup.Name), // TODO Rename to Name (same in PackageDataInstallation)
