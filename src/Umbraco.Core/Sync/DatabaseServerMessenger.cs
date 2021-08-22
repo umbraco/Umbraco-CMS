@@ -535,9 +535,17 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         protected static readonly string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
             + "/" + HttpRuntime.AppDomainAppId // eg /LM/S3SVC/11/ROOT
-            + " [P" + Process.GetCurrentProcess().Id // eg 1234
+            + " [P" + GetProcessId() // eg 1234
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
             + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
+
+        private static int GetProcessId()
+        {
+            using(var p = Process.GetCurrentProcess()){
+
+                return p.Id;
+            }
+        }
 
         private string GetDistCacheFilePath(IGlobalSettings globalSettings)
         {
