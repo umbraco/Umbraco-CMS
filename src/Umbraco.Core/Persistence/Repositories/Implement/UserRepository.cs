@@ -162,7 +162,7 @@ UNION
 SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL
 ORDER BY colName";
 
-            var result = Database.Fetch<dynamic>(sql);
+            var result = Database.Fetch<UserStateDto>(sql);
 
             return new Dictionary<UserState, int>
             {
