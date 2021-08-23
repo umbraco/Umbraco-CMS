@@ -323,8 +323,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                         }
 
                         // remove group if there are no properties left
-                        if (contentTypeGroup.properties.length > 1) {
-                            //contentType.groups.splice(groupIndex, 1);
+                        if (contentTypeGroup.properties.length > 0) {
                             groups.push(contentTypeGroup);
                         }
 
