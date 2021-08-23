@@ -68,6 +68,7 @@ namespace Umbraco.Core.Services.Implement
             var compositionAliases = compositionContentType.CompositionAliases();
             var compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
             var propertyTypeAliases = compositionContentType.PropertyTypes.Select(x => x.Alias).ToArray();
+            var propertyGroupAliases = compositionContentType.PropertyGroups.ToDictionary(x => x.Alias, x => x.Type, StringComparer.InvariantCultureIgnoreCase);
             var indirectReferences = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
             var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x.Id == y.Id, x => x.Id);
             var dependencies = new HashSet<IContentTypeComposition>(compositions, comparer);
@@ -101,10 +102,13 @@ namespace Umbraco.Core.Services.Implement
                 if (dependency.Id == compositionContentType.Id) continue;
                 var contentTypeDependency = allContentTypes.FirstOrDefault(x => x.Alias.Equals(dependency.Alias, StringComparison.InvariantCultureIgnoreCase));
                 if (contentTypeDependency == null) continue;
-                var intersect = contentTypeDependency.PropertyTypes.Select(x => x.Alias).Intersect(propertyTypeAliases, StringComparer.InvariantCultureIgnoreCase).ToArray();
-                if (intersect.Length == 0) continue;
 
-                throw new InvalidCompositionException(compositionContentType.Alias, intersect.ToArray());
+                var duplicatePropertyTypeAliases = contentTypeDependency.PropertyTypes.Select(x => x.Alias).Intersect(propertyTypeAliases, StringComparer.InvariantCultureIgnoreCase).ToArray();
+                var invalidPropertyGroupAliases = contentTypeDependency.PropertyGroups.Where(x => propertyGroupAliases.TryGetValue(x.Alias, out var type) && type != x.Type).Select(x => x.Alias).ToArray();
+
+                if (duplicatePropertyTypeAliases.Length == 0 && invalidPropertyGroupAliases.Length == 0) continue;
+
+                throw new InvalidCompositionException(compositionContentType.Alias, null, duplicatePropertyTypeAliases, invalidPropertyGroupAliases);
             }
         }
 
