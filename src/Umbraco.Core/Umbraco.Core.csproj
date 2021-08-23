@@ -61,6 +61,5 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ContentEditing" />
     </ItemGroup>
 </Project>

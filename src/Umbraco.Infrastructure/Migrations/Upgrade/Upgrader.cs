@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 {
     /// <summary>
-    /// Represents an upgrader.
+    /// Used to run a <see cref="MigrationPlan"/>
     /// </summary>
     public class Upgrader
     {
@@ -36,13 +36,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// </summary>
         /// <param name="scopeProvider">A scope provider.</param>
         /// <param name="keyValueService">A key-value service.</param>
-        public void Execute(IMigrationPlanExecutor migrationPlanExecutor, IScopeProvider scopeProvider, IKeyValueService keyValueService)
+        public ExecutedMigrationPlan Execute(IMigrationPlanExecutor migrationPlanExecutor, IScopeProvider scopeProvider, IKeyValueService keyValueService)
         {
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
             if (keyValueService == null) throw new ArgumentNullException(nameof(keyValueService));
 
-            using (var scope = scopeProvider.CreateScope())
-            {
+            using (IScope scope = scopeProvider.CreateScope())
+            {   
                 // read current state
                 var currentState = keyValueService.GetValue(StateValueKey);
                 var forceState = false;
@@ -51,13 +51,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
                 {
                     currentState = Plan.InitialState;
                     forceState = true;
-                }
+                }                
 
                 // execute plan
                 var state = migrationPlanExecutor.Execute(Plan, currentState);
                 if (string.IsNullOrWhiteSpace(state))
                 {
-                    throw new Exception("Plan execution returned an invalid null or empty state.");
+                    throw new InvalidOperationException("Plan execution returned an invalid null or empty state.");
                 }
 
                 // save new state
@@ -69,8 +69,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
                 {
                     keyValueService.SetValue(StateValueKey, currentState, state);
                 }
-
+                
                 scope.Complete();
+
+                return new ExecutedMigrationPlan(Plan, currentState, state);
             }
         }
     }
