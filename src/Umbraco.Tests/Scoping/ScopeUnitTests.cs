@@ -47,6 +47,39 @@ namespace Umbraco.Tests.Scoping
         }
 
         [Test]
+        public void Unused_Lazy_Locks_Cleared_At_Child_Scope()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            var outerScope = (Scope)scopeProvider.CreateScope();
+            outerScope.ReadLock(Constants.Locks.Domains);
+            outerScope.ReadLock(Constants.Locks.Languages);
+
+            using (var innerScope1 = (Scope)scopeProvider.CreateScope())
+            {
+                innerScope1.ReadLock(Constants.Locks.Domains);
+                innerScope1.ReadLock(Constants.Locks.Languages);
+
+                innerScope1.Complete();
+            }
+
+            using (var innerScope2 = (Scope)scopeProvider.CreateScope())
+            {
+                innerScope2.ReadLock(Constants.Locks.Domains);
+                innerScope2.ReadLock(Constants.Locks.Languages);
+
+                // force resolving the locks
+                var locks = innerScope2.GetReadLocks();
+
+                innerScope2.Complete();
+            }
+
+            outerScope.Complete();
+
+            Assert.DoesNotThrow(() => outerScope.Dispose());
+        }
+
+        [Test]
         public void WriteLock_Acquired_Only_Once_Per_Key()
         {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
@@ -101,7 +134,8 @@ namespace Umbraco.Tests.Scoping
         }
 
         [Test]
-        public void WriteLock_With_Timeout_Acquired_Only_Once_Per_Key(){
+        public void WriteLock_With_Timeout_Acquired_Only_Once_Per_Key()
+        {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
             var timeout = TimeSpan.FromMilliseconds(10000);
 
@@ -294,7 +328,7 @@ namespace Umbraco.Tests.Scoping
 
             using (var parentScope = scopeProvider.CreateScope())
             {
-                var realParentScope = (Scope) parentScope;
+                var realParentScope = (Scope)parentScope;
                 parentScope.WriteLock(Constants.Locks.ContentTree);
                 parentScope.WriteLock(Constants.Locks.ContentTypes);
 
@@ -356,7 +390,7 @@ namespace Umbraco.Tests.Scoping
 
             using (var parentScope = scopeProvider.CreateScope())
             {
-                var realParentScope = (Scope) parentScope;
+                var realParentScope = (Scope)parentScope;
                 parentScope.ReadLock(Constants.Locks.ContentTree);
                 parentScope.ReadLock(Constants.Locks.ContentTypes);
                 Assert.AreEqual(1, realParentScope.GetReadLocks()[realParentScope.InstanceId][Constants.Locks.ContentTree], $"parentScope after locks acquired: {nameof(Constants.Locks.ContentTree)}");
@@ -441,7 +475,7 @@ namespace Umbraco.Tests.Scoping
         public void Scope_Throws_If_ReadLocks_Not_Cleared()
         {
             var scopeprovider = GetScopeProvider(out var syntaxProviderMock);
-            var scope = (Scope) scopeprovider.CreateScope();
+            var scope = (Scope)scopeprovider.CreateScope();
 
             try
             {
@@ -466,7 +500,7 @@ namespace Umbraco.Tests.Scoping
         public void Scope_Throws_If_WriteLocks_Not_Cleared()
         {
             var scopeprovider = GetScopeProvider(out var syntaxProviderMock);
-            var scope = (Scope) scopeprovider.CreateScope();
+            var scope = (Scope)scopeprovider.CreateScope();
 
             try
             {
@@ -494,7 +528,7 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = scopeProvider.CreateScope())
             {
-                var realScope = (Scope) scope;
+                var realScope = (Scope)scope;
                 Assert.IsNull(realScope.GetWriteLocks());
             }
         }
@@ -506,7 +540,7 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = scopeProvider.CreateScope())
             {
-                var realScope = (Scope) scope;
+                var realScope = (Scope)scope;
                 Assert.IsNull(realScope.GetReadLocks());
             }
         }

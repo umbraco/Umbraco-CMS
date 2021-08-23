@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -54,7 +55,7 @@ namespace Umbraco.Core.Scoping
         private Dictionary<Guid, Dictionary<int, int>> _readLocksDictionary;
         private Dictionary<Guid, Dictionary<int, int>> _writeLocksDictionary;
 
-        private Queue<(LockType lockType, TimeSpan timeout, Guid instanceId, int lockId)> _queuedLocks;
+        private StackQueue<(LockType lockType, TimeSpan timeout, Guid instanceId, int lockId)> _queuedLocks;
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
@@ -757,10 +758,10 @@ namespace Umbraco.Core.Scoping
                     // remove any queued locks for this instance that weren't used.
                     while (_queuedLocks?.Count > 0)
                     {
-                        var top = _queuedLocks.Peek();
+                        var top = _queuedLocks.PeekStack();
                         if (top.instanceId == instanceId)
                         {
-                            _queuedLocks.Dequeue();
+                            _queuedLocks.Pop();
                         }
                         else
                         {
@@ -845,7 +846,7 @@ namespace Umbraco.Core.Scoping
             {
                 if (_queuedLocks == null)
                 {
-                    _queuedLocks = new Queue<(LockType, TimeSpan, Guid, int)>();
+                    _queuedLocks = new StackQueue<(LockType, TimeSpan, Guid, int)>();
                 }
                 foreach (var lockId in lockIds)
                 {
@@ -860,7 +861,7 @@ namespace Umbraco.Core.Scoping
             {
                 if (_queuedLocks == null)
                 {
-                    _queuedLocks = new Queue<(LockType, TimeSpan, Guid, int)>();
+                    _queuedLocks = new StackQueue<(LockType, TimeSpan, Guid, int)>();
                 }
                 _queuedLocks.Enqueue((lockType, timeout, instanceId, lockId));
             }

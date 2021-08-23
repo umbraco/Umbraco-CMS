@@ -128,6 +128,7 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="Collections\StackQueue.cs" />
     <Compile Include="Configuration\ICoreDebug.cs" />
     <Compile Include="Constants-CharArrays.cs" />
     <Compile Include="Collections\EventClearingObservableCollection.cs" />
