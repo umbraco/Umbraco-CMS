@@ -15,7 +15,9 @@ namespace Umbraco.Cms.Core.Cache
 
         public IDataValueEditor GetValueEditor(IDataEditor editor, IDataType dataType)
         {
-            // Instead of creating a value editor immediately check if we've already created one and use that.
+            // We try and get the dictionary based on the IDataEditor alias,
+            // this is here just in case a data type can have more than one value data editor.
+            // If this is not the case this could be simplified quite a bit, by just using the inner dictionary only.
             IDataValueEditor valueEditor;
             if (_valueEditorCache.TryGetValue(editor.Alias, out Dictionary<int, IDataValueEditor> dataEditorCache))
             {
