@@ -18,6 +18,17 @@ namespace Umbraco.Web.Compose
     {
         private ComplexPropertyEditorContentEventHandler _handler;
         private readonly BlockListEditorDataConverter _converter = new BlockListEditorDataConverter();
+        private readonly ILogger _logger;
+
+        [Obsolete("Use the ctor injecting dependencies.")]
+        public BlockEditorComponent() : this(Current.Logger)
+        {
+        }
+
+        public BlockEditorComponent(ILogger logger)
+        {
+            _logger = logger;
+        }
 
         public void Initialize()
         {
@@ -128,7 +139,7 @@ namespace Umbraco.Web.Compose
                                 // We are detecting JSON data by seeing if a string is surrounded by [] or {}
                                 // If people enter text like [PLACEHOLDER] JToken  parsing fails, it's safe to ignore though
                                 // Logging this just in case in the future we find values that are not safe to ignore
-                                Current.Logger.Warn<BlockEditorComponent>(
+                                _logger.Warn<BlockEditorComponent>(
                                     "The property {PropertyAlias} on content type {ContentTypeKey} has a value of: {BlockItemValue} - this was recognized as JSON but could not be parsed",
                                     data.Key, propertyAliasToBlockItemData.Key, asString);
                             }
