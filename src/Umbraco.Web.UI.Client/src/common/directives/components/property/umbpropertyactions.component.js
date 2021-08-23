@@ -83,11 +83,9 @@
                 Utilities.forEach(actions, action => {
 
                     if (action.labelKey) {
-                        if (action.labelKey) {
-                            localizationService.localize(action.labelKey, (action.labelTokens || []), action.label).then(data => {
-                                action.label = data;
-                            });
-                        }
+                        localizationService.localize(action.labelKey, (action.labelTokens || []), action.label).then(data => {
+                            action.label = data;
+                        });
                     }
 
                     action.useLegacyIcon = action.useLegacyIcon === false ? false : true;
