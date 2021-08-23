@@ -541,8 +541,8 @@ namespace Umbraco.Core.Sync
 
         private static int GetProcessId()
         {
-            using(var p = Process.GetCurrentProcess()){
-
+            using(var p = Process.GetCurrentProcess())
+            {
                 return p.Id;
             }
         }
