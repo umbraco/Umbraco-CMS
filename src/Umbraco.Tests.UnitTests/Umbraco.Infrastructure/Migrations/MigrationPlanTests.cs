@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -11,6 +12,7 @@ using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
@@ -32,7 +34,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
 
             var database = new TestDatabase();
-            IScope scope = Mock.Of<IScope>();
+            IScope scope = Mock.Of<IScope>(x => x.Notifications == Mock.Of<IScopedNotificationPublisher>());
             Mock.Get(scope)
                 .Setup(x => x.Database)
                 .Returns(database);
