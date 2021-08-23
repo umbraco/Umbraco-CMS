@@ -22,6 +22,7 @@
 
         vm.$onDestroy = onDestroy;
         vm.$onInit = onInit;
+        vm.$onChanges = onChanges;
 
         function initDropDown() {
             keyboardService.bind("esc", vm.close);
@@ -71,21 +72,28 @@
                 vm.labels.openText = values[0];
                 vm.labels.closeText = values[1];
             });
+        }
 
-            // Map action icons using legacy icon font or svg icons.
-            Utilities.forEach(vm.actions, action => {
+        function onChanges(simpleChanges) {
+            if (simpleChanges.actions) {
 
-                if (action.labelKey) {
+                let actions = simpleChanges.actions.currentValue || [];
+
+                // Map action icons using legacy icon font or svg icons.
+                Utilities.forEach(actions, action => {
+
                     if (action.labelKey) {
-                        localizationService.localize(action.labelKey, action.labelTokens || []).then(data => {
-                            action.label = data;
-                        });
+                        if (action.labelKey) {
+                            localizationService.localize(action.labelKey, (action.labelTokens || []), action.label).then(data => {
+                                action.label = data;
+                            });
+                        }
                     }
-                }
 
-                action.icon = (action.useLegacyIcon ? 'icon-' : '') + action.icon;
-            });
-
+                    action.useLegacyIcon = action.useLegacyIcon === false ? false : true;
+                    action.icon = (action.useLegacyIcon ? 'icon-' : '') + action.icon;
+                });
+            }
         }
     }
 
