@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Blocks;
 using Umbraco.Core.PropertyEditors;
 
@@ -116,8 +117,23 @@ namespace Umbraco.Web.Compose
                             // this gets a little ugly because there could be some other complex editor that contains another block editor
                             // and since we would have no idea how to parse that, all we can do is try JSON Path to find another block editor
                             // of our type
-                            var json = JToken.Parse(asString);
-                            if (ProcessJToken(json, createGuid, out var result))
+                            JToken json = null;
+                            try
+                            {
+                                json = JToken.Parse(asString);
+                            }
+                            catch (Exception e)
+                            {
+                                // See issue https://github.com/umbraco/Umbraco-CMS/issues/10879
+                                // We are detecting JSON data by seeing if a string is surrounded by [] or {}
+                                // If people enter text like [PLACEHOLDER] JToken  parsing fails, it's safe to ignore though
+                                // Logging this just in case in the future we find values that are not safe to ignore
+                                Current.Logger.Warn<BlockEditorComponent>(
+                                    "The property {PropertyAlias} on content type {ContentTypeKey} has a value of: {BlockItemValue} - this was recognized as JSON but could not be parsed",
+                                    data.Key, propertyAliasToBlockItemData.Key, asString);
+                            }
+
+                            if (json != null && ProcessJToken(json, createGuid, out var result))
                             {
                                 // need to re-save this back to the RawPropertyValues
                                 data.RawPropertyValues[propertyAliasToBlockItemData.Key] = result;
