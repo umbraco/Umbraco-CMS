@@ -62,15 +62,14 @@ namespace Umbraco.Core.Models
                     propertyType.ResetDirtyProperties(false);
                 }
 
-                return ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups)
+                return PropertyGroups.Union(ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups)
                     .Select(group =>
                     {
                         group = (PropertyGroup) group.DeepClone();
                         foreach (var property in group.PropertyTypes)
                             AcquireProperty(property);
                         return group;
-                    })
-                    .Union(PropertyGroups);
+                    }));
             }
         }
 
