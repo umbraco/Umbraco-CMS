@@ -638,25 +638,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Handle Notifications
 
-        // note: if the service is not ready, ie _isReady is false, then notifications are ignored
-
-        // SetUmbracoVersionStep issues a DistributedCache.Instance.RefreshAll...() call which should cause
-        // the entire content, media etc caches to reload from database -- and then the app restarts -- however,
-        // at the time SetUmbracoVersionStep runs, Umbraco is not fully initialized and therefore some property
-        // value converters, etc are not registered, and rebuilding the NuCache may not work properly.
-        //
-        // More details: ApplicationContext.IsConfigured being false, ApplicationEventHandler.ExecuteWhen... is
-        // called and in most cases events are skipped, so property value converters are not registered or
-        // removed, so PublishedPropertyType either initializes with the wrong converter, or throws because it
-        // detects more than one converter for a property type.
-        //
-        // It's not an issue for XmlStore - the app restart takes place *after* the install has refreshed the
-        // cache, and XmlStore just writes a new umbraco.config file upon RefreshAll, so that's OK.
-        //
-        // But for NuCache... we cannot rebuild the cache now. So it will NOT work and we are not fixing it,
-        // because now we should ALWAYS run with the database server messenger, and then the RefreshAll will
-        // be processed as soon as we are configured and the messenger processes instructions.
-
         // note: notifications for content type and data type changes should be invoked with the
         // pure live model factory, if any, locked and refreshed - see ContentTypeCacheRefresher and
         // DataTypeCacheRefresher
