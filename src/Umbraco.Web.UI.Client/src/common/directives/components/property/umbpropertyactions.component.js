@@ -71,6 +71,21 @@
                 vm.labels.openText = values[0];
                 vm.labels.closeText = values[1];
             });
+
+            // Map action icons using legacy icon font or svg icons.
+            Utilities.forEach(vm.actions, action => {
+
+                if (action.labelKey) {
+                    if (action.labelKey) {
+                        localizationService.localize(action.labelKey, action.labelTokens || []).then(data => {
+                            action.label = data;
+                        });
+                    }
+                }
+
+                action.icon = (action.useLegacyIcon ? 'icon-' : '') + action.icon;
+            });
+
         }
     }
 
