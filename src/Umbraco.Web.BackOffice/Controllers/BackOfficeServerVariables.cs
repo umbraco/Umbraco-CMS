@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -529,9 +530,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return app;
         }
 
-        private string GetMaxRequestLength()
-        {
-            return _runtimeSettings.MaxRequestLength.HasValue ? _runtimeSettings.MaxRequestLength.Value.ToString() : string.Empty;
-        }
+        private string GetMaxRequestLength() => _httpContextAccessor.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize != null ? (_httpContextAccessor.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize / 1024).ToString() : string.Empty;
+    
     }
 }
