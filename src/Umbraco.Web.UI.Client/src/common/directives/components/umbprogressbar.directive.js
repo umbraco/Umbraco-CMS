@@ -17,7 +17,7 @@ Use this directive to generate a progress bar.
 
 @param {number} percentage (<code>attribute</code>): The progress in percentage.
 @param {string} size (<code>attribute</code>): The size (s, m).
-
+@param {string} color (<code>attribute</code>): The color of the highlight (primary, secondary, success, warning, danger). Success by default.
 **/
 
 (function() {
@@ -31,7 +31,8 @@ Use this directive to generate a progress bar.
             templateUrl: 'views/components/umb-progress-bar.html',
             scope: {
                 percentage: "@",
-                size: "@?"
+                size: "@?",
+                color: "@?"
             }
         };
 
