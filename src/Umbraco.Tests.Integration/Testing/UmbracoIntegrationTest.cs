@@ -212,7 +212,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 TestHelper.Profiler);
             var builder = new UmbracoBuilder(services, Configuration, typeLoader, TestHelper.ConsoleLoggerFactory, TestHelper.Profiler, AppCaches.NoCache, hostingEnvironment);
 
-            builder.Services.AddLogger(TestHelper.GetHostingEnvironment(), TestHelper.GetLoggingConfiguration(), Configuration);
+            builder.Services.AddLogger(hostingEnvironment, TestHelper.GetLoggingConfiguration(), Configuration);
 
             builder.AddConfiguration()
                 .AddUmbracoCore()
