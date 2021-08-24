@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">Umbraco.Cms.Web.UI</RootNamespace>
+        <DefaultItemExcludes>$(DefaultItemExcludes);App_Plugins/**;</DefaultItemExcludes>
+        <DefaultItemExcludes>$(DefaultItemExcludes);umbraco/**;</DefaultItemExcludes>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,42 +13,18 @@
         <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" Condition="'$(UseSqlCe)' == 'true'" />
     </ItemGroup>
 
-    <Import Project="..\PackageTestSiteName\build\PackageTestSiteName.targets" Condition="'$(PackageTestSiteName)' != ''"/>
+    <Import Project="..\PackageTestSiteName\build\PackageTestSiteName.targets" Condition="'$(PackageTestSiteName)' != ''" />
+
     <ItemGroup Condition="'$(PackageTestSiteName)' != ''">
-        <ProjectReference Include="..\PackageTestSiteName\PackageTestSiteName.csproj"/>
+        <ProjectReference Include="..\PackageTestSiteName\PackageTestSiteName.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Remove="umbraco\Data\**" />
-        <Content Remove="umbraco\logs\**" />
-        <Content Remove="umbraco\MediaCache\**" />
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Remove="umbraco\Data\**" />
-        <Compile Remove="umbraco\logs\**" />
-        <Compile Remove="umbraco\MediaCache\**" />
-    </ItemGroup>
-    <ItemGroup>
-        <EmbeddedResource Remove="umbraco\Data\**" />
-        <EmbeddedResource Remove="umbraco\logs\**" />
-        <EmbeddedResource Remove="umbraco\MediaCache\**" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="config\**\*.*">
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
-        <None Include="umbraco\**\*.*">
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
-        <None Include="App_Plugins\**\*.*">
-            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-        </None>
-        <None Remove="umbraco\Data\**" />
-        <None Remove="umbraco\logs\**" />
-        <None Remove="umbraco\MediaCache\**" />
+        <Content Include="App_Plugins/**/*.*" CopyToOutputDirectory="Always" />
+        <Content Include="umbraco/**/*.*" CopyToOutputDirectory="Always" />
+        <Content Remove="umbraco/Data/**" />
+        <Content Remove="umbraco/Logs/**" />
+        <Content Remove="umbraco/mediacache/**"/>
     </ItemGroup>
 
     <!-- Set this to true if ModelsBuilder mode is not InMemoryAuto-->
@@ -53,4 +32,5 @@
         <RazorCompileOnBuild>false</RazorCompileOnBuild>
         <RazorCompileOnPublish>false</RazorCompileOnPublish>
     </PropertyGroup>
+
 </Project>
