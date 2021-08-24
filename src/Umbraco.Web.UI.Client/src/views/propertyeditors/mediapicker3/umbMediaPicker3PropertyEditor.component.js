@@ -1,34 +1,34 @@
 (function () {
     "use strict";
 
+    const component = {
+        templateUrl: "views/propertyeditors/MediaPicker3/umb-media-picker3-property-editor.html",
+        controller: MediaPickerController,
+        controllerAs: "vm",
+        bindings: {
+            model: "="
+        },
+        require: {
+            propertyForm: "^form",
+            umbProperty: "?^umbProperty",
+            umbVariantContent: '?^^umbVariantContent',
+            umbVariantContentEditors: '?^^umbVariantContentEditors',
+            umbElementEditorContent: '?^^umbElementEditorContent'
+        }
+    };
 
     /**
      * @ngdoc directive
-     * @name umbraco.directives.directive:umbMediaPicker3PropertyEditor
+     * @name umbraco.directives.directive:umbMediaPickerPropertyEditor
      * @function
      *
      * @description
      * The component for the Media Picker property editor.
      */
-    angular
-        .module("umbraco")
-        .component("umbMediaPicker3PropertyEditor", {
-            templateUrl: "views/propertyeditors/MediaPicker3/umb-media-picker3-property-editor.html",
-            controller: MediaPicker3Controller,
-            controllerAs: "vm",
-            bindings: {
-                model: "="
-            },
-            require: {
-                propertyForm: "^form",
-                umbProperty: "?^umbProperty",
-                umbVariantContent: '?^^umbVariantContent',
-                umbVariantContentEditors: '?^^umbVariantContentEditors',
-                umbElementEditorContent: '?^^umbElementEditorContent'
-            }
-        });
+    angular.module("umbraco").component("umbMediaPicker3PropertyEditor", component); // legacy
+    angular.module("umbraco").component("umbMediaPickerPropertyEditor", component);
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource) {
+    function MediaPickerController($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource) {
 
         var unsubscribe = [];
 
@@ -58,10 +58,12 @@
         vm.$onInit = function() {
 
             vm.validationLimit = vm.model.config.validationLimit || {};
+
             // If single-mode we only allow 1 item as the maximum:
-            if(vm.model.config.multiple === false) {
+            if (vm.model.config.multiple === false) {
                 vm.validationLimit.max = 1;
             }
+
             vm.model.config.crops = vm.model.config.crops || [];
             vm.singleMode = vm.validationLimit.max === 1;
             vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
@@ -83,16 +85,17 @@
             };
 
             var propertyActions = [];
-            if(vm.supportCopy) {
+            if (vm.supportCopy) {
                 propertyActions.push(copyAllMediasAction);
             }
+
             propertyActions.push(removeAllMediasAction);
 
             if (vm.umbProperty) {
                 vm.umbProperty.setPropertyActions(propertyActions);
             }
 
-            if(vm.model.value === null || !Array.isArray(vm.model.value)) {
+            if (vm.model.value === null || !Array.isArray(vm.model.value)) {
                 vm.model.value = [];
             }
 
@@ -125,7 +128,8 @@
         };
 
         function onServerValueChanged(newVal, oldVal) {
-            if(newVal === null || !Array.isArray(newVal)) {
+
+            if (newVal === null || !Array.isArray(newVal)) {
                 newVal = [];
                 vm.model.value = newVal;
             }
@@ -140,16 +144,17 @@
         }
 
         function addMediaAt(createIndex, $event) {
-            var mediaPicker = {
+
+            const mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
                 dataTypeKey: vm.model.dataTypeKey,
                 multiPicker: vm.singleMode !== true,
-                clickPasteItem: function(item, mouseEvent) {
+                clickPasteItem: (item, mouseEvent) => {
 
                     if (Array.isArray(item.data)) {
                         var indexIncrementor = 0;
-                        item.data.forEach(function (entry) {
+                        item.data.forEach(entry => {
                             if (requestPasteFromClipboard(createIndex + indexIncrementor, entry, item.type)) {
                                 indexIncrementor++;
                             }
@@ -161,11 +166,12 @@
                         mediaPicker.close();
                     }
                 },
-                submit: function (model) {
+                submit: model => {
                     editorService.close();
 
                     var indexIncrementor = 0;
-                    model.selection.forEach((entry) => {
+
+                    model.selection.forEach(entry => {
                         var mediaEntry = {};
                         mediaEntry.key = String.CreateGuid();
                         mediaEntry.mediaKey = entry.key;
@@ -176,7 +182,7 @@
 
                     setDirty();
                 },
-                close: function () {
+                close: () => {
                     editorService.close();
                 }
             }
@@ -190,7 +196,7 @@
             };
 
             mediaPicker.clipboardItems = clipboardService.retriveEntriesOfType(clipboardService.TYPES.MEDIA, vm.allowedTypes || null);
-            mediaPicker.clipboardItems.sort( (a, b) => {
+            mediaPicker.clipboardItems.sort((a, b) => {
                 return b.date - a.date
             });
 
@@ -200,15 +206,15 @@
         // To be used by infinite editor. (defined here cause we need configuration from property editor)
         function changeMediaFor(mediaEntry, onSuccess) {
 
-            var mediaPicker = {
+            const mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
                 dataTypeKey: vm.model.dataTypeKey,
                 multiPicker: false,
-                submit: function (model) {
+                submit: model => {
                     editorService.close();
 
-                    model.selection.forEach((entry) => {// only one.
+                    model.selection.forEach(entry => {// only one.
                         mediaEntry.mediaKey = entry.key;
                     });
 
@@ -221,7 +227,7 @@
                         onSuccess();
                     }
                 },
-                close: function () {
+                close: () => {
                     editorService.close();
                 }
             };
@@ -275,8 +281,9 @@
 
         function editMedia(mediaEntry, options, $event) {
 
-            if($event)
-            $event.stopPropagation();
+            if ($event) {
+                $event.stopPropagation();
+            }
 
             options = options || {};
 
@@ -287,7 +294,7 @@
             // make a clone to avoid editing model directly.
             var mediaEntryClone = Utilities.copy(mediaEntry);
 
-            var mediaEditorModel = {
+            const mediaEditorModel = {
                 $parentScope: $scope, // pass in a $parentScope, this maintains the scope inheritance in infinite editing
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 createFlow: options.createFlow === true,
@@ -300,12 +307,12 @@
                 enableFocalPointSetter: vm.model.config.enableLocalFocalPoint || false,
                 view: "views/common/infiniteeditors/mediaEntryEditor/mediaEntryEditor.html",
                 size: "large",
-                submit: function(model) {
+                submit: model => {
                     vm.model.value[vm.model.value.indexOf(mediaEntry)] = mediaEntryClone;
                     setActiveMedia(null)
                     editorService.close();
                 },
-                close: function(model) {
+                close: model => {
                     if(model.createFlow === true) {
                         // This means that the user cancelled the creation and we should remove the media item.
                         // TODO: remove new media item.
@@ -343,7 +350,7 @@
 
         var requestCopyAllMedias = function () {
             var mediaKeys = vm.model.value.map(x => x.mediaKey)
-            entityResource.getByIds(mediaKeys, "Media").then(function (entities) {
+            entityResource.getByIds(mediaKeys, "Media").then(entities => {
 
                 // gather aliases
                 var aliases = entities.map(mediaEntity => mediaEntity.metaData.ContentTypeAlias);
@@ -353,14 +360,14 @@
 
                 var documentInfo = getDocumentNameAndIcon();
 
-                localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, documentInfo.name]).then(function (localizedLabel) {
+                localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, documentInfo.name]).then(localizedLabel => {
                     clipboardService.copyArray(clipboardService.TYPES.MEDIA, aliases, vm.model.value, localizedLabel, documentInfo.icon || "icon-thumbnail-list", vm.model.id);
                 });
             });
         };
 
         function copyMedia(mediaEntry) {
-            entityResource.getById(mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
+            entityResource.getById(mediaEntry.mediaKey, "Media").then(mediaEntity => {
                 clipboardService.copy(clipboardService.TYPES.MEDIA, mediaEntity.metaData.ContentTypeAlias, mediaEntry, mediaEntity.name, mediaEntity.icon, mediaEntry.key);
             });
         }
@@ -381,14 +388,14 @@
         }
 
         function requestRemoveAllMedia() {
-            localizationService.localizeMany(["mediaPicker_confirmRemoveAllMediaEntryMessage", "general_remove"]).then(function (data) {
+            localizationService.localizeMany(["mediaPicker_confirmRemoveAllMediaEntryMessage", "general_remove"]).then(data => {
                 overlayService.confirmDelete({
                     title: data[1],
                     content: data[0],
-                    close: function () {
+                    close: () => {
                         overlayService.close();
                     },
-                    submit: function () {
+                    submit: () => {
                         deleteAllMedias();
                         overlayService.close();
                     }
@@ -432,7 +439,7 @@
 
         unsubscribe.push($scope.$watch(() => vm.model.value.length, onAmountOfMediaChanged));
 
-        $scope.$on("$destroy", function () {
+        $scope.$on("$destroy", () => {
             for (const subscription of unsubscribe) {
                 subscription();
             }
