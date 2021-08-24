@@ -1,15 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public class ValueEditorCache : IValueEditorCache,
-        INotificationHandler<DataTypeSavedNotification>,
-        INotificationHandler<DataTypeDeletedNotification>
+    public class ValueEditorCache : IValueEditorCache
     {
         private readonly Dictionary<string, Dictionary<int, IDataValueEditor>> _valueEditorCache;
         private readonly object _dictionaryLocker;
@@ -47,13 +42,7 @@ namespace Umbraco.Cms.Core.Cache
             }
         }
 
-        public void Handle(DataTypeSavedNotification notification) =>
-            ClearCache(notification.SavedEntities.Select(x => x.Id));
-
-        public void Handle(DataTypeDeletedNotification notification) =>
-            ClearCache(notification.DeletedEntities.Select(x => x.Id));
-
-        private void ClearCache(IEnumerable<int> dataTypeIds)
+        public void ClearCache(IEnumerable<int> dataTypeIds)
         {
             lock (_dictionaryLocker)
             {

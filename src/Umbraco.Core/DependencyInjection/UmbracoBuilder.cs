@@ -257,8 +257,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Register ValueEditorCache used for validation
             Services.AddSingleton<IValueEditorCache, ValueEditorCache>();
             Services
-                .AddNotificationHandler<DataTypeSavedNotification, ValueEditorCache>()
-                .AddNotificationHandler<DataTypeDeletedNotification, ValueEditorCache>();
+                .AddNotificationHandler<DataTypeSavedNotification, ValueEditorCacheRefresher>()
+                .AddNotificationHandler<DataTypeDeletedNotification, ValueEditorCacheRefresher>();
         }
     }
 }
