@@ -290,7 +290,6 @@
     <key alias="unpublishedLanguages">Yayınlanmamış Diller</key>
     <key alias="unmodifiedLanguages">Değiştirilmemiş Diller</key>
     <key alias="untouchedLanguagesForFirstTime">Bu diller oluşturulmadı</key>
-
     <key alias="variantsWillBeSaved">Tüm yeni varyantlar kaydedilecektir.</key>
     <key alias="variantsToPublish">Hangi çeşitleri yayınlamak istersiniz?</key>
     <key alias="variantsToSave">Hangi değişkenlerin kaydedileceğini seçin.</key>
@@ -298,7 +297,6 @@
     <key alias="variantsToSchedule">Planlanmış yayınlamayı ayarlayın...</key>
     <key alias="variantsToUnpublish">Yayından kaldırılacak varyantları seçin. Zorunlu bir dilin yayından kaldırılması tüm değişkenleri yayından kaldıracaktır.</key>
     <key alias="publishRequiresVariants">Yayınlamanın gerçekleşmesi için aşağıdaki varyantlar gereklidir:</key>
-
     <key alias="notReadyToPublish">Yayınlamaya hazır değiliz</key>
     <key alias="readyToPublish">Yayınlamaya hazır mısınız?</key>
     <key alias="readyToSave">Kaydetmeye Hazır mısınız?</key>
@@ -592,7 +590,7 @@
     <key alias="rteShowLabel">Etiketi göster</key>
     <key alias="rteWidthAndHeight">Genişlik ve yükseklik</key>
     <key alias="allPropTypes">Tüm mülk türleri &amp; emlak verileri</key>
-    Bu veri türünü kullanan <key alias="willBeDeleted">kalıcı olarak silinecek, lütfen bunları da silmek istediğinizi onaylayın</key>
+    <key alias="willBeDeleted">bu veri türünü kullanan kalıcı olarak silinecek, lütfen bunları da silmek istediğinizi onaylayın</key>
     <key alias="yesDelete">Evet, sil</key>
     <key alias="andAllRelated">ve tüm mülk türleri &amp; bu veri türünü kullanan mülk verileri</key>
     <key alias="selectFolder">Taşınacak klasörü seçin</key>
@@ -640,7 +638,6 @@
     <key alias="back">Geri</key>
     <key alias="backToOverview">Genel bakışa dön</key>
     <key alias="border">Kenarlık</key>
-    <key alias="border">yazan</key>
     <key alias="cancel">İptal</key>
     <key alias="cellMargin">Hücre kenar boşluğu</key>
     <key alias="choose">Seçin</key>
@@ -781,7 +778,6 @@
     <key alias="other">Diğer</key>
     <key alias="articles">Makaleler</key>
     <key alias="videos">Videolar</key>
-    <key alias="clear">Temizle</key>
     <key alias="installing">Kuruluyor</key>
   </area>
   <area alias="colors">
@@ -1224,7 +1220,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="includeAllChildNodes">Tüm alt düğümleri dahil et</key>
     <key alias="accept">Kabul ediyorum</key>
     <key alias="termsOfUse">kullanım şartları</key>
-
     <key alias="pathToFile">Dosyaya giden yol</key>
     <key alias="pathToFileDescription">Dosyaya giden mutlak yol (yani: /bin/umbraco.bin)</key>
     <key alias="installed">Yüklendi</key>
@@ -1304,7 +1299,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="paLoginPage">Giriş Sayfası</key>
     <key alias="paLoginPageHelp">Giriş formunu içeren sayfayı seçin</key>
     <key alias="paRemoveProtection">Korumayı kaldır ...</key>
-    <key alias="paRemoveProtectionConfirm"><![CDATA[Korumayı <strong>%0%</strong> sayfasından kaldırmak istediğinizden emin misiniz?]]> </key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Korumayı <strong>%0%</strong> sayfasından kaldırmak istediğinizden emin misiniz?]]></key>
     <key alias="paSelectPages">Giriş formu ve hata mesajları içeren sayfaları seçin</key>
     <key alias="paSelectGroups"><![CDATA[<strong>%0%</strong> sayfasına erişimi olan grupları seçin]]></key>
     <key alias="paSelectMembers"><![CDATA[<strong>%0%</strong> sayfasına erişimi olan üyeleri seçin]]></key>
@@ -1424,19 +1419,19 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="importDocumentTypeHelp">
       Bir belge türünü içe aktarmak için, "Gözat" düğmesini tıklayarak bilgisayarınızda ".udt" dosyasını bulun ve "İçe Aktar" ı tıklayın (sonraki ekranda onay vermeniz istenir) </key>
     <key alias="newtabname">Yeni Sekme Başlığı</key>
-      <key alias="nodetype">Düğüm türü</key>
-      <key alias="objecttype">Tür</key>
-      <key alias="stylesheet">Stil Sayfası</key>
-      <key alias="script">Komut Dosyası</key>
-      <key alias="tab">Sekme</key>
-      <key alias="tabname">Sekme Başlığı</key>
-      <key alias="tabs">Sekmeler</key>
-      <key alias="contentTypeEnabled">Ana İçerik Türü etkinleştirildi</key>
-      <key alias="contentTypeUses">Bu İçerik Türü kullanır</key>
-      <key alias="noPropertiesDefinedOnTab">Bu sekmede tanımlanmış özellik yok. Yeni bir mülk oluşturmak için üstteki "yeni mülk ekle" bağlantısını tıklayın.</key>
-      <key alias="createMatchingTemplate">Eşleşen şablon oluştur</key>
-      <key alias="addIcon">Simge ekle</key>
-    </area>
+    <key alias="nodetype">Düğüm türü</key>
+    <key alias="objecttype">Tür</key>
+    <key alias="stylesheet">Stil Sayfası</key>
+    <key alias="script">Komut Dosyası</key>
+    <key alias="tab">Sekme</key>
+    <key alias="tabname">Sekme Başlığı</key>
+    <key alias="tabs">Sekmeler</key>
+    <key alias="contentTypeEnabled">Ana İçerik Türü etkinleştirildi</key>
+    <key alias="contentTypeUses">Bu İçerik Türü kullanır</key>
+    <key alias="noPropertiesDefinedOnTab">Bu sekmede tanımlanmış özellik yok. Yeni bir mülk oluşturmak için üstteki "yeni mülk ekle" bağlantısını tıklayın.</key>
+    <key alias="createMatchingTemplate">Eşleşen şablon oluştur</key>
+    <key alias="addIcon">Simge ekle</key>
+  </area>
   <area alias="sort">
     <key alias="sortOrder">Sıralama düzeni</key>
     <key alias="sortCreationDate">Oluşturma tarihi</key>
@@ -1747,7 +1742,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="fallbackLanguage">Geri dönüş dili</key>
     <key alias="none">yok</key>
   </area>
-
   <area alias="macro">
     <key alias="addParameter">Parametre ekle</key>
     <key alias="editParameter">Parametreyi düzenle</key>
@@ -2096,7 +2090,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="minCount">En az eklemeniz gerekiyor</key>
     <key alias="maxCount">Yalnızca sahip olabilirsiniz</key>
     <key alias="addUpTo">En fazla ekle</key>
-
     <key alias="items">öğeler</key>
     <key alias="urls">url(ler)</key>
     <key alias="urlsSelected">url(ler) seçildi</key>
@@ -2139,7 +2132,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">IIS Özel Hatalarını Atlamayı deneyin başarıyla '%0%' olarak ayarlandı.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
     <key alias="configurationServiceFileNotFound">​​Dosya mevcut değil: '%0%'.</key>
-    <key alias="configurationServiceNodeNotFound">​​<![CDATA[<strong> '%1%' </strong> yapılandırma dosyasında <strong> '%0%' </strong> bulunamadı.]]> </key>
+    <key alias="configurationServiceNodeNotFound">​​<![CDATA[<strong> '%1%' </strong> yapılandırma dosyasında <strong> '%0%' </strong> bulunamadı.]]></key>
     <key alias="configurationServiceError">Bir hata oluştu, tam hata için günlüğü kontrol edin: %0%.</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Veritabanı - Veritabanı şeması, Umbraco'nun bu sürümü için doğru</key>
     <key alias="databaseSchemaValidationCheckDatabaseErrors">Veritabanı şemanızda %0% sorun algılandı (Ayrıntılar için günlüğe bakın)</key>
@@ -2153,7 +2146,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'Umbraco.Core.Https' web.config dosyanızda 'false' olarak ayarlandı. Bu siteye HTTPS şemasını kullanarak eriştiğinizde, bu 'doğru' olarak ayarlanmalıdır.</key>
     <key alias="httpsCheckConfigurationCheckResult">appSetting 'Umbraco.Core.Https' web.config dosyanızda '%0%' olarak ayarlandı, çerezleriniz%1% güvenli olarak işaretlendi.</key>
     <key alias="httpsCheckEnableHttpsError">Web.config dosyanızdaki 'Umbraco.Core.Https' ayarı güncellenemedi. Hata: %0%</key>
-
     <!-- The following keys don't get tokens passed in -->
     <key alias="httpsCheckEnableHttpsButton">HTTPS'yi etkinleştir</key>
     <key alias="httpsCheckEnableHttpsDescription">web.config dosyasının appSettings öğesinde umbracoSSL ayarını true olarak ayarlar.</key>
@@ -2181,43 +2173,42 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="requiredFilePermissionFailed"><![CDATA[Aşağıdaki dosyalar yazma izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0%</strong>]]></key>
     <key alias="optionalFilePermissionFailed"><![CDATA[Aşağıdaki dosyalar, belirli Umbraco işlemlerinin çalışması için yazma izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0% </strong>. Yazılmıyorsa herhangi bir işlem yapılmasına gerek yoktur.]]></key>
     <key alias="clickJackingCheckHeaderFound">
-      ​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong>.]]> </key>
-      <key alias="clickJackingCheckHeaderNotFound">
-        ​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong> bulunamadı.]]> </key>
+      ​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong>.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound">
+        ​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong> bulunamadı.]]></key>
     <key alias="setHeaderInConfig">Yapılandırmada Üstbilgiyi Ayarla</key>
-        <key alias="clickJackingSetHeaderInConfigDescription">Sitenin diğer web siteleri tarafından IFRAMEd olmasını önlemek için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
-        <key alias="clickJackingSetHeaderInConfigSuccess">Web.config dosyanıza, sitenin diğer web siteleri tarafından IFRAMEing yapılmasını engelleyen bir başlık oluşturma ayarı eklendi.</key>
-        <key alias="setHeaderInConfigError">web.config dosyası güncellenemedi. Hata: %0%</key>
-        <key alias="noSniffCheckHeaderFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulundu.]]></key>
-        <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]> </key>
-
-        <key alias="noSniffSetHeaderInConfigDescription">MIME koklama güvenlik açıklarına karşı koruma sağlamak için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
-        <key alias="noSniffSetHeaderInConfigSuccess">Web.config dosyanıza MIME koklama güvenlik açıklarına karşı koruma sağlayan bir üstbilgi oluşturma ayarı eklendi.</key>
-        <key alias="hSTSCheckHeaderFound">​​<![CDATA[HSTS başlığı olarak da bilinen <strong> Strict-Transport-Security </strong> başlığı bulundu.]]></key>
-        <key alias="hSTSCheckHeaderNotFound">​​<![CDATA[<strong> Strict-Transport-Security </strong> başlığı bulunamadı.]]></key>
-        <key alias="hSTSSetHeaderInConfigDescription">Web.config'in httpProtocol / customHeaders bölümüne 'max-age=10886400' değerine sahip 'Strict-Transport-Security' başlığını ekler. Bu düzeltmeyi yalnızca alanlarınız önümüzdeki 18 hafta boyunca (minimum) https ile çalışacaksa kullanın.</key>
-        <key alias="hSTSSetHeaderInConfigSuccess">HSTS başlığı web.config dosyanıza eklendi.</key>
-        <key alias="xssProtectionCheckHeaderFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulundu.]]></key>
-        <key alias="xssProtectionCheckHeaderNotFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulunamadı.]]></key>
-        <key alias="xssProtectionSetHeaderInConfigDescription">'X-XSS-Protection' başlığını '1; mode=block 'web.config'in httpProtocol / customHeaders bölümüne.</key>
-        <key alias="xssProtectionSetHeaderInConfigSuccess">X-XSS-Protection başlığı web.config dosyanıza eklendi.</key>
-        <!-- The following key get these tokens passed in:
+    <key alias="clickJackingSetHeaderInConfigDescription">Sitenin diğer web siteleri tarafından IFRAMEd olmasını önlemek için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
+    <key alias="clickJackingSetHeaderInConfigSuccess">Web.config dosyanıza, sitenin diğer web siteleri tarafından IFRAMEing yapılmasını engelleyen bir başlık oluşturma ayarı eklendi.</key>
+    <key alias="setHeaderInConfigError">web.config dosyası güncellenemedi. Hata: %0%</key>
+    <key alias="noSniffCheckHeaderFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulundu.]]></key>
+    <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]></key>
+    <key alias="noSniffSetHeaderInConfigDescription">MIME koklama güvenlik açıklarına karşı koruma sağlamak için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
+    <key alias="noSniffSetHeaderInConfigSuccess">Web.config dosyanıza MIME koklama güvenlik açıklarına karşı koruma sağlayan bir üstbilgi oluşturma ayarı eklendi.</key>
+    <key alias="hSTSCheckHeaderFound">​​<![CDATA[HSTS başlığı olarak da bilinen <strong> Strict-Transport-Security </strong> başlığı bulundu.]]></key>
+    <key alias="hSTSCheckHeaderNotFound">​​<![CDATA[<strong> Strict-Transport-Security </strong> başlığı bulunamadı.]]></key>
+    <key alias="hSTSSetHeaderInConfigDescription">Web.config'in httpProtocol / customHeaders bölümüne 'max-age=10886400' değerine sahip 'Strict-Transport-Security' başlığını ekler. Bu düzeltmeyi yalnızca alanlarınız önümüzdeki 18 hafta boyunca (minimum) https ile çalışacaksa kullanın.</key>
+    <key alias="hSTSSetHeaderInConfigSuccess">HSTS başlığı web.config dosyanıza eklendi.</key>
+    <key alias="xssProtectionCheckHeaderFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulundu.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulunamadı.]]></key>
+    <key alias="xssProtectionSetHeaderInConfigDescription">'X-XSS-Protection' başlığını '1; mode=block 'web.config'in httpProtocol / customHeaders bölümüne.</key>
+    <key alias="xssProtectionSetHeaderInConfigSuccess">X-XSS-Protection başlığı web.config dosyanıza eklendi.</key>
+    <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
-        <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</strong>.]]></key>
-        <key alias="excessiveHeadersNotFound">​​Web sitesi teknolojisi hakkında bilgi veren hiçbir başlık bulunamadı.</key>
-        <key alias="smtpMailSettingsNotFound">​​Web.config dosyasında system.net/mailsettings bulunamadı.</key>
-        <key alias="smtpMailSettingsHostNotConfigured">Web.config dosyası system.net/mailsettings bölümünde, ana bilgisayar yapılandırılmamış.</key>
-        <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
-        <key alias="smtpMailSettingsConnectionFail">'%0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
-        <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> olarak ayarlandı]]></key>
-        <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
-        <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
-        <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
-        <key alias="checkAllGroups">Tüm Grupları Kontrol Edin</key>
-        <key alias="checkGroup">Grubu kontrol et</key>
-        <key alias="helpText">
-          <![CDATA[
+    <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersNotFound">​​Web sitesi teknolojisi hakkında bilgi veren hiçbir başlık bulunamadı.</key>
+    <key alias="smtpMailSettingsNotFound">​​Web.config dosyasında system.net/mailsettings bulunamadı.</key>
+    <key alias="smtpMailSettingsHostNotConfigured">Web.config dosyası system.net/mailsettings bölümünde, ana bilgisayar yapılandırılmamış.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
+    <key alias="smtpMailSettingsConnectionFail">'%0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> olarak ayarlandı]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
+    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
+    <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
+    <key alias="checkAllGroups">Tüm Grupları Kontrol Edin</key>
+    <key alias="checkGroup">Grubu kontrol et</key>
+    <key alias="helpText">
+      <![CDATA[
         <p> Durum denetleyicisi, sitenizin çeşitli alanlarını en iyi uygulama ayarları, yapılandırma, olası sorunlar vb. için değerlendirir. Sorunları bir düğmeye basarak kolayca düzeltebilirsiniz.
         Kendi sağlık kontrollerinizi ekleyebilir, <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">özel durum kontrolleri hakkında daha fazla bilgi için belgeler </a>. </p>
         ]]>

@@ -300,8 +300,6 @@
     <key alias="unmodifiedLanguages">Uændrede sprog</key>
     <key alias="untouchedLanguagesForFirstTime">Disse sprog er ikke blevet oprettet</key>
     <key alias="variantsWillBeSaved">Alle nye varianter vil blive gemt.</key>
-    <key alias="variantsToPublish">Hvilke varianter skal udgives?</key>
-    <key alias="variantsToSave">Vælg, hvilke varianter skal gemmes.</key>
     <key alias="variantsToSendForApproval">Vælg varianter som skal sendes til gennemgang.</key>
     <key alias="variantsToSchedule">Sæt udgivnings tidspunkt...</key>
     <key alias="variantsToUnpublish">Vælg varianterne som skal afpubliceres. Afpublicering af et krævet sprog vil afpublicere alle varianter.</key>
@@ -746,7 +744,6 @@
     <key alias="off">Fra</key>
     <key alias="ok">OK</key>
     <key alias="open">Åben</key>
-    <key alias="options">Valgmuligheder</key>
     <key alias="on">Til</key>
     <key alias="or">eller</key>
     <key alias="orderBy">Sortér efter</key>
@@ -1699,7 +1696,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="passwordIsBlank">Dit nye kodeord kan ikke være blankt!</key>
     <key alias="passwordCurrent">Nuværende kodeord</key>
     <key alias="passwordInvalid">ugyldig nuværende kodeord</key>
-    <key alias="passwordIsBlank">Dit nye kodeord må ikke være tomt!</key>
     <key alias="passwordIsDifferent">Dit nye kodeord og dit bekræftede kodeord var ikke ens, forsøg venligst igen!</key>
     <key alias="passwordMismatch">Det bekræftede kodeord matcher ikke det nye kodeord</key>
     <key alias="permissionReplaceChildren">Erstat underelement-rettigheder</key>
@@ -1711,7 +1707,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionsGranularHelp">Sæt rettigheder for specifikke noder</key>
     <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
-    <key alias="startnode">Startnode</key>
     <key alias="sectionsHelp">Tilføj sektioner for at give brugerne adgang</key>
     <key alias="selectUserGroups">Vælg brugergrupper</key>
     <key alias="noStartNode">Ingen startnode valgt</key>

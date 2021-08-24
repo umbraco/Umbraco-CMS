@@ -156,7 +156,7 @@
     <key alias="deleteTag">Delete tag</key>
     <key alias="confirmActionCancel">Cancel</key>
     <key alias="confirmActionConfirm">Confirm</key>
-	<key alias="morePublishingOptions">More publishing options</key>
+    <key alias="morePublishingOptions">More publishing options</key>
     <key alias="submitChanges">Submit</key>
     <key alias="submitChangesAndClose">Submit and close</key>
   </area>
@@ -260,7 +260,7 @@
     <key alias="updateDate">Last edited</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Remove file(s)</key>
-	<key alias="uploadClearImageContext">Click here to remove the image from the media item</key>
+    <key alias="uploadClearImageContext">Click here to remove the image from the media item</key>
     <key alias="uploadClearFileContext">Click here to remove the file from the media item</key>
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
@@ -295,7 +295,6 @@
     <key alias="unpublishedLanguages">Unpublished Languages</key>
     <key alias="unmodifiedLanguages">Unmodified Languages</key>
     <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
-
     <key alias="variantsWillBeSaved">All new variants will be saved.</key>
     <key alias="variantsToPublish">Which variants would you like to publish?</key>
     <key alias="variantsToSave">Choose which variants to be saved.</key>
@@ -303,7 +302,6 @@
     <key alias="variantsToSchedule">Set scheduled publishing...</key>
     <key alias="variantsToUnpublish">Select the variants to unpublish. Unpublishing a mandatory language will unpublish all variants.</key>
     <key alias="publishRequiresVariants">The following variants is required for publishing to take place:</key>
-
     <key alias="notReadyToPublish">We are not ready to Publish</key>
     <key alias="readyToPublish">Ready to publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
@@ -325,7 +323,7 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
-        <key alias="dragFilesHereToUpload">You can drag files here to upload.</key>
+    <key alias="dragFilesHereToUpload">You can drag files here to upload.</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
@@ -340,7 +338,6 @@
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
-    <key alias="createNewMember">Create a new member</key>
     <key alias="duplicateMemberLogin">A member with this login already exists</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
     <key alias="memberHasGroup">The member is already in group '%0%'</key>
@@ -349,16 +346,16 @@
     <key alias="memberNotInGroup">The member is not in group '%0%'</key>
   </area>
   <area alias="contentType">
-     <key alias="copyFailed">Failed to copy content type</key>
-     <key alias="moveFailed">Failed to move content type</key>
+    <key alias="copyFailed">Failed to copy content type</key>
+    <key alias="moveFailed">Failed to move content type</key>
   </area>
   <area alias="mediaType">
-     <key alias="copyFailed">Failed to copy media type</key>
-     <key alias="moveFailed">Failed to move media type</key>
-     <key alias="autoPickMediaType">Auto pick</key>
+    <key alias="copyFailed">Failed to copy media type</key>
+    <key alias="moveFailed">Failed to move media type</key>
+    <key alias="autoPickMediaType">Auto pick</key>
   </area>
   <area alias="memberType">
-     <key alias="copyFailed">Failed to copy member type</key>
+    <key alias="copyFailed">Failed to copy member type</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
@@ -470,7 +467,7 @@
     <key alias="linkinternal">Internal link:</key>
     <key alias="linklocaltip">When using local links, insert "#" in front of link</key>
     <key alias="linknewwindow">Open in new window?</key>
-	<key alias="macroContainerSettings">Macro Settings</key>
+    <key alias="macroContainerSettings">Macro Settings</key>
     <key alias="macroDoesNotHaveProperties">This macro does not contain any properties you can edit</key>
     <key alias="paste">Paste</key>
     <key alias="permissionsEdit">Edit permissions for</key>
@@ -1656,10 +1653,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="setAsDefault">Set as default</key>
     <key alias="chooseExtra">Choose extra</key>
     <key alias="chooseDefault">Choose default</key>
-      <key alias="areAdded">are added</key>
-        <key alias="warning">Warning</key>
-        <key alias="youAreDeleting">You are deleting the row configuration</key>
-        <key alias="deletingARow">
+    <key alias="areAdded">are added</key>
+    <key alias="warning">Warning</key>
+    <key alias="youAreDeleting">You are deleting the row configuration</key>
+    <key alias="deletingARow">
             Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.
         </key>
   </area>
@@ -2368,47 +2365,47 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="labelUsedByMedia">Used in Media</key>
   </area>
   <area alias="logViewer">
-      <key alias="deleteSavedSearch">Delete Saved Search</key>
-      <key alias="logLevels">Log Levels</key>
-      <key alias="savedSearches">Saved Searches</key>
-      <key alias="saveSearch">Save Search</key>
-      <key alias="saveSearchDescription">Enter a friendly name for your search query</key>
-      <key alias="filterSearch">Filter Search</key>
-      <key alias="totalItems">Total Items</key>
-      <key alias="timestamp">Timestamp</key>
-      <key alias="level">Level</key>
-      <key alias="machine">Machine</key>
-      <key alias="message">Message</key>
-      <key alias="exception">Exception</key>
-      <key alias="properties">Properties</key>
-      <key alias="searchWithGoogle">Search With Google</key>
-      <key alias="searchThisMessageWithGoogle">Search this message with Google</key>
-      <key alias="searchWithBing">Search With Bing</key>
-      <key alias="searchThisMessageWithBing">Search this message with Bing</key>
-      <key alias="searchOurUmbraco">Search Our Umbraco</key>
-      <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Search this message on Our Umbraco forums and docs</key>
-      <key alias="searchOurUmbracoWithGoogle">Search Our Umbraco with Google</key>
-      <key alias="searchOurUmbracoForumsUsingGoogle">Search Our Umbraco forums using Google</key>
-      <key alias="searchUmbracoSource">Search Umbraco Source</key>
-      <key alias="searchWithinUmbracoSourceCodeOnGithub">Search within Umbraco source code on Github</key>
-      <key alias="searchUmbracoIssues">Search Umbraco Issues</key>
-      <key alias="searchUmbracoIssuesOnGithub">Search Umbraco Issues on Github</key>
-      <key alias="deleteThisSearch">Delete this search</key>
-      <key alias="findLogsWithRequestId">Find Logs with Request ID</key>
-      <key alias="findLogsWithNamespace">Find Logs with Namespace</key>
-      <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
-      <key alias="open">Open</key>
-      <key alias="polling">Polling</key>
-      <key alias="every2">Every 2 seconds</key>
-      <key alias="every5">Every 5 seconds</key>
-      <key alias="every10">Every 10 seconds</key>
-      <key alias="every20">Every 20 seconds</key>
-      <key alias="every30">Every 30 seconds</key>
-      <key alias="pollingEvery2">Polling every 2s</key>
-      <key alias="pollingEvery5">Polling every 5s</key>
-      <key alias="pollingEvery10">Polling every 10s</key>
-      <key alias="pollingEvery20">Polling every 20s</key>
-      <key alias="pollingEvery30">Polling every 30s</key>
+    <key alias="deleteSavedSearch">Delete Saved Search</key>
+    <key alias="logLevels">Log Levels</key>
+    <key alias="savedSearches">Saved Searches</key>
+    <key alias="saveSearch">Save Search</key>
+    <key alias="saveSearchDescription">Enter a friendly name for your search query</key>
+    <key alias="filterSearch">Filter Search</key>
+    <key alias="totalItems">Total Items</key>
+    <key alias="timestamp">Timestamp</key>
+    <key alias="level">Level</key>
+    <key alias="machine">Machine</key>
+    <key alias="message">Message</key>
+    <key alias="exception">Exception</key>
+    <key alias="properties">Properties</key>
+    <key alias="searchWithGoogle">Search With Google</key>
+    <key alias="searchThisMessageWithGoogle">Search this message with Google</key>
+    <key alias="searchWithBing">Search With Bing</key>
+    <key alias="searchThisMessageWithBing">Search this message with Bing</key>
+    <key alias="searchOurUmbraco">Search Our Umbraco</key>
+    <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Search this message on Our Umbraco forums and docs</key>
+    <key alias="searchOurUmbracoWithGoogle">Search Our Umbraco with Google</key>
+    <key alias="searchOurUmbracoForumsUsingGoogle">Search Our Umbraco forums using Google</key>
+    <key alias="searchUmbracoSource">Search Umbraco Source</key>
+    <key alias="searchWithinUmbracoSourceCodeOnGithub">Search within Umbraco source code on Github</key>
+    <key alias="searchUmbracoIssues">Search Umbraco Issues</key>
+    <key alias="searchUmbracoIssuesOnGithub">Search Umbraco Issues on Github</key>
+    <key alias="deleteThisSearch">Delete this search</key>
+    <key alias="findLogsWithRequestId">Find Logs with Request ID</key>
+    <key alias="findLogsWithNamespace">Find Logs with Namespace</key>
+    <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
+    <key alias="open">Open</key>
+    <key alias="polling">Polling</key>
+    <key alias="every2">Every 2 seconds</key>
+    <key alias="every5">Every 5 seconds</key>
+    <key alias="every10">Every 10 seconds</key>
+    <key alias="every20">Every 20 seconds</key>
+    <key alias="every30">Every 30 seconds</key>
+    <key alias="pollingEvery2">Polling every 2s</key>
+    <key alias="pollingEvery5">Polling every 5s</key>
+    <key alias="pollingEvery10">Polling every 10s</key>
+    <key alias="pollingEvery20">Polling every 20s</key>
+    <key alias="pollingEvery30">Polling every 30s</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
