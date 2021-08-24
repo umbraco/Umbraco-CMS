@@ -21,8 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="App_Plugins/**/*.*" CopyToOutputDirectory="Always" />
-        <Content Include="umbraco/**/*.*" CopyToOutputDirectory="Always" />
+        <Content Include="App_Plugins/**" CopyToOutputDirectory="Always" />
+        <Content Include="umbraco/**" CopyToOutputDirectory="Always" />
         <Content Remove="umbraco/Data/**" />
         <Content Remove="umbraco/Logs/**" />
         <Content Remove="umbraco/mediacache/**"/>
