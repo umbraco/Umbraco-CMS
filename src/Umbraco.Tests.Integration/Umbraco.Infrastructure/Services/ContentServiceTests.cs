@@ -9,6 +9,7 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -72,13 +73,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
 
+        private IValueEditorCache ValueEditorCache => GetRequiredService<IValueEditorCache>();
+
         [SetUp]
         public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
         protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
             .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, ContentNotificationHandler>()
-            .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>();
+            .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<DataTypeSavedNotification, ValueEditorCacheRefresher>()
+            .AddNotificationHandler<DataTypeDeletedNotification, ValueEditorCacheRefresher>();
 
         [TearDown]
         public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
@@ -1162,7 +1167,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsFalse(content.HasIdentity);
 
             // content cannot publish values because they are invalid
-            var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, TextService);
+            var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, TextService, ValueEditorCache);
             bool isValid = propertyValidationService.IsPropertyDataValid(content, out IProperty[] invalidProperties, CultureImpact.Invariant);
             Assert.IsFalse(isValid);
             Assert.IsNotEmpty(invalidProperties);
