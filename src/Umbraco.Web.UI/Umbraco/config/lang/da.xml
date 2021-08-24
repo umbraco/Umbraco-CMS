@@ -316,7 +316,7 @@
     <key alias="nodeIsInTrash">Dette element er i papirkurven</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Opret en ny indholdsskabelon fra '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Opret en ny indholdsskabelon fra <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Blank</key>
     <key alias="selectBlueprint">Vælg en indholdsskabelon</key>
     <key alias="createdBlueprintHeading">Indholdsskabelon oprettet</key>

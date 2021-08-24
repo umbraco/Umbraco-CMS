@@ -309,7 +309,7 @@
     <key alias="nodeIsInTrash">Bu öğe Geri Dönüşüm Kutusu'nda</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">'%0%' den yeni bir İçerik Şablonu oluşturun</key>
+    <key alias="createBlueprintFrom"><![CDATA[<em>%0%</em> den yeni bir İçerik Şablonu oluşturun]]></key>
     <key alias="blankBlueprint">Boş</key>
     <key alias="selectBlueprint">Bir İçerik Şablonu Seçin</key>
     <key alias="createdBlueprintHeading">İçerik Şablonu oluşturuldu</key>

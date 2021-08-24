@@ -289,7 +289,7 @@
     <key alias="createFromClipboard">Copier du clipboard</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Créer un nouveau Modèle de Contenu à partir de '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Créer un nouveau Modèle de Contenu à partir de <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Vide</key>
     <key alias="selectBlueprint">Sélectionner un Modèle de Contenu</key>
     <key alias="createdBlueprintHeading">Modèle de Contenu créé</key>
