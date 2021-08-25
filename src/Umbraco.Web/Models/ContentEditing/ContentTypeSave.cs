@@ -116,7 +116,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
                 yield return new ValidationResult("Duplicate property aliases not allowed: " + duplicatePropertyAlias.Key, new[]
                 {
-                    $"Groups[{lastPropertyIndex}].Properties[{propertyGroupIndex}].Alias"
+                    $"Groups[{propertyGroupIndex}].Properties[{lastPropertyIndex}].Alias"
                 });
             }
 
