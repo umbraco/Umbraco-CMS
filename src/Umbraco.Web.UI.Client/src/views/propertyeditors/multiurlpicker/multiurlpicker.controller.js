@@ -58,6 +58,8 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
             $scope.sortableOptions.disabled = $scope.renderModel.length === 1;
+            //Update value
+            $scope.model.value = $scope.renderModel;
         }
     );
 
@@ -122,7 +124,6 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
 
                     setDirty();
                 }
-                $scope.model.value = $scope.renderModel;
                 editorService.close();
             },
             close: function () {
