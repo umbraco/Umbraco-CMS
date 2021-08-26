@@ -92,6 +92,7 @@
     $src = "$($this.SolutionRoot)\src"
     $log = "$($this.BuildTemp)\belle.log"
 
+
     Write-Host "Compile Belle"
     Write-Host "Logging to $log"
 
@@ -555,7 +556,6 @@
   # run
   if (-not $get)
   {
-cd
     if ($command.Length -eq 0)
     {
       $command = @( "Build" )
