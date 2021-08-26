@@ -122,6 +122,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
 
                     setDirty();
                 }
+                $scope.$emit("formSubmitting");
                 editorService.close();
             },
             close: function () {
