@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         protected UmbracoExamineIndex(
             ILoggerFactory loggerFactory,
             string name,
-            IOptionsSnapshot<LuceneDirectoryIndexOptions> indexOptions,
+            IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState)
             : base(loggerFactory, name, indexOptions)

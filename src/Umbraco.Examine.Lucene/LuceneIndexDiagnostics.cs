@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             LuceneIndex index,
             ILogger<LuceneIndexDiagnostics> logger,
             IHostingEnvironment hostingEnvironment,
-            IOptionsSnapshot<LuceneDirectoryIndexOptions> indexOptions)
+            IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions)
         {
             _hostingEnvironment = hostingEnvironment;
             _indexOptions = indexOptions.Get(index.Name);
