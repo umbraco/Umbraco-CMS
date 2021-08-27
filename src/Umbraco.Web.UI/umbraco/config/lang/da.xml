@@ -2050,7 +2050,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="MediaFolderCreation">Medie mappeoprettelse</key>
   </area>
   <area alias="treeSearch">
-    <key alias="searchResult">result</key>
+    <key alias="searchResult">resultat</key>
     <key alias="searchResults">resultater</key>
   </area>
 </language>
