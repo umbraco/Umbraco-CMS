@@ -10,6 +10,16 @@ angular.module("umbraco")
             vm.mediaEntry = vm.model.mediaEntry;
             vm.currentCrop = null;
 
+            vm.focalPointChanged = focalPointChanged;
+            vm.onImageLoaded = onImageLoaded;
+            vm.openMedia = openMedia;
+            vm.repickMedia = repickMedia;
+            vm.selectCrop = selectCrop;
+            vm.deselectCrop = deselectCrop;
+            vm.resetCrop = resetCrop;
+            vm.submitAndClose = submitAndClose;
+            vm.close = close;
+
             localizationService.localizeMany([
                 vm.model.createFlow ? "general_cancel" : "general_close",
                 vm.model.createFlow ? "general_create" : "buttons_submitChanges"
@@ -59,14 +69,11 @@ angular.module("umbraco")
                 });
             }
 
-            vm.onImageLoaded = onImageLoaded;
             function onImageLoaded(isCroppable, hasDimensions) {
                 vm.isCroppable = isCroppable;
                 vm.hasDimensions = hasDimensions;
-            };
+            }
 
-
-            vm.repickMedia = repickMedia;
             function repickMedia() {
                 vm.model.propertyEditor.changeMediaFor(vm.model.mediaEntry, onMediaReplaced);
             }
@@ -83,7 +90,6 @@ angular.module("umbraco")
                 updateMedia();
             }
 
-            vm.openMedia = openMedia;
             function openMedia() {
 
                 var mediaEditor = {
@@ -95,11 +101,11 @@ angular.module("umbraco")
                         editorService.close();
                     }
                 };
+
                 editorService.mediaEditor(mediaEditor);
             }
 
-
-            vm.focalPointChanged = function(left, top) {
+            function focalPointChanged(left, top) {
                 //update the model focalpoint value
                 vm.mediaEntry.focalPoint = {
                     left: left,
@@ -110,21 +116,16 @@ angular.module("umbraco")
                 setDirty();
             }
 
-
-
-            vm.selectCrop = selectCrop;
             function selectCrop(targetCrop) {
                 vm.currentCrop = targetCrop;
                 setDirty();
                 // TODO: start watchin values of crop, first when changed set to dirty.
-            };
+            }
 
-            vm.deselectCrop = deselectCrop;
             function deselectCrop() {
                 vm.currentCrop = null;
-            };
+            }
 
-            vm.resetCrop = resetCrop;
             function resetCrop() {
                 if (vm.currentCrop) {
                     $scope.$evalAsync( () => {
@@ -138,14 +139,13 @@ angular.module("umbraco")
                 vm.imageCropperForm.$setDirty();
             }
 
-
-            vm.submitAndClose = function () {
+            function submitAndClose() {
                 if (vm.model && vm.model.submit) {
                     vm.model.submit(vm.model);
                 }
             }
 
-            vm.close = function () {
+            function close() {
                 if (vm.model && vm.model.close) {
                     if (vm.model.createFlow === true || vm.imageCropperForm.$dirty === true) {
                         var labels = vm.model.createFlow === true ? ["mediaPicker_confirmCancelMediaEntryCreationHeadline", "mediaPicker_confirmCancelMediaEntryCreationMessage"] : ["prompt_discardChanges", "mediaPicker_confirmCancelMediaEntryHasChanges"];
@@ -175,9 +175,9 @@ angular.module("umbraco")
             }
 
             init();
+
             $scope.$on("$destroy", function () {
                 unsubscribe.forEach(x => x());
             });
-
         }
     );
