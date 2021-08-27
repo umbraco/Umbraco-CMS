@@ -713,7 +713,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         }
 
         // Get current id for node to load it's children
-        $scope.contentId = editorState.current.id ? editorState.current.id : id;
+        $scope.contentId = editorState.current ? editorState.current.id : id;
         $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
 
         $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
