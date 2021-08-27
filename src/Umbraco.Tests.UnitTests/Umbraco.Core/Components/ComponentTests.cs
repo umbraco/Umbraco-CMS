@@ -478,7 +478,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         {
         }
 
-        public class Composer3 : TestComposerBase, IUserComposer
+        public class Composer3 : TestComposerBase, IComposer
         {
         }
 
@@ -539,7 +539,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         {
         }
 
-        public interface ITestComposer : IUserComposer
+        public interface ITestComposer : IComposer
         {
         }
 
