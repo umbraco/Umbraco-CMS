@@ -187,6 +187,11 @@ angular.module("umbraco.directives")
 
                     function _requestChooseMediaTypeDialog() {
 
+                        if (scope.queue.length === 0) {
+                            // if queue has no items so there is nothing to choose a type for
+                            return false;
+                        }
+                        
                         if (scope.acceptedMediatypes.length === 1) {
                             // if only one accepted type, then we wont ask to choose.
                             return false;
