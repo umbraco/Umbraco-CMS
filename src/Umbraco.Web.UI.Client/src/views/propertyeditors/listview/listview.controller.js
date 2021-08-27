@@ -67,7 +67,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     $scope.createAllowedButtonSingleWithBlueprints = false;
     $scope.createAllowedButtonMultiWithBlueprints = false;
 
-
     //when this is null, we don't check permissions
     $scope.currentNodePermissions = null;
 
@@ -146,6 +145,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     var listParamsForCurrent = $routeParams.id == $routeParams.list;
+
     $scope.options = {
         useInfiniteEditor: $scope.model.config.useInfiniteEditor === true,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
@@ -598,13 +598,13 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
                         forceReload: true,
                         activate: false
                     })
-                        .then(function (args) {
-                            //get the currently edited node (if any)
-                            var activeNode = appState.getTreeState("selectedNode");
-                            if (activeNode) {
-                                navigationService.reloadNode(activeNode);
-                            }
-                        });
+                    .then(function (args) {
+                        //get the currently edited node (if any)
+                        var activeNode = appState.getTreeState("selectedNode");
+                        if (activeNode) {
+                            navigationService.reloadNode(activeNode);
+                        }
+                    });
                 }
             });
     }
@@ -712,7 +712,8 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             return;
         }
 
-        $scope.contentId = id;
+        // Get current id for node to load it's children
+        $scope.contentId = editorState.current.id ? editorState.current.id : id;
         $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
 
         $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
