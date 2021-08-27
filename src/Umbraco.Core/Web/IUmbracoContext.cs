@@ -1,5 +1,4 @@
 using System;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 
@@ -54,11 +53,6 @@ namespace Umbraco.Cms.Core.Web
         //// TODO: Can we refactor this so it's not a settable thing required for routing?
         //// The only nicer way would be to have a RouteRequest method directly on IUmbracoContext but that means adding another dep to the ctx/factory.
         IPublishedRequest PublishedRequest { get; set; }
-
-        /// <summary>
-        /// Gets the variation context accessor.
-        /// </summary>
-        IVariationContextAccessor VariationContextAccessor { get; } // TODO: This shouldn't expose the accessor should it? IUmbracoContext is basically the accessor to the VariationContext since IUmbracoContextFactory currently creates it?
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled

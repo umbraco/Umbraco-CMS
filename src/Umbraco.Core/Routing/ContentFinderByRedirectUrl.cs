@@ -45,8 +45,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
         public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            IUmbracoContext umbCtx = _umbracoContextAccessor.UmbracoContext;
-            if (umbCtx == null)
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
                 return false;
             }
@@ -63,7 +62,7 @@ namespace Umbraco.Cms.Core.Routing
                 return false;
             }
 
-            IPublishedContent content = umbCtx.Content.GetById(redirectUrl.ContentId);
+            IPublishedContent content = umbracoContext.Content.GetById(redirectUrl.ContentId);
             var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {

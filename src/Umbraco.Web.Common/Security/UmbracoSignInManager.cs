@@ -58,9 +58,15 @@ namespace Umbraco.Cms.Web.Common.Security
 
             var auth = await Context.AuthenticateAsync(ExternalAuthenticationType);
             var items = auth?.Properties?.Items;
-            if (auth?.Principal == null || items == null || !items.ContainsKey(UmbracoSignInMgrLoginProviderKey))
+            if (auth?.Principal == null || items == null)
             {
+                Logger.LogDebug("The external login authentication failed. No user Principal or authentication items was resolved.");
                 return null;
+            }
+
+            if (!items.ContainsKey(UmbracoSignInMgrLoginProviderKey))
+            {
+                throw new InvalidOperationException($"The external login authenticated successfully but the key {UmbracoSignInMgrLoginProviderKey} was not found in the authentication properties. Ensure you call SignInManager.ConfigureExternalAuthenticationProperties before issuing a ChallengeResult.");
             }
 
             if (expectedXsrf != null)

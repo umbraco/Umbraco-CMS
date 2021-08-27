@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -37,13 +37,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 user.EmailConfirmedDate = dto.EmailConfirmedDate;
                 user.InvitedDate = dto.InvitedDate;
                 user.TourData = dto.TourData;
-
-                // we should never get user with ID zero from database, except
-                // when upgrading from v7 - mark that user so that we do not
-                // save it back to database (as that would create a *new* user)
-                // see also: UserRepository.PersistNewItem
-                if (dto.Id == 0)
-                    user.ToUserCache<string>("IS_V7_ZERO", "true");
 
                 // reset dirty initial properties (U4-1946)
                 user.ResetDirtyProperties(false);

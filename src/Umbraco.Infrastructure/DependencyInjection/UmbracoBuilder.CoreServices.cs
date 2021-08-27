@@ -40,6 +40,7 @@ using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HealthChecks;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Infrastructure.Mail;
 using Umbraco.Cms.Infrastructure.Media;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -144,9 +145,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.PropertyValueConverters()
                 .Remove<SimpleTinyMceValueConverter>();
 
-            builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
-            builder.Services.AddUnique<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
-
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
@@ -162,10 +160,12 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<ITagQuery, TagQuery>();
 
             builder.Services.AddUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
+            builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>();
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
                 var umbCtx = factory.GetRequiredService<IUmbracoContextAccessor>();
-                return new PublishedContentQuery(umbCtx.UmbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
+                var umbracoContext = umbCtx.GetRequiredUmbracoContext();
+                return new PublishedContentQuery(umbracoContext.PublishedSnapshot, factory.GetRequiredService<IVariationContextAccessor>(), factory.GetRequiredService<IExamineManager>());
             });
 
             // register accessors for cultures
@@ -180,6 +180,11 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<UploadAutoFillProperties>();
 
             builder.Services.AddUnique<ICronTabParser, NCronTabParser>();
+
+            // Add default ImageSharp configuration and service implementations
+            builder.Services.AddUnique(SixLabors.ImageSharp.Configuration.Default);
+            builder.Services.AddUnique<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
+            builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
             builder.Services.AddUnique<PackageDataInstallation>();
 

@@ -35,8 +35,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public virtual bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            IUmbracoContext umbCtx = UmbracoContextAccessor.UmbracoContext;
-            if (umbCtx == null)
+            if (!UmbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
                 return false;
             }
@@ -61,8 +60,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>The document node, or null.</returns>
         protected IPublishedContent FindContent(IPublishedRequestBuilder docreq, string route)
         {
-            IUmbracoContext umbCtx = UmbracoContextAccessor.UmbracoContext;
-            if (umbCtx == null)
+            if (!UmbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
                 return null;
             }
@@ -74,7 +72,7 @@ namespace Umbraco.Cms.Core.Routing
 
             _logger.LogDebug("Test route {Route}", route);
 
-            IPublishedContent node = umbCtx.Content.GetByRoute(umbCtx.InPreviewMode, route, culture: docreq.Culture);
+            IPublishedContent node = umbracoContext.Content.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
             if (node != null)
             {
                 docreq.SetPublishedContent(node);

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Web.Common.Attributes;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -21,20 +21,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     {
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
-        public ImageUrlGeneratorController(IImageUrlGenerator imageUrlGenerator)
-        {
-            _imageUrlGenerator = imageUrlGenerator;
-        }
+        public ImageUrlGeneratorController(IImageUrlGenerator imageUrlGenerator) => _imageUrlGenerator = imageUrlGenerator;
 
-        public string GetCropUrl(string mediaPath, int? width = null, int? height = null, ImageCropMode? imageCropMode = null, string animationProcessMode = null)
+        public string GetCropUrl(string mediaPath, int? width = null, int? height = null, ImageCropMode? imageCropMode = null) => _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(mediaPath)
         {
-            return _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(mediaPath)
-            {
-                Width = width,
-                Height = height,
-                ImageCropMode = imageCropMode,
-                AnimationProcessMode = animationProcessMode
-            });
-        }
+            Width = width,
+            Height = height,
+            ImageCropMode = imageCropMode
+        });
     }
 }

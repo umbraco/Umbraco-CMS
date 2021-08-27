@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
             if (useBackgroundThread)
             {
-                _logger.LogInformation($"Starting async background thread for rebuilding index {indexName}.");
+                _logger.LogInformation("Starting async background thread for rebuilding index {indexName}.",indexName);
 
                 _backgroundTaskQueue.QueueBackgroundWorkItem(
                     cancellationToken => Task.Run(() => RebuildIndex(indexName, delay.Value, cancellationToken)));

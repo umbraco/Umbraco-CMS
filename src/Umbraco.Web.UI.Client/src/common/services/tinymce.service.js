@@ -306,8 +306,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             if (imgUrl) {
                 mediaHelper.getProcessedImageUrl(imgUrl,
                     {
-                        height: newSize.height,
-                        width: newSize.width
+                        width: newSize.width,
+                        height: newSize.height
                     })
                     .then(function (resizedImgUrl) {
                         editor.dom.setAttrib(imageDomElement, 'data-mce-src', resizedImgUrl);
@@ -1526,15 +1526,13 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             args.editor.on('ObjectResized', function (e) {
                 var srcAttr = $(e.target).attr("src");
                 var path = srcAttr.split("?")[0];
-                mediaHelper.getProcessedImageUrl(path,
-                    {
-                        height: e.height,
-                        moded: "max",
-                        width: e.width
-                    })
-                    .then(function (resizedPath) {
-                        $(e.target).attr("data-mce-src", resizedPath);
-                    });
+                mediaHelper.getProcessedImageUrl(path, {
+                    width: e.width,
+                    height: e.height,
+                    mode: "max"
+                }).then(function (resizedPath) {
+                    $(e.target).attr("data-mce-src", resizedPath);
+                });
 
                 syncContent();
             });

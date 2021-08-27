@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
                 var links = new List<Link>();
                 var dtos = _jsonSerializer.Deserialize<IEnumerable<MultiUrlPickerValueEditor.LinkDto>>(inter.ToString());
-
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 foreach (var dto in dtos)
                 {
                     var type = LinkType.External;
@@ -71,8 +71,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                             : LinkType.Content;
 
                         var content = type == LinkType.Media ?
-                             _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(preview, dto.Udi.Guid) :
-                             _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(preview, dto.Udi.Guid);
+                             publishedSnapshot.Media.GetById(preview, dto.Udi.Guid) :
+                             publishedSnapshot.Content.GetById(preview, dto.Udi.Guid);
 
                         if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
                         {

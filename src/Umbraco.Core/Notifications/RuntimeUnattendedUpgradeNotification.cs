@@ -1,5 +1,6 @@
 namespace Umbraco.Cms.Core.Notifications
 {
+
     /// <summary>
     /// Used to notify when the core runtime can do an unattended upgrade.
     /// </summary>

@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var node = umbracoContext.Content.GetById(id);
             if (node == null)
                 yield break;

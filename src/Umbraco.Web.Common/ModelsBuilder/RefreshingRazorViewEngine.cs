@@ -180,6 +180,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             {
                 if (disposing)
                 {
+                    _inMemoryModelFactory.ModelsChanged -= InMemoryModelFactoryModelsChanged;
                     _locker.Dispose();
                 }
 

@@ -16,7 +16,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         private readonly IMigrationBuilder _migrationBuilder;
         private readonly ILogger<MigrationPlanExecutor> _logger;
 
-        public MigrationPlanExecutor(IScopeProvider scopeProvider, ILoggerFactory loggerFactory, IMigrationBuilder migrationBuilder)
+        public MigrationPlanExecutor(
+            IScopeProvider scopeProvider,
+            ILoggerFactory loggerFactory,
+            IMigrationBuilder migrationBuilder)
         {
             _scopeProvider = scopeProvider;
             _loggerFactory = loggerFactory;
@@ -40,51 +43,58 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
             _logger.LogInformation("Starting '{MigrationName}'...", plan.Name);
 
-            var origState = fromState ?? string.Empty;
+            fromState ??= string.Empty;
+            var nextState = fromState;
 
-            _logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin" : origState);
+            _logger.LogInformation("At {OrigState}", string.IsNullOrWhiteSpace(nextState) ? "origin" : nextState);
 
-            if (!plan.Transitions.TryGetValue(origState, out MigrationPlan.Transition transition))
+            if (!plan.Transitions.TryGetValue(nextState, out MigrationPlan.Transition transition))
             {
-                plan.ThrowOnUnknownInitialState(origState);
+                plan.ThrowOnUnknownInitialState(nextState);
             }
 
             using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
             {
-                var context = new MigrationContext(plan, scope.Database, _loggerFactory.CreateLogger<MigrationContext>());
-
-                while (transition != null)
+                // We want to suppress scope (service, etc...) notifications during a migration plan
+                // execution. This is because if a package that doesn't have their migration plan
+                // executed is listening to service notifications to perform some persistence logic,
+                // that packages notification handlers may explode because that package isn't fully installed yet.
+                using (scope.Notifications.Suppress())
                 {
-                    _logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
+                    var context = new MigrationContext(plan, scope.Database, _loggerFactory.CreateLogger<MigrationContext>());
 
-                    var migration = _migrationBuilder.Build(transition.MigrationType, context);
-                    migration.Run();
-
-                    var nextState = transition.TargetState;
-                    origState = nextState;
-
-                    _logger.LogInformation("At {OrigState}", origState);
-
-                    // throw a raw exception here: this should never happen as the plan has
-                    // been validated - this is just a paranoid safety test
-                    if (!plan.Transitions.TryGetValue(origState, out transition))
+                    while (transition != null)
                     {
-                        throw new InvalidOperationException($"Unknown state \"{origState}\".");
+                        _logger.LogInformation("Execute {MigrationType}", transition.MigrationType.Name);
+
+                        var migration = _migrationBuilder.Build(transition.MigrationType, context);
+                        migration.Run();
+
+                        nextState = transition.TargetState;
+
+                        _logger.LogInformation("At {OrigState}", nextState);
+
+                        // throw a raw exception here: this should never happen as the plan has
+                        // been validated - this is just a paranoid safety test
+                        if (!plan.Transitions.TryGetValue(nextState, out transition))
+                        {
+                            throw new InvalidOperationException($"Unknown state \"{nextState}\".");
+                        }
                     }
-                }
 
-                // prepare and de-duplicate post-migrations, only keeping the 1st occurence
-                var temp = new HashSet<Type>();
-                var postMigrationTypes = context.PostMigrations
-                    .Where(x => !temp.Contains(x))
-                    .Select(x => { temp.Add(x); return x; });
+                    // prepare and de-duplicate post-migrations, only keeping the 1st occurence
+                    var temp = new HashSet<Type>();
+                    var postMigrationTypes = context.PostMigrations
+                        .Where(x => !temp.Contains(x))
+                        .Select(x => { temp.Add(x); return x; });
 
-                // run post-migrations
-                foreach (var postMigrationType in postMigrationTypes)
-                {
-                    _logger.LogInformation($"PostMigration: {postMigrationType.FullName}.");
-                    var postMigration = _migrationBuilder.Build(postMigrationType, context);
-                    postMigration.Run();
+                    // run post-migrations
+                    foreach (var postMigrationType in postMigrationTypes)
+                    {
+                        _logger.LogInformation($"PostMigration: {postMigrationType.FullName}.");
+                        var postMigration = _migrationBuilder.Build(postMigrationType, context);
+                        postMigration.Run();
+                    }
                 }
             }
 
@@ -93,12 +103,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations
             // safety check - again, this should never happen as the plan has been validated,
             // and this is just a paranoid safety test
             var finalState = plan.FinalState;
-            if (origState != finalState)
+            if (nextState != finalState)
             {
-                throw new InvalidOperationException($"Internal error, reached state {origState} which is not final state {finalState}");
+                throw new InvalidOperationException($"Internal error, reached state {nextState} which is not final state {finalState}");
             }
 
-            return origState;
+            return nextState;
         }
     }
 }

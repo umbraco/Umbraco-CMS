@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
             contentCache.Setup(x => x.GetContentType(_settingKey1)).Returns(test3ContentType);
             contentCache.Setup(x => x.GetContentType(_settingKey2)).Returns(test4ContentType);
             IPublishedSnapshot publishedSnapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == contentCache.Object);
-            IPublishedSnapshotAccessor publishedSnapshotAccessor = Mock.Of<IPublishedSnapshotAccessor>(x => x.PublishedSnapshot == publishedSnapshot);
+            IPublishedSnapshotAccessor publishedSnapshotAccessor = Mock.Of<IPublishedSnapshotAccessor>(x => x.TryGetPublishedSnapshot(out publishedSnapshot));
             return publishedSnapshotAccessor;
         }
 

@@ -44,19 +44,17 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            IUmbracoContext umbCtx = _umbracoContextAccessor.UmbracoContext;
-            if (umbCtx == null)
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
             {
                 return false;
             }
-
             IPublishedContent node = null;
 
             // no alias if "/"
             if (frequest.Uri.AbsolutePath != "/")
             {
                 node = FindContentByAlias(
-                    umbCtx.Content,
+                    umbracoContext.Content,
                     frequest.Domain != null ? frequest.Domain.ContentId : 0,
                     frequest.Culture,
                     frequest.AbsolutePathDecoded);
@@ -86,7 +84,7 @@ namespace Umbraco.Cms.Core.Routing
             // and then the comparisons in IsMatch can be way faster - and allocate way less strings
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;
 
-            var test1 = alias.TrimStart('/') + ",";
+            var test1 = alias.TrimStart(Constants.CharArrays.ForwardSlash) + ",";
             var test2 = ",/" + test1; // test2 is ",/alias,"
             test1 = "," + test1; // test1 is ",alias,"
 

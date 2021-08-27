@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core
                     if (IsRoot)
                     {
                         UmbracoContext.Dispose();
-                        _umbracoContextAccessor.UmbracoContext = null;
+                        _umbracoContextAccessor.Clear();
                     }
                 }
 

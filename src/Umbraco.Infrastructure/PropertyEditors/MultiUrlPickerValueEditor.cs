@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -18,7 +17,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -95,13 +93,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         {
                             continue;
                         }
-
+                        var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                         if (entity is IDocumentEntitySlim documentEntity)
                         {
                             icon = documentEntity.ContentTypeIcon;
                             published = culture == null ? documentEntity.Published : documentEntity.PublishedCultures.Contains(culture);
                             udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
+                            url = publishedSnapshot.Content.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = documentEntity.Trashed;
                         }
                         else if(entity is IContentEntitySlim contentEntity)
@@ -109,7 +107,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             icon = contentEntity.ContentTypeIcon;
                             published = !contentEntity.Trashed;
                             udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
-                            url = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
+                            url = publishedSnapshot.Media.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
                             trashed = contentEntity.Trashed;
                         }
                         else

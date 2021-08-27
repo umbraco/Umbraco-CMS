@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Umbraco.Web.UI.NetCore": {
+    "Umbraco.Web.UI": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

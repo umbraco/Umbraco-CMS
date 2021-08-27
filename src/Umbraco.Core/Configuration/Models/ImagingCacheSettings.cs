@@ -12,10 +12,10 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// </summary>
     public class ImagingCacheSettings
     {
-        internal const string StaticBrowserMaxAge = "7.00:00:00"; // TimeSpan.FromDays(7);
-        internal const string StaticCacheMaxAge = "365.00:00:00"; // TimeSpan.FromDays(365);
+        internal const string StaticBrowserMaxAge = "7.00:00:00";
+        internal const string StaticCacheMaxAge = "365.00:00:00";
         internal const int StaticCachedNameLength = 8;
-        internal const string StaticCacheFolder = "../umbraco/mediacache";
+        internal const string StaticCacheFolder = Constants.SystemDirectories.TempData +  "/MediaCache";
 
         /// <summary>
         /// Gets or sets a value for the browser image cache maximum age.

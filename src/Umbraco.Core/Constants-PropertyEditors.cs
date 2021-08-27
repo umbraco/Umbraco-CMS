@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core
 {
@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core
                 public const string ColorPicker = "Umbraco.ColorPicker";
 
                 /// <summary>
-                /// EyeDropper Color Picker.
+                /// Eye Dropper Color Picker.
                 /// </summary>
                 public const string ColorPickerEyeDropper = "Umbraco.ColorPicker.EyeDropper";
 
