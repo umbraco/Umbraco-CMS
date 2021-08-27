@@ -529,8 +529,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             return app;
         }
-
-        private string GetMaxRequestLength() => _httpContextAccessor.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize != null ? (_httpContextAccessor.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize / 1024).ToString() : string.Empty;
+        
+        private string GetMaxRequestLength() => _runtimeSettings.MaxRequestLength.HasValue ?
+            _runtimeSettings.MaxRequestLength.Value.ToString()
+            : _httpContextAccessor.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize != null ?
+                (_httpContextAccessor.HttpContext.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize / 1024).ToString() // Convert bytes to kilobytes
+                : string.Empty;
     
     }
 }
