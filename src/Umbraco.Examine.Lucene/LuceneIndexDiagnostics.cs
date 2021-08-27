@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 {
 
                     var rootDir = _hostingEnvironment.ApplicationPhysicalPath;
-                    d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(rootDir.ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
+                    d["LuceneIndexFolder"] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(rootDir.ToLowerInvariant()).Replace("\\", " /").EnsureStartsWith('/');
                 }
 
                 if (_indexOptions != null)
