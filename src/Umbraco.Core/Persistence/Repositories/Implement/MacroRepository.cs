@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IMacro Get(Guid id)
         {
-            var sql = GetBaseQuery().Where("uniqueId=@Id", new { Id = id });
+            var sql = GetBaseQuery().Where<MacroDto>(x => x.UniqueId == id);
             return GetBySql(sql);
         }
 
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "cmsMacro.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Macro}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

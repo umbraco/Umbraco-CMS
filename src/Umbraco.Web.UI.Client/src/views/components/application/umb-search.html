@@ -14,7 +14,7 @@
 
     <div class="flex items-center">
         <label for="app-search" class="umb-search__label">
-            <umb-icon icon="icon-search" class="umb-search-input-icon icon-search"></umb-icon>
+            <umb-icon icon="icon-search" class="umb-search-input-icon"></umb-icon>
             <span class="sr-only">
                 <localize key="general_search">Search...</localize>
             </span>
@@ -50,7 +50,7 @@
             <ul class="umb-search-items">
                 <li class="umb-search-item" ng-repeat="result in group.results" active-result="{{result === vm.activeResult}}">
                     <a class="umb-search-result__link" ng-href="#/{{result.editorPath}}" ng-click="vm.clickItem(result)">
-                        <umb-icon icon="{{result.icon}}" class="umb-search-result__icon {{result.icon}}"></umb-icon>
+                        <umb-icon icon="{{result.icon}}" class="umb-search-result__icon"></umb-icon>
                         <span class="umb-search-result__meta">
                             <span class="umb-search-result__name">{{result.name}}</span>
                             <span class="umb-search-result__description" ng-show="result.subTitle">

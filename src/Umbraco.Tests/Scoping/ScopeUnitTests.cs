@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -9,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -70,6 +72,30 @@ namespace Umbraco.Tests.Scoping
 
             syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Domains), Times.Once);
             syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
+        }
+
+        [Test]
+        public void WriteLock_Acquired_Only_Once_When_InnerScope_Disposed()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var outerScope = scopeProvider.CreateScope())
+            {
+                outerScope.WriteLock(Constants.Locks.Languages);
+
+                using (var innerScope = scopeProvider.CreateScope())
+                {
+                    innerScope.WriteLock(Constants.Locks.Languages);
+                    innerScope.WriteLock(Constants.Locks.ContentTree);
+                    innerScope.Complete();
+                }
+
+                outerScope.WriteLock(Constants.Locks.ContentTree);
+                outerScope.Complete();
+            }
+
+            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
         }
 
         [Test]
@@ -177,30 +203,57 @@ namespace Umbraco.Tests.Scoping
         }
 
         [Test]
+        public void ReadLock_Acquired_Only_Once_When_InnerScope_Disposed()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var outerScope = scopeProvider.CreateScope())
+            {
+                outerScope.ReadLock(Constants.Locks.Languages);
+
+                using (var innerScope = scopeProvider.CreateScope())
+                {
+                    innerScope.ReadLock(Constants.Locks.Languages);
+                    innerScope.ReadLock(Constants.Locks.ContentTree);
+                    innerScope.Complete();
+                }
+
+                outerScope.ReadLock(Constants.Locks.ContentTree);
+                outerScope.Complete();
+            }
+
+            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
+        }
+
+        [Test]
         public void WriteLocks_Count_correctly_If_Lock_Requested_Twice_In_Scope()
         {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+            Guid innerscopeId;
 
             using (var outerscope = scopeProvider.CreateScope())
             {
                 var realOuterScope = (Scope) outerscope;
                 outerscope.WriteLock(Constants.Locks.ContentTree);
                 outerscope.WriteLock(Constants.Locks.ContentTree);
-                Assert.AreEqual(2, realOuterScope.WriteLocks[Constants.Locks.ContentTree]);
+                Assert.AreEqual(2, realOuterScope.WriteLocks[outerscope.InstanceId][Constants.Locks.ContentTree]);
 
                 using (var innerScope = scopeProvider.CreateScope())
                 {
+                    innerscopeId = innerScope.InstanceId;
                     innerScope.WriteLock(Constants.Locks.ContentTree);
                     innerScope.WriteLock(Constants.Locks.ContentTree);
-                    Assert.AreEqual(4, realOuterScope.WriteLocks[Constants.Locks.ContentTree]);
+                    Assert.AreEqual(2, realOuterScope.WriteLocks[outerscope.InstanceId][Constants.Locks.ContentTree]);
+                    Assert.AreEqual(2, realOuterScope.WriteLocks[innerscopeId][Constants.Locks.ContentTree]);
 
                     innerScope.WriteLock(Constants.Locks.Languages);
                     innerScope.WriteLock(Constants.Locks.Languages);
-                    Assert.AreEqual(2, realOuterScope.WriteLocks[Constants.Locks.Languages]);
+                    Assert.AreEqual(2, realOuterScope.WriteLocks[innerScope.InstanceId][Constants.Locks.Languages]);
                     innerScope.Complete();
                 }
-                Assert.AreEqual(0, realOuterScope.WriteLocks[Constants.Locks.Languages]);
-                Assert.AreEqual(2, realOuterScope.WriteLocks[Constants.Locks.ContentTree]);
+                Assert.AreEqual(2, realOuterScope.WriteLocks[realOuterScope.InstanceId][Constants.Locks.ContentTree]);
+                Assert.IsFalse(realOuterScope.WriteLocks.ContainsKey(innerscopeId));
                 outerscope.Complete();
             }
         }
@@ -209,27 +262,32 @@ namespace Umbraco.Tests.Scoping
         public void ReadLocks_Count_correctly_If_Lock_Requested_Twice_In_Scope()
         {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+            Guid innerscopeId;
 
             using (var outerscope = scopeProvider.CreateScope())
             {
                 var realOuterScope = (Scope) outerscope;
                 outerscope.ReadLock(Constants.Locks.ContentTree);
                 outerscope.ReadLock(Constants.Locks.ContentTree);
-                Assert.AreEqual(2, realOuterScope.ReadLocks[Constants.Locks.ContentTree]);
+                Assert.AreEqual(2, realOuterScope.ReadLocks[outerscope.InstanceId][Constants.Locks.ContentTree]);
 
                 using (var innerScope = scopeProvider.CreateScope())
                 {
+                    innerscopeId = innerScope.InstanceId;
                     innerScope.ReadLock(Constants.Locks.ContentTree);
                     innerScope.ReadLock(Constants.Locks.ContentTree);
-                    Assert.AreEqual(4, realOuterScope.ReadLocks[Constants.Locks.ContentTree]);
+                    Assert.AreEqual(2, realOuterScope.ReadLocks[outerscope.InstanceId][Constants.Locks.ContentTree]);
+                    Assert.AreEqual(2, realOuterScope.ReadLocks[innerScope.InstanceId][Constants.Locks.ContentTree]);
 
                     innerScope.ReadLock(Constants.Locks.Languages);
                     innerScope.ReadLock(Constants.Locks.Languages);
-                    Assert.AreEqual(2, realOuterScope.ReadLocks[Constants.Locks.Languages]);
+                    Assert.AreEqual(2, realOuterScope.ReadLocks[innerScope.InstanceId][Constants.Locks.Languages]);
                     innerScope.Complete();
                 }
-                Assert.AreEqual(0, realOuterScope.ReadLocks[Constants.Locks.Languages]);
-                Assert.AreEqual(2, realOuterScope.ReadLocks[Constants.Locks.ContentTree]);
+                Assert.AreEqual(2, realOuterScope.ReadLocks[outerscope.InstanceId][Constants.Locks.ContentTree]);
+                Assert.IsFalse(realOuterScope.ReadLocks.ContainsKey(innerscopeId));
+
+
                 outerscope.Complete();
             }
         }
@@ -238,51 +296,61 @@ namespace Umbraco.Tests.Scoping
         public void Nested_Scopes_WriteLocks_Count_Correctly()
         {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+            Guid innerScope1Id, innerScope2Id;
 
-            using (var outerScope = scopeProvider.CreateScope())
+            using (var parentScope = scopeProvider.CreateScope())
             {
-                var parentScope = (Scope) outerScope;
-                outerScope.WriteLock(Constants.Locks.ContentTree);
-                outerScope.WriteLock(Constants.Locks.ContentTypes);
+                var realParentScope = (Scope) parentScope;
+                parentScope.WriteLock(Constants.Locks.ContentTree);
+                parentScope.WriteLock(Constants.Locks.ContentTypes);
 
-                Assert.AreEqual(1, parentScope.WriteLocks[Constants.Locks.ContentTree], $"parentScope after locks acquired: {nameof(Constants.Locks.ContentTree)}");
-                Assert.AreEqual(1, parentScope.WriteLocks[Constants.Locks.ContentTypes], $"parentScope after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"parentScope after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"parentScope after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
 
                 using (var innerScope1 = scopeProvider.CreateScope())
                 {
+                    innerScope1Id = innerScope1.InstanceId;
                     innerScope1.WriteLock(Constants.Locks.ContentTree);
                     innerScope1.WriteLock(Constants.Locks.ContentTypes);
                     innerScope1.WriteLock(Constants.Locks.Languages);
 
-                    Assert.AreEqual(2, parentScope.WriteLocks[Constants.Locks.ContentTree], $"childScope1 after locks acquired: {nameof(Constants.Locks.ContentTree)}");
-                    Assert.AreEqual(2, parentScope.WriteLocks[Constants.Locks.ContentTypes], $"childScope1 after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
-                    Assert.AreEqual(1, parentScope.WriteLocks[Constants.Locks.Languages], $"childScope1 after locks acquired: {nameof(Constants.Locks.Languages)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"innerScope1, parent instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, parent instance, after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope1, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.Languages], $"innerScope1, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.Languages)}");
 
                     using (var innerScope2 = scopeProvider.CreateScope())
                     {
+                        innerScope2Id = innerScope2.InstanceId;
                         innerScope2.WriteLock(Constants.Locks.ContentTree);
                         innerScope2.WriteLock(Constants.Locks.MediaTypes);
 
-                        Assert.AreEqual(3, parentScope.WriteLocks[Constants.Locks.ContentTree], $"childScope2 after locks acquired: {nameof(Constants.Locks.ContentTree)}");
-                        Assert.AreEqual(2, parentScope.WriteLocks[Constants.Locks.ContentTypes], $"childScope2 after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
-                        Assert.AreEqual(1, parentScope.WriteLocks[Constants.Locks.Languages], $"childScope2 after locks acquired: {nameof(Constants.Locks.Languages)}");
-                        Assert.AreEqual(1, parentScope.WriteLocks[Constants.Locks.MediaTypes], $"childScope2 after locks acquired: {nameof(Constants.Locks.MediaTypes)}");
+                        Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"innerScope2, parent instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                        Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"innerScope2, parent instance, after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                        Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope2, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                        Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope2, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                        Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.Languages], $"innerScope2, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.Languages)}");
+                        Assert.AreEqual(1, realParentScope.WriteLocks[innerScope2.InstanceId][Constants.Locks.ContentTree], $"innerScope2, innerScope2 instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                        Assert.AreEqual(1, realParentScope.WriteLocks[innerScope2.InstanceId][Constants.Locks.MediaTypes], $"innerScope2, innerScope2 instance, after locks acquired: {nameof(Constants.Locks.MediaTypes)}");
 
                         innerScope2.Complete();
                     }
-                    Assert.AreEqual(2, parentScope.WriteLocks[Constants.Locks.ContentTree], $"childScope1 after inner scope disposed: {nameof(Constants.Locks.ContentTree)}");
-                    Assert.AreEqual(2, parentScope.WriteLocks[Constants.Locks.ContentTypes], $"childScope1 after inner scope disposed: {nameof(Constants.Locks.ContentTypes)}");
-                    Assert.AreEqual(1, parentScope.WriteLocks[Constants.Locks.Languages], $"childScope1 after inner scope disposed: {nameof(Constants.Locks.Languages)}");
-                    Assert.AreEqual(0, parentScope.WriteLocks[Constants.Locks.MediaTypes], $"childScope1 after inner scope disposed: {nameof(Constants.Locks.MediaTypes)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"innerScope1, parent instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, parent instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope1, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.Languages], $"innerScope1, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.Languages)}");
+                    Assert.IsFalse(realParentScope.WriteLocks.ContainsKey(innerScope2Id));
 
                     innerScope1.Complete();
                 }
-                Assert.AreEqual(1, parentScope.WriteLocks[Constants.Locks.ContentTree], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTree)}");
-                Assert.AreEqual(1, parentScope.WriteLocks[Constants.Locks.ContentTypes], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTypes)}");
-                Assert.AreEqual(0, parentScope.WriteLocks[Constants.Locks.Languages], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.Languages)}");
-                Assert.AreEqual(0, parentScope.WriteLocks[Constants.Locks.MediaTypes], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.MediaTypes)}");
+                Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTree)}");
+                Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTypes)}");
+                Assert.IsFalse(realParentScope.WriteLocks.ContainsKey(innerScope2Id));
+                Assert.IsFalse(realParentScope.WriteLocks.ContainsKey(innerScope1Id));
 
-                outerScope.Complete();
+                parentScope.Complete();
             }
         }
 
@@ -290,48 +358,166 @@ namespace Umbraco.Tests.Scoping
         public void Nested_Scopes_ReadLocks_Count_Correctly()
         {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+            Guid innerScope1Id, innerScope2Id;
 
-            using (var outerScope = scopeProvider.CreateScope())
+            using (var parentScope = scopeProvider.CreateScope())
             {
-                var parentScope = (Scope) outerScope;
-                outerScope.ReadLock(Constants.Locks.ContentTree);
-                outerScope.ReadLock(Constants.Locks.ContentTypes);
-                Assert.AreEqual(1, parentScope.ReadLocks[Constants.Locks.ContentTree], $"parentScope after locks acquired: {nameof(Constants.Locks.ContentTree)}");
-                Assert.AreEqual(1, parentScope.ReadLocks[Constants.Locks.ContentTypes], $"parentScope after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                var realParentScope = (Scope) parentScope;
+                parentScope.ReadLock(Constants.Locks.ContentTree);
+                parentScope.ReadLock(Constants.Locks.ContentTypes);
+                Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"parentScope after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"parentScope after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
 
                 using (var innserScope1 = scopeProvider.CreateScope())
                 {
+                    innerScope1Id = innserScope1.InstanceId;
                     innserScope1.ReadLock(Constants.Locks.ContentTree);
                     innserScope1.ReadLock(Constants.Locks.ContentTypes);
                     innserScope1.ReadLock(Constants.Locks.Languages);
-                    Assert.AreEqual(2, parentScope.ReadLocks[Constants.Locks.ContentTree], $"childScope1 after locks acquired: {nameof(Constants.Locks.ContentTree)}");
-                    Assert.AreEqual(2, parentScope.ReadLocks[Constants.Locks.ContentTypes], $"childScope1 after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
-                    Assert.AreEqual(1, parentScope.ReadLocks[Constants.Locks.Languages], $"childScope1 after locks acquired: {nameof(Constants.Locks.Languages)}");
+                    Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"innerScope1, parent instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, parent instance, after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope1, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.Languages], $"innerScope1, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.Languages)}");
 
                     using (var innerScope2 = scopeProvider.CreateScope())
                     {
+                        innerScope2Id = innerScope2.InstanceId;
                         innerScope2.ReadLock(Constants.Locks.ContentTree);
                         innerScope2.ReadLock(Constants.Locks.MediaTypes);
-                        Assert.AreEqual(3, parentScope.ReadLocks[Constants.Locks.ContentTree], $"childScope2 after locks acquired: {nameof(Constants.Locks.ContentTree)}");
-                        Assert.AreEqual(2, parentScope.ReadLocks[Constants.Locks.ContentTypes], $"childScope2 after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
-                        Assert.AreEqual(1, parentScope.ReadLocks[Constants.Locks.Languages], $"childScope2 after locks acquired: {nameof(Constants.Locks.Languages)}");
-                        Assert.AreEqual(1, parentScope.ReadLocks[Constants.Locks.MediaTypes], $"childScope2 after locks acquired: {nameof(Constants.Locks.MediaTypes)}");
+                        Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"innerScope2, parent instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                        Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"innerScope2, parent instance, after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                        Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope2, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                        Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope2, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.ContentTypes)}");
+                        Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.Languages], $"innerScope2, innerScope1 instance, after locks acquired: {nameof(Constants.Locks.Languages)}");
+                        Assert.AreEqual(1, realParentScope.ReadLocks[innerScope2.InstanceId][Constants.Locks.ContentTree], $"innerScope2, innerScope2 instance, after locks acquired: {nameof(Constants.Locks.ContentTree)}");
+                        Assert.AreEqual(1, realParentScope.ReadLocks[innerScope2.InstanceId][Constants.Locks.MediaTypes], $"innerScope2, innerScope2 instance, after locks acquired: {nameof(Constants.Locks.MediaTypes)}");
 
                         innerScope2.Complete();
                     }
-                    Assert.AreEqual(2, parentScope.ReadLocks[Constants.Locks.ContentTree], $"childScope1 after inner scope disposed: {nameof(Constants.Locks.ContentTree)}");
-                    Assert.AreEqual(2, parentScope.ReadLocks[Constants.Locks.ContentTypes], $"childScope1 after inner scope disposed: {nameof(Constants.Locks.ContentTypes)}");
-                    Assert.AreEqual(1, parentScope.ReadLocks[Constants.Locks.Languages], $"childScope1 after inner scope disposed: {nameof(Constants.Locks.Languages)}");
-                    Assert.AreEqual(0, parentScope.ReadLocks[Constants.Locks.MediaTypes], $"childScope1 after inner scope disposed: {nameof(Constants.Locks.MediaTypes)}");
+
+                    Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"innerScope1, parent instance, after innerScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, parent instance, after innerScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope1, innerScope1 instance, after innerScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, innerScope1 instance, after innerScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.Languages], $"innerScope1, innerScope1 instance, after innerScope2 disposed: {nameof(Constants.Locks.Languages)}");
+                    Assert.IsFalse(realParentScope.ReadLocks.ContainsKey(innerScope2Id));
 
                     innserScope1.Complete();
                 }
-                Assert.AreEqual(1, parentScope.ReadLocks[Constants.Locks.ContentTree], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTree)}");
-                Assert.AreEqual(1, parentScope.ReadLocks[Constants.Locks.ContentTypes], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTypes)}");
-                Assert.AreEqual(0, parentScope.ReadLocks[Constants.Locks.Languages], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.Languages)}");
-                Assert.AreEqual(0, parentScope.ReadLocks[Constants.Locks.MediaTypes], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.MediaTypes)}");
 
-                outerScope.Complete();
+                Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"parentScope after innerScope1 disposed: {nameof(Constants.Locks.ContentTree)}");
+                Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"parentScope after innerScope1 disposed: {nameof(Constants.Locks.ContentTypes)}");
+                Assert.IsFalse(realParentScope.ReadLocks.ContainsKey(innerScope2Id));
+                Assert.IsFalse(realParentScope.ReadLocks.ContainsKey(innerScope1Id));
+
+                parentScope.Complete();
+            }
+        }
+
+        [Test]
+        public void WriteLock_Doesnt_Increment_On_Error()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+            syntaxProviderMock.Setup(x => x.WriteLock(It.IsAny<IDatabase>(), It.IsAny<int[]>())).Throws(new Exception("Boom"));
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                var realScope = (Scope) scope;
+
+                Assert.Throws<Exception>(() => scope.WriteLock(Constants.Locks.Languages));
+                Assert.IsFalse(realScope.WriteLocks[scope.InstanceId].ContainsKey(Constants.Locks.Languages));
+                scope.Complete();
+            }
+        }
+
+        [Test]
+        public void ReadLock_Doesnt_Increment_On_Error()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+            syntaxProviderMock.Setup(x => x.ReadLock(It.IsAny<IDatabase>(), It.IsAny<int[]>())).Throws(new Exception("Boom"));
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                var realScope = (Scope) scope;
+
+                Assert.Throws<Exception>(() => scope.ReadLock(Constants.Locks.Languages));
+                Assert.IsFalse(realScope.ReadLocks[scope.InstanceId].ContainsKey(Constants.Locks.Languages));
+                scope.Complete();
+            }
+        }
+
+        [Test]
+        public void Scope_Throws_If_ReadLocks_Not_Cleared()
+        {
+            var scopeprovider = GetScopeProvider(out var syntaxProviderMock);
+            var scope = (Scope) scopeprovider.CreateScope();
+
+            try
+            {
+                // Request a lock to create the ReadLocks dict.
+                scope.ReadLock(Constants.Locks.Domains);
+
+                var readDict = new Dictionary<int, int>();
+                readDict[Constants.Locks.Languages] = 1;
+                scope.ReadLocks[Guid.NewGuid()] = readDict;
+
+                Assert.Throws<InvalidOperationException>(() => scope.Dispose());
+            }
+            finally
+            {
+                // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
+                scope.ReadLocks?.Clear();
+                scope.Dispose();
+            }
+        }
+
+        [Test]
+        public void Scope_Throws_If_WriteLocks_Not_Cleared()
+        {
+            var scopeprovider = GetScopeProvider(out var syntaxProviderMock);
+            var scope = (Scope) scopeprovider.CreateScope();
+
+            try
+            {
+                // Request a lock to create the WriteLocks dict.
+                scope.WriteLock(Constants.Locks.Domains);
+
+                var writeDict = new Dictionary<int, int>();
+                writeDict[Constants.Locks.Languages] = 1;
+                scope.WriteLocks[Guid.NewGuid()] = writeDict;
+
+                Assert.Throws<InvalidOperationException>(() => scope.Dispose());
+            }
+            finally
+            {
+                // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
+                scope.WriteLocks?.Clear();
+                scope.Dispose();
+            }
+        }
+
+        [Test]
+        public void WriteLocks_Not_Created_Until_First_Lock()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                var realScope = (Scope) scope;
+                Assert.IsNull(realScope.WriteLocks);
+            }
+        }
+
+        [Test]
+        public void ReadLocks_Not_Created_Until_First_Lock()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                var realScope = (Scope) scope;
+                Assert.IsNull(realScope.ReadLocks);
             }
         }
     }

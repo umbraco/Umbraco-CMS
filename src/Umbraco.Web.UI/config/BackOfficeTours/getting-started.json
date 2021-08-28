@@ -272,9 +272,9 @@
                 "view": "nodename"
             },
             {
-                "element": "[data-element='editor-content'] [data-element='property-welcomeText']",
+                "element": "[data-element='editor-content'] [data-element='property-welcomeText'] > div",
                 "title": "Add a welcome text",
-                "content": "<p>Add content to the <b>Welcome Text</b> field.</p><p>If you don't have any ideas here is a start:<br/> <pre>I am learning Umbraco. High Five I Rock #H5IR</pre>.</p>"
+                "content": "<p>Add content to the <b>Welcome Text</b> field.</p><p>If you don't have any ideas here is a start:<br/> <pre>I am learning Umbraco. High Five I Rock #H5IR</pre></p>"
             },
             {
                 "element": "[data-element='editor-content'] [data-element='button-saveAndPublish']",

@@ -141,26 +141,6 @@
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">För att ändra vald dokumenttyp, välj först i listan av giltiga typer för denna platsen.</key>
-    <key alias="changeDocTypeInstruction2">Konfirmera sedan och/eller ändra mappningen av egenskaper från aktuell dokumenttyp till den nya, och klicka sedan på spara.</key>
-    <key alias="contentRepublished">Innehållet har blivit publicerat på nytt</key>
-    <key alias="currentProperty">Aktuell egenskap</key>
-    <key alias="currentType">Aktuell typ</key>
-    <key alias="docTypeCannotBeChanged">Dokumenttypen kan inte ändras, eftersom det inte finns några giltiga val för denna plats.</key>
-    <key alias="docTypeChanged">Dokumenttypen är ändrad</key>
-    <key alias="mapProperties">Mappningsegenskaper</key>
-    <key alias="mapToProperty">Mappning till egenskap</key>
-    <key alias="newTemplate">Ny sidmall</key>
-    <key alias="newType">Ny egenskap</key>
-    <key alias="none">ingen</key>
-    <key alias="selectedContent">Innehåll</key>
-    <key alias="selectNewDocType">Välj ny dokumenttyp</key>
-    <key alias="successMessage">Dokumenttypen på valt innehåll har ändrats till [new type] utan problem och följande egenskaper är mappade:</key>
-    <key alias="to">till</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Kunde inte slutföra egenskapsmappningen då en eller flera egenskaper har en eller flera mappningar definierade.</key>
-    <key alias="validDocTypesNote">Enbart giltiga alternativa egenskaper visas för platsen</key>
-  </area>
   <area alias="colorpicker">
     <key alias="noColors">Du har inte konfigurerat några giltiga färger</key>
   </area>
@@ -1027,5 +1007,9 @@
     <key alias="sortCreateDateAscending">Nyast</key>
     <key alias="sortCreateDateDescending">Äldst</key>
     <key alias="sortLastLoginDateDescending">Senaste login</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Välj alla</key>
+    <key alias="deselectAllLogLevelFilters">Avmarkera alla</key>
   </area>
 </language>

@@ -13,7 +13,7 @@ using Umbraco.Web.PublishedCache.NuCache.Navigable;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    internal class MemberCache : IPublishedMemberCache, INavigableData
+    internal class MemberCache : IPublishedMemberCache, INavigableData, IDisposable
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
@@ -23,6 +23,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberService _memberService;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly bool _previewDefault;
+        private bool _disposedValue;
 
         public MemberCache(bool previewDefault, IAppCache snapshotCache, IMemberService memberService, PublishedContentTypeCache contentTypeCache,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor, IEntityXmlSerializer entitySerializer)
@@ -156,6 +157,25 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public IPublishedContentType GetContentType(string alias)
         {
             return _contentTypeCache.Get(PublishedItemType.Member, alias);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _contentTypeCache.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
 
         #endregion

@@ -183,26 +183,6 @@
     <key alias="smallSort">Ordonner</key>
     <key alias="historyIncludingVariants">Historique (toutes variantes)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Pour changer le type de document du contenu séléctionné, faites d'abord un choix dans la liste des types valides à cet endroit.</key>
-    <key alias="changeDocTypeInstruction2">Puis confirmez et/ou modifiez la correspondance des propriétés du type actuel vers le nouveau, et cliquez sur Sauver.</key>
-    <key alias="contentRepublished">Le contenu a été republié.</key>
-    <key alias="currentProperty">Propriété actuelle</key>
-    <key alias="currentType">Type actuel</key>
-    <key alias="docTypeCannotBeChanged">Le type de document ne peut être changé car il n'y a pas d'alternative valide à cet endroit. Une alternative sera valide si elle est autorisée sous le parent du contenu sélectionné et si tous les éléments de contenu enfants existants peuvent être créés avec celle-ci.</key>
-    <key alias="docTypeChanged">Type de document modifié</key>
-    <key alias="mapProperties">Faire correspondre les propriétés</key>
-    <key alias="mapToProperty">Faire correspondre à la propriété</key>
-    <key alias="newTemplate">Nouveau modèle</key>
-    <key alias="newType">Nouveau type</key>
-    <key alias="none">aucun</key>
-    <key alias="selectedContent">Contenu</key>
-    <key alias="selectNewDocType">Choisir le nouveau Type de Document</key>
-    <key alias="successMessage">Le type de document du contenu séléctionné a bien été changé en [new type] et les correspondances de propriétés suivantes effectuées :</key>
-    <key alias="to">en</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Impossible de terminer la correspondance des propriétés car une ou plusieurs propriétés ont plus d'une correspondance définie.</key>
-    <key alias="validDocTypesNote">Seuls les types de documents valides à cet endroit sont affichés.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Echec de la création d'un dossier sous le parent avec l'ID %0%</key>
     <key alias="createFolderFailedByName">Echec de la création d'un dossier sous le parent avec le nom %0%</key>
@@ -1527,9 +1507,9 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
       ]]></key>
     <key alias="sectionName">Nom de la section</key>
     <key alias="sectionMandatory">La section est obligatoire</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Si obligatoire, le modèle enfant doit contenir une définition <code>@section</code>, sinon une erreur est affichée.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Générateur de requêtes</key>
     <key alias="itemsReturned">éléments trouvés, en</key>
     <key alias="copyToClipboard">copier dans le clipboard</key>
@@ -1576,6 +1556,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="contentAllowed">Ce contenu est autorisé ici</key>
     <key alias="clickToEmbed">Cliquez pour intégrer</key>
     <key alias="clickToInsertImage">Cliquez pour insérer une image</key>
+    <key alias="clickToInsertMacro">Cliquez pour insérer une macro</key>
     <key alias="placeholderImageCaption">Légende de l'image...</key>
     <key alias="placeholderWriteHere">Ecrivez ici...</key>
     <key alias="gridLayouts">Mises en pages de la Grid</key>
@@ -2212,6 +2193,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="newPartialView">Partial View</key>
     <key alias="newPartialViewMacro">Macro de Partial View</key>
     <key alias="newMember">Membre</key>
+    <key alias="searchContentTree">Chercher dans l'arborescence de contenu</key>
   </area>
   <area alias="references">
     <key alias="tabName">Références</key>
@@ -2226,6 +2208,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="logViewer">
       <key alias="logLevels">Niveaux de Log</key>
+      <key alias="selectAllLogLevelFilters">Tout sélectionner</key>
+      <key alias="deselectAllLogLevelFilters">Tout déselectionner</key>
       <key alias="savedSearches">Recherches sauvegardées</key>
       <key alias="totalItems">Nombre total d'éléments</key>
       <key alias="timestamp">Date</key>
@@ -2370,5 +2354,9 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
             Découvrez nos possibilités de <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">formations et certifications</a>
         ]]>
     </key>
+  </area>
+  <area alias="treeSearch">
+    <key alias="searchResult">élément retrouvé</key>
+    <key alias="searchResults">éléments retrouvés</key>
   </area>
 </language>

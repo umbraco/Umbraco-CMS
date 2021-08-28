@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -174,7 +174,7 @@ namespace Umbraco.Web
 
             // else... if we have a property, at least let the converter return its own
             // vision of 'no value' (could be an empty enumerable) - otherwise, default
-            return property == null ? default : property.Value<T>(culture, segment, fallback, defaultValue);
+            return property == null ? default : property.Value<T>(culture, segment);
         }
 
         #endregion
@@ -1213,8 +1213,8 @@ namespace Umbraco.Web
                                     { "NodeTypeAlias", n.ContentType.Alias },
                                     { "CreateDate", n.CreateDate },
                                     { "UpdateDate", n.UpdateDate },
-                                    { "CreatorName", n.CreatorName(services.UserService) },
-                                    { "WriterName", n.WriterName(services.UserService) },
+                                    { "CreatorName", n.CreatorName },
+                                    { "WriterName", n.WriterName },
                                     { "Url", n.Url() }
                                 };
 
