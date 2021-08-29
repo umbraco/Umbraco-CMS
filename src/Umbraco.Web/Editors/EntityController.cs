@@ -76,7 +76,9 @@ namespace Umbraco.Web.Editors
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPath", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetUrlAndAnchors", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[])),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAncestors", "id", typeof(int[]), typeof(Guid[]), typeof(Udi[]))
+                ));
             }
         }
 
@@ -753,9 +755,45 @@ namespace Umbraco.Web.Editors
 
         private bool IsDataTypeIgnoringUserStartNodes(Guid? dataTypeKey) => dataTypeKey.HasValue && Services.DataTypeService.IsDataTypeIgnoringUserStartNodes(dataTypeKey.Value);
 
+        /// <summary>
+        /// Get ancestors by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormDataCollection queryStrings)
         {
             return GetResultForAncestors(id, type, queryStrings);
+        }
+
+        /// <summary>
+        /// Get ancestors by key
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        public IEnumerable<EntityBasic> GetAncestors(Guid id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormDataCollection queryStrings)
+        {
+            return GetResultForAncestors(id, type, queryStrings);
+        }
+
+        // <summary>
+        /// Get ancestors by udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        public IEnumerable<EntityBasic> GetAncestors(Udi id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormDataCollection queryStrings)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetResultForAncestors(guidUdi.Guid, type, queryStrings);
+            }
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         /// <summary>
@@ -796,6 +834,73 @@ namespace Umbraco.Web.Editors
         }
 
         private IEnumerable<EntityBasic> GetResultForAncestors(int id, UmbracoEntityTypes entityType, FormDataCollection queryStrings = null)
+        {
+            var objectType = ConvertToObjectType(entityType);
+            if (objectType.HasValue)
+            {
+                // TODO: Need to check for Object types that support hierarchic here, some might not.
+
+                var ids = Services.EntityService.Get(id).Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Distinct().ToArray();
+
+                var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
+                if (ignoreUserStartNodes == false)
+                {
+                    int[] aids = null;
+                    switch (entityType)
+                    {
+                        case UmbracoEntityTypes.Document:
+                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
+                            break;
+                        case UmbracoEntityTypes.Media:
+                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
+                            break;
+                    }
+
+                    if (aids != null)
+                    {
+                        var lids = new List<int>();
+                        var ok = false;
+                        foreach (var i in ids)
+                        {
+                            if (ok)
+                            {
+                                lids.Add(i);
+                                continue;
+                            }
+                            if (aids.Contains(i))
+                            {
+                                lids.Add(i);
+                                ok = true;
+                            }
+                        }
+                        ids = lids.ToArray();
+                    }
+                }
+
+                var culture = queryStrings?.GetValue<string>("culture");
+
+                return ids.Length == 0
+                    ? Enumerable.Empty<EntityBasic>()
+                    : Services.EntityService.GetAll(objectType.Value, ids)
+                        .WhereNotNull()
+                        .OrderBy(x => x.Level)
+                        .Select(MapEntities(culture));
+            }
+            //now we need to convert the unknown ones
+            switch (entityType)
+            {
+                case UmbracoEntityTypes.PropertyType:
+                case UmbracoEntityTypes.PropertyGroup:
+                case UmbracoEntityTypes.Domain:
+                case UmbracoEntityTypes.Language:
+                case UmbracoEntityTypes.User:
+                case UmbracoEntityTypes.Macro:
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
+            }
+        }
+
+        private IEnumerable<EntityBasic> GetResultForAncestors(Guid id, UmbracoEntityTypes entityType, FormDataCollection queryStrings = null)
         {
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
