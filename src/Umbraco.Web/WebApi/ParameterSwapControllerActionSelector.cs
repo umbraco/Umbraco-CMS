@@ -90,9 +90,8 @@ namespace Umbraco.Web.WebApi
 
         private bool TryBindFromUri(HttpControllerContext controllerContext, ParameterSwapInfo found, out HttpActionDescriptor method)
         {
-            var requestParam = HttpUtility.ParseQueryString(controllerContext.Request.RequestUri.Query).Get(found.ParamName);
+            var requestParam = HttpUtility.ParseQueryString(controllerContext.Request.RequestUri.Query).Get(found.ParamName)?.Trim();
 
-            requestParam = requestParam?.Trim();
             var paramTypes = found.SupportedTypes;
 
             if (requestParam == string.Empty && paramTypes.Length > 0)
