@@ -72,12 +72,12 @@ namespace Umbraco.Web.Editors
 
                     //This is a special case, we'll accept a String here so that we can get page members when the special "all-members"
                     //id is passed in eventually we'll probably want to support GUID + Udi too
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAncestors", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPagedChildren", "id", typeof(int), typeof(string)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPath", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetUrlAndAnchors", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[])),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAncestors", "id", typeof(int[]), typeof(Guid[]), typeof(Udi[]))
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))
                 ));
             }
         }
