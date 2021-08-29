@@ -92,7 +92,7 @@ namespace Umbraco.Web.WebApi
         {
             var requestParam = HttpUtility.ParseQueryString(controllerContext.Request.RequestUri.Query).Get(found.ParamName);
 
-            requestParam = (requestParam == null) ? null : requestParam.Trim();
+            requestParam = requestParam?.Trim();
             var paramTypes = found.SupportedTypes;
 
             if (requestParam == string.Empty && paramTypes.Length > 0)
