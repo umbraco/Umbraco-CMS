@@ -288,6 +288,7 @@
     <Compile Include="PropertyEditors\MediaPicker3PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ArrayPoolingLimitedSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializationResult.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializerEntityType.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializer.cs" />
@@ -1182,7 +1183,9 @@
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
-    <Compile Include="FormlessPage.cs" />
+    <Compile Include="FormlessPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="ModelStateExtensions.cs" />

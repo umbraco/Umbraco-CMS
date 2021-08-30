@@ -49,9 +49,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             if (type == PrefixNull) return null;
             if (type != PrefixString)
                 throw new NotSupportedException($"Cannot deserialize type '{type}', expected '{PrefixString}'.");
-            return intern
-                ? string.Intern(PrimitiveSerializer.String.ReadFrom(stream))
-                : PrimitiveSerializer.String.ReadFrom(stream);
+            return ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream, intern);
         }
 
         protected int? ReadIntObject(Stream stream) => ReadStruct(stream, PrefixInt32, ReadInt);
@@ -80,7 +78,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 case PrefixNull:
                     return null;
                 case PrefixString:
-                    return PrimitiveSerializer.String.ReadFrom(stream);
+                    return ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream);
                 case PrefixInt32:
                     return PrimitiveSerializer.Int32.ReadFrom(stream);
                 case PrefixUInt16:

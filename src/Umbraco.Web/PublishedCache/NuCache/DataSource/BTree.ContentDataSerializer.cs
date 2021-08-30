@@ -25,8 +25,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return new ContentData
             {
                 Published = PrimitiveSerializer.Boolean.ReadFrom(stream),
-                Name = PrimitiveSerializer.String.ReadFrom(stream),
-                UrlSegment = PrimitiveSerializer.String.ReadFrom(stream),
+                Name = ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream),
+                UrlSegment = ArrayPoolingLimitedSerializer.StringSerializer.ReadString(stream),
                 VersionId = PrimitiveSerializer.Int32.ReadFrom(stream),
                 VersionDate = PrimitiveSerializer.DateTime.ReadFrom(stream),
                 WriterId = PrimitiveSerializer.Int32.ReadFrom(stream),
