@@ -16,6 +16,48 @@ describe('contentTypeHelper tests', function () {
       q = $injector.get('$q');
   }));
 
+  describe('Group type', function () {
+    it('should return the group type', function () {
+        var groupType = contentTypeHelper.TYPE_GROUP;
+        expect(groupType).toBe(0);
+    });
+  });
+
+  describe('Tab type', function () {
+    it('should return the tab type', function () {
+        var tabType = contentTypeHelper.TYPE_TAB;
+        expect(tabType).toBe(1);
+    });
+  });
+
+  describe('isAliasUnique', function () {
+    const groups = [{ alias: 'alias' }];
+
+    it('should return true when alias is unique', function () {
+        var isUnique = contentTypeHelper.isAliasUnique(groups, 'uniqueAlias');
+        expect(isUnique).toBe(true);
+    });
+
+    it('should return false when alias is not unique', function () {
+      var isUnique = contentTypeHelper.isAliasUnique(groups, 'alias');
+      expect(isUnique).toBe(false);
+    });
+  });
+
+  describe('createUniqueAlias', function () {
+
+    it('should generate a unique alias', function () {
+        const groups = [{ alias: 'alias' }, { alias: 'otherAlias' }, { alias: 'otherAlias1' }];
+
+        var alias = contentTypeHelper.createUniqueAlias(groups, 'alias');
+        expect(alias).toBe('alias1');
+        
+        alias = contentTypeHelper.createUniqueAlias(groups, 'otherAlias');
+        expect(alias).toBe('otherAlias2');
+    });
+
+  });
+
   describe('generateLocalAlias', function () {
 
       it('should generate an alias when given a name', function () {
@@ -125,6 +167,26 @@ describe('contentTypeHelper tests', function () {
       expect(groups[1].parentAlias).toBe('tab');
       expect(groups[2].parentAlias).toBeNull();
       expect(groups[3].parentAlias).toBeNull();
+    });
+
+  });
+
+  describe('convertGroupToTab', function () {
+
+    const groups = [
+      { type: 0, alias: 'hero', name: 'Hero' }, 
+      { type: 0, alias: 'content' }, 
+      { type: 0, alias: 'footer' }
+    ];
+
+    it('should convert group to tab', function () {
+      const newTab = groups[0];
+
+      contentTypeHelper.convertGroupToTab(groups, newTab);
+
+      expect(newTab.type).toBe(contentTypeHelper.TYPE_TAB);
+      expect(newTab.alias).toBe('hero');
+      expect(newTab.parentAlias).toBeNull();
     });
 
   });

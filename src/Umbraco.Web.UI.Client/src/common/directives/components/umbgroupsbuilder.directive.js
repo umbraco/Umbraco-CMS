@@ -7,8 +7,8 @@
 
         function link(scope, element) {
 
-            const TYPE_GROUP = 0;
-            const TYPE_TAB = 1;
+            const TYPE_GROUP = contentTypeHelper.TYPE_GROUP;
+            const TYPE_TAB = contentTypeHelper.TYPE_TAB;
 
             var eventBindings = [];
             var validationTranslated = "";
@@ -164,7 +164,11 @@
                         const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
 
                         if (group) {
-                            scope.convertGroupToTab(group);
+                            contentTypeHelper.convertGroupToTab(scope.model.groups, group);
+
+                            scope.tabs.push(group);
+                            scope.$broadcast('umbOverflowChecker.checkOverflow');
+                            scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
                         }
                     }
                 };
@@ -185,7 +189,7 @@
 
                             const newAlias = contentTypeHelper.updateParentAlias(group.alias || null, hoveredTabAlias);
                             // Check alias is unique
-                            if (group.alias !== newAlias && isAliasUnique(newAlias) === false) {
+                            if (group.alias !== newAlias && contentTypeHelper.isAliasUnique(scope.model.groups, newAlias) === false) {
                                 // TODO: Missing UI indication of why you cant move here.
                                 return;
                             }
@@ -596,18 +600,6 @@
                 }
             };
 
-            function isAliasUnique(alias) {
-                return scope.model.groups.find(group => group.alias === alias) ? false : true;
-            }
-
-            function createUniqueAlias(alias) {
-                let i = 1;
-                while(isAliasUnique(alias + i.toString()) === false) {
-                    i++;
-                }
-                return alias + i.toString();
-            }
-
             /** Universal method for updating group alias (for tabs, field-sets etc.) */
             function updateGroupAlias(group) {
                 const localAlias = contentTypeHelper.generateLocalAlias(group.name),
@@ -615,8 +607,8 @@
                 let newAlias = contentTypeHelper.updateLocalAlias(oldAlias, localAlias);
 
                 // Ensure unique alias, otherwise we would be transforming groups of other parents, we do not want this.
-                if(isAliasUnique(newAlias) === false) {
-                    newAlias = createUniqueAlias(newAlias);
+                if(contentTypeHelper.isAliasUnique(scope.model.groups, newAlias) === false) {
+                    newAlias = contentTypeHelper.createUniqueAlias(scope.model.groups, newAlias);
                 }
 
                 group.alias = newAlias;
@@ -783,20 +775,6 @@
                 const sortedGroups = $filter('orderBy')(groupsInTab, 'sortOrder');
                 scope.model.groups = [...otherGroups, ...sortedGroups];
             };
-
-            scope.convertGroupToTab = function (group) {
-                if (!group) {
-                    return;
-                }
-
-                group.type = TYPE_TAB;
-                const newAlias = contentTypeHelper.generateLocalAlias(group.name);
-                group.alias = createUniqueAlias(newAlias);
-                group.parentAlias = null;
-                scope.tabs.push(group);
-                scope.$broadcast('umbOverflowChecker.checkOverflow');
-                scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
-            }
 
             /* ---------- PROPERTIES ---------- */
             scope.addPropertyToActiveGroup = () => {

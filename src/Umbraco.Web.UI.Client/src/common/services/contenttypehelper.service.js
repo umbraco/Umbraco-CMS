@@ -7,6 +7,21 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
     var contentTypeHelperService = {
 
+        TYPE_GROUP: 0,
+        TYPE_TAB: 1,
+
+        isAliasUnique(groups, alias) {
+            return groups.find(group => group.alias === alias) ? false : true;
+        },
+
+        createUniqueAlias(groups, alias) {
+            let i = 1;
+            while(this.isAliasUnique(groups, alias + i.toString()) === false) {
+                i++;
+            }
+            return alias + i.toString();
+        },
+
         generateLocalAlias: function(name) {
             return name ? name.toUmbracoAlias() : String.CreateGuid();
         },
@@ -72,6 +87,21 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                 group.parentAlias = null;
                 this.updateDescendingAliases(groups, oldAlias, newAlias);
             });
+        },
+
+        convertGroupToTab: function (groups, group) {
+            group.convertingToTab = true;
+
+            group.type = this.TYPE_TAB;
+            
+            const newAlias = this.generateLocalAlias(group.name);
+            // when checking for alias uniqueness we need to exclude the current group or the alias would get a + 1
+            const otherGroups = [...groups].filter(groupCopy => !groupCopy.convertingToTab);
+
+            group.alias = this.isAliasUnique(otherGroups, newAlias) ? newAlias : this.createUniqueAlias(otherGroups, newAlias);
+            group.parentAlias = null;
+
+            group.convertingToTab = false;
         },
 
         createIdArray: function (array) {
