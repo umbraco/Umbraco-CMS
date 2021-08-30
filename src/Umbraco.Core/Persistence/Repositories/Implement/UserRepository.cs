@@ -149,30 +149,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IDictionary<UserState, int> GetUserStates()
         {
-            var sql = @"SELECT '1CountOfAll' AS colName, COUNT(id) AS num FROM umbracoUser
+            var sql = @"SELECT -1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser
 UNION
-SELECT '2CountOfActive' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL
+SELECT 0 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL
 UNION
-SELECT '3CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 1
+SELECT 1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 1
 UNION
-SELECT '4CountOfLockedOut' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userNoConsole = 1
+SELECT 2 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userNoConsole = 1
 UNION
-SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
+SELECT 3 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
 UNION
-SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL
-ORDER BY colName";
+SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL";
 
-            var result = Database.Fetch<UserStateDto>(sql);
+            var result = Database.Dictionary<int, int>(sql);
 
-            return new Dictionary<UserState, int>
-            {
-                {UserState.All, (int) result[0].Count},
-                {UserState.Active, (int) result[1].Count},
-                {UserState.Disabled, (int) result[2].Count},
-                {UserState.LockedOut, (int) result[3].Count},
-                {UserState.Invited, (int) result[4].Count},
-                {UserState.Inactive, (int) result[5].Count}
-            };
+            return result.ToDictionary(x => (UserState)x.Key, x => x.Value);
         }
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)

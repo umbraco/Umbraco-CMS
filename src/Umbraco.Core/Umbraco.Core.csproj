@@ -171,7 +171,6 @@
     <Compile Include="Persistence\Dtos\ConstraintPerTableDto.cs" />
     <Compile Include="Persistence\Dtos\DefaultConstraintPerColumnDto.cs" />
     <Compile Include="Persistence\Dtos\UserNotificationDto.cs" />
-    <Compile Include="Persistence\Dtos\UserStateDto.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />
     <Compile Include="Persistence\SqlCeImageMapper.cs" />
