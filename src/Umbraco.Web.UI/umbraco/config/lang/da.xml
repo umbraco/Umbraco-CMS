@@ -2049,4 +2049,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="FileWriting">Filskrivning</key>
     <key alias="MediaFolderCreation">Medie mappeoprettelse</key>
   </area>
+  <area alias="treeSearch">
+    <key alias="searchResult">resultat</key>
+    <key alias="searchResults">resultater</key>
+  </area>
 </language>
