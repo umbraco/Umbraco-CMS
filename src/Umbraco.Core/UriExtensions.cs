@@ -141,9 +141,9 @@ namespace Umbraco.Core
         /// <summary>
         /// Non Client Side request Extensions <see cref="IsClientSideRequest"/>
         /// </summary>
-        internal readonly static IDictionary<string, bool> NonClientSideRequestExtensions = new Dictionary<string, bool>(5,StringComparer.InvariantCultureIgnoreCase)
+        internal readonly static HashSet<string> NonClientSideRequestExtensions = new (5, StringComparer.InvariantCultureIgnoreCase)
         {
-            { ".aspx",true },{ ".ashx",true},{ ".asmx",true},{ ".axd",true}, {".svc",true}
+            ".aspx", ".ashx", ".asmx", ".axd", ".svc"
         };
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace Umbraco.Core
             {
                 var ext = Path.GetExtension(url.LocalPath);
                 if (ext.IsNullOrWhiteSpace()) return false;
-                return !NonClientSideRequestExtensions.ContainsKey(ext);
+                return !NonClientSideRequestExtensions.Contains(ext);
             }
             catch (ArgumentException)
             {
