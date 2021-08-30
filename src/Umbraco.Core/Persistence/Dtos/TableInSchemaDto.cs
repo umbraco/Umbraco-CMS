@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    public class TableInSchemaDto
+    internal class TableInSchemaDto
     {
         [Column("TABLE_NAME")]
         public string TableName { get; set; }

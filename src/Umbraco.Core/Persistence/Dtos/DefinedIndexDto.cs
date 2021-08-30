@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    public class DefinedIndexDto
+    internal class DefinedIndexDto
     {
 
         [Column("TABLE_NAME")]
