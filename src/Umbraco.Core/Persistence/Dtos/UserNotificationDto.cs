@@ -1,17 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using NPoco;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
     public class UserNotificationDto
     {
-        public int nodeId { get; set; }
-        public int userId { get; set; }
+        [Column("nodeId")]
+        public int NodeId { get; set; }
 
-        public Guid nodeObjectType { get; set; }
-        public string action { get; set; }
+        [Column("userId")]
+        public int UserId { get; set; }
+
+        [Column("nodeObjectType")]
+        public Guid NodeObjectType { get; set; }
+
+        [Column("action")]
+        public string Action { get; set; }
     }
 }

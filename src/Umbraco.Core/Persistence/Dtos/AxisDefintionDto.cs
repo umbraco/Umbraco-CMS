@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NPoco;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
     public class AxisDefintionDto
     {
-        public int nodeId { get; set; }
-        public string alias { get; set; }
-        public int parentID { get; set; }
+        [Column("nodeId")]
+        public int NodeId { get; set; }
+
+        [Column("alias")]
+        public string Alias { get; set; }
+
+        [Column("ParentID")]
+        public int ParentId { get; set; }
     }
 }

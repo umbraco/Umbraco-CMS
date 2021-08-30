@@ -1,19 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NPoco;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
     public class ColumnInSchemaDto
     {
-        public string TABLE_NAME { get; set; }
-        public string COLUMN_NAME { get; set; }
+        [Column("TABLE_NAME")]
+        public string TableName { get; set; }
 
-        public int ORDINAL_POSITION { get; set; }
-        public string COLUMN_DEFAULT { get; set; }
-        public string IS_NULLABLE { get; set; }
-        public string DATA_TYPE { get; set; }
+        [Column("COLUMN_NAME")]
+        public string ColumnName { get; set; }
+
+        [Column("ORDINAL_POSITION")]
+        public int OrdinalPosition { get; set; }
+
+        [Column("COLUMN_DEFAULT")]
+        public string ColumnDefault { get; set; }
+
+        [Column("IS_NULLABLE")]
+        public string IsNullable { get; set; }
+
+        [Column("DATA_TYPE")]
+        public string DataType { get; set; }
     }
 }

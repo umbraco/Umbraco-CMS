@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NPoco;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
     public class ConstraintPerColumnDto
     {
-        public string TABLE_NAME { get; set; }
-        public string COLUMN_NAME { get; set; }
-        public string CONSTRAINT_NAME { get; set; }
+        [Column("TABLE_NAME")]
+        public string TableName { get; set; }
+
+        [Column("COLUMN_NAME")]
+        public string ColumnName { get; set; }
+
+        [Column("CONSTRAINT_NAME")]
+        public string ConstraintName { get; set; }
     }
 }

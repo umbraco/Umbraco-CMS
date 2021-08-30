@@ -305,9 +305,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var childIds = Database.Fetch<AxisDefintionDto>(childIdsSql)
                 .Select(x => new EntitySlim
                 {
-                    Id = x.nodeId,
-                    ParentId = x.parentID,
-                    Name = x.alias
+                    Id = x.NodeId,
+                    ParentId = x.ParentId,
+                    Name = x.Alias
                 });
             return childIds;
         }

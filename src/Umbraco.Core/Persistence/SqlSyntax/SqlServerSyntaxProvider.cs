@@ -183,7 +183,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             var items = db.Fetch<TableInSchemaDto>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
-            return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
+            return items.Select(x => x.TableName).Cast<string>().ToList();
         }
 
         public override IsolationLevel DefaultIsolationLevel => IsolationLevel.ReadCommitted;
@@ -194,8 +194,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return
                 items.Select(
                     item =>
-                    new ColumnInfo(item.TABLE_NAME, item.COLUMN_NAME, item.ORDINAL_POSITION, item.COLUMN_DEFAULT,
-                                   item.IS_NULLABLE, item.DATA_TYPE)).ToList();
+                    new ColumnInfo(item.TableName, item.ColumnName, item.OrdinalPosition, item.ColumnDefault,
+                                   item.IsNullable, item.DataType)).ToList();
         }
 
         /// <inheritdoc />
@@ -204,7 +204,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var items =
                 db.Fetch<ConstraintPerTableDto>(
                     "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
-            return items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
+            return items.Select(item => new Tuple<string, string>(item.TableName, item.ConstraintName)).ToList();
         }
 
         /// <inheritdoc />
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var items =
                 db.Fetch<ConstraintPerColumnDto>(
                     "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
-            return items.Select(item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME)).ToList();
+            return items.Select(item => new Tuple<string, string, string>(item.TableName, item.ColumnName, item.ConstraintName)).ToList();
         }
 
         /// <inheritdoc />
@@ -229,8 +229,8 @@ from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id
    inner join sys.schemas as S on T.[schema_id] = S.[schema_id]
 WHERE S.name = (SELECT SCHEMA_NAME()) AND I.is_primary_key = 0
 order by T.name, I.name");
-            return items.Select(item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME,
-                item.UNIQUE == 1)).ToList();
+            return items.Select(item => new Tuple<string, string, string, bool>(item.TableName, item.IndexName, item.ColumnName,
+                item.Unique == 1)).ToList();
 
         }
 

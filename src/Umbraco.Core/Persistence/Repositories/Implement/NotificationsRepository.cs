@@ -37,7 +37,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql
                 .OrderBy<UserDto>(x => x.Id)
                 .OrderBy<NodeDto>(dto => dto.NodeId);
-            return AmbientScope.Database.Fetch<UserNotificationDto>(sql).Select(x => new Notification(x.nodeId, x.userId, x.action, objectType));
+            return AmbientScope.Database.Fetch<UserNotificationDto>(sql).Select(x => new Notification(x.NodeId, x.UserId, x.Action, objectType));
         }
 
         public IEnumerable<Notification> GetUserNotifications(IUser user)
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = AmbientScope.Database.Fetch<UserNotificationDto>(sql);
             //need to map the results
-            return dtos.Select(d => new Notification(d.nodeId, d.userId, d.action, d.nodeObjectType)).ToList();
+            return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
         }
 
         public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = AmbientScope.Database.Fetch<UserNotificationDto>(sql);
             //need to map the results
-            return dtos.Select(d => new Notification(d.nodeId, d.userId, d.action, d.nodeObjectType)).ToList();
+            return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
         }
 
         public int DeleteNotifications(IEntity entity)
