@@ -81,7 +81,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     // Reset request to use the static login background image
                     var absoluteLoginBackgroundImage = $"{url}/{_contentSection.LoginBackgroundImage}";
-
+                    
                     request = (HttpWebRequest)WebRequest.Create(absoluteLoginBackgroundImage);
                     response = (HttpWebResponse)request.GetResponse();
                 }
