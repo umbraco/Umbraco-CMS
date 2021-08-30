@@ -3,7 +3,7 @@ using NPoco;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    public class UserNotificationDto
+    internal class UserNotificationDto
     {
         [Column("nodeId")]
         public int NodeId { get; set; }

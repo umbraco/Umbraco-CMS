@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    public class AxisDefintionDto
+    internal class AxisDefintionDto
     {
         [Column("nodeId")]
         public int NodeId { get; set; }

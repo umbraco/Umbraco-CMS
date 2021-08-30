@@ -149,6 +149,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IDictionary<UserState, int> GetUserStates()
         {
+            // These keys in this query map to the `Umbraco.Core.Models.Membership.UserState` enum
             var sql = @"SELECT -1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser
 UNION
 SELECT 0 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL
