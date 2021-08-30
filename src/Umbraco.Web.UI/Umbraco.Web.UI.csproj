@@ -348,9 +348,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8143</DevelopmentServerPort>
+          <DevelopmentServerPort>8144</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8143</IISUrl>
+          <IISUrl>http://localhost:8144</IISUrl>
           <DevelopmentServerPort>8131</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:8131</IISUrl>
