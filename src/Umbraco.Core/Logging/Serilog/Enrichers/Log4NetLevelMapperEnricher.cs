@@ -28,15 +28,15 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
                     break;
 
                 case LogEventLevel.Information:
-                    log4NetLevel = "INFO ";//Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
+                    log4NetLevel = "INFO "; //Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
                     break;
 
                 case LogEventLevel.Verbose:
-                    log4NetLevel = "ALL  ";//Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
+                    log4NetLevel = "ALL  "; //Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
                     break;
 
                 case LogEventLevel.Warning:
-                    log4NetLevel = "WARN ";//Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
+                    log4NetLevel = "WARN "; //Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
                     break;
                 default:
                     log4NetLevel = string.Empty;
