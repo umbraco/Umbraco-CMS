@@ -215,7 +215,7 @@ namespace Umbraco.Extensions
             );
 
 
-        [Obsolete("Use GetCrop to merge local and media crops, get automatic cache buster value and have more parameters.")]
+        [Obsolete("Use GetCropUrl to merge local and media crops, get automatic cache buster value and have more parameters.")]
         public static string GetLocalCropUrl(
             this MediaWithCrops mediaWithCrops,
             string alias,
