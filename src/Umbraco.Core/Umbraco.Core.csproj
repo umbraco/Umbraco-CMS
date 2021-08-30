@@ -170,7 +170,6 @@
     <Compile Include="Persistence\Dtos\ConstraintPerColumnDto.cs" />
     <Compile Include="Persistence\Dtos\ConstraintPerTableDto.cs" />
     <Compile Include="Persistence\Dtos\DefaultConstraintPerColumnDto.cs" />
-    <Compile Include="Persistence\Dtos\TableInSchemaDto.cs" />
     <Compile Include="Persistence\Dtos\UserNotificationDto.cs" />
     <Compile Include="Persistence\Dtos\UserStateDto.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />

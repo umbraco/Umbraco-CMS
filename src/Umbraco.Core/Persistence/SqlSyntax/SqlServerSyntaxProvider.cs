@@ -182,8 +182,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
-            var items = db.Fetch<TableInSchemaDto>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
-            return items.Select(x => x.TableName).Cast<string>().ToList();
+            return db.Fetch<string>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
         }
 
         public override IsolationLevel DefaultIsolationLevel => IsolationLevel.ReadCommitted;
