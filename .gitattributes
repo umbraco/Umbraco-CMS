@@ -44,6 +44,7 @@
 *.json text=auto
 *.xml text=auto
 *.resx text=auto
+*.yml text eol=lf core.whitespace whitespace=tab-in-indent,trailing-space,tabwidth=2
 
 *.csproj text=auto merge=union
 *.vbproj text=auto merge=union
