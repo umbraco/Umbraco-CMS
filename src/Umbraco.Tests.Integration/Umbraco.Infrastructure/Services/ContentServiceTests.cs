@@ -81,9 +81,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
             .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
             .AddNotificationHandler<ContentCopyingNotification, ContentNotificationHandler>()
-            .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>()
-            .AddNotificationHandler<DataTypeSavedNotification, ValueEditorCacheRefresher>()
-            .AddNotificationHandler<DataTypeDeletedNotification, ValueEditorCacheRefresher>();
+            .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>();
 
         [TearDown]
         public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
