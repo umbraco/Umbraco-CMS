@@ -20,10 +20,11 @@ namespace Umbraco.Core.Runtime
 
         public MainDomSemaphoreLock(ILogger logger)
         {
-            var lockName = "UMBRACO-" + MainDom.GetMainDomId() + "-MAINDOM-LCK";
+            var mainDomId = MainDom.GetMainDomId();
+            var lockName = "UMBRACO-" + mainDomId + "-MAINDOM-LCK";
             _systemLock = new SystemLock(lockName);
 
-            var eventName = "UMBRACO-" + MainDom.GetMainDomId() + "-MAINDOM-EVT";
+            var eventName = "UMBRACO-" + mainDomId + "-MAINDOM-EVT";
             _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
             _logger = logger;
         }
