@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlServerCe;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Web;
@@ -20,9 +20,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Runtime
@@ -182,7 +180,7 @@ namespace Umbraco.Core.Runtime
                 AcquireMainDom(MainDom);
 
                 // determine our runtime level
-                DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
+                //DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
                 // get composers, and compose
                 var composerTypes = ResolveComposerTypes(typeLoader);
@@ -362,6 +360,22 @@ namespace Umbraco.Core.Runtime
 
             // no connection string set
             if (databaseFactory.Configured == false) return;
+
+            // create SQL CE database if not existing and database provider is SQL CE
+            if (databaseFactory.ProviderName == Constants.DbProviderNames.SqlCe)
+            {
+                var dataSource = new SqlCeConnectionStringBuilder(databaseFactory.ConnectionString).DataSource;
+                var dbFilePath = dataSource.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
+
+                if(!File.Exists(dbFilePath))
+                {
+
+                    var engine = new SqlCeEngine(databaseFactory.ConnectionString);
+                    engine.CreateDatabase();
+                }
+            }
+
+            DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
             var tries = 5;
             var connect = false;
