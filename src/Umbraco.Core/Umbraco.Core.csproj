@@ -165,9 +165,16 @@
     <Compile Include="Models\PublishedContent\PublishedContentTypeExtensions.cs" />
     <Compile Include="Models\ReadOnlyContentBaseAdapter.cs" />
     <Compile Include="Models\RelationTypeExtensions.cs" />
+    <Compile Include="Persistence\Dtos\AxisDefintionDto.cs" />
+    <Compile Include="Persistence\Dtos\ColumnInSchemaDto.cs" />
+    <Compile Include="Persistence\Dtos\ConstraintPerColumnDto.cs" />
+    <Compile Include="Persistence\Dtos\ConstraintPerTableDto.cs" />
+    <Compile Include="Persistence\Dtos\DefaultConstraintPerColumnDto.cs" />
+    <Compile Include="Persistence\Dtos\UserNotificationDto.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />
     <Compile Include="Persistence\SqlCeImageMapper.cs" />
+    <Compile Include="Persistence\Dtos\DefinedIndexDto.cs" />
     <Compile Include="PropertyEditors\IPropertyCacheCompressionOptions.cs" />
     <Compile Include="PropertyEditors\NoopPropertyCacheCompressionOptions.cs" />
     <Compile Include="PropertyEditors\PropertyCacheCompression.cs" />
