@@ -11,7 +11,7 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            var log4NetLevel = string.Empty;
+            string log4NetLevel;
 
             switch (logEvent.Level)
             {
@@ -28,20 +28,20 @@ namespace Umbraco.Core.Logging.Serilog.Enrichers
                     break;
 
                 case LogEventLevel.Information:
-                    log4NetLevel = "INFO";
+                    log4NetLevel = "INFO "; //Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
                     break;
 
                 case LogEventLevel.Verbose:
-                    log4NetLevel = "ALL";
+                    log4NetLevel = "ALL  "; //Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
                     break;
 
                 case LogEventLevel.Warning:
-                    log4NetLevel = "WARN";
+                    log4NetLevel = "WARN "; //Padded string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
+                    break;
+                default:
+                    log4NetLevel = string.Empty;
                     break;
             }
-
-            //Pad string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
-            log4NetLevel = log4NetLevel.PadRight(5);
 
             logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("Log4NetLevel", log4NetLevel));
         }

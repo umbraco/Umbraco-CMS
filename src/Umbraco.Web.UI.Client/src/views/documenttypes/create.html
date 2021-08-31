@@ -54,7 +54,7 @@
             </ul>
         </div>
 
-        <div class="umb-pane" ng-show="model.creatingFolder">
+        <div class="umb-pane" ng-if="model.creatingFolder">
             <form novalidate name="createFolderForm"
                   ng-submit="createContainer()"
                   val-form-manager>
