@@ -307,6 +307,7 @@
     <key alias="notReadyToPublish">We are not ready to Publish</key>
     <key alias="readyToPublish">Ready to publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
+    <key alias="resetFocalPoint">Reset focal point</key>
     <key alias="sendForApproval">Send for approval</key>
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
     <key alias="createEmpty">Create new</key>
