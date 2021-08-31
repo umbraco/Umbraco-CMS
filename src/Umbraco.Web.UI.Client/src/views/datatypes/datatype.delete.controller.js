@@ -10,7 +10,6 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
 
     var vm = this;
 
-    vm.propertyJoinSeparator = ', <i class="icon-alert red"></i>';
     vm.hasReferences = false;
     vm.references = [];
 

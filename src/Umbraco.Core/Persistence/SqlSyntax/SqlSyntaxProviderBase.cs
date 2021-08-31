@@ -352,7 +352,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             sql.Append(" ");
             sql.Append(FormatIdentity(column));
 
-            var isNullable = column.IsNullable;
+            //var isNullable = column.IsNullable;
 
             //var constraint = FormatConstraint(column)?.TrimStart("CONSTRAINT ");
             //var hasConstraint = !string.IsNullOrWhiteSpace(constraint);
@@ -360,11 +360,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             //var defaultValue = FormatDefaultValue(column);
             //var hasDefaultValue = !string.IsNullOrWhiteSpace(defaultValue);
 
-            if (isNullable /*&& !hasConstraint && !hasDefaultValue*/)
-            {
-                sqls = Enumerable.Empty<string>();
-                return sql.ToString();
-            }
+            // TODO: This used to exit if nullable but that means this would never work
+            // to return SQL if the column was nullable?!? I don't get it. This was here
+            // 4 years ago, I've removed it so that this works for nullable columns.
+            //if (isNullable /*&& !hasConstraint && !hasDefaultValue*/)
+            //{
+            //    sqls = Enumerable.Empty<string>();
+            //    return sql.ToString();
+            //}
 
             var msql = new List<string>();
             sqls = msql;

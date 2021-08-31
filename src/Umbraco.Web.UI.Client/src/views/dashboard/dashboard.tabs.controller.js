@@ -88,9 +88,9 @@ function startUpDynamicContentController($q, $timeout, $scope, dashboardResource
 
     evts.push(eventsService.on("appState.tour.complete", function (name, completedTour) {
         $timeout(function(){
-            angular.forEach(vm.tours, function (tourGroup) {
-                angular.forEach(tourGroup, function (tour) {
-                    if(tour.alias === completedTour.alias) {
+            Utilities.forEach(vm.tours, tourGroup => {
+                Utilities.forEach(tourGroup, tour => {
+                    if (tour.alias === completedTour.alias) {
                         tour.completed = true;
                     }
                 });
@@ -100,24 +100,24 @@ function startUpDynamicContentController($q, $timeout, $scope, dashboardResource
 
     //proxy remote css through the local server
     assetsService.loadCss(dashboardResource.getRemoteDashboardCssUrl("content"), $scope);
-    dashboardResource.getRemoteDashboardContent("content").then(
-        function (data) {
 
-            vm.loading = false;
+    dashboardResource.getRemoteDashboardContent("content").then(data => {
 
-            //test if we have received valid data
-            //we capture it like this, so we avoid UI errors - which automatically triggers ui based on http response code
-            if (data && data.sections) {
-                vm.dashboard = data;
-            } else {
-                vm.showDefault = true;
-            }
-        },
-        function (exception) {
-            console.error(exception);
-            vm.loading = false;
+        vm.loading = false;
+
+        //test if we have received valid data
+        //we capture it like this, so we avoid UI errors - which automatically triggers ui based on http response code
+        if (data && data.sections) {
+            vm.dashboard = data;
+        } else {
             vm.showDefault = true;
-        });
+        }
+    },
+    function (exception) {
+        console.error(exception);
+        vm.loading = false;
+        vm.showDefault = true;
+    });
 
     onInit();
 

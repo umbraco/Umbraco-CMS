@@ -140,7 +140,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// Determines whether the value has a specified crop.
         /// </summary>
         public bool HasCrop(string alias)
-            => Crops.Any(x => x.Alias == alias);
+            => Crops != null && Crops.Any(x => x.Alias == alias);
 
         /// <summary>
         /// Determines whether the value has a source image.
@@ -148,46 +148,35 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public bool HasImage()
             => !string.IsNullOrWhiteSpace(Src);
 
-        /// <summary>
-        /// Applies a configuration.
-        /// </summary>
-        /// <remarks>Ensures that all crops defined in the configuration exists in the value.</remarks>
-        internal void ApplyConfiguration(ImageCropperConfiguration configuration)
+        internal ImageCropperValue Merge(ImageCropperValue imageCropperValue)
         {
-            // merge the crop values - the alias + width + height comes from
-            // configuration, but each crop can store its own coordinates
-
-            var configuredCrops = configuration?.Crops;
-            if (configuredCrops == null) return;
-
-            //Use Crops if it's not null, otherwise create a new list
             var crops = Crops?.ToList() ?? new List<ImageCropperCrop>();
 
-            foreach (var configuredCrop in configuredCrops)
+            var incomingCrops = imageCropperValue?.Crops;
+            if (incomingCrops != null)
             {
-                var crop = crops.FirstOrDefault(x => x.Alias == configuredCrop.Alias);
-                if (crop != null)
+                foreach (var incomingCrop in incomingCrops)
                 {
-                    // found, apply the height & width
-                    crop.Width = configuredCrop.Width;
-                    crop.Height = configuredCrop.Height;
-                }
-                else
-                {
-                    // not found, add
-                    crops.Add(new ImageCropperCrop
+                    var crop = crops.FirstOrDefault(x => x.Alias == incomingCrop.Alias);
+                    if (crop == null)
                     {
-                        Alias = configuredCrop.Alias,
-                        Width = configuredCrop.Width,
-                        Height = configuredCrop.Height
-                    });
+                        // Add incoming crop
+                        crops.Add(incomingCrop);
+                    }
+                    else if (crop.Coordinates == null)
+                    {
+                        // Use incoming crop coordinates
+                        crop.Coordinates = incomingCrop.Coordinates;
+                    }
                 }
             }
 
-            // assume we don't have to remove the crops in value, that
-            // are not part of configuration anymore?
-
-            Crops = crops;
+            return new ImageCropperValue()
+            {
+                Src = !string.IsNullOrWhiteSpace(Src) ? Src : imageCropperValue?.Src,
+                Crops = crops,
+                FocalPoint = FocalPoint ?? imageCropperValue?.FocalPoint
+            };
         }
 
         #region IEquatable

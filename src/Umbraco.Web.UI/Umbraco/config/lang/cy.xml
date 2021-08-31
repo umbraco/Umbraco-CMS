@@ -197,26 +197,6 @@
         <key alias="smallCustom">Arferu</key>
         <key alias="historyIncludingVariants">Hanes (pob amrywiad)</key>
     </area>
-    <area alias="changeDocType">
-        <key alias="changeDocTypeInstruction">Er mwyn newid y math o ddogfen ar gyfer y cynnwys dewiswyd, yn gyntaf dewiswch o'r rhestr o fathau dilys ar gyfer y lleoliad yma.</key>
-        <key alias="changeDocTypeInstruction2">Wedyn cadarnhewch a/neu newid y mapiau priodweddau o'r math bresennol at yr un newydd, yna cliciwch Achub.</key>
-        <key alias="contentRepublished">Mae'r cynnwys wedi'i ail-gyhoeddi.</key>
-        <key alias="currentProperty">Priodwedd Bresennol</key>
-        <key alias="currentType">Math bresennol</key>
-        <key alias="docTypeCannotBeChanged">Ni ellir newid y fath o ddogfen gan nad oes dewisiadau amgen ar gyfer y lleoliad yma. Bydd dewis amgen yn ddilys os caniateir i'r dewis fod o dan rhiant yr eitem gynnwys sydd wedi'i ddewis ac fod caniatâd i bob eitem gynnwys blentyn sy'n bodoli eisoes i gael eu creu oddi'i tan.</key>
-        <key alias="docTypeChanged">Math o Ddogfen Wedi'i Newid</key>
-        <key alias="mapProperties">Mapio Priodweddau</key>
-        <key alias="mapToProperty">Mapio i Briodwedd</key>
-        <key alias="newTemplate">Templed Newydd</key>
-        <key alias="newType">Math Newydd</key>
-        <key alias="none">dim</key>
-        <key alias="selectedContent">Cynnwys</key>
-        <key alias="selectNewDocType">Dewis Math o Ddogfen Newydd</key>
-        <key alias="successMessage">Mae'r math o ddogfen ar gyfer y cynnwys dewiswyd wedi cael ei newid yn llwyddiannus i [new type] ac mae'r priodweddau canlynol wedi'u mapio:</key>
-        <key alias="to">i</key>
-        <key alias="validationErrorPropertyWithMoreThanOneMapping">Ni ellir cwblhau mapio'r priodweddau gan fod gan un neu fwy o'r priodweddau fwy nag un map wedi'i ddiffinio.</key>
-        <key alias="validDocTypesNote">Dim ond mathau amgen sy'n ddilys ar gyfer y lleoliad bresennol sydd yn ymddangos.</key>
-    </area>
     <area alias="codefile">
         <key alias="createFolderFailedById">Methwyd creu ffolder o dan id rhiant %0%</key>
         <key alias="createFolderFailedByName">Methwyd creu ffolder o dan rhiant efo enw %0%</key>
@@ -2564,6 +2544,8 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <area alias="logViewer">
         <key alias="deleteSavedSearch">Dileu Chwiliad Cadwedig</key>
         <key alias="logLevels">Lefelau Log</key>
+        <key alias="selectAllLogLevelFilters">Dewiswch y cyfan</key>
+        <key alias="deselectAllLogLevelFilters">Dad-ddewiswch bawb</key>
         <key alias="savedSearches">Chwiliadau Cadwedig</key>
         <key alias="saveSearch">Arbed Chwiliad</key>
         <key alias="saveSearchDescription">Rhoi enw cyfeillgar am eich ymholiad chwilio</key>

@@ -16,7 +16,8 @@
 
 	<div class="crop-controls-wrapper" ng-if="loaded">
         <div class="crop-slider-wrapper">
-            <i class="icon-picture crop-controls-wrapper__icon-left" aria-hidden="true"></i>
+
+            <umb-icon icon="icon-picture" class="crop-controls-wrapper__icon-left"></umb-icon>
 
             <div class="crop-slider">
                 <umb-range-slider
@@ -28,7 +29,8 @@
                 </umb-range-slider>
             </div>
 
-            <i class="icon-picture crop-controls-wrapper__icon-right" aria-hidden="true"></i>
+            <umb-icon icon="icon-picture" class="crop-controls-wrapper__icon-right"></umb-icon>
+
         </div>
         <ng-transclude></ng-transclude>
     </div>

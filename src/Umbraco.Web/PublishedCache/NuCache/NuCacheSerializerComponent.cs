@@ -16,6 +16,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
     public class NuCacheSerializerComponent : IComponent
     {
         internal const string Nucache_Serializer_Key = "Umbraco.Web.PublishedCache.NuCache.Serializer";
+        internal const string Nucache_UnPublishedContentCompression_Key = "Umbraco.Web.PublishedCache.NuCache.CompressUnPublishedContent";
         private const string JSON_SERIALIZER_VALUE = "JSON";
         private readonly Lazy<IPublishedSnapshotService> _service;
         private readonly IKeyValueService _keyValueService;
@@ -54,7 +55,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 _profilingLogger.Warn<NuCacheSerializerComponent>($"Database NuCache was serialized using {currentSerializer}. Currently configured NuCache serializer {serializer}. Rebuilding Nucache");
 
-                using (_profilingLogger.TraceDuration<NuCacheSerializerComponent>($"Rebuilding NuCache database with {currentSerializer} serializer"))
+                using (_profilingLogger.TraceDuration<NuCacheSerializerComponent>($"Rebuilding NuCache database with {serializer} serializer"))
                 {
                     _service.Value.Rebuild();
                     _keyValueService.SetValue(Nucache_Serializer_Key, serializer);

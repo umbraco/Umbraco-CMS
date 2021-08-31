@@ -51,22 +51,27 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             var mediaItems = new List<MediaWithCrops>();
             var dtos = MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(inter);
+            var configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
 
             foreach (var dto in dtos)
             {
                 var mediaItem = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(preview, dto.MediaKey);
                 if (mediaItem != null)
                 {
-                    mediaItems.Add(new MediaWithCrops
+                    var localCrops = new ImageCropperValue
                     {
-                        MediaItem = mediaItem,
-                        LocalCrops = new ImageCropperValue
-                        {
-                            Crops = dto.Crops,
-                            FocalPoint = dto.FocalPoint,
-                            Src = mediaItem.Url()
-                        }
-                    });
+                        Crops = dto.Crops,
+                        FocalPoint = dto.FocalPoint,
+                        Src = mediaItem.Url()
+                    };
+
+                    localCrops.ApplyConfiguration(configuration);
+
+                    // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
+                    var mediaWithCropsType = typeof(MediaWithCrops<>).MakeGenericType(mediaItem.GetType());
+                    var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem, localCrops);
+
+                    mediaItems.Add(mediaWithCrops);
 
                     if (!isMultiple)
                     {

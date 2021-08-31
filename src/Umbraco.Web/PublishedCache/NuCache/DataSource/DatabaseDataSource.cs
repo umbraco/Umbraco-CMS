@@ -412,12 +412,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var deserializedContent = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw);
+                    bool published = false;
+                    var deserializedContent = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
 
                     d = new ContentData
                     {
                         Name = dto.EditName,
-                        Published = false,
+                        Published = published,
                         TemplateId = dto.EditTemplateId,
                         VersionId = dto.VersionId,
                         VersionDate = dto.EditVersionDate,
@@ -439,13 +440,14 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw);
+                    bool published = true;
+                    var deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, published);
 
                     p = new ContentData
                     {
                         Name = dto.PubName,
                         UrlSegment = deserializedContent.UrlSegment,
-                        Published = true,
+                        Published = published,
                         TemplateId = dto.PubTemplateId,
                         VersionId = dto.VersionId,
                         VersionDate = dto.PubVersionDate,
@@ -475,12 +477,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             if (dto.EditData == null && dto.EditDataRaw == null)
                 throw new InvalidOperationException("No data for media " + dto.Id);
 
-            var deserializedMedia = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw);
+            bool published = true;
+            var deserializedMedia = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
 
             var p = new ContentData
             {
                 Name = dto.EditName,
-                Published = true,
+                Published = published,
                 TemplateId = -1,
                 VersionId = dto.VersionId,
                 VersionDate = dto.EditVersionDate,

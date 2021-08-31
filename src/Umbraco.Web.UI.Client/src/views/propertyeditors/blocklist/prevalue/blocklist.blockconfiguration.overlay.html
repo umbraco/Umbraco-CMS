@@ -37,14 +37,16 @@
                             <div class="control-group umb-control-group -no-border">
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="iconcolor"><localize key="blockEditor_labelCustomView">Custom view</localize></label>
-                                    <umb-property-info-button button-title="@blockEditor_labelCustomViewInfoTitle" localize="button-title"><localize key="blockEditor_labelCustomViewDescription">Overwrite how this block appears in the BackOffice UI. Pick a .html file containing your presentation.</localize></umb-property-info-button>
+                                    <umb-property-info-button button-title-key="blockEditor_labelCustomViewInfoTitle">
+                                        <localize key="blockEditor_labelCustomViewDescription">Overwrite how this block appears in the BackOffice UI. Pick a .html file containing your presentation.</localize>
+                                    </umb-property-info-button>
                                     <div class="controls">
                                         <div class="__settings-input --hasValue" ng-if="vm.block.view !== null" >
 
                                             <umb-node-preview icon="'icon-document'" name="vm.block.view"></umb-node-preview>
                                             <div class="__control-actions">
                                                 <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveViewForBlock(vm.block)">
-                                                    <i class="icon icon-wrong"></i>
+                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
                                                 </button>
                                             </div>
                                         </div>
@@ -65,7 +67,7 @@
                                             <umb-node-preview icon="'icon-document'" name="vm.block.stylesheet"></umb-node-preview>
                                             <div class="__control-actions">
                                                 <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveStylesheetForBlock(vm.block)">
-                                                    <i class="icon icon-wrong"></i>
+                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
                                                 </button>
                                             </div>
                                         </div>
@@ -111,7 +113,7 @@
                                             <umb-node-preview icon="vm.contentPreview.icon" name="vm.contentPreview.name" alias="vm.contentPreview.alias"></umb-node-preview>
                                             <div class="__control-actions">
                                                 <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.contentElementTypeKey)">
-                                                    <i class="icon icon-edit"></i>
+                                                    <umb-icon icon="icon-edit" class="icon"></umb-icon>
                                                 </button>
                                             </div>
                                         </div>
@@ -128,10 +130,10 @@
                                             <umb-node-preview icon="vm.settingsPreview.icon" name="vm.settingsPreview.name" alias="vm.settingsPreview.alias"></umb-node-preview>
                                             <div class="__control-actions">
                                                 <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.settingsElementTypeKey)">
-                                                    <i class="icon icon-edit"></i>
+                                                    <umb-icon icon="icon-edit" class="icon"></umb-icon>
                                                 </button>
                                                 <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveSettingsForBlock(vm.block)">
-                                                    <i class="icon icon-wrong"></i>
+                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
                                                 </button>
                                             </div>
                                         </div>
@@ -190,7 +192,7 @@
                                             <umb-node-preview icon="'icon-document'" name="vm.block.thumbnail"></umb-node-preview>
                                             <div class="__control-actions">
                                                 <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.removeThumbnailForBlock(vm.block)">
-                                                    <i class="icon icon-wrong"></i>
+                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
                                                 </button>
                                             </div>
                                         </div>
