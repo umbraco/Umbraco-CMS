@@ -84,7 +84,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Udi -Trashed
         private static void Map(PropertyGroup source, EntityBasic target, MapperContext context)
         {
-            target.Alias = source.Name.ToLowerInvariant();
+            target.Alias = source.Alias;
             target.Icon = "icon-tab";
             target.Id = source.Id;
             target.Key = source.Key;

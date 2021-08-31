@@ -434,9 +434,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Inherited = x.Inherited,
                     Id = x.Id,
-                    Properties = x.Properties,
+                    Key = x.Key,
+                    Type = x.Type,
+                    Name = x.Name,
+                    Alias = x.Alias,
                     SortOrder = x.SortOrder,
-                    Name = x.Name
+                    Properties = x.Properties
                 }).ToArray()
             };
         }

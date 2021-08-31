@@ -56,11 +56,13 @@
                                 <umb-icon icon="{{entry.open ? 'icon-navigation-down' : 'icon-navigation-right'}}" class="icon"></umb-icon>
                             </button>
                             <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, entry.variant)">
-                                <span class="umb-variant-switcher__name" ng-bind="entry.variant.displayName"></span>
-                                <span class="umb-variant-switcher__state">
-                                    <umb-variant-state variant="entry.variant"></umb-variant-state>
-                                    <span ng-if="entry.variant.language.isMandatory"> - <localize key="general_mandatory"></localize></span>
-                                    <span ng-if="entry.variant.language.isDefault"> - <localize key="general_default"></localize></span>
+                                <span class="umb-variant-switcher__name-content">
+                                    <span class="umb-variant-switcher__name" ng-bind="entry.variant.displayName"></span>
+                                    <span class="umb-variant-switcher__state">
+                                        <umb-variant-state variant="entry.variant"></umb-variant-state>
+                                        <span ng-if="entry.variant.language.isMandatory"> - <localize key="general_mandatory"></localize></span>
+                                        <span ng-if="entry.variant.language.isDefault"> - <localize key="general_default"></localize></span>
+                                    </span>
                                 </span>
                             </button>
                             <div ng-if="splitViewOpen !== true && !entry.variant.active" class="umb-variant-switcher__split-view umb-outline" ng-click="openInSplitView($event, entry.variant)">Open in split view</div>
@@ -76,8 +78,10 @@
                                 ng-class="{'--current': subVariant === editor.content, '--active': subVariant.active && vm.dropdownOpen, '--error': subVariant.active !== true && subVariant.hasError, '--state-notCreated':subVariant.state==='NotCreated', '--state-draft':subVariant.state==='Draft'}"
                             >
                                 <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, subVariant)">
-                                    <span class="umb-variant-switcher__name" ng-bind="subVariant.segment"></span>
-                                    <umb-variant-state variant="subVariant" class="umb-variant-switcher__state"></umb-variant-state>
+                                    <span class="umb-variant-switcher__name-content">
+                                        <span class="umb-variant-switcher__name" ng-bind="subVariant.segment"></span>
+                                        <umb-variant-state variant="subVariant" class="umb-variant-switcher__state"></umb-variant-state>
+                                    </span>
                                 </button>
                                 <div ng-if="splitViewOpen !== true && !subVariant.active" class="umb-variant-switcher__split-view umb-outline" ng-click="openInSplitView($event, subVariant)">Open in split view</div>
                             </umb-dropdown-item>
@@ -92,7 +96,7 @@
 
         <div ng-if="splitViewOpen">
             <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
-                <umb-icon icon="icon-delete"></umb-icon>
+                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
                 <span class="sr-only"><localize key="general_closepane">Close Pane</localize></span>
             </button>
         </div>
@@ -102,7 +106,8 @@
                 data-element="editor-sub-views"
                 navigation="editor.variantApps"
                 on-select="selectNavigationItem(item)"
-                on-anchor-select="selectAnchorItem(item, anchor)">
+                on-anchor-select="selectAnchorItem(item, anchor)"
+                limit="vm.navigationItemLimit">
             </umb-editor-navigation>
         </div>
 
@@ -113,6 +118,13 @@
                 current-section="{{menu.currentSection}}"
                 is-disabled="disableActionsMenu">
             </umb-editor-menu>
+        </div>
+
+        <div ng-if="splitViewOpen">
+            <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
+                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
+                <span class="sr-only"><localize key="general_closepane">Close Pane</localize></span>
+            </button>
         </div>
 
     </div>
