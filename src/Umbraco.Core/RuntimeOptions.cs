@@ -68,6 +68,15 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Gets a value indicating whether the <c>unattended.user.json</c> file should be deleted after unattended install.
+        /// </summary>
+        public static bool DeleteUnattendedUserFile
+        {
+            get => _upgradeUnattended ?? BoolSetting("Umbraco.Core.RuntimeState.DeleteUnattendedUserFile", true);
+            set => _upgradeUnattended = value;
+        }
+
+        /// <summary>
         /// Gets a value indicating whether unattended upgrade is enabled.
         /// </summary>
         public static bool UpgradeUnattended

@@ -343,7 +343,7 @@ namespace Umbraco.Core.Runtime
             Current.Services.UserService.Save(admin);
 
             // Delete JSON file if it existed to tidy 
-            if (fileExists)
+            if (fileExists && RuntimeOptions.DeleteUnattendedUserFile)
             {
                 File.Delete(filePath);
             }
