@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -519,7 +519,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     {
                         try
                         {
-                            _emailSender.SendAsync(request.Mail).GetAwaiter().GetResult();
+                            _emailSender.SendAsync(request.Mail, "Notification").GetAwaiter().GetResult();
                             _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                         }
                         catch (Exception ex)

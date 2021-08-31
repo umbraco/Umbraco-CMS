@@ -559,7 +559,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var mailMessage = new EmailMessage(fromEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
 
-            await _emailSender.SendAsync(mailMessage, true);
+            await _emailSender.SendAsync(mailMessage, "UserInvite", true);
         }
 
         /// <summary>

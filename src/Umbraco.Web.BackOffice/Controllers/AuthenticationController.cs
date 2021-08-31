@@ -394,7 +394,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
-                    await _emailSender.SendAsync(mailMessage);
+                    await _emailSender.SendAsync(mailMessage, "PasswordReset");
 
                     _userManager.NotifyForgotPasswordRequested(User, user.Id.ToString());
                 }
@@ -458,7 +458,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
-                await _emailSender.SendAsync(mailMessage);
+                await _emailSender.SendAsync(mailMessage, "2FA");
             }
             else if (provider == "Phone")
             {
