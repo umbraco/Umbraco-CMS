@@ -606,6 +606,12 @@
                             return null;
                         }
 
+                        // the Settings model has been changed to a new Element Type.
+                        // we need to update the settingsData with the new Content Type key
+                        if (settingsData.contentTypeKey !== settingsScaffold.contentTypeKey) {
+                            settingsData.contentTypeKey = settingsScaffold.contentTypeKey;
+                        }
+
                         blockObject.settingsData = settingsData;
 
                         // make basics from scaffold
