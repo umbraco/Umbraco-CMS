@@ -1,19 +1,17 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
-using Umbraco.Tests.Scoping;
 
 namespace Umbraco.Tests.Services
 {
@@ -1179,7 +1177,7 @@ namespace Umbraco.Tests.Services
             {
                 Id = propertyGroup.Id,
                 Name = "Content",
-                //Alias = "content",
+                Alias = "content",
                 SortOrder = 0
             }));
 
@@ -1703,17 +1701,17 @@ namespace Umbraco.Tests.Services
             // property is variant on A
             var test = service.Get(typeA.Id);
             Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
-            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.First().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.Last().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
 
             // but not on B
             test = service.Get(typeB.Id);
             Assert.AreEqual(ContentVariation.Nothing, test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
-            Assert.AreEqual(ContentVariation.Nothing, test.CompositionPropertyGroups.First().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+            Assert.AreEqual(ContentVariation.Nothing, test.CompositionPropertyGroups.Last().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
 
             // but on C
             test = service.Get(typeC.Id);
             Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
-            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.First().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.Last().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
         }
 
         private ContentType CreateComponent()
