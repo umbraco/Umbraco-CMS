@@ -37,22 +37,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql
                 .OrderBy<UserDto>(x => x.Id)
                 .OrderBy<NodeDto>(dto => dto.NodeId);
-            return AmbientScope.Database.Fetch<dynamic>(sql).Select(x => new Notification(x.nodeId, x.userId, x.action, objectType));
+            return AmbientScope.Database.Fetch<UserNotificationDto>(sql).Select(x => new Notification(x.NodeId, x.UserId, x.Action, objectType));
         }
 
         public IEnumerable<Notification> GetUserNotifications(IUser user)
         {
             var sql = AmbientScope.SqlContext.Sql()
-                .Select("DISTINCT umbracoNode.id, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
+                .Select("DISTINCT umbracoNode.id AS nodeId, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                 .From<User2NodeNotifyDto>()
                 .InnerJoin<NodeDto>()
                 .On<User2NodeNotifyDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
                 .Where<User2NodeNotifyDto>(dto => dto.UserId == (int)user.Id)
                 .OrderBy<NodeDto>(dto => dto.NodeId);
 
-            var dtos = AmbientScope.Database.Fetch<dynamic>(sql);
+            var dtos = AmbientScope.Database.Fetch<UserNotificationDto>(sql);
             //need to map the results
-            return dtos.Select(d => new Notification(d.id, d.userId, d.action, d.nodeObjectType)).ToList();
+            return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
         }
 
         public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
@@ -64,16 +64,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
         {
             var sql = AmbientScope.SqlContext.Sql()
-                .Select("DISTINCT umbracoNode.id, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
+                .Select("DISTINCT umbracoNode.id as nodeId, umbracoUser2NodeNotify.userId, umbracoNode.nodeObjectType, umbracoUser2NodeNotify.action")
                 .From<User2NodeNotifyDto>()
                 .InnerJoin<NodeDto>()
                 .On<User2NodeNotifyDto, NodeDto>(dto => dto.NodeId, dto => dto.NodeId)
                 .Where<User2NodeNotifyDto>(dto => dto.NodeId == entity.Id)
                 .OrderBy<NodeDto>(dto => dto.NodeId);
 
-            var dtos = AmbientScope.Database.Fetch<dynamic>(sql);
+            var dtos = AmbientScope.Database.Fetch<UserNotificationDto>(sql);
             //need to map the results
-            return dtos.Select(d => new Notification(d.id, d.userId, d.action, d.nodeObjectType)).ToList();
+            return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
         }
 
         public int DeleteNotifications(IEntity entity)
