@@ -7,7 +7,7 @@ using Newtonsoft.Json.Converters;
 namespace Umbraco.Core.Serialization
 {
     /// <summary>
-    /// When applied to a dictionary with a string key, will ensure the deserialized string keys are interned 
+    /// When applied to a dictionary with a string key, will ensure the deserialized string keys are interned
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
     /// <remarks>
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Serialization
         {
             if (reader.TokenType == JsonToken.StartObject)
             {
-                var dictionary = new Dictionary<string, TValue>();
+                var dictionary = Create(objectType);
                 while (reader.Read())
                 {
                     switch (reader.TokenType)
