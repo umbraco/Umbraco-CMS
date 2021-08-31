@@ -281,6 +281,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+        [AngularJsonOnlyConfiguration]
         [HttpGet]
         public IEnumerable<IGridEditorConfig> GetGridConfig()
         {
