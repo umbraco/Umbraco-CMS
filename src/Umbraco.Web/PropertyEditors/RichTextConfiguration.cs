@@ -16,6 +16,9 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("hideLabel", "Hide Label", "boolean")]
         public bool HideLabel { get; set; }
 
+        [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay.")]
+        public string OverlaySize { get; set; }
+
         [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
