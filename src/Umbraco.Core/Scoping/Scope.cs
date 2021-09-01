@@ -758,6 +758,8 @@ namespace Umbraco.Core.Scoping
                     // remove any queued locks for this instance that weren't used.
                     while (_queuedLocks?.Count > 0)
                     {
+                        // It's safe to assume that the locks on the top of the stack belong to this instance,
+                        // since any child scopes that might have added locks to the stack must be disposed before we try and dispose this instance.
                         var top = _queuedLocks.PeekStack();
                         if (top.instanceId == instanceId)
                         {
