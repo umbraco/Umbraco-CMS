@@ -632,6 +632,7 @@ When building a custom infinite editor view you can use the same components as a
          */
         function iconPicker(editor) {
             editor.view = "views/common/infiniteeditors/iconpicker/iconpicker.html";
+            editor.size = "medium";
             if (!editor.size) editor.size = "small";
             open(editor);
         }
