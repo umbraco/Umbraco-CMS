@@ -367,9 +367,8 @@ namespace Umbraco.Core.Runtime
                 var dataSource = new SqlCeConnectionStringBuilder(databaseFactory.ConnectionString).DataSource;
                 var dbFilePath = dataSource.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
 
-                if(!File.Exists(dbFilePath))
+                if(File.Exists(dbFilePath) == false)
                 {
-
                     var engine = new SqlCeEngine(databaseFactory.ConnectionString);
                     engine.CreateDatabase();
                 }
