@@ -170,7 +170,7 @@ namespace Umbraco.Core.Runtime
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
 
-                
+
 
                 // register runtime-level services
                 // there should be none, really - this is here "just in case"
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Runtime
                 AcquireMainDom(MainDom);
 
                 // determine our runtime level
-                //DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
+                DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
 
                 // get composers, and compose
                 var composerTypes = ResolveComposerTypes(typeLoader);
@@ -274,7 +274,7 @@ namespace Umbraco.Core.Runtime
                 || unattendedEmail.IsNullOrWhiteSpace()
                 || unattendedPassword.IsNullOrWhiteSpace())
             {
-                
+
                 fileExists = File.Exists(filePath);
                 if (fileExists == false)
                 {
@@ -340,7 +340,7 @@ namespace Umbraco.Core.Runtime
 
             Current.Services.UserService.Save(admin);
 
-            // Delete JSON file if it existed to tidy 
+            // Delete JSON file if it existed to tidy
             if (fileExists)
             {
                 File.Delete(filePath);
@@ -375,8 +375,6 @@ namespace Umbraco.Core.Runtime
                 }
             }
 
-            DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
-
             var tries = 5;
             var connect = false;
             for (var i = 0;;)
@@ -399,7 +397,7 @@ namespace Umbraco.Core.Runtime
 
                 // all conditions fulfilled, do the install
                 Logger.Info<CoreRuntime>("Starting unattended install.");
-                
+
                 try
                 {
                     database.BeginTransaction();
