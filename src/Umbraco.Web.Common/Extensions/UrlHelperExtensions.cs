@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -209,27 +208,27 @@ namespace Umbraco.Extensions
             return $"{version}.{runtimeMinifier.CacheBuster}".GenerateHash();
         }
 
-        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string cropAlias, bool htmlEncode = true)
+        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
         {
             if (mediaItem == null)
             {
                 return HtmlString.Empty;
             }
 
-            var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
+            var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
             return CreateHtmlString(url, htmlEncode);
         }
 
         private static IHtmlContent CreateHtmlString(string url, bool htmlEncode) => htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
 
-        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true)
+        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
         {
             if (mediaItem == null)
             {
                 return HtmlString.Empty;
             }
 
-            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
+            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
             return CreateHtmlString(url, htmlEncode);
         }
 
@@ -246,7 +245,8 @@ namespace Umbraco.Extensions
             bool useCropDimensions = false,
             bool cacheBuster = true,
             string furtherOptions = null,
-            bool htmlEncode = true)
+            bool htmlEncode = true,
+            UrlMode urlMode = UrlMode.Default)
         {
             if (mediaItem == null)
             {
@@ -254,7 +254,7 @@ namespace Umbraco.Extensions
             }
 
             var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions);
+                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, urlMode);
 
             return CreateHtmlString(url, htmlEncode);
         }

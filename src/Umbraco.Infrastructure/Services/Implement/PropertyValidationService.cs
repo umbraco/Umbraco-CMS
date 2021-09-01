@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
@@ -13,12 +14,18 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _textService;
+        private readonly IValueEditorCache _valueEditorCache;
 
-        public PropertyValidationService(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService)
+        public PropertyValidationService(
+            PropertyEditorCollection propertyEditors,
+            IDataTypeService dataTypeService,
+            ILocalizedTextService textService,
+            IValueEditorCache valueEditorCache)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _textService = textService;
+            _valueEditorCache = valueEditorCache;
         }
 
         /// <inheritdoc />
@@ -58,7 +65,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _textService.Localize("validation", "invalidPattern"),
                 };
 
-            var valueEditor = editor.GetValueEditor(dataType.Configuration);
+            IDataValueEditor valueEditor = _valueEditorCache.GetValueEditor(editor, dataType);
             foreach (var validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp))
             {
                 // If we've got custom error messages, we'll replace the default ones that will have been applied in the call to Validate().

@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($q, treeService, navigationService, notificationsService) {
+function umbTreeDirective($q, treeService, notificationsService) {
 
     return {
         restrict: 'E',
@@ -357,8 +357,6 @@ function umbTreeDirective($q, treeService, navigationService, notificationsServi
               defined on the tree
             */
             $scope.select = function (n, ev) {
-
-                navigationService.hideMenu();
                 
                 if (n.metaData && n.metaData.noAccess === true) {
                     ev.preventDefault();
