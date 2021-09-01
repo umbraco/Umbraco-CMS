@@ -22,6 +22,7 @@
         var create = $routeParams.create;
         var noTemplate = $routeParams.notemplate;
         var isElement = $routeParams.iselement;
+        var icon = $routeParams.icon;
         var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var documentTypeIcon = "";
@@ -71,6 +72,7 @@
                 if (create && !documentTypeId) documentTypeId = -1;
                 noTemplate = $scope.model.notemplate || $scope.model.noTemplate;
                 isElement = $scope.model.isElement;
+                icon = $scope.model.icon;
                 allowVaryByCulture = $scope.model.allowVaryByCulture;
                 vm.submitButtonKey = "buttons_saveAndClose";
                 vm.generateModelsKey = "buttons_generateModelsAndClose";
@@ -403,6 +405,12 @@
             if (isElement) {
                 contentType.isElement = true;
             }
+
+            // set isElement checkbox by default
+            if (icon !== null) {
+                contentType.icon = icon;
+            }
+
             // set vary by culture checkbox by default
             if (allowVaryByCulture) {
                 contentType.allowCultureVariant = true;

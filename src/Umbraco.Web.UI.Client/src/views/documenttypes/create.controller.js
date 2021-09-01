@@ -51,39 +51,54 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
             });
         }
-    };   
+    };
+
+    function createDocType( config ) {
+
+        $location.search("create", null);
+        $location.search("notemplate", null);
+        $location.search("iscomposition", null);
+        $location.search("iselement", null);
+        $location.search("icon", null);
+
+        var icon = null;
+
+        if (config.icon) {
+            var icon = config.icon;
+            if (config.color) {
+                icon += " " + config.color;
+            }
+        }
+
+        $location
+            .path("/settings/documenttypes/edit/" + node.id)
+            .search("create", "true")
+            .search("notemplate", config.notemplate ? "true" : null)
+            .search("iscomposition", config.iscomposition ? "true" : null)
+            .search("iselement", config.iselement ? "true" : null)
+            .search("icon", icon);
+
+        navigationService.hideMenu();
+    }
+
 
     // Disabling logic for creating document type with template if disableTemplates is set to true
     if (!disableTemplates) {
-        $scope.createDocType = function () {
-            $location.search('create', null);
-            $location.search('notemplate', null);
-            $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
-            navigationService.hideMenu();
+        $scope.createDocType = function (icon, color) {
+            createDocType({ icon: icon, color: color });
         };
     }
 
-    $scope.createComponent = function () {
-        $location.search('create', null);
-        $location.search('notemplate', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
-        navigationService.hideMenu();
+    $scope.createComponent = function (icon, color) {
+        createDocType({ notemplate: true, icon:icon, color:color });
     };
 
-    $scope.createComposition = function () {
-        $location.search('create', null);
-        $location.search('notemplate', null);
-        $location.search('iscomposition', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true").search("iscomposition", "true");
-        navigationService.hideMenu();
+    $scope.createComposition = function (icon, color) {
+        createDocType({ iscomposition: true, iselement: true, icon: icon, color: color });
     };
 
-    $scope.createElement = function () {
-        $location.search('create', null);
-        $location.search('notemplate', null);
-        $location.search('iselement', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true").search("iselement", "true");
-        navigationService.hideMenu();
+    $scope.createElement = function (icon, color) {
+        createDocType({ iselement: true, icon: icon, color: color });
     };
 
     $scope.close = function() {
