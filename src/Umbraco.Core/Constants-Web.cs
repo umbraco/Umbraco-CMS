@@ -59,6 +59,15 @@ namespace Umbraco.Cms.Core
                 public const string ActionToken = "action";
                 public const string AreaToken = "area";
             }
+
+            public static class EmailTypes
+            {
+                public const string HealthCheck = "HealthCheck";
+                public const string Notification = "Notification";
+                public const string PasswordReset = "PasswordReset";
+                public const string TwoFactorAuth = "2FA";
+                public const string UserInvite = "UserInvite";
+            }
         }
     }
 }

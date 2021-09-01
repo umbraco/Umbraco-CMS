@@ -519,7 +519,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     {
                         try
                         {
-                            _emailSender.SendAsync(request.Mail, "Notification").GetAwaiter().GetResult();
+                            _emailSender.SendAsync(request.Mail, Constants.Web.EmailTypes.Notification).GetAwaiter().GetResult();
                             _logger.LogDebug("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                         }
                         catch (Exception ex)
