@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         {
             var hostingEnvironment = container.GetRequiredService<IHostingEnvironment>();
             var globalSettings = container.GetRequiredService<IOptions<GlobalSettings>>().Value;
-            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(globalSettings.UmbracoPath, "config", "lang")));
+            var mainLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Umbraco, "config", "lang")));
             var appPlugins = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins));
             var configLangFolder = new DirectoryInfo(hostingEnvironment.MapPathContentRoot(WebPath.Combine(Constants.SystemDirectories.Config, "lang")));
 
