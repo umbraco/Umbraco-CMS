@@ -7,6 +7,25 @@
     margin-bottom: 20px;
 }
 
+.umb-tabs-nav .badge {
+    background-color: @red;
+    animation-duration: 1.4s;
+    animation-iteration-count: infinite;
+    animation-name: umb-tab--badge-bounce;
+    animation-timing-function: ease;
+    display: none;
+    margin-left: 5px;
+
+    @keyframes umb-tab--badge-bounce {
+        0%   { transform: translateY(0); }
+        20%  { transform: translateY(-6px); }
+        40%  { transform: translateY(0); }
+        55%  { transform: translateY(-3px); }
+        70%  { transform: translateY(0); }
+        100% { transform: translateY(0); }
+    }
+}
+
 .umb-tab {
     display: inline-flex;
     position: relative;
@@ -79,26 +98,37 @@
     }
 }
 
-.show-validation .umb-tab--error > .umb-tab-button,
-.show-validation .umb-tab--error > .umb-tab-button:hover,
-.show-validation .umb-tab--error > .umb-tab-button:focus {
-    color: @white !important;
-    background-color: @red !important;
-    border-color: @errorBorder;
-}
-.show-validation.show-validation-type-warning .umb-tab--error > .umb-tab-button,
-.show-validation.show-validation-type-warning .umb-tab--error > .umb-tab-button:hover,
-.show-validation.show-validation-type-warning .umb-tab--error > .umb-tab-button:focus {
-    color: @white !important;
-    background-color: @yellow-d2 !important;
-    border-color: @warningBorder;
-}
+.show-validation {
 
-.show-validation .umb-tab--error .umb-tab-button:before {
-    content: "\e25d";
-    font-family: "icomoon";
-    margin-right: 5px;
-    vertical-align: top;
+    &.show-validation-type-error {
+        .umb-tab--error {
+            .badge {
+                display: block;
+                background-color: @red;
+            }
+
+            .umb-tab-button {
+                &::after {
+                    background-color: @red;
+                }
+            }
+        }
+    }
+
+    &.show-validation-type-warning {
+        .umb-tab--error {
+            .badge {
+                display: block;
+                background-color: @yellow-d2;
+            }
+
+            .umb-tab-button {
+                &::after {
+                    background-color: @yellow-d2;
+                }
+            }
+        }
+    }
 }
 
 // tabs tray
@@ -110,8 +140,4 @@
 
 .umb-tabs-tray > .umb-tab-button {
     cursor: pointer;
-}
-
-.umb-tabs-tray-item--active {
-    border-left: 2px solid @ui-active;
 }

@@ -11,6 +11,9 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("maxNumber", "Maximum number of items", "number")]
         public int MaxNumber { get; set; }
 
+        [ConfigurationField("overlayWidthSize", "Overlay Width Size", "views/propertyeditors/multiurlpicker/multiurlpicker.prevalues.html")]
+        public string OverlayWidthSize { get; set; }
+
         [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]

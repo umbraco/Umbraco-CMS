@@ -23,8 +23,9 @@
                         <div class="umb-panel-group__details-status" ng-repeat="indexer in vm.indexerDetails">
 
                             <div class="umb-panel-group__details-status-icon-container">
-                                <i class="umb-panel-status-icon" aria-hidden="true"
-                                   ng-class="{'icon-check color-green' : indexer.isHealthy, 'icon-delete color-red' : !indexer.isHealthy}"></i>
+                                <umb-icon icon="{{indexer.isHealthy ? 'icon-check' : 'icon-delete'}}"
+                                          ng-class="{'color-green' : indexer.isHealthy, 'color-red' : !indexer.isHealthy}">
+                                </umb-icon>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
@@ -59,7 +60,7 @@
                         <div class="umb-panel-group__details-status" ng-repeat="searcher in vm.searcherDetails">
 
                             <div class="umb-panel-group__details-status-icon-container">
-                                <i class="umb-panel-status-icon icon-info" aria-hidden="true"></i>
+                                <umb-icon icon="icon-info"></umb-icon>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
@@ -116,15 +117,19 @@
                                         <div class="umb-panel-group__details-status-action">
                                             <ng-form name="searchTools">
 
-                                                <div class="row form-search">
-                                                    <div class="inner-addon left-addon flex">
-                                                        <umb-icon icon="icon-search" class="icon icon-search"></umb-icon>
+                                                <div class="row">
+                                                    <div class="flex">
 
-                                                        <input type="text" class="search-query"
-                                                               placeholder="@placeholders_search"
-                                                               localize="placeholder"
-                                                               ng-model="vm.searchText" no-dirty-check
-                                                               ng-keypress="vm.search(vm.selectedSearcher, $event)" />
+                                                        <div class="flex-auto">
+                                                            <umb-search-filter
+                                                                input-id="examine-search"
+                                                                model="vm.searchText"
+                                                                on-search="vm.search(vm.selectedIndex, $event)"
+                                                                label-key="placeholders_filter"
+                                                                text="Type to filter..."
+                                                                css-class="w-100">
+                                                            </umb-search-filter>
+                                                        </div>
 
                                                         <umb-button disabled="vm.selectedSearcher.isProcessing"
                                                                     type="button"
@@ -153,8 +158,8 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
-                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
+                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName'] | umbCmsJoinArray:', '}}</a>
+                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName'] | umbCmsJoinArray:', '}}</span>
                                                                     <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                 </td>
                                                             </tr>
@@ -220,8 +225,9 @@
                             <div class="umb-panel-group__details-status">
 
                                 <div class="umb-panel-group__details-status-icon-container">
-                                    <i class="umb-panel-status-icon" aria-hidden="true"
-                                       ng-class="{'icon-check color-green' : vm.selectedIndex.isHealthy, 'icon-delete color-red' : !vm.selectedIndex.isHealthy}"></i>
+                                    <umb-icon icon="{{vm.selectedIndex.isHealthy ? 'icon-check' : 'icon-delete'}}"
+                                              ng-class="{ 'color-green' : vm.selectedIndex.isHealthy, 'color-red': !vm.selectedIndex.isHealthy}">
+                                    </umb-icon>
                                 </div>
 
                                 <div class="umb-panel-group__details-status-content">
@@ -231,7 +237,6 @@
                                         <div ng-show="!vm.selectedIndex" class="color-red">
                                             <localize key="examineManagement_indexCannotRead">The index cannot be read and will need to be rebuilt</localize>
                                         </div>
-                                        <!--<div ng-if="status.description" ng-bind-html="status.description"></div>-->
                                     </div>
                                 </div>
 
@@ -256,14 +261,19 @@
                                         <div class="umb-panel-group__details-status-action">
                                             <ng-form name="searchTools">
 
-                                                <div class="row form-search">
-                                                    <div class="inner-addon left-addon flex">
-                                                        <umb-icon icon="icon-search" class="icon icon-search"></umb-icon>
-                                                        <input type="text" class="search-query"
-                                                               placeholder="@placeholders_search"
-                                                               localize="placeholder"
-                                                               ng-model="vm.searchText" no-dirty-check
-                                                               ng-keypress="vm.search(vm.selectedIndex, $event)" />
+                                                <div class="row">
+                                                    <div class="flex">
+
+                                                        <div class="flex-auto">
+                                                            <umb-search-filter
+                                                                input-id="examine-search"
+                                                                model="vm.searchText"
+                                                                on-search="vm.search(vm.selectedIndex, $event)"
+                                                                label-key="placeholders_filter"
+                                                                text="Type to filter..."
+                                                                css-class="w-100">
+                                                            </umb-search-filter>
+                                                        </div>
 
                                                         <umb-button disabled="vm.selectedIndex.isProcessing"
                                                                     type="button"
@@ -292,8 +302,8 @@
                                                                 <td>{{result.score}}</td>
                                                                 <td>{{result.id}}</td>
                                                                 <td>
-                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName']}}</a>
-                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
+                                                                    <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">{{result.values['nodeName'] | umbCmsJoinArray:', '}}</a>
+                                                                    <span ng-hide="result.editUrl">{{result.values['nodeName'] | umbCmsJoinArray:', '}}</span>
                                                                     <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                 </td>
                                                             </tr>

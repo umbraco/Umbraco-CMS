@@ -110,7 +110,7 @@
      * Not equivalent to angular.forEach. But like the angularJS method this does not fail on null or undefined.
      */
     const forEach = (obj, iterator) => {
-        if (obj) {
+        if (obj && isArray(obj)) {
             return obj.forEach(iterator);
         }
         return obj;

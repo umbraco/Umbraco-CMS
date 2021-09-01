@@ -18,7 +18,7 @@
 
                     <div class="umb-form-settings form-horizontal">
 
-                        <p><localize key="grid_addRowConfigurationDetail" /></p>
+                        <p><localize key="grid_addRowConfigurationDetail"></localize></p>
 
                         <div class="alert alert-warn ng-scope" ng-show="nameChanged">
                             <p>Modifying a row configuration name will result in loss of
@@ -55,7 +55,7 @@
                                     <button type="button" class="btn-reset td uSky-templates-column add"
                                             ng-click="vm.configureCell(null, currentRow)"
                                             ng-style="{width: vm.percentage(availableRowSpace) + '%'}">
-                                        <i class="icon icon-add" aria-hidden="true"></i>
+                                        <umb-icon icon="icon-add" class="icon"></umb-icon>
                                         <span class="sr-only">
                                             <localize key="grid_addRowConfiguration">Add row configuration</localize>
                                         </span>
@@ -69,11 +69,11 @@
                             <umb-control-group label="@general_width">
                                 <div class="grid-size-scaler">
                                     <button type="button" class="btn-link" ng-click="vm.scaleDown(currentCell)">
-                                        <i class="icon icon-remove" aria-hidden="true"></i>
+                                        <umb-icon icon="icon-remove" class="icon"></umb-icon>
                                     </button>
                                     <span>{{currentCell.grid}}</span>
                                     <button type="button" class="btn-link" ng-click="vm.scaleUp(currentCell, availableRowSpace, true)">
-                                        <i class="icon icon-add" aria-hidden="true"></i>
+                                        <umb-icon icon="icon-add" class="icon"></umb-icon>
                                     </button>
                                 </div>
                             </umb-control-group>
@@ -83,11 +83,11 @@
                             </umb-control-group>
 
                             <umb-control-group hide-label="true">
-	  		                    <i class="icon-delete red" aria-hidden="true"></i>
-	  		                    <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteArea(currentCell, currentRow)">
-	  			                    <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
-	  		                    </button>
-	  	                    </umb-control-group>
+                                <umb-icon icon="icon-delete" class="red"></umb-icon>
+                                <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteArea(currentCell, currentRow)">
+                                    <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
+                                </button>
+                            </umb-control-group>
 
                             <umb-control-group hide-label="true">
 
@@ -109,7 +109,7 @@
                                             <umb-checkbox model="editor.allowed"
                                                           input-id="editorconfig-{{$index}}"
                                                           on-change="vm.selectEditor(currentCell, editor)">
-                                                <umb-icon icon="{{editor.icon}}" class="icon {{editor.icon}}"></umb-icon>
+                                                <umb-icon icon="{{editor.icon}}" class="icon"></umb-icon>
                                                 <small class="input-label--small">({{editor.alias}})</small>
                                             </umb-checkbox>
 

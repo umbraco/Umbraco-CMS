@@ -89,8 +89,8 @@
     <PackageReference Include="ClientDependency" Version="1.9.9" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.9.3" />
     <PackageReference Include="Examine" Version="1.2.0" />
-    <PackageReference Include="ImageProcessor.Web" Version="4.10.0.100" />
-    <PackageReference Include="ImageProcessor.Web.Config" Version="2.5.0.100" />
+    <PackageReference Include="ImageProcessor.Web" Version="4.12.1" />
+    <PackageReference Include="ImageProcessor.Web.Config" Version="2.6.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
@@ -330,7 +330,7 @@
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>      
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
   <!-- get TransformXml task from WebPublishingtasks -->
   <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
@@ -348,12 +348,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8140</DevelopmentServerPort>
+          <DevelopmentServerPort>8160</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8140</IISUrl>
-          <DevelopmentServerPort>8131</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8131</IISUrl>
+          <IISUrl>http://localhost:8160</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

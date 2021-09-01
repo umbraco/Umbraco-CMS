@@ -208,11 +208,11 @@ namespace Umbraco.Web.Trees
 
         protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
         {
-            var result = base.GetChildEntities(id, queryStrings);
+            var result = base.GetChildEntities(id, queryStrings).ToArray();
             var culture = queryStrings["culture"].TryConvertTo<string>();
 
             //if this is null we'll set it to the default.
-            var cultureVal = (culture.Success ? culture.Result : null) ?? Services.LocalizationService.GetDefaultLanguageIsoCode();
+            var cultureVal = (culture.Success ? culture.Result : null).IfNullOrWhiteSpace(Services.LocalizationService.GetDefaultLanguageIsoCode());
 
             // set names according to variations
             foreach (var entity in result)

@@ -37,7 +37,8 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Web.Routing;
-using Umbraco.Core.Collections;
+using Umbraco.Core.Mapping;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web.Editors
 {
@@ -55,14 +56,19 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+        private readonly IScopeProvider _scopeProvider;
 
         public object Domains { get; private set; }
 
-        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services,
+            AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
+            IScopeProvider scopeProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _scopeProvider = scopeProvider;
         }
 
         /// <summary>
@@ -97,7 +103,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
-        public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
+        public IEnumerable<ContentItemDisplay> GetByIds([FromUri] int[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
             return foundContent.Select(MapToDisplay);
@@ -358,6 +364,24 @@ namespace Umbraco.Web.Editors
             return GetEmpty(contentType, parentId);
         }
 
+        /// <summary>
+        /// Gets a dictionary containing empty content items for every alias specified in the contentTypeAliases array in the body of the request.
+        /// </summary>
+        /// <remarks>
+        /// This is a post request in order to support a large amount of aliases without hitting the URL length limit.
+        /// </remarks>
+        /// <param name="contentTypesByAliases"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [HttpPost]
+        public IDictionary<string, ContentItemDisplay> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
+        {
+            // It's important to do this operation within a scope to reduce the amount of readlock queries. 
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = contentTypesByAliases.ContentTypeAliases.Select(alias => Services.ContentTypeService.Get(alias));
+            return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
+        }
+
 
         /// <summary>
         /// Gets an empty content item for the document type.
@@ -367,29 +391,113 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmptyByKey(Guid contentTypeKey, int parentId)
         {
-            var contentType = Services.ContentTypeService.Get(contentTypeKey);
-            if (contentType == null)
+            using (var scope = _scopeProvider.CreateScope())
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+                var contentType = Services.ContentTypeService.Get(contentTypeKey);
+                if (contentType == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
 
-            return GetEmpty(contentType, parentId);
+                var contentItem = GetEmpty(contentType, parentId);
+                scope.Complete();
+
+                return contentItem;
+            }
+        }
+
+        private ContentItemDisplay CleanContentItemDisplay(ContentItemDisplay display)
+        {
+            // translate the content type name if applicable
+            display.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(display.ContentTypeName);
+            // if your user type doesn't have access to the Settings section it would not get this property mapped
+            if (display.DocumentType != null)
+                display.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(display.DocumentType.Name);
+
+            //remove the listview app if it exists
+            display.ContentApps = display.ContentApps.Where(x => x.Alias != "umbListView").ToList();
+            return display;
         }
 
         private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
         {
-            var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
+            var emptyContent = Services.ContentService.Create("", parentId, contentType, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
-            // translate the content type name if applicable
-            mapped.ContentTypeName = Services.TextService.UmbracoDictionaryTranslate(mapped.ContentTypeName);
-            // if your user type doesn't have access to the Settings section it would not get this property mapped
-            if (mapped.DocumentType != null)
-                mapped.DocumentType.Name = Services.TextService.UmbracoDictionaryTranslate(mapped.DocumentType.Name);
+            return CleanContentItemDisplay(mapped);
+        }
 
-            //remove the listview app if it exists
-            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
+        /// <summary>
+        /// Gets an empty <see cref="ContentItemDisplay"/> for each content type in the IEnumerable, all with the same parent ID
+        /// </summary>
+        /// <remarks>Will attempt to re-use the same permissions for every content as long as the path and user are the same</remarks>
+        /// <param name="contentTypes"></param>
+        /// <param name="parentId"></param>
+        /// <returns></returns>
+        private IEnumerable<ContentItemDisplay> GetEmpties(IEnumerable<IContentType> contentTypes, int parentId)
+        {
+            var result = new List<ContentItemDisplay>();
+            var userId = Security.GetUserId().ResultOr(0);
+            var currentUser = Security.CurrentUser;
+            // We know that if the ID is less than 0 the parent is null.
+            // Since this is called with parent ID it's safe to assume that the parent is the same for all the content types.
+            var parent = parentId > 0 ? Services.ContentService.GetById(parentId) : null;
+            // Since the parent is the same and the path used to get permissions is based on the parent we only have to do it once
+            var path = parent == null ? "-1" : parent.Path;
+            var permissions = new Dictionary<string, EntityPermissionSet>
+            {
+                [path] = Services.UserService.GetPermissionsForPath(currentUser, path)
+            };
 
-            return mapped;
+            foreach (var contentType in contentTypes)
+            {
+                var emptyContent = Services.ContentService.Create("", parentId, contentType, userId);
+
+                var mapped = MapToDisplay(emptyContent, context =>
+                {
+                    // Since the permissions depend on current user and path, we add both of these to context as well,
+                    // that way we can compare the path and current user when mapping, if they're the same just take permissions
+                    // and skip getting them again, in theory they should always be the same, but better safe than sorry.,
+                    context.Items["Parent"] = parent;
+                    context.Items["CurrentUser"] = currentUser;
+                    context.Items["Permissions"] = permissions;
+                });
+                result.Add(CleanContentItemDisplay(mapped));
+            }
+
+            return result;
+        }
+
+        private IDictionary<Guid, ContentItemDisplay> GetEmptyByKeysInternal(Guid[] contentTypeKeys, int parentId)
+        {
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
+            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+        }
+
+        /// <summary>
+        /// Gets a collection of empty content items for all document types.
+        /// </summary>
+        /// <param name="contentTypeKeys"></param>
+        /// <param name="parentId"></param>
+        [OutgoingEditorModelEvent]
+        public IDictionary<Guid, ContentItemDisplay> GetEmptyByKeys([FromUri] Guid[] contentTypeKeys, [FromUri] int parentId)
+        {
+            return GetEmptyByKeysInternal(contentTypeKeys, parentId);
+        }
+
+        /// <summary>
+        /// Gets a collection of empty content items for all document types.
+        /// </summary>
+        /// <remarks>
+        /// This is a post request in order to support a large amount of GUIDs without hitting the URL length limit.
+        /// </remarks>
+        /// <param name="contentTypeByKeys"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [OutgoingEditorModelEvent]
+        public IDictionary<Guid, ContentItemDisplay> GetEmptyByKeys(ContentTypesByKeys contentTypeByKeys)
+        {
+            return GetEmptyByKeysInternal(contentTypeByKeys.ContentTypeKeys, contentTypeByKeys.ParentId);
         }
 
         [OutgoingEditorModelEvent]
@@ -550,7 +658,7 @@ namespace Umbraco.Web.Editors
         /// <param name="name">The name of the blueprint</param>
         /// <returns></returns>
         [HttpPost]
-        public SimpleNotificationModel CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
+        public SimpleNotificationModel CreateBlueprintFromContent([FromUri] int contentId, [FromUri] string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
@@ -1432,7 +1540,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private string GetVariantName(string culture, string segment)
         {
-            if(culture.IsNullOrWhiteSpace() && segment.IsNullOrWhiteSpace())
+            if (culture.IsNullOrWhiteSpace() && segment.IsNullOrWhiteSpace())
             {
                 // TODO: Get name for default variant from somewhere?
                 return "Default";
@@ -2236,12 +2344,22 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        private ContentItemDisplay MapToDisplay(IContent content)
-        {
-            var display = Mapper.Map<ContentItemDisplay>(content, context =>
+        private ContentItemDisplay MapToDisplay(IContent content) =>
+            MapToDisplay(content, context =>
             {
                 context.Items["CurrentUser"] = Security.CurrentUser;
             });
+
+        /// <summary>
+        /// Used to map an <see cref="IContent"/> instance to a <see cref="ContentItemDisplay"/> and ensuring AllowPreview is set correctly.
+        /// Also allows you to pass in an action for the mapper context where you can pass additional information on to the mapper.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="contextOptions"></param>
+        /// <returns></returns>
+        private ContentItemDisplay MapToDisplay(IContent content, Action<MapperContext> contextOptions)
+        {
+            var display = Mapper.Map<ContentItemDisplay>(content, contextOptions);
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }
@@ -2436,7 +2554,7 @@ namespace Umbraco.Web.Editors
         // set up public access using role based access
         [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
         [HttpPost]
-        public HttpResponseMessage PostPublicAccess(int contentId, [FromUri]string[] groups, [FromUri]string[] usernames, int loginPageId, int errorPageId)
+        public HttpResponseMessage PostPublicAccess(int contentId, [FromUri] string[] groups, [FromUri] string[] usernames, int loginPageId, int errorPageId)
         {
             if ((groups == null || groups.Any() == false) && (usernames == null || usernames.Any() == false))
             {

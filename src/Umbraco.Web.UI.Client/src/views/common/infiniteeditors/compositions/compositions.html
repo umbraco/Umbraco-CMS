@@ -49,7 +49,7 @@
                             <li class="umb-checkbox-list__item"
                                 ng-repeat="contentTypeEntity in model.whereCompositionUsed">
                                 <a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)">
-                                    <i class="{{contentTypeEntity.contentType.icon}}"></i>
+                                    <umb-icon icon="{{contentTypeEntity.contentType.icon}}"></umb-icon>
                                     &nbsp;{{contentTypeEntity.contentType.name}}
                                 </a>
                             </li>
@@ -59,7 +59,7 @@
                     <div class="umb-control-group -no-border" ng-if="vm.availableGroups.length > 0">
                         <ul class="umb-checkbox-list" ng-repeat="group in vm.availableGroups | filter:searchTerm">
                             <li ng-show="vm.availableGroups.length > 1">
-                                <i class="icon-folder umb-checkbox-list__item-icon"></i>
+                                <umb-icon icon="icon-folder" class="umb-checkbox-list__item-icon"></umb-icon>
                                 {{group.containerPath}}
                             </li>
                             <li class="umb-checkbox-list__item"
@@ -75,10 +75,10 @@
                                 </div>
 
                                 <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': compositeContentType.allowed === false && !compositeContentType.selected}">
-                                    <div class="umb-checkbox-list__item-icon-wrapper">
-                                        <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon" ng-class="{'o-0': compositeContentType.contentType.alias === vm.loadingAlias}"></i>
-                                        <div ng-if="compositeContentType.contentType.alias === vm.loadingAlias" class="umb-button__progress -black umb-checkbox-list__item-checkbox-progress"></div>
-                                    </div>
+                                    <span class="umb-checkbox-list__item-icon-wrapper">
+                                        <umb-icon icon="{{compositeContentType.contentType.icon}}" class="umb-checkbox-list__item-icon" ng-class="{'o-0': compositeContentType.contentType.alias === vm.loadingAlias}"></umb-icon>
+                                        <span ng-if="compositeContentType.contentType.alias === vm.loadingAlias" class="umb-button__progress -black umb-checkbox-list__item-checkbox-progress"></span>
+                                    </span>
                                     {{ compositeContentType.contentType.name }}
                                     <span class="umb-checkbox-list__item-caption" ng-if="compositeContentType.inherited">(inherited)</span>
                                 </label>

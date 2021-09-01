@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -9,6 +10,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     /// <remarks>Instances of the <see cref="PublishedContentType"/> class are immutable, ie
     /// if the content type changes, then a new class needs to be created.</remarks>
+    [DebuggerDisplay("{Alias}")]
     public class PublishedContentType : IPublishedContentType2
     {
         private readonly IPublishedPropertyType[] _propertyTypes;
