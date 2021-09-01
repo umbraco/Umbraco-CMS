@@ -94,13 +94,6 @@
 
         </div>
 
-        <div ng-if="splitViewOpen">
-            <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
-                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
-                <span class="sr-only"><localize key="general_closepane">Close Pane</localize></span>
-            </button>
-        </div>
-
         <div ng-if="editor.variantApps && splitViewOpen !== true">
             <umb-editor-navigation
                 data-element="editor-sub-views"
