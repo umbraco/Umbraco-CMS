@@ -59,8 +59,8 @@ namespace Umbraco.Web.PropertyEditors
 
             if (dataTypeConfiguration is FileUploadConfiguration fileUploadConfiguration)
             {
-                // If FileExtensions is empty no allowed extensions has been specified, so we allow everything.
-                // If there is any extensions specified, we need to check that the uploaded extension is one of them.
+                // If FileExtensions is empty and no allowed extensions have been specified, we allow everything.
+                // If there are any extensions specified, we need to check that the uploaded extension is one of them.
                 return fileUploadConfiguration.FileExtensions.IsCollectionEmpty() ||
                        fileUploadConfiguration.FileExtensions.Any(x => x.Value.InvariantEquals(extension));
             }
