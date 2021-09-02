@@ -61,6 +61,7 @@
             var iconPicker = {
                 icon: layout.icon.split(' ')[0],
                 color: layout.icon.split(' ')[1],
+                size: "medium",
                 submit: function (model) {
                     if (model.icon) {
                         if (model.color) {
