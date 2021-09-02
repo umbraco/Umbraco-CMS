@@ -1,0 +1,23 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
+
+namespace Umbraco.Extensions
+{
+    public static partial class UmbracoApplicationBuilderExtensions
+    {
+        public static IUmbracoBuilder SetBackOfficeUserManager<TUserManager>(this IUmbracoBuilder builder)
+            where TUserManager : UserManager<BackOfficeIdentityUser>, IBackOfficeUserManager
+        {
+
+            var customType = typeof(TUserManager);
+            var userManagerType = typeof(UserManager<BackOfficeIdentityUser>);
+            builder.Services.Replace(ServiceDescriptor.Scoped(typeof(IBackOfficeUserManager),customType));
+            builder.Services.AddScoped(customType, services => services.GetRequiredService(userManagerType));
+            builder.Services.Replace(ServiceDescriptor.Scoped(userManagerType,customType));
+            return builder;
+        }
+    }
+}
