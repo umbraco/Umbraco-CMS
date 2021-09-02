@@ -480,11 +480,13 @@ namespace Umbraco.Web.Editors
         {
             foreach (var propertyAlias in invalidPropertyAliases)
             {
-                //find the property relating to these
-                var prop = contentTypeSave.Groups.SelectMany(x => x.Properties).Single(x => x.Alias == propertyAlias);
-                var group = contentTypeSave.Groups.Single(x => x.Properties.Contains(prop));
+                // Find the property relating to these
+                var property = contentTypeSave.Groups.SelectMany(x => x.Properties).Single(x => x.Alias == propertyAlias);
+                var group = contentTypeSave.Groups.Single(x => x.Properties.Contains(property));
+                var propertyIndex = group.Properties.IndexOf(property);
+                var groupIndex = contentTypeSave.Groups.IndexOf(group);
 
-                var key = string.Format("Groups[{0}].Properties[{1}].Alias", group.SortOrder, prop.SortOrder);
+                var key = $"Groups[{groupIndex}].Properties[{propertyIndex}].Alias";
                 ModelState.AddModelError(key, "Duplicate property aliases not allowed between compositions");
             }
         }

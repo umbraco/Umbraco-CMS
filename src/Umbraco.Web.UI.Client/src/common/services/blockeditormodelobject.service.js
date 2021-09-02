@@ -87,12 +87,14 @@
 
             for (var t = 0; t < fromVariant.tabs.length; t++) {
                 var fromTab = fromVariant.tabs[t];
-                var toTab = toVariant.tabs[t];
+                var toTab = toVariant.tabs.find(tab => tab.alias === fromTab.alias);
 
-                for (var p = 0; p < fromTab.properties.length; p++) {
-                    var fromProp = fromTab.properties[p];
-                    var toProp = toTab.properties[p];
-                    toProp.value = fromProp.value;
+                if (fromTab && fromTab.properties && fromTab.properties.length > 0 && toTab && toTab.properties && toTab.properties.length > 0) {
+                    for (var p = 0; p < fromTab.properties.length; p++) {
+                        var fromProp = fromTab.properties[p];
+                        var toProp = toTab.properties[p];
+                        toProp.value = fromProp.value;
+                    }
                 }
             }
         }
@@ -604,6 +606,12 @@
                         if (settingsData === null) {
                             console.error("Couldnt find settings data of " + settingsUdi)
                             return null;
+                        }
+
+                        // the Settings model has been changed to a new Element Type.
+                        // we need to update the settingsData with the new Content Type key
+                        if (settingsData.contentTypeKey !== settingsScaffold.contentTypeKey) {
+                            settingsData.contentTypeKey = settingsScaffold.contentTypeKey;
                         }
 
                         blockObject.settingsData = settingsData;

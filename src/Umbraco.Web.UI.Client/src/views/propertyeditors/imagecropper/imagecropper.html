@@ -45,8 +45,13 @@
                                        on-value-changed="focalPointChanged(left, top)"
                                        on-image-loaded="imageLoaded(isCroppable, hasDimensions)">
                     </umb-image-gravity>
-                    <button type="button" class="btn btn-link btn-crop-delete" aria-hidden="true" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></button>
-                    <button type="button" class="sr-only" ng-click="vm.clear()"><localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize></button>
+                    <div class="umb-cropper-imageholder-buttons">
+                        <button type="button" class="btn btn-link btn-crop-delete" ng-click="clear()"><umb-icon icon="icon-delete" class="red"></umb-icon> <localize key="content_uploadClear">Remove file</localize></button>
+                        <button type="button" class="sr-only" ng-click="vm.clear()"><localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize></button>
+                        <button type="button" ng-show="(model.value.focalPoint.left !== 0.5 && model.value.focalPoint.top !== 0.5)" class="btn btn-link btn-gravity-reset" ng-click="focalPointChanged(0.5,0.5)">
+                            <umb-icon icon="icon-axis-rotation"></umb-icon> <localize key="content_resetFocalPoint">Reset focal point</localize>
+                        </button>
+                    </div>
                 </div>
 
 

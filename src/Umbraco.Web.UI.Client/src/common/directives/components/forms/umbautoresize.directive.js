@@ -17,6 +17,12 @@ angular.module("umbraco.directives")
                         }
                     }
 
+                    // if the element is hidden the width will be 0 even though it has a value. 
+                    // This could happen if the element is hidden in a tab.
+                    if (ngModelController.$modelValue && domEl.clientWidth === 0) {
+                        element.width('auto');
+                    }
+
                     if (!ngModelController.$modelValue && attr.placeholder) {
                         attr.$set('size', attr.placeholder.length);
                         element.width('auto');
@@ -25,39 +31,25 @@ angular.module("umbraco.directives")
                 }
 
                 function resizeTextarea() {
-
                     if (domEl.scrollHeight !== domEl.clientHeight) {
-
                         element.height(domEl.scrollHeight);
-
                     }
-
                 }
 
                 var update = function (force) {
-
-
                     if (force === true) {
-
                         if (domElType === "textarea") {
                             element.height(0);
                         } else if (domElType === "text") {
                             element.width(0);
                         }
-
                     }
-
 
                     if (domElType === "textarea") {
-
                         resizeTextarea();
-
                     } else if (domElType === "text") {
-
                         resizeInput();
-
                     }
-
                 };
 
                 //listen for tab changes

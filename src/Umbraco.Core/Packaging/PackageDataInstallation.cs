@@ -690,7 +690,7 @@ namespace Umbraco.Core.Packaging
             }
 
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
-            UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
+            UpdateContentTypesPropertyGroups(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
 
             return contentType;
@@ -734,28 +734,39 @@ namespace Umbraco.Core.Packaging
             }
         }
 
-        private void UpdateContentTypesTabs(IContentType contentType, XElement tabElement)
+        private void UpdateContentTypesPropertyGroups(IContentType contentType, XElement propertyGroupsContainer)
         {
-            if (tabElement == null)
+            if (propertyGroupsContainer == null)
                 return;
 
-            var tabs = tabElement.Elements("Tab");
-            foreach (var tab in tabs)
+            var propertyGroupElements = propertyGroupsContainer.Elements("Tab");
+            foreach (var propertyGroupElement in propertyGroupElements)
             {
-                var id = tab.Element("Id").Value;//Do we need to use this for tracking?
-                var caption = tab.Element("Caption").Value;
+                var name = propertyGroupElement.Element("Caption").Value; // TODO Rename to Name (same in EntityXmlSerializer)
 
-                if (contentType.PropertyGroups.Contains(caption) == false)
+                var alias = propertyGroupElement.Element("Alias")?.Value;
+                if (string.IsNullOrEmpty(alias))
                 {
-                    contentType.AddPropertyGroup(caption);
-
+                    alias = name.ToSafeAlias(true);
                 }
 
-                int sortOrder;
-                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                contentType.AddPropertyGroup(name, alias);
+                var propertyGroup = contentType.PropertyGroups[alias];
+
+                if (Guid.TryParse(propertyGroupElement.Element("Key")?.Value, out var key))
+                {
+                    propertyGroup.Key = key;
+                }
+
+                if (Enum.TryParse<PropertyGroupType>(propertyGroupElement.Element("Type")?.Value, out var type))
+                {
+                    propertyGroup.Type = type;
+                }
+
+                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, out var sortOrder))
                 {
                     // Override the sort order with the imported value
-                    contentType.PropertyGroups[caption].SortOrder = sortOrder;
+                    propertyGroup.SortOrder = sortOrder;
                 }
             }
         }
@@ -840,14 +851,23 @@ namespace Umbraco.Core.Packaging
                 if (property.Element("Key") != null)
                     propertyType.Key = new Guid(property.Element("Key").Value);
 
-                var tab = (string)property.Element("Tab");
-                if (string.IsNullOrEmpty(tab))
+                var tabElement = property.Element("Tab");
+                if (tabElement == null || string.IsNullOrEmpty(tabElement.Value))
                 {
                     contentType.AddPropertyType(propertyType);
                 }
                 else
                 {
-                    contentType.AddPropertyType(propertyType, tab);
+                    var tabName = tabElement.Value;
+                    var tabAlias = tabElement.Attribute("Alias")?.Value;
+                    if (string.IsNullOrEmpty(tabAlias))
+                    {
+                        contentType.AddPropertyType(propertyType, tabName);
+                    }
+                    else
+                    {
+                        contentType.AddPropertyType(propertyType, tabAlias, tabName);
+                    }
                 }
             }
         }

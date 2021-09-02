@@ -63,11 +63,13 @@
 
 @param {string} ngModel (<code>binding</code>): Value for the color picker.
 @param {object} options (<code>binding</code>): Config object for the color picker.
-@param {function} onBeforeShow (<code>expression</code>): Callback function before color picker is shown.
-@param {function} onChange (<code>expression</code>): Callback function when the color is changed.
-@param {function} onShow (<code>expression</code>): Callback function when color picker is shown.
-@param {function} onHide (<code>expression</code>): Callback function when color picker is hidden.
-@param {function} onMove (<code>expression</code>): Callback function when the color is moved in color picker.
+@param {function} onBeforeShow (<code>expression</code>): You can prevent the color picker from showing up if you return false in the beforeShow event. This event is ignored on a flat color picker.
+@param {function} onChange (<code>expression</code>): Called as the original input changes. Only happens when the input is closed or the 'Choose' button is clicked.
+@param {function} onShow (<code>expression</code>): Called after the color picker is opened. This is ignored on a flat color picker. Note, when any color picker on the page is shown it will hide any that are already open.
+@param {function} onHide (<code>expression</code>): Called after the color picker is hidden. This happens when clicking outside of the picker while it is open. Note, when any color picker on the page is shown it will hide any that are already open. This event is ignored on a flat color picker.
+@param {function} onMove (<code>expression</code>): Called as the user moves around within the color picker.
+@param {function} onDragStart (<code>expression</code>): Called at the beginning of a drag event on either hue slider, alpha slider, or main color picker areas.
+@param {function} onDragStop (<code>expression</code>): Called at the end of a drag event on either hue slider, alpha slider, or main color picker areas.
 
 **/
 
@@ -220,6 +222,24 @@
                     });
                 }
 
+                // bind hook for drag start
+                if (ctrl.onDragStart) {
+                    colorPickerInstance.on('dragstart.spectrum', (e, tinycolor) => {
+                        $timeout(function () {
+                            ctrl.onDragStart({ color: tinycolor });
+                        });
+                    });
+                }
+
+                // bind hook for drag stop
+                if (ctrl.onDragStop) {
+                    colorPickerInstance.on('dragstop.spectrum', (e, tinycolor) => {
+                        $timeout(function () {
+                            ctrl.onDragStop({ color: tinycolor });
+                        });
+                    });
+                }
+
             }
         }
     }
@@ -232,11 +252,13 @@
             bindings: {
                 ngModel: '<',
                 options: '<',
-                onBeforeShow: '&',
-                onShow: '&',
-                onHide: '&',
-                onChange: '&',
-                onMove: '&'
+                onBeforeShow: '&?',
+                onShow: '&?',
+                onHide: '&?',
+                onChange: '&?',
+                onMove: '&?',
+                onDragStart: '&?',
+                onDragStop: '&?'
             }
         });
 

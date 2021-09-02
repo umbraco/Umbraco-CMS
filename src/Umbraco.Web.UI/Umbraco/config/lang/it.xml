@@ -951,4 +951,8 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="umbInfo">Info</key>
         <key alias="umbListView">Elementi</key>
     </area>
+    <area alias="logViewer">
+        <key alias="selectAllLogLevelFilters">Seleziona tutto</key>
+        <key alias="deselectAllLogLevelFilters">Deselezionare tutto</key>
+    </area>
 </language>
