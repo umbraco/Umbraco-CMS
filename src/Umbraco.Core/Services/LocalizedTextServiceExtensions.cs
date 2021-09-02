@@ -65,7 +65,7 @@ namespace Umbraco.Extensions
              if (text == null)
                  return null;
 
-             if (text.StartsWith("#") == false || text.IndexOf('_') == -1)
+             if (text.StartsWith("#") == false)
                  return text;
 
              text = text.Substring(1);
@@ -74,6 +74,9 @@ namespace Umbraco.Extensions
              {
                  return value;
              }
+
+             if (text.IndexOf('_') == -1)
+                 return text;
 
              var areaAndKey = text.Split('_');
 
