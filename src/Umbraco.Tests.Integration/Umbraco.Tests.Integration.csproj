@@ -77,7 +77,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-        <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.1" />
     </ItemGroup>
 
     <ItemGroup>
