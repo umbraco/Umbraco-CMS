@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public string DbType { get; set; }
 
         [Column("config")]
-        [SpecialDbType(SpecialDbTypes.NTEXT)]
+        [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Configuration { get; set; }
 

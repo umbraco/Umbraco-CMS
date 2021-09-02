@@ -209,6 +209,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.17.0
             To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
+            To<UpgradeNtextColumns>("{E07A02BE-20F8-4C94-950D-8797B1872073}");
 
             //FINAL
         }

@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public DateTime UtcStamp { get; set; }
 
         [Column("jsonInstruction")]
-        [SpecialDbType(SpecialDbTypes.NTEXT)]
+        [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         public string Instructions { get; set; }
 

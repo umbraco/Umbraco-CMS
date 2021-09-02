@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("textValue")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [SpecialDbType(SpecialDbTypes.NTEXT)]
+        [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
         public string TextValue { get; set; }
 
         [ResultColumn]
