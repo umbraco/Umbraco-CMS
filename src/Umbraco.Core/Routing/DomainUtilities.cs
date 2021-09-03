@@ -199,10 +199,6 @@ namespace Umbraco.Cms.Core.Routing
             if (filter != null)
             {
                 var domainAndUri = filter(cultureDomains ?? domainsAndUris, uri, culture, defaultCulture);
-                // if still nothing, pick the first one?
-                // no: move that constraint to the filter, but check
-                if (domainAndUri == null)
-                    throw new InvalidOperationException("The filter returned null.");
                 return domainAndUri;
             }
 
