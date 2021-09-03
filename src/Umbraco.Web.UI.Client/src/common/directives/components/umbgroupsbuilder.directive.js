@@ -78,11 +78,13 @@
                 localizationService.localizeMany([
                     "validation_validation",
                     "contentTypeEditor_tabHasNoSortOrder",
-                    "general_generic"
+                    "general_generic",
+                    "contentTypeEditor_tabDirectPropertiesDropZone"
                 ]).then(data => {
                     validationTranslated = data[0];
                     tabNoSortOrderTranslated = data[1];
                     scope.genericTab.name = data[2];
+                    scope.tabDirectPropertiesDropZoneLabel = data[3];
                 });
             }
 
