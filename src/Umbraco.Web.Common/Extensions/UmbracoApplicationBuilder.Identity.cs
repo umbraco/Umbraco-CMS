@@ -12,11 +12,11 @@ namespace Umbraco.Extensions
             where TUserManager : UserManager<BackOfficeIdentityUser>, IBackOfficeUserManager
         {
 
-            var customType = typeof(TUserManager);
-            var userManagerType = typeof(UserManager<BackOfficeIdentityUser>);
-            builder.Services.Replace(ServiceDescriptor.Scoped(typeof(IBackOfficeUserManager),customType));
+            Type customType = typeof(TUserManager);
+            Type userManagerType = typeof(UserManager<BackOfficeIdentityUser>);
+            builder.Services.Replace(ServiceDescriptor.Scoped(typeof(IBackOfficeUserManager), customType));
             builder.Services.AddScoped(customType, services => services.GetRequiredService(userManagerType));
-            builder.Services.Replace(ServiceDescriptor.Scoped(userManagerType,customType));
+            builder.Services.Replace(ServiceDescriptor.Scoped(userManagerType, customType));
             return builder;
         }
     }
