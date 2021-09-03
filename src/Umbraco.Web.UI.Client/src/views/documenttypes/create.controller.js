@@ -53,7 +53,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         }
     };
 
-    function createDocType( config ) {
+    function createDocType(config) {
 
         $location.search("create", null);
         $location.search("notemplate", null);
@@ -63,8 +63,8 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
         var icon = null;
 
-        if (config.icon) {
-            var icon = config.icon;
+        if (config.icon != undefined && config.icon != null) {
+            icon = config.icon;
             if (config.color) {
                 icon += " " + config.color;
             }
