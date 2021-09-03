@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             // look for domains that would be the base of the uri
-            var baseDomains = SelectByBase(considerForBaseDomains, uri);
+            var baseDomains = SelectByBase(considerForBaseDomains, uri, culture);
             if (baseDomains.Count > 0) // found, return
                 return baseDomains.First();
 
@@ -208,12 +208,15 @@ namespace Umbraco.Cms.Core.Routing
         private static bool IsBaseOf(DomainAndUri domain, Uri uri)
             => domain.Uri.EndPathWithSlash().IsBaseOf(uri);
 
-        private static IReadOnlyCollection<DomainAndUri> SelectByBase(IReadOnlyCollection<DomainAndUri> domainsAndUris, Uri uri)
+        private static bool MatchesCulture(DomainAndUri domain, string culture)
+            => culture == null || domain.Culture == culture;
+
+        private static IReadOnlyCollection<DomainAndUri> SelectByBase(IReadOnlyCollection<DomainAndUri> domainsAndUris, Uri uri, string culture)
         {
             // look for domains that would be the base of the uri
             // ie current is www.example.com/foo/bar, look for domain www.example.com
             var currentWithSlash = uri.EndPathWithSlash();
-            var baseDomains = domainsAndUris.Where(d => IsBaseOf(d, currentWithSlash)).ToList();
+            var baseDomains = domainsAndUris.Where(d => IsBaseOf(d, currentWithSlash) && MatchesCulture(d, culture)).ToList();
 
             // if none matches, try again without the port
             // ie current is www.example.com:1234/foo/bar, look for domain www.example.com
