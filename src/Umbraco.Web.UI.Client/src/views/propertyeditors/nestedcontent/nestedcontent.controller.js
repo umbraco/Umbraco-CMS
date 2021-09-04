@@ -241,7 +241,7 @@
 
             dialog.pasteItems = [];
 
-            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
+            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
             _.each(entriesForPaste, function (entry) {
                 dialog.pasteItems.push({
                     date: entry.date,

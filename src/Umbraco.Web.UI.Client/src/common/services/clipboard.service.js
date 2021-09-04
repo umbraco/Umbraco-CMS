@@ -6,8 +6,8 @@
  * @requires eventsService
  *
  * @description
- * Service to handle clipboard in general across the application. Responsible for handling the data both storing and retrive.
- * The service has a set way for defining a data-set by a entryType and alias, which later will be used to retrive the posible entries for a paste scenario.
+ * Service to handle clipboard in general across the application. Responsible for handling the data both storing and retrieve.
+ * The service has a set way for defining a data-set by a entryType and alias, which later will be used to retrieve the posible entries for a paste scenario.
  *
  */
 function clipboardService($window, notificationsService, eventsService, localStorageService, iconHelper) {
@@ -77,7 +77,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
     var STORAGE_KEY = "umbClipboardService";
 
-    var retriveStorage = function() {
+    var retrieveStorage = function() {
         if (localStorageService.isSupported === false) {
             return null;
         }
@@ -300,7 +300,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
     */
     service.copy = function(type, alias, data, displayLabel, displayIcon, uniqueKey, firstLevelClearupMethod) {
 
-        var storage = retriveStorage();
+        var storage = retrieveStorage();
 
         displayLabel = displayLabel || data.name;
         displayIcon = displayIcon || iconHelper.convertFromLegacyIcon(data.icon);
@@ -347,7 +347,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
             type = "elementType";
         }
 
-        var storage = retriveStorage();
+        var storage = retrieveStorage();
 
         // Clean up each entry
         var copiedDatas = datas.map(data => prepareEntryForStorage(type, data, firstLevelClearupMethod));
@@ -396,7 +396,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
     */
     service.hasEntriesOfType = function(type, aliases) {
 
-        if(service.retriveEntriesOfType(type, aliases).length > 0) {
+        if(service.retrieveEntriesOfType(type, aliases).length > 0) {
             return true;
         }
 
@@ -405,7 +405,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
     /**
     * @ngdoc method
-    * @name umbraco.services.supportsCopy#retriveEntriesOfType
+    * @name umbraco.services.supportsCopy#retrieveEntriesOfType
     * @methodOf umbraco.services.clipboardService
     *
     * @param {string} type A string defining the type of data to recive.
@@ -414,9 +414,9 @@ function clipboardService($window, notificationsService, eventsService, localSto
     * @description
     * Returns an array of entries matching the given type and one of the provided aliases.
     */
-    service.retriveEntriesOfType = function(type, allowedAliases) {
+    service.retrieveEntriesOfType = function(type, allowedAliases) {
 
-        var storage = retriveStorage();
+        var storage = retrieveStorage();
 
         // Find entries that are fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
@@ -430,7 +430,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
     /**
     * @ngdoc method
-    * @name umbraco.services.supportsCopy#retriveEntriesOfType
+    * @name umbraco.services.supportsCopy#retrieveEntriesOfType
     * @methodOf umbraco.services.clipboardService
     *
     * @param {string} type A string defining the type of data to recive.
@@ -439,13 +439,13 @@ function clipboardService($window, notificationsService, eventsService, localSto
     * @description
     * Returns an array of data of entries matching the given type and one of the provided aliases.
     */
-    service.retriveDataOfType = function(type, aliases) {
-        return service.retriveEntriesOfType(type, aliases).map((x) => x.data);
+    service.retrieveDataOfType = function(type, aliases) {
+        return service.retrieveEntriesOfType(type, aliases).map((x) => x.data);
     };
 
     /**
     * @ngdoc method
-    * @name umbraco.services.supportsCopy#retriveEntriesOfType
+    * @name umbraco.services.supportsCopy#retrieveEntriesOfType
     * @methodOf umbraco.services.clipboardService
     *
     * @param {string} type A string defining the type of data to remove.
@@ -456,7 +456,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
     */
     service.clearEntriesOfType = function(type, allowedAliases) {
 
-        var storage = retriveStorage();
+        var storage = retrieveStorage();
 
         // Find entries that are NOT fulfilling the criteria for this nodeType and nodeTypesAliases.
         var filteretEntries = storage.entries.filter(
