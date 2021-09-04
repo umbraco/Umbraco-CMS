@@ -49,6 +49,65 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Update_Member_Property_Values()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "hello", "helloworld@test123.com", "hello", "hello");
+            member.SetValue("title", "title of mine");
+            member.SetValue("bodyText", "hello world");
+            ServiceContext.MemberService.Save(member);
+
+            // re-get
+            member = ServiceContext.MemberService.GetById(member.Id);
+            member.SetValue("title", "another title of mine");          // Change a value
+            member.SetValue("bodyText", null);                          // Clear a value
+            member.SetValue("author", "new author");                    // Add a value
+            ServiceContext.MemberService.Save(member);
+
+            // re-get
+            member = ServiceContext.MemberService.GetById(member.Id);
+            Assert.AreEqual("another title of mine", member.GetValue("title"));
+            Assert.IsNull(member.GetValue("bodyText"));
+            Assert.AreEqual("new author", member.GetValue("author"));
+        }
+
+        [Test]
+        public void Can_Get_By_Username()
+        {
+            var memberType = ServiceContext.MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
+            ServiceContext.MemberService.Save(member);
+
+            var member2 = ServiceContext.MemberService.GetByUsername(member.Username);
+
+            Assert.IsNotNull(member2);
+            Assert.AreEqual(member.Email, member2.Email);
+        }
+
+        [Test]
+        public void Can_Set_Last_Login_Date()
+        {
+            var now = DateTime.Now;
+            var memberType = ServiceContext.MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
+            {
+                LastLoginDate = now,
+                UpdateDate = now
+            };
+            ServiceContext.MemberService.Save(member);
+
+            var newDate = now.AddDays(10);
+            ServiceContext.MemberService.SetLastLogin(member.Username, newDate);
+
+            //re-get
+            member = ServiceContext.MemberService.GetById(member.Id);
+
+            Assert.That(member.LastLoginDate, Is.EqualTo(newDate).Within(1).Seconds);
+            Assert.That(member.UpdateDate, Is.EqualTo(newDate).Within(1).Seconds);
+        }
+
+        [Test]
         public void Can_Create_Member_With_Properties()
         {
             var memberType = ServiceContext.MemberTypeService.Get("member");

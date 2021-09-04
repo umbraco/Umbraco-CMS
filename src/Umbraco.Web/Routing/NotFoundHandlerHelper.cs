@@ -41,7 +41,8 @@ namespace Umbraco.Web.Routing
             IContentErrorPage[] error404Collection,
             IEntityService entityService,
             IPublishedContentQuery publishedContentQuery,
-            CultureInfo errorCulture)
+            CultureInfo errorCulture,
+            int? domainContentId)
         {
             if (error404Collection.Length > 1)
             {
@@ -50,11 +51,11 @@ namespace Umbraco.Web.Routing
                     ?? error404Collection.FirstOrDefault(x => x.Culture == "default"); // there should be a default one!
 
                 if (cultureErr != null)
-                    return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery);
+                    return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery, domainContentId);
             }
             else
             {
-                return GetContentIdFromErrorPageConfig(error404Collection.First(), entityService, publishedContentQuery);
+                return GetContentIdFromErrorPageConfig(error404Collection.First(), entityService, publishedContentQuery, domainContentId);
             }
 
             return null;
@@ -67,7 +68,7 @@ namespace Umbraco.Web.Routing
         /// <param name="entityService"></param>
         /// <param name="publishedContentQuery"></param>
         /// <returns></returns>
-        internal static int? GetContentIdFromErrorPageConfig(IContentErrorPage errorPage, IEntityService entityService, IPublishedContentQuery publishedContentQuery)
+        internal static int? GetContentIdFromErrorPageConfig(IContentErrorPage errorPage, IEntityService entityService, IPublishedContentQuery publishedContentQuery, int? domainContentId)
         {
             if (errorPage.HasContentId) return errorPage.ContentId;
 
@@ -92,11 +93,11 @@ namespace Umbraco.Web.Routing
                     //we have an xpath statement to execute
                     var xpathResult = UmbracoXPathPathSyntaxParser.ParseXPathQuery(
                         xpathExpression: errorPage.ContentXPath,
-                        nodeContextId: null,
+                        nodeContextId: domainContentId,
                         getPath: nodeid =>
                         {
                             var ent = entityService.Get(nodeid);
-                            return ent.Path.Split(',').Reverse();
+                            return ent.Path.Split(Constants.CharArrays.Comma).Reverse();
                         },
                         publishedContentExists: i => publishedContentQuery.Content(i) != null);
 
@@ -107,7 +108,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<NotFoundHandlerHelper>(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
+                    Current.Logger.Error<NotFoundHandlerHelper,string>(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
                     return null;
                 }
             }

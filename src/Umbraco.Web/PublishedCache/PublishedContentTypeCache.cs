@@ -13,7 +13,7 @@ namespace Umbraco.Web.PublishedCache
     /// Represents a content type cache.
     /// </summary>
     /// <remarks>This cache is not snapshotted, so it refreshes any time things change.</remarks>
-    public class PublishedContentTypeCache
+    public class PublishedContentTypeCache : IDisposable
     {
         // NOTE: These are not concurrent dictionaries because all access is done within a lock
         private readonly Dictionary<string, IPublishedContentType> _typesByAlias = new Dictionary<string, IPublishedContentType>();
@@ -72,7 +72,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="id">An identifier.</param>
         public void ClearContentType(int id)
         {
-            _logger.Debug<PublishedContentTypeCache>("Clear content type w/id {ContentTypeId}", id);
+            _logger.Debug<PublishedContentTypeCache,int>("Clear content type w/id {ContentTypeId}", id);
 
             try
             {
@@ -107,7 +107,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="id">A data type identifier.</param>
         public void ClearDataType(int id)
         {
-            _logger.Debug<PublishedContentTypeCache>("Clear data type w/id {DataTypeId}.", id);
+            _logger.Debug<PublishedContentTypeCache,int>("Clear data type w/id {DataTypeId}.", id);
 
             // there is no recursion to handle here because a PublishedContentType contains *all* its
             // properties ie both its own properties and those that were inherited (it's based upon an
@@ -320,6 +320,8 @@ namespace Umbraco.Web.PublishedCache
         // for unit tests - changing the callback must reset the cache obviously
         // TODO: Why does this even exist? For testing you'd pass in a mocked service to get by id
         private Func<int, IPublishedContentType> _getPublishedContentTypeById;
+        private bool _disposedValue;
+
         internal Func<int, IPublishedContentType> GetPublishedContentTypeById
         {
             get => _getPublishedContentTypeById;
@@ -366,6 +368,25 @@ namespace Umbraco.Web.PublishedCache
         private static string GetAliasKey(IPublishedContentType contentType)
         {
             return GetAliasKey(contentType.ItemType, contentType.Alias);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _lock.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

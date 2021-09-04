@@ -23,6 +23,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             $scope.model.value.mode = "classic";
         }
 
+        if(!$scope.model.value.overlayWidthSize) {
+            $scope.model.value.overlayWidthSize = "small";
+        }
+
         tinyMceService.configuration().then(function(config){
             $scope.tinyMceConfig = config;
 

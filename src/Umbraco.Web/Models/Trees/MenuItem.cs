@@ -32,12 +32,9 @@ namespace Umbraco.Web.Models.Trees
         public MenuItem(string alias, ILocalizedTextService textService)
             : this()
         {
-            var values = textService.GetAllStoredValues(Thread.CurrentThread.CurrentUICulture);
-            values.TryGetValue($"visuallyHiddenTexts/{alias}_description", out var textDescription);
-
             Alias = alias;
-            Name = textService.Localize($"actions/{Alias}");
-            TextDescription = textDescription;
+            Name = textService.Localize("actions", Alias);
+            TextDescription =  textService.Localize("visuallyHiddenTexts", alias + "_description", Thread.CurrentThread.CurrentUICulture);
         }
 
         /// <summary>
@@ -165,7 +162,7 @@ namespace Umbraco.Web.Models.Trees
         }
 
         /// <summary>
-        /// Sets the menu item to display a dialog based on a url path in an iframe
+        /// Sets the menu item to display a dialog based on a URL path in an iframe
         /// </summary>
         /// <param name="url"></param>
         /// <param name="dialogTitle"></param>

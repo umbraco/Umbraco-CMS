@@ -1,19 +1,23 @@
-<ul class="unstyled" ng-if="model.prevalues">
-    <li ng-repeat="preval in model.prevalues">
+<div class="umb-radiobuttons-preval">
 
-        <umb-radiobutton model="model.value" value="{{preval.value || preval}}">
-            {{preval.label || preval.value || preval}}
-        </umb-radiobutton>
+    <ul class="unstyled" ng-if="model.prevalues">
+        <li ng-repeat="preval in model.prevalues">
 
-    </li>
-</ul>
+            <umb-radiobutton model="model.value" value="{{preval.value || preval}}">
+                {{preval.label || preval.value || preval}}
+            </umb-radiobutton>
 
-<ul class="unstyled" ng-if="model.config.prevalues">
-    <li ng-repeat="(key, value) in model.config.prevalues">
+        </li>
+    </ul>
 
-        <umb-radiobutton model="model.value" value="{{value.value}}">
-            {{value.label}}
-        </umb-radiobutton>
+    <ul class="unstyled" ng-if="model.config.prevalues">
+        <li ng-repeat="(key, value) in model.config.prevalues">
 
-    </li>
-</ul>
+            <umb-radiobutton model="model.value" value="{{value.value}}">
+                {{value.label}}
+            </umb-radiobutton>
+
+        </li>
+    </ul>
+
+</div>

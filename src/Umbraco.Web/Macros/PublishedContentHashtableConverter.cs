@@ -100,7 +100,7 @@ namespace Umbraco.Web.Macros
             Elements.Add("createDate", createDate);
             Elements.Add("updateDate", updateDate);
             Elements.Add("path", path);
-            Elements.Add("splitpath", path.Split(','));
+            Elements.Add("splitpath", path.Split(Constants.CharArrays.Comma));
         }
 
         /// <summary>

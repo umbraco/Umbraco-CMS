@@ -20,13 +20,15 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldNotEqual;
 
+        public override ProvidedValueValidation ProvidedValueValidation => ProvidedValueValidation.Email;
+
         public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
             new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
         };
 
-        public override string CheckSuccessMessage => TextService.Localize("healthcheck/notificationEmailsCheckSuccessMessage", new [] { CurrentValue } );
+        public override string CheckSuccessMessage => TextService.Localize("healthcheck", "notificationEmailsCheckSuccessMessage", new [] { CurrentValue } );
 
-        public override string CheckErrorMessage => TextService.Localize("healthcheck/notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
+        public override string CheckErrorMessage => TextService.Localize("healthcheck", "notificationEmailsCheckErrorMessage", new[] { DefaultFromEmail });
     }
 }

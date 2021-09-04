@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -62,7 +63,7 @@ namespace Umbraco.Core.Models.Identity
             _culture = Current.Configs.Global().DefaultUILanguage; // TODO: inject
 
             // must initialize before setting groups
-            _roles = new ObservableCollection<IdentityUserRole<string>>();
+            _roles = new EventClearingObservableCollection<IdentityUserRole<string>>();
             _roles.CollectionChanged += _roles_CollectionChanged;
 
             // use the property setters - they do more than just setting a field
@@ -223,7 +224,7 @@ namespace Umbraco.Core.Models.Identity
                 _groups = value;
 
                 //now clear all roles and re-add them
-                _roles.CollectionChanged -= _roles_CollectionChanged;
+                _roles.ClearCollectionChangedEvents();
                 _roles.Clear();
                 foreach (var identityUserRole in _groups.Select(x => new IdentityUserRole<string>
                 {
@@ -258,7 +259,7 @@ namespace Umbraco.Core.Models.Identity
         {
             get
             {
-                var isLocked = LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() >= DateTime.Now;
+                var isLocked = LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() > DateTime.Now;
                 return isLocked;
             }
         }
@@ -275,16 +276,23 @@ namespace Umbraco.Core.Models.Identity
         {
             get
             {
-                if (_getLogins != null && _getLogins.IsValueCreated == false)
+                // return if it exists
+                if (_logins != null) return _logins;
+
+                _logins = new ObservableCollection<IIdentityUserLogin>();
+
+                // if the callback is there and hasn't been created yet then execute it and populate the logins
+                if (_getLogins != null && !_getLogins.IsValueCreated)
                 {
-                    _logins = new ObservableCollection<IIdentityUserLogin>();
                     foreach (var l in _getLogins.Value)
                     {
                         _logins.Add(l);
                     }
-                    //now assign events
-                    _logins.CollectionChanged += Logins_CollectionChanged;
                 }
+
+                //now assign events
+                _logins.CollectionChanged += Logins_CollectionChanged;
+
                 return _logins;
             }
         }
@@ -299,7 +307,7 @@ namespace Umbraco.Core.Models.Identity
             _beingDirty.OnPropertyChanged(nameof(Roles));
         }
 
-        private readonly ObservableCollection<IdentityUserRole<string>> _roles;
+        private readonly EventClearingObservableCollection<IdentityUserRole<string>> _roles;
 
         /// <summary>
         /// helper method to easily add a role without having to deal with IdentityUserRole{T}

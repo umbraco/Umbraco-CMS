@@ -7,7 +7,7 @@
                 <div class="umb-healthcheck-help-text">
                     <localize key="healthcheck_helpText">
                         <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
-                            You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+                            You can add your own health checks, have a look at <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
                     </localize>
                 </div>
                 <div class="umb-panel-group__details-status-actions">
@@ -34,7 +34,7 @@
                          ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
 
                         <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
-                            <i class="icon-check color-green" aria-hidden="true"></i>
+                            <umb-icon icon="icon-check" class="color-green"></umb-icon>
                             {{ group.totalSuccess }}
                             <span class="sr-only">
                                 <localize key="visuallyHiddenTexts_passed">passed</localize>
@@ -42,7 +42,7 @@
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
-                            <i class="icon-alert color-orange" aria-hidden="true"></i>
+                            <umb-icon icon="icon-alert" class="color-orange"></umb-icon>
                             {{ group.totalWarning }}
                             <span class="sr-only">
                                 <localize key="visuallyHiddenTexts_warning">warning</localize>
@@ -50,7 +50,7 @@
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
-                            <i class="icon-delete color-red" aria-hidden="true"></i>
+                            <umb-icon icon="icon-delete" class="color-red"></umb-icon>
                             {{ group.totalError }}
                             <span class="sr-only">
                                 <localize key="visuallyHiddenTexts_failed">failed</localize>
@@ -58,7 +58,7 @@
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
-                            <i class="umb-healthcheck-status-icon icon-info" aria-hidden="true"></i>
+                            <umb-icon icon="icon-info" class="umb-healthcheck-status-icon"></umb-icon>
                             {{ group.totalInfo }}
                             <span class="sr-only">
                                 <localize key="visuallyHiddenTexts_suggestion">suggestion</localize>
@@ -103,10 +103,10 @@
 
                         <div class="umb-panel-group__details-status" ng-repeat="status in check.status">
                             <div class="umb-panel-group__details-status-icon-container" aria-hidden="true">
-                                <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0"></i>
-                                <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1"></i>
-                                <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2"></i>
-                                <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType === 3"></i>
+                                <umb-icon icon="icon-check" class="umb-healthcheck-status-icon color-green" ng-if="status.resultType === 0"></umb-icon>
+                                <umb-icon icon="icon-alert" class="umb-healthcheck-status-icon color-yellow" ng-if="status.resultType === 1"></umb-icon>
+                                <umb-icon icon="icon-delete" class="umb-healthcheck-status-icon color-red" ng-if="status.resultType === 2"></umb-icon>
+                                <umb-icon icon="icon-info" class="umb-healthcheck-status-icon" ng-if="status.resultType === 3"></umb-icon>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
@@ -133,7 +133,12 @@
 
                                             <div ng-if="action.valueRequired">
                                                 <div><label class="bold">Set new value:</label></div>
-                                                <input name="providedValue" type="text" ng-model="action.providedValue" required val-email />
+
+                                                <div ng-switch on="action.providedValueValidation">
+                                                    <input ng-switch-when="email" name="providedValue" type="text" ng-model="action.providedValue" required val-email />
+                                                    <input ng-switch-when="regex" name="providedValue" type="text" ng-model="action.providedValue" required ng-pattern="vm.parseRegex(action.providedValueValidationRegex)" />
+                                                    <input ng-switch-default name="providedValue" type="text" ng-model="action.providedValue" required />
+                                                </div>
                                             </div>
 
                                             <umb-button type="button"

@@ -36,18 +36,17 @@
         }
     }
 
-    input {
-        border: none;
-        background: @white;
-    }
-
     .twitter-typeahead {
         margin: 10px;
         margin-top: 16px;
         vertical-align: top;
+        max-width: calc(100% - 20px);
 
         input {
+            border: none;
+            background: @white;
             padding-left: 0;
+            max-width: 100%;
         }
     }
 }

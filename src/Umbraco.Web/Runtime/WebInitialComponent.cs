@@ -129,7 +129,7 @@ namespace Umbraco.Web.Runtime
 
             if (ConfigurationManager.GetSection("system.web/httpRuntime") is HttpRuntimeSection section)
             {
-                //set the max url length for CDF to be the smallest of the max query length, max request length
+                //set the max URL length for CDF to be the smallest of the max query length, max request length
                 ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(section.MaxQueryStringLength, section.MaxRequestLength);
             }
 
@@ -208,7 +208,7 @@ namespace Umbraco.Web.Runtime
             var url = umbracoPath + (meta.IsBackOffice ? "/BackOffice" : "") + "/Api/" + meta.ControllerName + "/{action}/{id}";
             var route = RouteTable.Routes.MapHttpRoute(
                 $"umbraco-api-{meta.ControllerName}",
-                url, // url to match
+                url, // URL to match
                 new { controller = meta.ControllerName, id = UrlParameter.Optional },
                 new[] { meta.ControllerNamespace });
             if (route.DataTokens == null) // web api routes don't set the data tokens object
@@ -222,7 +222,7 @@ namespace Umbraco.Web.Runtime
             var url = umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}";
             var route = RouteTable.Routes.MapRoute(
                 $"umbraco-surface-{meta.ControllerName}",
-                url, // url to match
+                url, // URL to match
                 new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
                 new[] { meta.ControllerNamespace }); // look in this namespace to create the controller
             route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "surface"); // ensure the umbraco token is set

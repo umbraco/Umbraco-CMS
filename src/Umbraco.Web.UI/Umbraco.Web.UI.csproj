@@ -88,9 +88,9 @@
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="ClientDependency" Version="1.9.9" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.9.3" />
-    <PackageReference Include="Examine" Version="1.0.2" />
-    <PackageReference Include="ImageProcessor.Web" Version="4.10.0.100" />
-    <PackageReference Include="ImageProcessor.Web.Config" Version="2.5.0.100" />
+    <PackageReference Include="Examine" Version="1.2.0" />
+    <PackageReference Include="ImageProcessor.Web" Version="4.12.1" />
+    <PackageReference Include="ImageProcessor.Web.Config" Version="2.6.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
@@ -111,6 +111,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +170,7 @@
     <Content Include="Config\Lang\zh-CN.user.xml" />
     <Content Include="Config\splashes\noNodes.aspx" />
     <Content Include="Umbraco\Config\Lang\cs.xml" />
+    <Content Include="Umbraco\Config\Lang\cy.xml" />
     <Content Include="Umbraco\Config\Lang\tr.xml" />
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Config\Splashes\noNodes.aspx" />
@@ -318,6 +320,7 @@
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v14.0</VSToolsPath>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v15.0</VSToolsPath>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v16.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v16.0</VSToolsPath>
+    <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v17.0</VSToolsPath>
   </PropertyGroup>
   <!-- determine WebPublishingTasks -->
   <PropertyGroup>
@@ -327,8 +330,7 @@
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v15.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
     <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
-    <!-- Temporary addition for the VS2019 preview - can be removed when VS2019 final is released, then v16 above will be used -->
-    <WebPublishingTasks Condition="exists('$(ProgramFiles32)\Microsoft Visual Studio\2019\Preview\MSBuild\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(ProgramFiles32)\Microsoft Visual Studio\2019\Preview\MSBuild\Microsoft\VisualStudio\v16.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
+    <WebPublishingTasks Condition="exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll')">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v17.0\Web\Microsoft.Web.Publishing.Tasks.dll</WebPublishingTasks>
   </PropertyGroup>
   <!-- get TransformXml task from WebPublishingtasks -->
   <UsingTask TaskName="TransformXml" AssemblyFile="$(WebPublishingTasks)" Condition="'$(WebPublishingTasks)' != ''" />
@@ -346,9 +348,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8800</DevelopmentServerPort>
+          <DevelopmentServerPort>8170</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8800</IISUrl>
+          <IISUrl>http://localhost:8170</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -376,6 +378,7 @@
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
     <Message Text="Copy ClientDependency.$(Configuration).config to ClientDependency.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
+    <Copy SourceFiles="$(ProjectDir)Config\umbracoSettings.Release.config" DestinationFiles="$(ProjectDir)Config\umbracoSettings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\umbracoSettings.config')" />
     <!-- Create Serilog.config & serilog.user.config file from Templates if it doesn't exist -->
     <Message Text="Copy serilog.$(Configuration).config to serilog.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\serilog.Release.config" DestinationFiles="$(ProjectDir)Config\serilog.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />

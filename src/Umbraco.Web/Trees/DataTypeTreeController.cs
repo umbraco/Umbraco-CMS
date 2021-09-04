@@ -46,7 +46,7 @@ namespace Umbraco.Web.Trees
                    .OrderBy(entity => entity.Name)
                    .Select(dt =>
                    {
-                       var node = CreateTreeNode(dt, Constants.ObjectTypes.DataType, id, queryStrings, "icon-folder", dt.HasChildren);
+                       var node = CreateTreeNode(dt, Constants.ObjectTypes.DataType, id, queryStrings, Constants.Icons.Folder, dt.HasChildren);
                        node.Path = dt.Path;
                        node.NodeType = "container";
                        // TODO: This isn't the best way to ensure a no operation process for clicking a node but it works for now.
@@ -135,7 +135,7 @@ namespace Umbraco.Web.Trees
 
                 menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions/rename"))
+                menu.Items.Add(new MenuItem("rename", Services.TextService.Localize("actions", "rename"))
                 {
                     Icon = "icon icon-edit"
                 });

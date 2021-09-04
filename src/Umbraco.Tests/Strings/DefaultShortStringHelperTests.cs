@@ -338,7 +338,7 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
 
             // FIXME: but for a filename we want to keep them!
-            // FIXME: and what about a url?
+            // FIXME: and what about a URL?
         }
 
         [Test]
@@ -424,7 +424,7 @@ namespace Umbraco.Tests.Strings
             // lower-cased, utf8 filename, removing illegal filename chars, using dash-separator
             Assert.AreEqual("0123-中文测试-中文测试-léger-zôrg-2-a-x", filename, "filename");
 
-            // lower-cased, utf8 url segment, only letters and digits, using dash-separator
+            // lower-cased, utf8 URL segment, only letters and digits, using dash-separator
             Assert.AreEqual("0123-中文测试-中文测试-léger-zôrg-2-a-x", segment, "segment");
         }
 

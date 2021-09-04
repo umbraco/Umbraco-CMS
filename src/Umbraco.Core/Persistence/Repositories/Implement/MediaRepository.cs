@@ -24,6 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepository>, IMediaRepository
     {
+        private readonly AppCaches _cache;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
@@ -32,6 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditorCollection, DataValueReferenceFactoryCollection dataValueReferenceFactories)
             : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories)
         {
+            _cache = cache;
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, logger);
@@ -186,7 +188,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             const string pattern = ".*[_][0-9]+[x][0-9]+[.].*";
             var isResized = Regex.IsMatch(mediaPath, pattern);
 
-            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url.
+            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" URL.
             if (isResized)
             {
                 var underscoreIndex = mediaPath.LastIndexOf('_');
@@ -281,9 +283,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(mediaVersionDto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            InsertPropertyValues(entity, 0, out _, out _);
 
             // set tags
             SetEntityTags(entity, _tagRepository);
@@ -346,11 +346,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Update(mediaVersionDto);
 
                 // replace the property data
-                var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == entity.VersionId);
-                Database.Execute(deletePropertyDataSql);
-                var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-                foreach (var propertyDataDto in propertyDataDtos)
-                    Database.Insert(propertyDataDto);
+                ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
                 SetEntityTags(entity, _tagRepository);
 
@@ -374,6 +370,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Recycle Bin
 
         public override int RecycleBinId => Constants.System.RecycleBinMedia;
+
+        public bool RecycleBinSmells()
+        {
+            var cache = _cache.RuntimeCache;
+            var cacheKey = CacheKeys.MediaRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
 
         #endregion
 
@@ -503,10 +508,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Models.Media) cached;
+                        content[i] = (Models.Media)cached;
                         continue;
                     }
                 }

@@ -125,6 +125,9 @@ namespace Umbraco.Core.Persistence
         public string ConnectionString => _connectionString;
 
         /// <inheritdoc />
+        public string ProviderName => _providerName;
+
+        /// <inheritdoc />
         public bool CanConnect =>
             // actually tries to connect to the database (regardless of configured/initialized)
             !_connectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace() &&
@@ -162,7 +165,7 @@ namespace Umbraco.Core.Persistence
                 // else leave unchanged
             }
 
-            _logger.Debug<UmbracoDatabaseFactory>("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
+            _logger.Debug<UmbracoDatabaseFactory, SqlServerSyntaxProvider.VersionName, DatabaseType, string>("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
                 versionName, _databaseType, fromSettings ? "settings" : "detected");
         }
 

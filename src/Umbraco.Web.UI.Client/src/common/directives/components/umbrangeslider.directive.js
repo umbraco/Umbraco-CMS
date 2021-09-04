@@ -46,12 +46,13 @@ For extra details about options and events take a look here: https://refreshless
 </pre>
 
 @param {object} ngModel (<code>binding</code>): Value for the slider.
-@param {object} options (<code>binding</code>): Config object for the date picker.
+@param {object} options (<code>binding</code>): Config object for the slider.
 @param {callback} onSetup (<code>callback</code>): onSetup gets triggered when the slider is initialized
 @param {callback} onUpdate (<code>callback</code>): onUpdate fires every time the slider values are changed.
 @param {callback} onSlide (<code>callback</code>): onSlide gets triggered when the handle is being dragged.
 @param {callback} onSet (<code>callback</code>): onSet will trigger every time a slider stops changing.
 @param {callback} onChange (<code>callback</code>): onChange fires when a user stops sliding, or when a slider value is changed by 'tap'.
+@param {callback} onDrag (<code>callback</code>): onDrag fires when a connect element between handles is being dragged, while ignoring other updates to the slider values.
 @param {callback} onStart (<code>callback</code>): onStart fires when a handle is clicked (mousedown, or the equivalent touch events).
 @param {callback} onEnd (<code>callback</code>): onEnd fires when a handle is released (mouseup etc), or when a slide is canceled due to other reasons.
 **/
@@ -71,6 +72,7 @@ For extra details about options and events take a look here: https://refreshless
             onSlide: '&?',
             onSet: '&?',
             onChange: '&?',
+            onDrag: '&?',
             onStart: '&?',
             onEnd: '&?'
         }
@@ -177,6 +179,15 @@ For extra details about options and events take a look here: https://refreshless
                     sliderInstance.noUiSlider.on('change', function (values, handle, unencoded, tap, positions) {
                         $timeout(function () {
                             ctrl.onChange({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
+                        });
+                    });
+                }
+
+                // bind hook for drag
+                if (ctrl.onDrag) {
+                    sliderInstance.noUiSlider.on('drag', function (values, handle, unencoded, tap, positions) {
+                        $timeout(function () {
+                            ctrl.onDrag({ values: values, handle: handle, unencoded: unencoded, tap: tap, positions: positions });
                         });
                     });
                 }

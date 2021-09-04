@@ -1,13 +1,13 @@
-.umb-button-ellipsis{
+.umb-button-ellipsis {
     padding: 0 5px;
     text-align: center;
     margin: 0 auto;
     cursor: pointer;
     border-radius: @baseBorderRadius;
-    color: black;
+    color: @ui-action-discreet-type;
     position: relative;
     opacity: 0.8;
-    transition: opacity .3s ease-out;
+    transition: opacity 120ms, color 120ms;
 
     &--absolute {
         position: absolute;
@@ -23,14 +23,18 @@
         justify-content: center;
     }
 
+    &:hover {
+        color: @ui-action-discreet-type-hover;
+    }
+
     .umb-button-ellipsis--tab,
-    .umb-tour-is-visible .umb-tree &,
+    .umb-tour-is-visible .umb-tree .umb-tree-item.above-backdrop &,
     &:hover,
-    &:focus{
+    &:focus {
         opacity: 1;
     }
 
-    &--hidden{
+    &--hidden {
         opacity: 0;
 
         &:hover,
@@ -47,10 +51,11 @@
     &__icon {
         color: inherit;
         flex-basis: 100%;
+        font-size: 12px;
 
         .umb-button-ellipsis--tab & {
             margin: 0 0 7px;
-         }
+        }
 
         .umb-button-ellipsis--small & {
             font-size: 8px;

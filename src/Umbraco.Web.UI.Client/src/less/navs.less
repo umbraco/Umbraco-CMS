@@ -2,17 +2,21 @@
 // Navs
 // --------------------------------------------------
 
-.list-icons li{
-  padding-left: 35px;
-  max-width: 300px
+.list-icons li {
+    padding-left: 35px;
+    max-width: 300px;
+
+    > .umb-icon,
+    > i.icon {
+        margin-left: -25px;
+        padding-right: 7px;
+    }
 }
 
-.list-icons li > i.icon{
-  margin-left: -25px;
-  padding-right: 7px;
+.umb-icon.handle,
+.icon.handle {
+  color: @gray-8;
 }
-
-.icon.handle{color: @gray-8;}
 
 
 // BASE CLASS
@@ -168,8 +172,7 @@
 
 // Active state
 .nav-pills > .active > a,
-.nav-pills > .active > a:hover,
-.nav-pills > .active > a:focus {
+.nav-pills > .active > a:hover {
   color: @white;
   background-color: @linkColor;
 }
@@ -184,7 +187,14 @@
   float: none;
 }
 .nav-stacked > li > a {
+  position: relative;
   margin-right: 0; // no need for the gap between nav items
+  color: @ui-action-discreet-type;
+  border-radius: 3px;
+}
+.nav-stacked > li > a:hover {
+  color: @ui-action-discreet-type-hover;
+  background-color: @ui-action-discreet-hover;
 }
 
 // Tabs
@@ -226,6 +236,21 @@
   padding-top: 0;
   padding-bottom: 0;
 }
+.dropdown-menu > li {
+    position: relative;
+}
+.dropdown-menu > li .dropdown-menu--active {
+    &::after {
+        content: "";
+        position: absolute;
+        width: 3px;
+        left:0;
+        top: 3px;
+        bottom: 3px;
+        background-color: @ui-light-active-border;
+        border-radius: 0 3px 3px 0;
+    }
+}
 
 // fix dropdown with checkbox + long text in label
 .dropdown-menu > li > .flex > label {
@@ -245,7 +270,8 @@
   border: 0;
   padding: 8px 20px;
   color: @ui-option-type;
-  display: block;
+  display: flex;
+  justify-content: start;
   clear: both;
   font-weight: normal;
   line-height: 20px;

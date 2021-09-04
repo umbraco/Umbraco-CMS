@@ -51,7 +51,12 @@
 
         function close() {
             focusLockService.removeInertAttribute();
-            backdropService.close();
+
+            var tourIsOpen = document.body.classList.contains("umb-tour-is-visible");
+            if (!tourIsOpen) {
+                backdropService.close();
+            }
+            
             currentOverlay = null;
             eventsService.emit("appState.overlay", null);
         }

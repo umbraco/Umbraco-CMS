@@ -13,8 +13,8 @@
             top: 0
         };
 
-        var htmlImage = null; //DOM element reference
-        var htmlOverlay = null; //DOM element reference
+        var imageElement = null; //DOM element reference
+        var focalPointElement = null; //DOM element reference
         var draggable = null;
 
         vm.loaded = false;
@@ -22,33 +22,41 @@
         vm.$onChanges = onChanges;
         vm.$postLink = postLink;
         vm.$onDestroy = onDestroy;
-        vm.style = style;
+        vm.style = {};
+        vm.overlayStyle = {};
         vm.setFocalPoint = setFocalPoint;
+        vm.resetFocalPoint = resetFocalPoint;
 
         /** Sets the css style for the Dot */
-        function style() {
-
-            if (vm.dimensions.width <= 0 || vm.dimensions.height <= 0) {
-                //this initializes the dimensions since when the image element first loads
-                //there will be zero dimensions
-                setDimensions();
-            }
-
-            return {
+        function updateStyle() {
+            vm.style = {
                 'top': vm.dimensions.top + 'px',
                 'left': vm.dimensions.left + 'px'
             };
+            vm.overlayStyle = {
+                'width': vm.dimensions.width + 'px',
+                'height': vm.dimensions.height + 'px'
+            };
+
         };
 
-        function setFocalPoint (event) {
+        function resetFocalPoint() {
+            vm.onValueChanged({
+                left: 0.5,
+                top: 0.5
+            });
+        };
+
+        function setFocalPoint(event) {
             $scope.$emit("imageFocalPointStart");
 
-            var offsetX = event.offsetX - 10;
-            var offsetY = event.offsetY - 10;
+            // We do this to get the right position, no matter the focalPoint was clicked.
+            var viewportPosition = imageElement[0].getBoundingClientRect();
+            var offsetX = event.clientX - viewportPosition.left;
+            var offsetY = event.clientY - viewportPosition.top;
 
             calculateGravity(offsetX, offsetY);
-
-            lazyEndEvent();
+            $scope.$emit("imageFocalPointStop");
         };
 
         /** Initializes the component */
@@ -61,33 +69,30 @@
         /** Called when the component has linked everything and the DOM is available */
         function postLink() {
             //elements
-            htmlImage = $element.find("img");
-            htmlOverlay = $element.find(".overlay");
+            imageElement = $element.find("img");
+            focalPointElement = $element.find(".focalPoint");
 
             //Drag and drop positioning, using jquery ui draggable
-            draggable = htmlOverlay.draggable({
+            draggable = focalPointElement.draggable({
                 containment: "parent",
                 start: function () {
-                    $scope.$apply(function () {
-                        $scope.$emit("imageFocalPointStart");
-                    });
+                    $scope.$emit("imageFocalPointStart");
                 },
-                stop: function () {
-                    $scope.$apply(function () {
-                        var offsetX = htmlOverlay[0].offsetLeft;
-                        var offsetY = htmlOverlay[0].offsetTop;
-                        calculateGravity(offsetX, offsetY);
-                    });
+                stop: function (event, ui) {
 
-                    lazyEndEvent();
+                    var offsetX = ui.position.left;
+                    var offsetY = ui.position.top;
+
+                    $scope.$evalAsync(calculateGravity(offsetX, offsetY));
+
+                    $scope.$emit("imageFocalPointStop");
+
                 }
             });
 
-            $(window).on('resize.umbImageGravity', function () {
-                $scope.$apply(function () {
-                    resized();
-                });
-            });
+            window.addEventListener('resize.umbImageGravity', onResizeHandler);
+            window.addEventListener('resize', onResizeHandler);
+
 
             //if any ancestor directive emits this event, we need to resize
             $scope.$on("editors.content.splitViewChanged", function () {
@@ -95,12 +100,12 @@
             });
 
             //listen for the image DOM element loading
-            htmlImage.on("load", function () {
+            imageElement.on("load", function () {
                 $timeout(function () {
 
                     vm.isCroppable = true;
                     vm.hasDimensions = true;
-                    
+
                     if (vm.src) {
                         if (vm.src.endsWith(".svg")) {
                             vm.isCroppable = false;
@@ -117,6 +122,8 @@
                     }
 
                     setDimensions();
+                    updateStyle();
+
                     vm.loaded = true;
                     if (vm.onImageLoaded) {
                         vm.onImageLoaded({
@@ -129,16 +136,19 @@
         }
 
         function onDestroy() {
-            $(window).off('resize.umbImageGravity');
-            if (htmlOverlay) {
+            window.removeEventListener('resize.umbImageGravity', onResizeHandler);
+            window.removeEventListener('resize', onResizeHandler);
+            /*
+            if (focalPointElement) {
                 // TODO: This should be destroyed but this will throw an exception:
                 // "cannot call methods on draggable prior to initialization; attempted to call method 'destroy'"
                 // I've tried lots of things and cannot get this to work, we weren't destroying before so hopefully
                 // there's no mem leaks?
-                //htmlOverlay.draggable("destroy");
+                focalPointElement.draggable("destroy");
             }
-            if (htmlImage) {
-                htmlImage.off("load");
+            */
+            if (imageElement) {
+                imageElement.off("load");
             }
         }
 
@@ -146,34 +156,42 @@
         function resized() {
             $timeout(function () {
                 setDimensions();
+                updateStyle();
             });
+            /*
             // Make sure we can find the offset values for the overlay(dot) before calculating
             // fixes issue with resize event when printing the page (ex. hitting ctrl+p inside the rte)
-            if (htmlOverlay.is(':visible')) {
-                var offsetX = htmlOverlay[0].offsetLeft;
-                var offsetY = htmlOverlay[0].offsetTop;
+            if (focalPointElement.is(':visible')) {
+                var offsetX = focalPointElement[0].offsetLeft;
+                var offsetY = focalPointElement[0].offsetTop;
                 calculateGravity(offsetX, offsetY);
             }
+            */
+        }
+
+        function onResizeHandler() {
+            $scope.$evalAsync(resized);
         }
 
         /** Watches the one way binding changes */
         function onChanges(changes) {
             if (changes.center && !changes.center.isFirstChange()
                 && changes.center.currentValue
-                && !angular.equals(changes.center.currentValue, changes.center.previousValue)) {
+                && !Utilities.equals(changes.center.currentValue, changes.center.previousValue)) {
                 //when center changes update the dimensions
                 setDimensions();
+                updateStyle();
             }
         }
 
         /** Sets the width/height/left/top dimentions based on the image size and the "center" value */
         function setDimensions() {
 
-            if (vm.isCroppable && htmlImage && vm.center) {
-                vm.dimensions.width = htmlImage.width();
-                vm.dimensions.height = htmlImage.height();
-                vm.dimensions.left = vm.center.left * vm.dimensions.width - 10;
-                vm.dimensions.top = vm.center.top * vm.dimensions.height - 10;
+            if (vm.isCroppable && imageElement && vm.center) {
+                vm.dimensions.width = imageElement.width();
+                vm.dimensions.height = imageElement.height();
+                vm.dimensions.left = vm.center.left * vm.dimensions.width;
+                vm.dimensions.top = vm.center.top * vm.dimensions.height;
             }
 
             return vm.dimensions.width;
@@ -185,21 +203,11 @@
          * @param {any} offsetY
          */
         function calculateGravity(offsetX, offsetY) {
-
             vm.onValueChanged({
-                left: (offsetX + 10) / vm.dimensions.width,
-                top: (offsetY + 10) / vm.dimensions.height
+                left: Math.min(Math.max(offsetX, 0), vm.dimensions.width) / vm.dimensions.width,
+                top: Math.min(Math.max(offsetY, 0), vm.dimensions.height) / vm.dimensions.height
             });
-
-            //vm.center.left = (offsetX + 10) / scope.dimensions.width;
-            //vm.center.top = (offsetY + 10) / scope.dimensions.height;
         };
-
-        var lazyEndEvent = _.debounce(function () {
-            $scope.$apply(function () {
-                $scope.$emit("imageFocalPointStop");
-            });
-        }, 2000);
 
     }
 
@@ -207,9 +215,10 @@
         templateUrl: 'views/components/imaging/umb-image-gravity.html',
         bindings: {
             src: "<",
-            center: "<", 
+            center: "<",
             onImageLoaded: "&?",
-            onValueChanged: "&"
+            onValueChanged: "&",
+            disableFocalPoint: "<?"
         },
         controllerAs: 'vm',
         controller: umbImageGravityController

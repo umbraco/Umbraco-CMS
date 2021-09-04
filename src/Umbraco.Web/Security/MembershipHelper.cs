@@ -119,7 +119,7 @@ namespace Umbraco.Web.Security
             {
                 pathsWithAccess.TryGetValue(path, out var hasAccess);
                 // if it's not found it's false anyways
-                result[path] = hasAccess;
+                result[path] = !pathsWithProtection.Contains(path) || hasAccess;
             }
             return result;
         }
@@ -309,12 +309,13 @@ namespace Umbraco.Web.Security
             {
                 return false;
             }
-            //Set member online
-            var member = provider.GetUser(username, true);
+            // Get the member, do not set to online - this is done implicitly as part of ValidateUser which is consistent with
+            // how the .NET framework SqlMembershipProvider works. Passing in true will just cause more unnecessary SQL queries/locks.
+            var member = provider.GetUser(username, false);
             if (member == null)
             {
                 //this should not happen
-                Current.Logger.Warn<MembershipHelper>("The member validated but then no member was returned with the username {Username}", username);
+                Current.Logger.Warn<MembershipHelper, string>("The member validated but then no member was returned with the username {Username}", username);
                 return false;
             }
             //Log them in
@@ -826,33 +827,17 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         private IMember GetCurrentPersistedMember()
         {
-            return _appCaches.RequestCache.GetCacheItem<IMember>(
-                GetCacheKey("GetCurrentPersistedMember"), () =>
-                {
-                    var provider = _membershipProvider;
+            var provider = _membershipProvider;
 
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("An IMember model can only be retrieved when using the built-in Umbraco membership providers");
-                    }
-                    var username = provider.GetCurrentUserName();
-                    var member = _memberService.GetByUsername(username);
-                    return member;
-                });
-        }
-
-        private static string GetCacheKey(string key, params object[] additional)
-        {
-            var sb = new StringBuilder();
-            sb.Append(typeof(MembershipHelper).Name);
-            sb.Append("-");
-            sb.Append(key);
-            foreach (var s in additional)
+            if (provider.IsUmbracoMembershipProvider() == false)
             {
-                sb.Append("-");
-                sb.Append(s);
+                throw new NotSupportedException("An IMember model can only be retrieved when using the built-in Umbraco membership providers");
             }
-            return sb.ToString();
+            var username = provider.GetCurrentUserName();
+
+            // The result of this is cached by the MemberRepository
+            var member = _memberService.GetByUsername(username);
+            return member;
         }
 
     }

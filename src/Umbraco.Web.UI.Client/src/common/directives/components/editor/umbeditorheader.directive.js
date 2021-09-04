@@ -199,6 +199,7 @@ Use this directive to construct a header inside the main editor window.
 @param {boolean=} aliasLocked Set to <code>true</code> to lock the alias.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
+@param {boolean=} descriptionLocked Set to <code>true</code> to lock the description.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
 @param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with
 @param {string=} editorfor The localization to use to aid accessibility on the edit and create screen
@@ -340,24 +341,26 @@ Use this directive to construct a header inside the main editor window.
                         }
 
                     }
-                    scope.accessibility.a11yMessageVisible = !isEmptyOrSpaces(scope.accessibility.a11yMessage);
-                    scope.accessibility.a11yNameVisible = !isEmptyOrSpaces(scope.accessibility.a11yName);
+
+                    scope.accessibility.a11yMessageVisible = !isNullOrWhitespace(scope.accessibility.a11yMessage);
+                    scope.accessibility.a11yNameVisible = !isNullOrWhitespace(scope.accessibility.a11yName);
 
                 });
             }
 
-
-
-           function isEmptyOrSpaces(str) {
-               return str === null || str===undefined || str.trim ==='';
+            function isNullOrWhitespace(str) {
+               return str === null || str === undefined || str.trim() === '';
             }
 
             function SetPageTitle(title) {
-                    scope.$emit("$changeTitle", title);
+                scope.$emit("$changeTitle", title);
             }
 
-            $rootScope.$on('$setAccessibleHeader', function (event, isNew, editorFor, nameLocked, name, contentTypeName, setTitle) {
+            var unbindEventHandler = $rootScope.$on('$setAccessibleHeader', function (event, isNew, editorFor, nameLocked, name, contentTypeName, setTitle) {
                 setAccessibilityHeaderDirective(isNew, editorFor, nameLocked, name, contentTypeName, setTitle);
+            });
+            scope.$on('$destroy', function () {
+                unbindEventHandler();
             });
         }
 

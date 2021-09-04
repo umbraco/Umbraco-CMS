@@ -9,11 +9,14 @@ using Umbraco.Core.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models;
+using Umbraco.Core;
 
 namespace Umbraco.Web
 {
     using Core.Configuration;
+    using System;
     using Umbraco.Web.JavaScript;
+    using Umbraco.Web.Security;
 
     /// <summary>
     /// HtmlHelper extensions for the back office
@@ -26,7 +29,7 @@ namespace Umbraco.Web
         /// <param name="html"></param>
         /// <param name="uri"></param>
         /// <param name="externalLoginsUrl">
-        /// The post url used to sign in with external logins - this can change depending on for what service the external login is service.
+        /// The post URL used to sign in with external logins - this can change depending on for what service the external login is service.
         /// Example: normal back office login or authenticating upgrade login
         /// </param>
         /// <param name="features"></param>
@@ -56,10 +59,9 @@ namespace Umbraco.Web
         /// <param name="html"></param>
         /// <param name="externalLoginErrors"></param>
         /// <returns></returns>
-        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
+        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, BackOfficeExternalLoginProviderErrors externalLoginErrors)
         {
-            var loginProviders = html.ViewContext.HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
-                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+            var loginProviders = html.ViewContext.HttpContext.GetOwinContext().Authentication.GetBackOfficeExternalLoginProviders()
                 .Select(p => new
                 {
                     authType = p.AuthenticationType,
@@ -74,19 +76,27 @@ namespace Umbraco.Web
 
             if (externalLoginErrors != null)
             {
-                foreach (var error in externalLoginErrors)
+                foreach (var error in externalLoginErrors.Errors)
                 {
-                    sb.AppendFormat(@"errors.push(""{0}"");", error).AppendLine();
+                    sb.AppendFormat(@"errors.push(""{0}"");", error.ToSingleLine()).AppendLine();
                 }
             }
 
             sb.AppendLine(@"app.value(""externalLoginInfo"", {");
+            if (externalLoginErrors?.AuthenticationType != null)
+                sb.AppendLine($@"errorProvider: '{externalLoginErrors.AuthenticationType}',");
             sb.AppendLine(@"errors: errors,");
             sb.Append(@"providers: ");
             sb.AppendLine(JsonConvert.SerializeObject(loginProviders));
             sb.AppendLine(@"});");
 
             return html.Raw(sb.ToString());
+        }
+
+        [Obsolete("Use the other overload instead")]
+        public static IHtmlString AngularValueExternalLoginInfoScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
+        {
+            return html.AngularValueExternalLoginInfoScript(new BackOfficeExternalLoginProviderErrors(string.Empty, externalLoginErrors));
         }
 
         /// <summary>

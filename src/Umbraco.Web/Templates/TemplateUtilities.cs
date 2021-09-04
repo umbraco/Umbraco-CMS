@@ -22,7 +22,7 @@ namespace Umbraco.Web.Templates
         [Obsolete("Inject and use an instance of " + nameof(HtmlLocalLinkParser) + " instead")]
         internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
         {
-            using (umbracoContext.ForcedPreview(preview)) // force for url provider
+            using (umbracoContext.ForcedPreview(preview)) // force for URL provider
             {
                 text = ParseInternalLinks(text, umbracoContext.UrlProvider);
             }

@@ -33,11 +33,14 @@ namespace Umbraco.Web.Routing
         {
             _logger.Debug<ContentFinderByConfigured404>("Looking for a page to handle 404.");
 
+            int? domainConentId = null;
+
             // try to find a culture as best as we can
             var errorCulture = CultureInfo.CurrentUICulture;
             if (frequest.HasDomain)
             {
                 errorCulture = frequest.Domain.Culture;
+                domainConentId = frequest.Domain.ContentId;
             }
             else
             {
@@ -63,13 +66,15 @@ namespace Umbraco.Web.Routing
                 _contentConfigSection.Error404Collection.ToArray(),
                 _entityService,
                 new PublishedContentQuery(frequest.UmbracoContext.PublishedSnapshot, frequest.UmbracoContext.VariationContextAccessor),
-                errorCulture);
+                errorCulture,
+                domainConentId
+                );
 
             IPublishedContent content = null;
 
             if (error404.HasValue)
             {
-                _logger.Debug<ContentFinderByConfigured404>("Got id={ErrorNodeId}.", error404.Value);
+                _logger.Debug<ContentFinderByConfigured404,int>("Got id={ErrorNodeId}.", error404.Value);
 
                 content = frequest.UmbracoContext.Content.GetById(error404.Value);
 

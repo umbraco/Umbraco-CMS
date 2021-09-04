@@ -26,12 +26,16 @@ namespace Umbraco.Web.Logging
             _provider = new WebProfilerProvider();
 
             //see https://miniprofiler.com/dotnet/AspDotNet
-            MiniProfiler.Configure(new MiniProfilerOptions
+            var options = new MiniProfilerOptions
             {
                 SqlFormatter = new SqlServerFormatter(),
-                StackMaxLength = 5000, 
+                StackMaxLength = 5000,
                 ProfilerProvider = _provider
-            });
+            };
+            // this is a default path and by default it performs a 'contains' check which will match our content controller
+            // (and probably other requests) and ignore them.
+            options.IgnoredPaths.Remove("/content/"); 
+            MiniProfiler.Configure(options);
         }
 
         public void UmbracoApplicationBeginRequest(object sender, EventArgs e)

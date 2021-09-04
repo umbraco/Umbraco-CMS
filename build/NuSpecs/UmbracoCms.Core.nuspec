@@ -32,16 +32,16 @@
                 <dependency id="MiniProfiler" version="[4.0.138,4.999999)" />
                 <dependency id="Newtonsoft.Json" version="[12.0.1,12.999999)" />
                 <dependency id="Semver" version="[2.0.4,2.999999)" />
-                <dependency id="Serilog" version="[2.8.0,2.999999)" />
-                <dependency id="Serilog.Enrichers.Process" version="[2.0.1,2.999999)" />
-                <dependency id="Serilog.Enrichers.Thread" version="[3.0.0,3.999999)" />
-                <dependency id="Serilog.Filters.Expressions" version="[2.0.0,2.999999)" />
-                <dependency id="Serilog.Formatting.Compact" version="[1.0.0,1.999999)" />
-                <dependency id="Serilog.Formatting.Compact.Reader" version="[1.0.3,1.999999)" />
+                <dependency id="Serilog" version="[2.10.0,2.999999)" />
+                <dependency id="Serilog.Enrichers.Process" version="[2.0.2,2.999999)" />
+                <dependency id="Serilog.Enrichers.Thread" version="[3.1.0,3.999999)" />
+                <dependency id="Serilog.Filters.Expressions" version="[2.1.0,2.999999)" />
+                <dependency id="Serilog.Formatting.Compact" version="[1.1.0,1.999999)" />
+                <dependency id="Serilog.Formatting.Compact.Reader" version="[1.0.5,1.999999)" />
                 <dependency id="Serilog.Settings.AppSettings" version="[2.2.2,2.999999)" />
-                <dependency id="Serilog.Sinks.File" version="[4.0.0,4.999999)" />
-                <dependency id="Serilog.Sinks.Map" version="[1.0.0,1.999999)" />
-                <dependency id="Serilog.Sinks.Async" version="[1.3.0,1.999999)" />
+                <dependency id="Serilog.Sinks.File" version="[4.1.0,4.999999)" />
+                <dependency id="Serilog.Sinks.Map" version="[1.0.2,1.999999)" />
+                <dependency id="Serilog.Sinks.Async" version="[1.5.0,1.999999)" />
                 <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.999999)" />
                 <dependency id="NPoco" version="[3.9.4,3.999999)" />
             </group>

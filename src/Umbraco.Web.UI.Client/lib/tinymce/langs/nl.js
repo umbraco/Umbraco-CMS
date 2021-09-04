@@ -150,7 +150,7 @@ tinymce.addI18n('nl',{
 "Insert link": "Hyperlink invoegen",
 "Insert\/edit link": "Hyperlink invoegen\/bewerken",
 "Text to display": "Linktekst",
-"Url": "Url",
+"Url": "URL",
 "Target": "Doel",
 "None": "Geen",
 "New window": "Nieuw venster",

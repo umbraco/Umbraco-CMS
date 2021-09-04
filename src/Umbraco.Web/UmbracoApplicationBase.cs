@@ -6,7 +6,6 @@ using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Logging.Serilog;
 
 namespace Umbraco.Web
 {
@@ -133,7 +132,7 @@ namespace Umbraco.Web
                     BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
                     null, runtime, null);
 
-                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
+                Current.Logger.Info<UmbracoApplicationBase,ApplicationShutdownReason, string, string>("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
                     HostingEnvironment.ShutdownReason,
                     shutDownMessage,
                     shutDownStack);
@@ -141,7 +140,7 @@ namespace Umbraco.Web
             catch (Exception)
             {
                 //if for some reason that fails, then log the normal output
-                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
+                Current.Logger.Info<UmbracoApplicationBase,ApplicationShutdownReason>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
             }
 
             Current.Logger.DisposeIfDisposable();
@@ -170,6 +169,8 @@ namespace Umbraco.Web
         {
             var exception = Server.GetLastError();
 
+            if (exception == null) return;
+
             // ignore HTTP errors
             if (exception.GetType() == typeof(HttpException)) return;
 
@@ -196,7 +197,7 @@ namespace Umbraco.Web
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<UmbracoApplicationBase>(ex, "Error in {Name} handler.", name);
+                Current.Logger.Error<UmbracoApplicationBase, string>(ex, "Error in {Name} handler.", name);
                 throw;
             }
         }

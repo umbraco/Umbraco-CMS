@@ -8,7 +8,7 @@
 
     angular.module('umbraco').run(['clipboardService', function (clipboardService) {
 
-        function clearNestedContentPropertiesForStorage(prop, propClearingMethod) {
+        function resolveNestedContentPropertiesForPaste(prop, propClearingMethod) {
 
             // if prop.editor is "Umbraco.NestedContent"
             if ((typeof prop === 'object' && prop.editor === "Umbraco.NestedContent")) {
@@ -17,8 +17,8 @@
                 for (var i = 0; i < value.length; i++) {
                     var obj = value[i];
 
-                    // remove the key
-                    delete obj.key;
+                    // generate a new key.
+                    obj.key = String.CreateGuid();
 
                     // Loop through all inner properties:
                     for (var k in obj) {
@@ -28,10 +28,10 @@
             }
         }
 
-        clipboardService.registerClearPropertyResolver(clearNestedContentPropertiesForStorage, clipboardService.TYPES.ELEMENT_TYPE)
+        clipboardService.registerPastePropertyResolver(resolveNestedContentPropertiesForPaste, clipboardService.TYPES.ELEMENT_TYPE)
 
 
-        function clearInnerNestedContentPropertiesForStorage(prop, propClearingMethod) {
+        function resolveInnerNestedContentPropertiesForPaste(prop, propClearingMethod) {
 
             // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property data.
             if ((Array.isArray(prop) && prop.length > 0 && prop[0].ncContentTypeAlias !== undefined)) {
@@ -39,8 +39,8 @@
                 for (var i = 0; i < prop.length; i++) {
                     var obj = prop[i];
 
-                    // remove the key
-                    delete obj.key;
+                    // generate a new key.
+                    obj.key = String.CreateGuid();
 
                     // Loop through all inner properties:
                     for (var k in obj) {
@@ -50,7 +50,7 @@
             }
         }
 
-        clipboardService.registerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage, clipboardService.TYPES.RAW)
+        clipboardService.registerPastePropertyResolver(resolveInnerNestedContentPropertiesForPaste, clipboardService.TYPES.RAW)
     }]);
 
     angular
@@ -105,12 +105,13 @@
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "actions_copy"]).then(function (data) {
             labels.grid_addElement = data[0];
             labels.content_createEmpty = data[1];
-            labels.copy_icon_title = data[2]
+            labels.copy_icon_title = data[2];
         });
 
-        function setCurrentNode(node) {
+        function setCurrentNode(node, focusNode) {
             updateModel();
             vm.currentNode = node;
+            vm.focusOnNode = focusNode;
         }
 
         var copyAllEntries = function () {
@@ -168,11 +169,14 @@
             method: removeAllEntries,
             isDisabled: true
         };
+
         // helper to force the current form into the dirty state
         function setDirty() {
-            if ($scope.$parent.$parent.propertyForm) {
-                $scope.$parent.$parent.propertyForm.$setDirty();
+
+            if (vm.umbProperty) {
+                vm.umbProperty.setDirty();
             }
+
         };
 
         function addNode(alias) {
@@ -180,13 +184,13 @@
 
             var newNode = createNode(scaffold, null);
 
-            setCurrentNode(newNode);
+            setCurrentNode(newNode, true);
             setDirty();
             validate();
         };
 
         vm.openNodeTypePicker = function ($event) {
-            
+
             if (vm.nodes.length >= vm.maxItems) {
                 return;
             }
@@ -202,7 +206,6 @@
             });
 
             const dialog = {
-                view: "itempicker",
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
@@ -277,9 +280,9 @@
 
         vm.editNode = function (idx) {
             if (vm.currentNode && vm.currentNode.key === vm.nodes[idx].key) {
-                setCurrentNode(null);
+                setCurrentNode(null, false);
             } else {
-                setCurrentNode(vm.nodes[idx]);
+                setCurrentNode(vm.nodes[idx], true);
             }
         };
 
@@ -352,7 +355,7 @@
                         item["$index"] = (idx + 1);
 
                         var newName = contentType.nameExp(item);
-                        if (newName && (newName = $.trim(newName))) {
+                        if (newName && (newName = newName.trim())) {
                             name = newName;
                         }
 
@@ -442,6 +445,26 @@
         function clearNodeForCopy(clonedData) {
             delete clonedData.key;
             delete clonedData.$$hashKey;
+
+            var variant = clonedData.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+
+                    // If we have ncSpecific data, lets revert to standard data model.
+                    if (prop.propertyAlias) {
+                        prop.alias = prop.propertyAlias;
+                        delete prop.propertyAlias;
+                    }
+
+                    if(prop.ncMandatory !== undefined) {
+                        prop.validation.mandatory = prop.ncMandatory;
+                        delete prop.ncMandatory;
+                    }
+                }
+            }
+
         }
 
         vm.showCopy = clipboardService.isSupported();
@@ -467,19 +490,30 @@
             // generate a new key.
             newNode.key = String.CreateGuid();
 
+            // Ensure we have NC data in place:
+            var variant = newNode.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    extendPropertyWithNCData(tab.properties[p]);
+                }
+            }
+
             vm.nodes.push(newNode);
             setDirty();
             //updateModel();// done by setting current node...
 
-            setCurrentNode(newNode);
+            setCurrentNode(newNode, true);
         }
 
         function checkAbilityToPasteContent() {
             vm.showPaste = clipboardService.hasEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
         }
 
-        eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
-
+        var storageUpdate = eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
+        $scope.$on('$destroy', function () {
+            storageUpdate();
+        });
         var notSupported = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
@@ -488,10 +522,14 @@
         ];
 
         // Initialize
-        var scaffoldsLoaded = 0;
         vm.scaffolds = [];
-        _.each(model.config.contentTypes, function (contentType) {
-            contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
+
+        contentResource.getScaffolds(-20, contentTypeAliases).then(function (scaffolds){
+            // Loop through all the content types
+            _.each(model.config.contentTypes, function (contentType){
+                // Get the scaffold from the result
+                var scaffold = scaffolds[contentType.ncAlias];
+
                 // make sure it's an element type before allowing the user to create new ones
                 if (scaffold.isElement) {
                     // remove all tabs except the specified tab
@@ -503,77 +541,119 @@
                     if (tab) {
                         scaffold.variants[0].tabs.push(tab);
 
-                        tab.properties.forEach(function (property) {
+                        tab.properties.forEach(
+                            function (property) {
                                 if (_.find(notSupported, function (x) { return x === property.editor; })) {
                                     property.notSupported = true;
                                     // TODO: Not supported message to be replaced with 'content_nestedContentEditorNotSupported' dictionary key. Currently not possible due to async/timing quirk.
                                     property.notSupportedMessage = "Property " + property.label + " uses editor " + property.editor + " which is not supported by Nested Content.";
                                 }
-                            });
+                            }
+                        );
                     }
+
+                    // Ensure Culture Data for Complex Validation.
+                    ensureCultureData(scaffold);
 
                     // Store the scaffold object
                     vm.scaffolds.push(scaffold);
                 }
-
-                scaffoldsLoaded++;
-                initIfAllScaffoldsHaveLoaded();
-            }, function (error) {
-                scaffoldsLoaded++;
-                initIfAllScaffoldsHaveLoaded();
             });
+
+            // Initialize once all scaffolds have been loaded
+            initNestedContent();
         });
 
-        var initIfAllScaffoldsHaveLoaded = function () {
+        /**
+         * Ensure that the containing content variant language and current property culture is transferred along
+         * to the scaffolded content object representing this block.
+         * This is required for validation along with ensuring that the umb-property inheritance is constantly maintained.
+         * @param {any} content
+         */
+         function ensureCultureData(content) {
+
+            if (!content || !vm.umbVariantContent || !vm.umbProperty) return;
+
+            if (vm.umbVariantContent.editor.content.language) {
+                // set the scaffolded content's language to the language of the current editor
+                content.language = vm.umbVariantContent.editor.content.language;
+            }
+            // currently we only ever deal with invariant content for blocks so there's only one
+            content.variants[0].tabs.forEach(tab => {
+                tab.properties.forEach(prop => {
+                    // set the scaffolded property to the culture of the containing property
+                    prop.culture = vm.umbProperty.property.culture;
+                });
+            });
+        }
+
+        var initNestedContent = function () {
             // Initialize when all scaffolds have loaded
-            if (model.config.contentTypes.length === scaffoldsLoaded) {
-                // Because we're loading the scaffolds async one at a time, we need to
-                // sort them explicitly according to the sort order defined by the data type.
-                contentTypeAliases = [];
-                _.each(model.config.contentTypes, function (contentType) {
-                    contentTypeAliases.push(contentType.ncAlias);
-                });
-                vm.scaffolds = $filter("orderBy")(vm.scaffolds, function (s) {
-                    return contentTypeAliases.indexOf(s.contentTypeAlias);
-                });
+            // Sort the scaffold explicitly according to the sort order defined by the data type.
+            vm.scaffolds = $filter("orderBy")(vm.scaffolds, function (s) {
+                return contentTypeAliases.indexOf(s.contentTypeAlias);
+            });
 
-                // Convert stored nodes
-                if (model.value) {
-                    for (var i = 0; i < model.value.length; i++) {
-                        var item = model.value[i];
-                        var scaffold = getScaffold(item.ncContentTypeAlias);
-                        if (scaffold == null) {
-                            // No such scaffold - the content type might have been deleted. We need to skip it.
-                            continue;
-                        }
-                        createNode(scaffold, item);
+            // Convert stored nodes
+            if (model.value) {
+                for (var i = 0; i < model.value.length; i++) {
+                    var item = model.value[i];
+                    var scaffold = getScaffold(item.ncContentTypeAlias);
+                    if (scaffold == null) {
+                        // No such scaffold - the content type might have been deleted. We need to skip it.
+                        continue;
                     }
+                    createNode(scaffold, item);
                 }
+            }
 
-                // Enforce min items if we only have one scaffold type
-                var modelWasChanged = false;
-                if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
-                    for (var i = vm.nodes.length; i < model.config.minItems; i++) {
-                        addNode(vm.scaffolds[0].contentTypeAlias);
-                    }
-                    modelWasChanged = true;
+            // Enforce min items if we only have one scaffold type
+            var modelWasChanged = false;
+            if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
+                for (var i = vm.nodes.length; i < model.config.minItems; i++) {
+                    addNode(vm.scaffolds[0].contentTypeAlias);
                 }
+                modelWasChanged = true;
+            }
 
-                // If there is only one item, set it as current node
-                if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
-                    setCurrentNode(vm.nodes[0]);
-                }
+            // If there is only one item, set it as current node
+            if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
+                setCurrentNode(vm.nodes[0], false);
+            }
 
-                validate();
+            validate();
 
-                vm.inited = true;
+            vm.inited = true;
 
-                if (modelWasChanged) {
-                    updateModel();
-                }
+            if (modelWasChanged) {
+                updateModel();
+            }
 
-                updatePropertyActionStates();
-                checkAbilityToPasteContent();
+            updatePropertyActionStates();
+            checkAbilityToPasteContent();
+        }
+
+        function extendPropertyWithNCData(prop) {
+
+            if (prop.propertyAlias === undefined) {
+                // store the original alias before we change below, see notes
+                prop.propertyAlias = prop.alias;
+
+                // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
+                // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
+                prop.alias = model.alias + "___" + prop.alias;
+            }
+
+            // TODO: Do we need to deal with this separately?
+            // Force validation to occur server side as this is the
+            // only way we can have consistency between mandatory and
+            // regex validation messages. Not ideal, but it works.
+            if(prop.ncMandatory === undefined) {
+                prop.ncMandatory = prop.validation.mandatory;
+                prop.validation = {
+                    mandatory: false,
+                    pattern: ""
+                };
             }
         }
 
@@ -590,22 +670,7 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
 
-                    // store the original alias before we change below, see notes
-                    prop.propertyAlias = prop.alias;
-
-                    // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
-                    // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
-                    prop.alias = model.alias + "___" + prop.alias;
-
-                    // TODO: Do we need to deal with this separately?
-                    // Force validation to occur server side as this is the
-                    // only way we can have consistency between mandatory and
-                    // regex validation messages. Not ideal, but it works.
-                    prop.ncMandatory = prop.validation.mandatory;
-                    prop.validation = {
-                        mandatory: false,
-                        pattern: ""
-                    };
+                    extendPropertyWithNCData(prop);
 
                     if (fromNcEntry && fromNcEntry[prop.propertyAlias]) {
                         prop.value = fromNcEntry[prop.propertyAlias];

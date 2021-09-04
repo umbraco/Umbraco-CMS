@@ -10,13 +10,13 @@
 
     <ul class="thumbnails">
         <li class="span3" ng-repeat="pck in packages">
-            <a ng-click="setPackageAndContinue(pck.id)" class="thumbnail">
+            <button type="button" ng-click="setPackageAndContinue(pck.id)" class="btn-reset thumbnail">
                 <img ng-src="https://our.umbraco.com{{
                         pck.thumbnail
                     }}?width=170"
                      alt="{{ pck.name }}" />
                 <small>Install starter website</small>
-            </a>
+            </button>
         </li>
     </ul>
 

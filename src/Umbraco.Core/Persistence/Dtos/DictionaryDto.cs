@@ -11,6 +11,7 @@ namespace Umbraco.Core.Persistence.Dtos
     internal class DictionaryDto
     {
         public const string TableName = Constants.DatabaseSchema.Tables.DictionaryEntry;
+
         [Column("pk")]
         [PrimaryKeyColumn]
         public int PrimaryKey { get; set; }

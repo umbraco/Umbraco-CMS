@@ -1,0 +1,9 @@
+<button type="button"
+    title="{{ vm.show ? '' : vm.buttonTitle}}"
+    class="btn-reset umb-outline umb-outline--surrounding __button"
+    ng-click="vm.onMouseClick($event)"
+    ng-bind="vm.symbol">
+</button>
+<div class="__tooltip" ng-if="vm.show" on-outside-click="vm.onMouseClickOutside($event)">
+    <ng-transclude></ng-transclude>
+</div>

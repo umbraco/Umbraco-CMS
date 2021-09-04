@@ -150,7 +150,7 @@ tinymce.addI18n('sr',{
 "Insert link": "Ubaci vezu",
 "Insert\/edit link": "Ubaci\/promeni vezu",
 "Text to display": "Tekst za prikaz",
-"Url": "Url",
+"Url": "URL",
 "Target": "Meta",
 "None": "Ni\u0161ta",
 "New window": "Novi prozor",

@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -87,12 +87,14 @@
 
             for (var t = 0; t < fromVariant.tabs.length; t++) {
                 var fromTab = fromVariant.tabs[t];
-                var toTab = toVariant.tabs[t];
+                var toTab = toVariant.tabs.find(tab => tab.alias === fromTab.alias);
 
-                for (var p = 0; p < fromTab.properties.length; p++) {
-                    var fromProp = fromTab.properties[p];
-                    var toProp = toTab.properties[p];
-                    toProp.value = fromProp.value;
+                if (fromTab && fromTab.properties && fromTab.properties.length > 0 && toTab && toTab.properties && toTab.properties.length > 0) {
+                    for (var p = 0; p < fromTab.properties.length; p++) {
+                        var fromProp = fromTab.properties[p];
+                        var toProp = toTab.properties[p];
+                        toProp.value = fromProp.value;
+                    }
                 }
             }
         }
@@ -104,8 +106,8 @@
          */
         function getBlockLabel(blockObject) {
             if (blockObject.labelInterpolator !== undefined) {
-                // We are just using the data model, since its a key/value object that is live synced. (if we need to add additional vars, we could make a shallow copy and apply those.)
-                return blockObject.labelInterpolator(blockObject.data);
+                var labelVars = Object.assign({"$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
+                return blockObject.labelInterpolator(labelVars);
             }
             return blockObject.content.contentTypeName;
         }
@@ -419,14 +421,18 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                scaffoldKeys.forEach(contentTypeKey => {
-                    tasks.push(contentResource.getScaffoldByKey(-20, contentTypeKey).then(scaffold => {
+                tasks.push(contentResource.getScaffoldByKeys(-20, scaffoldKeys).then(scaffolds => {
+                    Object.values(scaffolds).forEach(scaffold => {
                         // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
                         if (self.scaffolds) {
                             self.scaffolds.push(formatScaffoldData(scaffold));
                         }
-                    }));
-                });
+                    });
+                }).catch(
+                    () => {
+                        // Do nothing if we get an error.
+                    }
+                ));
 
                 return $q.all(tasks);
             },
@@ -439,7 +445,14 @@
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function () {
-                return this.blockConfigurations.map(blockConfiguration => this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey).contentTypeAlias);
+                return this.blockConfigurations.map(
+                    (blockConfiguration) => {
+                        var scaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
+                        if (scaffold) {
+                            return scaffold.contentTypeAlias;
+                        }
+                    }
+                );
             },
 
             /**
@@ -476,7 +489,7 @@
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromKey: function (contentTypeKey) {
-                return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey);
+                return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey) || null;
             },
 
             /**
@@ -488,7 +501,7 @@
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromAlias: function (contentTypeAlias) {
-                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias);
+                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias) || null;
             },
 
             /**
@@ -519,7 +532,7 @@
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);
 
                 if (dataModel === null) {
-                    console.error("Couldn't find content model of " + contentUdi)
+                    console.error("Couldn't find content data of " + contentUdi)
                     return null;
                 }
 
@@ -591,17 +604,27 @@
 
                         var settingsData = getDataByUdi(settingsUdi, this.value.settingsData);
                         if (settingsData === null) {
-                            console.error("Couldnt find content settings data of " + settingsUdi)
+                            console.error("Couldnt find settings data of " + settingsUdi)
                             return null;
+                        }
+
+                        // the Settings model has been changed to a new Element Type.
+                        // we need to update the settingsData with the new Content Type key
+                        if (settingsData.contentTypeKey !== settingsScaffold.contentTypeKey) {
+                            settingsData.contentTypeKey = settingsScaffold.contentTypeKey;
                         }
 
                         blockObject.settingsData = settingsData;
 
                         // make basics from scaffold
-                        blockObject.settings = Utilities.copy(settingsScaffold);
-                        ensureUdiAndKey(blockObject.settings, settingsUdi);
+                        if (settingsScaffold !== null) {// We might not have settingsScaffold
+                            blockObject.settings = Utilities.copy(settingsScaffold);
+                            ensureUdiAndKey(blockObject.settings, settingsUdi);
 
-                        mapToElementModel(blockObject.settings, settingsData);
+                            mapToElementModel(blockObject.settings, settingsData);
+                        } else {
+                            blockObject.settings = null;
+                        }
 
                         // add settings content-app
                         appendSettingsContentApp(blockObject.content, this.__labels.settingsName);
@@ -759,6 +782,57 @@
                 }
 
                 mapToPropertyModel(elementTypeDataModel, dataModel);
+
+                return layoutEntry;
+
+            },
+            /**
+             * @ngdoc method
+             * @name createFromBlockData
+             * @methodOf umbraco.services.blockEditorModelObject
+             * @description Insert data from raw models
+             * @return {Object | null} Layout entry object, to be inserted at a decired location in the layout object. Or ´null´ if the given ElementType isnt supported by the block configuration.
+             */
+            createFromBlockData: function (blockData) {
+
+                blockData = clipboardService.parseContentForPaste(blockData, clipboardService.TYPES.BLOCK);
+
+                // As the blockData is a cloned object we can use its layout part for our layout entry.
+                var layoutEntry = blockData.layout;
+                if (layoutEntry === null) {
+                    return null;
+                }
+
+                var blockConfiguration;
+
+                if (blockData.data) {
+                    // Ensure that we support the alias:
+                    blockConfiguration = this.getBlockConfiguration(blockData.data.contentTypeKey);
+                    if(blockConfiguration === null) {
+                        return null;
+                    }
+
+                    this.value.contentData.push(blockData.data);
+                } else {
+                    // We do not have data, this cannot be succesful paste.
+                    return null;
+                }
+
+                if (blockData.settingsData) {
+                    // Ensure that we support the alias:
+                    if(blockConfiguration.settingsElementTypeKey) {
+                        // If we have settings for this Block Configuration, we need to check that they align, if we dont we do not want to fail.
+                        if(blockConfiguration.settingsElementTypeKey === blockData.settingsData.contentTypeKey) {
+                            this.value.settingsData.push(blockData.settingsData);
+                        } else {
+                            notificationsService.error("Clipboard", "Couldn't paste because settings-data is not compatible.");
+                            return null;
+                        }
+                    } else {
+                        // We do not have settings currently, so lets get rid of the settings part and move on with the paste.
+                        delete layoutEntry.settingUdi;
+                    }
+                }
 
                 return layoutEntry;
 

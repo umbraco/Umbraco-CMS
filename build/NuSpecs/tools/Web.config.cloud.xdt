@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+    <runtime xdt:Transform="InsertIfMissing" />
+    <runtime>
+        <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1" xdt:Transform="InsertIfMissing" />
+        <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+			<dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Collections.Immutable')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Buffers')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Memory')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Numerics.Vectors')" xdt:Transform="Remove" />
+			<dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Collections.Immutable" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
+                <bindingRedirect oldVersion="0.0.0.0-1.2.5.0" newVersion="1.2.5.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Buffers" publicKeyToken="cc7b13ffcd2ddd51" />
+                <bindingRedirect oldVersion="4.0.0.0-4.0.3.0" newVersion="4.0.3.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Memory" publicKeyToken="cc7b13ffcd2ddd51" />
+                <bindingRedirect oldVersion="4.0.0.0-4.0.1.1" newVersion="4.0.1.1" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Numerics.Vectors" publicKeyToken="b03f5f7f11d50a3a" />
+                <bindingRedirect oldVersion="4.0.0.0-4.1.4.0" newVersion="4.1.4.0" />
+            </dependentAssembly>
+        </assemblyBinding>
+    </runtime>
+</configuration>

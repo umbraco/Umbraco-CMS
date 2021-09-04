@@ -150,7 +150,7 @@ tinymce.addI18n('et',{
 "Insert link": "Lisa link",
 "Insert\/edit link": "Lisa\/muuda link",
 "Text to display": "Kuvatav tekst",
-"Url": "Viide (url)",
+"Url": "Viide (URL)",
 "Target": "Sihtm\u00e4rk",
 "None": "Puudub",
 "New window": "Uus aken",

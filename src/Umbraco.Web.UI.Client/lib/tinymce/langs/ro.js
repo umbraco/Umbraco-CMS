@@ -121,7 +121,7 @@ tinymce.addI18n('ro',{
 "Date\/time": "Data\/ora",
 "Insert date\/time": "Insereaz\u0103 data\/ora",
 "Remove link": "\u0218terge link-ul",
-"Url": "Url",
+"Url": "URL",
 "Text to display": "Text de afi\u0219at",
 "Anchors": "Ancor\u0103",
 "Insert link": "Inserare link",

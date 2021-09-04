@@ -380,7 +380,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     _collectTask = null;
                 }
-            }, TaskContinuationOptions.ExecuteSynchronously);
+            },
+            CancellationToken.None,
+            TaskContinuationOptions.ExecuteSynchronously,
+            // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+            TaskScheduler.Default);
             // ReSharper restore InconsistentlySynchronizedField
 
             return task;
