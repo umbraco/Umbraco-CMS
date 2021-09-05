@@ -374,14 +374,17 @@ namespace Umbraco.Tests.TestHelpers
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
 
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(
+                new UrlProviderSettings((umbracoSettings ?? Factory.GetInstance<IUmbracoSettingsSection>()).WebRouting),
+              urlProviders ?? Enumerable.Empty<IUrlProvider>(),
+              mediaUrlProviders ?? Enumerable.Empty<IMediaUrlProvider>(), new TestVariationContextAccessor());
+
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
                 new WebSecurity(httpContext, Factory.GetInstance<IUserService>(),
                     Factory.GetInstance<IGlobalSettings>()),
-                umbracoSettings ?? Factory.GetInstance<IUmbracoSettingsSection>(),
-                urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                mediaUrlProviders ?? Enumerable.Empty<IMediaUrlProvider>(),
+                urlProviderFactory,
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
                 new TestVariationContextAccessor());
 

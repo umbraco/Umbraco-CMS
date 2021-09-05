@@ -127,15 +127,18 @@ namespace Umbraco.Tests.TestHelpers
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
 
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(
+                new UrlProviderSettings(umbracoSettings.WebRouting),
+              urlProviders,
+              mediaUrlProviders, new TestVariationContextAccessor());
+
             var umbracoContextFactory = new UmbracoContextFactory(
                 accessor,
                 publishedSnapshotService,
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                umbracoSettings,
+                urlProviderFactory,
                 globalSettings,
-                urlProviders,
-                mediaUrlProviders,
                 Mock.Of<IUserService>());
 
             return umbracoContextFactory.EnsureUmbracoContext(httpContext).UmbracoContext;
