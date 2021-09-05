@@ -156,10 +156,10 @@ namespace Umbraco.Tests.Cache
                 Mock.Of<IPublishedSnapshotService>(),
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                TestObjects.GetUmbracoSettings(),
-                TestObjects.GetGlobalSettings(),
+                new UmbracoContextUrlProviderFactory(new UrlProviderSettings(TestObjects.GetUmbracoSettings().WebRouting), 
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
-                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
+                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor()),
+                TestObjects.GetGlobalSettings(),
                 Mock.Of<IUserService>());
 
             // just assert it does not throw

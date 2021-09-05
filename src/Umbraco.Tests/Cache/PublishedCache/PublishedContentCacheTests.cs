@@ -75,13 +75,15 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedShapshot);
 
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(new UrlProviderSettings(TestObjects.GetUmbracoSettings().WebRouting),
+               new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+               new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor());
+
             _umbracoContext = new UmbracoContext(
                 _httpContextFactory.HttpContext,
                 publishedSnapshotService.Object,
                 new WebSecurity(_httpContextFactory.HttpContext, Current.Services.UserService, globalSettings),
-                umbracoSettings,
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                urlProviderFactory,
                 globalSettings,
                 new TestVariationContextAccessor());
 

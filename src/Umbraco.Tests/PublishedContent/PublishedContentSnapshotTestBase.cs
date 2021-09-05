@@ -65,13 +65,15 @@ namespace Umbraco.Tests.PublishedContent
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(new UrlProviderSettings(TestObjects.GetUmbracoSettings().WebRouting),
+               new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+               new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor());
+
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 publishedSnapshotService.Object,
                 new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                urlProviderFactory,
                 globalSettings,
                 new TestVariationContextAccessor());
 

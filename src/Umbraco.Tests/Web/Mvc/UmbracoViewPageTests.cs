@@ -433,14 +433,15 @@ namespace Umbraco.Tests.Web.Mvc
             var http = GetHttpContextFactory(url, routeData).HttpContext;
 
             var globalSettings = TestObjects.GetGlobalSettings();
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(new UrlProviderSettings(TestObjects.GetUmbracoSettings().WebRouting),
+               new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
+               new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor());
 
             var ctx = new UmbracoContext(
                 http,
                 _service,
                 new WebSecurity(http, Current.Services.UserService, globalSettings),
-                TestObjects.GetUmbracoSettings(),
-                Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                urlProviderFactory,
                 globalSettings,
                 new TestVariationContextAccessor());
 

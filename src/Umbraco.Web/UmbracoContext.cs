@@ -33,18 +33,14 @@ namespace Umbraco.Web
         internal UmbracoContext(HttpContextBase httpContext,
             IPublishedSnapshotService publishedSnapshotService,
             WebSecurity webSecurity,
-            IUmbracoSettingsSection umbracoSettings,
-            IEnumerable<IUrlProvider> urlProviders,
-            IEnumerable<IMediaUrlProvider> mediaUrlProviders,
+            IUmbracoContextUrlProviderFactory urlProviderfactory,
             IGlobalSettings globalSettings,
             IVariationContextAccessor variationContextAccessor)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
-            if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
-            if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
-            if (mediaUrlProviders == null) throw new ArgumentNullException(nameof(mediaUrlProviders));
+            if (urlProviderfactory == null) throw new ArgumentNullException(nameof(urlProviderfactory));
             VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
@@ -75,7 +71,8 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
-            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, mediaUrlProviders, variationContextAccessor);
+
+            UrlProvider = urlProviderfactory.Create(this);
         }
 
         /// <summary>

@@ -26,13 +26,15 @@ namespace Umbraco.Tests.Web
         [Test]
         public void RouteDataExtensions_GetUmbracoContext()
         {
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(new UrlProviderSettings(TestObjects.GetUmbracoSettings().WebRouting),
+              new UrlProviderCollection(new List<IUrlProvider>()),
+              new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor());
+
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
-                TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                urlProviderFactory,
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor());
             var r1 = new RouteData();
@@ -45,13 +47,14 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_RouteValues()
         {
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(new UrlProviderSettings(TestObjects.GetUmbracoSettings().WebRouting),
+               new UrlProviderCollection(new List<IUrlProvider>()),
+               new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor());
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
-                TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                urlProviderFactory,
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor());
 
@@ -74,13 +77,15 @@ namespace Umbraco.Tests.Web
         [Test]
         public void ControllerContextExtensions_GetUmbracoContext_From_Current()
         {
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(new UrlProviderSettings(TestObjects.GetUmbracoSettings().WebRouting),
+              new UrlProviderCollection(new List<IUrlProvider>()),
+              new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor());
+
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
-                TestObjects.GetUmbracoSettings(),
-                new List<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+                urlProviderFactory,
                 TestObjects.GetGlobalSettings(),
                 new TestVariationContextAccessor());
 

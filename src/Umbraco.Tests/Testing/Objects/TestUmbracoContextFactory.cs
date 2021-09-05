@@ -30,17 +30,19 @@ namespace Umbraco.Tests.Testing.Objects
             snapshot.Setup(x => x.Content).Returns(contentCache.Object);
             snapshot.Setup(x => x.Media).Returns(mediaCache.Object);
             var snapshotService = new Mock<IPublishedSnapshotService>();
-            snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot.Object);            
-            
+            snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(snapshot.Object);
+
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(new UrlProviderSettings(Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
+                new UrlProviderCollection(new[] { urlProvider }),
+               new MediaUrlProviderCollection(new[] { mediaUrlProvider }), new TestVariationContextAccessor());
+
             var umbracoContextFactory = new UmbracoContextFactory(
                 umbracoContextAccessor,
                 snapshotService.Object,
                 new TestVariationContextAccessor(),
                 new TestDefaultCultureAccessor(),
-                Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "Auto")),
+                urlProviderFactory,
                 globalSettings,
-                new UrlProviderCollection(new[] { urlProvider }),
-                new MediaUrlProviderCollection(new[] { mediaUrlProvider }),
                 Mock.Of<IUserService>());
 
             return umbracoContextFactory;

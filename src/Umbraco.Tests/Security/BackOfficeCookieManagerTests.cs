@@ -30,11 +30,16 @@ namespace Umbraco.Tests.Security
             ConfigurationManager.AppSettings.Set(Constants.AppSettings.ConfigurationStatus, "");
 
             var globalSettings = TestObjects.GetGlobalSettings();
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(
+                new UrlProviderSettings(TestObjects.GetUmbracoSettings().WebRouting),
+              new UrlProviderCollection(new List<IUrlProvider>()),
+              new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor());
+
             var umbracoContext = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, globalSettings),
-                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(), Enumerable.Empty<IMediaUrlProvider>(), globalSettings,
+                urlProviderFactory, globalSettings,
                 new TestVariationContextAccessor());
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
@@ -50,11 +55,17 @@ namespace Umbraco.Tests.Security
         public void ShouldAuthenticateRequest_When_Configured()
         {
             var globalSettings = TestObjects.GetGlobalSettings();
+
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(
+                new UrlProviderSettings(TestObjects.GetUmbracoSettings().WebRouting),
+              new UrlProviderCollection(new List<IUrlProvider>()),
+              new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor());
+
             var umbCtx = new UmbracoContext(
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, globalSettings),
-                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(), Enumerable.Empty<IMediaUrlProvider>(), globalSettings,
+                urlProviderFactory, globalSettings,
                 new TestVariationContextAccessor());
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);

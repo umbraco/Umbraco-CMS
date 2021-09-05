@@ -185,6 +185,9 @@ namespace Umbraco.Web.Runtime
             composition.FilteredControllerFactory()
                 .Append<RenderControllerFactory>();
 
+            composition.Register<UrlProviderSettings, UrlProviderSettings>(Lifetime.Singleton);
+            composition.Register<IUmbracoContextUrlProviderFactory,UmbracoContextUrlProviderFactory>(Lifetime.Singleton);
+
             composition.UrlProviders()
                 .Append<AliasUrlProvider>()
                 .Append<DefaultUrlProvider>();

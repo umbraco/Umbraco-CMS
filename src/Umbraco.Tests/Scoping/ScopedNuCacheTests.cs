@@ -113,13 +113,17 @@ namespace Umbraco.Tests.Scoping
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
 
             var globalSettings = TestObjects.GetGlobalSettings();
+
+            var urlProviderFactory = new UmbracoContextUrlProviderFactory(
+                new UrlProviderSettings((umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings()).WebRouting),
+              new UrlProviderCollection(urlProviders ?? Enumerable.Empty<IUrlProvider>()),
+              new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()), new TestVariationContextAccessor());
+
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
                 new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
-                umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
-                urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                Enumerable.Empty<IMediaUrlProvider>(),
+               urlProviderFactory,
                 globalSettings,
                 new TestVariationContextAccessor());
 

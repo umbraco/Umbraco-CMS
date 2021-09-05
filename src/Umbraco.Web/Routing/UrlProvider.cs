@@ -23,7 +23,7 @@ namespace Umbraco.Web.Routing
         /// <param name="urlProviders">The list of URL providers.</param>
         /// <param name="mediaUrlProviders">The list of media URL providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
+        public UrlProvider(UmbracoContext umbracoContext, UrlProviderSettings routingSettings, IEnumerable<IUrlProvider> urlProviders, IEnumerable<IMediaUrlProvider> mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
         {
             if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
 
@@ -31,13 +31,8 @@ namespace Umbraco.Web.Routing
             _urlProviders = urlProviders;
             _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            var provider = UrlMode.Auto;
-            Mode = provider;
 
-            if (Enum<UrlMode>.TryParse(routingSettings.UrlProviderMode, out provider))
-            {
-                Mode = provider;
-            }
+            Mode = routingSettings.Mode;
         }
 
         /// <summary>
