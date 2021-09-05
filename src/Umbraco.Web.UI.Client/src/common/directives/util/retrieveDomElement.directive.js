@@ -1,14 +1,14 @@
-﻿angular.module("umbraco.directives").directive("retriveDomElement", function () {
+﻿angular.module("umbraco.directives").directive("retrieveDomElement", function () {
   var directiveDefinitionObject = {
 
     restrict: "A",
-    selector: '[retriveDomElement]',
+    selector: '[retrieveDomElement]',
     scope: {
-        "retriveDomElement": "&"
+        "retrieveDomElement": "&"
     },
     link: {
         post: function(scope, iElement, iAttrs, controller) {
-            scope.retriveDomElement({element:iElement, attributes: iAttrs});
+            scope.retrieveDomElement({element:iElement, attributes: iAttrs});
         }
     }
   };
