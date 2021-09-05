@@ -1,7 +1,7 @@
 /**
     * @ngdoc service
     * @name umbraco.resources.logResource
-    * @description retrieves log history from umbraco
+    * @description Retrieves log history from umbraco
     * 
     *
     **/

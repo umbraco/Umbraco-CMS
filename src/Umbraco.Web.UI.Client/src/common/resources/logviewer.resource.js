@@ -1,7 +1,7 @@
 /**
  * @ngdoc service
  * @name umbraco.resources.logViewerResource
- * @description retrieves Umbraco log items (by default from JSON files on disk)
+ * @description Retrieves Umbraco log items (by default from JSON files on disk)
  *
  *
  **/
