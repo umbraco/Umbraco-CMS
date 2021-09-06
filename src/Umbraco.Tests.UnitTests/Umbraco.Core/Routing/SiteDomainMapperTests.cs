@@ -191,9 +191,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             siteDomainMapper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
             siteDomainMapper.AddSite("site4", "https://domain4.com", "https://domain4.net", "https://domain4.org");
 
-            // this works, but it's purely by chance / arbitrary
-            // don't use the www in tests here!
-            var current = new Uri("https://www.domain1.com/foo/bar");
+            var current = new Uri("https://domain1.com/foo/bar");
             Domain[] domains = new[]
                 {
                     new Domain(1, "domain2.com", -1, s_cultureFr, false),
