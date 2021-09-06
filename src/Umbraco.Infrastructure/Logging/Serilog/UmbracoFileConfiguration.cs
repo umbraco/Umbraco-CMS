@@ -34,10 +34,10 @@ namespace Umbraco.Cms.Infrastructure.Logging.Serilog
 
         public LogEventLevel RestrictedToMinimumLevel { get; set; } = LogEventLevel.Verbose;
         public long FileSizeLimitBytes { get; set; } = 1073741824;
-        public RollingInterval RollingInterval { get; set; }= RollingInterval.Day;
+        public RollingInterval RollingInterval { get; set; } = RollingInterval.Day;
         public TimeSpan? FlushToDiskInterval { get; set; } = null;
         public bool RollOnFileSizeLimit { get; set; } = false;
-        public int RetainedFileCountLimit { get; set; }= 31;
+        public int RetainedFileCountLimit { get; set; } = 31;
 
         public string GetPath(string logDirectory)
         {
