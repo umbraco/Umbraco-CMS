@@ -15,11 +15,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddComposers(this IUmbracoBuilder builder)
         {
-            // TODO: Should have a better name
-
             IEnumerable<Type> composerTypes = builder.TypeLoader.GetTypes<IComposer>();
             IEnumerable<Attribute> enableDisable = builder.TypeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
-            new Composers(builder, composerTypes, enableDisable, builder.BuilderLoggerFactory.CreateLogger<Composers>()).Compose();
+
+            new ComposerGraph(builder, composerTypes, enableDisable, builder.BuilderLoggerFactory.CreateLogger<ComposerGraph>()).Compose();
 
             return builder;
         }

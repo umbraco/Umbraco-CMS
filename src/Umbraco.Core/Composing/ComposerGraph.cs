@@ -9,28 +9,25 @@ using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Core.Composing
 {
-    // note: this class is NOT thread-safe in any ways
+    // note: this class is NOT thread-safe in any way
 
     /// <summary>
     /// Handles the composers.
     /// </summary>
-    public class Composers
+    internal class ComposerGraph
     {
         private readonly IUmbracoBuilder _builder;
-        private readonly ILogger<Composers> _logger;
+        private readonly ILogger<ComposerGraph> _logger;
         private readonly IEnumerable<Type> _composerTypes;
         private readonly IEnumerable<Attribute> _enableDisableAttributes;
 
-        private const int LogThresholdMilliseconds = 100;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="Composers" /> class.
+        /// Initializes a new instance of the <see cref="ComposerGraph" /> class.
         /// </summary>
         /// <param name="builder">The composition.</param>
         /// <param name="composerTypes">The <see cref="IComposer" /> types.</param>
         /// <param name="enableDisableAttributes">The <see cref="EnableComposerAttribute" /> and/or <see cref="DisableComposerAttribute" /> attributes.</param>
         /// <param name="logger">The logger.</param>
-        /// <param name="profileLogger">The profiling logger.</param>
         /// <exception cref="ArgumentNullException">composition
         /// or
         /// composerTypes
@@ -38,7 +35,7 @@ namespace Umbraco.Cms.Core.Composing
         /// enableDisableAttributes
         /// or
         /// logger</exception>
-        public Composers(IUmbracoBuilder builder, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger<Composers> logger)
+        public ComposerGraph(IUmbracoBuilder builder, IEnumerable<Type> composerTypes, IEnumerable<Attribute> enableDisableAttributes, ILogger<ComposerGraph> logger)
         {
             _builder = builder ?? throw new ArgumentNullException(nameof(builder));
             _composerTypes = composerTypes ?? throw new ArgumentNullException(nameof(composerTypes));
@@ -48,8 +45,8 @@ namespace Umbraco.Cms.Core.Composing
 
         private class EnableInfo
         {
-            public bool Enabled;
-            public int Weight = -1;
+            public bool Enabled { get; set; }
+            public int Weight { get; set; } = -1;
         }
 
         /// <summary>
@@ -60,14 +57,9 @@ namespace Umbraco.Cms.Core.Composing
             // make sure it is there
             _builder.WithCollectionBuilder<ComponentCollectionBuilder>();
 
-            IEnumerable<Type> orderedComposerTypes;
+            IEnumerable<Type> orderedComposerTypes = PrepareComposerTypes();
 
-            orderedComposerTypes = PrepareComposerTypes();
-
-            var composers = InstantiateComposers(orderedComposerTypes);
-
-
-            foreach (var composer in composers)
+            foreach (IComposer composer in InstantiateComposers(orderedComposerTypes))
             {
                 composer.Compose(_builder);
             }
@@ -78,7 +70,7 @@ namespace Umbraco.Cms.Core.Composing
             var requirements = GetRequirements();
 
             // only for debugging, this is verbose
-            //_logger.Debug<Composers>(GetComposersReport(requirements));
+            //_logger.Debug<ComposerGraph>(GetComposersReport(requirements));
 
             var sortedComposerTypes = SortComposers(requirements);
 
@@ -341,17 +333,19 @@ namespace Umbraco.Cms.Core.Composing
             }
         }
 
-        private IEnumerable<IComposer> InstantiateComposers(IEnumerable<Type> types)
+        private static IEnumerable<IComposer> InstantiateComposers(IEnumerable<Type> types)
         {
-            IComposer InstantiateComposer(Type type)
+            foreach (Type type in types)
             {
-                var ctor = type.GetConstructor(Array.Empty<Type>());
-                if (ctor == null)
-                    throw new InvalidOperationException($"Composer {type.FullName} does not have a parameter-less constructor.");
-                return (IComposer)ctor.Invoke(Array.Empty<object>());
-            }
+                ConstructorInfo ctor = type.GetConstructor(Array.Empty<Type>());
 
-            return types.Select(InstantiateComposer).ToArray();
+                if (ctor == null)
+                {
+                    throw new InvalidOperationException($"Composer {type.FullName} does not have a parameter-less constructor.");
+                }
+
+                yield return (IComposer) ctor.Invoke(Array.Empty<object>());
+            }
         }
     }
 }
