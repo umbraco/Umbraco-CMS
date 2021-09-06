@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MacroController",
-        function ($scope, $timeout, editorService, macroResource, macroService, localizationService, $routeParams) {
+        function ($scope, $timeout, editorService, macroResource, macroService, localizationService, $routeParams, $sce) {
 
             $scope.control.icon = $scope.control.icon || 'icon-settings-alt';
 
@@ -45,7 +45,7 @@ angular.module("umbraco")
                     .then(function (htmlResult) {
                         $scope.title = macro.macroAlias;
                         if (htmlResult.trim().length > 0 && htmlResult.indexOf("Macro:") < 0) {
-                            $scope.preview = htmlResult;
+                            $scope.preview = $sce.trustAsHtml(htmlResult);
                         }
                     });
 
