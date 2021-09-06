@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Logging.Serilog
             IConfiguration configuration)
         {
             var loggerConfig = new LoggerConfiguration()
-                .MinimalConfiguration(hostingEnvironment, loggingConfiguration)
+                .MinimalConfiguration(hostingEnvironment, loggingConfiguration, configuration)
                 .ReadFrom.Configuration(configuration);
 
             return new SerilogLogger(loggerConfig);
