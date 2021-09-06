@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Composing
     /// <summary>
     /// Handles the composers.
     /// </summary>
-    public class ComposerGraph
+    internal class ComposerGraph
     {
         private readonly IUmbracoBuilder _builder;
         private readonly ILogger<ComposerGraph> _logger;
