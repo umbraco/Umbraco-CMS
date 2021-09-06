@@ -209,7 +209,7 @@ namespace Umbraco.Cms.Core.Routing
             => domain.Uri.EndPathWithSlash().IsBaseOf(uri);
 
         private static bool MatchesCulture(DomainAndUri domain, string culture)
-            => culture == null || domain.Culture == culture;
+            => culture == null || domain.Culture.InvariantEquals(culture);
 
         private static IReadOnlyCollection<DomainAndUri> SelectByBase(IReadOnlyCollection<DomainAndUri> domainsAndUris, Uri uri, string culture)
         {
