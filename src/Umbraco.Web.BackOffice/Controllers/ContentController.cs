@@ -386,6 +386,23 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return GetEmptyInner(contentType, parentId);
         }
 
+        /// <summary>
+        /// Gets a dictionary containing empty content items for every alias specified in the contentTypeAliases array in the body of the request.
+        /// </summary>
+        /// <remarks>
+        /// This is a post request in order to support a large amount of aliases without hitting the URL length limit.
+        /// </remarks>
+        /// <param name="contentTypesByAliases"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [HttpPost]
+        public ActionResult<IDictionary<string, ContentItemDisplay>> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
+        {
+            // It's important to do this operation within a scope to reduce the amount of readlock queries. 
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = contentTypesByAliases.ContentTypeAliases.Select(alias => _contentTypeService.Get(alias));
+            return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
+        }
 
         /// <summary>
         /// Gets an empty content item for the document type.

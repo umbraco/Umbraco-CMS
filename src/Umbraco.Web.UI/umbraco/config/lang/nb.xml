@@ -918,4 +918,8 @@ Vennlig hilsen Umbraco roboten
     <key alias="yourHistory" version="7.0">Din historikk</key>
     <key alias="sessionExpires" version="7.0">Sesjonen utløper om</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Velg alle</key>
+    <key alias="deselectAllLogLevelFilters">Opphev alle</key>
+  </area>
 </language>

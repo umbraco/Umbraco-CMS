@@ -296,6 +296,7 @@
     <key alias="languagesToSchedule">Hvilke sprog vil du gerne planlægge?</key>
     <key alias="languagesToUnpublish">Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil afpublicere alle sprog.</key>
     <key alias="publishedLanguages">Udgivne sprog</key>
+    <key alias="resetFocalPoint">Nulstil fokuspunkt</key>
     <key alias="unpublishedLanguages">Ikke-udgivne sprog</key>
     <key alias="unmodifiedLanguages">Uændrede sprog</key>
     <key alias="untouchedLanguagesForFirstTime">Disse sprog er ikke blevet oprettet</key>
@@ -1917,6 +1918,8 @@ Mange hilsner fra Umbraco robotten
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Slet gemte søgning</key>
     <key alias="logLevels">Log type</key>
+    <key alias="selectAllLogLevelFilters">Vælg alle</key>
+    <key alias="deselectAllLogLevelFilters">Fravælg alle</key>
     <key alias="savedSearches">Gemte søgninger</key>
     <key alias="saveSearch">Gem søgning</key>
     <key alias="saveSearchDescription">Indtast et navn for din søgebetingelse</key>

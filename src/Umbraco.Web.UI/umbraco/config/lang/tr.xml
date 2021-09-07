@@ -2342,6 +2342,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Kaydedilmiş Aramayı Sil</key>
     <key alias="logLevels">Günlük Düzeyleri</key>
+    <key alias="selectAllLogLevelFilters">Hepsini seç</key>
+    <key alias="deselectAllLogLevelFilters">Tüm seçimleri kaldır</key>
     <key alias="savedSearches">Kaydedilmiş Aramalar</key>
     <key alias="saveSearch">Aramayı Kaydet</key>
     <key alias="saveSearchDescription">Arama sorgunuz için kolay bir ad girin</key>

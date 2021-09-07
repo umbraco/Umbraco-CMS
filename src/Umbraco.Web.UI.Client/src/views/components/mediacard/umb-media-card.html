@@ -4,12 +4,12 @@
         <div ng-if="vm.loading" class="umb-button__progress"></div>
 
         <p ng-if="vm.media.trashed" class="__status --error">
-            <i class="icon-trash" aria-hidden="true"></i>
+            <umb-icon icon="icon-trash"></umb-icon>
             <localize key="mediaPicker_trashed"></localize>
         </p>
 
         <p ng-if="vm.notAllowed" class="__status --error">
-            <i class="icon-block" aria-hidden="true"></i>
+            <umb-icon icon="icon-block"></umb-icon>
             <localize key="mediaPicker_notAllowed"></localize>
         </p>
 

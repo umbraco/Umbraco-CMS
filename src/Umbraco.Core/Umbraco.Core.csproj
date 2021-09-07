@@ -59,7 +59,4 @@
     <ItemGroup>
       <EmbeddedResource Include="EmbeddedResources\**\*" />
     </ItemGroup>
-
-    <ItemGroup>
-    </ItemGroup>
 </Project>

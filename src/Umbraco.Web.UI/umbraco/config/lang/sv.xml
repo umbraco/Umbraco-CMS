@@ -1008,4 +1008,8 @@
     <key alias="sortCreateDateDescending">Äldst</key>
     <key alias="sortLastLoginDateDescending">Senaste login</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Välj alla</key>
+    <key alias="deselectAllLogLevelFilters">Avmarkera alla</key>
+  </area>
 </language>

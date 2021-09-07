@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -45,8 +46,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         private UserRepository CreateRepository(IScopeProvider provider)
         {
             var accessor = (IScopeAccessor)provider;
-            var repository = new UserRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mappers, Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
+            Mock<IRuntimeState> mockRuntimeState = CreateMockRuntimeState(RuntimeLevel.Run);
+
+            var repository = new UserRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mappers, Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer(), mockRuntimeState.Object);
             return repository;
+        }
+
+        private static Mock<IRuntimeState> CreateMockRuntimeState(RuntimeLevel runtimeLevel)
+        {
+            var mockRuntimeState = new Mock<IRuntimeState>();
+            mockRuntimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
+            return mockRuntimeState;
         }
 
         private UserGroupRepository CreateUserGroupRepository(IScopeProvider provider)
@@ -134,7 +144,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 int id = user.Id;
 
-                var repository2 = new UserRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mock.Of<IMapperCollection>(), Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer());
+                Mock<IRuntimeState> mockRuntimeState = CreateMockRuntimeState(RuntimeLevel.Run);
+
+                var repository2 = new UserRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<UserRepository>(), Mock.Of<IMapperCollection>(), Options.Create(GlobalSettings), Options.Create(new UserPasswordConfigurationSettings()), new JsonNetSerializer(), mockRuntimeState.Object);
 
                 repository2.Delete(user);
 

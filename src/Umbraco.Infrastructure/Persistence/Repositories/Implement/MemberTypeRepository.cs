@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -146,11 +146,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             //By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
-            entity.AddPropertyGroup(Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
+            entity.AddPropertyGroup(Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupAlias);
             var standardPropertyTypes = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
             foreach (var standardPropertyType in standardPropertyTypes)
             {
-                entity.AddPropertyType(standardPropertyType.Value, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
+                entity.AddPropertyType(standardPropertyType.Value, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupAlias, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
             }
 
             EnsureExplicitDataTypeForBuiltInProperties(entity);

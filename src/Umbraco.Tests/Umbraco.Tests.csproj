@@ -160,6 +160,25 @@
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
+    <Compile Include="Logging\LogviewerTests.cs" />
+    <Compile Include="Manifest\ManifestContentAppTests.cs" />
+    <Compile Include="Mapping\MappingTests.cs" />
+    <Compile Include="Membership\MembersMembershipProviderTests.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_17_0\AddPropertyTypeGroupColumnsTests.cs" />
+    <Compile Include="Migrations\MigrationPlanTests.cs" />
+    <Compile Include="Migrations\MigrationTests.cs" />
+    <Compile Include="ModelsBuilder\BuilderTests.cs" />
+    <Compile Include="ModelsBuilder\ConfigTests.cs" />
+    <Compile Include="ModelsBuilder\StringExtensions.cs" />
+    <Compile Include="ModelsBuilder\UmbracoApplicationTests.cs" />
+    <Compile Include="Models\ContentScheduleTests.cs" />
+    <Compile Include="Models\CultureImpactTests.cs" />
+    <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
+    <Compile Include="Models\PathValidationTests.cs" />
+    <Compile Include="Models\PropertyTests.cs" />
+    <Compile Include="Models\RangeTests.cs" />
+    <Compile Include="Models\UserGroupTests.cs" />
+    <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
@@ -304,6 +323,38 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\SqlScripts\SqlResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SqlResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Services\Importing\ImportResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Configurations\UmbracoSettings\web.config">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="Logging\logviewer.searches.config.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
+    <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
+    <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
+    <Content Include="Services\Importing\CheckboxList-Content-Package.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Services\Importing\CompositionsTestPackage-Random.xml" />
+    <Content Include="Services\Importing\CompositionsTestPackage.xml" />
     <Content Include="Services\Importing\Dictionary-Package.xml" />
   </ItemGroup>
   <ItemGroup>

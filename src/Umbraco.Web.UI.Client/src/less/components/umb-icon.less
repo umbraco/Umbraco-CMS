@@ -8,26 +8,43 @@
         width: 100%;
         height: 100%;
         fill: currentColor;
+        animation: inherit;
     }
 
-    &.large{
-        width: 32px; 
+    &.large {
+        width: 32px;
         height: 32px;
     }
-    &.medium{
+
+    &.medium {
         width: 24px;
         height: 24px;
     }
-    &.small{
+
+    &.small {
         width: 14px;
         height: 14px;
     }
 
-    &:before, &:after {
+    &::before,
+    &::after {
         content: none !important;
     }
 
-    > i {
-        font-family: inherit;
+    &__inner {
+        // Clear pseudo classes
+        &::before,
+        &::after {
+            content: none !important;
+        }
+
+        ng-transclude {
+            animation: inherit;
+            font-family: inherit;
+
+            > span {
+                animation: inherit;
+            }
+        }
     }
 }

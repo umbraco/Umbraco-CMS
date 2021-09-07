@@ -75,8 +75,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             if (args.showNotifications === undefined) {
                 args.showNotifications = true;
             }
-			// needed for infinite editing to create new items
-			if (args.create === undefined) {
+            // needed for infinite editing to create new items
+            if (args.create === undefined) {
                 if ($routeParams.create) {
                     args.create = true;
                 }
@@ -178,6 +178,38 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 });
             }
 
+        },
+
+        registerGenericTab: function (groups) {
+            if (!groups) {
+                return;
+            }
+
+            const hasGenericTab = groups.find(group => group.isGenericTab);
+            if (hasGenericTab) {
+                return;
+            }
+
+            const isRootGroup = (group) => group.type === 0 && group.parentAlias === null;
+            const hasRootGroups = groups.filter(group => isRootGroup(group)).length > 0;
+            if (!hasRootGroups) {
+                return;
+            }
+
+            const genericTab = {
+                isGenericTab: true,
+                type: 1,
+                label: 'Generic',
+                key: String.CreateGuid(),
+                alias: null,
+                parentAlias: null,
+                properties: []
+            };
+
+            localizationService.localize("general_generic").then(function (value) {
+                genericTab.label = value;
+                groups.unshift(genericTab);
+            });
         },
 
         /** Returns the action button definitions based on what permissions the user has.

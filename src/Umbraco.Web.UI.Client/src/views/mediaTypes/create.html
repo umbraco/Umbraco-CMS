@@ -8,7 +8,7 @@
             <ul class="umb-actions umb-actions-child">
                 <li class="umb-action">
                     <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="createMediaType()" umb-auto-focus>
-                        <i class="large icon icon-item-arrangement" aria-hidden="true"></i>
+                        <umb-icon icon="icon-item-arrangement" class="icon large"></umb-icon>
                         <span class="menu-label">
                             <localize key="general_new">New</localize>
                             <localize key="content_mediatype">Media type</localize>
@@ -17,14 +17,14 @@
                 </li>
                 <li class="umb-action">
                     <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="showCreateFolder()">
-                        <i class="large icon icon-folder" aria-hidden="true"></i>
+                        <umb-icon icon="icon-folder" class="icon large"></umb-icon>
                         <span class="menu-label"><localize key="general_folder"></localize>...</span>
                     </button>
                 </li>
             </ul>
         </div>
 
-        <div class="umb-pane" ng-show="model.creatingFolder">
+        <div class="umb-pane" ng-if="model.creatingFolder">
             <form novalidate name="createFolderForm"
                 ng-submit="createContainer()"
                 val-form-manager>

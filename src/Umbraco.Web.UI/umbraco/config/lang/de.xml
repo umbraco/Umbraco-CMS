@@ -2224,4 +2224,8 @@
     <key alias="openCloseBackofficeHelp">Back-Office Hilfe öffnen / schliessen</key>
     <key alias="openCloseBackofficeProfileOptions">Ihre Profil-Einstellungen öffnen / schliessen</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Wählen Sie Alle</key>
+    <key alias="deselectAllLogLevelFilters">Alle abwählen</key>
+  </area>
 </language>

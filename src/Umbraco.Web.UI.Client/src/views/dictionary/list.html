@@ -38,8 +38,9 @@
                         </th>
                         <td ng-repeat="column in item.translations | orderBy:'displayName'">
                             <button type="button" class="btn-reset" ng-click="vm.clickItem(item.id)">
-                                <umb-icon icon="{{ column.hasTranslation ? 'icon-check' : 'icon-alert' }}" 
-                                    class="{{ column.hasTranslation ? 'color-green' : 'color-red' }}"></umb-icon>
+                                <umb-icon icon="{{ column.hasTranslation ? 'icon-check' : 'icon-alert' }}"
+                                          class="{{ column.hasTranslation ? 'color-green' : 'color-red' }}">
+                                </umb-icon>
                                 <span class="sr-only">
                                     <localize ng-if="column.hasTranslation" key="visuallyHiddenTexts_hasTranslation"></localize>
                                     <localize ng-if="!column.hasTranslation" key="visuallyHiddenTexts_noTranslation"></localize>

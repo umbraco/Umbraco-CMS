@@ -58,6 +58,8 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
             $scope.sortableOptions.disabled = $scope.renderModel.length === 1;
+            //Update value
+            $scope.model.value = $scope.renderModel;
         }
     );
 
@@ -81,6 +83,7 @@ function multiUrlPickerController($scope, localizationService, entityResource, i
             dataTypeKey: $scope.model.dataTypeKey,
             ignoreUserStartNodes : ($scope.model.config && $scope.model.config.ignoreUserStartNodes) ? $scope.model.config.ignoreUserStartNodes : "0",
             hideAnchor: $scope.model.config && $scope.model.config.hideAnchor ? true : false,
+            size: $scope.model.config.overlayWidthSize,
             submit: function (model) {
                 if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed

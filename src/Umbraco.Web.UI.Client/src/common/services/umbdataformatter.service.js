@@ -75,7 +75,7 @@
                 });
                 saveModel.groups = _.map(realGroups, function (g) {
 
-                    var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name');
+                    var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name', 'alias', 'type');
 
                     var realProperties = _.reject(g.properties, function (p) {
                         //do not include these properties

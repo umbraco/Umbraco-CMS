@@ -311,13 +311,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where("umbracoNode." + SqlContext.SqlSyntax.GetQuotedColumnName("id") + " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
                     new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});
 
-            IEnumerable<EntitySlim> childIds = Database.Fetch<dynamic>(childIdsSql)
+            var childIds = Database.Fetch<AxisDefintionDto>(childIdsSql)
                 .Select(x => new EntitySlim
                 {
-                    Id = x.nodeId,
-                    ParentId = x.parentID,
-                    Name = x.alias
+                    Id = x.NodeId,
+                    ParentId = x.ParentId,
+                    Name = x.Alias
                 });
+
             return childIds;
         }
 

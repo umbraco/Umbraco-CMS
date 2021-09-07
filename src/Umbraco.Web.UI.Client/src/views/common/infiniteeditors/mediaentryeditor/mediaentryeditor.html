@@ -16,7 +16,7 @@
             <div class="umb-editor-container umb-panel-body umb-scrollable">
 
                 <div ng-if="vm.media.trashed" class="umb-editor--trashed-message">
-                    <i class="icon icon-trash"></i> <localize key="content_nodeIsInTrash">This item is in the Recycle Bin</localize>
+                    <umb-icon icon="icon-trash" class="icon"></umb-icon> <localize key="content_nodeIsInTrash">This item is in the Recycle Bin</localize>
                 </div>
 
                 <div class="umb-media-entry-editor__pane">
@@ -50,7 +50,9 @@
                                             force-update="{{vm.forceUpdateCrop}}"
                                             center="vm.mediaEntry.focalPoint"
                                             src="vm.imageSrc">
-                                <button class="btn btn-link" ng-click="vm.resetCrop()"><i class="icon-wrong"></i> <localize key="imagecropper_reset">Reset this crop</localize></button>
+                                <button class="btn btn-link" ng-click="vm.resetCrop()">
+                                    <umb-icon icon="icon-wrong"></umb-icon> <localize key="imagecropper_reset">Reset this crop</localize>
+                                </button>
                             </umb-image-crop>
 
                         </div>
@@ -78,8 +80,15 @@
                             </umb-file-icon>
 
                             <div class="umb-media-entry-editor__imageholder-actions">
-                                <button class="btn btn-link" aria-hidden="true" ng-click="vm.repickMedia()"><i class="icon-wrong"></i> <localize key="mediaPicker_changeMedia">Replace media</localize></button>
-                                <button class="btn btn-link" aria-hidden="true" ng-click="vm.openMedia()"><i class="icon-out"></i> <localize key="mediaPicker_openMedia">Open media</localize></button>
+                                <button class="btn btn-link" ng-click="vm.repickMedia()">
+                                    <umb-icon icon="icon-wrong"></umb-icon> <localize key="mediaPicker_changeMedia">Replace media</localize>
+                                </button>
+                                <button class="btn btn-link" ng-click="vm.openMedia()">
+                                    <umb-icon icon="icon-out"></umb-icon> <localize key="mediaPicker_openMedia">Open media</localize>
+                                </button>
+                                <button type="button" ng-show="vm.model.enableFocalPointSetter && (vm.mediaEntry.focalPoint.left !== 0.5 && vm.mediaEntry.focalPoint.top !== 0.5)" class="btn btn-link" ng-click="vm.focalPointChanged(0.5, 0.5)">
+                                    <umb-icon icon="icon-axis-rotation"></umb-icon> <localize key="content_resetFocalPoint">Reset focal point</localize>
+                                </button>
                             </div>
                         </div>
 

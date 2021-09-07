@@ -2197,6 +2197,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="logViewer">
       <key alias="logLevels">Niveaux de Log</key>
+      <key alias="selectAllLogLevelFilters">Tout sélectionner</key>
+      <key alias="deselectAllLogLevelFilters">Tout déselectionner</key>
       <key alias="savedSearches">Recherches sauvegardées</key>
       <key alias="totalItems">Nombre total d'éléments</key>
       <key alias="timestamp">Date</key>

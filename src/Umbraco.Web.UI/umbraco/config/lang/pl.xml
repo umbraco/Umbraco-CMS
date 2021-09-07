@@ -1448,4 +1448,8 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   <area alias="textbox">
     <key alias="characters_left">pozostało znaków</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Zaznacz wszystko</key>
+    <key alias="deselectAllLogLevelFilters">Odznacz wszystkie</key>
+  </area>
 </language>
