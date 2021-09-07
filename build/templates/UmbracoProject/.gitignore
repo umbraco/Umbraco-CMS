@@ -452,3 +452,39 @@ $RECYCLE.BIN/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+
+##
+## Umbraco CMS .NETCore
+##
+
+# Dont commit Umbraco TEMP folder containing Examine Indexes, NuCache etc
+**/umbraco/Data/TEMP/
+
+# Dont commit files that are generated and cached from the default ImageSharp location
+**/umbraco/mediacache/
+
+# Umbraco backoffice language files
+# Nuget package Umbraco.Cms.StaticAssets will copy them in during dotnet build
+# Customize langguage files in /config/lang/{language}.user.xml
+**/umbraco/config/lang/
+
+# JSON Schema file for appsettings
+# This is auto generated from the build
+**/umbraco/config/appsettings-schema.json
+
+# This is the no-nodes, installer & upgrader pages from Umbraco
+# Nuget package Umbraco.Cms.StaticAssets will copy them in during dotnet build
+**/umbraco/UmbracoWebsite/
+**/umbraco/UmbracoInstall/
+**/umbraco/UmbracoBackOffice/
+
+# Comment out the line below if you wish to change or add any new templates to PartialView Macros
+**/umbraco/PartialViewMacros/Templates
+
+# Umbraco Static Assets of Backoffice
+# Nuget package Umbraco.Cms.StaticAssets will copy them in during dotnet build
+**/wwwroot/umbraco/assets/
+**/wwwroot/umbraco/js/
+**/wwwroot/umbraco/lib/
+**/wwwroot/umbraco/views/
