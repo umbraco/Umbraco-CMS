@@ -158,7 +158,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 {
                     Id = g.Id,
                     Key = g.Key,
-                    Type = (int)g.Type,
+                    Type = g.Type.ToString(),
                     Alias = g.Alias,
                     Label = LocalizedTextService.UmbracoDictionaryTranslate(CultureDictionary, g.Name),
                     Properties = mappedProperties

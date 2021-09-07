@@ -19,14 +19,14 @@ describe('contentTypeHelper tests', function () {
   describe('Group type', function () {
     it('should return the group type', function () {
         var groupType = contentTypeHelper.TYPE_GROUP;
-        expect(groupType).toBe(0);
+        expect(groupType).toBe('Group');
     });
   });
 
   describe('Tab type', function () {
     it('should return the tab type', function () {
         var tabType = contentTypeHelper.TYPE_TAB;
-        expect(tabType).toBe(1);
+        expect(tabType).toBe('Tab');
     });
   });
 

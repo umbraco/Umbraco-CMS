@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         public Guid Key { get; set; }
 
         [DataMember(Name = "type")]
-        public int Type { get; set; }
+        public string Type { get; set; }
 
         [DataMember(Name = "active")]
         public bool IsActive { get; set; }

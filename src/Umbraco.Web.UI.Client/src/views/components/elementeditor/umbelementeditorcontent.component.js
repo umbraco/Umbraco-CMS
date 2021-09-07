@@ -31,7 +31,7 @@
             contentTypeHelper.relocateDisorientedGroups(newValue);
 
             vm.tabs = $filter("filter")(newValue, (tab) => {
-                return tab.type === 1;
+                return tab.type === contentTypeHelper.TYPE_TAB;
             });
 
             if (vm.tabs.length > 0) {

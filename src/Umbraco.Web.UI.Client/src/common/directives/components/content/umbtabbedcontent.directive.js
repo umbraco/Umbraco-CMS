@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
@@ -23,7 +23,7 @@
 
                 // make a collection with only tabs and not all groups
                 $scope.tabs = $filter("filter")(newValue, (tab) => {
-                    return tab.type === 1;
+                    return tab.type === contentTypeHelper.TYPE_TAB;
                 });
 
                 if ($scope.tabs.length > 0) {

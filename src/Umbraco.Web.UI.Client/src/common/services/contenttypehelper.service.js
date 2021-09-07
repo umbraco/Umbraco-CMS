@@ -7,8 +7,8 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
     var contentTypeHelperService = {
 
-        TYPE_GROUP: 0,
-        TYPE_TAB: 1,
+        TYPE_GROUP: 'Group',
+        TYPE_TAB: 'Tab',
 
         isAliasUnique(groups, alias) {
             return groups.find(group => group.alias === alias) ? false : true;

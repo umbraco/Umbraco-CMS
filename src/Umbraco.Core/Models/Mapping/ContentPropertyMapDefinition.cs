@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             target.Id = source.Id;
             target.Key = source.Key;
-            target.Type = (int)source.Type;
+            target.Type = source.Type.ToString();
             target.Label = source.Name;
             target.Alias = source.Alias;
             target.IsActive = true;

@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader(serverValidationManager, localizationService, editorState, contentEditingHelper) {
+    function EditorContentHeader(serverValidationManager, localizationService, editorState, contentEditingHelper, contentTypeHelper) {
         function link(scope) {
 
             var unsubscribe = [];
@@ -137,7 +137,7 @@
                 scope.editor.variantApps.forEach((app) => {
                     // only render quick links on the content app if there are no tabs
                     if (app.alias === "umbContent") {
-                        const hasTabs = scope.editor.content.tabs && scope.editor.content.tabs.filter(group => group.type === 1).length > 0;
+                        const hasTabs = scope.editor.content.tabs && scope.editor.content.tabs.filter(group => group.type === contentTypeHelper.TYPE_TAB).length > 0;
                         app.anchors = hasTabs ? [] : scope.editor.content.tabs;
                     }
                 });

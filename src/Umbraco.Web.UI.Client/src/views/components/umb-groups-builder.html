@@ -133,7 +133,7 @@
     <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
         <div
             ng-repeat="(groupIndex, group) in model.groups track by group.key"
-            ng-show="group.type === 0 && group.parentAlias === openTabAlias"
+            ng-show="group.type === 'Group' && group.parentAlias === openTabAlias"
             ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}"
             data-group-key="{{group.key}}">
 
@@ -149,7 +149,7 @@
                 sorting="sortingMode"
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)"
                 val-server-field-name="{{'Groups[' + group.serverValidationIndex + '].Name'}}"
-                val-tab-alias="tab-content-{{group.type === 0 ? group.parentAlias : group.alias}}">
+                val-tab-alias="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties" ng-show="group.properties.length > 0 || sortingMode">
                     <li ng-repeat="(propertyIndex, property) in group.properties track by propertyIndex" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
@@ -162,7 +162,7 @@
                             on-change-sort-order-value="onChangePropertySortOrderValue(group)"
                             val-server-field-alias="{{'Groups[' + group.serverValidationIndex + '].Properties[' + propertyIndex + '].Alias'}}"
                             val-server-field-label="{{'Groups[' + group.serverValidationIndex + '].Properties[' + propertyIndex + '].Label'}}"
-                            val-tab-alias="tab-content-{{group.type === 0 ? group.parentAlias : group.alias}}">
+                            val-tab-alias="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
                         </umb-content-type-property>
                     </li>
                 </ul>
