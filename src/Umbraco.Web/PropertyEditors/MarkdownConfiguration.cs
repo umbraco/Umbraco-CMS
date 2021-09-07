@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
         public string DefaultValue { get; set; }
 
 
-        [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay.")]
+        [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay (link picker).")]
         public string OverlaySize { get; set; }
     }
 }
