@@ -28,8 +28,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
+            var previousStep = InstallStatusTracker.GetRequiredStep("StarterKitDownload");
             var packageId = Convert.ToInt32(previousStep.AdditionalData["packageId"]);
 
             InstallBusinessLogic(packageId);
@@ -51,9 +50,9 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override bool RequiresExecution(object model)
         {
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
+            var startKitDownloadStep = InstallStatusTracker.GetStep("StarterKitDownload");
             //this step relies on the previous one completed - because it has stored some information we need
-            if (installSteps.Any(x => x.Name == "StarterKitDownload" && x.AdditionalData.ContainsKey("packageId")) == false)
+            if (startKitDownloadStep == null || !startKitDownloadStep.AdditionalData.ContainsKey("packageId"))
             {
                 return false;
             }

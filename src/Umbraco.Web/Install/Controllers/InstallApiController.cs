@@ -74,12 +74,7 @@ namespace Umbraco.Web.Install.Controllers
         {
             if (installModel == null) throw new ArgumentNullException(nameof(installModel));
 
-            var status = InstallStatusTracker.GetStatus().ToArray();
-            //there won't be any statuses returned if the app pool has restarted so we need to re-read from file.
-            if (status.Any() == false)
-            {
-                status = InstallStatusTracker.InitializeFromFile(installModel.InstallId).ToArray();
-            }
+            var status = InstallStatusTracker.GetOrderedStatus(installModel.InstallId);
 
             //create a new queue of the non-finished ones
             var queue = new Queue<InstallTrackingItem>(status.Where(x => x.IsComplete == false));

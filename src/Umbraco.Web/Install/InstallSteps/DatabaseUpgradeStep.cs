@@ -29,8 +29,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
+            var previousStep = InstallStatusTracker.GetRequiredStep("DatabaseInstall");
             var upgrade = previousStep.AdditionalData.ContainsKey("upgrade");
 
             if (upgrade)
@@ -59,9 +58,9 @@ namespace Umbraco.Web.Install.InstallSteps
             if (_runtime.Level == RuntimeLevel.Run)
                 return false;
 
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
+            var dbInstallStep = InstallStatusTracker.GetStep("DatabaseInstall");
             //this step relies on the previous one completed - because it has stored some information we need
-            if (installSteps.Any(x => x.Name == "DatabaseInstall" && x.AdditionalData.ContainsKey("upgrade")) == false)
+            if (dbInstallStep == null || !dbInstallStep.AdditionalData.ContainsKey("upgrade"))
             {
                 return false;
             }

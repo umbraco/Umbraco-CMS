@@ -19,8 +19,9 @@ namespace Umbraco.Web.Install
     /// </summary>
     internal static class InstallStatusTracker
     {
+        private static readonly object _locker = new object();
 
-        private static ConcurrentHashSet<InstallTrackingItem> _steps = new ConcurrentHashSet<InstallTrackingItem>();
+        private static Dictionary<string, InstallTrackingItem> _steps = new Dictionary<string, InstallTrackingItem>();
 
         private static string GetFile(Guid installId)
         {
@@ -33,51 +34,36 @@ namespace Umbraco.Web.Install
 
         public static void Reset()
         {
-            _steps = new ConcurrentHashSet<InstallTrackingItem>();
-            ClearFiles();
+            lock (_locker)
+            {
+                _steps.Clear();
+                ClearFiles();
+            }
         }
 
         public static void ClearFiles()
         {
-            var dir = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
-            if (Directory.Exists(dir))
+            lock (_locker)
             {
-                var files = Directory.GetFiles(dir);
-                foreach (var f in files)
+                var dir = IOHelper.MapPath(SystemDirectories.TempData.EnsureEndsWith('/') + "Install/");
+                if (Directory.Exists(dir))
                 {
-                    File.Delete(f);
+                    var files = Directory.GetFiles(dir);
+                    foreach (var f in files)
+                    {
+                        File.Delete(f);
+                    }
                 }
-            }
-            else
-            {
-                Directory.CreateDirectory(dir);
-            }
+                else
+                {
+                    Directory.CreateDirectory(dir);
+                }
+            }            
         }
 
-        public static IEnumerable<InstallTrackingItem> InitializeFromFile(Guid installId)
+        private static IReadOnlyList<InstallTrackingItem> InitializeFromFile(Guid installId)
         {
-            //check if we have our persisted file and read it
-            var file = GetFile(installId);
-            if (File.Exists(file))
-            {
-                var deserialized = JsonConvert.DeserializeObject<IEnumerable<InstallTrackingItem>>(
-                    File.ReadAllText(file));
-                foreach (var item in deserialized)
-                {
-                    _steps.Add(item);
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException("Cannot initialize from file, the installation file with id " + installId + " does not exist");
-            }
-            return new List<InstallTrackingItem>(_steps);
-        }
-
-        public static IEnumerable<InstallTrackingItem> Initialize(Guid installId, IEnumerable<InstallSetupStep> steps)
-        {
-            //if there are no steps in memory
-            if (_steps.Count == 0)
+            lock (_locker)
             {
                 //check if we have our persisted file and read it
                 var file = GetFile(installId);
@@ -85,62 +71,120 @@ namespace Umbraco.Web.Install
                 {
                     var deserialized = JsonConvert.DeserializeObject<IEnumerable<InstallTrackingItem>>(
                         File.ReadAllText(file));
-                    foreach (var item in deserialized)
+
+                    _steps = deserialized.ToDictionary(x => x.Name);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Cannot initialize from file, the installation file with id " + installId + " does not exist");
+                }
+
+                return new List<InstallTrackingItem>(_steps.Values.OrderBy(x => x.ServerOrder));
+            }   
+        }
+
+        public static IReadOnlyList<InstallTrackingItem> Initialize(Guid installId, IEnumerable<InstallSetupStep> steps)
+        {
+            lock (_locker)
+            {
+                //if there are no steps in memory
+                if (_steps.Count == 0)
+                {
+                    //check if we have our persisted file and read it
+                    var file = GetFile(installId);
+                    if (File.Exists(file))
                     {
-                        _steps.Add(item);
+                        var deserialized = JsonConvert.DeserializeObject<IEnumerable<InstallTrackingItem>>(
+                            File.ReadAllText(file));
+
+                        _steps = deserialized.ToDictionary(x => x.Name);
+                    }
+                    else
+                    {
+                        ClearFiles();
+
+                        //otherwise just create the steps in memory (brand new install)
+                        _steps = steps.ToDictionary(step => step.Name, step => new InstallTrackingItem(step.Name, step.ServerOrder));
+
+                        //save the file
+                        var serialized = JsonConvert.SerializeObject(_steps.Values);
+                        Directory.CreateDirectory(Path.GetDirectoryName(file));
+                        File.WriteAllText(file, serialized);
                     }
                 }
                 else
                 {
-                    ClearFiles();
-
-                    //otherwise just create the steps in memory (brand new install)
-                    foreach (var step in steps.OrderBy(x => x.ServerOrder))
+                    //ensure that the file exists with the current install id
+                    var file = GetFile(installId);
+                    if (File.Exists(file) == false)
                     {
-                        _steps.Add(new InstallTrackingItem(step.Name, step.ServerOrder));
+                        ClearFiles();
+
+                        //save the correct file
+                        var serialized = JsonConvert.SerializeObject(_steps.Values);
+                        Directory.CreateDirectory(Path.GetDirectoryName(file));
+                        File.WriteAllText(file, serialized);
                     }
-                    //save the file
-                    var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps));
-                    Directory.CreateDirectory(Path.GetDirectoryName(file));
-                    File.WriteAllText(file, serialized);
                 }
-            }
-            else
-            {
-                //ensure that the file exists with the current install id
-                var file = GetFile(installId);
-                if (File.Exists(file) == false)
-                {
-                    ClearFiles();
 
-                    //save the correct file
-                    var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps));
-                    Directory.CreateDirectory(Path.GetDirectoryName(file));
-                    File.WriteAllText(file, serialized);
-                }
-            }
-
-            return new List<InstallTrackingItem>(_steps);
+                return new List<InstallTrackingItem>(_steps.Values.OrderBy(x => x.ServerOrder));
+            }  
         }
 
         public static void SetComplete(Guid installId, string name, IDictionary<string, object> additionalData = null)
         {
-            var trackingItem = _steps.Single(x => x.Name == name);
-            if (additionalData != null)
+            lock (_locker)
             {
-                trackingItem.AdditionalData = additionalData;
-            }
-            trackingItem.IsComplete = true;
+                var trackingItem = _steps[name];
+                if (additionalData != null)
+                {
+                    trackingItem.AdditionalData = additionalData;
+                }
+                trackingItem.IsComplete = true;
 
-            //save the file
-            var file = GetFile(installId);
-            var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps));
-            File.WriteAllText(file, serialized);
+                //save the file
+                var file = GetFile(installId);
+                var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps.Values));
+                File.WriteAllText(file, serialized);
+            }
         }
 
-        public static IEnumerable<InstallTrackingItem> GetStatus()
+        public static IReadOnlyList<InstallTrackingItem> GetOrderedStatus(Guid installId)
         {
-            return new List<InstallTrackingItem>(_steps).OrderBy(x => x.ServerOrder);
+            lock (_locker)
+            {
+                IReadOnlyList<InstallTrackingItem> items = new List<InstallTrackingItem>(_steps.Values.OrderBy(x => x.ServerOrder));
+                //there won't be any statuses returned if the app pool has restarted so we need to re-read from file.
+                if (_steps.Count == 0)
+                {
+                    items = InitializeFromFile(installId);
+                }
+                return items;
+            }   
+        }
+
+        public static InstallTrackingItem GetRequiredStep(string stepName)
+        {
+            lock (_locker)
+            {
+                if (!_steps.TryGetValue(stepName, out var step))
+                {
+                    throw new InvalidOperationException("No step found with name " + stepName);
+                }
+                return step;
+            }
+        }
+
+        public static InstallTrackingItem GetStep(string stepName)
+        {
+            lock (_locker)
+            {
+                if (!_steps.TryGetValue(stepName, out var step))
+                {
+                    return null;
+                }
+                return step;
+            }
         }
     }
 }

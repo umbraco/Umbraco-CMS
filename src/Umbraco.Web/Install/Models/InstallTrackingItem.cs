@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Install.Models
 {
-    internal class InstallTrackingItem
+    internal class InstallTrackingItem : IEquatable<InstallTrackingItem>
     {
         public InstallTrackingItem(string name, int serverOrder)
         {
@@ -17,22 +18,20 @@ namespace Umbraco.Web.Install.Models
         public bool IsComplete { get; set; }
         public IDictionary<string, object> AdditionalData { get; set; }
 
-        protected bool Equals(InstallTrackingItem other)
-        {
-            return string.Equals(Name, other.Name);
-        }
-
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((InstallTrackingItem) obj);
+            return Equals(obj as InstallTrackingItem);
+        }
+
+        public bool Equals(InstallTrackingItem other)
+        {
+            return other != null &&
+                   Name == other.Name;
         }
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode();
+            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
         }
     }
 }
