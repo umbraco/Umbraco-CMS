@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
@@ -26,10 +25,7 @@ namespace Umbraco.Cms.Core.Models
         /// Initializes a new instance of the <see cref="PropertyGroupCollection" /> class.
         /// </summary>
         /// <param name="groups">The groups.</param>
-        public PropertyGroupCollection(IEnumerable<PropertyGroup> groups)
-        {
-            Reset(groups);
-        }
+        public PropertyGroupCollection(IEnumerable<PropertyGroup> groups) => Reset(groups);
 
         /// <summary>
         /// Resets the collection to only contain the <see cref="PropertyGroup"/> instances referenced in the <paramref name="groups"/> parameter.
@@ -127,16 +123,9 @@ namespace Umbraco.Cms.Core.Models
             base.Add(item);
         }
 
-        internal void ChangeKey(PropertyGroup item, string newKey)
-        {
-            ChangeItemKey(item, newKey);
-        }
+        internal void ChangeKey(PropertyGroup item, string newKey) => ChangeItemKey(item, newKey);
 
-        public bool Contains(int id)
-        {
-            return this.Any(x => x.Id == id);
-        }
-
+        public bool Contains(int id) => this.IndexOfKey(id) != -1;
 
         public int IndexOfKey(string key) => this.FindIndex(x => x.Alias == key);
 
@@ -151,10 +140,7 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         public void ClearCollectionChangedEvents() => CollectionChanged = null;
 
-        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            CollectionChanged?.Invoke(this, args);
-        }
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args) => CollectionChanged?.Invoke(this, args);
 
         public object DeepClone()
         {

@@ -60,6 +60,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                         new PropertyGroup(true)
                         {
                             Name = "PG1",
+                            Alias = "pg1",
                             PropertyTypes = new PropertyTypeCollection(true)
                             {
                                 new PropertyType(ShortStringHelper, dataType1, "pt1")

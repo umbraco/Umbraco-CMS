@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -146,6 +146,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 {
                     Id = PropertyGroupBasic.GenericPropertiesGroupId,
                     Name = "Generic properties",
+                    Alias = "genericProperties",
                     SortOrder = 999,
                     Properties = genericProperties,
                     ContentTypeId = source.Id

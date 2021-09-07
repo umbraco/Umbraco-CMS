@@ -139,7 +139,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
             contentType.Variations = from;
             PropertyTypeCollection properties = CreatePropertyCollection(("title", from));
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             // create some content of this content type
@@ -189,7 +193,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
             contentType.Variations = startingContentTypeVariation;
             PropertyTypeCollection properties = CreatePropertyCollection(("title", startingContentTypeVariation));
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             // create some content of this content type
@@ -349,7 +357,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Update it
             contentType.Variations = contentTypeVariation;
             PropertyTypeCollection properties = CreatePropertyCollection(("title", propertyTypeVariation));
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             // Check if property type variations have been updated correctly
@@ -367,7 +379,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // content type supports all variations
             contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
             PropertyTypeCollection properties = CreatePropertyCollection(("title", invariant));
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             // create some content of this content type
@@ -412,7 +428,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // content type supports all variations
             contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
             PropertyTypeCollection properties = CreatePropertyCollection(("title", variant));
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             // create some content of this content type
@@ -450,7 +470,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // content type supports all variations
             contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
             PropertyTypeCollection properties = CreatePropertyCollection(("title", variant));
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             // compose this from the other one
@@ -499,7 +523,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
             contentType.Variations = variant;
             PropertyTypeCollection properties = CreatePropertyCollection(("title", ContentVariation.Culture));
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             // compose this from the other one
@@ -552,7 +580,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 ("value1", ContentVariation.Culture),
                 ("value2", ContentVariation.Nothing));
 
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             var document = (IContent)new Content("document", -1, contentType);
@@ -649,7 +681,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 ("value1", ContentVariation.Nothing),
                 ("value2", ContentVariation.Nothing));
 
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             var document = (IContent)new Content("document", -1, contentType);
@@ -737,7 +773,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 ("value1", ContentVariation.Culture),
                 ("value2", ContentVariation.Nothing));
 
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             var document = (IContent)new Content("document", -1, contentType);
@@ -830,7 +870,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             PropertyTypeCollection properties = CreatePropertyCollection(("value1", variant));
 
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             IContent document = new Content("document", -1, contentType);
@@ -932,7 +976,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             PropertyTypeCollection properties = CreatePropertyCollection(("value1", invariant));
 
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "Content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(contentType);
 
             var document = (IContent)new Content("document", -1, contentType);
@@ -1013,7 +1061,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 ("value11", ContentVariation.Culture),
                 ("value12", ContentVariation.Nothing));
 
-            composing.PropertyGroups.Add(new PropertyGroup(properties1) { Name = "Content" });
+            composing.PropertyGroups.Add(new PropertyGroup(properties1)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(composing);
 
             IContentType composed = CreateContentType(ContentVariation.Culture, "composed");
@@ -1022,7 +1074,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 ("value21", ContentVariation.Culture),
                 ("value22", ContentVariation.Nothing));
 
-            composed.PropertyGroups.Add(new PropertyGroup(properties2) { Name = "Content" });
+            composed.PropertyGroups.Add(new PropertyGroup(properties2)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             composed.AddContentType(composing);
             ContentTypeService.Save(composed);
 
@@ -1114,7 +1170,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 ("value11", ContentVariation.Culture),
                 ("value12", ContentVariation.Nothing));
 
-            composing.PropertyGroups.Add(new PropertyGroup(properties1) { Name = "Content" });
+            composing.PropertyGroups.Add(new PropertyGroup(properties1)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             ContentTypeService.Save(composing);
 
             IContentType composed1 = CreateContentType(ContentVariation.Culture, "composed1");
@@ -1123,7 +1183,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 ("value21", ContentVariation.Culture),
                 ("value22", ContentVariation.Nothing));
 
-            composed1.PropertyGroups.Add(new PropertyGroup(properties2) { Name = "Content" });
+            composed1.PropertyGroups.Add(new PropertyGroup(properties2)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             composed1.AddContentType(composing);
             ContentTypeService.Save(composed1);
 
@@ -1133,7 +1197,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 ("value31", ContentVariation.Nothing),
                 ("value32", ContentVariation.Nothing));
 
-            composed2.PropertyGroups.Add(new PropertyGroup(properties3) { Name = "Content" });
+            composed2.PropertyGroups.Add(new PropertyGroup(properties3)
+            {
+                Alias = "content",
+                Name = "Content"
+            });
             composed2.AddContentType(composing);
             ContentTypeService.Save(composed2);
 

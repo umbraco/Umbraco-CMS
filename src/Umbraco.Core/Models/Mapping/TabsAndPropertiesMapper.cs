@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Dictionary;
@@ -13,7 +13,6 @@ namespace Umbraco.Cms.Core.Models.Mapping
     {
         protected ICultureDictionary CultureDictionary { get; }
         protected ILocalizedTextService LocalizedTextService { get; }
-
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
         protected TabsAndPropertiesMapper(ICultureDictionary cultureDictionary, ILocalizedTextService localizedTextService)

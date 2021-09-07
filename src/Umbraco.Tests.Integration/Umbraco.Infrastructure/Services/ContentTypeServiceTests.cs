@@ -57,7 +57,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     Variations = ContentVariation.Nothing
                 }
             };
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection)
+            {
+                Alias = "content",
+                Name = "Content",
+                SortOrder = 1
+            });
             ContentTypeService.Save(contentType);
 
             contentType = ContentTypeService.Get(contentType.Id);
@@ -402,7 +407,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            ContentType childContentType = ContentTypeBuilder.CreateSimpleContentType("childPage", "Child Page", contentType, randomizeAliases: true, propertyGroupName: "Child Content", defaultTemplateId: template.Id);
+            ContentType childContentType = ContentTypeBuilder.CreateSimpleContentType("childPage", "Child Page", contentType, randomizeAliases: true, propertyGroupAlias: "childContent", propertyGroupName: "Child Content", defaultTemplateId: template.Id);
             ContentTypeService.Save(childContentType);
             IContent content = ContentService.Create("Page 1", -1, childContentType.Alias);
             ContentService.Save(content);
@@ -766,7 +771,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Title", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool added = composition.AddPropertyType(duplicatePropertyType, "Meta");
+            bool added = composition.AddPropertyType(duplicatePropertyType, "meta", "Meta");
 
             // Assert
             Assert.That(added, Is.True);
@@ -803,10 +808,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Title", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool addedToBasePage = basePage.AddPropertyType(duplicatePropertyType, "Content");
-            bool addedToAdvancedPage = advancedPage.AddPropertyType(duplicatePropertyType, "Content");
-            bool addedToMeta = metaComposition.AddPropertyType(duplicatePropertyType, "Meta");
-            bool addedToSeo = seoComposition.AddPropertyType(duplicatePropertyType, "Seo");
+            bool addedToBasePage = basePage.AddPropertyType(duplicatePropertyType, "content", "Content");
+            bool addedToAdvancedPage = advancedPage.AddPropertyType(duplicatePropertyType, "content", "Content");
+            bool addedToMeta = metaComposition.AddPropertyType(duplicatePropertyType, "meta", "Meta");
+            bool addedToSeo = seoComposition.AddPropertyType(duplicatePropertyType, "seo", "Seo");
 
             // Assert
             Assert.That(metaAdded, Is.True);
@@ -856,14 +861,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Body Text", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
             ContentTypeService.Save(basePage);
 
             var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
             ContentTypeService.Save(contentPage);
 
             bool compositionAdded = advancedPage.AddContentType(contentMetaComposition);
@@ -874,7 +879,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Title", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool titleAdded = basePage.AddPropertyType(titlePropertyType, "Content");
+            bool titleAdded = basePage.AddPropertyType(titlePropertyType, "content", "Content");
 
             // Assert
             Assert.That(bodyTextAdded, Is.True);
@@ -930,28 +935,28 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Body Text", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
             ContentTypeService.Save(basePage);
 
             var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
             ContentTypeService.Save(contentPage);
 
             var subtitlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
             {
                  Name = "Subtitle", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "Content");
+            bool subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "content", "Content");
             ContentTypeService.Save(advancedPage);
 
             var titlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                  Name = "Title", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool titleAdded = seoComposition.AddPropertyType(titlePropertyType, "Content");
+            bool titleAdded = seoComposition.AddPropertyType(titlePropertyType, "content", "Content");
             ContentTypeService.Save(seoComposition);
 
             bool seoCompositionAdded = advancedPage.AddContentType(seoComposition);
@@ -1009,28 +1014,28 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Body Text", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
             ContentTypeService.Save(basePage);
 
             var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
             ContentTypeService.Save(contentPage);
 
             var subtitlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
             {
                  Name = "Subtitle", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "Content");
+            bool subtitleAdded = advancedPage.AddPropertyType(subtitlePropertyType, "content", "Content");
             ContentTypeService.Save(advancedPage);
 
             var titlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
                  Name = "Title", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool titleAdded = seoComposition.AddPropertyType(titlePropertyType, "Content");
+            bool titleAdded = seoComposition.AddPropertyType(titlePropertyType, "content", "Content");
             ContentTypeService.Save(seoComposition);
 
             bool seoCompositionAdded = advancedPage.AddContentType(seoComposition);
@@ -1050,7 +1055,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Test", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool testAdded = seoComposition.AddPropertyType(testPropertyType, "Content");
+            bool testAdded = seoComposition.AddPropertyType(testPropertyType, "content", "Content");
             ContentTypeService.Save(seoComposition);
 
             Assert.That(testAdded, Is.True);
@@ -1069,9 +1074,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ContentType page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true, defaultTemplateId: template.Id);
             ContentTypeService.Save(page);
-            ContentType contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, propertyGroupName: "Content_", defaultTemplateId: template.Id);
+            ContentType contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, propertyGroupAlias: "content2", propertyGroupName: "Content_", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentPage);
-            ContentType advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, randomizeAliases: true, propertyGroupName: "Details", defaultTemplateId: template.Id);
+            ContentType advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, randomizeAliases: true, propertyGroupAlias: "details", propertyGroupName: "Details", defaultTemplateId: template.Id);
             ContentTypeService.Save(advancedPage);
 
             ContentType contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
@@ -1086,18 +1091,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Author", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
-            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            bool subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "content", "Content");
+            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
             ContentTypeService.Save(contentPage);
 
             bool compositionAdded = contentPage.AddContentType(contentMetaComposition);
             ContentTypeService.Save(contentPage);
 
             // Change the name of the tab on the "root" content type 'page'.
-            PropertyGroup propertyGroup = contentPage.PropertyGroups["Content_"];
-            Assert.Throws<Exception>(() => contentPage.PropertyGroups.Add(new PropertyGroup(true)
+            PropertyGroup propertyGroup = contentPage.PropertyGroups["content2"];
+            Assert.Throws<ArgumentException>(() => contentPage.PropertyGroups.Add(new PropertyGroup(true)
             {
                 Id = propertyGroup.Id,
+                Alias = "content",
                 Name = "Content",
                 SortOrder = 0
             }));
@@ -1127,22 +1133,22 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Title", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool titleAdded = basePage.AddPropertyType(titlePropertyType, "Content");
+            bool titleAdded = basePage.AddPropertyType(titlePropertyType, "content", "Content");
             var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "Content");
+            bool bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "content", "Content");
             var subtitlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "subtitle")
             {
                  Name = "Subtitle", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
+            bool subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "content", "Content");
             var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content");
+            bool authorAdded = advancedPage.AddPropertyType(authorPropertyType, "content", "Content");
             ContentTypeService.Save(basePage);
             ContentTypeService.Save(contentPage);
             ContentTypeService.Save(advancedPage);
@@ -1200,7 +1206,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Title", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool addedToContentPage = contentPage.AddPropertyType(propertyType, "Content");
+            bool addedToContentPage = contentPage.AddPropertyType(propertyType, "content", "Content");
 
             // Assert
             Assert.That(metaAdded, Is.True);
@@ -1219,7 +1225,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // create 'page' content type with a 'Content_' group
             Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            ContentType page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", propertyGroupName: "Content_", defaultTemplateId: template.Id);
+            ContentType page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", propertyGroupAlias: "content2", propertyGroupName: "Content_", defaultTemplateId: template.Id);
             Assert.AreEqual(1, page.PropertyGroups.Count);
             Assert.AreEqual("Content_", page.PropertyGroups.First().Name);
             Assert.AreEqual(3, page.PropertyTypes.Count());
@@ -1245,7 +1251,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(2, meta.PropertyTypes.Count());
             Assert.AreEqual("Meta Keywords", meta.PropertyTypes.First().Name);
             Assert.AreEqual("Meta Description", meta.PropertyTypes.Skip(1).First().Name);
-            meta.AddPropertyGroup("Content");
+            meta.AddPropertyGroup("Content", "content");
             Assert.AreEqual(2, meta.PropertyTypes.Count());
             ContentTypeService.Save(meta);
 
@@ -1258,7 +1264,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Test Textbox", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool prop1Added = contentPage.AddPropertyType(prop1, "Content_");
+            bool prop1Added = contentPage.AddPropertyType(prop1, "content2", "Content_");
             Assert.IsTrue(prop1Added);
 
             // add property 'prop2' to 'contentPage' group 'Content'
@@ -1266,13 +1272,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Another Test Textbox", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool prop2Added = contentPage.AddPropertyType(prop2, "Content");
+            bool prop2Added = contentPage.AddPropertyType(prop2, "content", "Content");
             Assert.IsTrue(prop2Added);
 
             // save 'contentPage' content type
             ContentTypeService.Save(contentPage);
 
-            PropertyGroup group = page.PropertyGroups["Content_"];
+            PropertyGroup group = page.PropertyGroups["content2"];
             group.Name = "ContentTab"; // rename the group
             ContentTypeService.Save(page);
             Assert.AreEqual(3, page.PropertyTypes.Count());
@@ -1300,11 +1306,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Arrange
             Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            ContentType page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true, propertyGroupName: "Content_", defaultTemplateId: template.Id);
+            ContentType page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true, propertyGroupAlias: "content2", propertyGroupName: "Content_", defaultTemplateId: template.Id);
             ContentTypeService.Save(page);
-            ContentType contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, propertyGroupName: "Contentx", defaultTemplateId: template.Id);
+            ContentType contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, propertyGroupAlias: "contentx", propertyGroupName: "Contentx", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentPage);
-            ContentType advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, randomizeAliases: true, propertyGroupName: "Contenty", defaultTemplateId: template.Id);
+            ContentType advancedPage = ContentTypeBuilder.CreateSimpleContentType("advancedPage", "Advanced Page", contentPage, randomizeAliases: true, propertyGroupAlias: "contenty", propertyGroupName: "Contenty", defaultTemplateId: template.Id);
             ContentTypeService.Save(advancedPage);
 
             ContentType contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
@@ -1321,8 +1327,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Subtitle", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "Content_"); // Will be added to the parent tab
-            bool subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content"); // Will be added to the "Content Meta" composition
+            bool bodyTextAdded = contentPage.AddPropertyType(bodyTextPropertyType, "content2", "Content_"); // Will be added to the parent tab
+            bool subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "content", "Content"); // Will be added to the "Content Meta" composition
             ContentTypeService.Save(contentPage);
 
             var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
@@ -1337,14 +1343,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Keywords", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content_"); // Will be added to an ancestor tab
-            bool descriptionAdded = advancedPage.AddPropertyType(descriptionPropertyType, "Contentx"); // Will be added to a parent tab
-            bool keywordsAdded = advancedPage.AddPropertyType(keywordsPropertyType, "Content"); // Will be added to the "Content Meta" composition
+            bool authorAdded = advancedPage.AddPropertyType(authorPropertyType, "content2", "Content_"); // Will be added to an ancestor tab
+            bool descriptionAdded = advancedPage.AddPropertyType(descriptionPropertyType, "contentx", "Contentx"); // Will be added to a parent tab
+            bool keywordsAdded = advancedPage.AddPropertyType(keywordsPropertyType, "content", "Content"); // Will be added to the "Content Meta" composition
             ContentTypeService.Save(advancedPage);
 
             // Change the name of the tab on the "root" content type 'page'.
-            PropertyGroup propertyGroup = page.PropertyGroups["Content_"];
-            page.PropertyGroups.Add(new PropertyGroup(true) { Id = propertyGroup.Id, Name = "Content", SortOrder = 0 });
+            PropertyGroup propertyGroup = page.PropertyGroups["content2"];
+            page.PropertyGroups.Add(new PropertyGroup(true) {
+                Id = propertyGroup.Id,
+                Name = "Content",
+                Alias = "content",
+                SortOrder = 0
+            });
             ContentTypeService.Save(page);
 
             // Assert
@@ -1374,9 +1385,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Arrange
             Template template = TemplateBuilder.CreateTextPageTemplate();
             FileService.SaveTemplate(template);
-            ContentType page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true, propertyGroupName: "Content_", defaultTemplateId: template.Id);
+            ContentType page = ContentTypeBuilder.CreateSimpleContentType("page", "Page", randomizeAliases: true, propertyGroupAlias: "content2", propertyGroupName: "Content_", defaultTemplateId: template.Id);
             ContentTypeService.Save(page);
-            ContentType contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, propertyGroupName: "Content", defaultTemplateId: template.Id);
+            ContentType contentPage = ContentTypeBuilder.CreateSimpleContentType("contentPage", "Content Page", page, randomizeAliases: true, propertyGroupAlias: "content", propertyGroupName: "Content", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentPage);
 
             ContentType contentMetaComposition = ContentTypeBuilder.CreateContentMetaContentType();
@@ -1395,18 +1406,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Author", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool bodyTextAdded = page.AddPropertyType(bodyTextPropertyType, "Content_");
-            bool subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
-            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content_");
+            bool bodyTextAdded = page.AddPropertyType(bodyTextPropertyType, "content2", "Content_");
+            bool subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "content", "Content");
+            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "content2", "Content_");
             ContentTypeService.Save(page);
             ContentTypeService.Save(contentPage);
 
             bool compositionAdded = contentPage.AddContentType(contentMetaComposition);
             ContentTypeService.Save(contentPage);
 
-            // Change the name of the tab on the "root" content type 'page'.
-            PropertyGroup propertyGroup = page.PropertyGroups["Content_"];
-            page.PropertyGroups.Add(new PropertyGroup(true) { Id = propertyGroup.Id, Name = "Content", SortOrder = 0 });
+            // Change the alias/name of the tab on the "root" content type 'page'.
+            PropertyGroup propertyGroup = page.PropertyGroups["content2"];
+            page.PropertyGroups.Add(new PropertyGroup(true)
+            {
+                Id = propertyGroup.Id,
+                Alias = "content",
+                Name = "Content",
+                SortOrder = 0
+            });
             ContentTypeService.Save(page);
 
             // Assert
@@ -1439,20 +1456,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Body Text", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
             ContentTypeService.Save(basePage);
 
             var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
             {
                  Name = "Author", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
             ContentTypeService.Save(contentPage);
 
             bool compositionAdded = contentPage.AddContentType(contentMetaComposition);
             ContentTypeService.Save(contentPage);
 
-            basePage.RemovePropertyGroup("Content");
+            basePage.RemovePropertyGroup("content");
             ContentTypeService.Save(basePage);
 
             // Assert
@@ -1464,15 +1481,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
 
             IContentType contentType = ContentTypeService.Get("contentPage");
-            PropertyGroup propertyGroup = contentType.PropertyGroups["Content"];
+            PropertyGroup propertyGroup = contentType.PropertyGroups["content"];
         }
 
         [Test]
         public void Can_Remove_PropertyGroup_Without_Removing_Property_Types()
         {
             var basePage = (IContentType)ContentTypeBuilder.CreateBasicContentType();
-            basePage.AddPropertyGroup("Content");
-            basePage.AddPropertyGroup("Meta");
+            basePage.AddPropertyGroup("Content", "content");
+            basePage.AddPropertyGroup("Meta", "meta");
             ContentTypeService.Save(basePage);
 
             var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
@@ -1483,7 +1500,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 SortOrder = 1,
                 DataTypeId = -88
             };
-            Assert.IsTrue(basePage.AddPropertyType(authorPropertyType, "Content"));
+            Assert.IsTrue(basePage.AddPropertyType(authorPropertyType, "content", "Content"));
 
             var titlePropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "title")
             {
@@ -1493,7 +1510,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 SortOrder = 1,
                 DataTypeId = -88
             };
-            Assert.IsTrue(basePage.AddPropertyType(titlePropertyType, "Meta"));
+            Assert.IsTrue(basePage.AddPropertyType(titlePropertyType, "meta", "Meta"));
 
             ContentTypeService.Save(basePage);
             basePage = ContentTypeService.Get(basePage.Id);
@@ -1501,7 +1518,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             int count = basePage.PropertyTypes.Count();
             Assert.AreEqual(2, count);
 
-            basePage.RemovePropertyGroup("Content");
+            basePage.RemovePropertyGroup("content");
 
             ContentTypeService.Save(basePage);
             basePage = ContentTypeService.Get(basePage.Id);
@@ -1537,14 +1554,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                  Name = "Author", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
+            bool authorAdded = contentPage.AddPropertyType(authorPropertyType, "content", "Content");
             ContentTypeService.Save(contentPage);
 
             var bodyTextPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "bodyText")
             {
                  Name = "Body Text", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "Content");
+            bool bodyTextAdded = basePage.AddPropertyType(bodyTextPropertyType, "content", "Content");
             ContentTypeService.Save(basePage);
 
             bool compositionAdded = contentPage.AddContentType(contentMetaComposition);
@@ -1559,7 +1576,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.DoesNotThrow(() => ContentTypeService.Get("advancedPage"));
 
             IContentType contentType = ContentTypeService.Get("contentPage");
-            PropertyGroup propertyGroup = contentType.PropertyGroups["Content"];
+            PropertyGroup propertyGroup = contentType.PropertyGroups["content"];
 
             int numberOfContentTabs = contentType.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
             Assert.That(numberOfContentTabs, Is.EqualTo(3));
@@ -1569,12 +1586,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                 Alias = "description", Name = "Description", Description = string.Empty,  Mandatory = false, SortOrder = 1, DataTypeId = -88
             };
-            bool descriptionAdded = contentType.AddPropertyType(descriptionPropertyType, "Content");
+            bool descriptionAdded = contentType.AddPropertyType(descriptionPropertyType, "content", "Content");
             ContentTypeService.Save(contentType);
             Assert.That(descriptionAdded, Is.True);
 
             IContentType contentPageReloaded = ContentTypeService.Get("contentPage");
-            PropertyGroup propertyGroupReloaded = contentPageReloaded.PropertyGroups["Content"];
+            PropertyGroup propertyGroupReloaded = contentPageReloaded.PropertyGroups["content"];
             bool hasDescriptionPropertyType = propertyGroupReloaded.PropertyTypes.Contains("description");
             Assert.That(hasDescriptionPropertyType, Is.True);
 
@@ -1618,17 +1635,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // property is variant on A
             IContentType test = ContentTypeService.Get(typeA.Id);
             Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
-            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.First().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.Last().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
 
             // but not on B
             test = ContentTypeService.Get(typeB.Id);
             Assert.AreEqual(ContentVariation.Nothing, test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
-            Assert.AreEqual(ContentVariation.Nothing, test.CompositionPropertyGroups.First().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+            Assert.AreEqual(ContentVariation.Nothing, test.CompositionPropertyGroups.Last().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
 
             // but on C
             test = ContentTypeService.Get(typeC.Id);
             Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
-            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.First().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.Last().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
         }
 
         private ContentType CreateComponent()
@@ -1649,7 +1666,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "componentGroup") { Name = "Component Group", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88 }
             };
-            component.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Component", SortOrder = 1 });
+
+            component.PropertyGroups.Add(new PropertyGroup(contentCollection) 
+            {
+                Alias= "component", 
+                Name = "Component",
+                SortOrder = 1 
+            });
 
             return component;
         }
@@ -1677,7 +1700,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 SortOrder = 2,
                 DataTypeId = -88
             };
-            banner.AddPropertyType(propertyType, "Component");
+            banner.AddPropertyType(propertyType, "component", "Component");
             return banner;
         }
 
@@ -1699,7 +1722,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "hostname") { Name = "Hostname", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = -88 }
             };
-            site.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Site Settings", SortOrder = 1 });
+            site.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Site Settings", Alias = "siteSettings", SortOrder = 1 });
 
             return site;
         }

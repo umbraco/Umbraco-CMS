@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -128,13 +126,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService);
         }
 
-
-
         #endregion
 
-
         #region Content
-
 
         public IReadOnlyList<T> ImportContentBase<T, S>(
             IEnumerable<CompiledPackageContentBase> docs,
@@ -939,15 +933,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     propertyType.Key = new Guid(property.Element("Key").Value);
                 }
 
-                var tabElement = property.Element("Tab");
-                if (tabElement == null || string.IsNullOrEmpty(tabElement.Value))
+                var propertyGroupElement = property.Element("Tab");
+                if (propertyGroupElement == null || string.IsNullOrEmpty(propertyGroupElement.Value))
                 {
                     contentType.AddPropertyType(propertyType);
                 }
                 else
                 {
-                    var propertyGroupName = tabElement.Value;
-                    var propertyGroupAlias = tabElement.Attribute("Alias")?.Value;
+                    var propertyGroupName = propertyGroupElement.Value;
+                    var propertyGroupAlias = propertyGroupElement.Attribute("Alias")?.Value;
                     if (string.IsNullOrEmpty(propertyGroupAlias))
                     {
                         propertyGroupAlias = propertyGroupName.ToSafeAlias(_shortStringHelper, true);

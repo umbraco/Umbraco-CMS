@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -1383,9 +1383,9 @@ WHERE {Cms.Core.Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cm
                 "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @id",
                 "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @id",
                 "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE contentTypeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup + " WHERE contenttypeNodeId = @id"
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyType + " WHERE contentTypeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup + " WHERE contenttypeNodeId = @id"
             };
             return list;
         }

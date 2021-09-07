@@ -211,7 +211,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 MediaTypeContainerRepository.Save(container);
 
-                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup", defaultTemplateId: 0);
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup", defaultTemplateId: 0);
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
 
@@ -228,7 +228,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 MediaTypeContainerRepository.Save(container);
 
-                IMediaType contentType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
+                IMediaType contentType = MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
                 MediaTypeRepository.Save(contentType);
 
@@ -252,7 +252,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             using (IScope scope = provider.CreateScope())
             {
                 // Act
-                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
+                ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
                 ContentTypeRepository.Save(contentType);
 
                 IContentType fetched = ContentTypeRepository.Get(contentType.Id);
@@ -287,7 +287,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 ContentTypeRepository repository = ContentTypeRepository;
 
                 // Act
-                var contentType = (IContentType)ContentTypeBuilder.CreateSimpleContentType2("test", "Test", propertyGroupName: "testGroup");
+                var contentType = (IContentType)ContentTypeBuilder.CreateSimpleContentType2("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
 
                 Assert.AreEqual(4, contentType.PropertyTypes.Count());
 
@@ -342,7 +342,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IContentType contentType = repository.Get(_textpageContentType.Id);
 
                 contentType.Thumbnail = "Doc2.png";
-                contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
+                contentType.PropertyGroups["content"].PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
                 {
                     Name = "Subtitle",
                     Description = "Optional Subtitle",
@@ -689,7 +689,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IContentType contentType = repository.Get(_textpageContentType.Id);
 
                 // Act
-                contentType.PropertyGroups["Meta"].PropertyTypes.Remove("description");
+                contentType.PropertyGroups["meta"].PropertyTypes.Remove("description");
                 repository.Save(contentType);
 
                 IContentType result = repository.Get(_textpageContentType.Id);
@@ -988,7 +988,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     LabelOnTop = true,
                     Variations = ContentVariation.Nothing
                 });
-                elementType.PropertyGroups.Add(new PropertyGroup(contentCollection) {Name = "Content", SortOrder = 1});
+                elementType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", Alias = "content", SortOrder = 1});
                 elementType.ResetDirtyProperties(false);
                 elementType.SetDefaultTemplate(new Template(ShortStringHelper, "ElementType", "elementType"));
                 repository.Save(elementType);

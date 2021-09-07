@@ -116,9 +116,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             Assert.That(uBlogsyBasePage.ContentTypeCompositionExists("uBlogsyBaseDocType"), Is.True);
             Assert.That(uBlogsyBasePage.PropertyTypes.Count(), Is.EqualTo(7));
             Assert.That(uBlogsyBasePage.PropertyGroups.Count, Is.EqualTo(3));
-            Assert.That(uBlogsyBasePage.PropertyGroups["Content"].PropertyTypes.Count, Is.EqualTo(3));
-            Assert.That(uBlogsyBasePage.PropertyGroups["SEO"].PropertyTypes.Count(), Is.EqualTo(3));
-            Assert.That(uBlogsyBasePage.PropertyGroups["Navigation"].PropertyTypes.Count(), Is.EqualTo(1));
+            Assert.That(uBlogsyBasePage.PropertyGroups["content"].PropertyTypes.Count, Is.EqualTo(3));
+            Assert.That(uBlogsyBasePage.PropertyGroups["sEO"].PropertyTypes.Count(), Is.EqualTo(3));
+            Assert.That(uBlogsyBasePage.PropertyGroups["navigation"].PropertyTypes.Count(), Is.EqualTo(1));
             Assert.That(uBlogsyBasePage.CompositionPropertyTypes.Count(), Is.EqualTo(12));
 
             IContentType uBlogsyLanding = contentTypes.First(x => x.Alias == "uBlogsyLanding");
@@ -181,7 +181,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             IContentType mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
             Assert.That(mRBasePage.PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(mRBasePage.PropertyGroups.Count(), Is.EqualTo(1));
-            Assert.That(mRBasePage.PropertyGroups["Metadaten"].PropertyTypes.Count(), Is.EqualTo(2));
+            Assert.That(mRBasePage.PropertyGroups["metadaten"].PropertyTypes.Count(), Is.EqualTo(2));
 
             IContentType mRStartPage = contentTypes.First(x => x.Alias == "MRStartPage");
             Assert.That(mRStartPage.ContentTypeCompositionExists("MRBasePage"), Is.True);
@@ -263,11 +263,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             IContentType contentMaster = contentTypes.First(x => x.Alias == "ContentMaster");
             Assert.That(contentMaster.PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(contentMaster.PropertyGroups.Count(), Is.EqualTo(1));
-            Assert.That(contentMaster.PropertyGroups["SEO"].PropertyTypes.Count(), Is.EqualTo(3));
+            Assert.That(contentMaster.PropertyGroups["sEO"].PropertyTypes.Count(), Is.EqualTo(3));
             Assert.That(contentMaster.ContentTypeCompositionExists("Base"), Is.True);
 
-            int propertyGroupId = contentMaster.PropertyGroups["SEO"].Id;
-            Assert.That(contentMaster.PropertyGroups["SEO"].PropertyTypes.Any(x => x.PropertyGroupId.Value != propertyGroupId), Is.False);
+            int propertyGroupId = contentMaster.PropertyGroups["sEO"].Id;
+            Assert.That(contentMaster.PropertyGroups["sEO"].PropertyTypes.Any(x => x.PropertyGroupId.Value != propertyGroupId), Is.False);
         }
 
         [Test]

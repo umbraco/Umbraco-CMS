@@ -269,7 +269,7 @@ namespace Umbraco.TestData
                 Name = "Umbraco Test Data Content",
                 Icon = "icon-science color-green"
             };
-            docType.AddPropertyGroup("Content");
+            docType.AddPropertyGroup("Content", "content");
             docType.AddPropertyType(new PropertyType(_shortStringHelper, GetOrCreateRichText(), "review")
             {
                 Name = "Review"
