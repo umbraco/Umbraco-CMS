@@ -298,23 +298,15 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Checks whether a PropertyType with a given alias already exists
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="alias">Alias of the PropertyType</param>
         /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
-        public abstract bool PropertyTypeExists(string propertyTypeAlias);
+        public abstract bool PropertyTypeExists(string alias);
 
         /// <inheritdoc />
-        [Obsolete("Use AddPropertyGroup(name, alias) instead to explicitly set the alias.")]
-        public virtual bool AddPropertyGroup(string groupName) => AddPropertyGroup(groupName, groupName.ToSafeAlias(_shortStringHelper, true));
+        public abstract bool AddPropertyGroup(string alias, string name);
 
         /// <inheritdoc />
-        public abstract bool AddPropertyGroup(string name, string alias);
-
-        /// <inheritdoc />
-        [Obsolete("Use AddPropertyType(propertyType, groupAlias, groupName) instead to explicitly set the alias of the group (note the slighty different parameter order).")]
-        public virtual bool AddPropertyType(IPropertyType propertyType, string propertyGroupName) => AddPropertyType(propertyType, propertyGroupName.ToSafeAlias(_shortStringHelper, true), propertyGroupName);
-
-        /// <inheritdoc />
-        public abstract bool AddPropertyType(IPropertyType propertyType, string groupAlias, string groupName);
+        public abstract bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string propertyGroupName = null);
 
         /// <summary>
         /// Adds a PropertyType, which does not belong to a PropertyGroup.
@@ -336,11 +328,11 @@ namespace Umbraco.Cms.Core.Models
         /// Moves a PropertyType to a specified PropertyGroup
         /// </summary>
         /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
-        /// <param name="propertyGroupName">Name of the PropertyGroup to move the PropertyType to</param>
+        /// <param name="propertyGroupAlias">Alias of the PropertyGroup to move the PropertyType to</param>
         /// <returns></returns>
-        /// <remarks>If <paramref name="propertyGroupName"/> is null then the property is moved back to
+        /// <remarks>If <paramref name="propertyGroupAlias"/> is null then the property is moved back to
         /// "generic properties" ie does not have a tab anymore.</remarks>
-        public bool MovePropertyType(string propertyTypeAlias, string propertyGroupName)
+        public bool MovePropertyType(string propertyTypeAlias, string propertyGroupAlias)
         {
             // get property, ensure it exists
             var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
@@ -348,9 +340,9 @@ namespace Umbraco.Cms.Core.Models
 
             // get new group, if required, and ensure it exists
             PropertyGroup newPropertyGroup = null;
-            if (propertyGroupName != null)
+            if (propertyGroupAlias != null)
             {
-                var index = PropertyGroups.IndexOfKey(propertyGroupName);
+                var index = PropertyGroups.IndexOfKey(propertyGroupAlias);
                 if (index == -1) return false;
 
                 newPropertyGroup = PropertyGroups[index];
@@ -373,13 +365,13 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Removes a PropertyType from the current ContentType
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the <see cref="IPropertyType"/> to remove</param>
-        public void RemovePropertyType(string propertyTypeAlias)
+        /// <param name="alias">Alias of the <see cref="IPropertyType"/> to remove</param>
+        public void RemovePropertyType(string alias)
         {
             //check through each property group to see if we can remove the property type by alias from it
             foreach (var propertyGroup in PropertyGroups)
             {
-                if (propertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias))
+                if (propertyGroup.PropertyTypes.RemoveItem(alias))
                 {
                     if (!HasPropertyTypeBeenRemoved)
                     {
@@ -391,7 +383,7 @@ namespace Umbraco.Cms.Core.Models
             }
 
             //check through each local property type collection (not assigned to a tab)
-            if (_noGroupPropertyTypes.RemoveItem(propertyTypeAlias))
+            if (_noGroupPropertyTypes.RemoveItem(alias))
             {
                 if (!HasPropertyTypeBeenRemoved)
                 {
@@ -404,11 +396,11 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Removes a PropertyGroup from the current ContentType
         /// </summary>
-        /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup"/> to remove</param>
-        public void RemovePropertyGroup(string propertyGroupName)
+        /// <param name="alias">Alias of the <see cref="PropertyGroup"/> to remove</param>
+        public void RemovePropertyGroup(string alias)
         {
-            // if no group exists with that name, do nothing
-            var index = PropertyGroups.IndexOfKey(propertyGroupName);
+            // if no group exists with that alias, do nothing
+            var index = PropertyGroups.IndexOfKey(alias);
             if (index == -1) return;
 
             var group = PropertyGroups[index];

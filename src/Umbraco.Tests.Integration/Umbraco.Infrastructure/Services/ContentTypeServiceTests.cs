@@ -1251,7 +1251,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(2, meta.PropertyTypes.Count());
             Assert.AreEqual("Meta Keywords", meta.PropertyTypes.First().Name);
             Assert.AreEqual("Meta Description", meta.PropertyTypes.Skip(1).First().Name);
-            meta.AddPropertyGroup("Content", "content");
+            meta.AddPropertyGroup("content", "Content");
             Assert.AreEqual(2, meta.PropertyTypes.Count());
             ContentTypeService.Save(meta);
 
@@ -1488,8 +1488,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Remove_PropertyGroup_Without_Removing_Property_Types()
         {
             var basePage = (IContentType)ContentTypeBuilder.CreateBasicContentType();
-            basePage.AddPropertyGroup("Content", "content");
-            basePage.AddPropertyGroup("Meta", "meta");
+            basePage.AddPropertyGroup("content", "Content");
+            basePage.AddPropertyGroup("meta", "Meta");
             ContentTypeService.Save(basePage);
 
             var authorPropertyType = new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, "author")
