@@ -1543,7 +1543,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         dataTypeKey: args.model.dataTypeKey,
                         ignoreUserStartNodes: args.model.config.ignoreUserStartNodes,
                         anchors: anchorValues,
-                        size: args.model.config.editor.overlaySize,
+                        size: args.model.config.overlaySize,
                         submit: model => {
                             self.insertLinkInEditor(args.editor, model.target, anchorElement);
                             editorService.close();
