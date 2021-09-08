@@ -41,6 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     /// <para>Some objects such as macros are not based on CMSNode</para>
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+    [ParameterSwapControllerActionSelector(nameof(GetAncestors), "id", typeof(int), typeof(Guid))]
     [ParameterSwapControllerActionSelector(nameof(GetPagedChildren), "id", typeof(int), typeof(string))]
     [ParameterSwapControllerActionSelector(nameof(GetPath), "id", typeof(int), typeof(Guid), typeof(Udi))]
     [ParameterSwapControllerActionSelector(nameof(GetUrlAndAnchors), "id", typeof(int), typeof(Guid), typeof(Udi))]
@@ -802,6 +803,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             return GetResultForAncestors(id, type, queryStrings);
+        }
+
+        public ActionResult<IEnumerable<EntityBasic>> GetAncestors(Guid id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        {
+            var entity = _entityService.Get(id);
+            if (entity is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(GetResultForAncestors(entity.Id, type, queryStrings));
         }
 
         /// <summary>
