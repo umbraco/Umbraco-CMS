@@ -155,10 +155,10 @@ describe('contentTypeHelper tests', function () {
     it('should remove parentAlias from groups where the tab doesnt exist', function () {
 
       const groups = [
-        { alias: 'group', parentAlias: null, type: 0 },
-        { alias: 'tab/group', parentAlias: 'tab', type: 0 },
-        { alias: 'tab', parentAlias: null, type: 1 },
-        { alias: 'notExistingTab/group', parentAlias: 'notExistingTab', type: 0 }
+        { alias: 'group', parentAlias: null, type: contentTypeHelper.TYPE_GROUP },
+        { alias: 'tab/group', parentAlias: 'tab', type: contentTypeHelper.TYPE_GROUP },
+        { alias: 'tab', parentAlias: null, type: contentTypeHelper.TYPE_TAB },
+        { alias: 'notExistingTab/group', parentAlias: 'notExistingTab', type: contentTypeHelper.TYPE_GROUP }
       ];
 
       contentTypeHelper.relocateDisorientedGroups(groups);
@@ -175,9 +175,9 @@ describe('contentTypeHelper tests', function () {
 
     it('should convert group to tab', function () {
       const groups = [
-        { type: 0, alias: 'hero', name: 'Hero' }, 
-        { type: 0, alias: 'content' }, 
-        { type: 0, alias: 'footer' }
+        { type: contentTypeHelper.TYPE_GROUP, alias: 'hero', name: 'Hero' },
+        { type: contentTypeHelper.TYPE_GROUP, alias: 'content' },
+        { type: contentTypeHelper.TYPE_GROUP, alias: 'footer' }
       ];
 
       const newTab = groups[0];
@@ -191,7 +191,7 @@ describe('contentTypeHelper tests', function () {
 
     it('should set sort order to 0 if it is the first tab', function () {
       const groups = [
-        { type: 0, alias: 'hero', name: 'Hero' }
+        { type: contentTypeHelper.TYPE_GROUP, alias: 'hero', name: 'Hero' }
       ];
       
       const newTab = groups[0];
@@ -202,8 +202,8 @@ describe('contentTypeHelper tests', function () {
 
     it('should set sort order to 1 higher than the last tab', function () {
       const groups = [
-        { type: 0, alias: 'settings', name: 'Settings', sortOrder: 100 },
-        { type: 1, alias: 'content', name: 'Content', sortOrder: 5 }
+        { type: contentTypeHelper.TYPE_GROUP, alias: 'settings', name: 'Settings', sortOrder: 100 },
+        { type: contentTypeHelper.TYPE_TAB, alias: 'content', name: 'Content', sortOrder: 5 }
       ];
       
       const newTab = groups[0];
