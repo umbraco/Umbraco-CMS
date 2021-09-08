@@ -480,7 +480,7 @@ $RECYCLE.BIN/
 **/umbraco/UmbracoBackOffice/
 
 # Comment out the line below if you wish to change or add any new templates to PartialView Macros
-**/umbraco/PartialViewMacros/Templates
+**/umbraco/PartialViewMacros/
 
 # Umbraco Static Assets of Backoffice
 # Nuget package Umbraco.Cms.StaticAssets will copy them in during dotnet build
