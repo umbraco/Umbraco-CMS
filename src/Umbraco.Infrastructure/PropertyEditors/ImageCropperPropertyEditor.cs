@@ -14,9 +14,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -70,11 +68,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
         {
-            if (propertyEditorAlias == Alias)
+            if (propertyEditorAlias == Alias &&
+                GetFileSrcFromPropertyValue(value, out _, false) is var mediaPathValue &&
+                !string.IsNullOrWhiteSpace(mediaPathValue))
             {
-                mediaPath = GetFileSrcFromPropertyValue(value, out _, false);
+                mediaPath = mediaPathValue;
                 return true;
             }
+
             mediaPath = null;
             return false;
         }
@@ -95,11 +96,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Gets a value indicating whether a property is an image cropper field.
         /// </summary>
         /// <param name="property">The property.</param>
-        /// <returns>A value indicating whether a property is an image cropper field, and (optionally) has a non-empty value.</returns>
-        private static bool IsCropperField(IProperty property)
-        {
-            return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper;
-        }
+        /// <returns>
+        ///   <c>true</c> if the specified property is an image cropper field; otherwise, <c>false</c>.
+        /// </returns>
+        private static bool IsCropperField(IProperty property) => property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.ImageCropper;
 
         /// <summary>
         /// Parses the property value into a json object.
@@ -167,10 +167,23 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
             deserializedValue = null;
             if (propVal == null || !(propVal is string str)) return null;
-            if (!str.DetectIsJson()) return null;
-            deserializedValue = GetJObject(str, true);
+
+            if (!str.DetectIsJson())
+            {
+                // Assume the value is a plain string with the file path
+                deserializedValue = new JObject()
+                {
+                    { "src", str }
+                };
+            }
+            else
+            {
+                deserializedValue = GetJObject(str, true);
+            }
+
             if (deserializedValue?["src"] == null) return null;
             var src = deserializedValue["src"].Value<string>();
+
             return relative ? _mediaFileManager.FileSystem.GetRelativePath(src) : src;
         }
 
