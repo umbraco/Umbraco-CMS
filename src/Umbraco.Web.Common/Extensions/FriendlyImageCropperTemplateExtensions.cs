@@ -22,16 +22,18 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="mediaItem">The IPublishedContent item.</param>
         /// <param name="cropAlias">The crop alias e.g. thumbnail.</param>
+        /// <param name="urlMode">The url mode.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
             this IPublishedContent mediaItem,
-            string cropAlias) =>
-            mediaItem.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
+            string cropAlias,
+            UrlMode urlMode = UrlMode.Default) =>
+            mediaItem.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
-        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias)
-            => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
+        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias, UrlMode urlMode = UrlMode.Default)
+            => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
         /// <summary>
         /// Gets the crop URL by using only the specified <paramref name="imageCropperValue" />.
@@ -39,14 +41,16 @@ namespace Umbraco.Extensions
         /// <param name="mediaItem">The media item.</param>
         /// <param name="imageCropperValue">The image cropper value.</param>
         /// <param name="cropAlias">The crop alias.</param>
+        /// <param name="urlMode">The url mode.</param>
         /// <returns>
         /// The image crop URL.
         /// </returns>
         public static string GetCropUrl(
             this IPublishedContent mediaItem,
             ImageCropperValue imageCropperValue,
-            string cropAlias)
-            => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, imageCropperValue, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
+            string cropAlias,
+            UrlMode urlMode = UrlMode.Default)
+            => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, imageCropperValue, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
         /// <summary>
         /// Gets the underlying image processing service URL by the crop alias using the specified property containing the image cropper JSON data on the IPublishedContent item.
@@ -54,17 +58,19 @@ namespace Umbraco.Extensions
         /// <param name="mediaItem">The IPublishedContent item.</param>
         /// <param name="propertyAlias">The property alias of the property containing the JSON data e.g. umbracoFile.</param>
         /// <param name="cropAlias">The crop alias e.g. thumbnail.</param>
+        /// <param name="urlMode">The url mode.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
             this IPublishedContent mediaItem,
             string propertyAlias,
-            string cropAlias) =>
-            mediaItem.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
+            string cropAlias,
+            UrlMode urlMode = UrlMode.Default) =>
+            mediaItem.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
-        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias)
-            => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
+        public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias, UrlMode urlMode = UrlMode.Default)
+            => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
         /// <summary>
         /// Gets the underlying image processing service URL from the IPublishedContent item.
@@ -84,6 +90,7 @@ namespace Umbraco.Extensions
         /// <example><![CDATA[
         /// furtherOptions: "bgcolor=fff"
         /// ]]></example></param>
+        /// <param name="urlMode">The url mode.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
@@ -99,7 +106,8 @@ namespace Umbraco.Extensions
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
             bool cacheBuster = true,
-            string furtherOptions = null)
+            string furtherOptions = null,
+            UrlMode urlMode = UrlMode.Default)
             => mediaItem.GetCropUrl(
                 ImageUrlGenerator,
                 PublishedValueFallback,
@@ -114,7 +122,8 @@ namespace Umbraco.Extensions
                 preferFocalPoint,
                 useCropDimensions,
                 cacheBuster,
-                furtherOptions
+                furtherOptions,
+                urlMode
             );
 
         /// <summary>
@@ -215,7 +224,7 @@ namespace Umbraco.Extensions
             );
 
 
-        [Obsolete("Use GetCrop to merge local and media crops, get automatic cache buster value and have more parameters.")]
+        [Obsolete("Use GetCropUrl to merge local and media crops, get automatic cache buster value and have more parameters.")]
         public static string GetLocalCropUrl(
             this MediaWithCrops mediaWithCrops,
             string alias,

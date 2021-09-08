@@ -5,6 +5,7 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
 
             var propEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
 
-            validationService = new PropertyValidationService(propEditors, dataTypeService.Object, Mock.Of<ILocalizedTextService>());
+            validationService = new PropertyValidationService(propEditors, dataTypeService.Object, Mock.Of<ILocalizedTextService>(), new ValueEditorCache());
         }
 
         [Test]

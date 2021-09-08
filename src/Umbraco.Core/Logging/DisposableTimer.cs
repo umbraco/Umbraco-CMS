@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Logging
                             var args = new object[startMessageArgs.Length + 1];
                             startMessageArgs.CopyTo(args, 0);
                             args[startMessageArgs.Length] = _timingId;
-                            logger.LogDebug(startMessage + " [Timing {TimingId}]", args);
+                            logger.LogInformation(startMessage + " [Timing {TimingId}]", args);
                         }
                         break;
                     default:

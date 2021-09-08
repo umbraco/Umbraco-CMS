@@ -49,16 +49,16 @@ namespace Umbraco.Cms.Infrastructure.Mail
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task SendAsync(EmailMessage message) => await SendAsyncInternal(message, false);
+        public async Task SendAsync(EmailMessage message, string emailType) => await SendAsyncInternal(message, emailType, false);
 
-        public async Task SendAsync(EmailMessage message, bool enableNotification) =>
-            await SendAsyncInternal(message, enableNotification);
+        public async Task SendAsync(EmailMessage message, string emailType, bool enableNotification) =>
+            await SendAsyncInternal(message, emailType, enableNotification);
 
-        private async Task SendAsyncInternal(EmailMessage message, bool enableNotification)
+        private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification)
         {
             if (enableNotification)
             {
-                var notification = new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From));
+                var notification = new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From), emailType);
                 await _eventAggregator.PublishAsync(notification);
 
                 // if a handler handled sending the email then don't continue.

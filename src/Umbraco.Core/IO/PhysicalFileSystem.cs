@@ -258,15 +258,16 @@ namespace Umbraco.Cms.Core.IO
             // test URL
             var path = fullPathOrUrl.Replace('\\', '/'); // ensure URL separator char
 
+            // if it starts with the root path, strip it and trim the starting slash to make it relative
+            // eg "c:/websites/test/root/Media/1234/img.jpg" => "1234/img.jpg"
+            // or on unix systems "/var/wwwroot/test/Meia/1234/img.jpg"
+            if (_ioHelper.PathStartsWith(path, _rootPathFwd, '/'))
+                return path.Substring(_rootPathFwd.Length).TrimStart(Constants.CharArrays.ForwardSlash);
+
             // if it starts with the root URL, strip it and trim the starting slash to make it relative
             // eg "/Media/1234/img.jpg" => "1234/img.jpg"
             if (_ioHelper.PathStartsWith(path, _rootUrl, '/'))
                 return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
-
-            // if it starts with the root path, strip it and trim the starting slash to make it relative
-            // eg "c:/websites/test/root/Media/1234/img.jpg" => "1234/img.jpg"
-            if (_ioHelper.PathStartsWith(path, _rootPathFwd, '/'))
-                return path.Substring(_rootPathFwd.Length).TrimStart(Constants.CharArrays.ForwardSlash);
 
             // unchanged - what else?
             return path;

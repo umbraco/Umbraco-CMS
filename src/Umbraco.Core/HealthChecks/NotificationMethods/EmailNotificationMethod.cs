@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
 
 
             var mailMessage = CreateMailMessage(subject, message);
-            await _emailSender.SendAsync(mailMessage);
+            await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.HealthCheck);
         }
 
         private EmailMessage CreateMailMessage(string subject, string message)

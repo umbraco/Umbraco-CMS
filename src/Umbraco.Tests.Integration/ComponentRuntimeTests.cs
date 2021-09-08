@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Tests.Integration
             Assert.IsTrue(myComponent.IsTerminated, "The component was not terminated");
         }
 
-        public class MyComposer : IUserComposer
+        public class MyComposer : IComposer
         {
             public void Compose(IUmbracoBuilder builder) => builder.Components().Append<MyComponent>();
         }
