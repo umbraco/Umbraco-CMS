@@ -167,10 +167,23 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
             deserializedValue = null;
             if (propVal == null || !(propVal is string str)) return null;
-            if (!str.DetectIsJson()) return null;
-            deserializedValue = GetJObject(str, true);
+
+            if (!str.DetectIsJson())
+            {
+                // Assume the value is a plain string with the file path
+                deserializedValue = new JObject()
+                {
+                    { "src", str }
+                };
+            }
+            else
+            {
+                deserializedValue = GetJObject(str, true);
+            }
+
             if (deserializedValue?["src"] == null) return null;
             var src = deserializedValue["src"].Value<string>();
+
             return relative ? _mediaFileManager.FileSystem.GetRelativePath(src) : src;
         }
 
