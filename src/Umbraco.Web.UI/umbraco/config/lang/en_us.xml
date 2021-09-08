@@ -1669,6 +1669,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
     <key alias="group">Group</key>
+    <key alias="groupReorderSameAliasError">You can't move the group %0% to this tab because the group will get the same alias as a tab: "%1%". Rename the group to continue.</key>
     <key alias="noGroups">You have not added any groups</key>
     <key alias="addGroup">Add group</key>
     <key alias="inheritedFrom">Inherited from</key>

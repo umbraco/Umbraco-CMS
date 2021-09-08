@@ -173,13 +173,13 @@ describe('contentTypeHelper tests', function () {
 
   describe('convertGroupToTab', function () {
 
-    const groups = [
-      { type: 0, alias: 'hero', name: 'Hero' }, 
-      { type: 0, alias: 'content' }, 
-      { type: 0, alias: 'footer' }
-    ];
-
     it('should convert group to tab', function () {
+      const groups = [
+        { type: 0, alias: 'hero', name: 'Hero' }, 
+        { type: 0, alias: 'content' }, 
+        { type: 0, alias: 'footer' }
+      ];
+
       const newTab = groups[0];
 
       contentTypeHelper.convertGroupToTab(groups, newTab);
@@ -187,6 +187,29 @@ describe('contentTypeHelper tests', function () {
       expect(newTab.type).toBe(contentTypeHelper.TYPE_TAB);
       expect(newTab.alias).toBe('hero');
       expect(newTab.parentAlias).toBeNull();
+    });
+
+    it('should set sort order to 0 if it is the first tab', function () {
+      const groups = [
+        { type: 0, alias: 'hero', name: 'Hero' }
+      ];
+      
+      const newTab = groups[0];
+      contentTypeHelper.convertGroupToTab(groups, newTab);
+
+      expect(newTab.sortOrder).toBe(0);
+    });
+
+    it('should set sort order to 1 higher than the last tab', function () {
+      const groups = [
+        { type: 0, alias: 'settings', name: 'Settings', sortOrder: 100 },
+        { type: 1, alias: 'content', name: 'Content', sortOrder: 5 }
+      ];
+      
+      const newTab = groups[0];
+      contentTypeHelper.convertGroupToTab(groups, newTab);
+
+      expect(newTab.sortOrder).toBe(6);
     });
 
   });
