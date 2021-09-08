@@ -36,6 +36,14 @@ namespace Umbraco.Cms.Core.Exceptions
         public string[] PropertyTypeAliases { get; }
 
         /// <summary>
+        /// Gets the property group aliases.
+        /// </summary>
+        /// <value>
+        /// The property group aliases.
+        /// </value>
+        public string[] PropertyGroupAliases { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="InvalidCompositionException" /> class.
         /// </summary>
         public InvalidCompositionException()
@@ -57,7 +65,29 @@ namespace Umbraco.Cms.Core.Exceptions
         /// <param name="addedCompositionAlias">The added composition alias.</param>
         /// <param name="propertyTypeAliases">The property type aliases.</param>
         public InvalidCompositionException(string contentTypeAlias, string addedCompositionAlias, string[] propertyTypeAliases)
-            : this(addedCompositionAlias.IsNullOrWhiteSpace()
+            : this(contentTypeAlias, addedCompositionAlias, propertyTypeAliases, new string[0])
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InvalidCompositionException" /> class.
+        /// </summary>
+        /// <param name="contentTypeAlias">The content type alias.</param>
+        /// <param name="addedCompositionAlias">The added composition alias.</param>
+        /// <param name="propertyTypeAliases">The property type aliases.</param>
+        /// <param name="propertyGroupAliases">The property group aliases.</param>
+        public InvalidCompositionException(string contentTypeAlias, string addedCompositionAlias, string[] propertyTypeAliases, string[] propertyGroupAliases)
+            : this(FormatMessage(contentTypeAlias, addedCompositionAlias, propertyTypeAliases, propertyGroupAliases))
+        {
+            ContentTypeAlias = contentTypeAlias;
+            AddedCompositionAlias = addedCompositionAlias;
+            PropertyTypeAliases = propertyTypeAliases;
+            PropertyGroupAliases = propertyGroupAliases;
+        }
+
+        private static string FormatMessage(string contentTypeAlias, string addedCompositionAlias, string[] propertyTypeAliases, string[] propertyGroupAliases)
+        {
+            // TODO Add property group aliases to message
+            return addedCompositionAlias.IsNullOrWhiteSpace()
                     ? string.Format(
                         "ContentType with alias '{0}' has an invalid composition " +
                         "and there was a conflict on the following PropertyTypes: '{1}'. " +
@@ -67,11 +97,7 @@ namespace Umbraco.Cms.Core.Exceptions
                         "ContentType with alias '{0}' was added as a Composition to ContentType with alias '{1}', " +
                         "but there was a conflict on the following PropertyTypes: '{2}'. " +
                         "PropertyTypes must have a unique alias across all Compositions in order to compose a valid ContentType Composition.",
-                        addedCompositionAlias, contentTypeAlias, string.Join(", ", propertyTypeAliases)))
-        {
-            ContentTypeAlias = contentTypeAlias;
-            AddedCompositionAlias = addedCompositionAlias;
-            PropertyTypeAliases = propertyTypeAliases;
+                        addedCompositionAlias, contentTypeAlias, string.Join(", ", propertyTypeAliases));
         }
 
         /// <summary>
@@ -102,6 +128,7 @@ namespace Umbraco.Cms.Core.Exceptions
             ContentTypeAlias = info.GetString(nameof(ContentTypeAlias));
             AddedCompositionAlias = info.GetString(nameof(AddedCompositionAlias));
             PropertyTypeAliases = (string[])info.GetValue(nameof(PropertyTypeAliases), typeof(string[]));
+            PropertyGroupAliases = (string[])info.GetValue(nameof(PropertyGroupAliases), typeof(string[]));
         }
 
         /// <summary>
@@ -120,6 +147,7 @@ namespace Umbraco.Cms.Core.Exceptions
             info.AddValue(nameof(ContentTypeAlias), ContentTypeAlias);
             info.AddValue(nameof(AddedCompositionAlias), AddedCompositionAlias);
             info.AddValue(nameof(PropertyTypeAliases), PropertyTypeAliases);
+            info.AddValue(nameof(PropertyGroupAliases), PropertyGroupAliases);
 
             base.GetObjectData(info, context);
         }

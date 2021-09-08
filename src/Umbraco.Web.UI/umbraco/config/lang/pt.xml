@@ -835,4 +835,8 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="userTypes">Tipos de usuários</key>
     <key alias="writer">Escrevente</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Selecionar tudo</key>
+    <key alias="deselectAllLogLevelFilters">Desmarcar todos</key>
+  </area>
 </language>

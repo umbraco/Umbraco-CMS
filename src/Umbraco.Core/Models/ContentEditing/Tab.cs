@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing
@@ -11,6 +12,12 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     {
         [DataMember(Name = "id")]
         public int Id { get; set; }
+
+        [DataMember(Name = "key")]
+        public Guid Key { get; set; }
+
+        [DataMember(Name = "type")]
+        public string Type { get; set; }
 
         [DataMember(Name = "active")]
         public bool IsActive { get; set; }

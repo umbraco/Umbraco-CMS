@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters
 
             _contentType.AddPropertyType(
                 new PropertyType(_shortStringHelper, "complexTest", ValueStorageType.Ntext) { Alias = "complex", Name = "Complex", Description = string.Empty, Mandatory = false, SortOrder = 1, DataTypeId = complexDataType.Id },
-                "Content");
+                "content", "Content");
 
             // make them all validate with a regex rule that will not pass
             foreach (IPropertyType prop in _contentType.PropertyTypes)

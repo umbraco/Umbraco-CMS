@@ -44,9 +44,9 @@
                                         </button>
 
                                         <button type="button" class="btn-reset td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
-                                           ng-click="vm.configureSection(null, currentLayout)"
-                                           ng-style="{width: vm.percentage(availableLayoutSpace) + '%'}">
-                                            <i class="icon icon-add" aria-hidden="true"></i>
+                                                ng-click="vm.configureSection(null, currentLayout)"
+                                                ng-style="{width: vm.percentage(availableLayoutSpace) + '%'}">
+                                            <umb-icon icon="icon-add" class="icon"></umb-icon>
                                             <span class="sr-only">
                                                 <localize key="grid_addGridLayout">Add grid layout</localize>
                                             </span>
@@ -61,21 +61,20 @@
                                 <umb-control-group label="@general_width">
                                     <div class="grid-size-scaler">
                                         <button type="button" class="btn-link" ng-click="vm.scaleDown(currentSection)">
-                                            <i class="icon icon-remove" aria-hidden="true"></i>
+                                            <umb-icon icon="icon-remove" class="icon"></umb-icon>
                                         </button>
                                         <span>{{currentSection.grid}}</span>
                                         <button type="button" class="btn-link" ng-click="vm.scaleUp(currentSection, availableLayoutSpace)">
-                                            <i class="icon icon-add" aria-hidden="true"></i>
+                                            <umb-icon icon="icon-add" class="icon"></umb-icon>
                                         </button>
                                     </div>
                                 </umb-control-group>
 
                                 <umb-control-group hide-label="true">
-                                    <i class="icon-delete red" aria-hidden="true"></i>
+                                    <umb-icon icon="icon-delete" class="red"></umb-icon>
                                     <button type="button" class="btn btn-small btn-link"
                                             ng-click="vm.deleteSection(currentSection, currentLayout)">
-                                        <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete
-                                        </localize>
+                                        <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
                                     </button>
                                 </umb-control-group>
 

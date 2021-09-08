@@ -374,29 +374,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                 structure.Add(new XElement("MediaType", allowedType.Alias));
             }
 
-            var genericProperties = new XElement("GenericProperties"); // actually, all of them
-            foreach (var propertyType in mediaType.PropertyTypes)
-            {
-                var definition = _dataTypeService.GetDataType(propertyType.DataTypeId);
+            var genericProperties = new XElement("GenericProperties", SerializePropertyTypes(mediaType.PropertyTypes, mediaType.PropertyGroups)); // actually, all of them
 
-                var propertyGroup = propertyType.PropertyGroupId == null // true generic property
-                    ? null
-                    : mediaType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
-
-                XElement genericProperty = SerializePropertyType(propertyType, definition, propertyGroup);
-                genericProperties.Add(genericProperty);
-            }
-
-            var tabs = new XElement("Tabs");
-            foreach (var propertyGroup in mediaType.PropertyGroups)
-            {
-                var tab = new XElement("Tab",
-                                       new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
-                                       new XElement("Caption", propertyGroup.Name),
-                                       new XElement("SortOrder", propertyGroup.SortOrder));
-
-                tabs.Add(tab);
-            }
+            var tabs = new XElement("Tabs", SerializePropertyGroups(mediaType.PropertyGroups)); // TODO Rename to PropertyGroups
 
             var xml = new XElement("MediaType",
                                    info,
@@ -500,30 +480,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                 structure.Add(new XElement("DocumentType", allowedType.Alias));
             }
 
-            var genericProperties = new XElement("GenericProperties"); // actually, all of them
-            foreach (var propertyType in contentType.PropertyTypes)
-            {
-                var definition = _dataTypeService.GetDataType(propertyType.DataTypeId);
+            var genericProperties = new XElement("GenericProperties", SerializePropertyTypes(contentType.PropertyTypes, contentType.PropertyGroups)); // actually, all of them
 
-                var propertyGroup = propertyType.PropertyGroupId == null // true generic property
-                    ? null
-                    : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
-
-                XElement genericProperty = SerializePropertyType(propertyType, definition, propertyGroup);
-                genericProperty.Add(new XElement("Variations", propertyType.Variations.ToString()));
-
-                genericProperties.Add(genericProperty);
-            }
-
-            var tabs = new XElement("Tabs");
-            foreach (var propertyGroup in contentType.PropertyGroups)
-            {
-                var tab = new XElement("Tab",
-                                       new XElement("Id", propertyGroup.Id.ToString(CultureInfo.InvariantCulture)),
-                                       new XElement("Caption", propertyGroup.Name),
-                                       new XElement("SortOrder", propertyGroup.SortOrder));
-                tabs.Add(tab);
-            }
+            var tabs = new XElement("Tabs", SerializePropertyGroups(contentType.PropertyGroups)); // TODO Rename to PropertyGroups
 
             var xml = new XElement("DocumentType",
                 info,
@@ -536,7 +495,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (contentType.Level != 1 && masterContentType == null)
             {
                 //get URL encoded folder names
-                IEnumerable<string> folders = _contentTypeService.GetContainers(contentType)
+                var folders = _contentTypeService.GetContainers(contentType)
                     .OrderBy(x => x.Level)
                     .Select(x => WebUtility.UrlEncode(x.Name));
 
@@ -544,11 +503,40 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
-            {
                 xml.Add(new XAttribute("Folders", folderNames));
-            }
 
             return xml;
+        }
+
+        private IEnumerable<XElement> SerializePropertyTypes(IEnumerable<IPropertyType> propertyTypes, IEnumerable<PropertyGroup> propertyGroups)
+        {
+            foreach (var propertyType in propertyTypes)
+            {
+                var definition = _dataTypeService.GetDataType(propertyType.DataTypeId);
+
+                var propertyGroup = propertyType.PropertyGroupId == null // true generic property
+                    ? null
+                    : propertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+
+                XElement genericProperty = SerializePropertyType(propertyType, definition, propertyGroup);
+                genericProperty.Add(new XElement("Variations", propertyType.Variations.ToString()));
+
+                yield return genericProperty;
+            }
+        }
+
+        private IEnumerable<XElement> SerializePropertyGroups(IEnumerable<PropertyGroup> propertyGroups)
+        {
+            foreach (var propertyGroup in propertyGroups)
+            {
+                yield return new XElement("Tab", // TODO Rename to PropertyGroup
+                    new XElement("Id", propertyGroup.Id),
+                    new XElement("Key", propertyGroup.Key),
+                    new XElement("Type", propertyGroup.Type.ToString()),
+                    new XElement("Caption", propertyGroup.Name), // TODO Rename to Name (same in PackageDataInstallation)
+                    new XElement("Alias", propertyGroup.Alias),
+                    new XElement("SortOrder", propertyGroup.SortOrder));
+            }
         }
 
         private XElement SerializePropertyType(IPropertyType propertyType, IDataType definition, PropertyGroup propertyGroup)
@@ -558,7 +546,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     new XElement("Key", propertyType.Key),
                     new XElement("Type", propertyType.PropertyEditorAlias),
                     new XElement("Definition", definition.Key),
-                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
+                    propertyGroup != null ? new XElement("Tab", propertyGroup.Name, new XAttribute("Alias", propertyGroup.Alias)) : null, // TODO Replace with PropertyGroupAlias
                     new XElement("SortOrder", propertyType.SortOrder),
                     new XElement("Mandatory", propertyType.Mandatory.ToString()),
                     new XElement("LabelOnTop", propertyType.LabelOnTop.ToString()),

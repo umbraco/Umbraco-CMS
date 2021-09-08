@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -17,7 +17,8 @@ namespace Umbraco.Cms.Core.Models
         private List<IContentTypeComposition> _contentTypeComposition = new List<IContentTypeComposition>();
         private List<int> _removedContentTypeKeyTracker = new List<int>();
 
-        protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
+        protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper, int parentId)
+            : base(shortStringHelper, parentId)
         { }
 
         protected ContentTypeCompositionBase(IShortStringHelper shortStringHelper,IContentTypeComposition parent)
@@ -61,19 +62,18 @@ namespace Umbraco.Cms.Core.Models
 
                 void AcquireProperty(IPropertyType propertyType)
                 {
-                    propertyType.Variations = propertyType.Variations & Variations;
+                    propertyType.Variations &= Variations;
                     propertyType.ResetDirtyProperties(false);
                 }
 
-                return ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups)
+                return PropertyGroups.Union(ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups)
                     .Select(group =>
                     {
                         group = (PropertyGroup) group.DeepClone();
                         foreach (var property in group.PropertyTypes)
                             AcquireProperty(property);
                         return group;
-                    })
-                    .Union(PropertyGroups);
+                    }));
             }
         }
 
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Core.Models
                 IPropertyType AcquireProperty(IPropertyType propertyType)
                 {
                     propertyType = (IPropertyType) propertyType.DeepClone();
-                    propertyType.Variations = propertyType.Variations & Variations;
+                    propertyType.Variations &= Variations;
                     propertyType.ResetDirtyProperties(false);
                     return propertyType;
                 }
@@ -133,8 +133,8 @@ namespace Umbraco.Cms.Core.Models
 
             if (ContentTypeCompositionExists(contentType.Alias) == false)
             {
-                //Before we actually go ahead and add the ContentType as a Composition we ensure that we don't
-                //end up with duplicate PropertyType aliases - in which case we throw an exception.
+                // Before we actually go ahead and add the ContentType as a Composition we ensure that we don't
+                // end up with duplicate PropertyType aliases - in which case we throw an exception.
                 var conflictingPropertyTypeAliases = CompositionPropertyTypes.SelectMany(
                     x => contentType.CompositionPropertyTypes
                         .Where(y => y.Alias.Equals(x.Alias, StringComparison.InvariantCultureIgnoreCase))
@@ -144,9 +144,12 @@ namespace Umbraco.Cms.Core.Models
                     throw new InvalidCompositionException(Alias, contentType.Alias, conflictingPropertyTypeAliases.ToArray());
 
                 _contentTypeComposition.Add(contentType);
+
                 OnPropertyChanged(nameof(ContentTypeComposition));
+
                 return true;
             }
+
             return false;
         }
 
@@ -160,19 +163,21 @@ namespace Umbraco.Cms.Core.Models
             if (ContentTypeCompositionExists(alias))
             {
                 var contentTypeComposition = ContentTypeComposition.FirstOrDefault(x => x.Alias == alias);
-                if (contentTypeComposition == null)//You can't remove a composition from another composition
+                if (contentTypeComposition == null) // You can't remove a composition from another composition
                     return false;
 
                 _removedContentTypeKeyTracker.Add(contentTypeComposition.Id);
 
-                //If the ContentType we are removing has Compositions of its own these needs to be removed as well
+                // If the ContentType we are removing has Compositions of its own these needs to be removed as well
                 var compositionIdsToRemove = contentTypeComposition.CompositionIds().ToList();
                 if (compositionIdsToRemove.Any())
                     _removedContentTypeKeyTracker.AddRange(compositionIdsToRemove);
 
                 OnPropertyChanged(nameof(ContentTypeComposition));
+
                 return _contentTypeComposition.Remove(contentTypeComposition);
             }
+
             return false;
         }
 
@@ -195,36 +200,30 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Checks whether a PropertyType with a given alias already exists
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
+        /// <param name="alias">Alias of the PropertyType</param>
         /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
-        public override bool PropertyTypeExists(string propertyTypeAlias)
-        {
-            return CompositionPropertyTypes.Any(x => x.Alias == propertyTypeAlias);
-        }
+        public override bool PropertyTypeExists(string alias) => CompositionPropertyTypes.Any(x => x.Alias == alias);
 
-        /// <summary>
-        /// Adds a PropertyGroup.
-        /// </summary>
-        /// <param name="groupName">Name of the PropertyGroup to add</param>
-        /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
-        public override bool AddPropertyGroup(string groupName)
-        {
-            return AddAndReturnPropertyGroup(groupName) != null;
-        }
+        /// <inheritdoc />
+        public override bool AddPropertyGroup(string alias, string name) => AddAndReturnPropertyGroup(alias, name) != null;
 
-        private PropertyGroup AddAndReturnPropertyGroup(string name)
+        private PropertyGroup AddAndReturnPropertyGroup(string alias, string name)
         {
-            // ensure we don't have it already
-            if (PropertyGroups.Any(x => x.Name == name))
+            // Ensure we don't have it already
+            if (PropertyGroups.Contains(alias))
                 return null;
 
-            // create the new group
-            var group = new PropertyGroup(SupportsPublishing) { Name = name, SortOrder = 0 };
+            // Add new group
+            var group = new PropertyGroup(SupportsPublishing)
+            {
+                Alias = alias,
+                Name = name
+            };
 
             // check if it is inherited - there might be more than 1 but we want the 1st, to
             // reuse its sort order - if there are more than 1 and they have different sort
             // orders... there isn't much we can do anyways
-            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Name == name);
+            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Alias == alias);
             if (inheritGroup == null)
             {
                 // no, just local, set sort order
@@ -244,24 +243,31 @@ namespace Umbraco.Cms.Core.Models
             return group;
         }
 
-        /// <summary>
-        /// Adds a PropertyType to a specific PropertyGroup
-        /// </summary>
-        /// <param name="propertyType"><see cref="IPropertyType"/> to add</param>
-        /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
-        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
-        public override bool AddPropertyType(IPropertyType propertyType, string propertyGroupName)
+        /// <inheritdoc />
+        public override bool AddPropertyType(IPropertyType propertyType, string propertyGroupAlias, string propertyGroupName = null)
         {
             // ensure no duplicate alias - over all composition properties
             if (PropertyTypeExists(propertyType.Alias))
                 return false;
 
             // get and ensure a group local to this content type
-            var group = PropertyGroups.Contains(propertyGroupName)
-                ? PropertyGroups[propertyGroupName]
-                : AddAndReturnPropertyGroup(propertyGroupName);
-            if (group == null)
+            PropertyGroup group;
+            var index = PropertyGroups.IndexOfKey(propertyGroupAlias);
+            if (index != -1)
+            {
+                group = PropertyGroups[index];
+            }
+            else if (!string.IsNullOrEmpty(propertyGroupName))
+            {
+                group = AddAndReturnPropertyGroup(propertyGroupAlias, propertyGroupName);
+                if (group == null)
+                    return false;
+            }
+            else
+            {
+                // No group name specified, so we can't create a new one and add the property type
                 return false;
+            }
 
             // add property to group
             propertyType.PropertyGroupId = new Lazy<int>(() => group.Id);
@@ -276,11 +282,9 @@ namespace Umbraco.Cms.Core.Models
         /// <returns>An enumerable list of string aliases</returns>
         /// <remarks>Does not contain the alias of the Current ContentType</remarks>
         public IEnumerable<string> CompositionAliases()
-        {
-            return ContentTypeComposition
+            => ContentTypeComposition
                 .Select(x => x.Alias)
                 .Union(ContentTypeComposition.SelectMany(x => x.CompositionAliases()));
-        }
 
         /// <summary>
         /// Gets a list of ContentType Ids from the current composition
@@ -288,11 +292,9 @@ namespace Umbraco.Cms.Core.Models
         /// <returns>An enumerable list of integer ids</returns>
         /// <remarks>Does not contain the Id of the Current ContentType</remarks>
         public IEnumerable<int> CompositionIds()
-        {
-            return ContentTypeComposition
+            => ContentTypeComposition
                 .Select(x => x.Id)
                 .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
-        }
 
         protected override void PerformDeepClone(object clone)
         {
@@ -300,7 +302,7 @@ namespace Umbraco.Cms.Core.Models
 
             var clonedEntity = (ContentTypeCompositionBase)clone;
 
-            //need to manually assign since this is an internal field and will not be automatically mapped
+            // need to manually assign since this is an internal field and will not be automatically mapped
             clonedEntity._removedContentTypeKeyTracker = new List<int>();
             clonedEntity._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
         }

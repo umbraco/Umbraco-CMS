@@ -2126,6 +2126,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Opgeslagen zoekopdracht verwijderen</key>
     <key alias="logLevels">Log Niveaus</key>
+    <key alias="selectAllLogLevelFilters">Selecteer alles</key>
+    <key alias="deselectAllLogLevelFilters">Deselecteer alles</key>
     <key alias="savedSearches">Opgeslagen Zoekopdrachten</key>
     <key alias="saveSearch">Zoekopdracht opslaan</key>
     <key alias="saveSearchDescription">Enter a friendly name for your search query</key>

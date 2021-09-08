@@ -137,6 +137,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public string ConnectionString { get; private set; }
 
         /// <inheritdoc />
+        public string ProviderName => _providerName;
+
+        /// <inheritdoc />
         public bool CanConnect =>
             // actually tries to connect to the database (regardless of configured/initialized)
             !ConnectionString.IsNullOrWhiteSpace() && !_providerName.IsNullOrWhiteSpace() &&

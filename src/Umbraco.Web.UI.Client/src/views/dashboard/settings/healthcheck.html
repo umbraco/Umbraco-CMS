@@ -34,7 +34,7 @@
                          ng-hide="group.loading || !group.totalSuccess && !group.totalWarning && !group.totalError && !group.totalInfo">
 
                         <div class="umb-healthcheck-message" ng-if="group.totalSuccess > 0">
-                            <i class="icon-check color-green" aria-hidden="true"></i>
+                            <umb-icon icon="icon-check" class="color-green"></umb-icon>
                             {{ group.totalSuccess }}
                             <span class="sr-only">
                                 <localize key="visuallyHiddenTexts_passed">passed</localize>
@@ -42,7 +42,7 @@
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalWarning > 0">
-                            <i class="icon-alert color-orange" aria-hidden="true"></i>
+                            <umb-icon icon="icon-alert" class="color-orange"></umb-icon>
                             {{ group.totalWarning }}
                             <span class="sr-only">
                                 <localize key="visuallyHiddenTexts_warning">warning</localize>
@@ -50,7 +50,7 @@
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalError > 0">
-                            <i class="icon-delete color-red" aria-hidden="true"></i>
+                            <umb-icon icon="icon-delete" class="color-red"></umb-icon>
                             {{ group.totalError }}
                             <span class="sr-only">
                                 <localize key="visuallyHiddenTexts_failed">failed</localize>
@@ -58,7 +58,7 @@
                         </div>
 
                         <div class="umb-healthcheck-message" ng-if="group.totalInfo > 0">
-                            <i class="umb-healthcheck-status-icon icon-info" aria-hidden="true"></i>
+                            <umb-icon icon="icon-info" class="umb-healthcheck-status-icon"></umb-icon>
                             {{ group.totalInfo }}
                             <span class="sr-only">
                                 <localize key="visuallyHiddenTexts_suggestion">suggestion</localize>
@@ -103,24 +103,24 @@
 
                         <div class="umb-panel-group__details-status" ng-repeat="status in check.status">
                             <div class="umb-panel-group__details-status-icon-container" aria-hidden="true">
-                                <i class="umb-healthcheck-status-icon icon-check color-green" ng-if="status.resultType === 0 || status.resultType === 'Success' "></i>
-                                <i class="umb-healthcheck-status-icon icon-alert icon-alert color-yellow" ng-if="status.resultType === 1 || status.resultType === 'Warning' "></i>
-                                <i class="umb-healthcheck-status-icon icon-delete icon-delete color-red" ng-if="status.resultType === 2 || status.resultType === 'Error' "></i>
-                                <i class="umb-healthcheck-status-icon icon-info icon-info" ng-if="status.resultType === 3 || status.resultType === 'Info' "></i>
+                                <umb-icon icon="icon-check" class="umb-healthcheck-status-icon color-green" ng-if="status.resultType === 'Success'"></umb-icon>
+                                <umb-icon icon="icon-alert" class="umb-healthcheck-status-icon color-yellow" ng-if="status.resultType === 'Warning'"></umb-icon>
+                                <umb-icon icon="icon-delete" class="umb-healthcheck-status-icon color-red" ng-if="status.resultType === 'Error'"></umb-icon>
+                                <umb-icon icon="icon-info" class="umb-healthcheck-status-icon" ng-if="status.resultType === 'Info'"></umb-icon>
                             </div>
 
                             <div class="umb-panel-group__details-status-content">
                                 <div class="umb-panel-group__details-status-text">
-                                    <span class="sr-only" ng-if="status.resultType === 0">
+                                    <span class="sr-only" ng-if="status.resultType === 'Success'">
                                         <localize key="visuallyHiddenTexts_checkPassed">Check passed</localize>:
                                     </span>
-                                    <span class="sr-only" ng-if="status.resultType === 1">
+                                    <span class="sr-only" ng-if="status.resultType === 'Warning'">
                                         <localize key="visuallyHiddenTexts_warning">warning</localize>:
                                     </span>
-                                    <span class="sr-only" ng-if="status.resultType === 2">
+                                    <span class="sr-only" ng-if="status.resultType === 'Error'">
                                         <localize key="visuallyHiddenTexts_checkFailed">Check failed</localize>:
                                     </span>
-                                    <span class="sr-only" ng-if="status.resultType === 3">
+                                    <span class="sr-only" ng-if="status.resultType === 'Info'">
                                         <localize key="visuallyHiddenTexts_suggestion">suggestion</localize>:
                                     </span>
                                     <div ng-bind-html="status.message"></div>

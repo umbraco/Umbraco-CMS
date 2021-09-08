@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NPoco;
@@ -255,12 +255,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (contentType is IMemberType memberType)
                 {
                     // ensure that the group exists (ok if it already exists)
-                    memberType.AddPropertyGroup(Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
+                    memberType.AddPropertyGroup(Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupAlias, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
 
                     // ensure that property types exist (ok if they already exist)
                     foreach (var (alias, propertyType) in builtinProperties)
                     {
-                        var added = memberType.AddPropertyType(propertyType, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
+                        var added = memberType.AddPropertyType(propertyType, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupAlias, Cms.Core.Constants.Conventions.Member.StandardPropertiesGroupName);
 
                         if (added)
                         {
@@ -278,9 +278,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return new PropertyGroup(new PropertyTypeCollection(isPublishing))
             {
                 Id = dto.Id,
+                Key = dto.UniqueId,
+                Type = (PropertyGroupType)dto.Type,
                 Name = dto.Text,
-                SortOrder = dto.SortOrder,
-                Key = dto.UniqueId
+                Alias = dto.Alias,
+                SortOrder = dto.SortOrder
             };
         }
 

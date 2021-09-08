@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -227,8 +227,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _dashboardService.GetDashboards(section, currentUser).Select(x => new Tab<IDashboardSlim>
             {
                 Id = x.Id,
-                Alias = x.Alias,
+                Key = x.Key,
                 Label = x.Label,
+                Alias = x.Alias,
+                Type = x.Type,
                 Expanded = x.Expanded,
                 IsActive = x.IsActive,
                 Properties = x.Properties.Select(y => new DashboardSlim
