@@ -63,10 +63,4 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [DataMember(Name = "properties")]
         public IEnumerable<TPropertyType> Properties { get; set; }
     }
-
-    internal static class PropertyGroupBasicExtensions
-    {
-        public static string GetParentAlias(this PropertyGroupBasic propertyGroup)
-            => PropertyGroupExtensions.GetParentAlias(propertyGroup.Alias);
-    }
 }
