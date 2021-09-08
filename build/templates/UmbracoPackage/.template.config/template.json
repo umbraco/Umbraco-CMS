@@ -30,13 +30,53 @@
         },
         "namespaceReplacer": {
             "type": "generated",
-            "generator": "coalesce",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "UmbracoPackage",
             "parameters": {
-                "sourceVariableName": "name",
-                "defaultValue": "UmbracoPackage",
-                "fallbackVariableName": "name"
-            },
-            "replaces":"UmbracoPackage"
+                "source": "name",
+                "steps": [
+                    {
+                        "regex": "\\s",
+                        "replacement": "_"
+                    },
+                    {
+                        "regex": "-",
+                        "replacement": "_"
+                    },
+                    {
+                        "regex": "^[^a-zA-Z_]+",
+                        "replacement": "_"
+                    }
+                ]
+            }
+        },
+        "msbuildReplacer": {
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "UmbracoPackageMsBuild",
+            "parameters": {
+                "source": "name",
+                "steps": [
+                    {
+                        "regex": "\\s",
+                        "replacement": ""
+                    },
+                    {
+                        "regex": "\\.",
+                        "replacement": ""
+                    },
+                    {
+                        "regex": "-",
+                        "replacement": ""
+                    },
+                    {
+                        "regex": "^[^a-zA-Z_]+",
+                        "replacement": ""
+                    }
+                ]
+            }
         },
         "Framework": {
             "type": "parameter",

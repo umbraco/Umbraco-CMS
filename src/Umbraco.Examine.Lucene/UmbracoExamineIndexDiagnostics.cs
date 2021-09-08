@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             UmbracoExamineIndex index,
             ILogger<UmbracoExamineIndexDiagnostics> logger,
             IHostingEnvironment hostingEnvironment,
-            IOptionsSnapshot<LuceneDirectoryIndexOptions> indexOptions)
+            IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions)
             : base(index, logger, hostingEnvironment, indexOptions)
         {
             _index = index;
