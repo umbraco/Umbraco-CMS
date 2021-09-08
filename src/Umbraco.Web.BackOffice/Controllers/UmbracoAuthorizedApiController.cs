@@ -25,7 +25,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     /// </remarks>
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [JsonExceptionFilter]
-    [AngularJsonOnlyConfiguration]
     [IsBackOffice]
     [UmbracoUserTimeoutFilter]
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
