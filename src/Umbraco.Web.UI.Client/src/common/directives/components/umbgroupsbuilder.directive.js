@@ -143,6 +143,9 @@
                             const dropIndex = groupsInTab.findIndex(group => group.key === groupKey);
 
                             updateSortOrder(groupsInTab, dropIndex);
+
+                            // when a group is dropped we need to reset the requested tab hover alias
+                            scope.sortableRequestedTabAlias = undefined;
                         }
                     }
                 };
@@ -192,7 +195,9 @@
                             const newAlias = contentTypeHelper.updateParentAlias(group.alias || null, hoveredTabAlias);
                             // Check alias is unique
                             if (group.alias !== newAlias && contentTypeHelper.isAliasUnique(scope.model.groups, newAlias) === false) {
-                                // TODO: Missing UI indication of why you cant move here.
+                                localizationService.localize("contentTypeEditor_groupReorderSameAliasError",  [group.name, newAlias]).then((value) => {
+                                    notificationsService.error(value);
+                                });
                                 return;
                             }
                         }
