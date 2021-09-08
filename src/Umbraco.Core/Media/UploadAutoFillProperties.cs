@@ -75,12 +75,7 @@ namespace Umbraco.Cms.Core.Media
                     {
                         using (var filestream = _mediaFileManager.FileSystem.OpenFile(filepath))
                         {
-                            var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart(Constants.CharArrays.Period);
-                            var size = _imageUrlGenerator.IsSupportedImageFormat(extension)
-                                ? _imageDimensionExtractor.GetDimensions(filestream) ?? (Size?)new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize)
-                                : null;
-
-                            SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
+                            SetProperties(content, autoFillConfig, filepath, filestream, culture, segment);
                         }
                     }
                     catch (Exception ex)
@@ -113,13 +108,19 @@ namespace Umbraco.Cms.Core.Media
             }
             else
             {
-                var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart(Constants.CharArrays.Period);
-                var size = _imageUrlGenerator.IsSupportedImageFormat(extension)
-                    ? _imageDimensionExtractor.GetDimensions(filestream) ?? (Size?)new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize)
-                    : null;
-
-                SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
+                SetProperties(content, autoFillConfig, filepath, filestream, culture, segment);
             }
+        }
+
+        private void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, string culture, string segment)
+        {
+            var extension = (Path.GetExtension(filepath) ?? string.Empty).TrimStart(Constants.CharArrays.Period);
+
+            var size = _imageUrlGenerator.IsSupportedImageFormat(extension)
+                ? _imageDimensionExtractor.GetDimensions(filestream) ?? (Size?)new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize)
+                : null;
+
+            SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
         }
 
         private static void SetProperties(IContentBase content, ImagingAutoFillUploadField autoFillConfig, Size? size, long length, string extension, string culture, string segment)
