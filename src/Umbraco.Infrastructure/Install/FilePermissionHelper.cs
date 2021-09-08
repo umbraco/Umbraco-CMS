@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             _packagesPermissionsDirs = new[]
             {
                 hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Bin),
-                hostingEnvironment.MapPathContentRoot(_globalSettings.UmbracoPath),
+                hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Umbraco),
                 hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoPath),
                 hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages)
             };
