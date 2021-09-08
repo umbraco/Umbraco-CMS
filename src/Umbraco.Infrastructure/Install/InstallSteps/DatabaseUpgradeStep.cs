@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 }
             }
 
-            return Task.FromResult<InstallSetupResult>(null);
+            return Task.FromResult((InstallSetupResult)null);
         }
 
         public override bool RequiresExecution(object model)

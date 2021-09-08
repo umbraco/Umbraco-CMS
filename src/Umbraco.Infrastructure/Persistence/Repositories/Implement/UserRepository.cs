@@ -444,17 +444,6 @@ ORDER BY colName";
 
         protected override void PersistNewItem(IUser entity)
         {
-            // the use may have no identity, ie ID is zero, and be v7 super
-            // user - then it has been marked - and we must not persist it
-            // as new, as we do not want to create a new user - instead, persist
-            // it as updated
-            // see also: UserFactory.BuildEntity
-            if (entity.FromUserCache<string>("IS_V7_ZERO") != null)
-            {
-                PersistUpdatedItem(entity);
-                return;
-            }
-
             entity.AddingEntity();
 
             // ensure security stamp if missing

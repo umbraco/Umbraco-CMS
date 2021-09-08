@@ -40,10 +40,10 @@ namespace Umbraco.Cms.Core.Logging
             => TraceDuration<T>(startMessage, "Completed.", startMessageArgs: startMessageArgs);
 
         public DisposableTimer TraceDuration<T>(string startMessage, string completeMessage, string failMessage = null, object[] startMessageArgs = null, object[] endMessageArgs = null, object[] failMessageArgs = null)
-            => new DisposableTimer(Logger, LogLevel.Information, Profiler, typeof(T), startMessage, completeMessage, failMessage);
+            => new DisposableTimer(Logger, LogLevel.Information, Profiler, typeof(T), startMessage, completeMessage, failMessage, startMessageArgs, endMessageArgs, failMessageArgs);
 
         public DisposableTimer TraceDuration(Type loggerType, string startMessage, string completeMessage, string failMessage = null, object[] startMessageArgs = null, object[] endMessageArgs = null, object[] failMessageArgs = null)
-            => new DisposableTimer(Logger, LogLevel.Information, Profiler, loggerType, startMessage, completeMessage, failMessage);
+            => new DisposableTimer(Logger, LogLevel.Information, Profiler, loggerType, startMessage, completeMessage, failMessage, startMessageArgs, endMessageArgs, failMessageArgs);
 
         public DisposableTimer DebugDuration<T>(string startMessage, object[] startMessageArgs = null)
             => Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug)

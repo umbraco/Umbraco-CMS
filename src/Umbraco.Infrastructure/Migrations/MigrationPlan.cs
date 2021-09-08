@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 using Type = System.Type;
 
@@ -217,6 +215,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations
         public virtual MigrationPlan AddPostMigration<TMigration>()
             where TMigration : MigrationBase
         {
+            // TODO: Post migrations are obsolete/irrelevant. Notifications should be used instead.
+            // The only place we use this is to clear cookies in the installer which could be done
+            // via notification. Then we can clean up all the code related to post migrations which is
+            // not insignificant.
+
             _postMigrationTypes.Add(typeof(TMigration));
             return this;
         }

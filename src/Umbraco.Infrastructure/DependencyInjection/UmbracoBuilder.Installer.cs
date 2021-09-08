@@ -29,6 +29,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddTransient<InstallStepCollection>();
             builder.Services.AddUnique<InstallHelper>();
 
+            builder.Services.AddTransient<PackageMigrationRunner>();
+
             return builder;
         }
     }
