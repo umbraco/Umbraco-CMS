@@ -7,6 +7,15 @@ namespace Umbraco.Cms.Infrastructure.Media
 {
     internal class ImageSharpDimensionExtractor : IImageDimensionExtractor
     {
+        private readonly Configuration _configuration;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageSharpDimensionExtractor" /> class.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        public ImageSharpDimensionExtractor(Configuration configuration)
+            => _configuration = configuration;
+
         /// <summary>
         /// Gets the dimensions of an image.
         /// </summary>
@@ -16,14 +25,9 @@ namespace Umbraco.Cms.Infrastructure.Media
         /// </returns>
         public Size? GetDimensions(Stream stream)
         {
-            if (stream.CanRead && stream.CanSeek)
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-            }
-
             Size? size = null;
 
-            IImageInfo imageInfo = Image.Identify(stream);
+            IImageInfo imageInfo = Image.Identify(_configuration, stream);
             if (imageInfo != null)
             {
                 size = new Size(imageInfo.Width, imageInfo.Height);
