@@ -6,7 +6,7 @@ using Umbraco.TestData.Extensions;
 
 namespace Umbraco.TestData
 {
-    public class LoadTestComposer : IUserComposer
+    public class LoadTestComposer : IComposer
     {
         public void Compose(IUmbracoBuilder builder) => builder.AddUmbracoTestData();
     }

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -17,6 +18,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificationHandler
     {
         private readonly BlockListEditorDataConverter _converter = new BlockListEditorDataConverter();
+        private readonly ILogger _logger;
+
+        public BlockEditorPropertyHandler(ILogger<BlockEditorPropertyHandler> logger)
+        {
+            _logger = logger;
+        }
 
         protected override string EditorAlias => Constants.PropertyEditors.Aliases.BlockList;
 
@@ -110,8 +117,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             // this gets a little ugly because there could be some other complex editor that contains another block editor
                             // and since we would have no idea how to parse that, all we can do is try JSON Path to find another block editor
                             // of our type
-                            var json = JToken.Parse(asString);
-                            if (ProcessJToken(json, createGuid, out var result))
+                            JToken json = null;
+                            try
+                            {
+                                json = JToken.Parse(asString);
+                            }
+                            catch (Exception e)
+                            {
+                                // See issue https://github.com/umbraco/Umbraco-CMS/issues/10879
+                                // We are detecting JSON data by seeing if a string is surrounded by [] or {}
+                                // If people enter text like [PLACEHOLDER] JToken  parsing fails, it's safe to ignore though
+                                // Logging this just in case in the future we find values that are not safe to ignore
+                                _logger.LogWarning(                                    "The property {PropertyAlias} on content type {ContentTypeKey} has a value of: {BlockItemValue} - this was recognized as JSON but could not be parsed",
+                                    data.Key, propertyAliasToBlockItemData.Key, asString);
+                            }
+
+                            if (json != null && ProcessJToken(json, createGuid, out var result))
                             {
                                 // need to re-save this back to the RawPropertyValues
                                 data.RawPropertyValues[propertyAliasToBlockItemData.Key] = result;
