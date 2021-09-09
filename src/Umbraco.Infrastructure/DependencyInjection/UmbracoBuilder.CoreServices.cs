@@ -219,7 +219,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
-                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>();
+                var connectionStrings = factory.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
