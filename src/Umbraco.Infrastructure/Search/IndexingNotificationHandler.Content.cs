@@ -44,13 +44,21 @@ namespace Umbraco.Cms.Infrastructure.Search
                 throw new NotSupportedException();
             }
 
+            // Used to track permanent deletions so we can bulk delete from the index
+            // when needed. For example, when emptying the recycle bin, else it will
+            // individually update the index which will be much slower.
+            HashSet<int> deleteBatch = null;
+
             foreach (var payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
             {
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
                 {
-                    // delete content entirely (with descendants)
-                    //  false: remove entirely from all indexes
-                    _umbracoIndexingHandler.DeleteIndexForEntity(payload.Id, false);
+                    if (deleteBatch == null)
+                    {
+                        deleteBatch = new HashSet<int>();
+                    }
+
+                    deleteBatch.Add(payload.Id);
                 }
                 else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
@@ -62,6 +70,15 @@ namespace Umbraco.Cms.Infrastructure.Search
                 }
                 else // RefreshNode or RefreshBranch (maybe trashed)
                 {
+                    if (deleteBatch != null && deleteBatch.Contains(payload.Id))
+                    {
+                        // the same node has already been deleted, to ensure ordering is
+                        // handled, we'll need to execute all queued deleted items now
+                        // and reset the deleted items list.
+                        _umbracoIndexingHandler.DeleteIndexForEntities(deleteBatch, false);
+                        deleteBatch = null;
+                    }
+
                     // don't try to be too clever - refresh entirely
                     // there has to be race conditions in there ;-(
 
@@ -131,6 +148,12 @@ namespace Umbraco.Cms.Infrastructure.Search
                 //  XML from database instead of reloading content & re-serializing!
                 //
                 // BUT ... pretty sure it is! see test "Index_Delete_Index_Item_Ensure_Heirarchy_Removed"
+            }
+
+            if (deleteBatch != null)
+            {
+                // process the delete batch
+                _umbracoIndexingHandler.DeleteIndexForEntities(deleteBatch, false);
             }
         }
     }
