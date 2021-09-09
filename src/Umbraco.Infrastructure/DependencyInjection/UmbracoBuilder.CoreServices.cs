@@ -189,7 +189,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             // Add default ImageSharp configuration and service implementations
             builder.Services.AddSingleton(SixLabors.ImageSharp.Configuration.Default);
-            builder.Services.AddSingleton<IImageDimensionExtractor, ImageDimensionExtractor>();
+            builder.Services.AddSingleton<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
             builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
             builder.Services.AddSingleton<PackageDataInstallation>();
