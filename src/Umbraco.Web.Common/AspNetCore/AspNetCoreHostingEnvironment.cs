@@ -39,6 +39,11 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
 
             SiteName = webHostEnvironment.ApplicationName;
             ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
+
+            if (_webRoutingSettings.CurrentValue.UmbracoApplicationUrl is not null)
+            {
+                ApplicationMainUrl = new Uri(_webRoutingSettings.CurrentValue.UmbracoApplicationUrl);
+            }
         }
 
         /// <inheritdoc/>
@@ -58,7 +63,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
                 if (_applicationId != null)
                 {
                     return _applicationId;
-                } 
+                }
 
                 var appId = _serviceProvider.GetApplicationUniqueIdentifier();
                 if (appId == null)
@@ -173,13 +178,13 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             // (this is a simplified version of what was in 7.x)
             // note: should this be optional? is it expensive?
 
-            
+
             if (currentApplicationUrl is null)
             {
                 return;
             }
 
-            if (!(_webRoutingSettings.CurrentValue.UmbracoApplicationUrl is null))
+            if (_webRoutingSettings.CurrentValue.UmbracoApplicationUrl is not null)
             {
                 return;
             }
