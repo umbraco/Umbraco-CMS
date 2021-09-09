@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             foreach (string filename in fileNames)
             {
-                if (IsValidFileExtension(filename, _contentSettings) == false)
+                if (IsValidFileExtension(filename, _contentSettings) is false || IsAllowedInDataTypeConfiguration(filename, dataTypeConfiguration) is false)
                 {
                     //we only store a single value for this editor so the 'member' or 'field'
                     // we'll associate this error with will simply be called 'value'
@@ -57,9 +57,36 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         internal static bool IsValidFileExtension(string fileName, ContentSettings contentSettings)
         {
-            if (fileName.IndexOf('.') <= 0) return false;
-            var extension = fileName.GetFileExtension().TrimStart(".");
+            if (TryGetFileExtension(fileName, out var extension) is false)
+                return false;
+
             return contentSettings.IsFileAllowedForUpload(extension);
+        }
+
+        internal static bool IsAllowedInDataTypeConfiguration(string filename, object dataTypeConfiguration)
+        {
+            if (TryGetFileExtension(filename, out var extension) is false)
+                return false;
+
+            if (dataTypeConfiguration is FileUploadConfiguration fileUploadConfiguration)
+            {
+                // If FileExtensions is empty and no allowed extensions have been specified, we allow everything.
+                // If there are any extensions specified, we need to check that the uploaded extension is one of them.
+                return fileUploadConfiguration.FileExtensions.IsCollectionEmpty() ||
+                       fileUploadConfiguration.FileExtensions.Any(x => x.Value.InvariantEquals(extension));
+            }
+
+            return false;
+        }
+
+        internal static bool TryGetFileExtension(string fileName, out string extension)
+        {
+            extension = null;
+            if (fileName.IndexOf('.') <= 0)
+                return false;
+
+            extension = fileName.GetFileExtension().TrimStart(".");
+            return true;
         }
     }
 }

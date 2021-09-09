@@ -9,6 +9,7 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -71,6 +72,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IDocumentRepository DocumentRepository => GetRequiredService<IDocumentRepository>();
 
         private IJsonSerializer Serializer => GetRequiredService<IJsonSerializer>();
+
+        private IValueEditorCache ValueEditorCache => GetRequiredService<IValueEditorCache>();
 
         [SetUp]
         public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
@@ -1162,7 +1165,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.IsFalse(content.HasIdentity);
 
             // content cannot publish values because they are invalid
-            var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, TextService);
+            var propertyValidationService = new PropertyValidationService(PropertyEditorCollection, DataTypeService, TextService, ValueEditorCache);
             bool isValid = propertyValidationService.IsPropertyDataValid(content, out IProperty[] invalidProperties, CultureImpact.Invariant);
             Assert.IsFalse(isValid);
             Assert.IsNotEmpty(invalidProperties);
@@ -2565,7 +2568,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext) { Alias = "title", Name = "Title", Mandatory = false, DataTypeId = -88 },
             };
 
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "content"
+            });
 
             contentType.SetDefaultTemplate(new Template(ShortStringHelper, "Textpage", "textpage"));
             FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!

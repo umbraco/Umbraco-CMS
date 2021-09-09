@@ -845,4 +845,8 @@
     <key alias="userTypes">사용자 타입</key>
     <key alias="writer">작성자</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">모두 선택</key>
+    <key alias="deselectAllLogLevelFilters">모두 선택 해제</key>
+  </area>
 </language>

@@ -26,7 +26,7 @@
                 <localize key="general_choose">Choose a root node</localize>
             </button>
             <div class="mt2" ng-show="model.value.type == 'content'">
-                <i class="icon icon-search" aria-hidden="true"></i>
+                <umb-icon icon="icon-search" class="icon"></umb-icon>
                 <button type="button" class="btn-link" ng-click="showSearch = true">Query for root node with xpath</button>
             </div>
         </div>
@@ -40,7 +40,7 @@
 
             <ul class="unstyled list-icons mt3">
                 <li style="max-width: 600px">
-                    <i class="icon icon-help-alt" aria-hidden="true"></i>
+                    <umb-icon icon="icon-help-alt" class="icon"></umb-icon>
                     <button type="button" class="btn-link" ng-click="showHelp = !showHelp">{{showHelp ? 'Hide' : 'Show'}} xpath query help</button>
 
                     <div class="small" ng-show="showHelp">
@@ -66,7 +66,7 @@
                     </div>
                 </li>
                 <li>
-                    <i class="icon icon-delete red" aria-hidden="true"></i>
+                    <umb-icon icon="icon-delete" class="icon red"></umb-icon>
                     <button type="button" class="btn-link" ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</button>
                 </li>
             </ul>

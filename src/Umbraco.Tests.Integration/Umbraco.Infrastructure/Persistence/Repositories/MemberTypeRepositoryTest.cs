@@ -320,7 +320,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual(3, memberType.PropertyTypes.Count());
 
                 // add one stub property, others are still missing
-                memberType.AddPropertyType(stubs.First().Value, Constants.Conventions.Member.StandardPropertiesGroupName);
+                memberType.AddPropertyType(stubs.First().Value, Constants.Conventions.Member.StandardPropertiesGroupAlias, Constants.Conventions.Member.StandardPropertiesGroupName);
 
                 // saving *new* member type adds the (missing) stub properties
                 repository.Save(memberType);

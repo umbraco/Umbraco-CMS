@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -603,7 +604,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             return new PropertyValidationService(
                 propertyEditorCollection,
                 dataTypeService,
-                localizedTextService);
+                localizedTextService,
+                new ValueEditorCache());
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
@@ -22,7 +23,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             => _loginProviderOptions = loginProviderOptions ?? (x => { });
 
         public string SchemeForBackOffice(string scheme)
-            => Constants.Security.BackOfficeExternalAuthenticationTypePrefix + scheme;
+            =>  scheme?.EnsureStartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix);
 
         /// <summary>
         /// Overridden to track the final authenticationScheme being registered for the external login

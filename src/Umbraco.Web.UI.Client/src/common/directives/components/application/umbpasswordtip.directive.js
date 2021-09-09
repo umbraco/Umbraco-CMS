@@ -7,7 +7,7 @@
             controller: UmbPasswordTipController,
             controllerAs: 'vm',
             template:
-                '<span class="help-inline" style="display: block;" ng-if="vm.passwordTip" ng-bind-html="vm.passwordTip">{{vm.passwordTip}}</span>',
+                '<span class="help-inline" style="display: block;" ng-if="vm.passwordTip" ng-bind-html="vm.passwordTip"></span>',
             bindings: {
                 passwordVal: "<",
                 minPwdLength: "<",
@@ -21,6 +21,11 @@
         let defaultMinPwdNonAlphaNum = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordNonAlphaNum;
 
         var vm = this;
+
+        vm.passwordNonAlphaTip = '';
+        vm.passwordTip = '';
+        vm.passwordLength = 0;
+
         vm.$onInit = onInit;
         vm.$onChanges = onChanges;
 
@@ -36,26 +41,27 @@
             if (vm.minPwdNonAlphaNum > 0) {
                 localizationService.localize('user_newPasswordFormatNonAlphaTip', [vm.minPwdNonAlphaNum]).then(data => {
                     vm.passwordNonAlphaTip = data;
-                    updatePasswordTip(0);
+                    updatePasswordTip(vm.passwordLength);
                 });
             } else {
                 vm.passwordNonAlphaTip = '';
-                updatePasswordTip(0);
+                updatePasswordTip(vm.passwordLength);
             }
         }
 
         function onChanges(simpleChanges) {
+
             if (simpleChanges.passwordVal) {
-                if (simpleChanges.passwordVal.currentValue) {
-                    updatePasswordTip(simpleChanges.passwordVal.currentValue.length);
-                } else {
-                    updatePasswordTip(0);
-                }
+                vm.passwordLength = simpleChanges.passwordVal.currentValue ? simpleChanges.passwordVal.currentValue.length : 0;
+
+                updatePasswordTip(vm.passwordLength);
             }
         }
 
         const updatePasswordTip = passwordLength => {
+
             const remainingLength = vm.minPwdLength - passwordLength;
+            
             if (remainingLength > 0) {
                 localizationService.localize('user_newPasswordFormatLengthTip', [remainingLength]).then(data => {
                     vm.passwordTip = data;

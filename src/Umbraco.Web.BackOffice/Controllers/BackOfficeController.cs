@@ -118,7 +118,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // force authentication to occur since this is not an authorized endpoint
             var result = await this.AuthenticateBackOfficeAsync();
 
-            var viewPath = Path.Combine(_globalSettings.UmbracoPath , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
+            var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
 
             return await RenderDefaultOrProcessExternalLoginAsync(
@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // force authentication to occur since this is not an authorized endpoint
             var result = await this.AuthenticateBackOfficeAsync();
 
-            var viewPath = Path.Combine(_globalSettings.UmbracoPath, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
+            var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
 
             return await RenderDefaultOrProcessExternalLoginAsync(
                 result,
@@ -281,6 +281,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+        [AngularJsonOnlyConfiguration]
         [HttpGet]
         public IEnumerable<IGridEditorConfig> GetGridConfig()
         {

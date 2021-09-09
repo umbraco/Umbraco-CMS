@@ -10,5 +10,9 @@
 
         [ConfigurationField("defaultValue", "Default value", "textarea", Description = "If value is blank, the editor will show this")]
         public string DefaultValue { get; set; }
+
+
+        [ConfigurationField("overlayWidthSize", "Overlay Width Size", "views/propertyeditors/multiurlpicker/multiurlpicker.prevalues.html")]
+        public string OverlayWidthSize { get; set; }
     }
 }

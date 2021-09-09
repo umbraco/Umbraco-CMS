@@ -30,18 +30,19 @@ namespace Umbraco.Cms.Infrastructure.Mail
             ILogger<EmailSender> logger,
             IOptions<GlobalSettings> globalSettings,
             IEventAggregator eventAggregator)
-            : this(logger, globalSettings, eventAggregator, null) { }
+            : this(logger, globalSettings, eventAggregator, null, null) { }
 
         public EmailSender(
             ILogger<EmailSender> logger,
             IOptions<GlobalSettings> globalSettings,
             IEventAggregator eventAggregator,
-            INotificationHandler<SendEmailNotification> handler)
+            INotificationHandler<SendEmailNotification> handler1,
+            INotificationAsyncHandler<SendEmailNotification> handler2)
         {
             _logger = logger;
             _eventAggregator = eventAggregator;
             _globalSettings = globalSettings.Value;
-            _notificationHandlerRegistered = handler is not null;
+            _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
         }
 
         /// <summary>
@@ -49,16 +50,16 @@ namespace Umbraco.Cms.Infrastructure.Mail
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        public async Task SendAsync(EmailMessage message) => await SendAsyncInternal(message, false);
+        public async Task SendAsync(EmailMessage message, string emailType) => await SendAsyncInternal(message, emailType, false);
 
-        public async Task SendAsync(EmailMessage message, bool enableNotification) =>
-            await SendAsyncInternal(message, enableNotification);
+        public async Task SendAsync(EmailMessage message, string emailType, bool enableNotification) =>
+            await SendAsyncInternal(message, emailType, enableNotification);
 
-        private async Task SendAsyncInternal(EmailMessage message, bool enableNotification)
+        private async Task SendAsyncInternal(EmailMessage message, string emailType, bool enableNotification)
         {
             if (enableNotification)
             {
-                var notification = new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From));
+                var notification = new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From), emailType);
                 await _eventAggregator.PublishAsync(notification);
 
                 // if a handler handled sending the email then don't continue.

@@ -1242,4 +1242,8 @@
     <key alias="enabledConfirm">现在已启用 URL 跟踪程序。</key>
     <key alias="enableError">启用 URL 跟踪程序时出错, 可以在日志文件中找到更多信息。</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">全选</key>
+    <key alias="deselectAllLogLevelFilters">取消全选</key>
+  </area>
 </language>

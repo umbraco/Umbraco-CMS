@@ -37,13 +37,13 @@
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <button type="button" ng-click="vm.searchLogQuery()" title="View all Logs" class="btn btn-link">All Logs <i class="icon-search" aria-hidden="true"></i></button>
+                                                <button type="button" ng-click="vm.searchLogQuery()" title="View all Logs" class="btn btn-link">All Logs <umb-icon icon="icon-search"></umb-icon></button>
                                             </td>
                                         </tr>
                                         <!-- Fetch saved searches  -->
                                         <tr ng-repeat="search in vm.searches">
                                             <td>
-                                                <button type="button" ng-click="vm.searchLogQuery(search.query)" title="{{search.name}}" class="btn btn-link">{{search.name}} <i class="icon-search" aria-hidden="true"></i></button>
+                                                <button type="button" ng-click="vm.searchLogQuery(search.query)" title="{{search.name}}" class="btn btn-link">{{search.name}} <umb-icon icon="icon-search"></umb-icon></button>
                                             </td>
                                         </tr>
                                     </tbody>

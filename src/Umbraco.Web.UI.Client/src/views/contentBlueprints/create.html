@@ -14,12 +14,10 @@
             <ul class="umb-actions umb-actions-child">
                 <li class="umb-action" ng-repeat="documentType in vm.documentTypes |orderBy:'name':false">
                     <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.createBlueprint(documentType)">
-                        <i class="large icon {{documentType.icon}}" aria-hidden="true"></i>
+                        <umb-icon icon="{{documentType.icon}}" class="icon large"></umb-icon>
                         <span class="menu-label">
                             {{documentType.name}}
-                            <small>
-                                {{documentType.description}}
-                            </small>
+                            <small>{{documentType.description}}</small>
                         </span>
                     </button>
                 </li>

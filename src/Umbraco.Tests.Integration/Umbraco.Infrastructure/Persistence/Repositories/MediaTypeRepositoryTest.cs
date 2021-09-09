@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 containerRepository.Save(container);
 
                 MediaType contentType =
-                    MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
+                    MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
 
@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 containerRepository.Save(container);
 
                 IMediaType contentType =
-                    MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
+                    MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupAlias: "testGroup", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
 
@@ -199,7 +199,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IMediaType mediaType = repository.Get(videoMediaType.Id);
 
                 mediaType.Thumbnail = "Doc2.png";
-                mediaType.PropertyGroups["Media"].PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
+                mediaType.PropertyGroups["media"].PropertyTypes.Add(new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext, "subtitle")
                     {
                         Name = "Subtitle",
                         Description = "Optional Subtitle",
@@ -360,7 +360,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IMediaType mediaTypeV2 = repository.Get(mediaType.Id);
-                mediaTypeV2.PropertyGroups["Media"].PropertyTypes.Remove("title");
+                mediaTypeV2.PropertyGroups["media"].PropertyTypes.Remove("title");
                 repository.Save(mediaTypeV2);
 
                 IMediaType mediaTypeV3 = repository.Get(mediaType.Id);

@@ -1,27 +1,27 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
     <PropertyGroup>
-        <UmbracoPackageContentFilesPath>$(MSBuildThisFileDirectory)..\App_Plugins\UmbracoPackage\**\*.*</UmbracoPackageContentFilesPath>
+        <UmbracoPackageMsBuildContentFilesPath>$(MSBuildThisFileDirectory)..\App_Plugins\UmbracoPackage\**\*.*</UmbracoPackageMsBuildContentFilesPath>
     </PropertyGroup>
 
-    <Target Name="CopyUmbracoPackageAssets" BeforeTargets="Build">
+    <Target Name="CopyUmbracoPackageMsBuildAssets" BeforeTargets="Build">
         <ItemGroup>
-            <UmbracoPackageContentFiles Include="$(UmbracoPackageContentFilesPath)" />
+            <UmbracoPackageMsBuildContentFiles Include="$(UmbracoPackageMsBuildContentFilesPath)" />
         </ItemGroup>
-        <Message Text="Copying UmbracoPackage files: $(UmbracoPackageContentFilesPath) - #@(UmbracoPackageContentFiles->Count()) files"  Importance="high" />
+        <Message Text="Copying UmbracoPackage files: $(UmbracoPackageMsBuildContentFilesPath) - #@(UmbracoPackageMsBuildContentFiles->Count()) files"  Importance="high" />
         <Copy
-            SourceFiles="@(UmbracoPackageContentFiles)"
-            DestinationFiles="@(UmbracoPackageContentFiles->'$(MSBuildProjectDirectory)\App_Plugins\UmbracoPackage\%(RecursiveDir)%(Filename)%(Extension)')"
+            SourceFiles="@(UmbracoPackageMsBuildContentFiles)"
+            DestinationFiles="@(UmbracoPackageMsBuildContentFiles->'$(MSBuildProjectDirectory)\App_Plugins\UmbracoPackage\%(RecursiveDir)%(Filename)%(Extension)')"
             SkipUnchangedFiles="true" />
 
     </Target>
 
-    <Target Name="ClearUmbracoPackageAssets" BeforeTargets="Clean">
+    <Target Name="ClearUmbracoPackageMsBuildAssets" BeforeTargets="Clean">
         <ItemGroup>
-            <UmbracoPackageDir Include="$(MSBuildProjectDirectory)\App_Plugins\UmbracoPackage\" />
+            <UmbracoPackageMsBuildDir Include="$(MSBuildProjectDirectory)\App_Plugins\UmbracoPackage\" />
         </ItemGroup>
         <Message Text="Clear old UmbracoPackage data"  Importance="high" />
-        <RemoveDir Directories="@(UmbracoPackageDir)"  />
+        <RemoveDir Directories="@(UmbracoPackageMsBuildDir)"  />
     </Target>
 
 </Project>

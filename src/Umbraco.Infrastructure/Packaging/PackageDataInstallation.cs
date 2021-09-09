@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -128,13 +126,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService);
         }
 
-
-
         #endregion
 
-
         #region Content
-
 
         public IReadOnlyList<T> ImportContentBase<T, S>(
             IEnumerable<CompiledPackageContentBase> docs,
@@ -768,7 +762,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 UpdateContentTypesAllowedTemplates(contentTypex, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
             }
 
-            UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
+            UpdateContentTypesPropertyGroups(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
 
             return contentType;
@@ -813,27 +807,40 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
         }
 
-        private void UpdateContentTypesTabs<T>(T contentType, XElement tabElement)
+        private void UpdateContentTypesPropertyGroups<T>(T contentType, XElement propertyGroupsContainer)
             where T : IContentTypeComposition
         {
-            if (tabElement == null)
+            if (propertyGroupsContainer == null)
                 return;
 
-            var tabs = tabElement.Elements("Tab");
-            foreach (var tab in tabs)
+            var propertyGroupElements = propertyGroupsContainer.Elements("Tab");
+            foreach (var propertyGroupElement in propertyGroupElements)
             {
-                var caption = tab.Element("Caption").Value;
+                var name = propertyGroupElement.Element("Caption").Value; // TODO Rename to Name (same in EntityXmlSerializer)
 
-                if (contentType.PropertyGroups.Contains(caption) == false)
+                var alias = propertyGroupElement.Element("Alias")?.Value;
+                if (string.IsNullOrEmpty(alias))
                 {
-                    contentType.AddPropertyGroup(caption);
-
+                    alias = name.ToSafeAlias(_shortStringHelper, true);
                 }
 
-                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out int sortOrder))
+                contentType.AddPropertyGroup(alias, name);
+                var propertyGroup = contentType.PropertyGroups[alias];
+
+                if (Guid.TryParse(propertyGroupElement.Element("Key")?.Value, out var key))
+                {
+                    propertyGroup.Key = key;
+                }
+
+                if (Enum.TryParse<PropertyGroupType>(propertyGroupElement.Element("Type")?.Value, out var type))
+                {
+                    propertyGroup.Type = type;
+                }
+
+                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, out var sortOrder))
                 {
                     // Override the sort order with the imported value
-                    contentType.PropertyGroups[caption].SortOrder = sortOrder;
+                    propertyGroup.SortOrder = sortOrder;
                 }
             }
         }
@@ -926,14 +933,21 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     propertyType.Key = new Guid(property.Element("Key").Value);
                 }
 
-                var tab = (string)property.Element("Tab");
-                if (string.IsNullOrEmpty(tab))
+                var propertyGroupElement = property.Element("Tab");
+                if (propertyGroupElement == null || string.IsNullOrEmpty(propertyGroupElement.Value))
                 {
                     contentType.AddPropertyType(propertyType);
                 }
                 else
                 {
-                    contentType.AddPropertyType(propertyType, tab);
+                    var propertyGroupName = propertyGroupElement.Value;
+                    var propertyGroupAlias = propertyGroupElement.Attribute("Alias")?.Value;
+                    if (string.IsNullOrEmpty(propertyGroupAlias))
+                    {
+                        propertyGroupAlias = propertyGroupName.ToSafeAlias(_shortStringHelper, true);
+                    }
+
+                    contentType.AddPropertyType(propertyType, propertyGroupAlias, propertyGroupName);
                 }
             }
         }

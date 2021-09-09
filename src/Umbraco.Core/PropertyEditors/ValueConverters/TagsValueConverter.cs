@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             }
 
             // Otherwise assume CSV storage type and return as string array
-            return source.ToString().Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            return source.ToString().Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
         }
 
         public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)

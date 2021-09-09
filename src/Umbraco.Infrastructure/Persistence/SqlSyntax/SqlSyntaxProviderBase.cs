@@ -529,7 +529,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
                 return string.Empty;
 
             // HACK: probably not needed with latest changes
-            if (column.DefaultValue.ToString().ToLower().Equals("getdate()".ToLower()))
+            if (string.Equals(column.DefaultValue.ToString(), "GETDATE()", StringComparison.OrdinalIgnoreCase))
                 column.DefaultValue = SystemMethods.CurrentDateTime;
 
             // see if this is for a system method

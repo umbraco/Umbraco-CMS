@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -102,6 +103,21 @@ namespace Umbraco.Extensions
             if (dataType == null) return;
             var payloads = new[] { new DataTypeCacheRefresher.JsonPayload(dataType.Id, dataType.Key, true) };
             dc.RefreshByPayload(DataTypeCacheRefresher.UniqueId, payloads);
+        }
+
+        #endregion
+
+        #region ValueEditorCache
+
+        public static void RefreshValueEditorCache(this DistributedCache dc, IEnumerable<IDataType> dataTypes)
+        {
+            if (dataTypes is null)
+            {
+                return;
+            }
+
+            var payloads = dataTypes.Select(x => new DataTypeCacheRefresher.JsonPayload(x.Id, x.Key, false));
+            dc.RefreshByPayload(ValueEditorCacheRefresher.UniqueId, payloads);
         }
 
         #endregion
