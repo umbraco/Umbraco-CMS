@@ -22,8 +22,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -54,7 +52,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
                 loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                 Options.Create(globalSettings),
-                Options.Create(connectionStrings),
+                Mock.Of<IOptionsMonitor<ConnectionStrings>>(x => x.CurrentValue == connectionStrings),
                 new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
                 TestHelper.DbProviderFactoryCreator,
                 new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()),

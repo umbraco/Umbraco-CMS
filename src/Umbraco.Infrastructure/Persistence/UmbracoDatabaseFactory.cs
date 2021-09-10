@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             ILogger<UmbracoDatabaseFactory> logger,
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
-            IOptions<ConnectionStrings> connectionStrings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
             IMapperCollection mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory;
 
-            var settings = connectionStrings.Value.UmbracoConnectionString;
+            var settings = connectionStrings.CurrentValue.UmbracoConnectionString;
 
             if (settings == null)
             {
