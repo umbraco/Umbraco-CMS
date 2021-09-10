@@ -155,7 +155,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
             }
 
-            var factory = _dbProviderFactoryCreator.CreateFactory(databaseSettings.ProviderName);
+
+            var factory = _dbProviderFactoryCreator.CreateFactory(databaseSettings?.ProviderName);
             var canConnect = connStringConfigured && DbConnectionExtensions.IsConnectionAvailable(databaseSettings.ConnectionString, factory);
             if (canConnect)
             {
