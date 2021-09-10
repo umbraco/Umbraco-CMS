@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 
 namespace Umbraco.Cms.Core
@@ -24,6 +24,8 @@ namespace Umbraco.Cms.Core
                 var str = (string)value;
                 if (str == null || str.Length == 0 || str == "0") return false;
                 if (str == "1") return true;
+                if (str.Equals("Yes", StringComparison.OrdinalIgnoreCase)) return true;
+                if (str.Equals("No", StringComparison.OrdinalIgnoreCase)) return false;
             }
 
             return base.ConvertFrom(context, culture, value);

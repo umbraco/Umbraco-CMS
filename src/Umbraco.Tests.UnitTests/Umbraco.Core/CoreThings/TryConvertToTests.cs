@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -10,6 +10,42 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings
     [TestFixture]
     public class TryConvertToTests
     {
+        [Test]
+        public void ConvertToBoolTest()
+        {
+            var conv = 1.TryConvertTo<bool>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(true, conv.Result);
+
+            conv = "1".TryConvertTo<bool>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(true, conv.Result);
+
+            conv = 0.TryConvertTo<bool>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(false, conv.Result);
+
+            conv = "0".TryConvertTo<bool>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(false, conv.Result);
+
+            conv = "Yes".TryConvertTo<bool>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(true, conv.Result);
+
+            conv = "yes".TryConvertTo<bool>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(true, conv.Result);
+
+            conv = "No".TryConvertTo<bool>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(false, conv.Result);
+
+            conv = "no".TryConvertTo<bool>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(false, conv.Result);
+        }
+
         [Test]
         public void ConvertToIntegerTest()
         {
