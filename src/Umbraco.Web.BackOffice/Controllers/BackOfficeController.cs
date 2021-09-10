@@ -120,9 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             // force authentication to occur since this is not an authorized endpoint
-            var result = await this.AuthenticateBackOfficeAsync();
-
-
+            AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
 
             var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
