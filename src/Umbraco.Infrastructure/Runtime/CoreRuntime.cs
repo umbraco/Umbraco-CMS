@@ -139,8 +139,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     break;
             }
 
-            await _eventAggregator.PublishAsync(new UmbracoApplicationComponentsInstallingNotification(State.Level), cancellationToken);
-
             // create & initialize the components
             _components.Initialize();
 
