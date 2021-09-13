@@ -128,6 +128,8 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="Collections\StackQueue.cs" />
+    <Compile Include="Configuration\ICoreDebug.cs" />
     <Compile Include="Constants-CharArrays.cs" />
     <Compile Include="Collections\EventClearingObservableCollection.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />
@@ -1500,6 +1502,7 @@
     <Compile Include="Services\Implement\ConsentService.cs" />
     <Compile Include="Services\Implement\ContentService.cs" />
     <Compile Include="Services\ContentServiceExtensions.cs" />
+    <Compile Include="Services\MediaServiceExtensions.cs" />
     <Compile Include="Services\Implement\ContentTypeService.cs" />
     <Compile Include="Services\Implement\ContentTypeServiceBase.cs" />
     <Compile Include="Services\Implement\ContentTypeServiceBaseOfTItemTService.cs" />
