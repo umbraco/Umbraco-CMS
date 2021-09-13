@@ -1,14 +1,11 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 
-namespace Umbraco.Tests.Serialization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization
 {
     [TestFixture]
     public class AutoInterningStringConverterTests
@@ -61,7 +58,7 @@ namespace Umbraco.Tests.Serialization
             public string Name { get; set; }
 
             [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<int>))]
-            public Dictionary<string, int> Values = new Dictionary<string, int>();
+            public Dictionary<string, int> Values { get; set; } = new Dictionary<string, int>();
         }
     }
 }
