@@ -869,13 +869,7 @@ AND cmsContentNu.nodeId IS NULL
             var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
-            var s = new ContentNodeKit
-            {
-                Node = n,
-                ContentTypeId = dto.ContentTypeId,
-                DraftData = d,
-                PublishedData = p
-            };
+            var s = new ContentNodeKit(n, dto.ContentTypeId, d, p);
 
             return s;
         }
@@ -903,12 +897,7 @@ AND cmsContentNu.nodeId IS NULL
             var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
-            var s = new ContentNodeKit
-            {
-                Node = n,
-                ContentTypeId = dto.ContentTypeId,
-                PublishedData = p
-            };
+            var s = new ContentNodeKit(n, dto.ContentTypeId, null, p);
 
             return s;
         }

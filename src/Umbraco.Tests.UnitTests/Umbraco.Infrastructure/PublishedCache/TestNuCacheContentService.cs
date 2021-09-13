@@ -6,19 +6,19 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 
-namespace Umbraco.Tests.Testing.Objects
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
-    internal class TestDataSource : INuCacheContentService
+    internal class TestNuCacheContentService : INuCacheContentService
     {
         private IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
 
-        public TestDataSource(params ContentNodeKit[] kits)
-            : this((IEnumerable<ContentNodeKit>) kits)
+        public TestNuCacheContentService(params ContentNodeKit[] kits)
+            : this((IEnumerable<ContentNodeKit>)kits)
         { }
 
-        public TestDataSource(IEnumerable<ContentNodeKit> kits) => Kits = kits.ToDictionary(x => x.Node.Id, x => x);
+        public TestNuCacheContentService(IEnumerable<ContentNodeKit> kits) => Kits = kits.ToDictionary(x => x.Node.Id, x => x);
 
-        public Dictionary<int, ContentNodeKit> Kits { get; }
+        public Dictionary<int, ContentNodeKit> Kits { get; }        
 
         // note: it is important to clone the returned kits, as the inner
         // ContentNode is directly reused and modified by the snapshot service
@@ -55,13 +55,18 @@ namespace Umbraco.Tests.Testing.Objects
         public IEnumerable<ContentNodeKit> GetBranchMediaSources(int id) => Enumerable.Empty<ContentNodeKit>();
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids) => Enumerable.Empty<ContentNodeKit>();
+
         public void DeleteContentItem(IContentBase item) => throw new NotImplementedException();
         public void DeleteContentItems(IEnumerable<IContentBase> items) => throw new NotImplementedException();
         public void RefreshContent(IContent content) => throw new NotImplementedException();
-        public void RefreshEntity(IContentBase content) => throw new NotImplementedException();
+        
+        public void RebuildDatabaseCacheIfSerializerChanged() => throw new NotImplementedException();
+        public void RefreshMedia(IMedia media) => throw new NotImplementedException();
+        public void RefreshMember(IMember member) => throw new NotImplementedException();
+        public void Rebuild(IReadOnlyCollection<int> contentTypeIds = null, IReadOnlyCollection<int> mediaTypeIds = null, IReadOnlyCollection<int> memberTypeIds = null) => throw new NotImplementedException();
+
         public bool VerifyContentDbCache() => throw new NotImplementedException();
         public bool VerifyMediaDbCache() => throw new NotImplementedException();
         public bool VerifyMemberDbCache() => throw new NotImplementedException();
-        public void Rebuild(int groupSize = 5000, IReadOnlyCollection<int> contentTypeIds = null, IReadOnlyCollection<int> mediaTypeIds = null, IReadOnlyCollection<int> memberTypeIds = null) => throw new NotImplementedException();
     }
 }

@@ -1,12 +1,12 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
-namespace Umbraco.Tests.PublishedContent
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
     [TestFixture]
     public class ContentSerializationTests
@@ -77,9 +77,12 @@ namespace Umbraco.Tests.PublishedContent
         {
             public override int Compare(CultureVariation x, CultureVariation y)
             {
-                if (x == null && y == null) return 0;
-                if (x == null && y != null) return -1;
-                if (x != null && y == null) return 1;
+                if (x == null && y == null)
+                    return 0;
+                if (x == null && y != null)
+                    return -1;
+                if (x != null && y == null)
+                    return 1;
 
                 return x.Date.CompareTo(y.Date) | x.IsDraft.CompareTo(y.IsDraft) | x.Name.CompareTo(y.Name) | x.UrlSegment.CompareTo(y.UrlSegment);
             }
@@ -89,9 +92,12 @@ namespace Umbraco.Tests.PublishedContent
         {
             public override int Compare(PropertyData x, PropertyData y)
             {
-                if (x == null && y == null) return 0;
-                if (x == null && y != null) return -1;
-                if (x != null && y == null) return 1;
+                if (x == null && y == null)
+                    return 0;
+                if (x == null && y != null)
+                    return -1;
+                if (x != null && y == null)
+                    return 1;
 
                 var xVal = x.Value?.ToString() ?? string.Empty;
                 var yVal = y.Value?.ToString() ?? string.Empty;

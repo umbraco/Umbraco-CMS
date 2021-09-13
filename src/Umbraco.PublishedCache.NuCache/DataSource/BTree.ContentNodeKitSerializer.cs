@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
@@ -10,19 +10,17 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             _contentDataSerializer = contentDataSerializer;
             if(_contentDataSerializer == null)
             {
-                _contentDataSerializer = DefaultDataSerializer;
+                _contentDataSerializer = s_defaultDataSerializer;
             }
         }
-        static readonly ContentDataSerializer DefaultDataSerializer = new ContentDataSerializer();
+        static readonly ContentDataSerializer s_defaultDataSerializer = new ContentDataSerializer();
         private readonly ContentDataSerializer _contentDataSerializer;
 
         //static readonly ListOfIntSerializer ChildContentIdsSerializer = new ListOfIntSerializer();
 
         public ContentNodeKit ReadFrom(Stream stream)
         {
-            var kit = new ContentNodeKit
-            {
-                Node = new ContentNode(
+            var contentNode = new ContentNode(
                     PrimitiveSerializer.Int32.ReadFrom(stream), // id
                     PrimitiveSerializer.Guid.ReadFrom(stream), // uid
                     PrimitiveSerializer.Int32.ReadFrom(stream), // level
@@ -31,15 +29,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
                     PrimitiveSerializer.Int32.ReadFrom(stream), // parent id
                     PrimitiveSerializer.DateTime.ReadFrom(stream), // date created
                     PrimitiveSerializer.Int32.ReadFrom(stream) // creator id
-                ),
-                ContentTypeId = PrimitiveSerializer.Int32.ReadFrom(stream)
-            };
+                );
+
+            int contentTypeId = PrimitiveSerializer.Int32.ReadFrom(stream);
             var hasDraft = PrimitiveSerializer.Boolean.ReadFrom(stream);
-            if (hasDraft)
-                kit.DraftData = _contentDataSerializer.ReadFrom(stream);
             var hasPublished = PrimitiveSerializer.Boolean.ReadFrom(stream);
-            if (hasPublished)
-                kit.PublishedData = _contentDataSerializer.ReadFrom(stream);
+
+            var kit = new ContentNodeKit(
+                contentNode,
+                contentTypeId,
+                hasDraft ? _contentDataSerializer.ReadFrom(stream) : null,
+                hasPublished ? _contentDataSerializer.ReadFrom(stream) : null);
+
             return kit;
         }
 
