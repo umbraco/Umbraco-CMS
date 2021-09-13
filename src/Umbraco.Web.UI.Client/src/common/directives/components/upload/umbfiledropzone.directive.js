@@ -172,6 +172,8 @@ angular.module("umbraco.directives")
                                     }
                                 } else if (evt.Message) {
                                     file.serverErrorMessage = evt.Message;
+                                } else if (evt && typeof evt === 'string') {
+                                    file.serverErrorMessage = evt;
                                 }
                                 // If file not found, server will return a 404 and display this message
                                 if (status === 404) {
@@ -248,6 +250,11 @@ angular.module("umbraco.directives")
 
                     scope.handleFiles = function(files, event, invalidFiles) {
                         const allFiles = [...files, ...invalidFiles];
+
+                        // add unique key for each files to use in ng-repeats
+                        allFiles.forEach(file => {
+                            file.key = String.CreateGuid();
+                        });
 
                         if (scope.filesQueued) {
                             scope.filesQueued(allFiles, event);
