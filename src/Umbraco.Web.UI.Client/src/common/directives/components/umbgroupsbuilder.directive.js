@@ -534,6 +534,8 @@
 
                 scope.openTabAlias = tab.alias;
 
+                notifyChanged();
+
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
                 scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
             };
@@ -570,6 +572,8 @@
                             });
 
                             scope.$broadcast('umbOverflowChecker.checkOverflow');
+
+                            notifyChanged();
 
                             overlayService.close();
                         }
@@ -712,6 +716,8 @@
                 scope.model.groups = [...scope.model.groups, group];
 
                 scope.activateGroup(group);
+
+                notifyChanged();
             };
 
             scope.activateGroup = selectedGroup => {
@@ -758,6 +764,7 @@
                             scope.model.groups.splice(index, 1);
 
                             overlayService.close();
+                            notifyChanged();
                         }
                     });
                 });
@@ -1022,7 +1029,6 @@
 
                 return (result.length > 0);
             }
-
 
             eventBindings.push(scope.$watch('model', (newValue, oldValue) => {
                 if (newValue !== undefined && newValue.groups !== undefined) {
