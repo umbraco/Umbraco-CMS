@@ -31,6 +31,10 @@ function textboxController($scope, validationMessageService) {
             checkLengthVadility();
             $scope.nearMaxLimit = $scope.validLength && $scope.charsCount > Math.max($scope.maxChars*.8, $scope.maxChars-25);
         }
+        else {
+            $scope.charsCount = 0;
+            checkLengthVadility();
+        }
     }
     $scope.model.onValueChanged = $scope.change;
     $scope.change();

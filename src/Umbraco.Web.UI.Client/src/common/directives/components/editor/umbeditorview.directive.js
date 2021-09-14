@@ -59,6 +59,8 @@ Use this directive to construct the main editor window.
     <li>{@link umbraco.directives.directive:umbEditorContainer umbEditorContainer}</li>
     <li>{@link umbraco.directives.directive:umbEditorFooter umbEditorFooter}</li>
 </ul>
+
+@param {boolean} footer Whether the directive should make place for a {@link umbraco.directives.directive:umbEditorFooter umbEditorFooter} at the bottom (`true` by default).
 **/
 
 (function() {

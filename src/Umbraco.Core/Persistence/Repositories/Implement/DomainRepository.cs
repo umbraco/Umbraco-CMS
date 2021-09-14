@@ -34,10 +34,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<IDomain> PerformGetAll(params int[] ids)
         {
-            var sql = GetBaseQuery(false).Where("umbracoDomain.id > 0");
+            var sql = GetBaseQuery(false).Where<DomainDto>(x => x.Id > 0);
             if (ids.Any())
             {
-                sql.Where("umbracoDomain.id in (@ids)", new { ids = ids });
+                sql.WhereIn<DomainDto>(x => x.Id, ids);
             }
 
             return Database.Fetch<DomainDto>(sql).Select(ConvertFromDto);
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoDomain.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Domain}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

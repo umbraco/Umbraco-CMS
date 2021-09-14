@@ -50,7 +50,7 @@
 
                 <!-- upload success -->
                 <div class="file-icon" ng-if="file.uploadStatus == 'done'">
-                    <i class="icon icon-check color-green" aria-hidden="true"></i>
+                    <umb-icon icon="icon-check" class="icon color-green"></umb-icon>
                 </div>
 
             </li>
@@ -58,7 +58,7 @@
             <li class="file" ng-if="currentFile">
 
                 <!-- file name -->
-                <div class="file-name">{{ currentFile.name }}</div>
+                <div class="file-name">{{currentFile.name}}</div>
 
                 <!-- upload progress bar -->
                 <div class="file-progress">
@@ -71,7 +71,7 @@
             <li class="file" ng-repeat="queued in queue">
 
                 <!-- file name -->
-                <div class="file-name">{{ queued.name }}</div>
+                <div class="file-name">{{queued.name}}</div>
             </li>
 
             <li class="file" ng-repeat="file in rejected">
@@ -79,7 +79,7 @@
                 <!-- file name -->
                 <div class="file-description">
 
-                   <strong>{{ file.name }}</strong>
+                   <strong>{{file.name}}</strong>
 
                    <span class="file-error" ng-if="file.$error">
                       <span ng-if="file.$error === 'pattern'" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
@@ -94,7 +94,7 @@
 
                 <!-- upload error -->
                 <div class="file-icon">
-                   <i class="icon icon-delete color-red" aria-hidden="true"></i>
+                   <umb-icon icon="icon-delete" class="icon color-red"></umb-icon>
                 </div>
 
             </li>

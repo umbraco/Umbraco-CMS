@@ -934,7 +934,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = 0, bool raiseEvents = true)
+        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (cultures == null) throw new ArgumentNullException(nameof(cultures));
@@ -2388,7 +2388,7 @@ namespace Umbraco.Core.Services.Implement
             if (raiseEvents)
             {
                 //raise cancelable sorting event
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Sorting)))
+                if (scope.Events.DispatchCancelable(Sorting, this, saveEventArgs, nameof(Sorting)))
                     return OperationResult.Cancel(evtMsgs);
 
                 //raise saving event (this one cannot be canceled)

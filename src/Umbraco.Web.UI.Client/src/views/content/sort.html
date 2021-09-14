@@ -20,16 +20,16 @@
                                 <th colspan="2">
                                     <button type="button" class="btn-reset" ng-click="vm.sort('name')">
                                         <strong><localize key="general_name">Name</localize></strong>
-                                        <span ng-if="vm.sortOrder.column === 'name'" aria-hidden="true">
-                                            <i ng-class="{ 'icon-navigation-up': vm.sortOrder.reverse, 'icon-navigation-down': !vm.sortOrder.reverse }"></i>
+                                        <span ng-if="vm.sortOrder.column === 'name'">
+                                            <umb-icon icon="{{vm.sortOrder.reverse ? 'icon-navigation-up' : 'icon-navigation-down'}}"></umb-icon>
                                         </span>
                                     </button>
                                 </th>
                                 <th>
                                     <button type="button" class="btn-reset" ng-click="vm.sort('createDate')">
                                         <strong><localize key="sort_sortCreationDate">Creation date</localize></strong>
-                                        <span ng-if="vm.sortOrder.column === 'createDate'" aria-hidden="true">
-                                            <i ng-class="{ 'icon-navigation-up': vm.sortOrder.reverse, 'icon-navigation-down': !vm.sortOrder.reverse }"></i>
+                                        <span ng-if="vm.sortOrder.column === 'createDate'">
+                                            <umb-icon icon="{{vm.sortOrder.reverse ? 'icon-navigation-up' : 'icon-navigation-down'}}"></umb-icon>
                                         </span>
                                     </button>
                                 </th>
@@ -37,9 +37,11 @@
                         </thead>
                         <tbody ui-sortable="vm.sortableOptions" ng-model="vm.children">
                             <tr ng-repeat="child in vm.children">
-                                <td class="tree-icon"><i class="{{ child.icon }}"></i></td>
-                                <td>{{ child.name }}</td>
-                                <td>{{ child.createDate }}</td>
+                                <td class="tree-icon">
+                                    <umb-icon icon="{{child.icon}}"></umb-icon>
+                                </td>
+                                <td>{{child.name}}</td>
+                                <td>{{child.createDate}}</td>
                             </tr>
                         </tbody>
                     </table>

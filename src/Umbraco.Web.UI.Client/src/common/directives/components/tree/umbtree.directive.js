@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService, backdropService) {
+function umbTreeDirective($q, treeService, notificationsService) {
 
     return {
         restrict: 'E',
@@ -318,18 +318,6 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 }
             }
 
-            // Close any potential backdrop and remove the #leftcolumn modifier class
-            function closeBackdrop() {
-                var aboveClass = 'above-backdrop';
-                var leftColumn = $('#leftcolumn');
-                var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
-
-                if(isLeftColumnOnTop){
-                    backdropService.close();
-                    leftColumn.removeClass(aboveClass);
-                }
-            }
-
             /** Returns the css classses assigned to the node (div element) */
             $scope.getNodeCssClass = function (node) {
                 if (!node) {
@@ -369,8 +357,6 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
               defined on the tree
             */
             $scope.select = function (n, ev) {
-
-                closeBackdrop()
                 
                 if (n.metaData && n.metaData.noAccess === true) {
                     ev.preventDefault();

@@ -87,8 +87,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 }
 
                 message = success
-                    ? TextService.Localize($"healthcheck", "{_localizedTextPrefix}CheckHeaderFound")
-                    : TextService.Localize($"healthcheck", "{_localizedTextPrefix}CheckHeaderNotFound");
+                    ? TextService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderFound")
+                    : TextService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderNotFound");
             }
             catch (Exception ex)
             {
@@ -101,7 +101,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 actions.Add(new HealthCheckAction(SetHeaderInConfigAction, Id)
                 {
                     Name = TextService.Localize("healthcheck", "setHeaderInConfig"),
-                    Description = TextService.Localize($"healthcheck", "{_localizedTextPrefix}SetHeaderInConfigDescription")
+                    Description = TextService.Localize($"healthcheck", $"{_localizedTextPrefix}SetHeaderInConfigDescription")
                 });
             }
 

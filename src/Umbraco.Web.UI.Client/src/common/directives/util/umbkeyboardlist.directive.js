@@ -32,20 +32,20 @@ angular.module('umbraco.directives')
 
         return {
             restrict: 'A',
-            link: function (scope, element, attr) {
+            link: function (scope, element) {
 
                 var listItems = [];
                 var currentIndex = 0;
                 var focusSet = false;
 
-                $timeout(function(){
+                $timeout(function() {
                     // get list of all links in the list
                     listItems = element.find("li :tabbable");
                 });
 
                 // Handle keydown events
                 function keydown(event) {
-                    $timeout(function(){
+                    $timeout(function() {
                         checkFocus();
                         // arrow down
                         if (event.keyCode === 40) {
@@ -62,7 +62,7 @@ angular.module('umbraco.directives')
                     var found = false;
 
                     // check if any element has focus
-                    angular.forEach(listItems, function (item, index) {
+                    Utilities.forEach(listItems, (item, index) => {
                         if ($(item).is(":focus")) {
                             // if an element already has focus set the
                             // currentIndex so we navigate from that element
@@ -109,7 +109,6 @@ angular.module('umbraco.directives')
 
                 // Stop listening when scope is destroyed.
                 scope.$on('$destroy', stopListening);
-
             }
         };
     }]);

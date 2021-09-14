@@ -30,6 +30,7 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
     function openLinkPicker(callback) {
         var linkPicker = {
             hideTarget: true,
+            size: $scope.model.config.overlayWidthSize,
             submit: function(model) {
                 callback(model.target.url, model.target.name);
                 editorService.close();

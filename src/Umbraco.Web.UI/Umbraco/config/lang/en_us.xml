@@ -192,26 +192,6 @@
     <key alias="smallCustom">Custom</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">To change the Document Type for the selected content, first select from the list of valid types for this location.</key>
-    <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
-    <key alias="contentRepublished">The content has been re-published.</key>
-    <key alias="currentProperty">Current Property</key>
-    <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The Document Type cannot be changed, as there are no alternatives valid for this location.  An alternative will be valid if it is allowed under the parent of the selected content item and that all existing child content items are allowed to be created under it.</key>
-    <key alias="docTypeChanged">Document Type Changed</key>
-    <key alias="mapProperties">Map Properties</key>
-    <key alias="mapToProperty">Map to Property</key>
-    <key alias="newTemplate">New Template</key>
-    <key alias="newType">New Type</key>
-    <key alias="none">none</key>
-    <key alias="selectedContent">Content</key>
-    <key alias="selectNewDocType">Select New Document Type</key>
-    <key alias="successMessage">The Document Type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
-    <key alias="to">to</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
-    <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
     <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
@@ -327,6 +307,7 @@
     <key alias="notReadyToPublish">We are not ready to Publish</key>
     <key alias="readyToPublish">Ready to publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
+    <key alias="resetFocalPoint">Reset focal point</key>
     <key alias="sendForApproval">Send for approval</key>
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
     <key alias="createEmpty">Create new</key>
@@ -724,6 +705,7 @@
     <key alias="first">First</key>
     <key alias="focalPoint">Focal point</key>
     <key alias="general">General</key>
+    <key alias="generic">Generic</key>
     <key alias="groups">Groups</key>
     <key alias="group">Group</key>
     <key alias="height">Height</key>
@@ -834,6 +816,7 @@
     <key alias="blue">Blue</key>
   </area>
   <area alias="shortcuts">
+    <key alias="addTab">Add tab</key>
     <key alias="addGroup">Add group</key>
     <key alias="addProperty">Add property</key>
     <key alias="addEditor">Add editor</key>
@@ -1687,6 +1670,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
     <key alias="group">Group</key>
+    <key alias="groupReorderSameAliasError">You can't move the group %0% to this tab because the group will get the same alias as a tab: "%1%". Rename the group to continue.</key>
     <key alias="noGroups">You have not added any groups</key>
     <key alias="addGroup">Add group</key>
     <key alias="inheritedFrom">Inherited from</key>
@@ -1753,6 +1737,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
     <key alias="displaySettingsHeadline">Appearance</key>
     <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
+    <key alias="confirmDeleteTabMessage"><![CDATA[Are you sure you want to delete the tab <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteGroupMessage"><![CDATA[Are you sure you want to delete the group <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeletePropertyMessage"><![CDATA[Are you sure you want to delete the property <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteTabNotice">This will also delete all items below this tab.</key>
+    <key alias="confirmDeleteGroupNotice">This will also delete all items below this group.</key>
+    <key alias="addTab">Add tab</key>
+    <key alias="convertToTab">Convert to tab</key>
+    <key alias="tabDirectPropertiesDropZone">Drag properties here to place directly on the tab</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2349,6 +2341,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
+    <key alias="maxAmount">Maximum amount</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2367,6 +2360,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="logViewer">
       <key alias="deleteSavedSearch">Delete Saved Search</key>
       <key alias="logLevels">Log Levels</key>
+      <key alias="selectAllLogLevelFilters">Select all</key>
+      <key alias="deselectAllLogLevelFilters">Deselect all</key>
       <key alias="savedSearches">Saved Searches</key>
       <key alias="saveSearch">Save Search</key>
       <key alias="saveSearchDescription">Enter a friendly name for your search query</key>

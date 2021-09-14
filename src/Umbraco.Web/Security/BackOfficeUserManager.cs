@@ -500,7 +500,7 @@ namespace Umbraco.Web.Security
             var result = await base.SetLockoutEndDateAsync(userId, lockoutEnd);
 
             // The way we unlock is by setting the lockoutEnd date to the current datetime
-            if (result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
+            if (result.Succeeded && lockoutEnd > DateTimeOffset.UtcNow)
             {
                 RaiseAccountLockedEvent(userId);
             }

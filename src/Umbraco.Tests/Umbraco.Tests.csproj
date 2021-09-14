@@ -116,6 +116,7 @@
     <Compile Include="Cache\SnapDictionaryTests.cs" />
     <Compile Include="Clr\ReflectionUtilitiesTests.cs" />
     <Compile Include="Collections\OrderedHashSetTests.cs" />
+    <Compile Include="Collections\StackQueueTests.cs" />
     <Compile Include="Composing\CompositionTests.cs" />
     <Compile Include="Composing\LightInjectValidation.cs" />
     <Compile Include="Composing\ContainerConformingTests.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Manifest\ManifestContentAppTests.cs" />
     <Compile Include="Mapping\MappingTests.cs" />
     <Compile Include="Membership\MembersMembershipProviderTests.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_17_0\AddPropertyTypeGroupColumnsTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="ModelsBuilder\BuilderTests.cs" />
@@ -610,7 +612,6 @@
     <Content Include="Logging\logviewer.searches.config.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Migrations\SqlScripts\MySqlTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
