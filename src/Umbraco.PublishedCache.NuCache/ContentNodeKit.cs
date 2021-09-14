@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         {
             Node = node ?? throw new ArgumentNullException(nameof(node));
             ContentTypeId = contentTypeId;
-            DraftData = draftData ?? throw new ArgumentNullException(nameof(draftData));
-            PublishedData = publishedData ?? throw new ArgumentNullException(nameof(publishedData));
+            DraftData = draftData;
+            PublishedData = publishedData;
         }
 
         public ContentNode Node { get; }
@@ -50,5 +50,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public ContentNodeKit Clone(IPublishedModelFactory publishedModelFactory)
             => new ContentNodeKit(new ContentNode(Node, publishedModelFactory), ContentTypeId, DraftData, PublishedData);
+
+        public ContentNodeKit Clone(IPublishedModelFactory publishedModelFactory, ContentData draftData, ContentData publishedData)
+            => new ContentNodeKit(new ContentNode(Node, publishedModelFactory), ContentTypeId, draftData, publishedData);
     }
 }

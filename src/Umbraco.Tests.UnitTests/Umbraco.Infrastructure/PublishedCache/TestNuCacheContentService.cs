@@ -8,7 +8,7 @@ using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
-    internal class TestNuCacheContentService : INuCacheContentService
+    public class TestNuCacheContentService : INuCacheContentService
     {
         private IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
 

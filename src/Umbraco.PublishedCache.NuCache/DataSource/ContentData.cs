@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
@@ -8,19 +8,32 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     /// </summary>
     public class ContentData
     {
-        public string Name { get; set; }
-        public string UrlSegment { get; set; }
-        public int VersionId { get; set; }
-        public DateTime VersionDate { get; set; }
-        public int WriterId { get; set; }
-        public int? TemplateId { get; set; }
-        public bool Published { get; set; }
+        public ContentData(string name, string urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, IDictionary<string, PropertyData[]> properties, IReadOnlyDictionary<string, CultureVariation> cultureInfos)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            UrlSegment = urlSegment ?? throw new ArgumentNullException(nameof(urlSegment));
+            VersionId = versionId;
+            VersionDate = versionDate;
+            WriterId = writerId;
+            TemplateId = templateId;
+            Published = published;
+            Properties = properties ?? throw new ArgumentNullException(nameof(properties));
+            CultureInfos = cultureInfos ?? throw new ArgumentNullException(nameof(cultureInfos));
+        }
 
-        public IDictionary<string, PropertyData[]> Properties { get; set; }
+        public string Name { get; }
+        public string UrlSegment { get; }
+        public int VersionId { get; }
+        public DateTime VersionDate { get; }
+        public int WriterId { get; }
+        public int? TemplateId { get; }
+        public bool Published { get; }
+
+        public IDictionary<string, PropertyData[]> Properties { get; }
 
         /// <summary>
         /// The collection of language Id to name for the content item
         /// </summary>
-        public IReadOnlyDictionary<string, CultureVariation> CultureInfos { get; set; }
+        public IReadOnlyDictionary<string, CultureVariation> CultureInfos { get; }
     }
 }
