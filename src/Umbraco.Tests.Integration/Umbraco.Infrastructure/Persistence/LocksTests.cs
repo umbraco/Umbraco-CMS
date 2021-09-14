@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -39,7 +40,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.ReadLock(Constants.Locks.Servers);
+                scope.EagerReadLock(Constants.Locks.Servers);
                 scope.Complete();
             }
         }
@@ -64,7 +65,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     {
                         try
                         {
-                            scope.ReadLock(Constants.Locks.Servers);
+                            scope.EagerReadLock(Constants.Locks.Servers);
                             lock (locker)
                             {
                                 acquired++;
@@ -114,6 +115,35 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         }
 
         [Test]
+        public void GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted()
+        {
+            var sqlCount = 0;
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var db = scope.Database;
+                try
+                {
+                    db.EnableSqlCount = true;
+
+                    // Issue a lock request, but we are using non-eager
+                    // locks so this only queues the request.
+                    // The lock will not be issued unless we resolve
+                    // scope.Database
+                    scope.WriteLock(Constants.Locks.Servers);
+
+                    sqlCount = db.SqlCount;
+                }
+                finally
+                {
+                    db.EnableSqlCount = false;
+                }
+            }
+
+            Assert.AreEqual(0, sqlCount);
+        }
+
+        [Test]
         public void ConcurrentWritersTest()
         {
             const int threadCount = 8;
@@ -145,7 +175,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                                 if (entered == threadCount) m1.Set();
                             }
                             ms[ic].WaitOne();
-                            scope.WriteLock(Constants.Locks.Servers);
+                            scope.EagerWriteLock(Constants.Locks.Servers);
                             lock (locker)
                             {
                                 acquired++;
@@ -177,12 +207,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             m1.Wait();
             // all threads have entered
             ms[0].Set(); // let 0 go
+            // TODO: This timing is flaky
             Thread.Sleep(100);
             for (var i = 1; i < threadCount; i++)
             {
                 ms[i].Set(); // let others go
             }
 
+            // TODO: This timing is flaky
             Thread.Sleep(500);
             // only 1 thread has locked
             Assert.AreEqual(1, acquired);
@@ -263,7 +295,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 {
                     otherEv.WaitOne();
                     Console.WriteLine($"[{id1}] WAIT {id1}");
-                    scope.WriteLock(id1);
+                    scope.EagerWriteLock(id1);
                     Console.WriteLine($"[{id1}] GRANT {id1}");
                     WriteLocks(scope.Database);
                     myEv.Set();
@@ -278,7 +310,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     }
 
                     Console.WriteLine($"[{id1}] WAIT {id2}");
-                    scope.WriteLock(id2);
+                    scope.EagerWriteLock(id2);
                     Console.WriteLine($"[{id1}] GRANT {id2}");
                     WriteLocks(scope.Database);
                 }
@@ -336,7 +368,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
                         Console.WriteLine("Write lock A");
                         // This will acquire right away
-                        scope.WriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+                        scope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
                         Thread.Sleep(6000); // Wait longer than the Read Lock B timeout
                         scope.Complete();
                         Console.WriteLine("Finished Write lock A");
@@ -354,7 +386,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                         // This will wait for the write lock to release but it isn't going to wait long
                         // enough so an exception will be thrown.
                         Assert.Throws<SqlException>(() =>
-                            scope.ReadLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+                            scope.EagerReadLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
                         scope.Complete();
                         Console.WriteLine("Finished Read lock B");
                     }
@@ -369,7 +401,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                         // This will wait for the write lock to release but it isn't going to wait long
                         // enough so an exception will be thrown.
                         Assert.Throws<SqlException>(() =>
-                            scope.WriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+                            scope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
 
                         scope.Complete();
                         Console.WriteLine("Finished Write lock C");
@@ -393,7 +425,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     {
                         Console.WriteLine("Write lock A");
                         // This will acquire right away
-                        scope.WriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+                        scope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
                         Thread.Sleep(4000); // Wait less than the Read Lock B timeout
                         scope.Complete();
                         Interlocked.Increment(ref locksCompleted);
@@ -411,7 +443,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
                         // This will wait for the write lock to release
                         Assert.DoesNotThrow(() =>
-                            scope.ReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
+                            scope.EagerReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
 
                         Assert.GreaterOrEqual(locksCompleted, 1);
 
@@ -430,7 +462,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
                         // This will wait for the write lock to release
                         Assert.DoesNotThrow(() =>
-                            scope.ReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
+                            scope.EagerReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
 
                         Assert.GreaterOrEqual(locksCompleted, 1);
 
@@ -456,7 +488,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 
                 Console.WriteLine("Write lock A");
                 // TODO: In theory this would throw
-                scope.WriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree);
+                scope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree);
                 scope.Complete();
                 Console.WriteLine("Finished Write lock A");
             }
@@ -471,7 +503,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 {
                     otherEv.WaitOne();
                     Console.WriteLine($"[{id}] WAIT {id}");
-                    scope.WriteLock(id);
+                    scope.EagerWriteLock(id);
                     Console.WriteLine($"[{id}] GRANT {id}");
                     WriteLocks(scope.Database);
                     myEv.Set();

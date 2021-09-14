@@ -135,6 +135,22 @@
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\DistributedCacheBinderTests.cs" />
+    <Compile Include="Cache\RefresherTests.cs" />
+    <Compile Include="Cache\SnapDictionaryTests.cs" />
+    <Compile Include="Clr\ReflectionUtilitiesTests.cs" />
+    <Compile Include="Collections\OrderedHashSetTests.cs" />
+    <Compile Include="Collections\StackQueueTests.cs" />
+    <Compile Include="Composing\CompositionTests.cs" />
+    <Compile Include="Composing\LightInjectValidation.cs" />
+    <Compile Include="Composing\ContainerConformingTests.cs" />
+    <Compile Include="Configurations\GlobalSettingsTests.cs" />
+    <Compile Include="CoreThings\CallContextTests.cs" />
+    <Compile Include="Components\ComponentTests.cs" />
+    <Compile Include="CoreThings\EnumExtensionsTests.cs" />
+    <Compile Include="CoreThings\GuidUtilsTests.cs" />
+    <Compile Include="CoreThings\HexEncoderTests.cs" />
+    <Compile Include="CoreXml\RenamedRootNavigatorTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\ContentXmlDto.cs" />
     <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\BackgroundTaskRunner.cs" />
     <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\BackgroundTaskRunnerOptions.cs" />

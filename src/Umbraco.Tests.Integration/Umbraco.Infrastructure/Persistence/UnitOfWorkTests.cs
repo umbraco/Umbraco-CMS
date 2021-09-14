@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             {
                 using (IScope scope = provider.CreateScope())
                 {
-                    scope.ReadLock(-666);
+                    scope.EagerReadLock(-666);
                     scope.Complete();
                 }
             });
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                scope.ReadLock(Constants.Locks.Servers);
+                scope.EagerReadLock(Constants.Locks.Servers);
                 scope.Complete();
             }
         }
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             {
                 using (IScope scope = provider.CreateScope())
                 {
-                    scope.WriteLock(-666);
+                    scope.EagerWriteLock(-666);
                     scope.Complete();
                 }
             });
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.Servers);
+                scope.EagerWriteLock(Constants.Locks.Servers);
                 scope.Complete();
             }
         }
