@@ -15,7 +15,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
     [TestFixture]
-    public class NuCacheCollectionsTests : NuCacheTestsBase
+    public class PublishedSnapshotServiceCollectionTests : PublishedSnapshotServiceTestBase
     {
         private ContentType _contentTypeInvariant;
         private ContentType _contentTypeVariant;

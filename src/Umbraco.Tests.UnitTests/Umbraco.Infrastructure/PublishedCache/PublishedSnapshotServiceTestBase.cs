@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -27,12 +28,11 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
     [TestFixture]
-    public class NuCacheTestsBase
+    public class PublishedSnapshotServiceTestBase
     {
         protected IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
         protected IPublishedSnapshotService SnapshotService { get; private set; }
         protected IVariationContextAccessor VariationAccesor { get; private set; }
-        protected IContentCacheDataSerializerFactory ContentNestedDataSerializerFactory { get; private set; }
         protected TestPublishedSnapshotAccessor PublishedSnapshotAccessor { get; private set; }
         protected TestNuCacheContentService NuCacheContentService { get; private set; }
 
@@ -98,6 +98,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             return snapshot;
         }
 
+        /// <summary>
+        /// Initializes the <see cref="IPublishedSnapshotService'"/> with a source of data
+        /// </summary>
+        /// <param name="contentNodeKits"></param>
+        /// <param name="contentTypes"></param>
         protected void Init(IEnumerable<ContentNodeKit> contentNodeKits, ContentType[] contentTypes)
         {
             // create a data source for NuCache
@@ -112,7 +117,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             // create a service context
-            ServiceContext serviceContext = GetServiceContext(contentTypes, out var dataTypeService);
+            ServiceContext serviceContext = GetServiceContext(contentTypes, out IDataTypeService dataTypeService);
 
             // create a scope provider
             var scopeProvider = Mock.Of<IScopeProvider>();
@@ -138,8 +143,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             var globalSettings = new GlobalSettings();
             var nuCacheSettings = new NuCacheSettings();
             
-            ContentNestedDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
-
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             SnapshotService = new PublishedSnapshotService(
@@ -159,7 +162,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 PublishedModelFactory,
                 TestHelper.GetHostingEnvironment(),
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings),
-                ContentNestedDataSerializerFactory,
+                //ContentNestedDataSerializerFactory,
                 new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
 
             // invariant is the current default

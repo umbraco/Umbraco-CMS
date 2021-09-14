@@ -8,6 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Published
 {
+
     public class PublishedSnapshotTestObjects
     {
         [PublishedModel("element1")]

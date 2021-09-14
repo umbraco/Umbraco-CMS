@@ -193,7 +193,6 @@
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PublishedContent\PublishedRouterTests.cs" />
-    <Compile Include="PublishedContent\RootNodeTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />

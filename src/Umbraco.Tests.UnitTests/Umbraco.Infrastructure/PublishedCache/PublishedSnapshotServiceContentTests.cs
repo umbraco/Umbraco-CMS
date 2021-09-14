@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
 
     [TestFixture]
-    public class NuCacheContentTests : NuCacheTestsBase
+    public class PublishedSnapshotServiceContentTests : PublishedSnapshotServiceTestBase
     {
         private ContentType _contentType;
         private PropertyType _propertyType;
