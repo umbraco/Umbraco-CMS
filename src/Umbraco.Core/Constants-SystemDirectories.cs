@@ -21,12 +21,17 @@ namespace Umbraco.Cms.Core
             public const string Umbraco = "~/umbraco";
 
             /// <summary>
-            /// The Umbraco data folder in the content root
+            /// The Umbraco data folder in the content root.
             /// </summary>
             public const string Data = Umbraco + "/Data";
 
             /// <summary>
-            /// The Umbraco temp data folder in the content root
+            /// The Umbraco licenses folder in the content root.
+            /// </summary>
+            public const string Licenses = Umbraco + "/Licenses";
+
+            /// <summary>
+            /// The Umbraco temp data folder in the content root.
             /// </summary>
             public const string TempData = Data + "/TEMP";
 
