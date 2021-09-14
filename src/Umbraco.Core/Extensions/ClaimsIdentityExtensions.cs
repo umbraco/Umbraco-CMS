@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -293,7 +294,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="identity"></param>
         /// <returns>User ID as integer</returns>
-        public static int GetId(this ClaimsIdentity identity) => int.Parse(identity.FindFirstValue(ClaimTypes.NameIdentifier));
+        public static int GetId(this ClaimsIdentity identity) => int.Parse(identity.FindFirstValue(ClaimTypes.NameIdentifier), CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Get the real name belonging to the user from a ClaimsIdentity

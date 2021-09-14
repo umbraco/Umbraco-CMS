@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -125,7 +126,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return menu;
             }
 
-            var container = _entityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentTypeContainer);
+            var container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentTypeContainer);
             if (container != null)
             {
                 //set the default to create
@@ -147,7 +148,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             else
             {
-                var ct = _contentTypeService.Get(int.Parse(id));
+                var ct = _contentTypeService.Get(int.Parse(id, CultureInfo.InvariantCulture));
                 var parent = ct == null ? null : _contentTypeService.Get(ct.ParentId);
 
                 menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);

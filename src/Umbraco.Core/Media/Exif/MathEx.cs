@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 
 namespace Umbraco.Cms.Core.Media.Exif
@@ -714,8 +715,8 @@ namespace Umbraco.Cms.Core.Media.Exif
                 }
                 else if (sa.Length == 2)
                 {
-                    numerator = int.Parse(sa[0]);
-                    denominator = int.Parse(sa[1]);
+                    numerator = int.Parse(sa[0], CultureInfo.InvariantCulture);
+                    denominator = int.Parse(sa[1], CultureInfo.InvariantCulture);
                 }
                 else
                     throw new FormatException("The input string must be formatted as n/d where n and d are integers");
@@ -1342,8 +1343,8 @@ namespace Umbraco.Cms.Core.Media.Exif
                 }
                 else if (sa.Length == 2)
                 {
-                    numerator = uint.Parse(sa[0]);
-                    denominator = uint.Parse(sa[1]);
+                    numerator = uint.Parse(sa[0], CultureInfo.InvariantCulture);
+                    denominator = uint.Parse(sa[1], CultureInfo.InvariantCulture);
                 }
                 else
                     throw new FormatException("The input string must be formatted as n/d where n and d are integers");

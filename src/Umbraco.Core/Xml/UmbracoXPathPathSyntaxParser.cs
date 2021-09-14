@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Umbraco.Cms.Core.Xml
@@ -51,7 +52,7 @@ namespace Umbraco.Cms.Core.Xml
                     int idAsInt;
                     if (int.TryParse(i, out idAsInt))
                     {
-                        var exists = publishedContentExists(int.Parse(i));
+                        var exists = publishedContentExists(int.Parse(i, CultureInfo.InvariantCulture));
                         if (exists)
                             return idAsInt;
                     }

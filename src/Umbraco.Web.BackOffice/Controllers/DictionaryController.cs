@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authorization;
@@ -202,7 +203,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public ActionResult<DictionaryDisplay> PostSave(DictionarySave dictionary)
         {
             var dictionaryItem =
-                _localizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString()));
+                _localizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString(), CultureInfo.InvariantCulture));
 
             if (dictionaryItem == null)
                 return ValidationProblem("Dictionary item does not exist");

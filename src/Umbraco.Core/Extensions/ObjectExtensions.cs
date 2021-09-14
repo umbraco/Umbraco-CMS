@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -94,8 +95,8 @@ namespace Umbraco.Extensions
                 {
                     // sure, null can be any object
                     return Attempt<T>.Succeed((T)input);
-                } 
-            } 
+                }
+            }
 
             // just try to cast
             try
@@ -293,7 +294,7 @@ namespace Umbraco.Extensions
             {
                 if (target == typeof(int))
                 {
-                    if (int.TryParse(input, out var value))
+                    if (int.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
@@ -301,26 +302,26 @@ namespace Umbraco.Extensions
                     // Because decimal 100.01m will happily convert to integer 100, it
                     // makes sense that string "100.01" *also* converts to integer 100.
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Attempt<object>.If(decimal.TryParse(input2, out var value2), Convert.ToInt32(value2));
+                    return Attempt<object>.If(decimal.TryParse(input2, NumberStyles.Number, CultureInfo.InvariantCulture, out var value2), Convert.ToInt32(value2, CultureInfo.InvariantCulture));
                 }
 
                 if (target == typeof(long))
                 {
-                    if (long.TryParse(input, out var value))
+                    if (long.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
 
                     // Same as int
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Attempt<object>.If(decimal.TryParse(input2, out var value2), Convert.ToInt64(value2));
+                    return Attempt<object>.If(decimal.TryParse(input2, NumberStyles.Number, CultureInfo.InvariantCulture, out var value2), Convert.ToInt64(value2));
                 }
 
                 // TODO: Should we do the decimal trick for short, byte, unsigned?
 
                 if (target == typeof(bool))
                 {
-                    if (bool.TryParse(input, out var value))
+                    if (bool.TryParse(input,  out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
@@ -333,15 +334,15 @@ namespace Umbraco.Extensions
                 switch (Type.GetTypeCode(target))
                 {
                     case TypeCode.Int16:
-                        return Attempt<object>.If(short.TryParse(input, out var value), value);
+                        return Attempt<object>.If(short.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value), value);
 
                     case TypeCode.Double:
                         var input2 = NormalizeNumberDecimalSeparator(input);
-                        return Attempt<object>.If(double.TryParse(input2, out var valueD), valueD);
+                        return Attempt<object>.If(double.TryParse(input2, NumberStyles.Float, CultureInfo.InvariantCulture, out var valueD), valueD);
 
                     case TypeCode.Single:
                         var input3 = NormalizeNumberDecimalSeparator(input);
-                        return Attempt<object>.If(float.TryParse(input3, out var valueF), valueF);
+                        return Attempt<object>.If(float.TryParse(input3, NumberStyles.Float, CultureInfo.InvariantCulture, out var valueF), valueF);
 
                     case TypeCode.Char:
                         return Attempt<object>.If(char.TryParse(input, out var valueC), valueC);
@@ -350,16 +351,16 @@ namespace Umbraco.Extensions
                         return Attempt<object>.If(byte.TryParse(input, out var valueB), valueB);
 
                     case TypeCode.SByte:
-                        return Attempt<object>.If(sbyte.TryParse(input, out var valueSb), valueSb);
+                        return Attempt<object>.If(sbyte.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var valueSb), valueSb);
 
                     case TypeCode.UInt32:
-                        return Attempt<object>.If(uint.TryParse(input, out var valueU), valueU);
+                        return Attempt<object>.If(uint.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var valueU), valueU);
 
                     case TypeCode.UInt16:
-                        return Attempt<object>.If(ushort.TryParse(input, out var valueUs), valueUs);
+                        return Attempt<object>.If(ushort.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var valueUs), valueUs);
 
                     case TypeCode.UInt64:
-                        return Attempt<object>.If(ulong.TryParse(input, out var valueUl), valueUl);
+                        return Attempt<object>.If(ulong.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var valueUl), valueUl);
                 }
             }
             else if (target == typeof(Guid))
@@ -368,7 +369,7 @@ namespace Umbraco.Extensions
             }
             else if (target == typeof(DateTime))
             {
-                if (DateTime.TryParse(input, out var value))
+                if (DateTime.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.None, out var value))
                 {
                     switch (value.Kind)
                     {
@@ -388,16 +389,16 @@ namespace Umbraco.Extensions
             }
             else if (target == typeof(DateTimeOffset))
             {
-                return Attempt<object>.If(DateTimeOffset.TryParse(input, out var value), value);
+                return Attempt<object>.If(DateTimeOffset.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.None,out var value), value);
             }
             else if (target == typeof(TimeSpan))
             {
-                return Attempt<object>.If(TimeSpan.TryParse(input, out var value), value);
+                return Attempt<object>.If(TimeSpan.TryParse(input, CultureInfo.InvariantCulture, out var value), value);
             }
             else if (target == typeof(decimal))
             {
                 var input2 = NormalizeNumberDecimalSeparator(input);
-                return Attempt<object>.If(decimal.TryParse(input2, out var value), value);
+                return Attempt<object>.If(decimal.TryParse(input2, NumberStyles.Number, CultureInfo.InvariantCulture, out var value), value);
             }
             else if (input != null && target == typeof(Version))
             {
@@ -676,7 +677,7 @@ namespace Umbraco.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string NormalizeNumberDecimalSeparator(string s)
         {
-            var normalized = System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
+            var normalized = CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator[0];
             return s.ReplaceMany(NumberDecimalSeparatorsToNormalize, normalized);
         }
 

@@ -485,7 +485,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var rootId = Cms.Core.Constants.System.RootString;
             var ids = media.Path.Split(Constants.CharArrays.Comma)
                 .Where(x => x != rootId && x != media.Id.ToString(CultureInfo.InvariantCulture))
-                .Select(int.Parse)
+                .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
                 .ToArray();
             if (ids.Any() == false)
                 return new List<IMedia>();

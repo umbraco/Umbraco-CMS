@@ -1344,7 +1344,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         /// <inheritdoc />
         public bool HasContainerInPath(string contentPath)
         {
-            var ids = contentPath.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray();
+            var ids = contentPath.Split(Constants.CharArrays.Comma).Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToArray();
             return HasContainerInPath(ids);
         }
 

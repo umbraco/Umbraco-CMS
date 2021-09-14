@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -16,9 +17,9 @@ namespace Umbraco.Cms.Core.Media.Exif
             var height = document.Root?.Attributes().Where(x => x.Name == "height").Select(x => x.Value).FirstOrDefault();
 
             Properties.Add(new ExifSInt(ExifTag.PixelYDimension,
-                height == null ? Constants.Conventions.Media.DefaultSize : int.Parse(height)));
+                height == null ? Constants.Conventions.Media.DefaultSize : int.Parse(height, CultureInfo.InvariantCulture)));
             Properties.Add(new ExifSInt(ExifTag.PixelXDimension,
-                width == null ? Constants.Conventions.Media.DefaultSize : int.Parse(width)));
+                width == null ? Constants.Conventions.Media.DefaultSize : int.Parse(width, CultureInfo.InvariantCulture)));
 
             Format = ImageFileFormat.SVG;
         }

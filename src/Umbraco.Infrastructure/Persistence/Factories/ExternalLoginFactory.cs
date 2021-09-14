@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
@@ -35,7 +36,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
-                UserId = int.Parse(entity.UserId), // TODO: This is temp until we change the ext logins to use GUIDs
+                UserId = int.Parse(entity.UserId, CultureInfo.InvariantCulture), // TODO: This is temp until we change the ext logins to use GUIDs
                 UserData = entity.UserData
             };
 

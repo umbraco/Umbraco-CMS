@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using System.Globalization;
 using NUnit.Framework;
 using Umbraco.Extensions;
 
@@ -46,10 +47,28 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings
             Assert.AreEqual(false, conv.Result);
         }
 
+
         [Test]
-        public void ConvertToIntegerTest()
+        [TestCase("en-US")]
+        [TestCase(null)]
+        [TestCase("sv-SE")]
+        [TestCase("da-DK")]
+        [TestCase("tr-TR")]
+        public void ConvertToIntegerTest(string culture)
         {
-            var conv = "100".TryConvertTo<int>();
+            if (culture is not null)
+            {
+                CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+            }
+            var conv = "-1".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(-1, conv.Result);
+
+            conv = "−1".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(-1, conv.Result);
+
+            conv = "100".TryConvertTo<int>();
             Assert.IsTrue(conv);
             Assert.AreEqual(100, conv.Result);
 
