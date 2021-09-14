@@ -112,30 +112,30 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Assert.AreEqual("val-fr1", publishedContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", "fr-FR"));
             Assert.AreEqual("val-uk1", publishedContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", "en-UK"));
 
-            Assert.IsNull(publishedContent.Name(VariationAccesor)); // no invariant name for varying content
-            Assert.AreEqual("name-fr1", publishedContent.Name(VariationAccesor, "fr-FR"));
-            Assert.AreEqual("name-uk1", publishedContent.Name(VariationAccesor, "en-UK"));
+            Assert.IsNull(publishedContent.Name(VariationContextAccessor)); // no invariant name for varying content
+            Assert.AreEqual("name-fr1", publishedContent.Name(VariationContextAccessor, "fr-FR"));
+            Assert.AreEqual("name-uk1", publishedContent.Name(VariationContextAccessor, "en-UK"));
 
             var draftContent = snapshot.Content.GetById(true, 1);
             Assert.AreEqual("val2", draftContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop"));
             Assert.AreEqual("val-fr2", draftContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", "fr-FR"));
             Assert.AreEqual("val-uk2", draftContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", "en-UK"));
 
-            Assert.IsNull(draftContent.Name(VariationAccesor)); // no invariant name for varying content
-            Assert.AreEqual("name-fr2", draftContent.Name(VariationAccesor, "fr-FR"));
-            Assert.AreEqual("name-uk2", draftContent.Name(VariationAccesor, "en-UK"));
+            Assert.IsNull(draftContent.Name(VariationContextAccessor)); // no invariant name for varying content
+            Assert.AreEqual("name-fr2", draftContent.Name(VariationContextAccessor, "fr-FR"));
+            Assert.AreEqual("name-uk2", draftContent.Name(VariationContextAccessor, "en-UK"));
 
             // now french is default
-            VariationAccesor.VariationContext = new VariationContext("fr-FR");
+            VariationContextAccessor.VariationContext = new VariationContext("fr-FR");
             Assert.AreEqual("val-fr1", publishedContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop"));
-            Assert.AreEqual("name-fr1", publishedContent.Name(VariationAccesor));
-            Assert.AreEqual(new DateTime(2018, 01, 01, 01, 00, 00), publishedContent.CultureDate(VariationAccesor));
+            Assert.AreEqual("name-fr1", publishedContent.Name(VariationContextAccessor));
+            Assert.AreEqual(new DateTime(2018, 01, 01, 01, 00, 00), publishedContent.CultureDate(VariationContextAccessor));
 
             // now uk is default
-            VariationAccesor.VariationContext = new VariationContext("en-UK");
+            VariationContextAccessor.VariationContext = new VariationContext("en-UK");
             Assert.AreEqual("val-uk1", publishedContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop"));
-            Assert.AreEqual("name-uk1", publishedContent.Name(VariationAccesor));
-            Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.CultureDate(VariationAccesor));
+            Assert.AreEqual("name-uk1", publishedContent.Name(VariationContextAccessor));
+            Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.CultureDate(VariationContextAccessor));
 
             // invariant needs to be retrieved explicitly, when it's not default
             Assert.AreEqual("val1", publishedContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop", culture: ""));
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Assert.AreEqual(ContentVariation.Nothing, againContent.ContentType.GetPropertyType("prop").Variations);
 
             // now, "no culture" means "invariant"
-            Assert.AreEqual("It Works1!", againContent.Name(VariationAccesor));
+            Assert.AreEqual("It Works1!", againContent.Name(VariationContextAccessor));
             Assert.AreEqual("val1", againContent.Value<string>(Mock.Of<IPublishedValueFallback>(), "prop"));
         }
 

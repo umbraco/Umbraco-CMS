@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -9,6 +8,7 @@ using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
+
     [TestFixture]
     public class RootNodeTests : PublishedSnapshotServiceTestBase
     {
@@ -22,9 +22,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
                 xml,
                 TestHelper.ShortStringHelper,
-                out ContentType[] contentTypes).ToList();
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
 
-            Init(kits, contentTypes);
+            Init(kits, contentTypes, dataTypes);
         }
 
         [Test]

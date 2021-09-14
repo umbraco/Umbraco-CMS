@@ -13,6 +13,9 @@ using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.PropertyEditors;
+using Moq;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.Common.Published
 {
@@ -22,8 +25,19 @@ namespace Umbraco.Cms.Tests.Common.Published
     /// </summary>
     public static class PublishedContentXmlAdapter
     {
-        public static IEnumerable<ContentNodeKit> GetContentNodeKits(string xml, IShortStringHelper shortStringHelper, out ContentType[] contentTypes)
+        public static IEnumerable<ContentNodeKit> GetContentNodeKits(
+            string xml,
+            IShortStringHelper shortStringHelper,
+            out ContentType[] contentTypes,
+            out DataType[] dataTypes)
         {
+            // use the label data type for all data for these tests except in the case
+            // where a property is named 'content', in which case use the RTE. 
+            var serializer = new ConfigurationEditorJsonSerializer();
+            var labelDataType = new DataType(new VoidEditor("Label", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 3 };
+            var rteDataType = new DataType(new VoidEditor("RTE", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 4 };
+            dataTypes = new[] { labelDataType, rteDataType };
+
             var kitsAndXml = new List<(ContentNodeKit kit, XElement node)>();
 
             var xDoc = XDocument.Parse(xml);
@@ -77,15 +91,25 @@ namespace Umbraco.Cms.Tests.Common.Published
 
             // put together the unique content types
             var contentTypesIdToType = new Dictionary<int, ContentType>();
-            foreach(var x in kitsAndXml)
+            foreach((ContentNodeKit kit, XElement node) in kitsAndXml)
             {
-                if (!contentTypesIdToType.ContainsKey(x.kit.ContentTypeId))
+                if (!contentTypesIdToType.ContainsKey(kit.ContentTypeId))
                 {
-                    contentTypesIdToType[x.kit.ContentTypeId] = new ContentType(shortStringHelper, -1)
+                    var contentType = new ContentType(shortStringHelper, -1)
                     {
-                        Id = x.kit.ContentTypeId,
-                        Alias = x.node.Name.LocalName
+                        Id = kit.ContentTypeId,
+                        Alias = node.Name.LocalName
                     };
+                    foreach(KeyValuePair<string, PropertyData[]> property in kit.DraftData.Properties)
+                    {
+                        var propertyType = new PropertyType(shortStringHelper, labelDataType, property.Key);
+                        if (propertyType.Alias == "content")
+                        {
+                            propertyType.DataTypeId = rteDataType.Id;
+                        }
+                        contentType.AddPropertyType(propertyType);
+                    }
+                    contentTypesIdToType[kit.ContentTypeId] = contentType;
                 }
             }
 

@@ -1,9 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
@@ -14,6 +13,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -22,7 +22,6 @@ using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common;
-using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
@@ -30,16 +29,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
     [TestFixture]
     public class PublishedSnapshotServiceTestBase
     {
-        protected IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
+        protected virtual IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
+        protected IPublishedValueFallback PublishedValueFallback { get; private set; }
         protected IPublishedSnapshotService SnapshotService { get; private set; }
-        protected IVariationContextAccessor VariationAccesor { get; private set; }
+        protected IVariationContextAccessor VariationContextAccessor { get; private set; }
         protected TestPublishedSnapshotAccessor PublishedSnapshotAccessor { get; private set; }
         protected TestNuCacheContentService NuCacheContentService { get; private set; }
+        protected virtual PropertyValueConverterCollection PropertyValueConverterCollection
+            => new PropertyValueConverterCollection(() => new[]
+                {
+                    new TestSimpleTinyMceValueConverter()
+                });
 
         [SetUp]
         public virtual void Setup()
         {
-            VariationAccesor = new TestVariationContextAccessor();
+            VariationContextAccessor = new TestVariationContextAccessor();
             PublishedSnapshotAccessor = new TestPublishedSnapshotAccessor();
         }
 
@@ -49,18 +54,27 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             SnapshotService?.Dispose();
         }
 
-        private static ServiceContext GetServiceContext(ContentType[] contentTypes, out IDataTypeService dataTypeService)
+        /// <summary>
+        /// Used as a property editor for any test property that has an editor alias called "Umbraco.Void.RTE"
+        /// </summary>
+        private class TestSimpleTinyMceValueConverter : SimpleTinyMceValueConverter
+        {
+            public override bool IsConverter(IPublishedPropertyType propertyType)
+                => propertyType.EditorAlias == "Umbraco.Void.RTE";
+        }
+
+        private static DataType[] GetDefaultDataTypes()
         {
             var serializer = new ConfigurationEditorJsonSerializer();
 
             // create data types, property types and content types
             var dataType = new DataType(new VoidEditor("Editor", Mock.Of<IDataValueEditorFactory>()), serializer) { Id = 3 };
 
-            var dataTypes = new[]
-            {
-                dataType
-            };
+            return new[] { dataType };
+        }
 
+        private static ServiceContext GetServiceContext(ContentType[] contentTypes, DataType[] dataTypes, out IDataTypeService dataTypeService)
+        {
             var contentTypeService = new Mock<IContentTypeService>();
             contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
             contentTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
@@ -103,21 +117,19 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         /// </summary>
         /// <param name="contentNodeKits"></param>
         /// <param name="contentTypes"></param>
-        protected void Init(IEnumerable<ContentNodeKit> contentNodeKits, ContentType[] contentTypes)
+        protected void Init(IEnumerable<ContentNodeKit> contentNodeKits, ContentType[] contentTypes, DataType[] dataTypes = null)
         {
             // create a data source for NuCache
             NuCacheContentService = new TestNuCacheContentService(contentNodeKits);
-
-            var factory = new Mock<IServiceProvider>();
-
-            factory.Setup(x => x.GetService(typeof(IPublishedModelFactory))).Returns(PublishedModelFactory);
-            factory.Setup(x => x.GetService(typeof(IPublishedValueFallback))).Returns(new NoopPublishedValueFallback());
 
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             // create a service context
-            ServiceContext serviceContext = GetServiceContext(contentTypes, out IDataTypeService dataTypeService);
+            ServiceContext serviceContext = GetServiceContext(
+                contentTypes,
+                dataTypes ?? GetDefaultDataTypes(),
+                out IDataTypeService dataTypeService);
 
             // create a scope provider
             var scopeProvider = Mock.Of<IScopeProvider>();
@@ -135,7 +147,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             // create a published content type factory
             var contentTypeFactory = new PublishedContentTypeFactory(
                 PublishedModelFactory,
-                new PropertyValueConverterCollection(() => Array.Empty<IPropertyValueConverter>()),
+                PropertyValueConverterCollection,
                 dataTypeService);            
 
             var typeFinder = TestHelper.GetTypeFinder();
@@ -152,7 +164,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 serviceContext,
                 contentTypeFactory,
                 PublishedSnapshotAccessor,
-                VariationAccesor,
+                VariationContextAccessor,
                 Mock.Of<IProfilingLogger>(),
                 NullLoggerFactory.Instance,
                 scopeProvider,
@@ -166,9 +178,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
 
             // invariant is the current default
-            VariationAccesor.VariationContext = new VariationContext();
+            VariationContextAccessor.VariationContext = new VariationContext();
 
-            factory.Setup(x => x.GetService(typeof(IVariationContextAccessor))).Returns(VariationAccesor);
+            PublishedValueFallback = new PublishedValueFallback(serviceContext, VariationContextAccessor);
         }
     }
 }
