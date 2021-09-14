@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
@@ -94,19 +93,20 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     DataTypesInstalled = ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
-                    MacrosInstalled = ImportMacros(compiledPackage.Macros, compiledPackage.MacroPartialViews, userId),
+                    MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
+                    MacroPartialViewsInstalled = ImportMacroPartialViews(compiledPackage.MacroPartialViews, userId),
                     TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
                     DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId),
                     MediaTypesInstalled = ImportMediaTypes(compiledPackage.MediaTypes, userId),
+                    StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId),
+                    ScriptsInstalled = ImportScripts(compiledPackage.Scripts, userId),
+                    PartialViewsInstalled = ImportPartialViews(compiledPackage.PartialViews, userId)
                 };
 
-                //we need a reference to the imported doc types to continue
+                // We need a reference to the imported doc types to continue
                 var importedDocTypes = installationSummary.DocumentTypesInstalled.ToDictionary(x => x.Alias, x => x);
                 var importedMediaTypes = installationSummary.MediaTypesInstalled.ToDictionary(x => x.Alias, x => x);
 
-                installationSummary.StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId);
-                installationSummary.PartialViewsInstalled = ImportPartialViews(compiledPackage.PartialViews, userId);
-                installationSummary.ScriptsInstalled = ImportScripts(compiledPackage.Scripts, userId);
                 installationSummary.ContentInstalled = ImportContentBase(compiledPackage.Documents, importedDocTypes, userId, _contentTypeService, _contentService);
                 installationSummary.MediaInstalled = ImportContentBase(compiledPackage.Media, importedMediaTypes, userId, _mediaTypeService, _mediaService);
 
@@ -1270,7 +1270,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <returns></returns>
         public IReadOnlyList<IMacro> ImportMacros(
             IEnumerable<XElement> macroElements,
-            IEnumerable<XElement> macroPartialViewsElements,
             int userId)
         {
             var macros = macroElements.Select(ParseMacroElement).ToList();
@@ -1280,29 +1279,36 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 _macroService.Save(macro, userId);
             }
 
-            ImportMacroPartialViews(macroPartialViewsElements);
-
             return macros;
         }
 
-        private void ImportMacroPartialViews(IEnumerable<XElement> viewElements)
+        public IReadOnlyList<IPartialView> ImportMacroPartialViews(IEnumerable<XElement> macroPartialViewsElements, int userId)
         {
-            foreach (XElement element in viewElements)
+            var result = new List<IPartialView>();
+
+            foreach (XElement macroPartialViewXml in macroPartialViewsElements)
             {
-                var path = element.AttributeValue<string>("path");
+                var path = macroPartialViewXml.AttributeValue<string>("path");
+
                 if (path == null)
                 {
                     throw new InvalidOperationException("No path attribute found");
                 }
-                var contents = element.Value ?? string.Empty;
 
-                var physicalPath = _hostingEnvironment.MapPathContentRoot(path);
-                // TODO: Do we overwrite? IMO I don't think so since these will be views a user will change.
-                if (!System.IO.File.Exists(physicalPath))
+                IPartialView macroPartialView = _fileService.GetPartialViewMacro(path);
+
+                // only update if it doesn't exist
+                if (macroPartialView == null)
                 {
-                    System.IO.File.WriteAllText(physicalPath, contents, Encoding.UTF8);
+                    var content = macroPartialViewXml.Value ?? string.Empty;
+
+                    macroPartialView = new PartialView(PartialViewType.PartialViewMacro, path) { Content = content };
+                    _fileService.SavePartialViewMacro(macroPartialView, userId);
+                    result.Add(macroPartialView);
                 }
             }
+
+            return result;
         }
 
         private IMacro ParseMacroElement(XElement macroElement)

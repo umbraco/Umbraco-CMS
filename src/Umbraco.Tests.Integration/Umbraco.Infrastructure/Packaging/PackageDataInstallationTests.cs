@@ -650,7 +650,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             // Act
             var macros = PackageDataInstallation.ImportMacros(
                 macrosElement.Elements("macro"),
-                Enumerable.Empty<XElement>(),
                 0).ToList();
 
             // Assert
@@ -674,7 +673,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             // Act
             var macros = PackageDataInstallation.ImportMacros(
                 macrosElement.Elements("macro"),
-                Enumerable.Empty<XElement>(),
                 0).ToList();
 
             // Assert
