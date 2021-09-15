@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Extensions
@@ -12,7 +13,7 @@ namespace Umbraco.Extensions
         public static Version GetVersion(this SemVersion semVersion, int maxParts = 4)
         {
             int build = 0;
-            int.TryParse(semVersion.Build, out build);
+            int.TryParse(semVersion.Build, NumberStyles.Integer, CultureInfo.InvariantCulture, out build);
 
             if (maxParts >= 4)
             {

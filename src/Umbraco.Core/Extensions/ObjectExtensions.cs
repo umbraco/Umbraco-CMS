@@ -294,7 +294,7 @@ namespace Umbraco.Extensions
             {
                 if (target == typeof(int))
                 {
-                    if (int.TryParse(input, NumberStyles.Any, CultureInfo.InvariantCulture, out var value))
+                    if (int.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }

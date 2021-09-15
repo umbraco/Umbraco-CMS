@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.XPath;
 using Examine;
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure
             switch (id)
             {
                 case string s:
-                    return int.TryParse(s, out intId);
+                    return int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out intId);
 
                 case int i:
                     intId = i;

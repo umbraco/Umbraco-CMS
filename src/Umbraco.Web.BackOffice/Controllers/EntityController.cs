@@ -579,7 +579,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             string filter = "",
             Guid? dataTypeKey = null)
         {
-            if (int.TryParse(id, out var intId))
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
             {
                 return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
             }

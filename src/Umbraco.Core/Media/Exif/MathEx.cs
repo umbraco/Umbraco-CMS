@@ -702,7 +702,7 @@ namespace Umbraco.Cms.Core.Media.Exif
                 if (sa.Length == 1)
                 {
                     // Try to parse as int
-                    if (int.TryParse(sa[0], out numerator))
+                    if (int.TryParse(sa[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out numerator))
                     {
                         denominator = 1;
                     }
@@ -1330,7 +1330,7 @@ namespace Umbraco.Cms.Core.Media.Exif
                 if (sa.Length == 1)
                 {
                     // Try to parse as uint
-                    if (uint.TryParse(sa[0], out numerator))
+                    if (uint.TryParse(sa[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out numerator))
                     {
                         denominator = 1;
                     }

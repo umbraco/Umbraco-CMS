@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
 
                 // ensure the remainder of the request has the correct principal set
-                actionContext.HttpContext.SetPrincipalForRequest(ClaimsPrincipal.Current);
+                //actionContext.HttpContext.SetPrincipalForRequest(ClaimsPrincipal.Current);
 
                 // flag that we've made changes
                 _requestCache.Set(nameof(CheckIfUserTicketDataIsStaleFilter), true);

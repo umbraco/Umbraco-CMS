@@ -838,7 +838,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     propertyGroup.Type = type;
                 }
 
-                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, out var sortOrder))
+                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var sortOrder))
                 {
                     // Override the sort order with the imported value
                     propertyGroup.SortOrder = sortOrder;
@@ -902,7 +902,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var sortOrderElement = property.Element("SortOrder");
                 if (sortOrderElement != null)
                 {
-                    int.TryParse(sortOrderElement.Value, out sortOrder);
+                    int.TryParse(sortOrderElement.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out sortOrder);
                 }
 
                 var propertyType = new PropertyType(_shortStringHelper, dataTypeDefinition, property.Element("Alias").Value)

@@ -268,7 +268,7 @@ namespace Umbraco.Extensions
         /// <returns>Array of start content nodes</returns>
         public static int[] GetStartContentNodes(this ClaimsIdentity identity) =>
             identity.FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType)
-                .Select(node => int.TryParse(node.Value, out var i) ? i : default)
+                .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : default)
                 .Where(x => x != default).ToArray();
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace Umbraco.Extensions
         /// <returns>Array of start media nodes</returns>
         public static int[] GetStartMediaNodes(this ClaimsIdentity identity) =>
             identity.FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType)
-                .Select(node => int.TryParse(node.Value, out var i) ? i : default)
+                .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : default)
                 .Where(x => x != default).ToArray();
 
         /// <summary>

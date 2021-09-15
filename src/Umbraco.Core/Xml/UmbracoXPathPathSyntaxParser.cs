@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.Xml
                 foreach (var i in path)
                 {
                     int idAsInt;
-                    if (int.TryParse(i, out idAsInt))
+                    if (int.TryParse(i, NumberStyles.Integer, CultureInfo.InvariantCulture, out idAsInt))
                     {
                         var exists = publishedContentExists(int.Parse(i, CultureInfo.InvariantCulture));
                         if (exists)

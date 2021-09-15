@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
@@ -61,7 +62,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             // It might be a udi, so check that next.
             // Otherwise treat it as a guid - unlikely we ever get here.
             // Failing that, we can't parse it.
-            if (int.TryParse(argument, out int parsedId))
+            if (int.TryParse(argument, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsedId))
             {
                 nodeId = parsedId;
                 return true;

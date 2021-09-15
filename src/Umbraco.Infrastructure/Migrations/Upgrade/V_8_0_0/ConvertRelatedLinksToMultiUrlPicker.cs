@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -68,7 +69,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                         if (linkIsUdi == false)
                         {
                             // oh no.. probably an integer, yikes!
-                            if (int.TryParse(relatedLink.Link, out var intId))
+                            if (int.TryParse(relatedLink.Link, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
                             {
                                 var sqlNodeData = Sql()
                                     .Select<NodeDto>()

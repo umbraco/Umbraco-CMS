@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -71,7 +72,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             int asInt;
             Guid asGuid = Guid.Empty;
-            if (int.TryParse(id, out asInt) == false)
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out asInt) == false)
             {
                 if (Guid.TryParse(id, out asGuid) == false)
                 {
@@ -264,7 +265,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             int id;
             var parts = entity.Path.Split(Comma, StringSplitOptions.RemoveEmptyEntries);
-            return parts.Length >= 2 && int.TryParse(parts[1], out id) ? id : 0;
+            return parts.Length >= 2 && int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out id) ? id : 0;
         }
 
         protected abstract ActionResult<MenuItemCollection> PerformGetMenuForNode(string id, FormCollection queryStrings);
@@ -275,7 +276,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
-            if (!int.TryParse(id, out var entityId))
+            if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var entityId))
             {
                 var entity = GetEntityFromId(id);
                 if (entity == null)
@@ -544,7 +545,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             {
                 return new Tuple<Guid?, int?>(idGuid, null);
             }
-            if (int.TryParse(id, out idInt))
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out idInt))
             {
                 return new Tuple<Guid?, int?>(null, idInt);
             }
@@ -576,7 +577,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 {
                     entity = _entityService.Get(idGuid, UmbracoObjectType);
                 }
-                else if (int.TryParse(s, out var idInt))
+                else if (int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var idInt))
                 {
                     entity = _entityService.Get(idInt, UmbracoObjectType);
                 }
