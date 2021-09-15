@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Web.Common.Security
         public void Configure(FormOptions options)
         {
             // convert from KB to bytes
-            options.MultipartBodyLengthLimit = _runtimeSettings.Value.MaxRequestLength.HasValue ? _runtimeSettings.Value.MaxRequestLength.Value * 1024 : int.MaxValue;
+            options.MultipartBodyLengthLimit = _runtimeSettings.Value.MaxRequestLength.HasValue ? _runtimeSettings.Value.MaxRequestLength.Value * 1024 : long.MaxValue;
         }
     }
 }
