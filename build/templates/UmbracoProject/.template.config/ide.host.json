@@ -55,6 +55,13 @@
                 "text": "Optional: Database connection string when using Unattended install"
             },
             "isVisible": "true"
+        },
+        {
+            "id": "NoNodesViewPath",
+            "name": {
+                "text": "Optional: Path to a custom view presented with the Umbraco installation contains no published content"
+            },
+            "isVisible": "true"
         }
     ]
 }

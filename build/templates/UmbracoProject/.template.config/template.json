@@ -249,6 +249,43 @@
                 ]
               }
         },
+        "NoNodesViewPath":{
+            "type": "parameter",
+            "datatype":"text",
+            "description": "Path to a custom view presented with the Umbraco installation contains no published content",
+            "defaultValue": ""
+        },
+        "NoNodesViewPathReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "NO_NODES_VIEW_PATH_FROM_TEMPLATE",
+            "parameters": {
+                "source": "NoNodesViewPath",
+                "steps": [
+                    {
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
+                    }
+                ]
+              }
+        },
+        "HasNoNodesViewPath":{
+            "type": "computed",
+            "value": "(NoNodesViewPath != \"\")"
+        },
         "UsingUnattenedInstall":{
             "type": "computed",
             "value": "(FriendlyName != \"\" && Email != \"\" && Password != \"\" && ConnectionString != \"\")"
