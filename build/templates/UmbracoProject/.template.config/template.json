@@ -253,7 +253,7 @@
             "type": "parameter",
             "datatype":"text",
             "description": "Path to a custom view presented with the Umbraco installation contains no published content",
-            "defaultValue": "",
+            "defaultValue": ""
         },
         "NoNodesViewPathReplaced":{
             "type": "generated",
