@@ -15,7 +15,8 @@
                 ng-model="filesHolder"
                 ngf-change="handleFiles($files, $event, $invalidFiles)"
                 ngf-multiple="true"
-                ngf-pattern="*.udt">
+                ngf-pattern="'*.udt'"
+                accept=".udt" >
                 <localize key="general_import">Import</localize>
             </button>
 
