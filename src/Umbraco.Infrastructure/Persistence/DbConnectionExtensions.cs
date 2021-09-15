@@ -1,35 +1,17 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.Common;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
-using Umbraco.Extensions;
 
 namespace Umbraco.Extensions
 {
     public static class DbConnectionExtensions
     {
-        public static string DetectProviderNameFromConnectionString(string connectionString)
+        public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)
         {
-            var builder = new DbConnectionStringBuilder { ConnectionString = connectionString };
-            var allKeys = builder.Keys.Cast<string>();
-
-            if (allKeys.InvariantContains("Data Source")
-                //this dictionary is case insensitive
-                && builder["Data source"].ToString().InvariantContains(".sdf"))
-            {
-                return Cms.Core.Constants.DbProviderNames.SqlCe;
-            }
-
-            return Cms.Core.Constants.DbProviderNames.SqlServer;
-        }
-
-    public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)
-        {
-
             var connection = factory?.CreateConnection();
 
             if (connection == null)
@@ -41,7 +23,6 @@ namespace Umbraco.Extensions
                 return connection.IsAvailable();
             }
         }
-
 
         public static bool IsAvailable(this IDbConnection connection)
         {
@@ -68,17 +49,25 @@ namespace Umbraco.Extensions
         internal static IDbConnection UnwrapUmbraco(this IDbConnection connection)
         {
             var unwrapped = connection;
+
             IDbConnection c;
             do
             {
                 c = unwrapped;
-                if (unwrapped is ProfiledDbConnection profiled) unwrapped = profiled.WrappedConnection;
-                if (unwrapped is RetryDbConnection retrying) unwrapped = retrying.Inner;
 
-            } while (c != unwrapped);
+                if (unwrapped is ProfiledDbConnection profiled)
+                {
+                    unwrapped = profiled.WrappedConnection;
+                }
+
+                if (unwrapped is RetryDbConnection retrying)
+                {
+                    unwrapped = retrying.Inner;
+                }
+            }
+            while (c != unwrapped);
 
             return unwrapped;
         }
-
     }
 }
