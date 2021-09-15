@@ -35,6 +35,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         protected IVariationContextAccessor VariationContextAccessor { get; private set; }
         protected TestPublishedSnapshotAccessor PublishedSnapshotAccessor { get; private set; }
         protected TestNuCacheContentService NuCacheContentService { get; private set; }
+        protected PublishedContentTypeFactory PublishedContentTypeFactory { get; private set; }
         protected virtual PropertyValueConverterCollection PropertyValueConverterCollection
             => new PropertyValueConverterCollection(() => new[]
                 {
@@ -145,7 +146,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 .Returns(Mock.Of<IScope>);
 
             // create a published content type factory
-            var contentTypeFactory = new PublishedContentTypeFactory(
+            PublishedContentTypeFactory = new PublishedContentTypeFactory(
                 PublishedModelFactory,
                 PropertyValueConverterCollection,
                 dataTypeService);            
@@ -162,7 +163,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 Mock.Of<ISyncBootStateAccessor>(x => x.GetSyncBootState() == SyncBootState.WarmBoot),
                 new SimpleMainDom(),
                 serviceContext,
-                contentTypeFactory,
+                PublishedContentTypeFactory,
                 PublishedSnapshotAccessor,
                 VariationContextAccessor,
                 Mock.Of<IProfilingLogger>(),

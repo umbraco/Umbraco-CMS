@@ -93,29 +93,43 @@ namespace Umbraco.Cms.Tests.Common.Published
             var contentTypesIdToType = new Dictionary<int, ContentType>();
             foreach((ContentNodeKit kit, XElement node) in kitsAndXml)
             {
-                if (!contentTypesIdToType.ContainsKey(kit.ContentTypeId))
+                if (!contentTypesIdToType.TryGetValue(kit.ContentTypeId, out ContentType contentType))
                 {
-                    var contentType = new ContentType(shortStringHelper, -1)
+                    contentType = new ContentType(shortStringHelper, -1)
                     {
                         Id = kit.ContentTypeId,
                         Alias = node.Name.LocalName
                     };
-                    foreach(KeyValuePair<string, PropertyData[]> property in kit.DraftData.Properties)
-                    {
-                        var propertyType = new PropertyType(shortStringHelper, labelDataType, property.Key);
-                        if (propertyType.Alias == "content")
-                        {
-                            propertyType.DataTypeId = rteDataType.Id;
-                        }
-                        contentType.AddPropertyType(propertyType);
-                    }
+                    SetContentTypeProperties(shortStringHelper, labelDataType, rteDataType, kit, contentType);
                     contentTypesIdToType[kit.ContentTypeId] = contentType;
                 }
+                else
+                {
+                    // we've already created it but might need to add properties
+                    SetContentTypeProperties(shortStringHelper, labelDataType, rteDataType, kit, contentType);
+                } 
             }
 
             contentTypes = contentTypesIdToType.Values.ToArray();
 
             return kitsAndXml.Select(x => x.kit);
+        }
+
+        private static void SetContentTypeProperties(IShortStringHelper shortStringHelper, DataType labelDataType, DataType rteDataType, ContentNodeKit kit, ContentType contentType)
+        {
+            foreach (KeyValuePair<string, PropertyData[]> property in kit.DraftData.Properties)
+            {
+                var propertyType = new PropertyType(shortStringHelper, labelDataType, property.Key);
+
+                if (!contentType.PropertyTypeExists(propertyType.Alias))
+                {
+                    if (propertyType.Alias == "content")
+                    {
+                        propertyType.DataTypeId = rteDataType.Id;
+                    }
+                    contentType.AddPropertyType(propertyType);
+                }
+            }
         }
     }
 }
