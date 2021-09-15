@@ -1,4 +1,4 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -61,10 +61,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings
                 CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
             }
             var conv = "-1".TryConvertTo<int>();
-            Assert.IsTrue(conv);
-            Assert.AreEqual(-1, conv.Result);
-
-            conv = "−1".TryConvertTo<int>();
             Assert.IsTrue(conv);
             Assert.AreEqual(-1, conv.Result);
 

@@ -369,7 +369,7 @@ namespace Umbraco.Extensions
             }
             else if (target == typeof(DateTime))
             {
-                if (DateTime.TryParse(input, CultureInfo.InvariantCulture, DateTimeStyles.None, out var value))
+                if (DateTime.TryParse(input, out var value))
                 {
                     switch (value.Kind)
                     {
