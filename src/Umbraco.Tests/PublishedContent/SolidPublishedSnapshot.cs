@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -355,31 +355,9 @@ namespace Umbraco.Tests.PublishedContent
         }
     }
 
-    [PublishedModel("ContentType2")]
-    public class ContentType2 : PublishedContentModel
-    {
-        #region Plumbing
+    
 
-        public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content, fallback)
-        { }
-
-        #endregion
-
-        public int Prop1 => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "prop1");
-    }
-
-    [PublishedModel("ContentType2Sub")]
-    public class ContentType2Sub : ContentType2
-    {
-        #region Plumbing
-
-        public ContentType2Sub(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content, fallback)
-        { }
-
-        #endregion
-    }
+    
 
     public class PublishedContentStrong1 : PublishedContentModel
     {

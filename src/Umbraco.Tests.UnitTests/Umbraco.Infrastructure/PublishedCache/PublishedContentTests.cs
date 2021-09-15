@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         // override to specify our own factory with custom types
         protected override IPublishedModelFactory PublishedModelFactory
             => _publishedModelFactory ??= new PublishedModelFactory(
-                    new[] { typeof(Home), typeof(Anything) },
+                    new[] { typeof(Home), typeof(Anything), typeof(CustomDocument) },
                     PublishedValueFallback);
 
         [PublishedModel("Home")]
@@ -61,12 +61,22 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             public Home(IPublishedContent content, IPublishedValueFallback fallback)
                 : base(content, fallback)
             { }
+
+            public bool UmbracoNaviHide => this.Value<bool>(Mock.Of<IPublishedValueFallback>(), "umbracoNaviHide");
         }
 
         [PublishedModel("anything")]
         internal class Anything : PublishedContentModel
         {
             public Anything(IPublishedContent content, IPublishedValueFallback fallback)
+                : base(content, fallback)
+            { }
+        }
+
+        [PublishedModel("CustomDocument")]
+        internal class CustomDocument : PublishedContentModel
+        {
+            public CustomDocument(IPublishedContent content, IPublishedValueFallback fallback)
                 : base(content, fallback)
             { }
         }
@@ -849,6 +859,87 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Assert.AreEqual(val3, c.Size);
         }
 
+        [Test]
+        public void First()
+        {
+            var publishedSnapshot = GetPublishedSnapshot();            
+            var content = publishedSnapshot.Content.GetAtRoot().First();
+            Assert.AreEqual("Home", content.Name(VariationContextAccessor));
+        }
+
+        [Test]
+        public void Distinct()
+        {
+            var items = GetNode(1173)
+                .Children(VariationContextAccessor)
+                .Distinct()
+                .Distinct()
+                .ToIndexedArray();
+
+            Assert.AreEqual(5, items.Length);
+
+            IndexedArrayItem<IPublishedContent> item = items[0];
+            Assert.AreEqual(1174, item.Content.Id);
+            Assert.IsTrue(item.IsFirst());
+            Assert.IsFalse(item.IsLast());
+
+            item = items[^1];
+            Assert.AreEqual(1176, item.Content.Id);
+            Assert.IsFalse(item.IsFirst());
+            Assert.IsTrue(item.IsLast());
+        }
+
+        [Test]
+        public void OfType1()
+        {
+            var publishedSnapshot = GetPublishedSnapshot();
+            var items = publishedSnapshot.Content.GetAtRoot()
+                .OfType<Home>()
+                .Distinct()
+                .ToIndexedArray();
+            Assert.AreEqual(1, items.Length);
+            Assert.IsInstanceOf<Home>(items.First().Content);
+        }
+
+        [Test]
+        public void OfType2()
+        {
+            var publishedSnapshot = GetPublishedSnapshot();
+            var content = publishedSnapshot.Content.GetAtRoot()
+                .OfType<CustomDocument>()
+                .Distinct()
+                .ToIndexedArray();
+            Assert.AreEqual(1, content.Length);
+            Assert.IsInstanceOf<CustomDocument>(content.First().Content);
+        }
+
+        [Test]
+        public void OfType()
+        {
+            var content = GetNode(1173)
+                .Children(VariationContextAccessor)
+                .OfType<Home>()
+                .First(x => x.UmbracoNaviHide == true);
+            Assert.AreEqual(1176, content.Id);
+        }
+
+        [Test]
+        public void Position()
+        {
+            var items = GetNode(1173).Children(VariationContextAccessor)
+                .Where(x => x.Value<int?>(Mock.Of<IPublishedValueFallback>(), "umbracoNaviHide") == 0)
+                .ToIndexedArray();
+
+            Assert.AreEqual(3, items.Length);
+
+            Assert.IsTrue(items.First().IsFirst());
+            Assert.IsFalse(items.First().IsLast());
+            Assert.IsFalse(items.Skip(1).First().IsFirst());
+            Assert.IsFalse(items.Skip(1).First().IsLast());
+            Assert.IsFalse(items.Skip(2).First().IsFirst());
+            Assert.IsTrue(items.Skip(2).First().IsLast());
+        }
+
         class ImageWithLegendModel : PublishedElement
         {
             public ImageWithLegendModel(IPublishedContentType contentType, Guid fragmentKey, Dictionary<string, object> values, bool previewing)
@@ -862,5 +953,31 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             public int Size => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "size");
         }
+
+        //[PublishedModel("ContentType2")]
+        //public class ContentType2 : PublishedContentModel
+        //{
+        //    #region Plumbing
+
+        //    public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
+        //        : base(content, fallback)
+        //    { }
+
+        //    #endregion
+
+        //    public int Prop1 => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "prop1");
+        //}
+
+        //[PublishedModel("ContentType2Sub")]
+        //public class ContentType2Sub : ContentType2
+        //{
+        //    #region Plumbing
+
+        //    public ContentType2Sub(IPublishedContent content, IPublishedValueFallback fallback)
+        //        : base(content, fallback)
+        //    { }
+
+        //    #endregion
+        //}
     }
 }

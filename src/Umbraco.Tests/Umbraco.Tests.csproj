@@ -196,7 +196,6 @@
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
-    <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
