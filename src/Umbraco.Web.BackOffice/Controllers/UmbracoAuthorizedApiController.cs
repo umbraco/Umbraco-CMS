@@ -23,6 +23,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     /// is logged in using forms authentication which indicates the seconds remaining
     /// before their timeout expires.
     /// </remarks>
+    [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
+    [JsonExceptionFilter]
     [IsBackOffice]
     [UmbracoUserTimeoutFilter]
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]

@@ -1618,4 +1618,8 @@
   <area alias="textbox">
     <key alias="characters_left">caracteres restantes</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Seleccionar todo</key>
+    <key alias="deselectAllLogLevelFilters">Deseleccionar todo</key>
+  </area>
 </language>

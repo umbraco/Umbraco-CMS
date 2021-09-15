@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Filters;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -11,8 +11,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     /// methods that are not called by Angular or don't contain a valid csrf header will NOT work.
     /// </remarks>
     [ValidateAngularAntiForgeryToken]
-    [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
-    [JsonExceptionFilter]
     public abstract class UmbracoAuthorizedJsonController : UmbracoAuthorizedApiController
     {
     }

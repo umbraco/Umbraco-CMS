@@ -1809,4 +1809,8 @@
     <key alias="invalidNumber">Не является числом</key>
     <key alias="invalidEmail">неверный формат email-адреса</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Выбрать все</key>
+    <key alias="deselectAllLogLevelFilters">Убрать выделение со всего</key>
+  </area>
 </language>

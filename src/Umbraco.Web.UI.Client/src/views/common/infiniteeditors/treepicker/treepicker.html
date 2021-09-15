@@ -21,7 +21,7 @@
                                 <div class="umb-language-picker" ng-if="vm.showLanguageSelector && vm.languages.length > 1" on-outside-click="vm.page.languageSelectorIsOpen = false" style="padding-bottom: 5px">
                                     <button class="umb-language-picker__toggle btn-reset" ng-click="vm.toggleLanguageSelector()">
                                         <span>{{vm.selectedLanguage.name}}</span>
-                                        <umb-icon icon="{{vm.languageSelectorIsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-language-picker__expand icon-navigation-down"></umb-icon>
+                                        <umb-icon icon="{{vm.languageSelectorIsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-language-picker__expand"></umb-icon>
                                     </button>
                                     <div class="umb-language-picker__dropdown" ng-if="vm.languageSelectorIsOpen">
                                         <button class="btn-reset" ng-click="vm.selectLanguage(language)" ng-repeat="language in vm.languages">{{language.name}}</button>

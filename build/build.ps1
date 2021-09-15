@@ -428,6 +428,7 @@
     &$this.BuildEnv.NuGet Pack "$templates\Umbraco.Templates.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
+        -NoDefaultExcludes `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.templates.log"
     if (-not $?) { throw "Failed to pack NuGet Umbraco.Templates." }
 

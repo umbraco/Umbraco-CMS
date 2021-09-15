@@ -30,18 +30,19 @@ namespace Umbraco.Cms.Infrastructure.Mail
             ILogger<EmailSender> logger,
             IOptions<GlobalSettings> globalSettings,
             IEventAggregator eventAggregator)
-            : this(logger, globalSettings, eventAggregator, null) { }
+            : this(logger, globalSettings, eventAggregator, null, null) { }
 
         public EmailSender(
             ILogger<EmailSender> logger,
             IOptions<GlobalSettings> globalSettings,
             IEventAggregator eventAggregator,
-            INotificationHandler<SendEmailNotification> handler)
+            INotificationHandler<SendEmailNotification> handler1,
+            INotificationAsyncHandler<SendEmailNotification> handler2)
         {
             _logger = logger;
             _eventAggregator = eventAggregator;
             _globalSettings = globalSettings.Value;
-            _notificationHandlerRegistered = handler is not null;
+            _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
         }
 
         /// <summary>

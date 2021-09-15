@@ -11,8 +11,10 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Install;
@@ -76,11 +78,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
             [Frozen] IOptions<GlobalSettings> globalSettings,
             [Frozen] IHostingEnvironment hostingEnvironment,
             [Frozen] ITempDataDictionary tempDataDictionary,
+            [Frozen] IRuntimeState runtimeState,
             BackOfficeController sut)
         {
             globalSettings.Value.UmbracoPath = "/";
             Mock.Get(hostingEnvironment).Setup(x => x.ToAbsolute("/")).Returns("http://localhost/");
             Mock.Get(hostingEnvironment).SetupGet(x => x.ApplicationVirtualPath).Returns("/");
+            Mock.Get(runtimeState).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             sut.TempData = tempDataDictionary;
 

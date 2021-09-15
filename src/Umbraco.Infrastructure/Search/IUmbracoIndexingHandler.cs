@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         void DeleteDocumentsForContentTypes(IReadOnlyCollection<int> removedContentTypes);
 
         /// <summary>
-        /// Remove items from an index
+        /// Remove an item from an index
         /// </summary>
         /// <param name="entityId"></param>
         /// <param name="keepIfUnpublished">
@@ -33,5 +33,15 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// If false it will delete this from all indexes regardless.
         /// </param>
         void DeleteIndexForEntity(int entityId, bool keepIfUnpublished);
+
+        /// <summary>
+        /// Remove items from an index
+        /// </summary>
+        /// <param name="entityIds"></param>
+        /// <param name="keepIfUnpublished">
+        /// If true, indicates that we will only delete this item from indexes that don't support unpublished content.
+        /// If false it will delete this from all indexes regardless.
+        /// </param>
+        void DeleteIndexForEntities(IReadOnlyCollection<int> entityIds, bool keepIfUnpublished);
     }
 }

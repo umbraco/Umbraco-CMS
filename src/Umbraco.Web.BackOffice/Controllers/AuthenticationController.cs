@@ -22,7 +22,6 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
@@ -48,6 +47,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     //[ValidationFilter] // TODO: I don't actually think this is required with our custom Application Model conventions applied
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice]
+    [DisableBrowserCache]
     public class AuthenticationController : UmbracoApiControllerBase
     {
         // NOTE: Each action must either be explicitly authorized or explicitly [AllowAnonymous], the latter is optional because

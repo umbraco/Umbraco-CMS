@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Cms.Core.Models.ContentEditing
+using System.Runtime.Serialization;
+
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
+    [DataContract]
     public enum NotificationStyle
     {
         /// <summary>

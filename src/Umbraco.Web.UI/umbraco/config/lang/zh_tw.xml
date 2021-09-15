@@ -1222,4 +1222,8 @@
     <key alias="enabledConfirm">轉址追蹤器已開啟。</key>
     <key alias="enableError">啟動轉址追蹤器錯誤，更多資訊請參閱您的紀錄檔。</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">全選</key>
+    <key alias="deselectAllLogLevelFilters">取消全選</key>
+  </area>
 </language>

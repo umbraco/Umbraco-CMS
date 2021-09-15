@@ -433,6 +433,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
             var basic = new PropertyGroupBasic<MemberPropertyTypeBasic>
             {
                 Id = 222,
+                Alias = "group1",
                 Name = "Group 1",
                 SortOrder = 1,
                 Properties = new[]
@@ -507,6 +508,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
             var basic = new PropertyGroupBasic<PropertyTypeBasic>
             {
                 Id = 222,
+                Alias = "group1",
                 Name = "Group 1",
                 SortOrder = 1,
                 Properties = new[]
@@ -670,9 +672,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
                     Mandatory = false,
                     SortOrder = 1,
                     DataTypeId = -88
-                }, "Another tab");
+                }, "anotherTab", "Another tab");
             MediaTypeBuilder.EnsureAllIds(ctChild1, 7777);
-            MediaType contentType = MediaTypeBuilder.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
+            MediaType contentType = MediaTypeBuilder.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "customGroup", "CustomGroup");
 
             // not assigned to tab
             contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
@@ -746,9 +748,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
                     Mandatory = false,
                     SortOrder = 1,
                     DataTypeId = -88
-                }, "Another tab");
+                }, "anotherTab", "Another tab");
             ContentTypeBuilder.EnsureAllIds(ctChild1, 7777);
-            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, randomizeAliases: true, propertyGroupName: "CustomGroup");
+            ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("child2", "Child 2", ctChild1, randomizeAliases: true, propertyGroupAlias: "customGroup", propertyGroupName: "CustomGroup");
 
             // not assigned to tab
             contentType.AddPropertyType(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext)
@@ -896,6 +898,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
                         new PropertyGroupBasic<MemberPropertyTypeBasic>()
                         {
                             Id = 987,
+                            Alias = "tab1",
                             Name = "Tab 1",
                             SortOrder = 0,
                             Inherited = false,
@@ -943,6 +946,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
                         new PropertyGroupBasic<PropertyTypeBasic>()
                         {
                             Id = 987,
+                            Alias = "tab1",
                             Name = "Tab 1",
                             SortOrder = 0,
                             Inherited = false,
@@ -993,6 +997,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
                         new PropertyGroupBasic<PropertyTypeBasic>()
                         {
                             Id = 987,
+                            Alias = "tab1",
                             Name = "Tab 1",
                             SortOrder = 0,
                             Inherited = false,
@@ -1038,6 +1043,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
                         new PropertyGroupBasic<PropertyTypeBasic>()
                         {
                             Id = 987,
+                            Alias = "tab1",
                             Name = "Tab 1",
                             SortOrder = 0,
                             Inherited = false,
@@ -1063,6 +1069,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
                         new PropertyGroupBasic<PropertyTypeBasic>()
                         {
                             Id = 894,
+                            Alias = "tab2",
                             Name = "Tab 2",
                             SortOrder = 0,
                             Inherited = true,
@@ -1114,6 +1121,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
                         new PropertyGroupBasic<PropertyTypeBasic>()
                         {
                             Id = 987,
+                            Alias = "tab1",
                             Name = "Tab 1",
                             SortOrder = 0,
                             Inherited = false,
@@ -1139,6 +1147,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
                         new PropertyGroupBasic<PropertyTypeBasic>()
                         {
                             Id = 894,
+                            Alias = "tab2",
                             Name = "Tab 2",
                             SortOrder = 0,
                             Inherited = true,

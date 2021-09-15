@@ -241,8 +241,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
         //    return i;
         //}
 
-        public static IOptionsSnapshot<LuceneDirectoryIndexOptions> GetOptions(string indexName, LuceneDirectoryIndexOptions options)
-            => Mock.Of<IOptionsSnapshot<LuceneDirectoryIndexOptions>>(x => x.Get(indexName) == options);
+        public static IOptionsMonitor<LuceneDirectoryIndexOptions> GetOptions(string indexName, LuceneDirectoryIndexOptions options)
+            => Mock.Of<IOptionsMonitor<LuceneDirectoryIndexOptions>>(x => x.Get(indexName) == options);
 
         internal void IndexingError(object sender, IndexingErrorEventArgs e) => throw new ApplicationException(e.Message, e.Exception);
 

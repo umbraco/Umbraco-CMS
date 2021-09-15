@@ -19,20 +19,17 @@
                              umb-auto-focus="{{vm.focusOnNode && vm.currentNode.key === node.key ? 'true' : 'false'}}">
 
                             <div class="umb-nested-content__heading">
-                                <umb-icon
-                                    icon="{{node.icon}}"
-                                    class="{{node.icon}} icon umb-nested-content__item-icon">
-                                </umb-icon>
+                                <umb-icon icon="{{node.icon}}" class="icon umb-nested-content__item-icon"></umb-icon>
                                 <span class="umb-nested-content__item-name" ng-class="{'--has-icon': vm.showIcons}" ng-bind="vm.getName($index)"></span>
                             </div>
 
                             <div class="umb-nested-content__icons">
                                 <button type="button" class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{vm.labels.copy_icon_title}}" ng-click="vm.clickCopy($event, node);" ng-if="vm.showCopy">
-                                    <i class="icon icon-documents" aria-hidden="true"></i>
+                                    <umb-icon icon="icon-documents" class="icon"></umb-icon>
                                     <span class="sr-only">{{vm.labels.copy_icon_title}}</span>
                                 </button>
                                 <button type="button" class="umb-nested-content__icon umb-nested-content__icon--delete" localize="title" title="general_delete" ng-class="{ 'umb-nested-content__icon--disabled': !vm.canDeleteNode($index) }" ng-click="vm.requestDeleteNode($index); $event.stopPropagation();">
-                                    <i class="icon icon-trash" aria-hidden="true"></i>
+                                    <umb-icon icon="icon-trash" class="icon"></umb-icon>
                                     <span class="sr-only">
                                         <localize key="general_delete">Delete</localize>
                                     </span>
@@ -41,7 +38,7 @@
                         </div>
 
                         <div class="umb-nested-content__content" ng-if="vm.currentNode.key === node.key && !vm.sorting">
-                            <umb-nested-content-editor ng-model="node" tab-alias="ncTabAlias" />
+                            <umb-nested-content-editor ng-model="node" tab-alias="ncTabAlias"></umb-nested-content-editor>
                         </div>
                     </div>
 

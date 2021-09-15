@@ -25,7 +25,9 @@
         <Content Include="umbraco/**" CopyToOutputDirectory="Always" />
         <Content Remove="umbraco/Data/**" />
         <Content Remove="umbraco/Logs/**" />
-        <Content Remove="umbraco/mediacache/**"/>
+        <Content Remove="umbraco/mediacache/**" />
+        <Content Remove="umbraco/models/**" />
+        <Compile Include="umbraco/models/**" Exclude="**/*.flag" />
     </ItemGroup>
 
     <!-- Set this to true if ModelsBuilder mode is not InMemoryAuto-->

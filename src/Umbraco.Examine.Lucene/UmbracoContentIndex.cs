@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public UmbracoContentIndex(
             ILoggerFactory loggerFactory,
             string name,
-            IOptionsSnapshot<LuceneDirectoryIndexOptions> indexOptions,
+            IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
             ILocalizationService languageService = null)

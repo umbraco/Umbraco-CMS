@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -203,7 +203,6 @@ AND umbracoNode.nodeObjectType = @objectType",
                 });
             }
 
-
             //Insert Tabs
             foreach (var propertyGroup in entity.PropertyGroups)
             {
@@ -393,7 +392,7 @@ AND umbracoNode.id <> @id",
                     // see http://issues.umbraco.org/issue/U4-8663
                     orphanPropertyTypeIds = Database.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete })
                         .Select(x => x.Id).ToList();
-                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId=NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete });
+                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId = NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete });
 
                     // now we can delete the tabs
                     Database.Delete<PropertyTypeGroupDto>("WHERE id IN (@ids)", new { ids = groupsToDelete });
@@ -1385,8 +1384,8 @@ WHERE {Cms.Core.Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cm
                 "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @id",
                 "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
-                "DELETE FROM cmsPropertyType WHERE contentTypeId = @id",
-                "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyType + " WHERE contentTypeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup + " WHERE contenttypeNodeId = @id"
             };
             return list;
         }

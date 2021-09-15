@@ -32,7 +32,7 @@
                     <div>
                         <p>{{template.name}}</p>
                         <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteTemplate($index)">
-                            <i class="icon-delete red" aria-hidden="true"></i>
+                            <umb-icon icon="icon-delete" class="red"></umb-icon>
                             <localize key="general_delete">Delete</localize>
                         </button>
                     </div>
@@ -41,7 +41,7 @@
             </ul>
 
             <button type="button" class="btn btn-small btn-info" ng-click="vm.configureTemplate()">
-                <i class="icon-add" aria-hidden="true"></i>
+                <umb-icon icon="icon-add"></umb-icon>
                 <localize key="grid_addGridLayout">Add Grid Layout</localize>
             </button>
         </div>
@@ -82,7 +82,7 @@
                         <div>
                             <p>{{layout.label || layout.name}}</p>
                             <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteLayout(layout, $index, $event)">
-                                <i class="icon-delete red" aria-hidden="true"></i>
+                                <umb-icon icon="icon-delete" class="red"></umb-icon>
                                 <localize key="general_delete">Delete</localize>
                             </button>
                         </div>
@@ -91,7 +91,7 @@
                 </ul>
 
                 <button type="button" class="btn btn-small btn-info" ng-click="vm.configureLayout()">
-                    <i class="icon-add" aria-hidden="true"></i>
+                    <umb-icon icon="icon-add"></umb-icon>
                     <localize key="grid_addRowConfiguration">Add row configuration</localize>
                 </button>
 
@@ -116,9 +116,9 @@
                 ng-model="model.value.config">
 
                 <li ng-repeat="configValue in model.value.config">
-                    <i class="icon icon-navigation handle" aria-hidden="true"></i>
+                    <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
                     <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.config, $index)">
-                        <i class="icon icon-delete red" aria-hidden="true"></i>
+                        <umb-icon icon="icon-delete" class="icon red"></umb-icon>
                     </button>
                     <span>{{configValue.label}}</span>
                 </li>
@@ -127,7 +127,7 @@
             <ul class="unstyled list-icons">
                 <li>
                     <button type="button" ng-click="vm.editConfig()" class="btn-link">
-                        <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
+                        <umb-icon icon="icon-settings-alt-2" class="icon turquoise"></umb-icon>
                         <localize key="general_edit">Edit</localize>
                     </button>
                 </li>
@@ -143,9 +143,9 @@
                 ng-model="model.value.styles">
 
                 <li ng-repeat="style in model.value.styles">
-                    <i class="icon icon-navigation handle" aria-hidden="true"></i>
+                    <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
                     <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.styles, $index)">
-                        <i class="icon icon-delete red" aria-hidden="true"></i>
+                        <umb-icon icon="icon-delete" class="icon red"></umb-icon>
                     </button>
                     <span>{{style.label}}</span>
                 </li>
@@ -154,7 +154,7 @@
             <ul class="unstyled list-icons">
                 <li>
                     <button type="button" ng-click="vm.editStyles()" class="btn-link">
-                        <i class="icon icon-settings-alt-2 turquoise" aria-hidden="true"></i>
+                        <umb-icon icon="icon-settings-alt-2" class="icon turquoise"></umb-icon>
                         <localize key="general_edit">Edit</localize>
                     </button>
                 </li>
