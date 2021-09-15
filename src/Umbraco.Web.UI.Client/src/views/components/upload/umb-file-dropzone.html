@@ -6,7 +6,7 @@
         <div ngf-drop
             ng-hide="hideDropzone === 'true'"
             ng-model="filesHolder"
-            ngf-change="handleFiles($files, $event)"
+            ngf-change="handleFiles($files, $event, $invalidFiles)"
             class="dropzone"
             ngf-drag-over-class="'drag-over'"
             ngf-multiple="true"
@@ -30,7 +30,7 @@
                      class="file-select"
                      ngf-select
                      ng-model="filesHolder"
-                     ngf-change="handleFiles($newFiles, $event)"
+                     ngf-change="handleFiles($files, $event, $invalidFiles)"
                      ngf-multiple="true"
                      ngf-pattern="{{ accept }}"
                      ngf-max-size="{{ maxFileSize }}">
@@ -43,7 +43,7 @@
         <ul class="file-list" ng-show="done.length > 0 || queue.length > 0 || rejected.length > 0 || filesHolder.length > 0">
 
             <!-- make list sort order the same as photo grid. The last uploaded photo in the top -->
-            <li class="file" ng-repeat="file in done">
+            <li class="file" ng-repeat="file in done track by file.key">
 
                 <!-- file name -->
                 <div class="file-description">{{ file.name }}</div>
@@ -68,13 +68,13 @@
             </li>
 
             <!-- make list sort order the same as photo grid. The last uploaded photo in the top -->
-            <li class="file" ng-repeat="queued in queue">
+            <li class="file" ng-repeat="queued in queue track by queued.key">
 
                 <!-- file name -->
                 <div class="file-name">{{queued.name}}</div>
             </li>
 
-            <li class="file" ng-repeat="file in rejected">
+            <li class="file" ng-repeat="file in rejected track by file.key">
 
                 <!-- file name -->
                 <div class="file-description">
