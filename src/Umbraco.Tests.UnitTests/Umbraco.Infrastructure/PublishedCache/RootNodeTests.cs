@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         {
             base.Setup();
 
-            string xml = PublishedContentXml.GetXmlContent1(1234);
+            string xml = PublishedContentXml.TestWithDatabaseXml(1234);
 
             IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
                 xml,

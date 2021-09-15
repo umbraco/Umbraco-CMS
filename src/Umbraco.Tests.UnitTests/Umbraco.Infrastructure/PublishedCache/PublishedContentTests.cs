@@ -16,6 +16,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
+
     [TestFixture]
     public class PublishedContentTests : PublishedSnapshotServiceTestBase
     {
@@ -28,7 +29,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         {
             base.Setup();
 
-            string xml = PublishedContentXml.GetXmlContent3(1234, _node1173Guid);
+            string xml = PublishedContentXml.PublishedContentTestXml(1234, _node1173Guid);
 
             IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
                 xml,

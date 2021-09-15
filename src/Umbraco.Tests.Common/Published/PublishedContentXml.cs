@@ -2,15 +2,13 @@
 // See LICENSE for more details.
 
 using System;
-using System.Collections;
 
 namespace Umbraco.Cms.Tests.Common.Published
 {
-    // TODO: Document/rename what each one does and where it's used.
-
     public static class PublishedContentXml
     {
-        public static string GetXmlContent2(int templateId)
+        // The content XML that was used in the old BaseWebTest class
+        public static string BaseWebTestXml(int templateId)
             => @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT Home ANY>
@@ -45,7 +43,8 @@ namespace Umbraco.Cms.Tests.Common.Published
     <CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
 
-        public static string GetXmlContent1(int templateId)
+        // The content XML that was used in the old TestWithDatabase class
+        public static string TestWithDatabaseXml(int templateId)
             => @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT Home ANY>
@@ -78,7 +77,8 @@ namespace Umbraco.Cms.Tests.Common.Published
     <CustomDocument id=""1172"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""test-page"" writerName=""admin"" creatorName=""admin"" path=""-1,1172"" isDoc="""" />
 </root>";
 
-        public static string GetXmlContent3(int templateId, Guid node1173Guid)
+        // The content XML that was used in the old PublishedContentTest class
+        public static string PublishedContentTestXml(int templateId, Guid node1173Guid)
             => @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT Home ANY>

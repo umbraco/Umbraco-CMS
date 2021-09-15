@@ -30,6 +30,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
     public class PublishedSnapshotServiceTestBase
     {
         protected virtual IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
+        protected IContentTypeService ContentTypeService { get; private set; }
+        protected IMediaTypeService MediaTypeService { get; private set; }
+        protected IDataTypeService DataTypeService { get; private set; }
         protected IPublishedValueFallback PublishedValueFallback { get; private set; }
         protected IPublishedSnapshotService SnapshotService { get; private set; }
         protected IVariationContextAccessor VariationContextAccessor { get; private set; }
@@ -74,7 +77,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             return new[] { dataType };
         }
 
-        private static ServiceContext GetServiceContext(ContentType[] contentTypes, DataType[] dataTypes, out IDataTypeService dataTypeService)
+        private static ServiceContext CreateServiceContext(ContentType[] contentTypes, DataType[] dataTypes)
         {
             var contentTypeService = new Mock<IContentTypeService>();
             contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
@@ -89,10 +92,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataTypes);
-            dataTypeService = dataTypeServiceMock.Object;
 
             return ServiceContext.CreatePartial(
-                dataTypeService: dataTypeService,
+                dataTypeService: dataTypeServiceMock.Object,
                 memberTypeService: Mock.Of<IMemberTypeService>(),
                 memberService: Mock.Of<IMemberService>(),
                 contentTypeService: contentTypeService.Object,
@@ -127,10 +129,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             // create a service context
-            ServiceContext serviceContext = GetServiceContext(
-                contentTypes,
-                dataTypes ?? GetDefaultDataTypes(),
-                out IDataTypeService dataTypeService);
+            ServiceContext serviceContext = CreateServiceContext(contentTypes, dataTypes ?? GetDefaultDataTypes());
+
+            DataTypeService = serviceContext.DataTypeService;
+            ContentTypeService = serviceContext.ContentTypeService;
+            MediaTypeService = serviceContext.MediaTypeService;
 
             // create a scope provider
             var scopeProvider = Mock.Of<IScopeProvider>();
@@ -149,7 +152,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             PublishedContentTypeFactory = new PublishedContentTypeFactory(
                 PublishedModelFactory,
                 PropertyValueConverterCollection,
-                dataTypeService);            
+                DataTypeService);            
 
             var typeFinder = TestHelper.GetTypeFinder();
 
