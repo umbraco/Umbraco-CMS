@@ -282,6 +282,10 @@
                 ]
               }
         },
+        "HasConnectionString":{
+            "type": "computed",
+            "value": "(ConnectionString != \"\")"
+        },
         "HasNoNodesViewPath":{
             "type": "computed",
             "value": "(NoNodesViewPath != \"\")"
