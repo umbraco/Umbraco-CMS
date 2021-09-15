@@ -19,7 +19,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
     [TestFixture]
-    public class PublishedRouterTests : PublishedSnapshotServiceTestBase
+    public class PublishedRouterTests
     {
         private PublishedRouter CreatePublishedRouter(IUmbracoContextAccessor umbracoContextAccessor)
             => new PublishedRouter(
@@ -31,9 +31,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 Mock.Of<ILogger<PublishedRouter>>(),
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
-                PublishedValueFallback,
+                Mock.Of<IPublishedValueFallback>(),
                 Mock.Of<IFileService>(),
-                ContentTypeService,
+                Mock.Of<IContentTypeService>(),
                 umbracoContextAccessor,
                 Mock.Of<IEventAggregator>());
 

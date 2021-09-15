@@ -45,6 +45,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     new TestSimpleTinyMceValueConverter()
                 });
 
+        protected IPublishedContent GetNode(int id)
+        {
+            var snapshot = GetPublishedSnapshot();
+            var doc = snapshot.Content.GetById(id);
+            Assert.IsNotNull(doc);
+            return doc;
+        }
+
         [SetUp]
         public virtual void Setup()
         {

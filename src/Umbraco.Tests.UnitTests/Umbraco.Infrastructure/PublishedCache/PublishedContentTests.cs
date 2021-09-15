@@ -71,14 +71,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             { }
         }
 
-        internal IPublishedContent GetNode(int id)
-        {
-            var snapshot = GetPublishedSnapshot();
-            var doc = snapshot.Content.GetById(id);
-            Assert.IsNotNull(doc);
-            return doc;
-        }
-
         [Test]
         public void GetNodeByIds()
         {

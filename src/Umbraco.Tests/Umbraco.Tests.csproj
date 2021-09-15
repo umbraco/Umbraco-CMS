@@ -191,7 +191,6 @@
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
-    <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
