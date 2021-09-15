@@ -6,8 +6,8 @@ angular.module("umbraco")
             vm.state = "upload";
             vm.model = {};
             vm.uploadStatus = "";
-
-            $scope.handleFiles = function (files, event) {
+            
+            $scope.handleFiles = function (files, event, invalidFiles) {
                 if (files && files.length > 0) {
                     $scope.upload(files[0]);
                 }

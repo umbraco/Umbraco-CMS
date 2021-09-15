@@ -13,7 +13,7 @@
                 name="file"
                 ngf-select
                 ng-model="filesHolder"
-                ngf-change="handleFiles($files, $event)"
+                ngf-change="handleFiles($files, $event, $invalidFiles)"
                 ngf-multiple="true"
                 ngf-pattern="*.udt">
                 <localize key="general_import">Import</localize>
