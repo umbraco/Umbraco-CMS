@@ -12,9 +12,9 @@ context('Url Picker', () => {
       });
 
     it('Test Url Picker', () => {
-       
+
         const urlPickerDocTypeName = 'Url Picker Test';
-        const pickerDocTypeAlias = AliasHelper.toAlias(urlPickerDocTypeName); 
+        const pickerDocTypeAlias = AliasHelper.toAlias(urlPickerDocTypeName);
         cy.umbracoEnsureDocumentTypeNameNotExists(urlPickerDocTypeName);
         cy.deleteAllContent();
         const pickerDocType = new DocumentTypeBuilder()
@@ -31,8 +31,7 @@ context('Url Picker', () => {
             .build();
 
         cy.saveDocumentType(pickerDocType);
-        cy.editTemplate(urlPickerDocTypeName, '@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.UrlPickerTest>' +
-        '\n@using ContentModels = Umbraco.Web.PublishedModels;' +
+        cy.editTemplate(urlPickerDocTypeName, '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<UrlPickerTest>' +
         '\n@{' +
         '\n    Layout = null;' +
         '\n}' +
@@ -61,10 +60,10 @@ context('Url Picker', () => {
         //Assert
         cy.get('.umb-notifications__notifications > .alert-error').should('not.exist');
         //Editing template with some content
-        
+
         //Testing if the edits match the expected results
         const expected = '<a href="/">UrlPickerContent</a>';
-        cy.umbracoVerifyRenderedViewContent('/', expected, true).should('be.true');        
+        cy.umbracoVerifyRenderedViewContent('/', expected, true).should('be.true');
         //clean
         cy.umbracoEnsureDocumentTypeNameNotExists(urlPickerDocTypeName);
         cy.umbracoEnsureTemplateNameNotExists(urlPickerDocTypeName);

@@ -32,12 +32,11 @@ context('DataTypes', () => {
         cy.umbracoTreeItem("content", [name]).click();
         //Pick a colour
         cy.get('.btn-000000').click();
-        //Save 
+        //Save
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         cy.umbracoSuccessNotification().should('be.visible');
         //Editing template with some content
-        cy.editTemplate(name, '@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.ApprovedColourTest>' +
-            '\n@using ContentModels = Umbraco.Web.PublishedModels;' +
+        cy.editTemplate(name, '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ApprovedColourTest>' +
             '\n@{' +
             '\n    Layout = null;' +
             '\n}' +
@@ -49,7 +48,7 @@ context('DataTypes', () => {
 
         //Pick another colour to verify both work
         cy.get('.btn-FF0000').click();
-        //Save 
+        //Save
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         cy.umbracoSuccessNotification().should('be.visible');
         //Assert
@@ -64,7 +63,7 @@ context('DataTypes', () => {
 
     //   it('Tests Checkbox List', () => {
     //     const name = 'CheckBox List';
-    //     const alias = AliasHelper.toAlias(name); 
+    //     const alias = AliasHelper.toAlias(name);
 
     //     cy.umbracoEnsureDocumentTypeNameNotExists(name);
     //     cy.umbracoEnsureDataTypeNameNotExists(name);
@@ -85,7 +84,7 @@ context('DataTypes', () => {
     //     //Save
     //     cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
     //     cy.umbracoSuccessNotification().should('be.visible');
-        
+
     //     //Edit template with content
     //     cy.editTemplate(name, '@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.CheckboxList>' +
     //     '\n@using ContentModels = Umbraco.Web.PublishedModels;' +
