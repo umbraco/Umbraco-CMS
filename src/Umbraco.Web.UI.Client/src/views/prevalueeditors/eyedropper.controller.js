@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.EyeDropperColorPickerController",
-    function ($scope) {
+    function ($scope, angularHelper) {
 
         var vm = this;
 
