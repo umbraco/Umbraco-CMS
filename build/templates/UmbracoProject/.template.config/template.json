@@ -293,6 +293,12 @@
         "UsingUnattenedInstall":{
             "type": "computed",
             "value": "(FriendlyName != \"\" && Email != \"\" && Password != \"\" && ConnectionString != \"\")"
+        },
+        "UseHttpsRedirect":{
+            "type": "parameter",
+            "datatype":"bool",
+            "defaultValue": "false",
+            "description": "Adds code to startup.cs to redirect HTTP to HTTPS (Default: false)"
         }
     }
 }

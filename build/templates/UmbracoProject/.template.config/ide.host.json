@@ -62,6 +62,13 @@
                 "text": "Optional: Path to a custom view presented with the Umbraco installation contains no published content"
             },
             "isVisible": "true"
+        },
+        {
+            "id": "UseHttpsRedirect",
+            "name": {
+                "text": "Optional: Adds code to startup.cs to redirect HTTP to HTTPS"
+            },
+            "isVisible": "true"
         }
     ]
 }
