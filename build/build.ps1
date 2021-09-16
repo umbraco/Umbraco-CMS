@@ -351,8 +351,8 @@
     $this.CopyFiles("$templates", "*", "$tmp\Templates")
 
     Write-Host "Copy files for dotnet templates"
-    $this.CopyFiles("$src\Umbraco.Web.UI", "Startup.cs", "$tmp\Templates\UmbracoProject")
     $this.CopyFiles("$src\Umbraco.Web.UI", "Program.cs", "$tmp\Templates\UmbracoProject")
+    $this.CopyFiles("$src\Umbraco.Web.UI", "Startup.cs", "$tmp\Templates\UmbracoProject")
     $this.CopyFiles("$src\Umbraco.Web.UI\Views", "*", "$tmp\Templates\UmbracoProject\Views")
 
   $this.RemoveDirectory("$tmp\Templates\UmbracoProject\bin")
