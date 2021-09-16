@@ -119,6 +119,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             if (_propertyTypeCollection != null)
             {
                 PropertyGroup propertyGroup = new PropertyGroupBuilder()
+                    .WithAlias("content")
                     .WithName("Content")
                     .WithSortOrder(1)
                     .WithPropertyTypeCollection(_propertyTypeCollection)
@@ -156,9 +157,9 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 .Build();
         }
 
-        public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
+        public static ContentType CreateSimpleContentType2(string alias, string name, IContentType parent = null, bool randomizeAliases = false, string propertyGroupAlias = "content", string propertyGroupName = "Content")
         {
-            ContentTypeBuilder builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupName: propertyGroupName);
+            ContentTypeBuilder builder = CreateSimpleContentTypeHelper(alias, name, parent, randomizeAliases: randomizeAliases, propertyGroupAlias: propertyGroupAlias, propertyGroupName: propertyGroupName);
 
             builder.AddPropertyType()
                 .WithAlias(RandomAlias("gen", randomizeAliases))
@@ -173,10 +174,10 @@ namespace Umbraco.Cms.Tests.Common.Builders
             return (ContentType)builder.Build();
         }
 
-        public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null, bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0) =>
-            (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
+        public static ContentType CreateSimpleContentType(string alias = null, string name = null, IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null, bool randomizeAliases = false, string propertyGroupAlias = "content", string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0) =>
+            (ContentType)CreateSimpleContentTypeHelper(alias, name, parent, propertyTypeCollection, randomizeAliases, propertyGroupAlias, propertyGroupName, mandatoryProperties, defaultTemplateId).Build();
 
-        public static ContentTypeBuilder CreateSimpleContentTypeHelper(string alias = null, string name = null, IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null,  bool randomizeAliases = false, string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
+        public static ContentTypeBuilder CreateSimpleContentTypeHelper(string alias = null, string name = null, IContentType parent = null, PropertyTypeCollection propertyTypeCollection = null,  bool randomizeAliases = false, string propertyGroupAlias = "content", string propertyGroupName = "Content", bool mandatoryProperties = false, int defaultTemplateId = 0)
         {
             ContentTypeBuilder builder = new ContentTypeBuilder()
                 .WithAlias(alias ?? "simple")
@@ -192,6 +193,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             {
                 builder = builder
                     .AddPropertyGroup()
+                        .WithAlias(propertyGroupAlias)
                         .WithName(propertyGroupName)
                         .WithSortOrder(1)
                         .WithSupportsPublishing(true)
@@ -257,6 +259,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 .WithAlias(alias)
                 .WithName(name)
                 .AddPropertyGroup()
+                    .WithAlias("content")
                     .WithName("Content")
                     .WithSortOrder(1)
                     .WithSupportsPublishing(true)
@@ -276,6 +279,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                     .Done()
                 .AddPropertyGroup()
                     .WithName("Meta")
+                    .WithAlias("meta")
                     .WithSortOrder(2)
                     .WithSupportsPublishing(true)
                     .AddPropertyType()
@@ -306,6 +310,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 .WithName(name)
                 .WithDescription($"ContentType used for {name} tags")
                 .AddPropertyGroup()
+                    .WithAlias(alias)
                     .WithName(name)
                     .WithSortOrder(2)
                     .WithSupportsPublishing(true)

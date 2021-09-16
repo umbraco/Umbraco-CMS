@@ -22,37 +22,33 @@ namespace Umbraco.Cms.Infrastructure.Install
 {
     public sealed class InstallHelper
     {
-        private static HttpClient _httpClient;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly ILogger<InstallHelper> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly ConnectionStrings _connectionStrings;
+        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
         private readonly IInstallationService _installationService;
         private readonly ICookieManager _cookieManager;
         private readonly IUserAgentProvider _userAgentProvider;
         private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
-        private readonly IJsonSerializer _jsonSerializer;
         private InstallationType? _installationType;
 
         public InstallHelper(DatabaseBuilder databaseBuilder,
             ILogger<InstallHelper> logger,
             IUmbracoVersion umbracoVersion,
-            IOptions<ConnectionStrings> connectionStrings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
             IInstallationService installationService,
             ICookieManager cookieManager,
             IUserAgentProvider userAgentProvider,
-            IUmbracoDatabaseFactory umbracoDatabaseFactory,
-            IJsonSerializer jsonSerializer)
+            IUmbracoDatabaseFactory umbracoDatabaseFactory)
         {
             _logger = logger;
             _umbracoVersion = umbracoVersion;
             _databaseBuilder = databaseBuilder;
-            _connectionStrings = connectionStrings.Value ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _connectionStrings = connectionStrings;
             _installationService = installationService;
             _cookieManager = cookieManager;
             _userAgentProvider = userAgentProvider;
             _umbracoDatabaseFactory = umbracoDatabaseFactory;
-            _jsonSerializer = jsonSerializer;
 
             //We need to initialize the type already, as we can't detect later, if the connection string is added on the fly.
             GetInstallationType();
@@ -118,7 +114,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         {
             get
             {
-                var databaseSettings = _connectionStrings.UmbracoConnectionString;
+                var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
                 if (databaseSettings.IsConnectionStringConfigured() == false)
                 {
                     //no version or conn string configured, must be a brand new install

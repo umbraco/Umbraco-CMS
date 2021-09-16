@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Core;
@@ -10,6 +11,7 @@ using Serilog.Formatting.Compact;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
+using Umbraco.Cms.Infrastructure.Logging.Serilog;
 
 namespace Umbraco.Extensions
 {
@@ -28,7 +30,8 @@ namespace Umbraco.Extensions
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             IHostingEnvironment hostingEnvironment,
-            ILoggingConfiguration loggingConfiguration)
+            ILoggingConfiguration loggingConfiguration,
+            IConfiguration configuration)
         {
             global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
@@ -48,10 +51,18 @@ namespace Umbraco.Extensions
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
 
+            //This is not optimal, but seems to be the only way if we do not make an Serilog.Sink.UmbracoFile sink all the way.
+            var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
 
             logConfig.WriteTo.UmbracoFile(
-                Path.Combine(loggingConfiguration.LogDirectory, $"UmbracoTraceLog.{Environment.MachineName}..json")
-                );
+                path : umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
+                fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
+                restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
+                rollingInterval: umbracoFileConfiguration.RollingInterval,
+                flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
+                rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
+                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit
+            );
 
             return logConfig;
         }

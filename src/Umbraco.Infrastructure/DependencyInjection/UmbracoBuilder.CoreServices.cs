@@ -67,15 +67,15 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddMainDom()
                 .AddLogging();
 
-            builder.Services.AddUnique<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
-            builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
+            builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
+            builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().CreateDatabase());
+            builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.NPocoMappers().Add<NullableDateMapper>();
             builder.PackageMigrationPlans().Add(() => builder.TypeLoader.GetPackageMigrationPlans());
 
-            builder.Services.AddUnique<IRuntimeState, RuntimeState>();
-            builder.Services.AddUnique<IRuntime, CoreRuntime>();
-            builder.Services.AddUnique<PendingPackageMigrations>();
+            builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
+            builder.Services.AddSingleton<IRuntime, CoreRuntime>();
+            builder.Services.AddSingleton<PendingPackageMigrations>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
 
@@ -93,21 +93,21 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Mappers().AddCoreMappers();
 
             // register the scope provider
-            builder.Services.AddUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
-            builder.Services.AddUnique<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
-            builder.Services.AddUnique<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            builder.Services.AddSingleton<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddSingleton<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
-            builder.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
-            builder.Services.AddUnique<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
-            builder.Services.AddUnique<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
+            builder.Services.AddSingleton<IJsonSerializer, JsonNetSerializer>();
+            builder.Services.AddSingleton<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
+            builder.Services.AddSingleton<IMenuItemCollectionFactory, MenuItemCollectionFactory>();
 
             // register database builder
             // *not* a singleton, don't want to keep it around
             builder.Services.AddTransient<DatabaseBuilder>();
 
             // register manifest parser, will be injected in collection builders where needed
-            builder.Services.AddUnique<IManifestParser, ManifestParser>();
+            builder.Services.AddSingleton<IManifestParser, ManifestParser>();
 
             // register the manifest filter collection builder (collection is empty by default)
             builder.ManifestFilters();
@@ -116,28 +116,28 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .Add<FileUploadPropertyEditor>()
                 .Add<ImageCropperPropertyEditor>();
 
-            builder.Services.AddUnique<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            builder.Services.AddSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
-            builder.Services.AddUnique<IShortStringHelper>(factory
+            builder.Services.AddSingleton<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptions<RequestHandlerSettings>>().Value)));
 
-            builder.Services.AddUnique<IMigrationPlanExecutor, MigrationPlanExecutor>();
-            builder.Services.AddUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
+            builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
+            builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
             builder.AddPreValueMigrators();
 
-            builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
+            builder.Services.AddSingleton<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
-            builder.Services.AddUnique<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
+            builder.Services.AddSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
-            builder.Services.AddUnique<IVariationContextAccessor, HybridVariationContextAccessor>();
+            builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
 
             // Config manipulator
-            builder.Services.AddUnique<IConfigManipulator, JsonConfigManipulator>();
+            builder.Services.AddSingleton<IConfigManipulator, JsonConfigManipulator>();
 
-            builder.Services.AddUnique<RichTextEditorPastedImages>();
-            builder.Services.AddUnique<BlockEditorConverter>();
+            builder.Services.AddSingleton<RichTextEditorPastedImages>();
+            builder.Services.AddSingleton<BlockEditorConverter>();
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We will remove the basic one defined
@@ -146,20 +146,26 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .Remove<SimpleTinyMceValueConverter>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
-            builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
+            builder.Services.AddSingleton<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 
-            builder.Services.AddUnique<IContentLastChanceFinder, ContentFinderByConfigured404>();
+            builder.Services.AddSingleton<IContentLastChanceFinder, ContentFinderByConfigured404>();
 
             builder.Services.AddScoped<UmbracoTreeSearcher>();
 
             // replace
-            builder.Services.AddUnique<IEmailSender, EmailSender>();
+            builder.Services.AddSingleton<IEmailSender, EmailSender>(
+                services => new EmailSender(
+                    services.GetRequiredService<ILogger<EmailSender>>(),
+                    services.GetRequiredService<IOptions<GlobalSettings>>(),
+                    services.GetRequiredService<IEventAggregator>(),
+                    services.GetService<INotificationHandler<SendEmailNotification>>(),
+                    services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));
 
-            builder.Services.AddUnique<IExamineManager, ExamineManager>();
+            builder.Services.AddSingleton<IExamineManager, ExamineManager>();
 
             builder.Services.AddScoped<ITagQuery, TagQuery>();
 
-            builder.Services.AddUnique<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
+            builder.Services.AddSingleton<IUmbracoTreeSearcherFields, UmbracoTreeSearcherFields>();
             builder.Services.AddSingleton<IPublishedContentQueryAccessor, PublishedContentQueryAccessor>();
             builder.Services.AddScoped<IPublishedContentQuery>(factory =>
             {
@@ -169,29 +175,29 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             });
 
             // register accessors for cultures
-            builder.Services.AddUnique<IDefaultCultureAccessor, DefaultCultureAccessor>();
+            builder.Services.AddSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
 
             builder.Services.AddSingleton<IFilePermissionHelper, FilePermissionHelper>();
 
-            builder.Services.AddUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
+            builder.Services.AddSingleton<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-            builder.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
+            builder.Services.AddSingleton<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
-            builder.Services.AddUnique<UploadAutoFillProperties>();
+            builder.Services.AddSingleton<UploadAutoFillProperties>();
 
-            builder.Services.AddUnique<ICronTabParser, NCronTabParser>();
+            builder.Services.AddSingleton<ICronTabParser, NCronTabParser>();
 
             // Add default ImageSharp configuration and service implementations
-            builder.Services.AddUnique(SixLabors.ImageSharp.Configuration.Default);
-            builder.Services.AddUnique<IImageDimensionExtractor, ImageDimensionExtractor>();
-            builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
+            builder.Services.AddSingleton(SixLabors.ImageSharp.Configuration.Default);
+            builder.Services.AddSingleton<IImageDimensionExtractor, ImageSharpDimensionExtractor>();
+            builder.Services.AddSingleton<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
-            builder.Services.AddUnique<PackageDataInstallation>();
+            builder.Services.AddSingleton<PackageDataInstallation>();
 
             builder.AddInstaller();
 
             // Services required to run background jobs (with out the handler)
-            builder.Services.AddUnique<IBackgroundTaskQueue, BackgroundTaskQueue>();
+            builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
 
             return builder;
         }
@@ -201,19 +207,19 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         /// </summary>
         private static IUmbracoBuilder AddLogging(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUnique<ThreadAbortExceptionEnricher>();
-            builder.Services.AddUnique<HttpSessionIdEnricher>();
-            builder.Services.AddUnique<HttpRequestNumberEnricher>();
-            builder.Services.AddUnique<HttpRequestIdEnricher>();
+            builder.Services.AddSingleton<ThreadAbortExceptionEnricher>();
+            builder.Services.AddSingleton<HttpSessionIdEnricher>();
+            builder.Services.AddSingleton<HttpRequestNumberEnricher>();
+            builder.Services.AddSingleton<HttpRequestIdEnricher>();
             return builder;
         }
 
         private static IUmbracoBuilder AddMainDom(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUnique<IMainDomLock>(factory =>
+            builder.Services.AddSingleton<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
-                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>();
+                var connectionStrings = factory.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
@@ -259,9 +265,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         public static IUmbracoBuilder AddLogViewer(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUnique<ILogViewerConfig, LogViewerConfig>();
+            builder.Services.AddSingleton<ILogViewerConfig, LogViewerConfig>();
             builder.SetLogViewer<SerilogJsonLogViewer>();
-            builder.Services.AddUnique<ILogViewer>(factory => new SerilogJsonLogViewer(factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
+            builder.Services.AddSingleton<ILogViewer>(factory => new SerilogJsonLogViewer(factory.GetRequiredService<ILogger<SerilogJsonLogViewer>>(),
                 factory.GetRequiredService<ILogViewerConfig>(),
                 factory.GetRequiredService<ILoggingConfiguration>(),
                 Log.Logger));
@@ -273,7 +279,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
         {
             // add handlers for sending user notifications (i.e. emails)
-            builder.Services.AddUnique<UserNotificationsHandler.Notifier>();
+            builder.Services.AddSingleton<UserNotificationsHandler.Notifier>();
             builder
                 .AddNotificationHandler<ContentSavedNotification, UserNotificationsHandler>()
                 .AddNotificationHandler<ContentSortedNotification, UserNotificationsHandler>()

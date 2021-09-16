@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using MessagePack;
 using Newtonsoft.Json;
 using Umbraco.Cms.Infrastructure.Serialization;
-using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
@@ -16,11 +17,13 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         [DataMember(Order = 0)]
         [JsonProperty("pd")]
         [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<PropertyData[]>))]
+        [MessagePackFormatter(typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<PropertyData[]>))]
         public Dictionary<string, PropertyData[]> PropertyData { get; set; }
 
         [DataMember(Order = 1)]
         [JsonProperty("cd")]
         [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<CultureVariation>))]
+        [MessagePackFormatter(typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<CultureVariation>))]
         public Dictionary<string, CultureVariation> CultureData { get; set; }
 
         [DataMember(Order = 2)]

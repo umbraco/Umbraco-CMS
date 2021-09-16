@@ -227,7 +227,12 @@ namespace Umbraco.Cms.Core
                 public const string FailedPasswordAttemptsLabel = "Failed Password Attempts";
 
                 /// <summary>
-                /// Group name to put the membership properties on
+                /// The standard properties group alias for membership properties.
+                /// </summary>
+                public const string StandardPropertiesGroupAlias = "membership";
+
+                /// <summary>
+                /// The standard properties group name for membership properties.
                 /// </summary>
                 public const string StandardPropertiesGroupName = "Membership";
             }

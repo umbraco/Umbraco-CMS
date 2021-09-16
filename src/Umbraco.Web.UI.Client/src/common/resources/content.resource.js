@@ -642,6 +642,24 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
         },
+
+        getScaffolds: function(parentId, aliases){
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmptyByAliases"),
+                        { parentId: parentId, contentTypeAliases: aliases }
+                    ),
+                    'Failed to retrieve data for empty content item aliases ' + aliases.join(", ")
+                ).then(function(result) {
+                    Object.keys(result).map(function(key){
+                        result[key] = umbDataFormatter.formatContentGetData(result[key]);
+                    });
+
+                    return $q.when(result);
+                });
+        },
         /**
          * @ngdoc method
          * @name umbraco.resources.contentResource#getScaffoldByKey

@@ -570,7 +570,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             ContentType contentType = ContentTypeBuilder.CreateTextPageContentType();
 
             // Act
-            contentType.PropertyGroups.Add(new PropertyGroup(true) { Name = "Test Group", SortOrder = 3 });
+            contentType.PropertyGroups.Add(new PropertyGroup(true)
+            {
+                Alias = "testGroup",
+                Name = "Test Group",
+                SortOrder = 3
+            });
 
             // Assert
             Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(3));
@@ -584,7 +589,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             contentType.ResetDirtyProperties();
 
             // Act
-            contentType.PropertyGroups.Remove("Content");
+            contentType.PropertyGroups.Remove("content");
 
             // Assert
             Assert.That(contentType.PropertyGroups.Count, Is.EqualTo(1));
@@ -602,10 +607,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
                 .WithAlias("subtitle")
                 .WithName("Subtitle")
                 .Build();
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
+            contentType.PropertyGroups["content"].PropertyTypes.Add(propertyType);
 
             // Assert
-            Assert.That(contentType.PropertyGroups["Content"].PropertyTypes.Count, Is.EqualTo(3));
+            Assert.That(contentType.PropertyGroups["content"].PropertyTypes.Count, Is.EqualTo(3));
         }
 
         [Test]
@@ -622,7 +627,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
                 .WithAlias("subtitle")
                 .WithName("Subtitle")
                 .Build();
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
+            contentType.PropertyGroups["content"].PropertyTypes.Add(propertyType);
             var newProperty = new Property(propertyType);
             newProperty.SetValue("This is a subtitle Test");
             content.Properties.Add(newProperty);
@@ -646,7 +651,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
                 .WithAlias("subtitle")
                 .WithName("Subtitle")
                 .Build();
-            var propertyGroup = new PropertyGroup(true) { Name = "Test Group", SortOrder = 3 };
+            var propertyGroup = new PropertyGroup(true)
+            {
+                Alias = "testGroup",
+                Name = "Test Group",
+                SortOrder = 3
+            };
             propertyGroup.PropertyTypes.Add(propertyType);
             contentType.PropertyGroups.Add(propertyGroup);
             var newProperty = new Property(propertyType);
@@ -806,7 +816,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             contentType.ResetDirtyProperties();
 
             // Act
-            var propertyGroup = new PropertyGroup(true) { Name = "Test Group", SortOrder = 3 };
+            var propertyGroup = new PropertyGroup(true)
+            {
+                Alias = "testGroup",
+                Name = "Test Group",
+                SortOrder = 3
+            };
             contentType.PropertyGroups.Add(propertyGroup);
 
             // Assert
@@ -904,11 +919,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
                 .WithAlias("subtitle")
                 .WithName("Subtitle")
                 .Build();
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
+            contentType.PropertyGroups["content"].PropertyTypes.Add(propertyType);
 
             // Assert
-            Assert.That(contentType.PropertyGroups["Content"].IsDirty(), Is.True);
-            Assert.That(contentType.PropertyGroups["Content"].IsPropertyDirty("PropertyTypes"), Is.True);
+            Assert.That(contentType.PropertyGroups["content"].IsDirty(), Is.True);
+            Assert.That(contentType.PropertyGroups["content"].IsPropertyDirty("PropertyTypes"), Is.True);
             Assert.That(contentType.PropertyGroups.Any(x => x.IsDirty()), Is.True);
         }
 

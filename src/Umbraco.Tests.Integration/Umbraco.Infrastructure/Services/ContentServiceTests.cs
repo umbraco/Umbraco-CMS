@@ -2568,7 +2568,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 new PropertyType(ShortStringHelper, "test", ValueStorageType.Ntext) { Alias = "title", Name = "Title", Mandatory = false, DataTypeId = -88 },
             };
 
-            contentType.PropertyGroups.Add(new PropertyGroup(properties) { Name = "content" });
+            contentType.PropertyGroups.Add(new PropertyGroup(properties)
+            {
+                Alias = "content",
+                Name = "content"
+            });
 
             contentType.SetDefaultTemplate(new Template(ShortStringHelper, "Textpage", "textpage"));
             FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!

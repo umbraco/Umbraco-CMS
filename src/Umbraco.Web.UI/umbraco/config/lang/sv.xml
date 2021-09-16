@@ -992,4 +992,8 @@
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="yourProfile">Din profil</key>
   </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Välj alla</key>
+    <key alias="deselectAllLogLevelFilters">Avmarkera alla</key>
+  </area>
 </language>

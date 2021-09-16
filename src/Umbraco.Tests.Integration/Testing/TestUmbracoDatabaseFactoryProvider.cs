@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly IOptions<ConnectionStrings> _connectionStrings;
+        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
         private readonly IMapperCollection _mappers;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         public TestUmbracoDatabaseFactoryProvider(
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
-            IOptions<ConnectionStrings> connectionStrings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
             IMapperCollection mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,

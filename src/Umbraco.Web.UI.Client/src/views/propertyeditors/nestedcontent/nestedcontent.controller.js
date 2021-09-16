@@ -522,10 +522,14 @@
         ];
 
         // Initialize
-        var scaffoldsLoaded = 0;
         vm.scaffolds = [];
-        _.each(model.config.contentTypes, function (contentType) {
-            contentResource.getScaffold(-20, contentType.ncAlias).then(function (scaffold) {
+
+        contentResource.getScaffolds(-20, contentTypeAliases).then(function (scaffolds){
+            // Loop through all the content types
+            _.each(model.config.contentTypes, function (contentType){
+                // Get the scaffold from the result
+                var scaffold = scaffolds[contentType.ncAlias];
+
                 // make sure it's an element type before allowing the user to create new ones
                 if (scaffold.isElement) {
                     // remove all tabs except the specified tab
@@ -554,13 +558,10 @@
                     // Store the scaffold object
                     vm.scaffolds.push(scaffold);
                 }
-
-                scaffoldsLoaded++;
-                initIfAllScaffoldsHaveLoaded();
-            }, function (error) {
-                scaffoldsLoaded++;
-                initIfAllScaffoldsHaveLoaded();
             });
+
+            // Initialize once all scaffolds have been loaded
+            initNestedContent();
         });
 
         /**
@@ -586,57 +587,50 @@
             });
         }
 
-        var initIfAllScaffoldsHaveLoaded = function () {
+        var initNestedContent = function () {
             // Initialize when all scaffolds have loaded
-            if (model.config.contentTypes.length === scaffoldsLoaded) {
-                // Because we're loading the scaffolds async one at a time, we need to
-                // sort them explicitly according to the sort order defined by the data type.
-                contentTypeAliases = [];
-                _.each(model.config.contentTypes, function (contentType) {
-                    contentTypeAliases.push(contentType.ncAlias);
-                });
-                vm.scaffolds = $filter("orderBy")(vm.scaffolds, function (s) {
-                    return contentTypeAliases.indexOf(s.contentTypeAlias);
-                });
+            // Sort the scaffold explicitly according to the sort order defined by the data type.
+            vm.scaffolds = $filter("orderBy")(vm.scaffolds, function (s) {
+                return contentTypeAliases.indexOf(s.contentTypeAlias);
+            });
 
-                // Convert stored nodes
-                if (model.value) {
-                    for (var i = 0; i < model.value.length; i++) {
-                        var item = model.value[i];
-                        var scaffold = getScaffold(item.ncContentTypeAlias);
-                        if (scaffold == null) {
-                            // No such scaffold - the content type might have been deleted. We need to skip it.
-                            continue;
-                        }
-                        createNode(scaffold, item);
+            // Convert stored nodes
+            if (model.value) {
+                for (var i = 0; i < model.value.length; i++) {
+                    var item = model.value[i];
+                    var scaffold = getScaffold(item.ncContentTypeAlias);
+                    if (scaffold == null) {
+                        // No such scaffold - the content type might have been deleted. We need to skip it.
+                        continue;
                     }
+                    createNode(scaffold, item);
                 }
-
-                // Enforce min items if we only have one scaffold type
-                var modelWasChanged = false;
-                if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
-                    for (var i = vm.nodes.length; i < model.config.minItems; i++) {
-                        addNode(vm.scaffolds[0].contentTypeAlias);
-                    }
-                    modelWasChanged = true;
-                }
-
-                // If there is only one item, set it as current node
-                if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
-                    setCurrentNode(vm.nodes[0], false);
-                }
-
-                validate();
-
-                vm.inited = true;
-
-                if (modelWasChanged) {
-                    updateModel();
-                }
-
-                updatePropertyActionStates();
-                checkAbilityToPasteContent();
             }
+
+            // Enforce min items if we only have one scaffold type
+            var modelWasChanged = false;
+            if (vm.nodes.length < vm.minItems && vm.scaffolds.length === 1) {
+                for (var i = vm.nodes.length; i < model.config.minItems; i++) {
+                    addNode(vm.scaffolds[0].contentTypeAlias);
+                }
+                modelWasChanged = true;
+            }
+
+            // If there is only one item, set it as current node
+            if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
+                setCurrentNode(vm.nodes[0], false);
+            }
+
+            validate();
+
+            vm.inited = true;
+
+            if (modelWasChanged) {
+                updateModel();
+            }
+
+            updatePropertyActionStates();
+            checkAbilityToPasteContent();
         }
 
         function extendPropertyWithNCData(prop) {

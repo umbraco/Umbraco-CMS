@@ -1,11 +1,11 @@
 <div ng-controller="Umbraco.Overlays.UserController">
     <div class="umb-control-group" ng-if="!showPasswordFields">
 
-       <h5><localize key="user_yourProfile" /></h5>
+       <h5><localize key="user_yourProfile"></localize></h5>
 
        <!--<p class="muted">
            <small>
-               <localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}
+               <localize key="user_sessionExpires"></localize>: {{remainingAuthSeconds | timespan}}
            </small>
        </p>-->
 
@@ -59,7 +59,7 @@
                             ng-class="login.properties.ButtonStyle"
                             id="{{login.authType}}">
 
-                      <umb-icon icon="{{login.properties.Icon}}" class="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
+                        <umb-icon icon="{{login.properties.Icon}}" style="height:100%;"></umb-icon>
                         <localize key="defaultdialogs_linkYour">Link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
                     </button>
                 </form>
@@ -71,22 +71,22 @@
                         id="{{login.authType}}"
                         name="provider"
                         value="{{login.authType}}">
-                    <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                    <umb-icon icon="fa {{login.properties.SocialIcon}}"></umb-icon>
                     <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
                 </button>
             </div>
-			
+            
         </div>
 
     </div>
 
 
     <div class="umb-control-group" ng-if="!showPasswordFields && history.length">
-        <h5><localize key="user_yourHistory" /></h5>
+        <h5><localize key="user_yourHistory"></localize></h5>
         <ul class="umb-tree">
             <li ng-repeat="item in history | orderBy:'time':true">
                 <a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
-                    <umb-icon icon="{{item.icon}}" class="{{item.icon}}"></umb-icon>
+                    <umb-icon icon="{{item.icon}}"></umb-icon>
                     {{item.name}}
                 </a>
             </li>

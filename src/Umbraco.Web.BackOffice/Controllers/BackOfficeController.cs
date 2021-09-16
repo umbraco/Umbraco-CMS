@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -112,13 +113,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Default()
         {
-            // TODO: It seems that if you login during an authorize upgrade and the upgrade fails, you can still
-            // access the back office. This should redirect to the installer in that case?
+            // Check if we not are in an run state, if so we need to redirect
+            if (_runtimeState.Level != RuntimeLevel.Run)
+            {
+                return Redirect("/");
+            }
 
             // force authentication to occur since this is not an authorized endpoint
-            var result = await this.AuthenticateBackOfficeAsync();
+            AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
 
-            var viewPath = Path.Combine(_globalSettings.UmbracoPath , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
+            var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
 
             return await RenderDefaultOrProcessExternalLoginAsync(
@@ -204,7 +208,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // force authentication to occur since this is not an authorized endpoint
             var result = await this.AuthenticateBackOfficeAsync();
 
-            var viewPath = Path.Combine(_globalSettings.UmbracoPath, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
+            var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
 
             return await RenderDefaultOrProcessExternalLoginAsync(
                 result,
@@ -281,6 +285,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+        [AngularJsonOnlyConfiguration]
         [HttpGet]
         public IEnumerable<IGridEditorConfig> GetGridConfig()
         {

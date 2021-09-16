@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             return mediaType;
         }
 
-        public static MediaType CreateSimpleMediaType(string alias, string name, IMediaType parent = null, bool randomizeAliases = false, string propertyGroupName = "Content")
+        public static MediaType CreateSimpleMediaType(string alias, string name, IMediaType parent = null, bool randomizeAliases = false, string propertyGroupAlias = "content", string propertyGroupName = "Content")
         {
             var builder = new MediaTypeBuilder();
             IMediaType mediaType = builder
@@ -132,6 +132,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 .WithName(name)
                 .WithParentContentType(parent)
                 .AddPropertyGroup()
+                    .WithAlias(propertyGroupAlias)
                     .WithName(propertyGroupName)
                     .WithSortOrder(1)
                     .AddPropertyType()
@@ -261,6 +262,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 .WithAlias("newMediaType")
                 .WithName("New Media Type")
                 .AddPropertyGroup()
+                    .WithAlias("media")
                     .WithName("Media")
                     .WithSortOrder(1)
                     .AddPropertyType()

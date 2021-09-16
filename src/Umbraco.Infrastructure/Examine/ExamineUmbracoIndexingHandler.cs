@@ -119,6 +119,20 @@ namespace Umbraco.Cms.Infrastructure.Examine
         }
 
         /// <inheritdoc />
+        public void DeleteIndexForEntities(IReadOnlyCollection<int> entityIds, bool keepIfUnpublished)
+        {
+            var actions = DeferedActions.Get(_scopeProvider);
+            if (actions != null)
+            {
+                actions.Add(new DeferedDeleteIndex(this, entityIds, keepIfUnpublished));
+            }
+            else
+            {
+                DeferedDeleteIndex.Execute(this, entityIds, keepIfUnpublished);
+            }
+        }
+
+        /// <inheritdoc />
         public void ReIndexForContent(IContent sender, bool isPublished)
         {
             var actions = DeferedActions.Get(_scopeProvider);
@@ -371,6 +385,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
             private readonly int _id;
+            private readonly IReadOnlyCollection<int> _ids;
             private readonly bool _keepIfUnpublished;
 
             public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id, bool keepIfUnpublished)
@@ -380,16 +395,42 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 _keepIfUnpublished = keepIfUnpublished;
             }
 
-            public override void Execute() => Execute(_examineUmbracoIndexingHandler, _id, _keepIfUnpublished);
+            public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IReadOnlyCollection<int> ids, bool keepIfUnpublished)
+            {
+                _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
+                _ids = ids;
+                _keepIfUnpublished = keepIfUnpublished;
+            }
+
+            public override void Execute()
+            {
+                if (_ids is null)
+                {
+                    Execute(_examineUmbracoIndexingHandler, _id, _keepIfUnpublished);
+                }
+                else
+                {
+                    Execute(_examineUmbracoIndexingHandler, _ids, _keepIfUnpublished);
+                } 
+            }
 
             public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id, bool keepIfUnpublished)
             {
-                var strId = id.ToString(CultureInfo.InvariantCulture);
                 foreach (var index in examineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
                     .Where(x => x.PublishedValuesOnly || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
-                    index.DeleteFromIndex(strId);
+                    index.DeleteFromIndex(id.ToString(CultureInfo.InvariantCulture));
+                }
+            }
+
+            public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IReadOnlyCollection<int> ids, bool keepIfUnpublished)
+            {
+                foreach (var index in examineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    .Where(x => x.PublishedValuesOnly || !keepIfUnpublished)
+                    .Where(x => x.EnableDefaultEventHandler))
+                {
+                    index.DeleteFromIndex(ids.Select(x => x.ToString(CultureInfo.InvariantCulture)));
                 }
             }
         }

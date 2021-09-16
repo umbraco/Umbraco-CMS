@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -9,6 +9,7 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
@@ -185,7 +186,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
         /// <returns></returns>
         public IEnumerable<Tuple<string, string, string, string>> GetDefaultConstraintsPerColumn(IDatabase db)
         {
-            var items = db.Fetch<dynamic>("SELECT TableName = t.Name, ColumnName = c.Name, dc.Name, dc.[Definition] FROM sys.tables t INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id INNER JOIN sys.schemas as s on t.[schema_id] = s.[schema_id] WHERE s.name = (SELECT SCHEMA_NAME())");
+            var items = db.Fetch<DefaultConstraintPerColumnDto>("SELECT TableName = t.Name, ColumnName = c.Name, dc.Name, dc.[Definition] FROM sys.tables t INNER JOIN sys.default_constraints dc ON t.object_id = dc.parent_object_id INNER JOIN sys.columns c ON dc.parent_object_id = c.object_id AND c.column_id = dc.parent_column_id INNER JOIN sys.schemas as s on t.[schema_id] = s.[schema_id] WHERE s.name = (SELECT SCHEMA_NAME())");
             return items.Select(x => new Tuple<string, string, string, string>(x.TableName, x.ColumnName, x.Name, x.Definition));
         }
 
@@ -193,45 +194,44 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
-            var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
-            return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
+            return db.Fetch<string>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
         }
 
         public override IsolationLevel DefaultIsolationLevel => IsolationLevel.ReadCommitted;
 
         public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
-            var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
+            var items = db.Fetch<ColumnInSchemaDto>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
             return
                 items.Select(
                     item =>
-                    new ColumnInfo(item.TABLE_NAME, item.COLUMN_NAME, item.ORDINAL_POSITION, item.COLUMN_DEFAULT,
-                                   item.IS_NULLABLE, item.DATA_TYPE)).ToList();
+                    new ColumnInfo(item.TableName, item.ColumnName, item.OrdinalPosition, item.ColumnDefault,
+                                   item.IsNullable, item.DataType)).ToList();
         }
 
         /// <inheritdoc />
         public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
         {
             var items =
-                db.Fetch<dynamic>(
+                db.Fetch<ConstraintPerTableDto>(
                     "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
-            return items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
+            return items.Select(item => new Tuple<string, string>(item.TableName, item.ConstraintName)).ToList();
         }
 
         /// <inheritdoc />
         public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
         {
             var items =
-                db.Fetch<dynamic>(
+                db.Fetch<ConstraintPerColumnDto>(
                     "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE TABLE_SCHEMA = (SELECT SCHEMA_NAME())");
-            return items.Select(item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME)).ToList();
+            return items.Select(item => new Tuple<string, string, string>(item.TableName, item.ColumnName, item.ConstraintName)).ToList();
         }
 
         /// <inheritdoc />
         public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db)
         {
             var items =
-                db.Fetch<dynamic>(
+                db.Fetch<DefinedIndexDto>(
                     @"select T.name as TABLE_NAME, I.name as INDEX_NAME, AC.Name as COLUMN_NAME,
 CASE WHEN I.is_unique_constraint = 1 OR  I.is_unique = 1 THEN 1 ELSE 0 END AS [UNIQUE]
 from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id]
@@ -240,8 +240,8 @@ from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id
    inner join sys.schemas as S on T.[schema_id] = S.[schema_id]
 WHERE S.name = (SELECT SCHEMA_NAME()) AND I.is_primary_key = 0
 order by T.name, I.name");
-            return items.Select(item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME,
-                item.UNIQUE == 1)).ToList();
+            return items.Select(item => new Tuple<string, string, string, bool>(item.TableName, item.IndexName, item.ColumnName,
+                item.Unique == 1)).ToList();
 
         }
 

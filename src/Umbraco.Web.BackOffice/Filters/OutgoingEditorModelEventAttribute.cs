@@ -1,9 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Cms.Core.Dashboards;
-using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
@@ -54,25 +54,37 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
                 if (context.Result is ObjectResult objectContent)
                 {
-                    var model = objectContent.Value;
-
-                    switch (model)
+                    // Support both batch (dictionary) and single results
+                    IEnumerable models;
+                    if (objectContent.Value is IDictionary modelDictionary)
                     {
-                        case ContentItemDisplay content:
-                            _eventAggregator.Publish(new SendingContentNotification(content, umbracoContext));
-                            break;
-                        case MediaItemDisplay media:
-                            _eventAggregator.Publish(new SendingMediaNotification(media, umbracoContext));
-                            break;
-                        case MemberDisplay member:
-                            _eventAggregator.Publish(new SendingMemberNotification(member, umbracoContext));
-                            break;
-                        case UserDisplay user:
-                            _eventAggregator.Publish(new SendingUserNotification(user, umbracoContext));
-                            break;
-                        case IEnumerable<Tab<IDashboardSlim>> dashboards:
-                            _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
-                            break;
+                        models = modelDictionary.Values;
+                    }
+                    else
+                    {
+                        models = new[] { objectContent.Value };
+                    }
+
+                    foreach (var model in models)
+                    {
+                        switch (model)
+                        {
+                            case ContentItemDisplay content:
+                                _eventAggregator.Publish(new SendingContentNotification(content, umbracoContext));
+                                break;
+                            case MediaItemDisplay media:
+                                _eventAggregator.Publish(new SendingMediaNotification(media, umbracoContext));
+                                break;
+                            case MemberDisplay member:
+                                _eventAggregator.Publish(new SendingMemberNotification(member, umbracoContext));
+                                break;
+                            case UserDisplay user:
+                                _eventAggregator.Publish(new SendingUserNotification(user, umbracoContext));
+                                break;
+                            case IEnumerable<Tab<IDashboardSlim>> dashboards:
+                                _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
+                                break;
+                        }
                     }
                 }
             }

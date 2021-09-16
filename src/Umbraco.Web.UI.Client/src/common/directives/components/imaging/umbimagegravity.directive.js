@@ -25,6 +25,7 @@
         vm.style = {};
         vm.overlayStyle = {};
         vm.setFocalPoint = setFocalPoint;
+        vm.resetFocalPoint = resetFocalPoint;
 
         /** Sets the css style for the Dot */
         function updateStyle() {
@@ -37,6 +38,13 @@
                 'height': vm.dimensions.height + 'px'
             };
 
+        };
+
+        function resetFocalPoint() {
+            vm.onValueChanged({
+                left: 0.5,
+                top: 0.5
+            });
         };
 
         function setFocalPoint(event) {

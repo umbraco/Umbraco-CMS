@@ -10,7 +10,7 @@
                     <div class="umb-property-editor form-horizontal">
                         <div ui-sortable="sortableOptions" ng-model="model.macro.parameters">
                             <div class="control-group umb-prevalues-multivalues__listitem" ng-repeat="parameter in model.macro.parameters track by $id(parameter)">
-                                <i class="icon icon-navigation handle" aria-hidden="true"></i>
+                                <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
                                 <div class="umb-prevalues-multivalues__left">
                                     <span>{{parameter.label}}</span>&nbsp;<span class="muted">({{parameter.key}})</span>:&nbsp;<small>{{parameter.editor}}</small>
                                 </div>

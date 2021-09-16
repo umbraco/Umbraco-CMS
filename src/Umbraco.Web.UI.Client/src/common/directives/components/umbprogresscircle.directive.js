@@ -20,8 +20,8 @@ Use this directive to render a circular progressbar.
 	</div>
 </pre>
 
-@param {string} size (<code>attribute</code>): This parameter defines the width and the height of the circle in pixels.
 @param {string} percentage (<code>attribute</code>): Takes a number between 0 and 100 and applies it to the circle's highlight length.
+@param {string} size (<code>attribute</code>): This parameter defines the width and the height of the circle in pixels.
 @param {string} color (<code>attribute</code>): The color of the highlight (primary, secondary, success, warning, danger). Success by default. 
 **/
 
@@ -72,9 +72,9 @@ Use this directive to render a circular progressbar.
             replace: true,
             templateUrl: 'views/components/umb-progress-circle.html',
             scope: {
-                size: "@?",
                 percentage: "@",
-                color: "@"
+                size: "@?",
+                color: "@?"
             },
             link: link
 

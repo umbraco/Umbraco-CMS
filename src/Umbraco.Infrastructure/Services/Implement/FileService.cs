@@ -624,7 +624,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
         {
-            var snippetPath = _hostingEnvironment.MapPathContentRoot($"{_globalSettings.UmbracoPath}/PartialViewMacros/Templates/");
+            var snippetPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.Umbraco}/PartialViewMacros/Templates/");
             var files = Directory.GetFiles(snippetPath, "*.cshtml")
                 .Select(Path.GetFileNameWithoutExtension)
                 .Except(filterNames, StringComparer.InvariantCultureIgnoreCase)
@@ -835,7 +835,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 fileName += ".cshtml";
             }
 
-            var snippetPath = _hostingEnvironment.MapPathContentRoot($"{_globalSettings.UmbracoPath}/PartialViewMacros/Templates/{fileName}");
+            var snippetPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.Umbraco}/PartialViewMacros/Templates/{fileName}");
             return System.IO.File.Exists(snippetPath)
                 ? Attempt<string>.Succeed(snippetPath)
                 : Attempt<string>.Fail();

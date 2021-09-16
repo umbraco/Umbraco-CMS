@@ -50,6 +50,11 @@
                                            center="model.target.focalPoint"
                                            on-value-changed="vm.focalPointChanged(left, top)">
                         </umb-image-gravity>
+                        <div class="media-crop-details-buttons">
+                            <button type="button" ng-show="(model.target.focalPoint.left !== 0.5 && model.target.focalPoint.top !== 0.5)" class="btn btn-link btn-gravity-reset" ng-click="vm.focalPointChanged(0.5,0.5)">
+                                <umb-icon icon="icon-axis-rotation"></umb-icon> <localize key="content_resetFocalPoint">Reset focal point</localize>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

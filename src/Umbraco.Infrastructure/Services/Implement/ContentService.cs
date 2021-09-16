@@ -304,7 +304,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
-            using (var scope = ScopeProvider.CreateScope(autoComplete:true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // locking the content tree secures content types too
                 scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
@@ -918,7 +918,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = 0)
+        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (cultures == null) throw new ArgumentNullException(nameof(cultures));

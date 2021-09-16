@@ -7,6 +7,106 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
     var contentTypeHelperService = {
 
+        TYPE_GROUP: 'Group',
+        TYPE_TAB: 'Tab',
+
+        isAliasUnique(groups, alias) {
+            return groups.find(group => group.alias === alias) ? false : true;
+        },
+
+        createUniqueAlias(groups, alias) {
+            let i = 1;
+            while(this.isAliasUnique(groups, alias + i.toString()) === false) {
+                i++;
+            }
+            return alias + i.toString();
+        },
+
+        generateLocalAlias: function(name) {
+            return name ? name.toUmbracoAlias() : String.CreateGuid();
+        },
+
+        getLocalAlias: function (alias) {
+            const lastIndex = alias.lastIndexOf('/');
+
+            return (lastIndex === -1) ? alias : alias.substring(lastIndex + 1);
+        },
+
+        updateLocalAlias: function (alias, localAlias) {
+            const parentAlias = this.getParentAlias(alias);
+
+            return (parentAlias == null || parentAlias === '') ? localAlias : parentAlias + '/' + localAlias;
+        },
+
+        getParentAlias: function (alias) {
+            if(alias) {
+                const lastIndex = alias.lastIndexOf('/');
+
+                return (lastIndex === -1) ? null : alias.substring(0, lastIndex);
+            }
+            return null;
+        },
+
+        updateParentAlias: function (alias, parentAlias) {
+            const localAlias = this.getLocalAlias(alias);
+
+            return (parentAlias == null || parentAlias === '') ? localAlias : parentAlias + '/' + localAlias;
+        },
+
+        updateDescendingAliases: function (groups, oldParentAlias, newParentAlias) {
+            groups.forEach(group => {
+                const parentAlias = this.getParentAlias(group.alias);
+
+                if (parentAlias === oldParentAlias) {
+                    const oldAlias = group.alias,
+                        newAlias = this.updateParentAlias(oldAlias, newParentAlias);
+
+                    group.alias = newAlias;
+                    group.parentAlias = newParentAlias;
+                    this.updateDescendingAliases(groups, oldAlias, newAlias);
+
+                }
+            });
+        },
+
+        defineParentAliasOnGroups: function (groups) {
+            groups.forEach(group => {
+                group.parentAlias = this.getParentAlias(group.alias);
+            });
+        },
+
+        relocateDisorientedGroups: function (groups) {
+            const existingAliases = groups.map(group => group.alias);
+            existingAliases.push(null);
+            const disorientedGroups = groups.filter(group => existingAliases.indexOf(group.parentAlias) === -1);
+            disorientedGroups.forEach(group => {
+                const oldAlias = group.alias,
+                        newAlias = this.updateParentAlias(oldAlias, null);
+
+                group.alias = newAlias;
+                group.parentAlias = null;
+                this.updateDescendingAliases(groups, oldAlias, newAlias);
+            });
+        },
+
+        convertGroupToTab: function (groups, group) {
+            const tabs = groups.filter(group => group.type === this.TYPE_TAB).sort((a, b) => a.sortOrder - b.sortOrder);
+            const nextSortOrder = tabs && tabs.length > 0 ? tabs[tabs.length - 1].sortOrder + 1 : 0;
+
+            group.convertingToTab = true;
+
+            group.type = this.TYPE_TAB;
+            
+            const newAlias = this.generateLocalAlias(group.name);
+            // when checking for alias uniqueness we need to exclude the current group or the alias would get a + 1
+            const otherGroups = [...groups].filter(groupCopy => !groupCopy.convertingToTab);
+
+            group.alias = this.isAliasUnique(otherGroups, newAlias) ? newAlias : this.createUniqueAlias(otherGroups, newAlias);
+            group.parentAlias = null;
+            group.sortOrder = nextSortOrder;
+            group.convertingToTab = false;
+        },
+
         createIdArray: function (array) {
 
             var newArray = [];
@@ -143,7 +243,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                 // if groups are named the same - merge the groups
                 contentType.groups.forEach(function (contentTypeGroup) {
 
-                    if (contentTypeGroup.name === compositionGroup.name) {
+                    if (contentTypeGroup.name === compositionGroup.name && contentTypeGroup.type === compositionGroup.type) {
 
                         // set flag to show if properties has been merged into a tab
                         compositionGroup.groupIsMerged = true;
@@ -256,8 +356,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                         }
 
                         // remove group if there are no properties left
-                        if (contentTypeGroup.properties.length > 1) {
-                            //contentType.groups.splice(groupIndex, 1);
+                        if (contentTypeGroup.properties.length > 0) {
                             groups.push(contentTypeGroup);
                         }
 

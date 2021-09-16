@@ -55,14 +55,14 @@ namespace Umbraco.Cms.Core.Scoping
         /// <summary>
         /// Read-locks some lock objects.
         /// </summary>
-        /// <param name="lockIds">The lock object identifiers.</param>
-        void ReadLock(int lockId);
+        /// <param name="lockIds">Array of lock object identifiers.</param>
+        void ReadLock(params int[] lockIds);
 
         /// <summary>
         /// Write-locks some lock objects.
         /// </summary>
-        /// <param name="lockIds">The lock object identifiers.</param>
-        void WriteLock(int lockId);
+        /// <param name="lockIds">Array of object identifiers.</param>
+        void WriteLock(params int[] lockIds);
 
         /// <summary>
         /// Write-locks some lock objects.
@@ -77,5 +77,12 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="timeout">The database timeout in milliseconds</param>
         /// <param name="lockId">The lock object identifier.</param>
         void ReadLock(TimeSpan timeout, int lockId);
+
+        void EagerWriteLock(params int[] lockIds);
+        void EagerWriteLock(TimeSpan timeout, int lockId);
+
+        void EagerReadLock(TimeSpan timeout, int lockId);
+
+        void EagerReadLock(params int[] lockIds);
     }
 }

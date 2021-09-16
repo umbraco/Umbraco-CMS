@@ -139,6 +139,7 @@ angular.module('umbraco.mocks').
                   "content_publishStatus": "Publication Status",
                   "content_releaseDate": "Publish at",
                   "content_removeDate": "Clear Date",
+                  "content_resetFocalPoint": "Reset focal point",
                   "content_sortDone": "Sortorder is updated",
                   "content_sortHelp": "To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the 'shift' or 'control' key while selecting",
                   "content_statistics": "Statistics",
