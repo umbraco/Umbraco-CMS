@@ -32,6 +32,10 @@
         "NoNodesViewPath":{
             "longName": "no-nodes-view-path",
             "shortName": ""
+        },
+        "UseHttpsRedirect": {
+            "longName": "use-https-redirect",
+            "shortName": ""
         }
     },
     "usageExamples": [
