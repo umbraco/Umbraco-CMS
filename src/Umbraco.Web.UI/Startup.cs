@@ -55,9 +55,9 @@ namespace Umbraco.Cms.Web.UI
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 #if (UseHttpsRedirect)
-            app.UseHttpsRedirection(); 
+            app.UseHttpsRedirection();
+            
 #endif
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
