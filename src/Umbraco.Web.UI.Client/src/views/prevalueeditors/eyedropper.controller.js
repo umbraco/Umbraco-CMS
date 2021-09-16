@@ -24,21 +24,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.EyeDropperColorPic
             angularHelper.safeApply($scope, function () {
                 vm.color = color ? color.toString() : null;
                 $scope.model.value = vm.color;
-                $scope.propertyForm.selectedColor.$setViewValue(vm.color);
             });
-        };
-
-        // Method required by the valPropertyValidator directive (returns true if the property editor has at least one color selected)
-        $scope.validateMandatory = function () {
-            var isValid = !$scope.model.validation.mandatory || (
-                $scope.model.value != null
-                && $scope.model.value != "");
-
-            return {
-                isValid: isValid,
-                errorMsg: $scope.model.validation.mandatoryMessage || "Value cannot be empty",
-                errorKey: "required"
-            };
         };
 
     });
