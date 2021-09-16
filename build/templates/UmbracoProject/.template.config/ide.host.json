@@ -66,7 +66,7 @@
         {
             "id": "UseHttpsRedirect",
             "name": {
-                "text": "Optional: Adds code to startup.cs to redirect HTTP to HTTPS"
+                "text": "Optional: Adds code to Startup.cs to redirect HTTP to HTTPS and enables the UseHttps setting."
             },
             "isVisible": "true"
         }
