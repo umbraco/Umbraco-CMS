@@ -234,14 +234,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
         private void CreatePropertyTypeGroupData()
         {
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 3, ContentTypeNodeId = 1032, Text = "Image", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Image) });
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 4, ContentTypeNodeId = 1033, Text = "File", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.File) });
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 52, ContentTypeNodeId = 1034, Text = "Video", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Video) });
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 53, ContentTypeNodeId = 1035, Text = "Audio", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Audio) });
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 54, ContentTypeNodeId = 1036, Text = "Article", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Article) });
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 55, ContentTypeNodeId = 1037, Text = "Vector Graphics", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.VectorGraphics) });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 3, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Image), ContentTypeNodeId = 1032, Text = "Image", Alias = "image", SortOrder = 1 });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 4, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.File), ContentTypeNodeId = 1033, Text = "File", Alias = "file", SortOrder = 1, });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 52, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Video), ContentTypeNodeId = 1034, Text = "Video", Alias = "video", SortOrder = 1 });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 53, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Audio), ContentTypeNodeId = 1035, Text = "Audio", Alias = "audio", SortOrder = 1 });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 54, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Article), ContentTypeNodeId = 1036, Text = "Article", Alias = "article", SortOrder = 1 });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 55, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.VectorGraphics), ContentTypeNodeId = 1037, Text = "Vector Graphics", Alias = "vectorGraphics", SortOrder = 1 });
             //membership property group
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 11, ContentTypeNodeId = 1044, Text = "Membership", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Membership) });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 11, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Membership), ContentTypeNodeId = 1044, Text = "Membership", Alias = "membership", SortOrder = 1 });
         }
 
         private void CreatePropertyTypeData()

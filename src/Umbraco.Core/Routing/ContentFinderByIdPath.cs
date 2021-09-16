@@ -41,8 +41,11 @@ namespace Umbraco.Cms.Core.Routing
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(IPublishedRequestBuilder frequest)
         {
-            IUmbracoContext umbCtx = _umbracoContextAccessor.UmbracoContext;
-            if (umbCtx == null || (umbCtx != null && umbCtx.InPreviewMode == false && _webRoutingSettings.DisableFindContentByIdPath))
+            if(!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            {
+                return false;
+            }
+            if (umbracoContext == null || (umbracoContext != null && umbracoContext.InPreviewMode == false && _webRoutingSettings.DisableFindContentByIdPath))
             {
                 return false;
             }
@@ -65,7 +68,7 @@ namespace Umbraco.Cms.Core.Routing
                 if (nodeId > 0)
                 {
                     _logger.LogDebug("Id={NodeId}", nodeId);
-                    node = umbCtx.Content.GetById(nodeId);
+                    node = umbracoContext.Content.GetById(nodeId);
 
                     if (node != null)
                     {

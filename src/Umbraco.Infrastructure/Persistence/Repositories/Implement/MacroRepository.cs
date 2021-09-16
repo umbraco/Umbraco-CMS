@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -36,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public IMacro Get(Guid id)
         {
-            var sql = GetBaseQuery().Where("uniqueId=@Id", new { Id = id });
+            var sql = GetBaseQuery().Where<MacroDto>(x => x.UniqueId == id);
             return GetBySql(sql);
         }
 
@@ -123,7 +124,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "cmsMacro.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Macro}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

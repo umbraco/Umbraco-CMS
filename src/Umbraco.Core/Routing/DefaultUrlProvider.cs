@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
 {
@@ -34,8 +35,7 @@ namespace Umbraco.Cms.Core.Routing
         public virtual UrlInfo GetUrl(IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
             if (!current.IsAbsoluteUri) throw new ArgumentException("Current URL must be absolute.", nameof(current));
-
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             // will not use cache if previewing
             var route = umbracoContext.Content.GetRouteById(content.Id, culture);
 
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </remarks>
         public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
-            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             var node = umbracoContext.Content.GetById(id);
             if (node == null)
             {

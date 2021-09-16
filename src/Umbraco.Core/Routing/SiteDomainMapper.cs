@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Umbraco.Extensions;
+using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Routing
 {
@@ -335,8 +336,7 @@ namespace Umbraco.Cms.Core.Routing
             if (qualifiedSites == null)
             {
                 return domainAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(culture))
-                    ?? domainAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(defaultCulture))
-                    ?? domainAndUris.First();
+                    ?? domainAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(defaultCulture));
             }
 
             // find a site that contains the current authority
@@ -349,20 +349,10 @@ namespace Umbraco.Cms.Core.Routing
                 : domainAndUris.FirstOrDefault(d => currentSite.Value.Contains(d.Uri.GetLeftPart(UriPartial.Authority)));
 
             // no match means that either current does not belong to a site, or the site it belongs to
-            // does not contain any of domainAndUris. Yet we have to return something. here, it becomes
-            // a bit arbitrary.
-
-            // look through sites in order and pick the first domainAndUri that belongs to a site
-            ret = ret ?? qualifiedSites
-                .Where(site => site.Key != currentSite.Key)
-                .Select(site => domainAndUris.FirstOrDefault(domainAndUri => site.Value.Contains(domainAndUri.Uri.GetLeftPart(UriPartial.Authority))))
-                .FirstOrDefault(domainAndUri => domainAndUri != null);
-
-            // random, really
-            ret = ret ?? domainAndUris.FirstOrDefault(x => x.Culture.InvariantEquals(culture)) ?? domainAndUris.First();
-
+            // does not contain any of domainAndUris.
             return ret;
         }
+
 
         #endregion
 
@@ -386,5 +376,7 @@ namespace Umbraco.Cms.Core.Routing
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
         }
+
+
     }
 }

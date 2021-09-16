@@ -130,6 +130,7 @@ namespace Umbraco.Cms.Core.Cache
             {
                 _distributedCache.RefreshDataTypeCache(entity);
             }
+            _distributedCache.RefreshValueEditorCache(notification.SavedEntities);
         }
 
         public void Handle(DataTypeDeletedNotification notification)
@@ -138,6 +139,7 @@ namespace Umbraco.Cms.Core.Cache
             {
                 _distributedCache.RemoveDataTypeCache(entity);
             }
+            _distributedCache.RefreshValueEditorCache(notification.DeletedEntities);
         }
 
         #endregion

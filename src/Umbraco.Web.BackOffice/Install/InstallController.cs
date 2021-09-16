@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
 
             await _installHelper.SetInstallStatusAsync(false, "");
 
-            return View(Path.Combine(baseFolder , Cms.Core.Constants.Web.Mvc.InstallArea, nameof(Index) + ".cshtml"));
+            return View(Path.Combine(Constants.SystemDirectories.Umbraco.TrimStart("~") , Cms.Core.Constants.Web.Mvc.InstallArea, nameof(Index) + ".cshtml"));
         }
 
         /// <summary>

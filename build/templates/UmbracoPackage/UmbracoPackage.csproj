@@ -8,6 +8,7 @@
         <Description>...</Description>
         <Product>...</Product>
         <PackageTags>umbraco plugin package</PackageTags>
+        <RootNamespace>UmbracoPackage</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

@@ -19,8 +19,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="MessagePack" Version="2.2.85" />
-    <PackageReference Include="K4os.Compression.LZ4" Version="1.2.6" />
+    <PackageReference Include="MessagePack" Version="2.3.75" />
+    <PackageReference Include="K4os.Compression.LZ4" Version="1.2.12" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Umbraco.Code" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>

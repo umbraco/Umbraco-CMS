@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Filters
 {
@@ -53,9 +54,12 @@ namespace Umbraco.Cms.Web.Common.Filters
         {
             if (content != null)
             {
-                IUmbracoContextAccessor umbracoContext = context.HttpContext.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
+                IUmbracoContextAccessor umbracoContextAccessor = context.HttpContext.RequestServices.GetRequiredService<IUmbracoContextAccessor>();
                 IPublishedRouter router = context.HttpContext.RequestServices.GetRequiredService<IPublishedRouter>();
-                IPublishedRequestBuilder requestBuilder = await router.CreateRequestAsync(umbracoContext.UmbracoContext.CleanedUmbracoUrl);
+
+                var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+
+                IPublishedRequestBuilder requestBuilder = await router.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
                 requestBuilder.SetPublishedContent(content);
                 IPublishedRequest publishedRequest = requestBuilder.Build();
 

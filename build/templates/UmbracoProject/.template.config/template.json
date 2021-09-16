@@ -35,7 +35,7 @@
             "type": "generated",
             "generator": "regex",
             "dataType": "string",
-            "replaces": "Umbraco.Cms.Web.UI.NetCore",
+            "replaces": "Umbraco.Cms.Web.UI",
             "parameters": {
                 "source": "name",
                 "steps": [
@@ -57,7 +57,7 @@
         "version": {
             "type": "parameter",
             "datatype": "string",
-            "defaultValue": "9.0.0-beta004",
+            "defaultValue": "9.0.0-rc003",
             "description": "The version of Umbraco to load using NuGet",
             "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
         },
@@ -249,9 +249,56 @@
                 ]
               }
         },
+        "NoNodesViewPath":{
+            "type": "parameter",
+            "datatype":"text",
+            "description": "Path to a custom view presented with the Umbraco installation contains no published content",
+            "defaultValue": ""
+        },
+        "NoNodesViewPathReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "NO_NODES_VIEW_PATH_FROM_TEMPLATE",
+            "parameters": {
+                "source": "NoNodesViewPath",
+                "steps": [
+                    {
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
+                    }
+                ]
+              }
+        },
+        "HasConnectionString":{
+            "type": "computed",
+            "value": "(ConnectionString != \"\")"
+        },
+        "HasNoNodesViewPath":{
+            "type": "computed",
+            "value": "(NoNodesViewPath != \"\")"
+        },
         "UsingUnattenedInstall":{
             "type": "computed",
             "value": "(FriendlyName != \"\" && Email != \"\" && Password != \"\" && ConnectionString != \"\")"
+        },
+        "UseHttpsRedirect":{
+            "type": "parameter",
+            "datatype":"bool",
+            "defaultValue": "false",
+            "description": "Adds code to Startup.cs to redirect HTTP to HTTPS and enables the UseHttps setting (Default: false)"
         }
     }
 }

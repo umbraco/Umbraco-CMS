@@ -41,8 +41,8 @@
                  ng-click="vm.selectItem(item, $index, $event)">
 
                 <div class="umb-table-cell">
-                    <umb-icon icon="{{item.icon}}" class="{{item.icon}} umb-table-body__icon umb-table-body__fileicon" ng-if="!item.selected"></umb-icon>
-                    <umb-icon icon="icon-check" class="icon-check umb-table-body__icon umb-table-body__checkicon" ng-if="item.selected"></umb-icon>
+                    <umb-icon icon="{{item.icon}}" class="umb-table-body__icon umb-table-body__fileicon" ng-if="!item.selected"></umb-icon>
+                    <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon" ng-if="item.selected"></umb-icon>
                 </div>
                 <div class="umb-table-cell umb-table__name">
                     <a title="{{item.name}}" class="umb-table-body__link"

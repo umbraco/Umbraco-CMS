@@ -143,7 +143,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns>A <see cref="HttpResponseMessage"/> containing the persisted relation type's ID.</returns>
         public ActionResult<int> PostCreate(RelationTypeSave relationType)
         {
-            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(_shortStringHelper, true), relationType.IsBidirectional, relationType.ChildObjectType, relationType.ParentObjectType);
+            var relationTypePersisted = new RelationType(
+                relationType.Name,
+                relationType.Name.ToSafeAlias(_shortStringHelper, true),
+                relationType.IsBidirectional,
+                relationType.ParentObjectType,
+                relationType.ChildObjectType);
 
             try
             {

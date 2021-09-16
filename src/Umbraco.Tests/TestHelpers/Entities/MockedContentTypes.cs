@@ -158,7 +158,12 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -87 });
             contentCollection.Add(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeId = -88 });
 
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection)
+            {
+                Name = "Content",
+                Alias = "content",
+                SortOrder = 1
+            });
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
@@ -204,7 +209,11 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext) { Alias = RandomAlias("bodyText", randomizeAliases), Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -87 });
             contentCollection.Add(new PropertyType(ShortStringHelper, Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("author", randomizeAliases) , Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeId = -88 });
 
-            var pg = new PropertyGroup(contentCollection) {Name = propertyGroupName, SortOrder = 1};
+            var pg = new PropertyGroup(contentCollection)
+            {
+                Name = propertyGroupName,
+                SortOrder = 1
+            };
             contentType.PropertyGroups.Add(pg);
 
             //ensure that nothing is marked as dirty

@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
 
             // process the file
-            var filepath = editorFile == null ? null : ProcessFile(file, cuid, puid);
+            var filepath = editorFile == null ? null : ProcessFile(file, editorValue.DataTypeConfiguration, cuid, puid);
 
             // remove all temp files
             foreach (ContentPropertyFile f in uploads)
@@ -111,11 +111,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         }
 
-        private string ProcessFile(ContentPropertyFile file, Guid cuid, Guid puid)
+        private string ProcessFile(ContentPropertyFile file, object dataTypeConfiguration, Guid cuid, Guid puid)
         {
             // process the file
             // no file, invalid file, reject change
-            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _contentSettings) == false)
+            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName, _contentSettings) is false ||
+                UploadFileTypeValidator.IsAllowedInDataTypeConfiguration(file.FileName, dataTypeConfiguration) is false)
             {
                 return null;
             }

@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
@@ -12,18 +14,16 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     /// </summary>
     public class BackOfficeAuthenticationBuilder : AuthenticationBuilder
     {
-        private readonly BackOfficeExternalLoginProviderOptions _loginProviderOptions;
+        private readonly Action<BackOfficeExternalLoginProviderOptions> _loginProviderOptions;
 
-        public BackOfficeAuthenticationBuilder(IServiceCollection services, BackOfficeExternalLoginProviderOptions loginProviderOptions)
+        public BackOfficeAuthenticationBuilder(
+            IServiceCollection services,
+            Action<BackOfficeExternalLoginProviderOptions> loginProviderOptions = null)
             : base(services)
-        {
-            _loginProviderOptions = loginProviderOptions;
-        }
+            => _loginProviderOptions = loginProviderOptions ?? (x => { });
 
         public string SchemeForBackOffice(string scheme)
-        {
-            return Constants.Security.BackOfficeExternalAuthenticationTypePrefix + scheme;
-        }
+            =>  scheme?.EnsureStartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix);
 
         /// <summary>
         /// Overridden to track the final authenticationScheme being registered for the external login
@@ -43,7 +43,13 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             }
 
             // add our login provider to the container along with a custom options configuration
-            Services.AddSingleton(x => new BackOfficeExternalLoginProvider(displayName, authenticationScheme, _loginProviderOptions));
+            Services.Configure(authenticationScheme, _loginProviderOptions);
+            base.Services.AddSingleton(services =>
+            {
+                return new BackOfficeExternalLoginProvider(
+                        authenticationScheme,
+                        services.GetRequiredService<IOptionsMonitor<BackOfficeExternalLoginProviderOptions>>());
+            });
             Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<TOptions>, EnsureBackOfficeScheme<TOptions>>());
 
             return base.AddRemoteScheme<TOptions, THandler>(authenticationScheme, displayName, configureOptions);

@@ -48,7 +48,6 @@ namespace Umbraco.Tests.TestHelpers
     /// <para>Provides an Umbraco context and Xml content.</para>
     /// <para>fixme what else?</para>
     /// </remarks>
-    [Apartment(ApartmentState.STA)] // why?
     [UmbracoTest(WithApplication = true)]
     public abstract class TestWithDatabaseBase : UmbracoTestBase
     {

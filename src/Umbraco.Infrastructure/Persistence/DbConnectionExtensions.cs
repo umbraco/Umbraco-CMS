@@ -30,7 +30,7 @@ namespace Umbraco.Extensions
     public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)
         {
 
-            var connection = factory.CreateConnection();
+            var connection = factory?.CreateConnection();
 
             if (connection == null)
                 throw new InvalidOperationException($"Could not create a connection for provider \"{factory}\".");

@@ -56,7 +56,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
             var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
             publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
-            publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
+            var localPublishedSnapshot = publishedSnapshotMock.Object;
+            publishedSnapshotAccessorMock.Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot)).Returns(true);
             register.AddTransient(f => publishedSnapshotAccessorMock.Object);
 
             IServiceProvider registerFactory = composition.CreateServiceProvider();
@@ -203,9 +204,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 IPublishedPropertyType propertyType,
                 PropertyCacheLevel referenceCacheLevel,
                 object inter,
-                bool preview) => ((int[])inter).Select(x =>
-                (PublishedSnapshotTestObjects.TestContentModel1)_publishedSnapshotAccessor.PublishedSnapshot.Content
+                bool preview) {
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+                return ((int[])inter).Select(x =>
+                (PublishedSnapshotTestObjects.TestContentModel1)publishedSnapshot.Content
                     .GetById(x)).ToArray();
+            } 
         }
     }
 }

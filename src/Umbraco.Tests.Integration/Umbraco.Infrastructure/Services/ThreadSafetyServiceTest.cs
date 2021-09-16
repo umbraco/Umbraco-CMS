@@ -33,7 +33,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     // causing it, getting into __sysObjects locks, no idea why
 
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
     public class ThreadSafetyServiceTest : UmbracoIntegrationTest
     {
@@ -135,7 +134,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         // ambient Scope like we do now.
                         // So although the test passes in v8, there's actually some strange things occuring because Scopes
                         // are being created and disposed concurrently and out of order.
-                        var currentScope = (Scope)ScopeAccessor.AmbientScope;
+                        var currentScope = ScopeAccessor.AmbientScope;
                         log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
                         Assert.IsNull(currentScope);
 
@@ -172,7 +171,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 // start all threads
                 log.LogInformation("Starting threads");
                 threads.ForEach(x => x.Start());
-            }   
+            }
 
             // wait for all to complete
             log.LogInformation("Joining threads");
@@ -232,7 +231,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                         // ambient Scope like we do now.
                         // So although the test passes in v8, there's actually some strange things occuring because Scopes
                         // are being created and disposed concurrently and out of order.
-                        var currentScope = (Scope)ScopeAccessor.AmbientScope;
+                        var currentScope = ScopeAccessor.AmbientScope;
                         log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
                         Assert.IsNull(currentScope);
 

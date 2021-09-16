@@ -1,4 +1,4 @@
-﻿/**
+/**
 * @ngdoc service
 * @name umbraco.services.mediaHelper
 * @description A helper object used for dealing with media items
@@ -408,16 +408,20 @@ function mediaHelper(umbRequestHelper, $http, $log) {
          * @param {string} imagePath Raw image path
          * @param {object} options Object describing image generation parameters:
          *  {
-         *      animationProcessMode: <string>
-         *      cacheBusterValue: <string>
+         *      width: <int>
+         *      height: <int>
          *      focalPoint: {
          *          left: <int>
          *          top: <int>
          *      },
-         *      height: <int>
          *      mode: <string>
-         *      upscale: <boolean>
-         *      width: <int>
+         *      cacheBusterValue: <string>
+         *      crop: {
+         *          x1: <int>
+         *          x2: <int>
+         *          y1: <int>
+         *          y2: <int>
+         *      },
          *  }
          */
         getProcessedImageUrl: function (imagePath, options) {
@@ -433,18 +437,16 @@ function mediaHelper(umbRequestHelper, $http, $log) {
                         "GetProcessedImageUrl",
                         {
                             imagePath,
-                            animationProcessMode: options.animationProcessMode,
-                            cacheBusterValue: options.cacheBusterValue,
+                            width: options.width,
+                            height: options.height,
                             focalPointLeft: options.focalPoint ? options.focalPoint.left : null,
                             focalPointTop:  options.focalPoint ? options.focalPoint.top : null,
-                            height: options.height,
                             mode: options.mode,
-                            upscale: options.upscale || false,
-                            width: options.width,
+                            cacheBusterValue: options.cacheBusterValue,
                             cropX1: options.crop ? options.crop.x1 : null,
                             cropX2: options.crop ? options.crop.x2 : null,
                             cropY1: options.crop ? options.crop.y1 : null,
-                            cropY2: options.crop ? options.crop.y : null
+                            cropY2: options.crop ? options.crop.y2 : null
                         })),
                 "Failed to retrieve processed image URL for image: " + imagePath);
         }

@@ -87,12 +87,14 @@
 
             for (var t = 0; t < fromVariant.tabs.length; t++) {
                 var fromTab = fromVariant.tabs[t];
-                var toTab = toVariant.tabs[t];
+                var toTab = toVariant.tabs.find(tab => tab.alias === fromTab.alias);
 
-                for (var p = 0; p < fromTab.properties.length; p++) {
-                    var fromProp = fromTab.properties[p];
-                    var toProp = toTab.properties[p];
-                    toProp.value = fromProp.value;
+                if (fromTab && fromTab.properties && fromTab.properties.length > 0 && toTab && toTab.properties && toTab.properties.length > 0) {
+                    for (var p = 0; p < fromTab.properties.length; p++) {
+                        var fromProp = fromTab.properties[p];
+                        var toProp = toTab.properties[p];
+                        toProp.value = fromProp.value;
+                    }
                 }
             }
         }
@@ -487,7 +489,7 @@
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromKey: function (contentTypeKey) {
-                return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey);
+                return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey) || null;
             },
 
             /**
@@ -499,7 +501,7 @@
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromAlias: function (contentTypeAlias) {
-                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias);
+                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias) || null;
             },
 
             /**
@@ -606,13 +608,23 @@
                             return null;
                         }
 
+                        // the Settings model has been changed to a new Element Type.
+                        // we need to update the settingsData with the new Content Type key
+                        if (settingsData.contentTypeKey !== settingsScaffold.contentTypeKey) {
+                            settingsData.contentTypeKey = settingsScaffold.contentTypeKey;
+                        }
+
                         blockObject.settingsData = settingsData;
 
                         // make basics from scaffold
-                        blockObject.settings = Utilities.copy(settingsScaffold);
-                        ensureUdiAndKey(blockObject.settings, settingsUdi);
+                        if (settingsScaffold !== null) {// We might not have settingsScaffold
+                            blockObject.settings = Utilities.copy(settingsScaffold);
+                            ensureUdiAndKey(blockObject.settings, settingsUdi);
 
-                        mapToElementModel(blockObject.settings, settingsData);
+                            mapToElementModel(blockObject.settings, settingsData);
+                        } else {
+                            blockObject.settings = null;
+                        }
 
                         // add settings content-app
                         appendSettingsContentApp(blockObject.content, this.__labels.settingsName);

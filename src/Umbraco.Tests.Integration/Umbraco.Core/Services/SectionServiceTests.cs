@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
     /// Tests covering the SectionService
     /// </summary>
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class SectionServiceTests : UmbracoIntegrationTest
     {

@@ -1,17 +1,38 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Routing;
+using static Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
     {
-        public AspNetCoreBackOfficeInfo(IOptionsMonitor<GlobalSettings> globalSettings)
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private string _getAbsoluteUrl;
+        public AspNetCoreBackOfficeInfo(IOptionsMonitor<GlobalSettings> globalSettings, IHostingEnvironment hostingEnviroment)
         {
-            GetAbsoluteUrl = globalSettings.CurrentValue.UmbracoPath;
+            _globalSettings = globalSettings;
+            _hostingEnvironment = hostingEnviroment;
+
         }
 
-        public string GetAbsoluteUrl { get; } // TODO make absolute
-
+        public string GetAbsoluteUrl
+        {
+            get
+            {
+                if (_getAbsoluteUrl is null)
+                {
+                    if(_hostingEnvironment.ApplicationMainUrl is null)
+                    {
+                        return "";
+                    }
+                    _getAbsoluteUrl = WebPath.Combine(_hostingEnvironment.ApplicationMainUrl.ToString(), _globalSettings.CurrentValue.UmbracoPath.TrimStart(CharArrays.TildeForwardSlash));
+                }
+                return _getAbsoluteUrl;
+            }
+        }
     }
 }

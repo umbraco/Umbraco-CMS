@@ -118,19 +118,28 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
     }
 
     function closeBackdrop() {
-        var aboveClass = 'above-backdrop';
-        var leftColumn = $('#leftcolumn');
-        var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
 
-        if(isLeftColumnOnTop){
-            backdropService.close();
-            leftColumn.removeClass(aboveClass);
+        var tourIsOpen = document.body.classList.contains("umb-tour-is-visible");
+        if (tourIsOpen) {
+            return;
+        }
+
+        var aboveClass = "above-backdrop";
+        var leftColumn = document.getElementById("leftcolumn");
+
+        if (leftColumn) {
+            var isLeftColumnOnTop = leftColumn.classList.contains(aboveClass);
+
+            if (isLeftColumnOnTop) {
+                backdropService.close();
+                leftColumn.classList.remove(aboveClass);
+            }
         }
     }
 
     function showBackdrop() {
         var backDropOptions = {
-            'element': $('#leftcolumn')[0]
+            'element': document.getElementById('leftcolumn')
         };
         backdropService.open(backDropOptions);
     }

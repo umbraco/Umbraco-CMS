@@ -10,7 +10,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -34,13 +34,12 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.Mail;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;
@@ -137,7 +136,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 
         public static UriUtility UriUtility => s_testHelperInternal.UriUtility;
 
-        public static IEmailSender EmailSender { get; } = new EmailSender(Options.Create(new GlobalSettings()), Mock.Of<IEventAggregator>());
+        public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), Options.Create(new GlobalSettings()), Mock.Of<IEventAggregator>());
 
         /// <summary>
         /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name

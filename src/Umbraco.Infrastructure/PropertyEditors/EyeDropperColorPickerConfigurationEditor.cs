@@ -1,4 +1,4 @@
-﻿
+
 using System.Collections.Generic;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Extensions;
@@ -25,8 +25,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <inheritdoc />
         public override EyeDropperColorPickerConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, EyeDropperColorPickerConfiguration configuration)
         {
-            var output = new EyeDropperColorPickerConfiguration();
-
             var showAlpha = true;
             var showPalette = true;
 

@@ -57,7 +57,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         *       Do stuff...
         *    });
         * </pre>
-        * 
+        *
         * @returns {Promise} resourcePromise object.
         *
         */
@@ -642,6 +642,24 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     return $q.when(umbDataFormatter.formatContentGetData(result));
                 });
         },
+
+        getScaffolds: function(parentId, aliases){
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmptyByAliases"),
+                        { parentId: parentId, contentTypeAliases: aliases }
+                    ),
+                    'Failed to retrieve data for empty content item aliases ' + aliases.join(", ")
+                ).then(function(result) {
+                    Object.keys(result).map(function(key){
+                        result[key] = umbDataFormatter.formatContentGetData(result[key]);
+                    });
+
+                    return $q.when(result);
+                });
+        },
         /**
          * @ngdoc method
          * @name umbraco.resources.contentResource#getScaffoldByKey
@@ -691,11 +709,12 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getScaffoldByKeys: function (parentId, scaffoldKeys) {
 
             return umbRequestHelper.resourcePromise(
-                    $http.get(
+                    $http.post(
                         umbRequestHelper.getApiUrl(
                             "contentApiBaseUrl",
-                            "GetEmptyByKeys",
-                            { contentTypeKeys: scaffoldKeys, parentId: parentId })),
+                            "GetEmptyByKeys"),
+                        { contentTypeKeys: scaffoldKeys, parentId: parentId }
+                    ),
                     'Failed to retrieve data for empty content items ids' + scaffoldKeys.join(", "))
                 .then(function (result) {
                     Object.keys(result).map(function(key) {
@@ -804,7 +823,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
-            
+
             //converts the value to a js bool
             function toBool(v) {
                 if (Utilities.isNumber(v)) {

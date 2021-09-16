@@ -24,7 +24,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     /// as well as configuration.
     /// </summary>
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class LocalizationServiceTests : UmbracoIntegrationTest
     {

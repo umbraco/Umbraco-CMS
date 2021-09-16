@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -29,6 +30,7 @@ namespace Umbraco.Cms.Core.Routing
         INotificationHandler<ContentMovingNotification>,
         INotificationHandler<ContentMovedNotification>
     {
+        private readonly ILogger<RedirectTrackingHandler> _logger;
         private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
@@ -36,8 +38,14 @@ namespace Umbraco.Cms.Core.Routing
 
         private const string NotificationStateKey = "Umbraco.Cms.Core.Routing.RedirectTrackingHandler";
 
-        public RedirectTrackingHandler(IOptionsMonitor<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
+        public RedirectTrackingHandler(
+            ILogger<RedirectTrackingHandler> logger,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
+            IRedirectUrlService redirectUrlService,
+            IVariationContextAccessor variationContextAccessor)
         {
+            _logger = logger;
             _webRoutingSettings = webRoutingSettings;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _redirectUrlService = redirectUrlService;
@@ -87,8 +95,12 @@ namespace Umbraco.Cms.Core.Routing
 
         private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)
         {
-            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
-            var entityContent = contentCache.GetById(entity.Id);
+            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                return;
+            }
+            var contentCache = publishedSnapshot.Content;
+            var entityContent = contentCache?.GetById(entity.Id);
             if (entityContent == null)
                 return;
 
@@ -112,7 +124,18 @@ namespace Umbraco.Cms.Core.Routing
 
         private void CreateRedirects(OldRoutesDictionary oldRoutes)
         {
-            var contentCache = _publishedSnapshotAccessor.PublishedSnapshot.Content;
+            if (!_publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot))
+            {
+                return;
+            }
+
+            var contentCache = publishedSnapshot.Content;
+
+            if (contentCache == null)
+            {
+                _logger.LogWarning("Could not track redirects because there is no current published snapshot available.");
+                return;
+            } 
 
             foreach (var oldRoute in oldRoutes)
             {

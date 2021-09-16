@@ -170,7 +170,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             clone.AddPropertyType(additionalPropertyType);
             Assert.IsTrue(asDirty.IsPropertyDirty("PropertyTypes"));
             Assert.IsFalse(asDirty.IsPropertyDirty("PropertyGroups"));
-            clone.AddPropertyGroup("hello");
+            clone.AddPropertyGroup("hello", "hello");
             Assert.IsTrue(asDirty.IsPropertyDirty("PropertyGroups"));
         }
 

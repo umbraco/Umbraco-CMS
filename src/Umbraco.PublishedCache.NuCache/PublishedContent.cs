@@ -238,7 +238,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             get
             {
                 var getById = GetGetterById();
-                var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 return getById(publishedSnapshot, IsPreviewing, ParentId);
             }
         }
@@ -249,7 +249,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             get
             {
                 var getById = GetGetterById();
-                var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
                 var id = _contentNode.FirstChildContentId;
 
                 while (id > 0)
@@ -316,7 +316,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // beware what you use that one for - you don't want to cache its result
         private IAppCache GetAppropriateCache()
         {
-            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             var cache = publishedSnapshot == null
                 ? null
                 : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ContentType.ItemType != PublishedItemType.Member)
@@ -327,7 +327,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private IAppCache GetCurrentSnapshotCache()
         {
-            var publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
             return publishedSnapshot?.SnapshotCache;
         }
 

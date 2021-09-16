@@ -8,11 +8,12 @@ using Umbraco.Cms.Web.BackOffice.Middleware;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Extensions;
+using Umbraco.Cms.Web.Common.Middleware;
 
 namespace Umbraco.Extensions
 {
     /// <summary>
-    /// <see cref="IUmbracoEndpointBuilder"/> extensions for Umbraco
+    /// <see cref="IUmbracoEndpointBuilderContext"/> extensions for Umbraco
     /// </summary>
     public static partial class UmbracoApplicationBuilderExtensions
     {
@@ -21,7 +22,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IUmbracoMiddlewareBuilder WithBackOffice(this IUmbracoMiddlewareBuilder builder)
+        public static IUmbracoApplicationBuilderContext UseBackOffice(this IUmbracoApplicationBuilderContext builder)
         {
             KeepAliveSettings keepAliveSettings = builder.ApplicationServices.GetRequiredService<IOptions<KeepAliveSettings>>().Value;
             IHostingEnvironment hostingEnvironment = builder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
@@ -33,7 +34,7 @@ namespace Umbraco.Extensions
             return builder;
         }
 
-        public static IUmbracoEndpointBuilder UseBackOfficeEndpoints(this IUmbracoEndpointBuilder app)
+        public static IUmbracoEndpointBuilderContext UseBackOfficeEndpoints(this IUmbracoEndpointBuilderContext app)
         {
             // NOTE: This method will have been called after UseRouting, UseAuthentication, UseAuthorization
             if (app == null)

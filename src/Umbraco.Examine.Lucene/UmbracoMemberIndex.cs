@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public UmbracoMemberIndex(
             ILoggerFactory loggerFactory,
             string name,
-            IOptionsSnapshot<LuceneDirectoryIndexOptions> indexOptions,
+            IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState)
             : base(loggerFactory, name, indexOptions, hostingEnvironment, runtimeState)

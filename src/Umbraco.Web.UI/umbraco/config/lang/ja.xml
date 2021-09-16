@@ -1,0 +1,1092 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="ja" intName="Japanese" localName="日本語" lcid="17" culture="ja-JP">
+  <creator>
+    <name>The Umbraco community</name>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
+  </creator>
+  <area alias="actions">
+    <key alias="assignDomain">ドメインの割り当て</key>
+    <key alias="auditTrail">動作記録</key>
+    <key alias="browse">ノードの参照</key>
+    <key alias="changeDocType">ドキュメントタイプの変更</key>
+    <key alias="copy">コピー</key>
+    <key alias="create">新規作成</key>
+    <key alias="createPackage">パッケージの作成</key>
+    <key alias="delete">削除</key>
+    <key alias="disable">無効</key>
+    <key alias="emptyRecycleBin">ごみ箱を空にする</key>
+    <key alias="exportDocumentType">ドキュメントタイプの書出</key>
+    <key alias="importDocumentType">ドキュメントタイプの読込</key>
+    <key alias="importPackage">パッケージの読み込み</key>
+    <key alias="liveEdit">ライブ編集</key>
+    <key alias="logout">ログアウト</key>
+    <key alias="move">移動</key>
+    <key alias="notify">メール通知</key>
+    <key alias="protect">一般公開</key>
+    <key alias="publish">公開</key>
+    <key alias="unpublish">公開を止める</key>
+    <key alias="refreshNode">最新の情報に更新</key>
+    <key alias="republish">サイトのリフレッシュ</key>
+    <key alias="restore" version="7.3.0">復元</key>
+    <key alias="rights">アクセス権</key>
+    <key alias="rollback">以前の版に戻る</key>
+    <key alias="sendtopublish">公開に送る</key>
+    <key alias="sendToTranslate">翻訳に送る</key>
+    <key alias="sort">並べ替え</key>
+    <key alias="toPublish">公開する</key>
+    <key alias="translate">翻訳</key>
+    <key alias="update">更新</key>
+    <key alias="defaultValue">初期値</key>
+  </area>
+  <area alias="assignDomain">
+    <key alias="permissionDenied">アクセスが拒否されました</key>
+    <key alias="addNew">ドメインの割り当て</key>
+    <key alias="remove">ドメインの削除</key>
+    <key alias="invalidNode">適当でないノード名</key>
+    <key alias="invalidDomain">適当でないホスト名</key>
+    <key alias="duplicateDomain">そのホスト名は既に利用されています</key>
+    <key alias="language">言語コード</key>
+    <key alias="domain">ドメイン</key>
+    <key alias="domainCreated">ドメイン '%0%' が新たに割り当てられました</key>
+    <key alias="domainDeleted">ドメイン '%0%' は削除されました</key>
+    <key alias="domainExists">ドメイン '%0%' は既に割り当てられています</key>
+    <key alias="domainUpdated">ドメイン '%0%' は更新されました</key>
+    <key alias="orEdit">ドメインの編集</key>
+    <key alias="inherit">継承</key>
+    <key alias="setLanguage">カルチャの割り当て</key>
+    <key alias="setLanguageHelp"><![CDATA[現在のノードの下のノードのカルチャを設定または親ノードからカルチャを継承。以下のドメインが適用されない場合、現在のノードにも適用します。]]></key>
+    <key alias="setDomains">ドメイン割り当て</key>
+  </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">これらを表示</key>
+  </area>
+  <area alias="buttons">
+    <key alias="select">選択</key>
+    <key alias="somethingElse">その他のアクション</key>
+    <key alias="bold">太字</key>
+    <key alias="deindent">インデント解除</key>
+    <key alias="formFieldInsert">フォーム フィールドの挿入</key>
+    <key alias="graphicHeadline">グラフィックヘッドラインの挿入</key>
+    <key alias="htmlEdit">HTMLの編集</key>
+    <key alias="indent">インデント</key>
+    <key alias="italic">イタリック</key>
+    <key alias="justifyCenter">中央揃え</key>
+    <key alias="justifyLeft">左揃え</key>
+    <key alias="justifyRight">右揃え</key>
+    <key alias="linkInsert">リンクの挿入</key>
+    <key alias="linkLocal">アンカーの挿入</key>
+    <key alias="listBullet">番号なしリスト</key>
+    <key alias="listNumeric">番号付きリスト</key>
+    <key alias="macroInsert">マクロの挿入</key>
+    <key alias="pictureInsert">画像の挿入</key>
+    <key alias="relations">関係性の編集</key>
+    <key alias="returnToList">リストに戻る</key>
+    <key alias="save">保存</key>
+    <key alias="saveAndPublish">保存及び公開</key>
+    <key alias="saveToPublish">保存して承認に送る</key>
+    <key alias="saveListView">リスト ビューの保存</key>
+    <key alias="saveAndPreview">プレビュー</key>
+    <key alias="showPageDisabled">テンプレートが指定されていないのでプレビューは無効になっています</key>
+    <key alias="styleChoose">スタイルの選択</key>
+    <key alias="styleShow">スタイルの表示</key>
+    <key alias="tableInsert">表の挿入</key>
+  </area>
+  <area alias="content">
+    <key alias="isPublished" version="7.2">公開されました</key>
+    <key alias="about">このページについて</key>
+    <key alias="alias">エイリアス</key>
+    <key alias="alternativeTextHelp">(画像を電話でわかるように言葉で説明)</key>
+    <key alias="alternativeUrls">別名のリンク</key>
+    <key alias="clickToEdit">クリックでアイテムを編集する</key>
+    <key alias="createBy">作成者</key>
+    <key alias="createByDesc" version="7.0">作成者</key>
+    <key alias="updatedBy" version="7.0">更新者</key>
+    <key alias="createDate">作成日時</key>
+    <key alias="createDateDesc" version="7.0">このドキュメントが作成された日時</key>
+    <key alias="documentType">ドキュメントタイプ</key>
+    <key alias="editing">編集中</key>
+    <key alias="expireDate">公開終了日時</key>
+    <key alias="itemChanged">このページは公開後変更されています</key>
+    <key alias="itemNotPublished">このページは公開されていません</key>
+    <key alias="lastPublished">公開日時</key>
+    <key alias="noItemsToShow">表示するアイテムはありません</key>
+    <key alias="listViewNoItems" version="7.1.5">リストに表示するアイテムはありません</key>
+    <key alias="mediatype">メディアタイプ</key>
+    <key alias="mediaLinks">メディアの項目へのリンク</key>
+    <key alias="membergroup">メンバーグループ</key>
+    <key alias="memberrole">役割</key>
+    <key alias="membertype">メンバータイプ</key>
+    <key alias="noDate">日時が選択されていません</key>
+    <key alias="nodeName">タイトル</key>
+    <key alias="otherElements">プロパティ</key>
+    <key alias="parentNotPublished">このページは公開されましたが、親ページの '%0%' が非公開のため閲覧できません</key>
+    <key alias="parentNotPublishedAnomaly">このコンテントは公開されていますがキャッシュされていません(内部エラー)</key>
+    <key alias="publish">公開</key>
+    <key alias="publishStatus">公開状態</key>
+    <key alias="releaseDate">公開開始日時</key>
+    <key alias="unpublishDate">公開停止日時</key>
+    <key alias="removeDate">日時の消去</key>
+    <key alias="sortDone">並び順が更新されました</key>
+    <key alias="sortHelp">ノードをドラッグ、クリック、または列のヘッダーをクリックする事でノードを簡単にソートできます。SHIFT、CONTROLキーを使い複数のノードを選択する事もできます。</key>
+    <key alias="statistics">統計</key>
+    <key alias="titleOptional">タイトル (オプション)</key>
+    <key alias="altTextOptional">代替テキスト (オプション)</key>
+    <key alias="type">型</key>
+    <key alias="unpublish">非公開</key>
+    <key alias="updateDate">最終更新日時</key>
+    <key alias="updateDateDesc" version="7.0">このドキュメントが最後に更新された日時</key>
+    <key alias="uploadClear">ファイルの消去</key>
+    <key alias="urls">ページへのリンク</key>
+    <key alias="memberof">グループのメンバー</key>
+    <key alias="notmemberof">グループのメンバーではありません</key>
+    <key alias="childItems" version="7.0">子コンテンツ</key>
+    <key alias="target" version="7.0">ターゲット</key>
+  </area>
+  <area alias="media">
+    <key alias="clickToUpload">クリックしてアップロードする</key>
+    <key alias="orClickHereToUpload">またはクリックしてファイルを選択</key>
+    <key alias="maxFileSize">ファイルの最大サイズ</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">メンバーの新規作成</key>
+    <key alias="allMembers">全てのメンバー</key>
+  </area>
+  <area alias="create">
+    <key alias="chooseNode">どこに新しい %0% を作りますか</key>
+    <key alias="createUnder">ここに作成</key>
+    <key alias="updateData">型とタイトルを選んでください</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[利用可能なドキュメントタイプがありません。以下の設定セクションでこれらを有効にする必要があります。<strong>"document types"</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[利用可能なメディアタイプがありません。以下の設定セクションでこれらを有効にする必要があります。<strong>"media types"</strong>.]]></key>
+    <key alias="documentTypeWithoutTemplate">テンプレートなしのドキュメント タイプ</key>
+  </area>
+  <area alias="dashboard">
+    <key alias="browser">ウェブサイトを参照する</key>
+    <key alias="dontShowAgain">次回から表示しない</key>
+    <key alias="nothinghappens">Umbracoが起動しない時は、このサイトのポップアップを許可してください。</key>
+    <key alias="openinnew">新規ウィンドウで開く</key>
+    <key alias="restart">再起動</key>
+    <key alias="visit">訪れる</key>
+    <key alias="welcome">ようこそ</key>
+  </area>
+  <area alias="prompt">
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+  </area>
+  <area alias="bulk">
+    <key alias="done">Done</key>
+    <key alias="deletedItem">Deleted %0% item</key>
+    <key alias="deletedItems">Deleted %0% items</key>
+    <key alias="deletedItemOfItem">Deleted %0% out of %1% item</key>
+    <key alias="deletedItemOfItems">Deleted %0% out of %1% items</key>
+    <key alias="publishedItem">Published %0% item</key>
+    <key alias="publishedItems">Published %0% items</key>
+    <key alias="publishedItemOfItem">Published %0% out of %1% item</key>
+    <key alias="publishedItemOfItems">Published %0% out of %1% items</key>
+    <key alias="unpublishedItem">Unpublished %0% item</key>
+    <key alias="unpublishedItems">Unpublished %0% items</key>
+    <key alias="unpublishedItemOfItem">Unpublished %0% out of %1% item</key>
+    <key alias="unpublishedItemOfItems">Unpublished %0% out of %1% items</key>
+    <key alias="movedItem">Moved %0% item</key>
+    <key alias="movedItems">Moved %0% items</key>
+    <key alias="movedItemOfItem">Moved %0% out of %1% item</key>
+    <key alias="movedItemOfItems">Moved %0% out of %1% items</key>
+    <key alias="copiedItem">Copied %0% item</key>
+    <key alias="copiedItems">Copied %0% items</key>
+    <key alias="copiedItemOfItem">Copied %0% out of %1% item</key>
+    <key alias="copiedItemOfItems">Copied %0% out of %1% items</key>
+  </area>
+  <area alias="defaultdialogs">
+    <key alias="anchorInsert">名前</key>
+    <key alias="assignDomain">ドメインの割り当て</key>
+    <key alias="closeThisWindow">このウィンドウを閉じる</key>
+    <key alias="confirmdelete">削除しますか？</key>
+    <key alias="confirmdisable">無効にしますか？</key>
+    <key alias="confirmlogout">ログアウトしますか？</key>
+    <key alias="confirmSure">本当にいいですか？</key>
+    <key alias="cut">切り取り</key>
+    <key alias="editdictionary">ディクショナリのアイテムの編集</key>
+    <key alias="editlanguage">言語の編集</key>
+    <key alias="insertAnchor">アンカーの挿入</key>
+    <key alias="insertCharacter">文字の挿入</key>
+    <key alias="insertgraphicheadline">ヘッドライン画像の挿入</key>
+    <key alias="insertimage">画像の挿入</key>
+    <key alias="insertlink">リンクの挿入</key>
+    <key alias="insertMacro">クリックするとマクロを追加</key>
+    <key alias="inserttable">表の挿入</key>
+    <key alias="lastEdited">最近の更新</key>
+    <key alias="link">リンク</key>
+    <key alias="linkinternal">内部リンク:</key>
+    <key alias="linklocaltip">内部リンクを使うときは、リンクの前に "#" を挿入してください。</key>
+    <key alias="linknewwindow">新規ウィンドウで開きますか?</key>
+    <key alias="macroDoesNotHaveProperties">このマクロは編集できるプロパティがありません</key>
+    <key alias="paste">貼り付け</key>
+    <key alias="permissionsEdit">許可の編集</key>
+    <key alias="recycleBinDeleting">ごみ箱を空にしています。実行中はウィンドウを閉じないでください。</key>
+    <key alias="recycleBinIsEmpty">ごみ箱は空です</key>
+    <key alias="recycleBinWarning">ごみ箱から削除すると復活させることはできません</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>のウェブサービスに現在問題が起きているかもしれず、操作できませんでした。大変申し訳ありませんがこの機能は使用できません。]]></key>
+    <key alias="regexSearchHelp">フォームのフィールドを正規表現で検証できます。例: 'email, 'zip-code' 'URL'</key>
+    <key alias="removeMacro">マクロを削除</key>
+    <key alias="requiredField">必須フィールド</key>
+    <key alias="sitereindexed">サイトは再インデックスされました</key>
+    <key alias="siterepublished">ウェブサイトのキャッシュがリフレッシュされました。 公開されているコンテンツはリフレッシュされましたが、非公開のコンテンツは非公開のままです。</key>
+    <key alias="siterepublishHelp">ウェブサイトのキャッシュがリフレッシュされます。 公開されているコンテンツはリフレッシュされますが、非公開のコンテンツは非公開のままです。</key>
+    <key alias="tableColumns">列数</key>
+    <key alias="tableRows">行数</key>
+    <key alias="thumbnailimageclickfororiginal">クリックすると画像がフルサイズで表示されます</key>
+    <key alias="treepicker">項目の選択</key>
+    <key alias="viewCacheItem">キャッシュされている項目の表示</key>
+    <key alias="relateToOriginalLabel">オリジナルに関連付ける</key>
+    <key alias="theFriendliestCommunity">フレンドリーなコミュニティ</key>
+    <key alias="linkToPage">ページへリンク</key>
+    <key alias="openInNewWindow">リンク ドキュメントを新しいウィンドウまたはタブで開く</key>
+    <key alias="linkToMedia">メディアへリンク</key>
+    <key alias="selectMedia">メディアの選択</key>
+    <key alias="selectIcon">アイコンの選択</key>
+    <key alias="selectItem">アイテムの選択</key>
+    <key alias="selectLink">リンクの選択</key>
+    <key alias="selectMacro">マクロの選択</key>
+    <key alias="selectContent">コンテンツの選択</key>
+    <key alias="selectMember">メンバーの選択</key>
+    <key alias="selectMemberGroup">メンバー グループの選択</key>
+    <key alias="noMacroParams">このマクロのパラメーターはありません</key>
+    <key alias="externalLoginProviders">外部ログイン プロバイダー</key>
+    <key alias="exceptionDetail">例外の詳細</key>
+    <key alias="stacktrace">スタックトレース</key>
+    <key alias="innerException">Inner Exception</key>
+    <key alias="linkYour">次をリンク:</key>
+    <key alias="unLinkYour">次をリンク解除:</key>
+    <key alias="account">アカウント</key>
+    <key alias="selectEditor">エディターの選択</key>
+  </area>
+  <area alias="dictionaryItem">
+    <key alias="description"><![CDATA[
+      ディクショナリのアイテム '<em>%0%</em>' の別の言語版を編集するには、左側のメニューの'言語'でその言語を追加します
+   ]]></key>
+    <key alias="displayName">カルチャ名</key>
+  </area>
+  <area alias="placeholders">
+    <key alias="username">ユーザー名を入力...</key>
+    <key alias="password">パスワードを入力...</key>
+    <key alias="nameentity">%0%と命名します...</key>
+    <key alias="entername">ここに名称を入力してください...</key>
+    <key alias="label">ラベル...</key>
+    <key alias="enterDescription">説明を入力してください...</key>
+    <key alias="search">検索する...</key>
+    <key alias="filter">条件で絞り込む...</key>
+    <key alias="enterTags">入力してタグを追加 (各タグの後に Enter を押してください)...</key>
+  </area>
+  <area alias="editcontenttype">
+    <key alias="createListView" version="7.2">カスタムリストビューを作成する</key>
+    <key alias="removeListView" version="7.2">カスタムリストビューを削除する</key>
+  </area>
+  <area alias="editdatatype">
+    <key alias="addPrevalue">値の前に追加</key>
+    <key alias="dataBaseDatatype">データベースのデータ型</key>
+    <key alias="guid">プロパティ エディター GUID</key>
+    <key alias="renderControl">プロパティ エディター</key>
+    <key alias="rteButtons">ボタン</key>
+    <key alias="rteEnableAdvancedSettings">高度な設定を有効にする</key>
+    <key alias="rteEnableContextMenu">コンテキストメニューを有効にする</key>
+    <key alias="rteMaximumDefaultImgSize">挿入される画像のデフォルト最大サイズ</key>
+    <key alias="rteRelatedStylesheets">関連付けるスタイルシート</key>
+    <key alias="rteShowLabel">ラベルの表示</key>
+    <key alias="rteWidthAndHeight">幅と高さ</key>
+  </area>
+  <area alias="errorHandling">
+    <key alias="errorButDataWasSaved">データは保存されましたが、公開前にこのページの幾つかのエラーを修正しなければなりません:</key>
+    <key alias="errorChangingProviderPassword">現在のメンバーシッププロバイダではパスワードを変更できません (EnablePasswordRetrievalがtrueでなければなりません)</key>
+    <key alias="errorExistsWithoutTab">%0% は既にあります</key>
+    <key alias="errorHeader">次の様なエラーが発生しています:</key>
+    <key alias="errorHeaderWithoutTab">次の様なエラーが発生しています:</key>
+    <key alias="errorInPasswordFormat">パスワードは最低でも %0% 文字の長さかつ %1% 文字以上の数以外の文字を含める必要があります</key>
+    <key alias="errorIntegerWithoutTab">%0% は整数でなければなりません</key>
+    <key alias="errorMandatory">%1% タブの %0% フィールドは必須です</key>
+    <key alias="errorMandatoryWithoutTab">%0% は必須です</key>
+    <key alias="errorRegExp">%1% の %0% は正しい書式ではありません</key>
+    <key alias="errorRegExpWithoutTab">%0% は正しい書式ではありません</key>
+  </area>
+  <area alias="errors">
+    <key alias="receivedErrorFromServer">サーバー エラーが発生しました</key>
+    <key alias="dissallowedMediaType">指定されたファイルタイプは管理者のみに許可されます</key>
+    <key alias="codemirroriewarning">注意! CodeMirrorが設定で有効化されていますが、 Internet Explorerでは不安定なので無効化してください。</key>
+    <key alias="contentTypeAliasAndNameNotNull">新しいプロパティ型のエイリアスと名前の両方を設定してください！</key>
+    <key alias="filePermissionsError">特定のファイルまたはフォルタの読み込み/書き込みアクセスに問題があります</key>
+    <key alias="macroErrorLoadingPartialView">Partial View スクリプトの読み込みエラー (ファイル: %0%)</key>
+    <key alias="missingTitle">タイトルを入力してください</key>
+    <key alias="missingType">型を選択してください</key>
+    <key alias="pictureResizeBiggerThanOrg">元画像より大きくしようとしていますが、本当によろしいのですか？</key>
+    <key alias="startNodeDoesNotExists">開始ノードが削除されています。管理者に連絡してください。</key>
+    <key alias="stylesMustMarkBeforeSelect">スタイルを変更する前にコンテントをマークしてください</key>
+    <key alias="stylesNoStylesOnPage">有効なスタイルがありません</key>
+    <key alias="tableColMergeLeft">結合したい2つのセルの左側にカーソルを置いてください</key>
+    <key alias="tableSplitNotSplittable">このセルは結合されたものではないので分離する事はできません。</key>
+  </area>
+  <area alias="general">
+    <key alias="about">Umbracoについて</key>
+    <key alias="action">アクション</key>
+    <key alias="actions">アクション選択</key>
+    <key alias="add">追加</key>
+    <key alias="alias">エイリアス</key>
+    <key alias="all">すべて</key>
+    <key alias="areyousure">確かですか?</key>
+    <key alias="border">枠線</key>
+    <key alias="by">または</key>
+    <key alias="cancel">キャンセル</key>
+    <key alias="cellMargin">セルの余白</key>
+    <key alias="choose">選択</key>
+    <key alias="close">閉じる</key>
+    <key alias="closewindow">ウィンドウを閉じる</key>
+    <key alias="comment">コメント</key>
+    <key alias="confirm">確認</key>
+    <key alias="constrainProportions">縦横比</key>
+    <key alias="continue">続行</key>
+    <key alias="copy">コピー</key>
+    <key alias="create">新規作成</key>
+    <key alias="database">データベース</key>
+    <key alias="date">日付</key>
+    <key alias="default">既定</key>
+    <key alias="delete">削除</key>
+    <key alias="deleted">削除済</key>
+    <key alias="deleting">削除中...</key>
+    <key alias="design">デザイン</key>
+    <key alias="dimensions">次元</key>
+    <key alias="down">下</key>
+    <key alias="download">ダウンロード</key>
+    <key alias="edit">編集</key>
+    <key alias="edited">編集済</key>
+    <key alias="elements">要素</key>
+    <key alias="email">電子メール</key>
+    <key alias="error">エラー</key>
+    <key alias="findDocument">検索</key>
+    <key alias="height">高さ</key>
+    <key alias="help">ヘルプ</key>
+    <key alias="icon">アイコン</key>
+    <key alias="import">インポート</key>
+    <key alias="innerMargin">内側の余白</key>
+    <key alias="insert">挿入</key>
+    <key alias="install">インストール</key>
+    <key alias="invalid">無効</key>
+    <key alias="justify">位置揃え</key>
+    <key alias="language">言語</key>
+    <key alias="layout">レイアウト</key>
+    <key alias="loading">読み込み中</key>
+    <key alias="locked">ロックされています</key>
+    <key alias="login">ログイン</key>
+    <key alias="logoff">ログオフ</key>
+    <key alias="logout">ログアウト</key>
+    <key alias="macro">マクロ</key>
+    <key alias="move">移動</key>
+    <key alias="name">名前</key>
+    <key alias="new">新規</key>
+    <key alias="next">次へ</key>
+    <key alias="no">いいえ</key>
+    <key alias="of">of</key>
+    <key alias="ok">OK</key>
+    <key alias="open">開く</key>
+    <key alias="or">または</key>
+    <key alias="password">パスワード</key>
+    <key alias="path">パス</key>
+    <key alias="pleasewait">しばらくお待ちください...</key>
+    <key alias="previous">前へ</key>
+    <key alias="properties">プロパティ</key>
+    <key alias="reciept">フォームからEmailを受信</key>
+    <key alias="recycleBin">ごみ箱</key>
+    <key alias="remaining">残り</key>
+    <key alias="rename">名前の変更</key>
+    <key alias="renew">更新</key>
+    <key alias="required" version="7.0">この項目は必須です</key>
+    <key alias="retry">再試行</key>
+    <key alias="rights">許可</key>
+    <key alias="search">検索</key>
+    <key alias="server">サーバー</key>
+    <key alias="show">表示</key>
+    <key alias="showPageOnSend">送信後にページを表示</key>
+    <key alias="size">サイズ</key>
+    <key alias="sort">並べ替え</key>
+    <key alias="submit">送信</key>
+    <key alias="type">型</key>
+    <key alias="typeToSearch">検索...</key>
+    <key alias="up">上</key>
+    <key alias="update">更新</key>
+    <key alias="upgrade">アップグレード</key>
+    <key alias="upload">アップロード</key>
+    <key alias="url">URL</key>
+    <key alias="user">ユーザー</key>
+    <key alias="username">ユーザー名</key>
+    <key alias="value">値</key>
+    <key alias="view">ビュー</key>
+    <key alias="welcome">ようこそ...</key>
+    <key alias="width">幅</key>
+    <key alias="yes">はい</key>
+    <key alias="folder">フォルダー</key>
+    <key alias="searchResults">検索結果</key>
+    <key alias="reorder">順序変更</key>
+    <key alias="reorderDone">順序変更終了</key>
+    <key alias="preview">プレビュー</key>
+    <key alias="changePassword">パスワードの変更</key>
+    <key alias="to">-&gt;　</key>
+    <key alias="listView">リスト ビュー</key>
+    <key alias="saving">保存...</key>
+    <key alias="current">現在</key>
+    <key alias="embed">埋め込み</key>
+  </area>
+  <area alias="colors">
+    <key alias="blue">ブルー</key>
+  </area>
+  <area alias="shortcuts">
+    <key alias="addGroup">タブの追加</key>
+    <key alias="addProperty">プロパティの追加</key>
+    <key alias="addEditor">エディターの追加</key>
+    <key alias="addTemplate">テンプレートの追加</key>
+    <key alias="addChildNode">子ノードの追加</key>
+    <key alias="addChild">子の追加</key>
+    <key alias="editDataType">データ タイプの編集</key>
+    <key alias="navigateSections">セクションの移動</key>
+    <key alias="shortcut">ショートカット</key>
+    <key alias="showShortcuts">ショートカットの表示</key>
+    <key alias="toggleListView">リスト ビューの切り替え</key>
+    <key alias="toggleAllowAsRoot">ルートとして許可に切り替え</key>
+  </area>
+  <area alias="graphicheadline">
+    <key alias="backgroundcolor">背景色</key>
+    <key alias="bold">太字</key>
+    <key alias="color">テキストの色</key>
+    <key alias="font">フォント</key>
+    <key alias="text">テキスト</key>
+  </area>
+  <area alias="headers">
+    <key alias="page">ページ</key>
+  </area>
+  <area alias="installer">
+    <key alias="databaseErrorCannotConnect">インストーラーはデータベースに接続できませんでした。</key>
+    <key alias="databaseErrorWebConfig">web.configファイルを保存できませんでした。接続文字列を手作業で編集してください。</key>
+    <key alias="databaseFound">データベースが見つかりました。識別子: </key>
+    <key alias="databaseHeader">データベースの設定</key>
+    <key alias="databaseInstall"><![CDATA[
+      <strong>インストール</strong>ボタンを押すと Umbraco %0% のデータベースへインストールします
+    ]]></key>
+    <key alias="databaseInstallDone"><![CDATA[Umbraco %0% をデータベースにコピーします。<strong>次へ</strong>を押して続行してください。]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>データベースを見つけられません！"web.config"ファイルの中の"接続文字列"を確認してください。</p>
+              <p>続行するには"web.config"ファイルを編集(Visual Studioないし使い慣れたテキストエディタで)し、下の方にスクロールし、"umbracoDbDSN"という名前のキーでデータベースの接続文字列を追加して保存します。</p>
+              <p>
+              <strong>再施行</strong>ボタンをクリックして
+              続けます。<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              より詳細にはこちらの web.config を編集します。</a></p>]]></key>
+    <key alias="databaseText"><![CDATA[このステップを完了するには、データベースサーバー(の"接続文字列")について把握していなければなりません。<br />
+        必要ならISPに連絡するなどしてみてください。
+        もしローカルのパソコンないしサーバーへインストールするのなら、システム管理者に情報を確認してください。]]></key>
+    <key alias="databaseUpgrade"><![CDATA[
+      <p>
+      <strong>アップグレード</strong>ボタンを押すとUmbraco %0% 用にデータベースをアップグレードします。</p>
+      <p>
+      心配ありません。 - コンテントが消える事はありませんし、後で続けることもできます。
+      </p>
+      ]]></key>
+    <key alias="databaseUpgradeDone"><![CDATA[データベースはバージョン %0% 用にアップグレードされました。<br /><strong>次へ</strong>
+      を押して続行してください。]]></key>
+    <key alias="databaseUpToDate"><![CDATA[データベースを更新しました！ <strong>次へ</strong> をクリックして設定ウィザードを進めてください。]]></key>
+    <key alias="defaultUserChangePass"><![CDATA[<strong>デフォルトユーザーのパスワードを変更する必要があります！</strong>]]></key>
+    <key alias="defaultUserDisabled"><![CDATA[<strong>デフォルトユーザーは無効化されているかUmbracoにアクセスできない状態になっています！</strong></p><p>これ以上のアクションは必要ありません。<b>次へ</b>をクリックして続行してください。]]></key>
+    <key alias="defaultUserPassChanged"><![CDATA[<strong>インストール後にデフォルトユーザーのパスワードが変更されています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
+    <key alias="defaultUserPasswordChanged">パスワードは変更されました！</key>
+    <key alias="greatStart">始めに、ビデオによる解説を見ましょう</key>
+    <key alias="licenseText">次へボタンをクリック(またはweb.configのumbracoConfigurationStatusを編集)すると、あなたはここに示されるこのソフトウェアのライセンスを承諾したと見做されます。注意として、UmbracoはMITライセンスをフレームワークへ、フリーウェアライセンスをUIへ、それぞれ異なる2つのライセンスを採用しています。</key>
+    <key alias="None">まだインストールは完了していません。</key>
+    <key alias="permissionsAffectedFolders">影響するファイルとフォルダ</key>
+    <key alias="permissionsAffectedFoldersMoreInfo">Umbracoに必要なアクセス権の設定についての詳細はこちらをどうぞ</key>
+    <key alias="permissionsAffectedFoldersText">これらのファイル/フォルダについてASP.NETに変更のアクセス権を与えなくてはなりません。</key>
+    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>アクセス権の設定はほぼ完璧です！</strong><br /><br />
+        Umbracoは問題無く起動できますが、Umbracoを最大限に活用する為に推奨されるパッケージのインストールはできないでしょう。]]></key>
+    <key alias="permissionsHowtoResolve">解決方法</key>
+    <key alias="permissionsHowtoResolveLink">テキスト版を読むにはここをクリックしてください</key>
+    <key alias="permissionsHowtoResolveText"><![CDATA[Umbracoの為のフォルダのアクセス権設定についての<strong>ビデオチュートリアル</strong>を見るか、テキスト版を読んで下さい。]]></key>
+    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>このアクセス権の設定はきっと問題になります！</strong>
+      <br/><br />
+      Umbracoを問題無く起動できますが、フォルダを作成できませんし、Umbracoを最大限に活用する為に推奨されるパッケージのインストールはできないでしょう。]]></key>
+    <key alias="permissionsNotReady"><![CDATA[<strong>Umbracoに必要なアクセス権の設定が不足しています！</strong>
+          <br /><br />
+          Umbracoを起動する為には、アクセス権の設定を見直す必要があります。]]></key>
+    <key alias="permissionsPerfect"><![CDATA[<strong>アクセス権の設定は完璧です！</strong><br /><br />
+              Umbracoを起動し、パッケージをインストールする準備が整いました！]]></key>
+    <key alias="permissionsResolveFolderIssues">フォルダの問題解決</key>
+    <key alias="permissionsResolveFolderIssuesLink">ASP.NETとフォルダの作成についての詳細はこちらのリンクからどうぞ</key>
+    <key alias="permissionsSettingUpPermissions">フォルダのアクセス権を設定</key>
+    <key alias="permissionsText"><![CDATA[
+      Umbracoは写真やPDFなどを格納する為の特定のフォルダへに対して書き込み/変更アクセスできなければなりません。
+      ウェブサイトの性能向上の為には、一時的なデータ(≈キャッシュ)を格納する必要がある為です。
+    ]]></key>
+    <key alias="runwayFromScratch">スクラッチから始めたい</key>
+    <key alias="runwayFromScratchText"><![CDATA[
+        ウェブサイトはさしあたり完全に空っぽで、必要なドキュメント型やテンプレートを作成するところから始められます。
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
+        後からRunwayをインストールする事もできます。そうしたくなった時は、Developerセクションのパッケージへどうぞ。
+      ]]></key>
+    <key alias="runwayHeader">Umbracoプラットフォームのクリーンセットアップが完了しました。この後はどうしますか？</key>
+    <key alias="runwayInstalled">Runwayがインストールされました</key>
+    <key alias="runwayInstalledText"><![CDATA[
+      Runwayによるウェブサイトの基礎は整いました。インストールしたいモジュールがあれば選んでください。<br />
+      推奨モジュールからインストールしたいモジュールをチェック、または<a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">全てのモジュールのリスト</a>を見て下さい。
+      ]]></key>
+    <key alias="runwayOnlyProUsers">経験を積んだユーザーのみに推奨します</key>
+    <key alias="runwaySimpleSite">簡単なウェブサイトから始めたい</key>
+    <key alias="runwaySimpleSiteText"><![CDATA[
+      <p>
+      "Runway"(≈滑走路)は幾つかの基本的なテンプレートから簡単なウェブサイトを用意します。このインストーラーは自動的にRnwayをセットアップできますが、
+        これを編集したり、拡張したり、削除する事も簡単にできます。もしUmbracoを完璧に使いこなせるならばこれは不要です。とはいえ、
+        Runwayを使う事は、手間なく簡単にUmbracoを始める為には良い選択肢です。
+        Runwayをインストールすれば、必要に応じてRunwayによる基本的な構成のページをRunwayのモジュールから選択できます。
+        </p>
+        <small>
+        <em>Runwayに含まれるもの:</em> ホームページ、はじめてのページ、モジュールのインストールページ。<br />
+        <em>オプションモジュール:</em> トップのナビゲーション、サイトマップ、コンタクト、ギャラリー。
+        </small>
+      ]]></key>
+    <key alias="runwayWhatIsRunway">Runwayとは？</key>
+    <key alias="step1">ステップ 1/5: ライセンスの承諾</key>
+    <key alias="step2">ステップ 2/5: データベースの設定</key>
+    <key alias="step3">ステップ 3/5: ファイルのアクセス権を検証</key>
+    <key alias="step4">ステップ 4/5: Umbracoのセキュリティ確認</key>
+    <key alias="step5">ステップ 5/5: Umbracoの準備が整いました</key>
+    <key alias="thankYou">Umbracoを選んで頂きありがとうございます</key>
+    <key alias="theEndBrowseSite"><![CDATA[<h3>新しいあなたのサイトを表示</h3>
+Runwayをインストールして作られた新しいウェブサイトがどのように表示されるのかを見る事ができます。]]></key>
+    <key alias="theEndFurtherHelp"><![CDATA[<h3>追加の情報と手助け</h3>
+我々の認めるコミュニティから手助けを得られるでしょう。どうしたら簡単なサイトを構築できるか、どうしたらパッケージを使えるかについてのビデオや文書、またUmbracoの用語のクイックガイドも見る事ができます。]]></key>
+    <key alias="theEndHeader">Umbraco %0% のインストールは完了、準備が整いました</key>
+    <key alias="theEndInstallFailed"><![CDATA[インストールを終えた後、もし必要ならば
+        <strong>/web.config file</strong>を手作業で編集し、<strong>'%0%'</strong>の下にある<strong>umbracoConfigurationStatus</strong>キーを設定してください。]]></key>
+    <key alias="theEndInstallSuccess"><![CDATA["Umbracoを始める"ボタンをクリックして<strong>今すぐ開始</strong>できます。<br />もし<strong>Umbracoの初心者</strong>なら、
+私たちの初心者向けのたくさんの情報を参考にしてください。]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Umbracoの開始</h3>
+ウェブサイトの管理から、簡単にバックオフィスを開き、コンテント、テンプレート、スタイルシート、機能を追加したり更新したりできます]]></key>
+    <key alias="Unavailable">データベースの接続に失敗しました。</key>
+    <key alias="Version3">Umbraco Version 3</key>
+    <key alias="Version4">Umbraco Version 4</key>
+    <key alias="watch">見る</key>
+    <key alias="welcomeIntro"><![CDATA[このウィザードでは <strong>umbraco %0%</strong> の新規インストールまたは3.0からの更新について設定方法を案内します。
+                                <br /><br />
+                                <strong>"次へ"</strong>を押してウィザードを開始します。]]></key>
+  </area>
+  <area alias="language">
+    <key alias="cultureCode">カルチャコード</key>
+    <key alias="displayName">カルチャ名</key>
+  </area>
+  <area alias="lockout">
+    <key alias="lockoutWillOccur">何もしないでいると自動的にログアウトします</key>
+    <key alias="renewSession">作業を保存して今すぐ更新</key>
+  </area>
+  <area alias="login">
+    <key alias="greeting0">ハッピー スーパー日曜日</key>
+    <key alias="greeting1">ハッピー マニアック月曜日</key>
+    <key alias="greeting2">ハッピー最高の火曜日</key>
+    <key alias="greeting3">ハッピー ワンダフル水曜日</key>
+    <key alias="greeting4">ハッピー サンダー木曜日</key>
+    <key alias="greeting5">ハッピー ファンキー金曜日</key>
+    <key alias="greeting6">ハッピー土曜日</key>
+    <key alias="instruction">ウェブサイトにログインします。</key>
+    <key alias="timeout">セッションタイムアウトしました。</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ]]></key>
+  </area>
+  <area alias="main">
+    <key alias="dashboard">ダッシュボード</key>
+    <key alias="sections">セクション</key>
+    <key alias="tree">コンテンツ</key>
+  </area>
+  <area alias="moveOrCopy">
+    <key alias="choose">上でページを選択...</key>
+    <key alias="copyDone">%0% は %1% にコピーしました</key>
+    <key alias="copyTo">下でドキュメント'%0%'をコピーする場所を選択してください。</key>
+    <key alias="moveDone">%0% は %1% に移動しました</key>
+    <key alias="moveTo">下でドキュメント'%0%'を移動する場所を選択してください。</key>
+    <key alias="nodeSelected">が、コンテンツの新しい親として選択されました。下の'ok' をクリックしてください。</key>
+    <key alias="noNodeSelected">まだノードが選択されていません。'ok'をクリックする前に上のリストでノードを選択してください。</key>
+    <key alias="notAllowedByContentType">現在のノードは、ドキュメントタイプの設定により選択されたノードの子になることはできません。</key>
+    <key alias="notAllowedByPath">ノードは、自分のサブページには移動できません</key>
+    <key alias="notAllowedAtRoot">現在のノードはルートにできません。</key>
+    <key alias="notValid">子ドキュメントで権限がないので、その操作はできません。</key>
+    <key alias="relateToOriginal">コピーしたものを元と関係づける</key>
+  </area>
+  <area alias="notifications">
+    <key alias="editNotifications">%0% への通知を編集</key>
+    <key alias="mailBody"><![CDATA[
+      前略 %0% さま
+
+      ユーザー '%3%' により
+      ページ '%2%' 上のタスク'%1%'から
+      自動的にメールします。
+
+      編集はこちらから: http://%4%/#/content/content/edit/%5%
+
+      早々
+
+      Umbracoのロボットより
+    ]]></key>
+    <key alias="mailBodyHtml"><![CDATA[<p>前略 %0% さま</p>
+
+			<p>ユーザー <strong>'%3%'</strong> によりページ <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a> 上のタスク <strong>'%1%'</strong> から自動的にメールします。</p>
+			<div style="margin: 8px 0; padding: 8px; display: block;">
+				<br />
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+				<br />
+		  </div>
+		  <p>
+			  <h3>更新のまとめ:</h3>
+			  <table style="width: 100%;">
+						   %6%
+				</table>
+			 </p>
+
+		  <div style="margin: 8px 0; padding: 8px; display: block;">
+				<br />
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;編集&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+				<br />
+		  </div>
+
+		  <p>早々<br /><br />
+			  Umbracoのロボットより
+		  </p>]]></key>
+    <key alias="mailSubject">[%0%] に通知: ページ %2% 上の %1% について</key>
+    <key alias="notifications">通知</key>
+  </area>
+  <area alias="packager">
+    <key alias="chooseLocalPackageText"><![CDATA[
+      参照ボタンをクリックしてパッケージの場所を示す事であなたのコンピュータ上の<br />
+         パッケージを選択できます。Umbracoのパッケージは概ね".zip"ないしは".umb"といった拡張子です。
+      ]]></key>
+    <key alias="packageAuthor">作成者</key>
+    <key alias="packageDocumentation">ヘルプ</key>
+    <key alias="packageMetaData">パッケージのメタデータ</key>
+    <key alias="packageName">パッケージ名</key>
+    <key alias="packageNoItemsHeader">パッケージには何も含まれません</key>
+    <key alias="packageNoItemsText"><![CDATA[このパッケージファイルにはアンインストールするアイテムが含まれません。<br/><br/>
+      "パッケージのアンインストール"をクリックしてシステムから安全に削除できます。]]></key>
+    <key alias="packageOptions">パッケージのオプション</key>
+    <key alias="packageReadme">パッケージの取扱説明書</key>
+    <key alias="packageRepository">パッケージリポジトリ</key>
+    <key alias="packageUninstallConfirm">本当にアンインストールしますか</key>
+    <key alias="packageUninstalledHeader">パッケージのアンインストールが終了しました</key>
+    <key alias="packageUninstalledText">パッケージが正常にアンインストールされました</key>
+    <key alias="packageUninstallHeader">パッケージのアンインストール</key>
+    <key alias="packageUninstallText"><![CDATA[今はまだ削除したくない項目の選択を解除できます。"アンインストールの確認"をクリックすると全てのチェックの外された項目を削除します。<br />
+      <span style="color: Red; font-weight: bold;">注意:</span> 全ての、文書やメディアなどに依存したアイテムを削除する場合はそれらの作業を一端止めてからアンインストールしなければシステムが不安定になる恐れがあります。
+      疑問点などあればパッケージの作者へ連絡してください。]]></key>
+    <key alias="packageVersion">パッケージのバージョン</key>
+  </area>
+  <area alias="paste">
+    <key alias="doNothing">完全な書式を含んだまま貼り付け (非推奨)</key>
+    <key alias="errorMessage">貼り付けようとしたテキストは、特殊文字や書式設定が含まれます。これは、Microsoft Wordからテキストをコピーしたりすると発生する事です。Umbracoでは貼り付けられたコンテンツをウェブに適用させる為、書式や特殊文字を自動的に削除します。</key>
+    <key alias="removeAll">全ての書式を削除してRAWテキストを貼り付け</key>
+    <key alias="removeSpecialFormattering">書式を除去して貼り付け (推奨)</key>
+  </area>
+  <area alias="publicAccess">
+    <key alias="paAdvanced">役割による保護</key>
+    <key alias="paAdvancedHelp"><![CDATA[Umbracoのグループを用い、<br />役割に基づく認証によりアクセス制御するのに適します。]]></key>
+    <key alias="paAdvancedNoGroups"><![CDATA[役割に基づく認証を用いる前に<br />メンバーグループを作成する必要があります。]]></key>
+    <key alias="paErrorPage">エラーページ</key>
+    <key alias="paErrorPageHelp">ログインできてもアクセスできない人々へのページです</key>
+    <key alias="paHowWould">このページのアクセス制限方法を選択してください</key>
+    <key alias="paIsProtected">%0% は保護されています</key>
+    <key alias="paIsRemoved">%0% の保護を解除しました</key>
+    <key alias="paLoginPage">ログインページ</key>
+    <key alias="paLoginPageHelp">ログインフォームのあるページを選択します</key>
+    <key alias="paRemoveProtection">保護を解除</key>
+    <key alias="paSelectPages">ログインフォームとエラーメッセージを含むページを選択してください</key>
+    <key alias="paSelectRoles">このページへアクセス可能な役割を選んでください</key>
+    <key alias="paSetLogin">このページへのログインとパスワードを設定します</key>
+    <key alias="paSimple">単一ユーザー保護</key>
+    <key alias="paSimpleHelp">単一のログインとパスワードで単純に保護したい場合に適します</key>
+  </area>
+  <area alias="publish">
+    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
+      %0% ページは公開がスケジュールされているため、公開されませんでした。
+    ]]></key>
+    <key alias="contentPublishedFailedExpired"><![CDATA[
+      アイテムの有効期限が切れているため %0% を公開できません。
+    ]]></key>
+    <key alias="contentPublishedFailedInvalid"><![CDATA[
+      %1% のプロパティがバリデーション定義に違反したため、%0% は公開できませんでした。
+    ]]></key>
+    <key alias="contentPublishedFailedByEvent"><![CDATA[
+      サードパーティのエクステンションがキャンセルされたので、%0% は公開できませんでした。
+    ]]></key>
+    <key alias="contentPublishedFailedByParent"><![CDATA[
+      親ページが公開されていないので、%0% は公開できませんでした。
+    ]]></key>
+    <key alias="includeUnpublished">非公開の子ページも含めます</key>
+    <key alias="inProgress">公開を進めています - 少々お待ちください...</key>
+    <key alias="inProgressCounter">%1% ページ中 %0% ページが公開されました...</key>
+    <key alias="nodePublish">%0% は公開されました</key>
+    <key alias="nodePublishAll">%0% とサブページは公開されました</key>
+    <key alias="publishAll">%0% とそのサブページの全てを公開します</key>
+    <key alias="publishHelp"><![CDATA[<em>OK</em> をクリックすると <strong>%0%</strong> を公開。<br/><br />
+      このページとその全ての子ページも公開したければ <em>全ての子ページを公開</em> をチェック。
+      ]]></key>
+  </area>
+  <area alias="colorpicker">
+    <key alias="noColors">設定済みの色はありません。</key>
+  </area>
+  <area alias="relatedlinks">
+    <key alias="enterExternal">外部リンクを入力</key>
+    <key alias="chooseInternal">内部リンクを選択</key>
+    <key alias="caption">キャプション</key>
+    <key alias="link">リンク</key>
+    <key alias="newWindow">新規ウィンドウで開く</key>
+    <key alias="captionPlaceholder">キャプションを入力</key>
+    <key alias="externalLinkPlaceholder">リンクを入力</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">リセット</key>
+  </area>
+  <area alias="rollback">
+    <key alias="currentVersion">現在の版</key>
+    <key alias="diffHelp"><![CDATA[現在の版と選択した以前の版との比較を表示します。<br /><del>赤</del> の文字列は以前の版にはない部分で、<ins>緑の文字列は以前の版にのみある部分です。</ins>]]></key>
+    <key alias="documentRolledBack">ドキュメントは以前の版に戻りました</key>
+    <key alias="htmlHelp">選択した版をhtmlで表示します。２つの版の比較を表示したいときは、Diff を選択してください。</key>
+    <key alias="rollbackTo">以前の版に戻る</key>
+    <key alias="selectVersion">版の選択</key>
+    <key alias="view">表示</key>
+  </area>
+  <area alias="scripts">
+    <key alias="editscript">スクリプトファイルの編集</key>
+  </area>
+  <area alias="sections">
+    <key alias="concierge">管理人</key>
+    <key alias="content">コンテンツ</key>
+    <key alias="courier">Courier</key>
+    <key alias="developer">開発</key>
+    <key alias="installer">Umbraco 設定ウィザード</key>
+    <key alias="media">メディア</key>
+    <key alias="member">メンバー</key>
+    <key alias="newsletters">ニュースレター</key>
+    <key alias="settings">設定</key>
+    <key alias="statistics">統計</key>
+    <key alias="translation">翻訳</key>
+    <key alias="users">ユーザー</key>
+    <key alias="help" version="7.0">ヘルプ</key>
+    <key alias="forms">フォーム</key>
+  </area>
+  <area alias="help">
+    <key alias="theBestUmbracoVideoTutorials">動画によるチュートリアル</key>
+  </area>
+  <area alias="settings">
+    <key alias="defaulttemplate">既定のテンプレート</key>
+    <key alias="importDocumentTypeHelp">ドキュメントタイプを読み込むには、「参照」ボタンをクリックして自分のPC内にある".udt"ファイルを選択して、「インポート」ボタンをクリックします。 (次画面で確認画面が表示されます)</key>
+    <key alias="newtabname">新規タブの名前</key>
+    <key alias="nodetype">ノードのタイプ</key>
+    <key alias="objecttype">タイプ</key>
+    <key alias="stylesheet">スタイルシート</key>
+    <key alias="script">スクリプト</key>
+    <key alias="tab">タブ</key>
+    <key alias="tabname">タブの名前</key>
+    <key alias="tabs">タブ</key>
+    <key alias="contentTypeEnabled">マスターコンテンツタイプが有効</key>
+    <key alias="contentTypeUses">このコンテンツタイプの使用</key>
+    <key alias="noPropertiesDefinedOnTab">このタブにはプロパティが定義されていません、上部のリンクから新しいプロパティを作成してください</key>
+    <key alias="addIcon">アイコンの追加</key>
+  </area>
+  <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
+    <key alias="sortDone">ソートが完了しました。</key>
+    <key alias="sortHelp">上下にアイテムをドラッグするなどして適当に配置したり、列のヘッダーをクリックしてコレクション全体をソートできます</key>
+    <key alias="sortPleaseWait"><![CDATA[ 項目の並べ替えには少し時間がかかります。しばらくお待ちください。]]></key>
+  </area>
+  <area alias="speechBubbles">
+    <key alias="validationFailedHeader">検証</key>
+    <key alias="validationFailedMessage">アイテムを保存する前に検証エラーを修正してください。</key>
+    <key alias="operationFailedHeader">失敗しました</key>
+    <key alias="invalidUserPermissionsText">不十分なユーザー権限により操作を完了できませんでした</key>
+    <key alias="operationCancelledHeader">キャンセルされました</key>
+    <key alias="operationCancelledText">サードパーティのアドインにより操作はキャンセルされました</key>
+    <key alias="contentPublishedFailedByEvent">サードパーティのアドインにより公開はキャンセルされました</key>
+    <key alias="contentTypeDublicatePropertyType">プロパティの方は既に存在しています</key>
+    <key alias="contentTypePropertyTypeCreated">プロパティの型を作成しました</key>
+    <key alias="contentTypePropertyTypeCreatedText"><![CDATA[名前: %0% <br /> データ型: %1%]]></key>
+    <key alias="contentTypePropertyTypeDeleted">プロパティ型を削除しました</key>
+    <key alias="contentTypeSavedHeader">コンテントの型を保存しました</key>
+    <key alias="contentTypeTabCreated">タブを作成しました</key>
+    <key alias="contentTypeTabDeleted">タブを削除しました</key>
+    <key alias="contentTypeTabDeletedText">idが %0% のタブを削除しました</key>
+    <key alias="cssErrorHeader">スタイルシートは未保存です</key>
+    <key alias="cssSavedHeader">スタイルシートを保存しました</key>
+    <key alias="cssSavedText">エラーなくスタイルシートを保存しました</key>
+    <key alias="dataTypeSaved">データ型を保存しました</key>
+    <key alias="dictionaryItemSaved">ディクショナリのアイテムを保存しました</key>
+    <key alias="editContentPublishedFailedByParent">親ページが公開されていないので、公開に失敗しました</key>
+    <key alias="editContentPublishedHeader">コンテントを公開しました</key>
+    <key alias="editContentPublishedText">と同時にウェブサイトを可視化しました</key>
+    <key alias="editContentSavedHeader">コンテントを保存しました</key>
+    <key alias="editContentSavedText">変更を適用する為に公開する事を忘れないでください</key>
+    <key alias="editContentSendToPublish">承認へ送りました</key>
+    <key alias="editContentSendToPublishText">変更は承認へと送られます</key>
+    <key alias="editMediaSaved">メディアを保存しました</key>
+    <key alias="editMediaSavedText">メディアをエラーなく保存しました</key>
+    <key alias="editMemberSaved">メンバーを保存しました</key>
+    <key alias="editStylesheetPropertySaved">スタイルシートのプロパティを保存しました</key>
+    <key alias="editStylesheetSaved">スタイルシートを保存しました</key>
+    <key alias="editTemplateSaved">テンプレートを保存しました</key>
+    <key alias="editUserError">ユーザーの保存時にエラーが発生しました (ログを確認してください)</key>
+    <key alias="editUserSaved">ユーザーを保存しました</key>
+    <key alias="editUserTypeSaved">ユーザータイプを保存しました</key>
+    <key alias="fileErrorHeader">ファイルは未保存です</key>
+    <key alias="fileErrorText">ファイルを保存できません。アクセス権を確認してください。</key>
+    <key alias="fileSavedHeader">ファイルを保存しました</key>
+    <key alias="fileSavedText">エラーなくファイルを保存しました</key>
+    <key alias="languageSaved">言語を保存しました</key>
+    <key alias="templateErrorHeader">テンプレートは未保存です</key>
+    <key alias="templateErrorText">2つのテンプレートで同じエイリアスを使用していないか確認してください</key>
+    <key alias="templateSavedHeader">テンプレートを保存しました</key>
+    <key alias="templateSavedText">エラーなくテンプレートを保存しました！</key>
+    <key alias="contentUnpublished">コンテンツは公開されていません</key>
+    <key alias="partialViewSavedHeader">部分ビュー保存しました</key>
+    <key alias="partialViewSavedText">部分ビューをエラーなしで保存しました!</key>
+    <key alias="partialViewErrorHeader">部分ビューは保存されていません</key>
+    <key alias="partialViewErrorText">ファイルを保存するときにエラーが発生しました。</key>
+  </area>
+  <area alias="stylesheet">
+    <key alias="aliasHelp">CSSシンタックスを使用 例: h1, .redHeader, .blueTex</key>
+    <key alias="editstylesheet">スタイルシートの編集</key>
+    <key alias="editstylesheetproperty">スタイルシートのプロパティの編集</key>
+    <key alias="nameHelp">リッチテキストエディターでスタイルのプロパティを識別する名前</key>
+    <key alias="preview">プレビュー</key>
+    <key alias="styles">スタイル</key>
+  </area>
+  <area alias="template">
+    <key alias="edittemplate">テンプレートの編集</key>
+    <key alias="insertContentArea">コンテンツ領域の挿入</key>
+    <key alias="insertContentAreaPlaceHolder">コンテンツ領域プレースホルダーの挿入</key>
+    <key alias="insertDictionaryItem">ディクショナリ アイテムを挿入</key>
+    <key alias="insertMacro">マクロの挿入</key>
+    <key alias="insertPageField">umbraco ページフィールドの挿入</key>
+    <key alias="mastertemplate">マスターテンプレート</key>
+    <key alias="quickGuide">umbraco テンプレートタグのクイックガイド</key>
+    <key alias="template">テンプレート</key>
+  </area>
+  <area alias="grid">
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="insertControl">挿入するアイテムを選択する</key>
+    <key alias="addRows">行の追加</key>
+    <key alias="addElement">コンテンツの追加</key>
+    <key alias="dropElement">コンテンツのドロップ</key>
+    <key alias="settingsApplied">適用される設定</key>
+    <key alias="contentNotAllowed">このコンテンツはここでは許可されていません</key>
+    <key alias="contentAllowed">このコンテンツはここに使用できます</key>
+    <key alias="clickToEmbed">クリックして埋め込む</key>
+    <key alias="clickToInsertImage">クリックして画像を挿入する</key>
+    <key alias="placeholderImageCaption">キャプション...</key>
+    <key alias="placeholderWriteHere">ここに記入する...</key>
+    <key alias="gridLayouts">レイアウト</key>
+    <key alias="gridLayoutsDetail">レイアウトは通常1つまたは2つの異なるレイアウトを必要とする、グリッドエディタの全体的な作業エリアです</key>
+    <key alias="addGridLayout">レイアウトを追加する</key>
+    <key alias="addGridLayoutDetail">追加のセクションの横幅を設定し、レイアウトを調整する</key>
+    <key alias="rowConfigurations">行の構成</key>
+    <key alias="rowConfigurationsDetail">定義された構成の行が水平に配置されます</key>
+    <key alias="addRowConfiguration">行の構成を追加</key>
+    <key alias="addRowConfigurationDetail">追加のセルのセル幅を設定することで調整します</key>
+    <key alias="columns">列</key>
+    <key alias="columnsDetails">グリッドレイアウトの列を合計した数</key>
+    <key alias="settings">設定</key>
+    <key alias="settingsDetails">編集者が設定できる項目</key>
+    <key alias="styles">スタイル</key>
+    <key alias="stylesDetails">編集者が設定できるスタイル</key>
+    <key alias="allowAllEditors">すべてのエディタを許可する</key>
+    <key alias="allowAllRowConfigurations">すべての行の構成を許可する</key>
+    <key alias="setAsDefault">デフォルトとして設定</key>
+    <key alias="chooseExtra">追加を選択</key>
+    <key alias="chooseDefault">デフォルトの選択</key>
+    <key alias="areAdded">追加されました</key>
+  </area>
+  <area alias="contentTypeEditor">
+    <key alias="compositions">構成</key>
+    <key alias="noGroups">タブが追加されていません</key>
+    <key alias="inheritedFrom">次から継承:</key>
+    <key alias="addProperty">プロパティの追加</key>
+    <key alias="requiredLabel">必要なラベル</key>
+    <key alias="enableListViewHeading">リスト ビューの有効化</key>
+    <key alias="enableListViewDescription">並べ替えと検索が可能な子のリストを表示するコンテンツ アイテムを設定します。子はツリーに表示されません。</key>
+    <key alias="allowedTemplatesHeading">利用可能なテンプレート</key>
+    <key alias="allowedTemplatesDescription">このタイプのコンテンツで使用できるテンプレート エディターを選択してください</key>
+    <key alias="allowAsRootHeading">ルートとして許可</key>
+    <key alias="allowAsRootDescription">コンテンツ ツリーのルートでこのタイプのコンテンツをエディターで作成することを許可</key>
+    <key alias="childNodesHeading">許可された子ノード タイプ</key>
+    <key alias="childNodesDescription">このタイプの下部コンテンツに指定タイプのコンテンツを作成することを許可</key>
+    <key alias="chooseChildNode">子ノードの選択</key>
+    <key alias="compositionsDescription">既存ドキュメント タイプのタブとプロパティを継承。新しいタブを現在のドキュメント タイプに追加、または同じ名前のタブがある場合はマージされます。</key>
+    <key alias="compositionInUse">このコンテンツ タイプが構成で使用されるため、自身を構成することはできません。</key>
+    <key alias="noAvailableCompositions">構成に使用できるコンテンツ タイプはありません。</key>
+    <key alias="availableEditors">使用可能なエディター</key>
+    <key alias="reuse">再利用</key>
+    <key alias="editorSettings">エディター設定</key>
+    <key alias="configuration">設定</key>
+    <key alias="yesDelete">削除します</key>
+    <key alias="movedUnderneath">下部に移動しました。</key>
+    <key alias="folderToMove">以下のツリー構造へ移動する</key>
+    <key alias="structureBelow">フォルダーを選択します</key>
+    <key alias="allDocumentTypes">すべてのドキュメント タイプ</key>
+    <key alias="allDocuments">すべてのドキュメント</key>
+    <key alias="allMediaItems">すべてのメディア アイテム</key>
+    <key alias="usingThisDocument">このドキュメント タイプを使用すると完全に削除されます。削除してもよろしいですか？</key>
+    <key alias="usingThisMedia">このメディア タイプを使用すると完全に削除されます。削除してもよろしいですか？</key>
+    <key alias="usingThisMember">このメンバー タイプを使用すると完全に削除されます。削除してもよろしいですか？</key>
+    <key alias="andAllDocuments">およびこのタイプを使用したすべてのドキュメント</key>
+    <key alias="andAllMediaItems">およびこのタイプを使用したこのメディア アイテム</key>
+    <key alias="andAllMembers">およびこのタイプを使用したすべてのメンバー</key>
+  </area>
+  <area alias="templateEditor">
+    <key alias="alternativeField">代替フィールド</key>
+    <key alias="alternativeText">代替テキスト</key>
+    <key alias="casing">大文字小文字変換</key>
+    <key alias="encoding">エンコーディング</key>
+    <key alias="chooseField">フィールドの選択</key>
+    <key alias="convertLineBreaks">改行コードの変換</key>
+    <key alias="convertLineBreaksHelp">改行コードをhtmlタグ &amp;lt;br&amp;gt; に変換する</key>
+    <key alias="customFields">カスタムフィールド</key>
+    <key alias="dateOnly">日付のみ表示</key>
+    <key alias="formatAsDate">日付の形式</key>
+    <key alias="htmlEncode">HTMLエンコード</key>
+    <key alias="htmlEncodeHelp">特殊文字をHTMLで等価な文字列に変換する</key>
+    <key alias="insertedAfter">フィールドの値の後ろに追加される</key>
+    <key alias="insertedBefore">フィールドの値の前に追加される</key>
+    <key alias="lowercase">小文字変換</key>
+    <key alias="none">なし</key>
+    <key alias="postContent">フィールド値の後ろ追加</key>
+    <key alias="preContent">フィールド値の前に追加</key>
+    <key alias="recursive">再帰的</key>
+    <key alias="removeParagraph">段落タグの消去</key>
+    <key alias="removeParagraphHelp">段落タグ &amp;lt;P&amp;gt; を消去します</key>
+    <key alias="standardFields">標準フィールド</key>
+    <key alias="uppercase">大文字変換</key>
+    <key alias="urlEncode">URLエンコード</key>
+    <key alias="urlEncodeHelp">文字列をURLで使用可能な文字列に変換する</key>
+    <key alias="usedIfAllEmpty">上のフィールドの値がいずれも空白の場合に使用される</key>
+    <key alias="usedIfEmpty">このフィールドは第1フィールドが空白の場合に使用される</key>
+    <key alias="withTime">時刻も表示 区切り文字: </key>
+  </area>
+  <area alias="translation">
+    <key alias="details">翻訳の詳細</key>
+    <key alias="DownloadXmlDTD">XML DTD ダウンロード</key>
+    <key alias="fields">フィールド</key>
+    <key alias="includeSubpages">サブページを含める</key>
+    <key alias="mailBody"><![CDATA[
+      前略 %0% さま
+
+      %2% よりドキュメント'%1%' を '%5%' への翻訳依頼がありましたので自動メールします。
+
+      編集はこちらから: http://%3%/translation/details.aspx?id=%4%
+
+      また、翻訳タスクの概況はこちらから: http://%3%
+
+      早々
+
+      Umbracoのロボットより
+    ]]></key>
+    <key alias="noTranslators">翻訳者ユーザーが見つかりません。コンテントの翻訳の前に翻訳者ユーザーを作成してください。</key>
+    <key alias="pageHasBeenSendToTranslation">ページ '%0%' を翻訳へ送りました</key>
+    <key alias="sendToTranslate">ページ '%0%' を翻訳へ送る</key>
+    <key alias="totalWords">述べ語数</key>
+    <key alias="translateTo">翻訳する: </key>
+    <key alias="translationDone">翻訳完了。</key>
+    <key alias="translationDoneHelp">クリックして翻訳したページのプレビューを表示できます。元のページがあれば2つのページを比較します。</key>
+    <key alias="translationFailed">翻訳に失敗しました。XMLファイルが壊れているかもしれません。</key>
+    <key alias="translationOptions">翻訳オプション</key>
+    <key alias="translator">翻訳者</key>
+    <key alias="uploadTranslationXml">翻訳XMLのアップロード</key>
+  </area>
+  <area alias="treeHeaders">
+    <key alias="cacheBrowser">キャッシュの参照</key>
+    <key alias="contentRecycleBin">ごみ箱</key>
+    <key alias="createdPackages">パッケージの作成</key>
+    <key alias="dataTypes">データ型</key>
+    <key alias="dictionary">ディクショナリ</key>
+    <key alias="installedPackages">インストール済のパッケージ</key>
+    <key alias="installSkin">スキンのインストール</key>
+    <key alias="installStarterKit">スターターキットのインストール</key>
+    <key alias="languages">言語</key>
+    <key alias="localPackage">ローカルパッケージのインストール</key>
+    <key alias="macros">マクロ</key>
+    <key alias="mediaTypes">メディアタイプ</key>
+    <key alias="member">メンバー</key>
+    <key alias="memberGroups">メンバーのグループ</key>
+    <key alias="memberRoles">役割</key>
+    <key alias="memberTypes">メンバーの種類</key>
+    <key alias="documentTypes">ドキュメントタイプ</key>
+    <key alias="relationTypes">関連タイプ</key>
+    <key alias="packager">パッケージ</key>
+    <key alias="packages">パッケージ</key>
+    <key alias="repositories">リポジトリからインストール</key>
+    <key alias="runway">Runwayのインストール</key>
+    <key alias="runwayModules">Runwayのモジュール</key>
+    <key alias="scripting">スクリプトファイル</key>
+    <key alias="scripts">スクリプト</key>
+    <key alias="stylesheets">スタイルシート</key>
+    <key alias="templates">テンプレート</key>
+    <key alias="userPermissions">ユーザーの権限</key>
+    <key alias="userTypes">ユーザータイプ</key>
+    <key alias="users">ユーザー</key>
+  </area>
+  <area alias="update">
+    <key alias="updateAvailable">新しい更新があります</key>
+    <key alias="updateDownloadText">%0% が用意されています。ダウンロードするにはクリックしてください。</key>
+    <key alias="updateNoServer">サーバーに接続できませんでした</key>
+    <key alias="updateNoServerError">更新の確認中にエラーが発生しました。詳細についてはスタックトレースを確認してください。</key>
+  </area>
+  <area alias="user">
+    <key alias="administrators">管理者</key>
+    <key alias="categoryField">フィールドのカテゴリー</key>
+    <key alias="changePassword">パスワードの変更</key>
+    <key alias="newPassword">新パスワード</key>
+    <key alias="confirmNewPassword">新パスワードの確認</key>
+    <key alias="changePasswordDescription">Umbracoの管理画面にアクセスするためのパスワードを変更するには、以下のフォームに新しいパスワード入力して「パスワードの変更」ボタンをクリックしてください。</key>
+    <key alias="contentChannel">コンテントチャンネル</key>
+    <key alias="descriptionField">概要フィールド</key>
+    <key alias="disabled">ユーザーを無効にする</key>
+    <key alias="documentType">ドキュメントタイプ</key>
+    <key alias="editors">編集者</key>
+    <key alias="excerptField">フィールドの抜粋</key>
+    <key alias="language">言語</key>
+    <key alias="loginname">ログイン</key>
+    <key alias="mediastartnode">メディアライブラリの開始ノード</key>
+    <key alias="modules">セクション</key>
+    <key alias="noConsole">Umbracoへのアクセスを無効にする</key>
+    <key alias="password">パスワード</key>
+    <key alias="resetPassword">パスワードのリセット</key>
+    <key alias="passwordChanged">パスワードが変更されました!</key>
+    <key alias="passwordConfirm">新しいパスワードの確認</key>
+    <key alias="passwordEnterNew">新しいパスワードの入力</key>
+    <key alias="passwordIsBlank">パスワードは空白にできません!</key>
+    <key alias="passwordCurrent">現在のパスワード</key>
+    <key alias="passwordInvalid">現在のパスワードが正しくない</key>
+    <key alias="passwordIsDifferent">新しいパスワードと確認のパスワードが一致しません。再度入力してください!</key>
+    <key alias="passwordMismatch">確認のパスワードは新しいパスワードと一致しません!</key>
+    <key alias="permissionReplaceChildren">子ノードのアクセス権を置き換える</key>
+    <key alias="permissionSelectedPages">これらのページのアクセス権を変更します:</key>
+    <key alias="permissionSelectPages">選択したページのアクセス権を変更する</key>
+    <key alias="searchAllChildren">全ての子要素から調べる</key>
+    <key alias="startnode">コンテンツの開始ノード</key>
+    <key alias="username">ユーザー名</key>
+    <key alias="userPermissions">ユーザーの権限</key>
+    <key alias="usertype">ユーザーの種類</key>
+    <key alias="userTypes">ユーザーの種類</key>
+    <key alias="writer">投稿者</key>
+    <key alias="change">変更</key>
+    <key alias="yourProfile" version="7.0">あなたのプロフィール</key>
+    <key alias="yourHistory" version="7.0">あなたの最新の履歴</key>
+    <key alias="sessionExpires" version="7.0">セッションの期限</key>
+  </area>
+  <area alias="validation">
+    <key alias="validation">検証</key>
+    <key alias="validateAsEmail">メールで検証</key>
+    <key alias="validateAsNumber">数値で検証</key>
+    <key alias="validateAsUrl">URL で検証</key>
+    <key alias="enterCustomValidation">... またはカスタム検証を入力</key>
+    <key alias="fieldIsMandatory">必須フィールドです</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">すべて選択</key>
+    <key alias="deselectAllLogLevelFilters">すべての選択を解除</key>
+  </area>
+</language>

@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
@@ -32,19 +33,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly GlobalSettings _globalSettings;
         private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IRuntimeState _runtimeState;
         private string _passwordConfigJson;
         private bool _passwordConfigInitialized;
 
         /// <summary>
-        /// Constructor
+        /// Initializes a new instance of the <see cref="UserRepository" /> class.
         /// </summary>
-        /// <param name="scopeAccessor"></param>
-        /// <param name="appCaches"></param>
-        /// <param name="logger"></param>
-        /// <param name="mapperCollection">
-        /// A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.
-        /// </param>
-        /// <param name="globalSettings"></param>
+        /// <param name="scopeAccessor">The scope accessor.</param>
+        /// <param name="appCaches">The application caches.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="mapperCollection">A dictionary specifying the configuration for user passwords. If this is null then no password configuration will be persisted or read.</param>
+        /// <param name="globalSettings">The global settings.</param>
+        /// <param name="passwordConfiguration">The password configuration.</param>
+        /// <param name="jsonSerializer">The JSON serializer.</param>
+        /// <param name="runtimeState">State of the runtime.</param>
+        /// <exception cref="System.ArgumentNullException">mapperCollection
+        /// or
+        /// globalSettings
+        /// or
+        /// passwordConfiguration</exception>
         public UserRepository(
             IScopeAccessor scopeAccessor,
             AppCaches appCaches,
@@ -52,13 +60,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             IMapperCollection mapperCollection,
             IOptions<GlobalSettings> globalSettings,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
-            IJsonSerializer jsonSerializer)
+            IJsonSerializer jsonSerializer,
+            IRuntimeState runtimeState)
             : base(scopeAccessor, appCaches, logger)
         {
             _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
             _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
             _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _jsonSerializer = jsonSerializer;
+            _runtimeState = runtimeState;
         }
 
         /// <summary>
@@ -91,9 +101,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // This will never resolve to a user, yet this is asked
             // for all of the time (especially in cases of members).
             // Don't issue a SQL call for this, we know it will not exist.
-            if (id == default || id < -1)
+            if (_runtimeState.Level == RuntimeLevel.Upgrade)
             {
-                return null;
+                // when upgrading people might come from version 7 where user 0 was the default,
+                // only in upgrade mode do we want to fetch the user of Id 0
+                if (id < -1)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                if (id == default || id < -1)
+                {
+                    return null;
+                }
             }
 
             var sql = SqlContext.Sql()
@@ -154,30 +176,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public IDictionary<UserState, int> GetUserStates()
         {
-            var sql = @"SELECT '1CountOfAll' AS colName, COUNT(id) AS num FROM umbracoUser
+            // These keys in this query map to the `Umbraco.Core.Models.Membership.UserState` enum
+            var sql = @"SELECT -1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser
 UNION
-SELECT '2CountOfActive' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL
+SELECT 0 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL
 UNION
-SELECT '3CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 1
+SELECT 1 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 1
 UNION
-SELECT '4CountOfLockedOut' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userNoConsole = 1
+SELECT 2 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userNoConsole = 1
 UNION
-SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
+SELECT 3 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
 UNION
-SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL
-ORDER BY colName";
+SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL";
 
-            var result = Database.Fetch<dynamic>(sql);
+            var result = Database.Dictionary<int, int>(sql);
 
-            return new Dictionary<UserState, int>
-            {
-                {UserState.All, (int) result[0].num},
-                {UserState.Active, (int) result[1].num},
-                {UserState.Disabled, (int) result[2].num},
-                {UserState.LockedOut, (int) result[3].num},
-                {UserState.Invited, (int) result[4].num},
-                {UserState.Inactive, (int) result[5].num}
-            };
+            return result.ToDictionary(x => (UserState)x.Key, x => x.Value);
         }
 
         public Guid CreateLoginSession(int userId, string requestingIpAddress, bool cleanStaleSessions = true)
@@ -425,35 +439,25 @@ ORDER BY colName";
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoUser.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.User}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
             {
-                "DELETE FROM umbracoUser2UserGroup WHERE userId = @id",
-                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @id",
-                "DELETE FROM umbracoUserStartNode WHERE userId = @id",
-                "DELETE FROM umbracoUser WHERE id = @id",
-                "DELETE FROM umbracoExternalLogin WHERE id = @id"
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.UserLogin} WHERE userId = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.User2UserGroup} WHERE userId = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.User2NodeNotify} WHERE userId = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.UserStartNode} WHERE userId = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.User} WHERE id = @id",
+                $"DELETE FROM {Constants.DatabaseSchema.Tables.ExternalLogin} WHERE id = @id"
             };
             return list;
         }
 
         protected override void PersistNewItem(IUser entity)
         {
-            // the use may have no identity, ie ID is zero, and be v7 super
-            // user - then it has been marked - and we must not persist it
-            // as new, as we do not want to create a new user - instead, persist
-            // it as updated
-            // see also: UserFactory.BuildEntity
-            if (entity.FromUserCache<string>("IS_V7_ZERO") != null)
-            {
-                PersistUpdatedItem(entity);
-                return;
-            }
-
             entity.AddingEntity();
 
             // ensure security stamp if missing
@@ -573,7 +577,7 @@ ORDER BY colName";
             {
                 userDto.EmailConfirmedDate = null;
                 changedCols.Add("emailConfirmedDate");
-                
+
                 // If the security stamp hasn't already updated we need to force it
                 if (entity.IsPropertyDirty("SecurityStamp") == false)
                 {

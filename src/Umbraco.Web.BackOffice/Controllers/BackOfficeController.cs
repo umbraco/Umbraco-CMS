@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -34,6 +34,7 @@ using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -50,6 +51,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         // this controller itself doesn't require authz but it's more clear what the intention is.
 
         private readonly IBackOfficeUserManager _userManager;
+        private readonly IRuntimeState _runtimeState;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -69,6 +71,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public BackOfficeController(
             IBackOfficeUserManager userManager,
+            IRuntimeState runtimeState,
             IRuntimeMinifier runtimeMinifier,
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
@@ -87,6 +90,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ServerVariablesParser serverVariables)
         {
             _userManager = userManager;
+            _runtimeState = runtimeState;
             _runtimeMinifier = runtimeMinifier;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
@@ -109,10 +113,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Default()
         {
-            // force authentication to occur since this is not an authorized endpoint
-            var result = await this.AuthenticateBackOfficeAsync();
+            // Check if we not are in an run state, if so we need to redirect
+            if (_runtimeState.Level != RuntimeLevel.Run)
+            {
+                return Redirect("/");
+            }
 
-            var viewPath = Path.Combine(_globalSettings.UmbracoPath , Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
+            // force authentication to occur since this is not an authorized endpoint
+            AuthenticateResult result = await this.AuthenticateBackOfficeAsync();
+
+            var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(Default) + ".cshtml")
                 .Replace("\\", "/"); // convert to forward slashes since it's a virtual path
 
             return await RenderDefaultOrProcessExternalLoginAsync(
@@ -198,7 +208,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // force authentication to occur since this is not an authorized endpoint
             var result = await this.AuthenticateBackOfficeAsync();
 
-            var viewPath = Path.Combine(_globalSettings.UmbracoPath, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
+            var viewPath = Path.Combine(Constants.SystemDirectories.Umbraco, Constants.Web.Mvc.BackOfficeArea, nameof(AuthorizeUpgrade) + ".cshtml");
 
             return await RenderDefaultOrProcessExternalLoginAsync(
                 result,
@@ -232,17 +242,25 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
-        public Dictionary<string, Dictionary<string, string>> LocalizedText(string culture = null)
+        public async Task<Dictionary<string, Dictionary<string, string>>> LocalizedText(string culture = null)
         {
-            var isAuthenticated = _backofficeSecurityAccessor.BackOfficeSecurity.IsAuthenticated();
+            CultureInfo cultureInfo;
+            if (string.IsNullOrWhiteSpace(culture))
+            {
+                // Force authentication to occur since this is not an authorized endpoint, we need this to get a user.
+                AuthenticateResult authenticationResult = await this.AuthenticateBackOfficeAsync();
+                // We have to get the culture from the Identity, we can't rely on thread culture
+                // It's entirely likely for a user to have a different culture in the backoffice, than their system.
+                var user = authenticationResult.Principal?.Identity;
 
-            var cultureInfo = string.IsNullOrWhiteSpace(culture)
-                //if the user is logged in, get their culture, otherwise default to 'en'
-                ? isAuthenticated
-                    //current culture is set at the very beginning of each request
-                    ? Thread.CurrentThread.CurrentCulture
-                    : CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage)
-                : CultureInfo.GetCultureInfo(culture);
+                cultureInfo = (authenticationResult.Succeeded && user is not null)
+                    ? user.GetCulture()
+                    : CultureInfo.GetCultureInfo(_globalSettings.DefaultUILanguage);
+            }
+            else
+            {
+                cultureInfo = CultureInfo.GetCultureInfo(culture);
+            }
 
             var allValues = _textService.GetAllStoredValues(cultureInfo);
             var pathedValues = allValues.Select(kv =>
@@ -267,6 +285,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
+        [AngularJsonOnlyConfiguration]
         [HttpGet]
         public IEnumerable<IGridEditorConfig> GetGridConfig()
         {
@@ -407,7 +426,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (ViewData.FromBase64CookieData<BackOfficeExternalLoginProviderErrors>(_httpContextAccessor.HttpContext, ViewDataExtensions.TokenExternalSignInError, _jsonSerializer) ||
                 ViewData.FromTempData(TempData, ViewDataExtensions.TokenExternalSignInError) ||
                 ViewData.FromTempData(TempData, ViewDataExtensions.TokenPasswordResetCode))
+            {
                 return defaultResponse();
+            }
 
             //First check if there's external login info, if there's not proceed as normal
             var loginInfo = await _signInManager.GetExternalLoginInfoAsync();
@@ -437,16 +458,23 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (response == null) throw new ArgumentNullException(nameof(response));
 
             // Sign in the user with this external login provider (which auto links, etc...)
-            var result = await _signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false);
+            SignInResult result = await _signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false);
 
             var errors = new List<string>();
 
-            if (result == Microsoft.AspNetCore.Identity.SignInResult.Success)
+            if (result == SignInResult.Success)
             {
                 // Update any authentication tokens if succeeded
                 await _signInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
+
+                // Check if we are in an upgrade state, if so we need to redirect
+                if (_runtimeState.Level == Core.RuntimeLevel.Upgrade)
+                {
+                    // redirect to the the installer
+                    return Redirect("/");
+                }
             }
-            else if (result == Microsoft.AspNetCore.Identity.SignInResult.TwoFactorRequired)
+            else if (result == SignInResult.TwoFactorRequired)
             {
 
                 var attemptedUser = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
@@ -474,17 +502,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return verifyResponse;
 
             }
-            else if (result == Microsoft.AspNetCore.Identity.SignInResult.LockedOut)
+            else if (result == SignInResult.LockedOut)
             {
                 errors.Add($"The local user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} is locked out.");
             }
-            else if (result == Microsoft.AspNetCore.Identity.SignInResult.NotAllowed)
+            else if (result == SignInResult.NotAllowed)
             {
                 // This occurs when SignInManager.CanSignInAsync fails which is when RequireConfirmedEmail , RequireConfirmedPhoneNumber or RequireConfirmedAccount fails
                 // however since we don't enforce those rules (yet) this shouldn't happen.
                 errors.Add($"The user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} has not confirmed their details and cannot sign in.");
             }
-            else if (result == Microsoft.AspNetCore.Identity.SignInResult.Failed)
+            else if (result == SignInResult.Failed)
             {
                 // Failed only occurs when the user does not exist
                 errors.Add("The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account, the provider must be linked from the back office.");
@@ -500,6 +528,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             else if (result is AutoLinkSignInResult autoLinkSignInResult && autoLinkSignInResult.Errors.Count > 0)
             {
                 errors.AddRange(autoLinkSignInResult.Errors);
+            }
+            else if (!result.Succeeded)
+            {
+                // this shouldn't occur, the above should catch the correct error but we'll be safe just in case
+                errors.Add($"An unknown error with the requested provider ({loginInfo.LoginProvider}) occurred.");
             }
 
             if (errors.Count > 0)

@@ -8,7 +8,6 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     public abstract class TestWithSomeContentBase : TestWithDatabaseBase
     {
         public override void SetUp()

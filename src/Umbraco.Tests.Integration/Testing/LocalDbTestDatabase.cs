@@ -126,6 +126,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 }
             }
 
+            _localDb.StopInstance(InstanceName);
+
             foreach (string file in Directory.EnumerateFiles(s_filesPath))
             {
                 if (file.EndsWith(".mdf") == false && file.EndsWith(".ldf") == false)

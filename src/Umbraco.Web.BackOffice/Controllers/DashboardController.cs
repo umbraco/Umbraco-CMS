@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -21,7 +21,6 @@ using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Filters;
-using Umbraco.Core.Dashboards;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -228,8 +227,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _dashboardService.GetDashboards(section, currentUser).Select(x => new Tab<IDashboardSlim>
             {
                 Id = x.Id,
-                Alias = x.Alias,
+                Key = x.Key,
                 Label = x.Label,
+                Alias = x.Alias,
+                Type = x.Type,
                 Expanded = x.Expanded,
                 IsActive = x.IsActive,
                 Properties = x.Properties.Select(y => new DashboardSlim

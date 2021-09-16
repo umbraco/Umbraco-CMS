@@ -35,17 +35,6 @@ namespace Umbraco.Extensions
                     => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, ConvertToDictionaryVars(tokens));
 
         /// <summary>
-        /// Localize using the current thread culture
-        /// </summary>
-        /// <param name="manager"></param>
-        /// <param name="area"></param>
-        /// <param name="alias"></param>
-        /// <param name="tokens"></param>
-        /// <returns></returns>
-        public static string Localize(this ILocalizedTextService manager, string area, string alias, IDictionary<string, string> tokens = null)
-            => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, tokens);
-
-        /// <summary>
         /// Localize a key without any variables
         /// </summary>
         /// <param name="manager"></param>
@@ -55,7 +44,7 @@ namespace Umbraco.Extensions
         /// <param name="tokens"></param>
         /// <returns></returns>
         public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture, string[] tokens)
-            => manager.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, ConvertToDictionaryVars(tokens));
+            => manager.Localize(area, alias, culture, ConvertToDictionaryVars(tokens));
 
          /// <summary>
          /// Convert an array of strings to a dictionary of indices -> values
@@ -76,7 +65,7 @@ namespace Umbraco.Extensions
              if (text == null)
                  return null;
 
-             if (text.StartsWith("#") == false || text.IndexOf('_') == -1)
+             if (text.StartsWith("#") == false)
                  return text;
 
              text = text.Substring(1);
@@ -85,6 +74,9 @@ namespace Umbraco.Extensions
              {
                  return value;
              }
+
+             if (text.IndexOf('_') == -1)
+                 return text;
 
              var areaAndKey = text.Split('_');
 

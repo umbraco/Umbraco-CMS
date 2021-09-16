@@ -148,7 +148,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             publishedSnapshot.Setup(x => x.ElementsCache).Returns(elementsCache);
 
             var publishedSnapshotAccessor = new Mock<IPublishedSnapshotAccessor>();
-            publishedSnapshotAccessor.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshot.Object);
+            var localPublishedSnapshot = publishedSnapshot.Object;
+            publishedSnapshotAccessor.Setup(x => x.TryGetPublishedSnapshot(out localPublishedSnapshot)).Returns(true);
 
             // pretend we're creating this set as a value for a property
             // referenceCacheLevel is the cache level for this fictious property

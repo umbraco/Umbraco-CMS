@@ -31,7 +31,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [Category("Slow")]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
     public class MemberServiceTests : UmbracoIntegrationTest
     {
@@ -915,7 +914,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         Name = "Number",
                         DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    }, "Content");
+                    }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
@@ -943,7 +942,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         Name = "Number",
                         DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    }, "Content");
+                    }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
@@ -971,7 +970,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     Name = "Number",
                     DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                }, "Content");
+                }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
@@ -999,7 +998,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         Name = "Number",
                         DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    }, "Content");
+                    }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
@@ -1027,7 +1026,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         Name = "Number",
                         DataTypeId = -51,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    }, "Content");
+                    }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
             MemberService.Save(members);
@@ -1055,7 +1054,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         Name = "Date",
                         DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    }, "Content");
+                    }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
@@ -1083,7 +1082,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         Name = "Date",
                         DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    }, "Content");
+                    }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
@@ -1111,7 +1110,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         Name = "Date",
                         DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    }, "Content");
+                    }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
@@ -1139,7 +1138,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         Name = "Date",
                         DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    }, "Content");
+                    }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);
@@ -1167,7 +1166,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     {
                         Name = "Date",
                         DataTypeId = -36,  // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    }, "Content");
+                    }, "content", "Content");
             MemberTypeService.Save(memberType);
             IEnumerable<IMember> members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
             MemberService.Save(members);

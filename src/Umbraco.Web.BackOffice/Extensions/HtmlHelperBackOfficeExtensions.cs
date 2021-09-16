@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,18 +54,18 @@ namespace Umbraco.Extensions
         /// <param name="html"></param>
         /// <param name="externalLogins"></param>
         /// <returns></returns>
-        public static Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
+        public static async Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
             IBackOfficeExternalLoginProviders externalLogins,
             BackOfficeExternalLoginProviderErrors externalLoginErrors)
         {
-            var providers = externalLogins.GetBackOfficeProviders();
+            var providers = await externalLogins.GetBackOfficeProvidersAsync();
 
             var loginProviders = providers
                 .Select(p => new
                 {
-                    authType = p.AuthenticationType,
-                    caption = p.Name,
-                    properties = p.Options
+                    authType = p.ExternalLoginProvider.AuthenticationType,
+                    caption = p.AuthenticationScheme.DisplayName,
+                    properties = p.ExternalLoginProvider.Options
                 })
                 .ToArray();
 
@@ -89,7 +89,7 @@ namespace Umbraco.Extensions
             sb.AppendLine(JsonConvert.SerializeObject(loginProviders));
             sb.AppendLine(@"});");
 
-            return Task.FromResult(html.Raw(sb.ToString()));
+            return html.Raw(sb.ToString());
         }
 
         /// <summary>

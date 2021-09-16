@@ -46,7 +46,7 @@
                             ng-click="tourGroup.open = !tourGroup.open"
                             aria-expanded="{{tourGroup.open === undefined ? false : tourGroup.open }}">
                             <span class="umb-help-list-item__group-title bold">
-                                <i ng-class="{'icon-navigation-right': !tourGroup.open, 'icon-navigation-down': tourGroup.open}" aria-hidden="true"></i>
+                                <umb-icon icon="{{tourGroup.open ? 'icon-navigation-down' : 'icon-navigation-right'}}"></umb-icon>
                                 <span ng-if="tourGroup.group !== 'undefined'">{{tourGroup.group}}</span>
                                 <span ng-if="tourGroup.group === 'undefined'">
                                     <localize key="general_other">Other</localize>
@@ -101,7 +101,7 @@
                             <span>
                                 <span class="umb-help-list-item__title">
                                     <span class="bold">{{topic.name}}</span>
-                                    <umb-icon icon="icon-out" class="umb-help-list-item__open-icon icon-out"></umb-icon>
+                                    <umb-icon icon="icon-out" class="umb-help-list-item__open-icon"></umb-icon>
                                 </span>
                                 <span class="umb-help-list-item__description">{{topic.description}}</span>
                             </span>
@@ -118,9 +118,9 @@
                 <ul class="umb-help-list">
                     <li class="umb-help-list-item" ng-repeat="video in vm.videos track by $index">
                         <a class="umb-help-list-item__content" data-element="help-article-{{video.title}}" href="#" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv" target="_blank" rel="noopener">
-                            <i class="umb-help-list-item__icon icon-tv-old" aria-hidden="true"></i>
+                            <umb-icon icon="icon-tv-old" class="umb-help-list-item__icon"></umb-icon>
                             <span class="umb-help-list-item__title">{{video.title}}</span>
-                            <i class="umb-help-list-item__open-icon icon-out" aria-hidden="true"></i>
+                            <umb-icon icon="icon-out" class="umb-help-list-item__open-icon"></umb-icon>
                         </a>
                     </li>
                 </ul>
@@ -129,7 +129,7 @@
             <!-- Links -->
             <div class="umb-help-section" data-element="help-links" ng-if="vm.hasAccessToSettings">
                 <a data-element="help-link-umbraco-tv" class="umb-help-badge" href="https://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv" target="_blank" rel="noopener">
-                    <i class="umb-help-badge__icon icon-tv-old" aria-hidden="true"></i>
+                    <umb-icon icon="icon-tv-old" class="umb-help-badge__icon"></umb-icon>
                     <div class="umb-help-badge__title">
                         <localize key="help_umbracoTv">Visit umbraco.tv</localize>
                     </div>
@@ -139,8 +139,7 @@
                 </a>
 
                 <a data-element="help-link-our-umbraco" class="umb-help-badge" href="https://our.umbraco.com?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our" target="_blank" rel="noopener">
-                    <i class="umb-help-badge__icon icon-favorite" aria-hidden="true"></i>
-
+                    <umb-icon icon="icon-favorite" class="umb-help-badge__icon"></umb-icon>
                     <div class="umb-help-badge__title">
                         <localize key="help_umbracoForum">Visit our.umbraco.com</localize>
                     </div>

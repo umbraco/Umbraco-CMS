@@ -22,10 +22,11 @@ namespace Umbraco.Cms.Core.Runtime
 
         public MainDomSemaphoreLock(ILogger<MainDomSemaphoreLock> logger, IHostingEnvironment hostingEnvironment)
         {
-            var lockName = "UMBRACO-" + MainDom.GetMainDomId(hostingEnvironment) + "-MAINDOM-LCK";
+            var mainDomId = MainDom.GetMainDomId(hostingEnvironment);
+            var lockName = "UMBRACO-" + mainDomId + "-MAINDOM-LCK";
             _systemLock = new SystemLock(lockName);
 
-            var eventName = "UMBRACO-" + MainDom.GetMainDomId(hostingEnvironment) + "-MAINDOM-EVT";
+            var eventName = "UMBRACO-" + mainDomId + "-MAINDOM-EVT";
             _signal = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
             _logger = logger;
         }

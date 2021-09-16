@@ -117,7 +117,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _publishedModelFactory = publishedModelFactory;
         }
 
-        protected PublishedSnapshot CurrentPublishedSnapshot => (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
+        protected PublishedSnapshot CurrentPublishedSnapshot
+        {
+            get
+            {
+                _publishedSnapshotAccessor.TryGetPublishedSnapshot(out var publishedSnapshot);
+                return (PublishedSnapshot)publishedSnapshot;
+            }
+        }
 
         // NOTE: These aren't used within this object but are made available internally to improve the IdKey lookup performance
         // when nucache is enabled.
@@ -210,36 +217,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
 
             return path;
-        }
-
-        private void DeleteLocalFilesForContent()
-        {
-            if (Volatile.Read(ref _isReady) && _localContentDb != null)
-            {
-                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-            }
-
-            var path = GetLocalFilesPath();
-            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
-            if (File.Exists(localContentDbPath))
-            {
-                File.Delete(localContentDbPath);
-            }
-        }
-
-        private void DeleteLocalFilesForMedia()
-        {
-            if (Volatile.Read(ref _isReady) && _localMediaDb != null)
-            {
-                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-            }
-
-            var path = GetLocalFilesPath();
-            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-            if (File.Exists(localMediaDbPath))
-            {
-                File.Delete(localMediaDbPath);
-            }
         }
 
         /// <summary>
@@ -456,7 +433,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 // Update: We will still return false here even though the above mentioned race condition has been fixed since we now
                 // lock the entire operation of creating/populating the cache file with the same lock as releasing/closing the cache file
 
-                _logger.LogInformation($"Tried to load {entityType} from the local cache file but it was empty.");
+                _logger.LogInformation("Tried to load {entityType} from the local cache file but it was empty.", entityType);
                 return false;
             }
 
@@ -511,13 +488,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
-            // no cache, trash everything
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                DeleteLocalFilesForContent();
-                draftChanged = publishedChanged = true;
-                return;
-            }
+            EnsureCaches();
 
             using (_contentStore.GetScopedWriteLock(_scopeProvider))
             {
@@ -612,13 +583,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <inheritdoc />
         public void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
-            // no cache, trash everything
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                DeleteLocalFilesForMedia();
-                anythingChanged = true;
-                return;
-            }
+            EnsureCaches();
 
             using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
@@ -710,11 +675,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <inheritdoc />
         public void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                return;
-            }
+            EnsureCaches();
 
             foreach (var payload in payloads)
             {
@@ -810,11 +771,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                return;
-            }
+            EnsureCaches();
 
             var idsA = payloads.Select(x => x.Id).ToArray();
 
@@ -854,11 +811,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public void Notify(DomainCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (Volatile.Read(ref _isReady) == false)
-            {
-                return;
-            }
+            EnsureCaches();
 
             // see note in LockAndLoadContent
             using (_domainStore.GetScopedWriteLock(_scopeProvider))
@@ -880,9 +833,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                             break;
                         case DomainChangeTypes.Refresh:
                             var domain = _serviceContext.DomainService.GetById(payload.Id);
-                            if (domain == null) continue;
-                            if (domain.RootContentId.HasValue == false) continue; // anomaly
-                            if (domain.LanguageIsoCode.IsNullOrWhiteSpace()) continue; // anomaly
+                            if (domain == null)
+                                continue;
+                            if (domain.RootContentId.HasValue == false)
+                                continue; // anomaly
+                            if (domain.LanguageIsoCode.IsNullOrWhiteSpace())
+                                continue; // anomaly
                             var culture = domain.LanguageIsoCode;
                             _domainStore.SetLocked(domain.Id, new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard));
                             break;

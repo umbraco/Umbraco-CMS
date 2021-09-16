@@ -28,12 +28,9 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Authorization;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -389,6 +386,23 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return GetEmptyInner(contentType, parentId);
         }
 
+        /// <summary>
+        /// Gets a dictionary containing empty content items for every alias specified in the contentTypeAliases array in the body of the request.
+        /// </summary>
+        /// <remarks>
+        /// This is a post request in order to support a large amount of aliases without hitting the URL length limit.
+        /// </remarks>
+        /// <param name="contentTypesByAliases"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [HttpPost]
+        public ActionResult<IDictionary<string, ContentItemDisplay>> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
+        {
+            // It's important to do this operation within a scope to reduce the amount of readlock queries. 
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = contentTypesByAliases.ContentTypeAliases.Select(alias => _contentTypeService.Get(alias));
+            return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
+        }
 
         /// <summary>
         /// Gets an empty content item for the document type.
@@ -478,6 +492,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return result;
         }
 
+        private ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeysInternal(Guid[] contentTypeKeys, int parentId)
+        {
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = _contentTypeService.GetAll(contentTypeKeys).ToList();
+            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+        }
+
         /// <summary>
         /// Gets a collection of empty content items for all document types.
         /// </summary>
@@ -486,9 +507,22 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         public ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeys([FromQuery] Guid[] contentTypeKeys, [FromQuery] int parentId)
         {
-            using var scope = _scopeProvider.CreateScope(autoComplete: true);
-            var contentTypes = _contentTypeService.GetAll(contentTypeKeys).ToList();
-            return GetEmpties(contentTypes, parentId).ToDictionary(x => x.ContentTypeKey);
+            return GetEmptyByKeysInternal(contentTypeKeys, parentId);
+        }
+
+        /// <summary>
+        /// Gets a collection of empty content items for all document types.
+        /// </summary>
+        /// <remarks>
+        /// This is a post request in order to support a large amount of GUIDs without hitting the URL length limit.
+        /// </remarks>
+        /// <param name="contentTypeByKeys"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [OutgoingEditorModelEvent]
+        public ActionResult<IDictionary<Guid, ContentItemDisplay>> GetEmptyByKeys(ContentTypesByKeys contentTypeByKeys)
+        {
+            return GetEmptyByKeysInternal(contentTypeByKeys.ContentTypeKeys, contentTypeByKeys.ParentId);
         }
 
         [OutgoingEditorModelEvent]
@@ -896,9 +930,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     v.Notifications.AddRange(n.Notifications);
             }
 
+            //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
             HandleInvalidModelState(display, cultureForInvariantErrors);
 
-            //lastly, if it is not valid, add the model state to the outgoing object and throw a 400
             if (!ModelState.IsValid)
             {
                 return ValidationProblem(display, ModelState);

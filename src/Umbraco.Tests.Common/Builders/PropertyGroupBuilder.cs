@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             IWithKeyBuilder,
             IWithCreateDateBuilder,
             IWithUpdateDateBuilder,
+            IWithAliasBuilder,
             IWithNameBuilder,
             IWithSortOrderBuilder,
             IWithSupportsPublishing
@@ -39,6 +40,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
         private Guid? _key;
         private DateTime? _createDate;
         private DateTime? _updateDate;
+        private string _alias;
         private string _name;
         private int? _sortOrder;
         private bool? _supportsPublishing;
@@ -68,6 +70,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             Guid key = _key ?? Guid.NewGuid();
             DateTime createDate = _createDate ?? DateTime.Now;
             DateTime updateDate = _updateDate ?? DateTime.Now;
+            var alias = _alias ?? Guid.NewGuid().ToString();
             var name = _name ?? Guid.NewGuid().ToString();
             var sortOrder = _sortOrder ?? 0;
             var supportsPublishing = _supportsPublishing ?? false;
@@ -90,6 +93,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             {
                 Id = id,
                 Key = key,
+                Alias = alias,
                 Name = name,
                 SortOrder = sortOrder,
                 CreateDate = createDate,
@@ -107,6 +111,12 @@ namespace Umbraco.Cms.Tests.Common.Builders
         {
             get => _key;
             set => _key = value;
+        }
+
+        string IWithAliasBuilder.Alias
+        {
+            get => _alias;
+            set => _alias = value;
         }
 
         string IWithNameBuilder.Name

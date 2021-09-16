@@ -19,12 +19,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 {
     internal class ImportPackageBuilderExpression : MigrationExpressionBase
     {
-        private readonly IPackagingService _packagingService;
-        private readonly IMediaService _mediaService;
-        private readonly MediaFileManager _mediaFileManager;
-        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
-        private readonly IShortStringHelper _shortStringHelper;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+        private readonly MediaFileManager _mediaFileManager;
+        private readonly IMediaService _mediaService;
+        private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
+        private readonly IPackagingService _packagingService;
+        private readonly IShortStringHelper _shortStringHelper;
         private bool _executed;
 
         public ImportPackageBuilderExpression(
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         }
 
         /// <summary>
-        /// The type of the migration which dictates the namespace of the embedded resource
+        ///     The type of the migration which dictates the namespace of the embedded resource
         /// </summary>
         public Type EmbeddedResourceMigrationType { get; set; }
 
@@ -63,68 +63,77 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             if (EmbeddedResourceMigrationType == null && PackageDataManifest == null)
             {
-                throw new InvalidOperationException($"Nothing to execute, neither {nameof(EmbeddedResourceMigrationType)} or {nameof(PackageDataManifest)} has been set.");
+                throw new InvalidOperationException(
+                    $"Nothing to execute, neither {nameof(EmbeddedResourceMigrationType)} or {nameof(PackageDataManifest)} has been set.");
             }
 
             InstallationSummary installationSummary;
             if (EmbeddedResourceMigrationType != null)
             {
-                // get the embedded resource
-                using (ZipArchive zipPackage = PackageMigrationResource.GetEmbeddedPackageDataManifest(
+                if (PackageMigrationResource.TryGetEmbeddedPackageDataManifest(
                     EmbeddedResourceMigrationType,
-                    out XDocument xml))
+                    out XDocument xml, out ZipArchive zipPackage))
                 {
                     // first install the package
                     installationSummary = _packagingService.InstallCompiledPackageData(xml);
 
-                    // then we need to save each file to the saved media items
-                    var mediaWithFiles = xml.XPathSelectElements(
-                        "./umbPackage/MediaItems/MediaSet//*[@id][@mediaFilePath]")
-                        .ToDictionary(
-                            x => x.AttributeValue<Guid>("key"),
-                            x => x.AttributeValue<string>("mediaFilePath"));
-
-                    // Any existing media by GUID will not be installed by the package service, it will just be skipped
-                    // so you cannot 'update' media (or content) using a package since those are not schema type items.
-                    // This means you cannot 'update' the media file either. The installationSummary.MediaInstalled
-                    // will be empty for any existing media which means that the files will also not be updated.
-                    foreach (IMedia media in installationSummary.MediaInstalled)
+                    if (zipPackage is not null)
                     {
-                        if (mediaWithFiles.TryGetValue(media.Key, out var mediaFilePath))
+                        // get the embedded resource
+                        using (zipPackage)
                         {
-                            // this is a media item that has a file, so find that file in the zip                            
-                            var entryPath = $"media{mediaFilePath.EnsureStartsWith('/')}";
-                            ZipArchiveEntry mediaEntry = zipPackage.GetEntry(entryPath);
-                            if (mediaEntry == null)
-                            {
-                                throw new InvalidOperationException("No media file found in package zip for path " + entryPath);
-                            }
+                            // then we need to save each file to the saved media items
+                            var mediaWithFiles = xml.XPathSelectElements(
+                                    "./umbPackage/MediaItems/MediaSet//*[@id][@mediaFilePath]")
+                                .ToDictionary(
+                                    x => x.AttributeValue<Guid>("key"),
+                                    x => x.AttributeValue<string>("mediaFilePath"));
 
-                            // read the media file and save it to the media item
-                            // using the current file system provider.
-                            using (Stream mediaStream = mediaEntry.Open())
+                            // Any existing media by GUID will not be installed by the package service, it will just be skipped
+                            // so you cannot 'update' media (or content) using a package since those are not schema type items.
+                            // This means you cannot 'update' the media file either. The installationSummary.MediaInstalled
+                            // will be empty for any existing media which means that the files will also not be updated.
+                            foreach (IMedia media in installationSummary.MediaInstalled)
                             {
-                                media.SetValue(
-                                    _mediaFileManager,
-                                    _mediaUrlGenerators,
-                                    _shortStringHelper,
-                                    _contentTypeBaseServiceProvider,
-                                    Constants.Conventions.Media.File,
-                                    Path.GetFileName(mediaFilePath),
-                                    mediaStream);
-                            }
+                                if (mediaWithFiles.TryGetValue(media.Key, out var mediaFilePath))
+                                {
+                                    // this is a media item that has a file, so find that file in the zip
+                                    var entryPath = $"media{mediaFilePath.EnsureStartsWith('/')}";
+                                    ZipArchiveEntry mediaEntry = zipPackage.GetEntry(entryPath);
+                                    if (mediaEntry == null)
+                                    {
+                                        throw new InvalidOperationException(
+                                            "No media file found in package zip for path " +
+                                            entryPath);
+                                    }
 
-                            _mediaService.Save(media);
+                                    // read the media file and save it to the media item
+                                    // using the current file system provider.
+                                    using (Stream mediaStream = mediaEntry.Open())
+                                    {
+                                        media.SetValue(
+                                            _mediaFileManager,
+                                            _mediaUrlGenerators,
+                                            _shortStringHelper,
+                                            _contentTypeBaseServiceProvider,
+                                            Constants.Conventions.Media.File,
+                                            Path.GetFileName(mediaFilePath),
+                                            mediaStream);
+                                    }
+
+                                    _mediaService.Save(media);
+                                }
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                installationSummary = _packagingService.InstallCompiledPackageData(PackageDataManifest);
-            }
+                else
+                {
+                    installationSummary = _packagingService.InstallCompiledPackageData(PackageDataManifest);
+                }
 
-            Logger.LogInformation($"Package migration executed. Summary: {installationSummary}");
+                Logger.LogInformation($"Package migration executed. Summary: {installationSummary}");
+            }
         }
     }
 }

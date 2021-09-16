@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -12,9 +11,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -71,11 +68,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)
         {
-            if (propertyEditorAlias == Alias)
+            if (propertyEditorAlias == Alias &&
+                value?.ToString() is var mediaPathValue &&
+                !string.IsNullOrWhiteSpace(mediaPathValue))
             {
-                mediaPath = value?.ToString();
+                mediaPath = mediaPathValue;
                 return true;
             }
+
             mediaPath = null;
             return false;
         }
@@ -84,11 +84,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Gets a value indicating whether a property is an upload field.
         /// </summary>
         /// <param name="property">The property.</param>
-        /// <returns>A value indicating whether a property is an upload field, and (optionally) has a non-empty value.</returns>
-        private static bool IsUploadField(IProperty property)
-        {
-            return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
-        }
+        /// <returns>
+        ///   <c>true</c> if the specified property is an upload field; otherwise, <c>false</c>.
+        /// </returns>
+        private static bool IsUploadField(IProperty property) => property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
 
         /// <summary>
         /// The paths to all file upload property files contained within a collection of content entities

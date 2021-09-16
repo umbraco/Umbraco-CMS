@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
@@ -37,12 +38,21 @@ namespace Umbraco.Cms.Infrastructure.Search
                 throw new NotSupportedException();
             }
 
+            // Used to track permanent deletions so we can bulk delete from the index
+            // when needed. For example, when emptying the recycle bin, else it will
+            // individually update the index which will be much slower.
+            HashSet<int> deleteBatch = null;
+
             foreach (var payload in (MediaCacheRefresher.JsonPayload[])args.MessageObject)
             {
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
                 {
-                    // remove from *all* indexes
-                    _umbracoIndexingHandler.DeleteIndexForEntity(payload.Id, false);
+                    if (deleteBatch == null)
+                    {
+                        deleteBatch = new HashSet<int>();
+                    }
+
+                    deleteBatch.Add(payload.Id);
                 }
                 else if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
@@ -52,6 +62,15 @@ namespace Umbraco.Cms.Infrastructure.Search
                 }
                 else // RefreshNode or RefreshBranch (maybe trashed)
                 {
+                    if (deleteBatch != null && deleteBatch.Contains(payload.Id))
+                    {
+                        // the same node has already been deleted, to ensure ordering is
+                        // handled, we'll need to execute all queued deleted items now
+                        // and reset the deleted items list.
+                        _umbracoIndexingHandler.DeleteIndexForEntities(deleteBatch, false);
+                        deleteBatch = null;
+                    }
+
                     var media = _mediaService.GetById(payload.Id);
                     if (media == null)
                     {
@@ -83,7 +102,13 @@ namespace Umbraco.Cms.Infrastructure.Search
                             }
                         }
                     }
-                }
+                }                
+            }
+
+            if (deleteBatch != null)
+            {
+                // process the delete batch
+                _umbracoIndexingHandler.DeleteIndexForEntities(deleteBatch, false);
             }
         }
     }

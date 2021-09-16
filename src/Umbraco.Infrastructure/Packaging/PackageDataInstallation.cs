@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -128,13 +126,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService);
         }
 
-
-
         #endregion
 
-
         #region Content
-
 
         public IReadOnlyList<T> ImportContentBase<T, S>(
             IEnumerable<CompiledPackageContentBase> docs,
@@ -222,13 +216,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                TContentBase content = CreateContentFromXml(root, importedContentTypes[contentTypeAlias], default, parentId, service);
-                if (content == null)
+                if (TryCreateContentFromXml(root, importedContentTypes[contentTypeAlias], default, parentId, service,
+                    out TContentBase content))
                 {
-                    continue;
+                    contents.Add(content);
                 }
-
-                contents.Add(content);
 
                 var children = root.Elements().Where(doc => (string)doc.Attribute("isDoc") == string.Empty)
                     .ToList();
@@ -262,8 +254,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
 
                 //Create and add the child to the list
-                var content = CreateContentFromXml(child, importedContentTypes[contentTypeAlias], parent, default, service);
-                list.Add(content);
+                if (TryCreateContentFromXml(child, importedContentTypes[contentTypeAlias], parent, default, service, out var content))
+                {
+                    list.Add(content);
+                }
 
                 //Recursive call
                 var child1 = child;
@@ -278,21 +272,24 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return list;
         }
 
-        private T CreateContentFromXml<T, S>(
+        private bool TryCreateContentFromXml<T, S>(
             XElement element,
             S contentType,
             T parent,
             int parentId,
-            IContentServiceBase<T> service)
+            IContentServiceBase<T> service,
+            out T output)
             where T : class, IContentBase
             where S : IContentTypeComposition
         {
             Guid key = element.RequiredAttributeValue<Guid>("key");
 
             // we need to check if the content already exists and if so we ignore the installation for this item
-            if (service.GetById(key) != null)
+            var value = service.GetById(key);
+            if (value != null)
             {
-                return null;
+                output = value;
+                return false;
             }
 
             var level = element.Attribute("level").Value;
@@ -383,7 +380,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
             }
 
-            return content;
+            output = content;
+            return true;
         }
 
         private T CreateContent<T, S>(string name, T parent, int parentId, S contentType, Guid key, int level, int sortOrder, int? templateId)
@@ -498,7 +496,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             //Iterate the sorted document types and create them as IContentType objects
             foreach (XElement documentType in documentTypes)
             {
-                var alias = documentType.Element("Info").Element("Alias").Value;                
+                var alias = documentType.Element("Info").Element("Alias").Value;
 
                 if (importedContentTypes.ContainsKey(alias) == false)
                 {
@@ -764,7 +762,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 UpdateContentTypesAllowedTemplates(contentTypex, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
             }
 
-            UpdateContentTypesTabs(contentType, documentType.Element("Tabs"));
+            UpdateContentTypesPropertyGroups(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
 
             return contentType;
@@ -809,27 +807,40 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
         }
 
-        private void UpdateContentTypesTabs<T>(T contentType, XElement tabElement)
+        private void UpdateContentTypesPropertyGroups<T>(T contentType, XElement propertyGroupsContainer)
             where T : IContentTypeComposition
         {
-            if (tabElement == null)
+            if (propertyGroupsContainer == null)
                 return;
 
-            var tabs = tabElement.Elements("Tab");
-            foreach (var tab in tabs)
+            var propertyGroupElements = propertyGroupsContainer.Elements("Tab");
+            foreach (var propertyGroupElement in propertyGroupElements)
             {
-                var caption = tab.Element("Caption").Value;
+                var name = propertyGroupElement.Element("Caption").Value; // TODO Rename to Name (same in EntityXmlSerializer)
 
-                if (contentType.PropertyGroups.Contains(caption) == false)
+                var alias = propertyGroupElement.Element("Alias")?.Value;
+                if (string.IsNullOrEmpty(alias))
                 {
-                    contentType.AddPropertyGroup(caption);
-
+                    alias = name.ToSafeAlias(_shortStringHelper, true);
                 }
 
-                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out int sortOrder))
+                contentType.AddPropertyGroup(alias, name);
+                var propertyGroup = contentType.PropertyGroups[alias];
+
+                if (Guid.TryParse(propertyGroupElement.Element("Key")?.Value, out var key))
+                {
+                    propertyGroup.Key = key;
+                }
+
+                if (Enum.TryParse<PropertyGroupType>(propertyGroupElement.Element("Type")?.Value, out var type))
+                {
+                    propertyGroup.Type = type;
+                }
+
+                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, out var sortOrder))
                 {
                     // Override the sort order with the imported value
-                    contentType.PropertyGroups[caption].SortOrder = sortOrder;
+                    propertyGroup.SortOrder = sortOrder;
                 }
             }
         }
@@ -922,14 +933,21 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     propertyType.Key = new Guid(property.Element("Key").Value);
                 }
 
-                var tab = (string)property.Element("Tab");
-                if (string.IsNullOrEmpty(tab))
+                var propertyGroupElement = property.Element("Tab");
+                if (propertyGroupElement == null || string.IsNullOrEmpty(propertyGroupElement.Value))
                 {
                     contentType.AddPropertyType(propertyType);
                 }
                 else
                 {
-                    contentType.AddPropertyType(propertyType, tab);
+                    var propertyGroupName = propertyGroupElement.Value;
+                    var propertyGroupAlias = propertyGroupElement.Attribute("Alias")?.Value;
+                    if (string.IsNullOrEmpty(propertyGroupAlias))
+                    {
+                        propertyGroupAlias = propertyGroupName.ToSafeAlias(_shortStringHelper, true);
+                    }
+
+                    contentType.AddPropertyType(propertyType, propertyGroupAlias, propertyGroupName);
                 }
             }
         }
@@ -1142,7 +1160,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDictionaryItem dictionaryItem;
             var itemName = dictionaryItemElement.Attribute("Name").Value;
             Guid key = dictionaryItemElement.RequiredAttributeValue<Guid>("Key");
-            
+
             dictionaryItem = _localizationService.GetDictionaryItemById(key);
             if (dictionaryItem != null)
             {
@@ -1277,7 +1295,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     throw new InvalidOperationException("No path attribute found");
                 }
                 var contents = element.Value ?? string.Empty;
-                
+
                 var physicalPath = _hostingEnvironment.MapPathContentRoot(path);
                 // TODO: Do we overwrite? IMO I don't think so since these will be views a user will change.
                 if (!System.IO.File.Exists(physicalPath))
@@ -1419,7 +1437,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 if (partialView == null)
                 {
                     var content = partialViewXml.Value ?? string.Empty;
-                    
+
                     partialView = new PartialView(PartialViewType.PartialView, path) { Content = content };
                     _fileService.SavePartialView(partialView, userId);
                     result.Add(partialView);

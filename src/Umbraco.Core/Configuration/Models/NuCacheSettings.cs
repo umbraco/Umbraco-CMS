@@ -30,5 +30,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         [DefaultValue(StaticSqlPageSize)]
         public int SqlPageSize { get; set; } = StaticSqlPageSize;
+
+        public bool UnPublishedContentCompression { get; set; } = false;
     }
 }

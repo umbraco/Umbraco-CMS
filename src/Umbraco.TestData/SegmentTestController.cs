@@ -1,31 +1,60 @@
-﻿using System.Configuration;
+using System;
 using System.Linq;
-using System.Web.Mvc;
-using Umbraco.Cms.Core;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.Mvc;
+using Umbraco.TestData.Configuration;
 
 namespace Umbraco.TestData
 {
     public class SegmentTestController : SurfaceController
     {
+        private IOptions<TestDataSettings> _testDataSettings;
 
-        public ActionResult EnableDocTypeSegments(string alias, string propertyTypeAlias)
+        public SegmentTestController(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IUmbracoDatabaseFactory databaseFactory,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger profilingLogger,
+            IPublishedUrlProvider publishedUrlProvider,
+            IOptions<TestDataSettings> testDataSettings)
+            : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
-            if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
+            _testDataSettings = testDataSettings;
+        }
+
+        public IActionResult EnableDocTypeSegments(string alias, string propertyTypeAlias)
+        {
+            if(_testDataSettings.Value.Enabled != true)
+            {
                 return HttpNotFound();
+            }
 
-            var ct = Services.ContentTypeService.Get(alias);
+            IContentType ct = Services.ContentTypeService.Get(alias);
             if (ct == null)
+            {
                 return Content($"No document type found by alias {alias}");
+            }
 
-            var propType = ct.PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
+            IPropertyType propType = ct.PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
             if (propType == null)
+            {
                 return Content($"The document type {alias} does not have a property type {propertyTypeAlias ?? "null"}");
+            }
 
             if (ct.Variations.VariesBySegment())
+            {
                 return Content($"The document type {alias} already allows segments, nothing has been changed");
+            }
 
             ct.SetVariesBy(ContentVariation.Segment);
             propType.SetVariesBy(ContentVariation.Segment);
@@ -34,17 +63,25 @@ namespace Umbraco.TestData
             return Content($"The document type {alias} and property type {propertyTypeAlias} now allows segments");
         }
 
-        public ActionResult DisableDocTypeSegments(string alias)
-        {
-            if (ConfigurationManager.AppSettings["Umbraco.TestData.Enabled"] != "true")
-                return HttpNotFound();
+        private IActionResult HttpNotFound() => throw new NotImplementedException();
 
-            var ct = Services.ContentTypeService.Get(alias);
+        public IActionResult DisableDocTypeSegments(string alias)
+        {
+            if (_testDataSettings.Value.Enabled != true)
+            {
+                return HttpNotFound();
+            }
+
+            IContentType ct = Services.ContentTypeService.Get(alias);
             if (ct == null)
+            {
                 return Content($"No document type found by alias {alias}");
+            }
 
             if (!ct.VariesBySegment())
+            {
                 return Content($"The document type {alias} does not allow segments, nothing has been changed");
+            }
 
             ct.SetVariesBy(ContentVariation.Segment, false);
 
@@ -54,21 +91,31 @@ namespace Umbraco.TestData
 
         public ActionResult AddSegmentData(int contentId, string propertyAlias, string value, string segment, string culture = null)
         {
-            var content = Services.ContentService.GetById(contentId);
+            IContent content = Services.ContentService.GetById(contentId);
             if (content == null)
+            {
                 return Content($"No content found by id {contentId}");
+            }
 
             if (propertyAlias.IsNullOrWhiteSpace() || !content.HasProperty(propertyAlias))
+            {
                 return Content($"The content by id {contentId} does not contain a property with alias {propertyAlias ?? "null"}");
+            }
 
             if (content.ContentType.VariesByCulture() && culture.IsNullOrWhiteSpace())
+            {
                 return Content($"The content by id {contentId} varies by culture but no culture was specified");
+            }
 
             if (value.IsNullOrWhiteSpace())
+            {
                 return Content("'value' cannot be null");
+            }
 
             if (segment.IsNullOrWhiteSpace())
+            {
                 return Content("'segment' cannot be null");
+            }
 
             content.SetValue(propertyAlias, value, culture, segment);
             Services.ContentService.Save(content);

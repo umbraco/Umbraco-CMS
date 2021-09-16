@@ -41,6 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     /// <para>Some objects such as macros are not based on CMSNode</para>
     /// </remarks>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+    [ParameterSwapControllerActionSelector(nameof(GetAncestors), "id", typeof(int), typeof(Guid))]
     [ParameterSwapControllerActionSelector(nameof(GetPagedChildren), "id", typeof(int), typeof(string))]
     [ParameterSwapControllerActionSelector(nameof(GetPath), "id", typeof(int), typeof(Guid), typeof(Udi))]
     [ParameterSwapControllerActionSelector(nameof(GetUrlAndAnchors), "id", typeof(int), typeof(Guid), typeof(Udi))]
@@ -258,16 +259,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the URL of an entity
         /// </summary>
-        /// <param name="udi">UDI of the entity to fetch URL for</param>
+        /// <param name="id">UDI of the entity to fetch URL for</param>
         /// <param name="culture">The culture to fetch the URL for</param>
         /// <returns>The URL or path to the item</returns>
-        public IActionResult GetUrl(Udi udi, string culture = "*")
+        public IActionResult GetUrl(Udi id, string culture = "*")
         {
-            var intId = _entityService.GetId(udi);
+            var intId = _entityService.GetId(id);
             if (!intId.Success)
                 return NotFound();
             UmbracoEntityTypes entityType;
-            switch (udi.EntityType)
+            switch (id.EntityType)
             {
                 case Constants.UdiEntityType.Document:
                     entityType = UmbracoEntityTypes.Document;
@@ -503,7 +504,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //all udi types will need to be the same in this list so we'll determine by the first
-            //currently we only support GuidIdi for this method
+            //currently we only support GuidUdi for this method
 
             var guidUdi = ids[0] as GuidUdi;
             if (guidUdi != null)
@@ -802,6 +803,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<EntityBasic> GetAncestors(int id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             return GetResultForAncestors(id, type, queryStrings);
+        }
+
+        public ActionResult<IEnumerable<EntityBasic>> GetAncestors(Guid id, UmbracoEntityTypes type, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        {
+            var entity = _entityService.Get(id);
+            if (entity is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(GetResultForAncestors(entity.Id, type, queryStrings));
         }
 
         /// <summary>
@@ -1183,16 +1195,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         private static readonly string[] _postFilterSplitStrings = new[]
-            {
-                "=",
-                "==",
-                "!=",
-                "<>",
-                ">",
-                "<",
-                ">=",
-                "<="
-            };
+        {
+            "=",
+            "==",
+            "!=",
+            "<>",
+            ">",
+            "<",
+            ">=",
+            "<="
+        };
+
         private static QueryCondition BuildQueryCondition<T>(string postFilter)
         {
             var postFilterParts = postFilter.Split(_postFilterSplitStrings, 2, StringSplitOptions.RemoveEmptyEntries);

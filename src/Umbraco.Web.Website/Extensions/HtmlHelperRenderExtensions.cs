@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.DataProtection;
@@ -18,6 +19,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Web.Mvc;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -66,15 +68,16 @@ namespace Umbraco.Extensions
         /// </remarks>
         public static IHtmlContent PreviewBadge(this IHtmlHelper helper, IUmbracoContextAccessor umbracoContextAccessor, IHttpContextAccessor httpContextAccessor, GlobalSettings globalSettings, IIOHelper ioHelper, ContentSettings contentSettings)
         {
-            var umbrcoContext = umbracoContextAccessor.UmbracoContext;
-            if (umbrcoContext.InPreviewMode)
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+
+            if (umbracoContext.InPreviewMode)
             {
                 var htmlBadge =
                     string.Format(
                         contentSettings.PreviewBadge,
                         ioHelper.ResolveUrl(globalSettings.UmbracoPath),
                         WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
-                        umbrcoContext.PublishedRequest.PublishedContent.Id);
+                        umbracoContext.PublishedRequest.PublishedContent.Id);
                 return new HtmlString(htmlBadge);
             }
 
@@ -82,11 +85,11 @@ namespace Umbraco.Extensions
 
         }
 
-        public static IHtmlContent CachedPartial(
+        public static async Task<IHtmlContent> CachedPartialAsync(
             this IHtmlHelper htmlHelper,
             string partialViewName,
             object model,
-            int cachedSeconds,
+            TimeSpan cacheTimeout,
             bool cacheByPage = false,
             bool cacheByMember = false,
             ViewDataDictionary viewData = null,
@@ -99,10 +102,12 @@ namespace Umbraco.Extensions
             {
                 cacheKey.AppendFormat("{0}-", cultureName);
             }
+
+            var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(htmlHelper);
+            umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext);
+
             if (cacheByPage)
             {
-                var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(htmlHelper);
-                var umbracoContext = umbracoContextAccessor.UmbracoContext;
                 if (umbracoContext == null)
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
@@ -113,11 +118,9 @@ namespace Umbraco.Extensions
 
             if (cacheByMember)
             {
-                // TODO reintroduce when members are migrated
-                throw new NotImplementedException("Reintroduce when members are migrated");
-                // var helper = Current.MembershipHelper;
-                // var currentMember = helper.GetCurrentMember();
-                // cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
+                var memberManager = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
+                var currentMember = await memberManager.GetCurrentMemberAsync();
+                cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? "0");
             }
 
             if (contextualKeyBuilder != null)
@@ -129,7 +132,7 @@ namespace Umbraco.Extensions
             var appCaches = GetRequiredService<AppCaches>(htmlHelper);
             var hostingEnvironment = GetRequiredService<IHostingEnvironment>(htmlHelper);
 
-            return appCaches.CachedPartialView(hostingEnvironment, htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
+            return appCaches.CachedPartialView(hostingEnvironment, umbracoContext, htmlHelper, partialViewName, model, cacheTimeout, cacheKey.ToString(), viewData);
         }
 
         // public static IHtmlContent EditorFor<T>(this IHtmlHelper htmlHelper, string templateName = "", string htmlFieldName = "", object additionalViewData = null)
@@ -667,7 +670,8 @@ namespace Umbraco.Extensions
             }
 
             IUmbracoContextAccessor umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
-            var formAction = umbracoContextAccessor.UmbracoContext.OriginalRequestUrl.PathAndQuery;
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+            var formAction = umbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);
         }
 

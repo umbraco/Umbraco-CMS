@@ -22,7 +22,6 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
@@ -48,6 +47,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     //[ValidationFilter] // TODO: I don't actually think this is required with our custom Application Model conventions applied
     [AngularJsonOnlyConfiguration] // TODO: This could be applied with our Application Model conventions
     [IsBackOffice]
+    [DisableBrowserCache]
     public class AuthenticationController : UmbracoApiControllerBase
     {
         // NOTE: Each action must either be explicitly authorized or explicitly [AllowAnonymous], the latter is optional because
@@ -181,14 +181,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                var opt = _externalAuthenticationOptions.Get(authType.Name);
+                BackOfficeExternaLoginProviderScheme opt = await _externalAuthenticationOptions.GetAsync(authType.Name);
                 if (opt == null)
                 {
                     return BadRequest($"Could not find external authentication options registered for provider {unlinkLoginModel.LoginProvider}");
                 }
                 else
                 {
-                    if (!opt.Options.AutoLinkOptions.AllowManualLinking)
+                    if (!opt.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking)
                     {
                         // If AllowManualLinking is disabled for this provider we cannot unlink
                         return BadRequest();
@@ -394,7 +394,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
-                    await _emailSender.SendAsync(mailMessage);
+                    await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.PasswordReset);
 
                     _userManager.NotifyForgotPasswordRequested(User, user.Id.ToString());
                 }
@@ -458,7 +458,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
-                await _emailSender.SendAsync(mailMessage);
+                await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.TwoFactorAuth);
             }
             else if (provider == "Phone")
             {

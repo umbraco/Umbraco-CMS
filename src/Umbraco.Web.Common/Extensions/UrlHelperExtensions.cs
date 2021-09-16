@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -209,26 +208,28 @@ namespace Umbraco.Extensions
             return $"{version}.{runtimeMinifier.CacheBuster}".GenerateHash();
         }
 
-        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string cropAlias, bool htmlEncode = true)
+        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
         {
             if (mediaItem == null)
             {
                 return HtmlString.Empty;
             }
 
-            var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
+            return CreateHtmlString(url, htmlEncode);
         }
 
-        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true)
+        private static IHtmlContent CreateHtmlString(string url, bool htmlEncode) => htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+
+        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true, UrlMode urlMode = UrlMode.Default)
         {
             if (mediaItem == null)
             {
                 return HtmlString.Empty;
             }
 
-            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true, urlMode: urlMode);
+            return CreateHtmlString(url, htmlEncode);
         }
 
         public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper,
@@ -244,9 +245,8 @@ namespace Umbraco.Extensions
             bool useCropDimensions = false,
             bool cacheBuster = true,
             string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null,
-            bool upScale = true,
-            bool htmlEncode = true)
+            bool htmlEncode = true,
+            UrlMode urlMode = UrlMode.Default)
         {
             if (mediaItem == null)
             {
@@ -254,9 +254,9 @@ namespace Umbraco.Extensions
             }
 
             var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
-                upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, urlMode);
+
+            return CreateHtmlString(url, htmlEncode);
         }
 
         public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper,
@@ -271,17 +271,15 @@ namespace Umbraco.Extensions
             bool useCropDimensions = true,
             string cacheBusterValue = null,
             string furtherOptions = null,
-            ImageCropRatioMode? ratioMode = null,
-            bool upScale = true,
             bool htmlEncode = true)
         {
             if (imageCropperValue == null) return HtmlString.Empty;
 
             var imageUrl = imageCropperValue.Src;
             var url = imageUrl.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
-                upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions);
+
+            return CreateHtmlString(url, htmlEncode);
         }
 
         /// <summary>

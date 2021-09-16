@@ -21,7 +21,7 @@
     </div>
     <div ui-sortable="sortableOptions" ng-model="model.value">
         <div class="control-group umb-prevalues-multivalues__listitem color-picker-preval" ng-repeat="item in model.value track by $id(item)">
-            <i class="icon icon-navigation handle" aria-hidden="true"></i>
+            <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
             <div class="umb-prevalues-multivalues__left">
                 <div class="thumbnail span1" hex-bg-color="{{item.value}}" hex-bg-orig="transparent"></div>
                 <div class="color-picker-prediv">

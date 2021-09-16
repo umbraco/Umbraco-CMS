@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Routing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Middleware
 {
@@ -126,7 +127,8 @@ namespace Umbraco.Cms.Web.Website.Middleware
         {
             if (pageId != publishedRequest.PublishedContent.Id)
             {
-                IPublishedContent publishedContent = _umbracoContextAccessor.UmbracoContext.PublishedSnapshot.Content.GetById(pageId);
+                var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
+                IPublishedContent publishedContent = umbracoContext.PublishedSnapshot.Content.GetById(pageId);
                 if (publishedContent == null)
                 {
                     throw new InvalidOperationException("No content found by id " + pageId);

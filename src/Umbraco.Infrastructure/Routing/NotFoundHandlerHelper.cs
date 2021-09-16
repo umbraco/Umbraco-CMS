@@ -20,7 +20,8 @@ namespace Umbraco.Cms.Core.Routing
             ContentErrorPage[] error404Collection,
             IEntityService entityService,
             IPublishedContentQuery publishedContentQuery,
-            string errorCulture)
+            string errorCulture,
+            int? domainContentId)
         {
             if (error404Collection.Length > 1)
             {
@@ -30,12 +31,12 @@ namespace Umbraco.Cms.Core.Routing
 
                 if (cultureErr != null)
                 {
-                    return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery);
+                    return GetContentIdFromErrorPageConfig(cultureErr, entityService, publishedContentQuery, domainContentId);
                 }
             }
             else if (error404Collection.Length == 1)
             {
-                return GetContentIdFromErrorPageConfig(error404Collection.First(), entityService, publishedContentQuery);
+                return GetContentIdFromErrorPageConfig(error404Collection.First(), entityService, publishedContentQuery, domainContentId);
             }
 
             return null;
@@ -44,7 +45,11 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Returns the content id based on the configured ContentErrorPage section.
         /// </summary>
-        internal static int? GetContentIdFromErrorPageConfig(ContentErrorPage errorPage, IEntityService entityService, IPublishedContentQuery publishedContentQuery)
+        internal static int? GetContentIdFromErrorPageConfig(
+            ContentErrorPage errorPage,
+            IEntityService entityService,
+            IPublishedContentQuery publishedContentQuery,
+            int? domainContentId)
         {
             if (errorPage.HasContentId)
             {
@@ -73,7 +78,7 @@ namespace Umbraco.Cms.Core.Routing
                     // we have an xpath statement to execute
                     var xpathResult = UmbracoXPathPathSyntaxParser.ParseXPathQuery(
                         xpathExpression: errorPage.ContentXPath,
-                        nodeContextId: null,
+                        nodeContextId: domainContentId,
                         getPath: nodeid =>
                         {
                             IEntitySlim ent = entityService.Get(nodeid);

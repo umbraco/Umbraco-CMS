@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             ILogger<SqlMainDomLock> logger,
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
-            IOptions<ConnectionStrings> connectionStrings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IHostingEnvironment hostingEnvironment,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,

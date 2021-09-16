@@ -17,7 +17,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     /// Tests covering the DataTypeService with cache enabled
     /// </summary>
     [TestFixture]
-    [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class CachedDataTypeServiceTests : UmbracoIntegrationTest
     {

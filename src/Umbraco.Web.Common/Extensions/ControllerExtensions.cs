@@ -14,13 +14,7 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static async Task<AuthenticateResult> AuthenticateBackOfficeAsync(this ControllerBase controller)
         {
-            if (controller.HttpContext == null)
-            {
-                return AuthenticateResult.NoResult();
-            }
-
-            var result = await controller.HttpContext.AuthenticateAsync(Cms.Core.Constants.Security.BackOfficeAuthenticationType);
-            return result;
+            return await controller.HttpContext.AuthenticateBackOfficeAsync();
         }
 
         /// <summary>

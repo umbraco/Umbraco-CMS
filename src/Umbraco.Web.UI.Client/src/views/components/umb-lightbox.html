@@ -1,8 +1,9 @@
 <div class="umb-lightbox">
 
     <div class="umb-lightbox__backdrop" ng-click="close()" hotkey="esc"></div>
+
     <button type="button" class="btn-reset umb-lightbox__close" localize="title" title="@general_close" ng-click="close()">
-        <i class="icon-delete umb-lightbox__control" aria-hidden="true"></i>
+        <umb-icon icon="icon-delete" class="umb-lightbox__control"></umb-icon>
         <span class="sr-only">
             <localize key="general_close">Close</localize>
         </span>
@@ -15,14 +16,14 @@
     </div>
 
     <button type="button" class="btn-reset umb-lightbox__control -prev" localize="title" title="@general_previous" ng-if="activeItemIndex > 0" ng-click="prev()" hotkey="left">
-        <i class="icon-previous umb-lightbox__control-icon" aria-hidden="true"></i>
+        <umb-icon icon="icon-previous" class="umb-lightbox__control-icon"></umb-icon>
         <span class="sr-only">
             <localize key="general_previous">Previous</localize>
         </span>
     </button>
 
     <button type="button" class="btn-reset umb-lightbox__control -next" localize="title" title="general_next" ng-if="activeItemIndex + 1 < items.length" ng-click="next()" hotkey="right">
-        <i class="icon-next umb-lightbox__control-icon" aria-hidden="true"></i>
+        <umb-icon icon="icon-next" class="umb-lightbox__control-icon"></umb-icon>
         <span class="sr-only">
             <localize key="general_next">Next</localize>
         </span>

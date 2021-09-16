@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Routing;
+﻿using System;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
-
-    /// <summary>
-    /// A builder to allow encapsulating the enabled routing features in Umbraco
-    /// </summary>
-    public interface IUmbracoEndpointBuilder : IUmbracoMiddlewareBuilder
-    {        
-        IEndpointRouteBuilder EndpointRouteBuilder { get; }        
+    public interface IUmbracoEndpointBuilder
+    {
+        /// <summary>
+        /// Final call during app building to configure endpoints
+        /// </summary>
+        /// <param name="configureUmbraco"></param>
+        void WithEndpoints(Action<IUmbracoEndpointBuilderContext> configureUmbraco);
     }
 }

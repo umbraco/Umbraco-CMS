@@ -15,12 +15,24 @@ namespace Umbraco.Cms.Core.Web
         { }
 
         /// <summary>
-        /// Gets or sets the <see cref="UmbracoContext"/> object.
+        /// Tries to get the <see cref="UmbracoContext"/> object.
         /// </summary>
-        public IUmbracoContext UmbracoContext
+        public bool TryGetUmbracoContext(out IUmbracoContext umbracoContext)
         {
-            get => Value;
-            set => Value = value;
+            umbracoContext = Value;
+
+            return umbracoContext is not null;
         }
+
+        /// <summary>
+        /// Clears the current <see cref="UmbracoContext"/> object.
+        /// </summary>
+        public void Clear() => Value = null;
+
+        /// <summary>
+        /// Sets the <see cref="UmbracoContext"/> object.
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        public void Set(IUmbracoContext umbracoContext) => Value = umbracoContext;
     }
 }

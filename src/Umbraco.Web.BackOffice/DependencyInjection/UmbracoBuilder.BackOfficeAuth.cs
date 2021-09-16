@@ -11,6 +11,7 @@ using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Web.BackOffice.Authorization;
+using Umbraco.Cms.Web.Common.Middleware;
 
 
 namespace Umbraco.Extensions

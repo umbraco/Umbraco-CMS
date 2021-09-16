@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <summary>
         /// Initializes a new instance of the <see cref="KeepAlive"/> class.
         /// </summary>
-        /// <param name="requestAccessor">Accessor for the current request.</param>
+        /// <param name="hostingEnvironment">The current hosting environment</param>
         /// <param name="mainDom">Representation of the main application domain.</param>
         /// <param name="keepAliveSettings">The configuration for keep alive settings.</param>
         /// <param name="logger">The typed logger.</param>
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
             using (_profilingLogger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
             {
-                var umbracoAppUrl = _hostingEnvironment.ApplicationMainUrl.ToString();
+                var umbracoAppUrl = _hostingEnvironment.ApplicationMainUrl?.ToString();
                 if (umbracoAppUrl.IsNullOrWhiteSpace())
                 {
                     _logger.LogWarning("No umbracoApplicationUrl for service (yet), skip.");

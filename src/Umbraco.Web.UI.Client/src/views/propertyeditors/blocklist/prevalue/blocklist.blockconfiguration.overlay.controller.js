@@ -76,33 +76,29 @@
 
         vm.addSettingsForBlock = function($event, block) {
 
-            localizationService.localize("blockEditor_headlineAddSettingsElementType").then(function(localizedTitle) {
+            localizationService.localize("blockEditor_headlineAddSettingsElementType").then(localizedTitle => {
 
                 const settingsTypePicker = {
                     title: localizedTitle,
-                    section: "settings",
-                    treeAlias: "documentTypes",
                     entityType: "documentType",
                     isDialog: true,
-                    filter: function (node) {
+                    filter: node => {
                         if (node.metaData.isElement === true) {
                             return false;
                         }
                         return true;
                     },
                     filterCssClass: "not-allowed",
-                    select: function (node) {
+                    select: node => {
                         vm.applySettingsToBlock(block, udiService.getKey(node.udi));
                         editorService.close();
                     },
-                    close: function () {
-                        editorService.close();
-                    },
+                    close: () => editorService.close(),
                     extraActions: [
                         {
                             style: "primary",
                             labelKey: "blockEditor_labelcreateNewElementType",
-                            action: function () {
+                            action: () => {
                                 vm.createElementTypeAndCallback((key) => {
                                     vm.applySettingsToBlock(block, key);
 
@@ -113,7 +109,8 @@
                         }
                     ]
                 };
-                editorService.treePicker(settingsTypePicker);
+                
+                editorService.contentTypePicker(settingsTypePicker);
 
             });
         };
@@ -166,28 +163,24 @@
         unsubscribe.push(eventsService.on("editors.documentType.saved", updateUsedElementTypes));
 
         vm.addViewForBlock = function(block) {
-            localizationService.localize("blockEditor_headlineAddCustomView").then(function (localizedTitle) {
+            localizationService.localize("blockEditor_headlineAddCustomView").then(localizedTitle => {
 
                 const filePicker = {
                     title: localizedTitle,
-                    section: "settings",
-                    treeAlias: "files",
-                    entityType: "file",
                     isDialog: true,
-                    filter: function (i) {
+                    filter: i => {
                         return !(i.name.indexOf(".html") !== -1);
                     },
                     filterCssClass: "not-allowed",
-                    select: function (node) {
+                    select: node => {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
                         block.view = "~/" + filepath;
                         editorService.close();
                     },
-                    close: function () {
-                        editorService.close();
-                    }
+                    close: () => editorService.close()
                 };
-                editorService.treePicker(filePicker);
+                
+                editorService.filePicker(filePicker);
 
             });
         };
@@ -213,28 +206,24 @@
         };
 
         vm.addStylesheetForBlock = function(block) {
-            localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(function (localizedTitle) {
+            localizationService.localize("blockEditor_headlineAddCustomStylesheet").then(localizedTitle => {
 
                 const filePicker = {
                     title: localizedTitle,
-                    section: "settings",
-                    treeAlias: "files",
-                    entityType: "file",
                     isDialog: true,
-                    filter: function (i) {
+                    filter: i => {
                         return !(i.name.indexOf(".css") !== -1);
                     },
                     filterCssClass: "not-allowed",
-                    select: function (node) {
+                    select: node => {
                         const filepath = decodeURIComponent(node.id.replace(/\+/g, " "));
                         block.stylesheet = "~/" + filepath;
                         editorService.close();
                     },
-                    close: function () {
-                        editorService.close();
-                    }
+                    close: () => editorService.close()
                 };
-                editorService.treePicker(filePicker);
+
+                editorService.filePicker(filePicker);
 
             });
         };
@@ -261,28 +250,27 @@
 
         vm.addThumbnailForBlock = function(block) {
 
-            localizationService.localize("blockEditor_headlineAddThumbnail").then(function (localizedTitle) {
+          localizationService.localize("blockEditor_headlineAddThumbnail").then(localizedTitle => {
+                
+                let allowedFileExtensions = ['jpg', 'jpeg', 'png', 'svg', 'webp', 'gif'];
 
                 const thumbnailPicker = {
                     title: localizedTitle,
-                    section: "settings",
-                    treeAlias: "files",
-                    entityType: "file",
                     isDialog: true,
-                    filter: function (i) {
-                        return !(i.name.indexOf(".jpg") !== -1 || i.name.indexOf(".jpeg") !== -1 || i.name.indexOf(".png") !== -1 || i.name.indexOf(".svg") !== -1 || i.name.indexOf(".webp") !== -1 || i.name.indexOf(".gif") !== -1);
+                    filter: i => {
+                        let ext = i.name.substr((i.name.lastIndexOf('.') + 1));
+                        return allowedFileExtensions.includes(ext) === false;
                     },
                     filterCssClass: "not-allowed",
-                    select: function (file) {
+                    select: file => {
                         const id = decodeURIComponent(file.id.replace(/\+/g, " "));
-                        block.thumbnail = "~/" + id;
+                        block.thumbnail = "~/" + id.replace("wwwroot/", "");
                         editorService.close();
                     },
-                    close: function () {
-                        editorService.close();
-                    }
+                    close: () => editorService.close()
                 };
-                editorService.treePicker(thumbnailPicker);
+                
+                editorService.staticFilePicker(thumbnailPicker);
 
             });
         };

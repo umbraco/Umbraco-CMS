@@ -55,15 +55,17 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
 
             _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName,
                 BundlingOptions.NotOptimizedAndComposite,
-                FormatPaths("lib/bootstrap-social/bootstrap-social.css",
-                "assets/css/umbraco.min.css",
-                "lib/font-awesome/css/font-awesome.min.css"));
+                FormatPaths(
+                    "assets/css/umbraco.min.css",
+                    "lib/bootstrap-social/bootstrap-social.css",
+                    "lib/font-awesome/css/font-awesome.min.css"));
 
             _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName,
                 BundlingOptions.NotOptimizedAndComposite,
-                FormatPaths("assets/css/umbraco.min.css",
-                "lib/bootstrap-social/bootstrap-social.css",
-                "lib/font-awesome/css/font-awesome.min.css"));
+                FormatPaths(
+                    "assets/css/umbraco.min.css",
+                    "lib/bootstrap-social/bootstrap-social.css",
+                    "lib/font-awesome/css/font-awesome.min.css"));
 
             _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName,
                 BundlingOptions.NotOptimizedAndComposite,

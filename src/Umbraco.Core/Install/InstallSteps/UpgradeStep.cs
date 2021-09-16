@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
-
+using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Install.InstallSteps
 {
     /// <summary>
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Install.InstallSteps
 
                 var currentState = FormatGuidState(_runtimeState.CurrentMigrationState);
                 var newState = FormatGuidState(_runtimeState.FinalMigrationState);
-                var newVersion = _umbracoVersion.SemanticVersion.ToString();
+                var newVersion = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
                 var oldVersion = new SemVersion(_umbracoVersion.SemanticVersion.Major, 0, 0).ToString(); //TODO can we find the old version somehow? e.g. from current state
 
                 var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={oldVersion}&to={newVersion}&notes=1";

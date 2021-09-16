@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -23,6 +25,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         private readonly IRuntimeState _runtime;
         private readonly string[] _explicitPaths;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
+        private readonly IBasicAuthService _basicAuthService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeCookieManager"/> class.
@@ -30,8 +33,9 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         public BackOfficeCookieManager(
             IUmbracoContextAccessor umbracoContextAccessor,
             IRuntimeState runtime,
-            UmbracoRequestPaths umbracoRequestPaths)
-            : this(umbracoContextAccessor, runtime, null, umbracoRequestPaths)
+            UmbracoRequestPaths umbracoRequestPaths,
+            IBasicAuthService basicAuthService)
+            : this(umbracoContextAccessor, runtime, null, umbracoRequestPaths, basicAuthService)
         {
         }
 
@@ -42,12 +46,14 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             IUmbracoContextAccessor umbracoContextAccessor,
             IRuntimeState runtime,
             IEnumerable<string> explicitPaths,
-            UmbracoRequestPaths umbracoRequestPaths)
+            UmbracoRequestPaths umbracoRequestPaths,
+            IBasicAuthService basicAuthService)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _runtime = runtime;
             _explicitPaths = explicitPaths?.ToArray();
             _umbracoRequestPaths = umbracoRequestPaths;
+            _basicAuthService = basicAuthService;
         }
 
         /// <summary>
@@ -88,6 +94,11 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 return true;
             }
 
+            if (_basicAuthService.IsBasicAuthEnabled())
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -98,8 +109,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         string Microsoft.AspNetCore.Authentication.Cookies.ICookieManager.GetRequestCookie(HttpContext context, string key)
         {
             var absPath = context.Request.Path;
-
-            if (_umbracoContextAccessor.UmbracoContext == null || _umbracoRequestPaths.IsClientSideRequest(absPath))
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out _) || _umbracoRequestPaths.IsClientSideRequest(absPath))
             {
                 return null;
             }
