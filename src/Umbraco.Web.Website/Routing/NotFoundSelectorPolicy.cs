@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         public NotFoundSelectorPolicy(EndpointDataSource endpointDataSource)
         {
             _notFound = new Lazy<Endpoint>(GetNotFoundEndpoint);
-            _endpointDataSource = endpointDataSource;            
+            _endpointDataSource = endpointDataSource;
         }
 
         // return the endpoint for the RenderController.Index action.
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         {
             // Don't apply this filter to any endpoint group that is a controller route
             // i.e. only dynamic routes.            
-            foreach(Endpoint endpoint in endpoints)
+            foreach (Endpoint endpoint in endpoints)
             {
                 ControllerAttribute controller = endpoint.Metadata?.GetMetadata<ControllerAttribute>();
                 if (controller != null)
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.Website.Routing
 
         public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
         {
-            if (candidates.Count == 1 && candidates[0].Values == null)
+            if (AllInvalid(candidates))
             {
                 UmbracoRouteValues umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
                 if (umbracoRouteValues?.PublishedRequest != null
@@ -72,8 +72,20 @@ namespace Umbraco.Cms.Web.Website.Routing
                     httpContext.SetEndpoint(_notFound.Value);
                 }
             }
-            
-            return Task.CompletedTask;            
+
+            return Task.CompletedTask;
+        }
+
+        private static bool AllInvalid(CandidateSet candidates)
+        {
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                if (candidates.IsValidCandidate(i))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
