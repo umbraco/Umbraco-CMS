@@ -7,7 +7,6 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using StackExchange.Profiling;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 using Umbraco.Extensions;
@@ -62,6 +61,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _connectionRetryPolicy = connectionRetryPolicy;
             _commandRetryPolicy = commandRetryPolicy;
             _mapperCollection = mapperCollection;
+
             Init();
         }
 
@@ -79,6 +79,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             SqlContext = sqlContext;
             _logger = logger;
             _bulkSqlInsertProvider = bulkSqlInsertProvider;
+
             Init();
         }
 
@@ -86,6 +87,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         {
             EnableSqlTrace = EnableSqlTraceDefault;
             NPocoDatabaseExtensions.ConfigureNPocoBulkExtensions();
+
             if (_mapperCollection != null)
             {
                 Mappers.AddRange(_mapperCollection);
@@ -104,11 +106,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         {
             var command = base.CreateCommand(connection, commandType, sql, args);
 
-            if (!DatabaseType.IsSqlCe()) return command;
+            if (!DatabaseType.IsSqlCe())
+                return command;
 
             foreach (DbParameter parameter in command.Parameters)
+            {
                 if (parameter.Value == DBNull.Value)
                     parameter.DbType = DbType.String;
+            }
 
             return command;
         }
@@ -128,17 +133,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 #endif
 
         /// <inheritdoc />
-        public string InstanceId
-        {
-            get
-            {
+        public string InstanceId =>
 #if DEBUG_DATABASES
-                return _instanceGuid.ToString("N").Substring(0, 8) + ':' + _spid;
+                _instanceGuid.ToString("N").Substring(0, 8) + ':' + _spid;
 #else
-                return _instanceId ?? (_instanceId = _instanceGuid.ToString("N").Substring(0, 8));
+                _instanceId ??= _instanceGuid.ToString("N").Substring(0, 8);
 #endif
-            }
-        }
 
         /// <inheritdoc />
         public bool InTransaction { get; private set; }
@@ -175,8 +175,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             set
             {
                 _enableCount = value;
+
                 if (_enableCount == false)
+                {
                     SqlCount = 0;
+                }
             }
         }
 
@@ -193,11 +196,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         internal IEnumerable<CommandInfo> Commands => _commands;
 
-        public int BulkInsertRecords<T>(IEnumerable<T> records)
-        {
-            return _bulkSqlInsertProvider.BulkInsertRecords(this, records);
-
-        }
+        public int BulkInsertRecords<T>(IEnumerable<T> records) => _bulkSqlInsertProvider.BulkInsertRecords(this, records);
 
         /// <summary>
         /// Returns the <see cref="DatabaseSchemaResult"/> for the database
@@ -206,6 +205,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         {
             var dbSchema = _databaseSchemaCreatorFactory.Create(this);
             var databaseSchemaValidationResult = dbSchema.ValidateSchema();
+
             return databaseSchemaValidationResult;
         }
 
@@ -263,8 +263,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         {
             _logger.LogError(ex, "Exception ({InstanceId}).", InstanceId);
             _logger.LogDebug("At:\r\n{StackTrace}", Environment.StackTrace);
+
             if (EnableSqlTrace == false)
                 _logger.LogDebug("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
+
             base.OnException(ex);
         }
 
@@ -287,22 +289,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 #endif
 
             _cmd = cmd;
+
             base.OnExecutingCommand(cmd);
         }
 
-        private string CommandToString(DbCommand cmd)
-        {
-            return CommandToString(cmd.CommandText, cmd.Parameters.Cast<DbParameter>().Select(x => x.Value).ToArray());
-        }
+        private string CommandToString(DbCommand cmd) => CommandToString(cmd.CommandText, cmd.Parameters.Cast<DbParameter>().Select(x => x.Value).ToArray());
 
         private string CommandToString(string sql, object[] args)
         {
             var text = new StringBuilder();
 #if DEBUG_DATABASES
-                text.Append(InstanceId);
-                text.Append(": ");
+            text.Append(InstanceId);
+            text.Append(": ");
 #endif
+
             NPocoSqlExtensions.ToText(sql, args, text);
+
             return text.ToString();
         }
 
@@ -325,11 +327,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             {
                 Text = cmd.CommandText;
                 var parameters = new List<ParameterInfo>();
-                foreach (IDbDataParameter parameter in cmd.Parameters) parameters.Add(new ParameterInfo(parameter));
+                foreach (IDbDataParameter parameter in cmd.Parameters)
+                    parameters.Add(new ParameterInfo(parameter));
+
                 Parameters = parameters.ToArray();
             }
 
             public string Text { get; }
+
             public ParameterInfo[] Parameters { get; }
         }
 
