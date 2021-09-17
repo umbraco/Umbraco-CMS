@@ -4,6 +4,11 @@ using Umbraco.Extensions;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.PropertyEditors;
+using Moq;
+using Umbraco.Cms.Infrastructure.Serialization;
 using System.Linq;
 
 namespace Umbraco.Cms.Tests.Common.Builders
@@ -73,6 +78,45 @@ namespace Umbraco.Cms.Tests.Common.Builders
         {
             _cultureInfos = cultureInfos;
             return this;
+        }
+
+        /// <summary>
+        /// Build and dynamically create a matching content type
+        /// </summary>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public ContentData Build(IShortStringHelper shortStringHelper, string alias, Dictionary<string, IDataType> propertyDataTypes, out ContentType contentType)
+        {
+            var result = Build();
+
+            contentType = new ContentType(shortStringHelper, -1)
+            {
+                Alias = alias,
+                Name = alias,
+                Key = Guid.NewGuid(),
+                Id = alias.GetHashCode()
+            };
+
+            foreach(var prop in result.Properties)
+            {
+                //var dataType = new DataType(new VoidEditor("Label", Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
+                //{
+                //    Id = 4
+                //};
+
+                if (!propertyDataTypes.TryGetValue(prop.Key, out IDataType dataType))
+                {
+                    dataType = propertyDataTypes.First().Value;
+                }
+
+                var propertyType = new PropertyType(shortStringHelper, dataType, prop.Key);
+                if (!contentType.PropertyTypeExists(propertyType.Alias))
+                {
+                    contentType.AddPropertyType(propertyType);
+                }
+            }
+
+            return result;
         }
 
         public override ContentData Build()
