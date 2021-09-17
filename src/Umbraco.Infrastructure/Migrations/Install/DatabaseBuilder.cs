@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
@@ -85,7 +83,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         public bool CanConnect(string databaseType, string connectionString, string server, string database, string login, string password, bool integratedAuth)
         {
             // we do not test SqlCE connection
-            if (databaseType.InvariantContains("sqlce"))
+            if (databaseType.InvariantContains("sqlce") || databaseType.InvariantContains("localdb"))
                 return true;
 
             string providerName;
@@ -153,23 +151,32 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </summary>
         public void ConfigureEmbeddedDatabaseConnection()
         {
-            ConfigureEmbeddedDatabaseConnection(_databaseFactory);
+            const string connectionString = EmbeddedDatabaseConnectionString;
+            const string providerName = Constants.DbProviderNames.SqlCe;
+
+            _configManipulator.SaveConnectionString(connectionString, providerName);
+            _databaseFactory.Configure(connectionString, providerName);
+
+            // Always create embedded database
+            CreateDatabase();
         }
 
-        private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory)
+        public const string LocalDbConnectionString = @"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;AttachDbFileName=|DataDirectory|\Umbraco.mdf";
+
+        public void ConfigureSqlLocalDbDatabaseConnection()
         {
-            _configManipulator.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+            string connectionString = LocalDbConnectionString;
+            const string providerName = Constants.DbProviderNames.SqlServer;
 
-            var path = _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.Data, "Umbraco.sdf"));
-            if (File.Exists(path) == false)
-            {
-                // this should probably be in a "using (new SqlCeEngine)" clause but not sure
-                // of the side effects and it's been like this for quite some time now
+            // Replace data directory placeholder (this is not supported by LocalDB)
+            var dataDirectory = AppDomain.CurrentDomain.GetData("DataDirectory")?.ToString();
+            connectionString = connectionString.Replace("|DataDirectory|", dataDirectory);
 
-                _dbProviderFactoryCreator.CreateDatabase(Constants.DbProviderNames.SqlCe);
-            }
+            _configManipulator.SaveConnectionString(connectionString, providerName);
+            _databaseFactory.Configure(connectionString, providerName);
 
-            factory.Configure(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+            // Always create LocalDB database
+            CreateDatabase();
         }
 
         /// <summary>
@@ -214,9 +221,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         public static string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
         {
             providerName = Constants.DbProviderNames.SqlServer;
-            var provider = databaseProvider.ToLower();
-            if (provider.InvariantContains("azure"))
+
+            if (databaseProvider.InvariantContains("Azure"))
                 return GetAzureConnectionString(server, databaseName, user, password);
+
             return $"server={server};database={databaseName};user id={user};password={password}";
         }
 
@@ -228,8 +236,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
             var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
-            _configManipulator.SaveConnectionString(connectionString, Constants.DbProviderNames.SqlServer);
-            _databaseFactory.Configure(connectionString, Constants.DbProviderNames.SqlServer);
+            const string providerName = Constants.DbProviderNames.SqlServer;
+
+            _configManipulator.SaveConnectionString(connectionString, providerName);
+            _databaseFactory.Configure(connectionString, providerName);
         }
 
         /// <summary>
@@ -292,17 +302,13 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             return $"Server={server};Database={databaseName};User ID={user};Password={password}";
         }
 
-        private static bool ServerStartsWithTcp(string server)
-        {
-            return server.ToLower().StartsWith("tcp:".ToLower());
-        }
-
-
-
+        private static bool ServerStartsWithTcp(string server) => server.InvariantStartsWith("tcp:");
 
         #endregion
 
         #region Database Schema
+
+        public void CreateDatabase() => _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName, _databaseFactory.ConnectionString);
 
         /// <summary>
         /// Validates the database schema.

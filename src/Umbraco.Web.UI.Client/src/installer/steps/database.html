@@ -10,38 +10,48 @@
             <legend>What type of database do you use?</legend>
             <label class="control-label" for="dbType">Database type</label>
             <div class="controls">
-                <select id="dbType" name="dbType"
+                <select id="dbType"
                         ng-options="db.id as db.name for db in dbs"
-                        required ng-model="installer.current.model.dbType">
+                        required
+                        ng-model="installer.current.model.dbType">
                 </select>
             </div>
         </div>
 
-        <div class="controls" ng-if="installer.current.model.dbType == 'SqlCe' ">
+         <div class="controls" ng-if="installer.current.model.dbType == 'SqlLocalDb'">
             <p>Great! No need to configure anything, you can simply click the <strong>continue</strong> button below to continue to the next step</p>
         </div>
 
-        <div ng-if="installer.current.model.dbType == 'Custom' ">
+        <div class="controls" ng-if="installer.current.model.dbType == 'SqlCe'">
+            <p>Great! No need to configure anything, you can simply click the <strong>continue</strong> button below to continue to the next step</p>
+        </div>
+
+        <div ng-if="installer.current.model.dbType == 'Custom'">
             <legend>What is the exact connection string we should use?</legend>
             <div class="control-group">
-                <label class="control-label" for="server">Connection string</label>
+                <label class="control-label" for="Custom_connectionString">Connection string</label>
                   <div class="controls">
-                    <textarea class="input-block-level" required ng-model="installer.current.model.connectionString" rows="5"></textarea>
+                    <textarea id="Custom_connectionString"
+                              class="input-block-level"
+                              required
+                              ng-model="installer.current.model.connectionString"
+                              rows="5"></textarea>
                     <small class="inline-help">Enter a valid database connection string.</small>
                 </div>
             </div>
         </div>
 
-        <div ng-if="installer.current.model.dbType == 'SqlAzure' || installer.current.model.dbType == 'SqlServer' ">
+        <div ng-if="installer.current.model.dbType == 'SqlAzure' || installer.current.model.dbType == 'SqlServer'">
             <div class="row">
                 <legend>Where do we find your database?</legend>
                 <div class="span6">
                     <div class="control-group">
-                        <label class="control-label" for="server">Server</label>
+                        <label class="control-label" for="Sql_Server">Server</label>
                         <div class="controls">
-                            <input type="text" id="server" name="server"
-                                   placeholder="{{ (installer.current.model.dbType == 'SqlAzure') ? 'umbraco-database.database.windows.net' : '127.0.0.1\\SQLEXPRESS'}}"
-                                   required ng-model="installer.current.model.server" />
+                            <input type="text" id="Sql_Server"
+                                   placeholder="{{ (installer.current.model.dbType == 'SqlAzure') ? 'umbraco-database.database.windows.net' : '(local)\\SQLEXPRESS'}}"
+                                   required
+                                   ng-model="installer.current.model.server" />
                             <small class="inline-help">Enter server domain or IP</small>
                         </div>
                     </div>
@@ -49,11 +59,12 @@
 
                 <div class="span6">
                     <div class="control-group">
-                        <label class="control-label" for="databaseName">Database name</label>
+                        <label class="control-label" for="Sql_databaseName">Database name</label>
                         <div class="controls">
-                            <input type="text" id="databaseName" name="installer.current.model.databaseName"
+                            <input type="text" id="Sql_databaseName"
                                    placeholder="umbraco-cms"
-                                   required ng-model="installer.current.model.databaseName" />
+                                   required
+                                   ng-model="installer.current.model.databaseName" />
                             <small class="inline-help">Enter the name of the database</small>
                         </div>
                     </div>
@@ -64,11 +75,12 @@
                 <legend>What credentials are used to access the database?</legend>
                 <div class="span6">
                     <div class="control-group" ng-if="!installer.current.model.integratedAuth">
-                        <label class="control-label" for="login">Login</label>
+                        <label class="control-label" for="Sql_login">Login</label>
                         <div class="controls">
-                            <input type="text" id="login" name="login"
+                            <input type="text" id="Sql_login"
                                    placeholder="umbraco-db-user"
-                                   required ng-model="installer.current.model.login" />
+                                   required
+                                   ng-model="installer.current.model.login" />
                             <small class="inline-help">Enter the database user name</small>
                         </div>
                     </div>
@@ -76,21 +88,21 @@
 
                 <div class="span6">
                     <div class="control-group" ng-if="!installer.current.model.integratedAuth">
-                    <label class="control-label" for="password">Password</label>
+                    <label class="control-label" for="Sql_password">Password</label>
                         <div class="controls">
-                            <input type="password" id="password" name="password"
+                            <input type="password" id="Sql_password"
                                    placeholder="umbraco-db-password"
-                                   required ng-model="installer.current.model.password" />
+                                   required
+                                   ng-model="installer.current.model.password" />
                             <small class="inline-help">Enter the database password</small>
                         </div>
                     </div>
                 </div>
 
-                <div class="span12 control-group" ng-if="installer.current.model.dbType =='SqlServer' ">
+                <div class="span12 control-group" ng-if="installer.current.model.dbType == 'SqlServer'">
                     <div class="controls">
                         <label class="checkbox">
-                            <input type="checkbox" id="integratedAuth" name="integratedAuth"
-                                   ng-model="installer.current.model.integratedAuth" />
+                            <input type="checkbox" ng-model="installer.current.model.integratedAuth" />
                             Use integrated authentication
                         </label>
                     </div>

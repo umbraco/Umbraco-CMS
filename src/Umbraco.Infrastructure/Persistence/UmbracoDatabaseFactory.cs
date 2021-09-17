@@ -96,7 +96,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _loggerFactory = loggerFactory;
 
             var settings = connectionStrings.CurrentValue.UmbracoConnectionString;
-
             if (settings == null)
             {
                 logger.LogDebug("Missing connection string, defer configuration.");
@@ -105,9 +104,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
             // could as well be <add name="umbracoDbDSN" connectionString="" providerName="" />
             // so need to test the values too
-            var connectionString = settings.ConnectionString;
-            var providerName = settings.ProviderName;
-            if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
+            if (settings.IsConnectionStringConfigured() == false)
             {
                 logger.LogDebug("Empty connection string or provider name, defer configuration.");
                 return; // not configured
@@ -148,7 +145,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         private void UpdateSqlServerDatabaseType()
         {
             // replace NPoco database type by a more efficient one
-
             var setting = _globalSettings.Value.DatabaseFactoryServerVersion;
             var fromSettings = false;
 
@@ -188,6 +184,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             {
                 // must be initialized to have a context
                 EnsureInitialized();
+
                 return _sqlContext;
             }
         }
@@ -199,15 +196,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             {
                 // must be initialized to have a bulk insert provider
                 EnsureInitialized();
+
                 return _bulkSqlInsertProvider;
             }
         }
 
         /// <inheritdoc />
-        public void ConfigureForUpgrade()
-        {
-            _upgrading = true;
-        }
+        public void ConfigureForUpgrade() => _upgrading = true;
 
         /// <inheritdoc />
         public void Configure(string connectionString, string providerName)
@@ -246,13 +241,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             if (DbProviderFactory == null)
             {
                 throw new Exception($"Can't find a provider factory for provider name \"{_providerName}\".");
-            }
-
-            // cannot initialize without being able to talk to the database
-            // TODO: Why not?
-            if (!DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DbProviderFactory))
-            {
-                throw new Exception("Cannot connect to the database.");
             }
 
             _connectionRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(ConnectionString);

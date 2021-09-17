@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
@@ -39,7 +40,9 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             {
                 throw new InstallException("Could not connect to the database");
             }
+
             ConfigureConnection(database);
+
             return Task.FromResult<InstallSetupResult>(null);
         }
 
@@ -48,6 +51,10 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             if (database.ConnectionString.IsNullOrWhiteSpace() == false)
             {
                 _databaseBuilder.ConfigureDatabaseConnection(database.ConnectionString);
+            }
+            else if (database.DatabaseType == DatabaseType.SqlLocalDb)
+            {
+                _databaseBuilder.ConfigureSqlLocalDbDatabaseConnection();
             }
             else if (database.DatabaseType == DatabaseType.SqlCe)
             {
@@ -62,9 +69,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 var password = database.Password.Replace("'", "''");
                 password = string.Format("'{0}'", password);
 
-                _databaseBuilder.ConfigureDatabaseConnection(
-                    database.Server, database.DatabaseName, database.Login, password,
-                    database.DatabaseType.ToString());
+                _databaseBuilder.ConfigureDatabaseConnection(database.Server, database.DatabaseName, database.Login, password, database.DatabaseType.ToString());
             }
         }
 
@@ -84,28 +89,31 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                     databases.Insert(0,  new { name = "Microsoft SQL Server Compact (SQL CE)", id = DatabaseType.SqlCe.ToString() });
                 }
 
+                if (IsLocalDbAvailable())
+                {
+                    // Ensure this is always inserted as first when available
+                    databases.Insert(0, new { name = "Microsoft SQL Server Express (LocalDB)", id = DatabaseType.SqlLocalDb.ToString() });
+                }
+
                 return new
                 {
-                    databases = databases
+                    databases
                 };
             }
         }
 
-        public static bool IsSqlCeAvailable()
-        {
+        public static bool IsLocalDbAvailable() => new LocalDb().IsAvailable;
+
+        public static bool IsSqlCeAvailable() =>
             // NOTE: Type.GetType will only return types that are currently loaded into the appdomain. In this case
             // that is ok because we know if this is availalbe we will have manually loaded it into the appdomain.
             // Else we'd have to use Assembly.LoadFrom and need to know the DLL location here which we don't need to do.
-            return !(Type.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistence.SqlCe") is null);
-        }
+            !(Type.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistence.SqlCe") is null);
 
         public override string View => ShouldDisplayView() ? base.View : "";
 
 
-        public override bool RequiresExecution(DatabaseModel model)
-        {
-            return ShouldDisplayView();
-        }
+        public override bool RequiresExecution(DatabaseModel model) => ShouldDisplayView();
 
         private bool ShouldDisplayView()
         {
@@ -118,6 +126,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 {
                     //Since a connection string was present we verify the db can connect and query
                     _ = _databaseBuilder.ValidateSchema();
+
                     return false;
                 }
                 catch (Exception ex)

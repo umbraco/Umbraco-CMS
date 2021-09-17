@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Install.Models
 {
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Install.Models
         public DatabaseModel()
         {
             //defaults
-            DatabaseType = DatabaseType.SqlCe;
+            DatabaseType = DatabaseType.SqlLocalDb;
         }
 
         [DataMember(Name = "dbType")]
