@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>Umbraco.Cms.Persistence.SqlCe</RootNamespace>
     </PropertyGroup>
 
@@ -18,7 +18,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
+      <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
       <PackageReference Include="Umbraco.Code" Version="1.1.1">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
@@ -34,6 +34,62 @@
 
     <ItemGroup>
       <None Remove="obj\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+      <None Remove="amd64\Microsoft.VC90.CRT\msvcr90.dll" />
+      <None Remove="amd64\Microsoft.VC90.CRT\README_ENU.txt" />
+      <None Remove="amd64\sqlceca40.dll" />
+      <None Remove="amd64\sqlcecompact40.dll" />
+      <None Remove="amd64\sqlceer40EN.dll" />
+      <None Remove="amd64\sqlceme40.dll" />
+      <None Remove="amd64\sqlceqp40.dll" />
+      <None Remove="amd64\sqlcese40.dll" />
+      <None Remove="System.Data.SqlServerCe.dll" />
+      <None Remove="System.Data.SqlServerCe.Entity.dll" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="amd64\Microsoft.VC90.CRT\msvcr90.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="amd64\Microsoft.VC90.CRT\README_ENU.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="amd64\sqlceca40.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="amd64\sqlcecompact40.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="amd64\sqlceer40EN.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="amd64\sqlceme40.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="amd64\sqlceqp40.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="amd64\sqlcese40.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="System.Data.SqlServerCe.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="System.Data.SqlServerCe.Entity.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="System.Data.SqlServerCe">
+        <HintPath>System.Data.SqlServerCe.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

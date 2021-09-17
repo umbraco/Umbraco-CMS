@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
 
