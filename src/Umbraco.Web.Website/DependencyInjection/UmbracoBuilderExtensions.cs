@@ -38,7 +38,7 @@ namespace Umbraco.Extensions
             builder.Services.AddDataProtection();
             builder.Services.AddAntiforgery();
 
-            builder.Services.AddScoped<UmbracoRouteValueTransformer>();
+            builder.Services.AddSingleton<UmbracoRouteValueTransformer>();
             builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
             builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
             builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
