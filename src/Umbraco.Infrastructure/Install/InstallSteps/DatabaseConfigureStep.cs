@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -34,6 +35,15 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             if (database == null)
             {
                 database = new DatabaseModel();
+
+                if (IsLocalDbAvailable())
+                {
+                    database.DatabaseType = DatabaseType.SqlLocalDb;
+                }
+                else if (IsSqlCeAvailable())
+                {
+                    database.DatabaseType = DatabaseType.SqlCe;
+                }
             }
 
             if (_databaseBuilder.CanConnect(database.DatabaseType.ToString(), database.ConnectionString, database.Server, database.DatabaseName, database.Login, database.Password, database.IntegratedAuth) == false)
@@ -108,6 +118,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             // NOTE: Type.GetType will only return types that are currently loaded into the appdomain. In this case
             // that is ok because we know if this is availalbe we will have manually loaded it into the appdomain.
             // Else we'd have to use Assembly.LoadFrom and need to know the DLL location here which we don't need to do.
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
             !(Type.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistence.SqlCe") is null);
 
         public override string View => ShouldDisplayView() ? base.View : "";
