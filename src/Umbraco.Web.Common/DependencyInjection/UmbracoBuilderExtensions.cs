@@ -150,7 +150,7 @@ namespace Umbraco.Extensions
                 DbProviderFactories.GetFactory,
                 factory.GetServices<ISqlSyntaxProvider>(),
                 factory.GetServices<IBulkSqlInsertProvider>(),
-                factory.GetServices<IEmbeddedDatabaseCreator>(),
+                factory.GetServices<IDatabaseCreator>(),
                 factory.GetServices<IProviderSpecificMapperFactory>()
             ));
 
@@ -357,17 +357,17 @@ namespace Umbraco.Extensions
 
                     Type sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider");
                     Type sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeBulkSqlInsertProvider");
-                    Type sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeEmbeddedDatabaseCreator");
+                    Type sqlCeDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeDatabaseCreator");
                     Type sqlCeSpecificMapperFactory = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSpecificMapperFactory");
 
                     if (!(sqlCeSyntaxProviderType is null
                           || sqlCeBulkSqlInsertProviderType is null
-                          || sqlCeEmbeddedDatabaseCreatorType is null
+                          || sqlCeDatabaseCreatorType is null
                           || sqlCeSpecificMapperFactory is null))
                     {
                         builder.Services.AddSingleton(typeof(ISqlSyntaxProvider), sqlCeSyntaxProviderType);
                         builder.Services.AddSingleton(typeof(IBulkSqlInsertProvider), sqlCeBulkSqlInsertProviderType);
-                        builder.Services.AddSingleton(typeof(IEmbeddedDatabaseCreator), sqlCeEmbeddedDatabaseCreatorType);
+                        builder.Services.AddSingleton(typeof(IDatabaseCreator), sqlCeDatabaseCreatorType);
                         builder.Services.AddSingleton(typeof(IProviderSpecificMapperFactory), sqlCeSpecificMapperFactory);
                     }
 
@@ -397,7 +397,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
             builder.Services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
-            builder.Services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
+            builder.Services.AddSingleton<IDatabaseCreator, SqlServerDatabaseCreator>();
 
             return builder;
         }
