@@ -160,10 +160,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             string connectionString = LocalDbConnectionString;
             const string providerName = Constants.DbProviderNames.SqlServer;
 
-            // Replace data directory placeholder (this is not supported by LocalDB)
-            var dataDirectory = AppDomain.CurrentDomain.GetData("DataDirectory")?.ToString();
-            connectionString = connectionString.Replace("|DataDirectory|", dataDirectory);
-
             _configManipulator.SaveConnectionString(connectionString, providerName);
             _databaseFactory.Configure(connectionString, providerName);
 

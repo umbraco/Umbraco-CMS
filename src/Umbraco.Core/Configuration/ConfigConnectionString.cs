@@ -14,8 +14,43 @@ namespace Umbraco.Cms.Core.Configuration
         public ConfigConnectionString(string name, string connectionString, string providerName = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            ConnectionString = connectionString;
-            ProviderName = string.IsNullOrEmpty(providerName) ? ParseProviderName(connectionString) : providerName;
+            ConnectionString = ParseConnectionString(connectionString, ref providerName);
+            ProviderName = providerName;
+        }
+
+        private static string ParseConnectionString(string connectionString, ref string providerName)
+        {
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                return null;
+            }
+
+            var builder = new DbConnectionStringBuilder
+            {
+                ConnectionString = connectionString
+            };
+
+            // Replace data directory placeholder
+            const string attachDbFileNameKey = "AttachDbFileName";
+            const string dataDirectoryPlaceholder = "|DataDirectory|";
+            if (builder.TryGetValue(attachDbFileNameKey, out var attachDbFileNameValue) &&
+                attachDbFileNameValue is string attachDbFileName &&
+                attachDbFileName.Contains(dataDirectoryPlaceholder))
+            {
+                var dataDirectory = AppDomain.CurrentDomain.GetData("DataDirectory")?.ToString();
+                if (!string.IsNullOrEmpty(dataDirectory))
+                {
+                    builder[attachDbFileNameKey] = attachDbFileName.Replace(dataDirectoryPlaceholder, dataDirectory);
+                }
+            }
+
+            // Also parse provider name now we already have a builder
+            if (string.IsNullOrEmpty(providerName))
+            {
+                providerName = ParseProviderName(builder);
+            }
+
+            return builder.ToString();
         }
 
         /// <summary>
@@ -37,13 +72,18 @@ namespace Umbraco.Cms.Core.Configuration
                 ConnectionString = connectionString
             };
 
+            return ParseProviderName(builder);
+        }
+
+        private static string ParseProviderName(DbConnectionStringBuilder builder)
+        {
             if ((builder.TryGetValue("Data Source", out var dataSource) || builder.TryGetValue("DataSource", out dataSource)) &&
                 dataSource?.ToString().EndsWith(".sdf", StringComparison.OrdinalIgnoreCase) == true)
             {
-                return Cms.Core.Constants.DbProviderNames.SqlCe;
+                return Constants.DbProviderNames.SqlCe;
             }
 
-            return Cms.Core.Constants.DbProviderNames.SqlServer;
+            return Constants.DbProviderNames.SqlServer;
         }
     }
 }

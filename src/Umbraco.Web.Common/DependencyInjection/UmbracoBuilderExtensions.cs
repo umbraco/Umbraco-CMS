@@ -94,6 +94,9 @@ namespace Umbraco.Extensions
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
+            // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
+            AppDomain.CurrentDomain.SetData("DataDirectory", tempHostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
+
             // Manually create and register the HttpContextAccessor. In theory this should not be registered
             // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
             // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
