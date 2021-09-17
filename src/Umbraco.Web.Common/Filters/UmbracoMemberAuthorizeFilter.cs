@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Security;
@@ -42,6 +46,12 @@ namespace Umbraco.Cms.Web.Common.Filters
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+            // Allow Anonymous skips all authorization
+            if (HasAllowAnonymous(context))
+            {
+                return;
+            }
+
             IMemberManager memberManager = context.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
 
             if (!await IsAuthorizedAsync(memberManager))
@@ -49,6 +59,32 @@ namespace Umbraco.Cms.Web.Common.Filters
                 context.HttpContext.SetReasonPhrase("Resource restricted: either member is not logged on or is not of a permitted type or group.");
                 context.Result = new ForbidResult();
             }
+        }
+
+        /// <summary>
+        /// Copied from https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/Authorization/AuthorizeFilter.cs
+        /// </summary>
+        private bool HasAllowAnonymous(AuthorizationFilterContext context)
+        {
+            var filters = context.Filters;
+            for (var i = 0; i < filters.Count; i++)
+            {
+                if (filters[i] is IAllowAnonymousFilter)
+                {
+                    return true;
+                }
+            }
+
+            // When doing endpoint routing, MVC does not add AllowAnonymousFilters for AllowAnonymousAttributes that
+            // were discovered on controllers and actions. To maintain compat with 2.x,
+            // we'll check for the presence of IAllowAnonymous in endpoint metadata.
+            var endpoint = context.HttpContext.GetEndpoint();
+            if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private async Task<bool> IsAuthorizedAsync(IMemberManager memberManager)
