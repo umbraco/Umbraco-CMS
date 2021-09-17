@@ -272,7 +272,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var result = _umbracoMapper.Map<UserDetail>(user);
 
             //set their remaining seconds
-            result.SecondsUntilTimeout = 100+ HttpContext.User.GetRemainingAuthSeconds();
+            result.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
 
             return result;
         }
