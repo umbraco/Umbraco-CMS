@@ -1,7 +1,9 @@
 using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
@@ -25,6 +27,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly ILogger<DatabaseBuilder> _logger;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IConfigManipulator _configManipulator;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
         private readonly IMigrationPlanExecutor _migrationPlanExecutor;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
 
@@ -41,6 +45,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             IKeyValueService keyValueService,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IConfigManipulator configManipulator,
+            IOptionsMonitor<GlobalSettings> globalSettings,
+            IOptionsMonitor<ConnectionStrings> connectionStrings,
             IMigrationPlanExecutor migrationPlanExecutor,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
@@ -51,6 +57,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _keyValueService = keyValueService;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _configManipulator = configManipulator;
+            _globalSettings = globalSettings;
+            _connectionStrings = connectionStrings;
             _migrationPlanExecutor = migrationPlanExecutor;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
         }
@@ -74,8 +82,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </summary>
         public bool CanConnect(string databaseType, string connectionString, string server, string database, string login, string password, bool integratedAuth)
         {
-            // we do not test SqlCE connection
-            if (databaseType.InvariantContains("sqlce") || databaseType.InvariantContains("localdb"))
+            // we do not test SqlCE or LocalDB connections
+            if (databaseType.InvariantContains("SqlCe") || databaseType.InvariantContains("SqlLocalDb"))
                 return true;
 
             string providerName;
@@ -147,10 +155,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             const string providerName = Constants.DbProviderNames.SqlCe;
 
             _configManipulator.SaveConnectionString(connectionString, providerName);
-            _databaseFactory.Configure(connectionString, providerName);
-
-            // Always create embedded database
-            CreateDatabase();
+            Configure(connectionString, providerName, true);
         }
 
         public const string LocalDbConnectionString = @"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;AttachDbFileName=|DataDirectory|\Umbraco.mdf";
@@ -161,10 +166,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             const string providerName = Constants.DbProviderNames.SqlServer;
 
             _configManipulator.SaveConnectionString(connectionString, providerName);
-            _databaseFactory.Configure(connectionString, providerName);
-
-            // Always create LocalDB database
-            CreateDatabase();
+            Configure(connectionString, providerName, true);
         }
 
         /// <summary>
@@ -174,10 +176,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// <remarks>Has to be SQL Server</remarks>
         public void ConfigureDatabaseConnection(string connectionString)
         {
-            const string providerName = Constants.DbProviderNames.SqlServer;
-
-            _configManipulator.SaveConnectionString(connectionString, providerName);
-            _databaseFactory.Configure(connectionString, providerName);
+            _configManipulator.SaveConnectionString(connectionString, null);
+            Configure(connectionString, null, _globalSettings.CurrentValue.InstallMissingDatabase);
         }
 
         /// <summary>
@@ -193,7 +193,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out var providerName);
 
             _configManipulator.SaveConnectionString(connectionString, providerName);
-            _databaseFactory.Configure(connectionString, providerName);
+            Configure(connectionString, providerName, _globalSettings.CurrentValue.InstallMissingDatabase);
+        }
+
+        private void Configure(string connectionString, string providerName, bool installMissingDatabase)
+        {
+            // Update existing connection string
+            var umbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString, providerName);
+            _connectionStrings.CurrentValue.UmbracoConnectionString = umbracoConnectionString;
+
+            _databaseFactory.Configure(umbracoConnectionString.ConnectionString, umbracoConnectionString.ProviderName);
+
+            if (installMissingDatabase)
+            {
+                CreateDatabase();
+            }
         }
 
         /// <summary>

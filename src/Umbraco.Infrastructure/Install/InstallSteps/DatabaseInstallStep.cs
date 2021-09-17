@@ -1,28 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
-        "DatabaseInstall", 11, "")]
+    [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade, "DatabaseInstall", 11, "")]
     public class DatabaseInstallStep : InstallSetupStep<object>
     {
-        private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
+        private readonly DatabaseBuilder _databaseBuilder;
 
-        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime)
+        public DatabaseInstallStep(IRuntimeState runtime, DatabaseBuilder databaseBuilder)
         {
-            _databaseBuilder = databaseBuilder;
             _runtime = runtime;
+            _databaseBuilder = databaseBuilder;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -47,10 +43,10 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 return Task.FromResult<InstallSetupResult>(null);
             }
 
-            //upgrade is required so set the flag for the next step
+            // Upgrade is required, so set the flag for the next step
             return Task.FromResult(new InstallSetupResult(new Dictionary<string, object>
             {
-                {"upgrade", true}
+                { "upgrade", true}
             }));
         }
 
