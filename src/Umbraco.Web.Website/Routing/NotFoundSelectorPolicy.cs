@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,8 +34,8 @@ namespace Umbraco.Cms.Web.Website.Routing
             {
                 // return the endpoint for the RenderController.Index action.
                 ControllerActionDescriptor descriptor = x.Metadata?.GetMetadata<ControllerActionDescriptor>();
-                return descriptor.ControllerTypeInfo == typeof(RenderController)
-                    && descriptor.ActionName == nameof(RenderController.Index);
+                return descriptor?.ControllerTypeInfo == typeof(RenderController)
+                    && descriptor?.ActionName == nameof(RenderController.Index);
             });
             return e;
         }
