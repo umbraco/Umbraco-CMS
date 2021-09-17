@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         private readonly ICookieManager _cookieManager;
         private readonly IUserAgentProvider _userAgentProvider;
         private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
-        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
+        private readonly IRuntimeState _runtimeState;
         private InstallationType? _installationType;
 
         public InstallHelper(DatabaseBuilder databaseBuilder,
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             ICookieManager cookieManager,
             IUserAgentProvider userAgentProvider,
             IUmbracoDatabaseFactory umbracoDatabaseFactory,
-            IOptionsMonitor<GlobalSettings> globalSettings)
+            IRuntimeState runtimeState)
         {
             _logger = logger;
             _umbracoVersion = umbracoVersion;
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             _cookieManager = cookieManager;
             _userAgentProvider = userAgentProvider;
             _umbracoDatabaseFactory = umbracoDatabaseFactory;
-            _globalSettings = globalSettings;
+            _runtimeState = runtimeState;
 
             // We need to initialize the type already, as we can't detect later, if the connection string is added on the fly.
             GetInstallationType();
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         /// </value>
         private bool IsBrandNewInstall => _connectionStrings.CurrentValue.UmbracoConnectionString?.IsConnectionStringConfigured() != true ||
                     _databaseBuilder.IsDatabaseConfigured == false ||
-                    (_globalSettings.CurrentValue.InstallMissingDatabase && _databaseBuilder.CanConnectToDatabase == false) ||
+                    (_runtimeState.Level == RuntimeLevel.Install && _runtimeState.Reason == RuntimeLevelReason.InstallMissingDatabase) ||
                     _databaseBuilder.IsUmbracoInstalled() == false;
     }
 }

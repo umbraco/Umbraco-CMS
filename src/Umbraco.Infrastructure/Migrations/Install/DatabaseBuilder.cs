@@ -20,12 +20,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IRuntimeState _runtime;
-        private readonly IMigrationBuilder _migrationBuilder;
+        private readonly IRuntimeState _runtimeState;
         private readonly IKeyValueService _keyValueService;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger<DatabaseBuilder> _logger;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IConfigManipulator _configManipulator;
         private readonly IMigrationPlanExecutor _migrationPlanExecutor;
@@ -39,11 +36,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         public DatabaseBuilder(
             IScopeProvider scopeProvider,
             IUmbracoDatabaseFactory databaseFactory,
-            IRuntimeState runtime,
+            IRuntimeState runtimeState,
             ILoggerFactory loggerFactory,
-            IMigrationBuilder migrationBuilder,
             IKeyValueService keyValueService,
-            IHostingEnvironment hostingEnvironment,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IConfigManipulator configManipulator,
             IMigrationPlanExecutor migrationPlanExecutor,
@@ -51,12 +46,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         {
             _scopeProvider = scopeProvider;
             _databaseFactory = databaseFactory;
-            _runtime = runtime;
+            _runtimeState = runtimeState;
             _logger = loggerFactory.CreateLogger<DatabaseBuilder>();
-            _loggerFactory = loggerFactory;
-            _migrationBuilder = migrationBuilder;
             _keyValueService = keyValueService;
-            _hostingEnvironment = hostingEnvironment;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _configManipulator = configManipulator;
             _migrationPlanExecutor = migrationPlanExecutor;
@@ -381,7 +373,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 //If the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (!hasInstalledVersion)
                 {
-                    if (_runtime.Level == RuntimeLevel.Run)
+                    if (_runtimeState.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
 
                     var creator = _databaseSchemaCreatorFactory.Create(database);

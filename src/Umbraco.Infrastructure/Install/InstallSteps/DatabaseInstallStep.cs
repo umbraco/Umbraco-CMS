@@ -18,13 +18,11 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
-        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
 
-        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime, IOptionsMonitor<GlobalSettings> globalSettings)
+        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
-            _globalSettings = globalSettings;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -32,7 +30,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             if (_runtime.Level == RuntimeLevel.Run)
                 throw new Exception("Umbraco is already configured!");
 
-            if (_globalSettings.CurrentValue.InstallMissingDatabase)
+            if (_runtime.Reason == RuntimeLevelReason.InstallMissingDatabase)
             {
                 _databaseBuilder.CreateDatabase();
             }
@@ -56,9 +54,6 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             }));
         }
 
-        public override bool RequiresExecution(object model)
-        {
-            return true;
-        }
+        public override bool RequiresExecution(object model) => true;
     }
 }

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -21,7 +22,6 @@ namespace Umbraco.Cms.Infrastructure.Install
         private readonly IEventAggregator _eventAggregator;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
-        private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly ILogger<UnattendedInstaller> _logger;
         private readonly IRuntimeState _runtimeState;
 
@@ -31,7 +31,6 @@ namespace Umbraco.Cms.Infrastructure.Install
             IOptions<UnattendedSettings> unattendedSettings,
             IUmbracoDatabaseFactory databaseFactory,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
-            IOptions<GlobalSettings> globalSettings,
             ILogger<UnattendedInstaller> logger,
             IRuntimeState runtimeState)
         {
@@ -40,7 +39,6 @@ namespace Umbraco.Cms.Infrastructure.Install
             _unattendedSettings = unattendedSettings;
             _databaseFactory = databaseFactory;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
-            _globalSettings = globalSettings;
             _logger = logger;
             _runtimeState = runtimeState;
         }
@@ -59,7 +57,11 @@ namespace Umbraco.Cms.Infrastructure.Install
                 return Task.CompletedTask;
             }
 
-            var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
+            _runtimeState.DetermineRuntimeLevel();
+            if (_runtimeState.Reason == RuntimeLevelReason.InstallMissingDatabase)
+            {
+                _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName, _databaseFactory.ConnectionString);
+            }
 
             bool connect;
             try
@@ -67,19 +69,12 @@ namespace Umbraco.Cms.Infrastructure.Install
                 for (var i = 0; ;)
                 {
                     connect = _databaseFactory.CanConnect;
-                    if (connect || ++i == tries)
+                    if (connect || ++i == 5)
                     {
                         break;
                     }
 
                     _logger.LogDebug("Could not immediately connect to database, trying again.");
-
-                    if (_globalSettings.Value.InstallMissingDatabase)
-                    {
-                        _logger.LogDebug("Install missing database is enabled, creating database before trying again.");
-
-                        _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName, _databaseFactory.ConnectionString);
-                    }
 
                     Thread.Sleep(1000);
                 }
