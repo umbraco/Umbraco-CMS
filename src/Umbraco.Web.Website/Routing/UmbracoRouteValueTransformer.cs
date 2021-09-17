@@ -28,6 +28,7 @@ using RouteDirection = Umbraco.Cms.Core.Routing.RouteDirection;
 
 namespace Umbraco.Cms.Web.Website.Routing
 {
+
     /// <summary>
     /// The route value transformer for Umbraco front-end routes
     /// </summary>
@@ -138,6 +139,16 @@ namespace Umbraco.Cms.Web.Website.Routing
                 return HandlePostedValues(postedInfo, httpContext);
             }
 
+            if (!umbracoRouteValues?.PublishedRequest?.HasPublishedContent() ?? false)
+            {
+                // No content was found, not by any registered 404 handlers and
+                // not by the IContentLastChanceFinder. In this case we want to return
+                // our default 404 page but we cannot return route values now because
+                // it's possible that a developer is handling dynamic routes too.
+                // Our 404 page will be handled with the NotFoundSelectorPolicy
+                return null;
+            }
+
             // See https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.routing.dynamicroutevaluetransformer.transformasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Mvc_Routing_DynamicRouteValueTransformer_TransformAsync_Microsoft_AspNetCore_Http_HttpContext_Microsoft_AspNetCore_Routing_RouteValueDictionary_
             // We should apparenlty not be modified these values.
             // So we create new ones.
@@ -149,11 +160,6 @@ namespace Umbraco.Cms.Web.Website.Routing
             {
                 newValues[ActionToken] = umbracoRouteValues.ActionName;
             }
-
-            // NOTE: If we are never returning null it means that it is not possible for another
-            // DynamicRouteValueTransformer to execute to set the route values. This one will
-            // always win even if it is a 404 because we manage all 404s via Umbraco and 404
-            // handlers.
 
             return newValues;
         }
