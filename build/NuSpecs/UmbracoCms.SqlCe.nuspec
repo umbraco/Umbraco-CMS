@@ -24,6 +24,7 @@
                   not want this to happen as the alpha of the next major is, really, the next major already.
                 -->
                 <dependency id="Umbraco.Cms.Core" version="[$version$]" />
+                <dependency id="Microsoft.Windows.Compatability" version="[5.0.2,5.999999]" />
             </group>
 
         </dependencies>
