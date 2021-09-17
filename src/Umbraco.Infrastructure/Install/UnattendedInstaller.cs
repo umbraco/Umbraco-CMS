@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
         private readonly IEventAggregator _eventAggregator;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
+        private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly ILogger<UnattendedInstaller> _logger;
         private readonly IRuntimeState _runtimeState;
@@ -29,6 +30,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             IEventAggregator eventAggregator,
             IOptions<UnattendedSettings> unattendedSettings,
             IUmbracoDatabaseFactory databaseFactory,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
             IOptions<GlobalSettings> globalSettings,
             ILogger<UnattendedInstaller> logger,
             IRuntimeState runtimeState)
@@ -37,6 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Install
             _eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
             _unattendedSettings = unattendedSettings;
             _databaseFactory = databaseFactory;
+            _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _globalSettings = globalSettings;
             _logger = logger;
             _runtimeState = runtimeState;
@@ -70,6 +73,14 @@ namespace Umbraco.Cms.Infrastructure.Install
                     }
 
                     _logger.LogDebug("Could not immediately connect to database, trying again.");
+
+                    if (_globalSettings.Value.InstallMissingDatabase)
+                    {
+                        _logger.LogDebug("Install missing database is enabled, creating database before trying again.");
+
+                        _dbProviderFactoryCreator.CreateDatabase(_databaseFactory.ProviderName, _databaseFactory.ConnectionString);
+                    }
+
                     Thread.Sleep(1000);
                 }
             }
