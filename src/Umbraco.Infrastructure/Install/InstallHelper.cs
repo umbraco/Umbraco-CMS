@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,7 +7,6 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Net;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -30,6 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Install
         private readonly ICookieManager _cookieManager;
         private readonly IUserAgentProvider _userAgentProvider;
         private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private InstallationType? _installationType;
 
         public InstallHelper(DatabaseBuilder databaseBuilder,
@@ -39,7 +36,8 @@ namespace Umbraco.Cms.Infrastructure.Install
             IInstallationService installationService,
             ICookieManager cookieManager,
             IUserAgentProvider userAgentProvider,
-            IUmbracoDatabaseFactory umbracoDatabaseFactory)
+            IUmbracoDatabaseFactory umbracoDatabaseFactory,
+            IOptionsMonitor<GlobalSettings> globalSettings)
         {
             _logger = logger;
             _umbracoVersion = umbracoVersion;
@@ -49,15 +47,13 @@ namespace Umbraco.Cms.Infrastructure.Install
             _cookieManager = cookieManager;
             _userAgentProvider = userAgentProvider;
             _umbracoDatabaseFactory = umbracoDatabaseFactory;
+            _globalSettings = globalSettings;
 
-            //We need to initialize the type already, as we can't detect later, if the connection string is added on the fly.
+            // We need to initialize the type already, as we can't detect later, if the connection string is added on the fly.
             GetInstallationType();
         }
 
-        public InstallationType GetInstallationType()
-        {
-            return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
-        }
+        public InstallationType GetInstallationType() => _installationType ??= IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade;
 
         public async Task SetInstallStatusAsync(bool isCompleted, string errorMsg)
         {
@@ -65,25 +61,14 @@ namespace Umbraco.Cms.Infrastructure.Install
             {
                 var userAgent = _userAgentProvider.GetUserAgent();
 
-                // Check for current install Id
-                var installId = Guid.NewGuid();
-
+                // Check for current install ID
                 var installCookie = _cookieManager.GetCookieValue(Constants.Web.InstallerCookieName);
-                if (string.IsNullOrEmpty(installCookie) == false)
+                if (!Guid.TryParse(installCookie, out var installId))
                 {
-                    if (Guid.TryParse(installCookie, out installId))
-                    {
-                        // check that it's a valid Guid
-                        if (installId == Guid.Empty)
-                            installId = Guid.NewGuid();
-                    }
-                    else
-                    {
-                        installId = Guid.NewGuid(); // Guid.TryParse will have reset installId to Guid.Empty
-                    }
-                }
+                    installId = Guid.NewGuid();
 
-                _cookieManager.SetCookieValue(Constants.Web.InstallerCookieName, installId.ToString());
+                    _cookieManager.SetCookieValue(Constants.Web.InstallerCookieName, installId.ToString());
+                }
 
                 var dbProvider = string.Empty;
                 if (IsBrandNewInstall == false)
@@ -108,29 +93,14 @@ namespace Umbraco.Cms.Infrastructure.Install
         }
 
         /// <summary>
-        /// Checks if this is a brand new install meaning that there is no configured version and there is no configured database connection
+        /// Checks if this is a brand new install, meaning that there is no configured database connection or the database is empty.
         /// </summary>
-        private bool IsBrandNewInstall
-        {
-            get
-            {
-                var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
-                if (databaseSettings.IsConnectionStringConfigured() == false)
-                {
-                    //no version or conn string configured, must be a brand new install
-                    return true;
-                }
-
-                //now we have to check if this is really a new install, the db might be configured and might contain data
-
-                if (databaseSettings.IsConnectionStringConfigured() == false
-                    || _databaseBuilder.IsDatabaseConfigured == false)
-                {
-                    return true;
-                }
-
-                return _databaseBuilder.IsUmbracoInstalled() == false;
-            }
-        }
+        /// <value>
+        ///   <c>true</c> if this is a brand new install; otherwise, <c>false</c>.
+        /// </value>
+        private bool IsBrandNewInstall => _connectionStrings.CurrentValue.UmbracoConnectionString?.IsConnectionStringConfigured() != true ||
+                    _databaseBuilder.IsDatabaseConfigured == false ||
+                    (_globalSettings.CurrentValue.InstallMissingDatabase && _databaseBuilder.CanConnectToDatabase == false) ||
+                    _databaseBuilder.IsUmbracoInstalled() == false;
     }
 }
