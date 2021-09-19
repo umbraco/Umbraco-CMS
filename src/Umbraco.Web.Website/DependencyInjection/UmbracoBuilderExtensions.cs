@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
@@ -11,6 +13,7 @@ using Umbraco.Cms.Web.Website.Middleware;
 using Umbraco.Cms.Web.Website.Models;
 using Umbraco.Cms.Web.Website.Routing;
 using Umbraco.Cms.Web.Website.ViewEngines;
+using static Microsoft.Extensions.DependencyInjection.ServiceDescriptor;
 
 namespace Umbraco.Extensions
 {
@@ -38,8 +41,9 @@ namespace Umbraco.Extensions
             builder.Services.AddDataProtection();
             builder.Services.AddAntiforgery();
 
-            builder.Services.AddScoped<UmbracoRouteValueTransformer>();
+            builder.Services.AddSingleton<UmbracoRouteValueTransformer>();
             builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
+            builder.Services.TryAddEnumerable(Singleton<MatcherPolicy, NotFoundSelectorPolicy>());
             builder.Services.AddSingleton<IUmbracoRouteValuesFactory, UmbracoRouteValuesFactory>();
             builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
 
