@@ -90,6 +90,9 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
         },
 
         convertGroupToTab: function (groups, group) {
+            const tabs = groups.filter(group => group.type === this.TYPE_TAB).sort((a, b) => a.sortOrder - b.sortOrder);
+            const nextSortOrder = tabs && tabs.length > 0 ? tabs[tabs.length - 1].sortOrder + 1 : 0;
+
             group.convertingToTab = true;
 
             group.type = this.TYPE_TAB;
@@ -100,7 +103,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
             group.alias = this.isAliasUnique(otherGroups, newAlias) ? newAlias : this.createUniqueAlias(otherGroups, newAlias);
             group.parentAlias = null;
-
+            group.sortOrder = nextSortOrder;
             group.convertingToTab = false;
         },
 

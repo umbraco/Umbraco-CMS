@@ -302,7 +302,7 @@ namespace Umbraco.Core.Models
         public abstract bool AddPropertyGroup(string groupName);
 
         /// <inheritdoc />
-        public abstract bool AddPropertyGroup(string name, string alias);
+        public abstract bool AddPropertyGroup(string alias, string name);
 
         /// <inheritdoc />
         [Obsolete("Use AddPropertyType(propertyType, groupAlias, groupName) instead to explicitly set the alias of the group (note the slighty different parameter order).")]

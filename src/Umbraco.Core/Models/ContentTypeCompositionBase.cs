@@ -205,19 +205,19 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        [Obsolete("Use AddPropertyGroup(name, alias) instead to explicitly set the alias.")]
+        [Obsolete("Use AddPropertyGroup(alias, name) instead to explicitly set the alias (note the slighty different parameter order).")]
         public override bool AddPropertyGroup(string groupName)
         {
-            return AddAndReturnPropertyGroup(groupName, groupName.ToSafeAlias(true)) != null;
+            return AddAndReturnPropertyGroup(groupName.ToSafeAlias(true), groupName) != null;
         }
 
         /// <inheritdoc />
-        public override bool AddPropertyGroup(string name, string alias)
+        public override bool AddPropertyGroup(string alias, string name)
         {
-            return AddAndReturnPropertyGroup(name, alias) != null;
+            return AddAndReturnPropertyGroup(alias, name) != null;
         }
 
-        private PropertyGroup AddAndReturnPropertyGroup(string name, string alias)
+        private PropertyGroup AddAndReturnPropertyGroup(string alias, string name)
         {
             // Ensure we don't have it already
             if (PropertyGroups.Contains(alias))
@@ -226,8 +226,8 @@ namespace Umbraco.Core.Models
             // Add new group
             var group = new PropertyGroup(SupportsPublishing)
             {
-                Name = name,
-                Alias = alias
+                Alias = alias,
+                Name = name
             };
 
             // check if it is inherited - there might be more than 1 but we want the 1st, to
@@ -273,7 +273,7 @@ namespace Umbraco.Core.Models
             }
             else if (!string.IsNullOrEmpty(groupName))
             {
-                group = AddAndReturnPropertyGroup(groupName, groupAlias);
+                group = AddAndReturnPropertyGroup(groupAlias, groupName);
                 if (group == null) return false;
             }
             else

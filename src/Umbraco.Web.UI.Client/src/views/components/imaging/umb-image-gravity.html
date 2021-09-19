@@ -3,8 +3,8 @@
 	<div class="gravity-container" ng-show="vm.loaded">
         <div class="viewport">
 
-            <img ng-show="vm.isCroppable" ng-src="{{vm.src}}" draggable="false" />
-            <img ng-show="!vm.isCroppable && !vm.hasDimensions" ng-src="{{vm.src}}" width="200" height="200" draggable="false" style="cursor: default;" />
+            <img ng-show="vm.isCroppable" ng-src="{{vm.src}}" src="" alt="" draggable="false" />
+            <img ng-show="!vm.isCroppable && !vm.hasDimensions" ng-src="{{vm.src}}" src="" alt="" draggable="false" class="cursor-default" />
 
         </div>
         <div class="overlayViewport">
