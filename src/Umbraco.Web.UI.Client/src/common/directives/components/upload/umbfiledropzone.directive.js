@@ -67,13 +67,13 @@ angular.module("umbraco.directives")
                         Utilities.forEach(files, file => {
                                 if (_filterFile(file) === true) {
 
-                                    if (file.$error) {
-                                        scope.rejected.push(file);
-                                    } else {
-                                        scope.queue.push(file);
-                                    }
+                                if (file.$error) {
+                                    scope.rejected.push(file);
+                                } else {
+                                    scope.queue.push(file);
                                 }
-                            });
+                            }
+                        });
 
                         //when queue is done, kick the uploader
                         if (!scope.working) {
@@ -192,7 +192,7 @@ angular.module("umbraco.directives")
                             // if queue has no items so there is nothing to choose a type for
                             return false;
                         }
-                        
+
                         if (scope.acceptedMediatypes.length === 1) {
                             // if only one accepted type, then we wont ask to choose.
                             return false;

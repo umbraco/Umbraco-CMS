@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -17,7 +17,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
 {
     /// <summary>
-    /// Health checks for the recommended production setup regarding https.
+    /// Health checks for the recommended production setup regarding HTTPS.
     /// </summary>
     [HealthCheck(
         "EB66BB3B-1BCD-4314-9531-9DA2C1D6D9A7",
@@ -26,17 +26,26 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         Group = "Security")]
     public class HttpsCheck : HealthCheck
     {
+        private const int NumberOfDaysForExpiryWarning = 14;
+        private const string HttpPropertyKeyCertificateDaysToExpiry = "CertificateDaysToExpiry";
+
         private readonly ILocalizedTextService _textService;
         private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         private static HttpClient s_httpClient;
-        private static HttpClientHandler s_httpClientHandler;
-        private static int s_certificateDaysToExpiry;
+
+        private static HttpClient HttpClient => s_httpClient ??= new HttpClient(new HttpClientHandler()
+        {
+            ServerCertificateCustomValidationCallback = ServerCertificateCustomValidation
+        });
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HttpsCheck"/> class.
+        /// Initializes a new instance of the <see cref="HttpsCheck" /> class.
         /// </summary>
+        /// <param name="textService">The text service.</param>
+        /// <param name="globalSettings">The global settings.</param>
+        /// <param name="hostingEnvironment">The hosting environment.</param>
         public HttpsCheck(
             ILocalizedTextService textService,
             IOptionsMonitor<GlobalSettings> globalSettings,
@@ -47,33 +56,22 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             _hostingEnvironment = hostingEnvironment;
         }
 
-        private static HttpClient HttpClient => s_httpClient ??= new HttpClient(HttpClientHandler);
-
-        private static HttpClientHandler HttpClientHandler => s_httpClientHandler ??= new HttpClientHandler()
-        {
-            ServerCertificateCustomValidationCallback = ServerCertificateCustomValidation
-        };
-
-        /// <summary>
-        /// Get the status for this health check
-        /// </summary>
+        /// <inheritdoc />
         public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
             await Task.WhenAll(
                 CheckIfCurrentSchemeIsHttps(),
                 CheckHttpsConfigurationSetting(),
                 CheckForValidCertificate());
 
-        /// <summary>
-        /// Executes the action and returns it's status
-        /// </summary>
+        /// <inheritdoc />
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
             => throw new InvalidOperationException("HttpsCheck action requested is either not executable or does not exist");
 
         private static bool ServerCertificateCustomValidation(HttpRequestMessage requestMessage, X509Certificate2 certificate, X509Chain chain, SslPolicyErrors sslErrors)
         {
-            if (!(certificate is null) && s_certificateDaysToExpiry == default)
+            if (certificate is not null)
             {
-                s_certificateDaysToExpiry = (int)Math.Floor((certificate.NotAfter - DateTime.Now).TotalDays);
+                requestMessage.Properties[HttpPropertyKeyCertificateDaysToExpiry] = (int)Math.Floor((certificate.NotAfter - DateTime.Now).TotalDays);
             }
 
             return sslErrors == SslPolicyErrors.None;
@@ -84,30 +82,37 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             string message;
             StatusResultType result;
 
-            // Attempt to access the site over HTTPS to see if it HTTPS is supported
-            // and a valid certificate has been configured
-            var url = _hostingEnvironment.ApplicationMainUrl.ToString().Replace("http:", "https:");
+            // Attempt to access the site over HTTPS to see if it HTTPS is supported and a valid certificate has been configured
+            var urlBuilder = new UriBuilder(_hostingEnvironment.ApplicationMainUrl)
+            {
+                Scheme = Uri.UriSchemeHttps
+            };
+            var url = urlBuilder.Uri;
 
             var request = new HttpRequestMessage(HttpMethod.Head, url);
 
             try
             {
                 using HttpResponseMessage response = await HttpClient.SendAsync(request);
+
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    // Got a valid response, check now for if certificate expiring within 14 days
-                    // Hat-tip: https://stackoverflow.com/a/15343898/489433
-                    const int numberOfDaysForExpiryWarning = 14;
+                    // Got a valid response, check now if the certificate is expiring within the specified amount of days
+                    int daysToExpiry = 0;
+                    if (request.Properties.TryGetValue(HttpPropertyKeyCertificateDaysToExpiry, out var certificateDaysToExpiry))
+                    {
+                        daysToExpiry = (int)certificateDaysToExpiry;
+                    }
 
-                    if (s_certificateDaysToExpiry <= 0)
+                    if (daysToExpiry <= 0)
                     {
                         result = StatusResultType.Error;
                         message = _textService.Localize("healthcheck","httpsCheckExpiredCertificate");
                     }
-                    else if (s_certificateDaysToExpiry < numberOfDaysForExpiryWarning)
+                    else if (daysToExpiry < NumberOfDaysForExpiryWarning)
                     {
                         result = StatusResultType.Warning;
-                        message = _textService.Localize("healthcheck","httpsCheckExpiringCertificate", new[] { s_certificateDaysToExpiry.ToString() });
+                        message = _textService.Localize("healthcheck","httpsCheckExpiringCertificate", new[] { daysToExpiry.ToString() });
                     }
                     else
                     {
@@ -118,21 +123,20 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
                 else
                 {
                     result = StatusResultType.Error;
-                    message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url, response.ReasonPhrase });
+                    message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url.AbsoluteUri, response.ReasonPhrase });
                 }
             }
             catch (Exception ex)
             {
-                var exception = ex as WebException;
-                if (exception != null)
+                if (ex is WebException exception)
                 {
                     message = exception.Status == WebExceptionStatus.TrustFailure
-                        ? _textService.Localize("healthcheck","httpsCheckInvalidCertificate", new[] { exception.Message })
-                        : _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url, exception.Message });
+                        ? _textService.Localize("healthcheck", "httpsCheckInvalidCertificate", new[] { exception.Message })
+                        : _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.AbsoluteUri, exception.Message });
                 }
                 else
                 {
-                    message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url, ex.Message });
+                    message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.AbsoluteUri, ex.Message });
                 }
 
                 result = StatusResultType.Error;
@@ -150,7 +154,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         private Task<HealthCheckStatus> CheckIfCurrentSchemeIsHttps()
         {
             Uri uri = _hostingEnvironment.ApplicationMainUrl;
-            var success = uri.Scheme == "https";
+            var success = uri.Scheme == Uri.UriSchemeHttps;
 
             return Task.FromResult(new HealthCheckStatus(_textService.Localize("healthcheck","httpsCheckIsCurrentSchemeHttps", new[] { success ? string.Empty : "not" }))
             {
@@ -166,16 +170,14 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
 
             string resultMessage;
             StatusResultType resultType;
-            if (uri.Scheme != "https")
+            if (uri.Scheme != Uri.UriSchemeHttps)
             {
                 resultMessage = _textService.Localize("healthcheck","httpsCheckConfigurationRectifyNotPossible");
                 resultType = StatusResultType.Info;
             }
             else
             {
-                resultMessage = _textService.Localize(
-                    "healthcheck","httpsCheckConfigurationCheckResult",
-                    new[] { httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not" });
+                resultMessage = _textService.Localize("healthcheck","httpsCheckConfigurationCheckResult", new[] { httpsSettingEnabled.ToString(), httpsSettingEnabled ? string.Empty : "not" });
                 resultType = httpsSettingEnabled ? StatusResultType.Success : StatusResultType.Error;
             }
 

@@ -28,6 +28,14 @@
         "ConnectionString":{
             "longName": "connection-string",
             "shortName": ""
+        },
+        "NoNodesViewPath":{
+            "longName": "no-nodes-view-path",
+            "shortName": ""
+        },
+        "UseHttpsRedirect": {
+            "longName": "use-https-redirect",
+            "shortName": ""
         }
     },
     "usageExamples": [
