@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
                         foreach (ISearchResult item in paged)
                         {
-                            if (int.TryParse(item.Id, out int contentId))
+                            if (int.TryParse(item.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out int contentId))
                             {
                                 DeleteIndexForEntity(contentId, false);
                             }
@@ -411,7 +411,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 else
                 {
                     Execute(_examineUmbracoIndexingHandler, _ids, _keepIfUnpublished);
-                } 
+                }
             }
 
             public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id, bool keepIfUnpublished)

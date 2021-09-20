@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -71,7 +72,7 @@ namespace Umbraco.Cms.Web.Common.Filters
             var members = new List<int>();
             foreach (var s in AllowMembers.Split(Core.Constants.CharArrays.Comma))
             {
-                if (int.TryParse(s, out var id))
+                if (int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
                 {
                     members.Add(id);
                 }

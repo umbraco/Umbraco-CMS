@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -294,7 +295,7 @@ namespace Umbraco.Cms.Core.Packaging
             var dataTypes = new XElement("DataTypes");
             foreach (var dtId in definition.DataTypes)
             {
-                if (!int.TryParse(dtId, out var outInt))
+                if (!int.TryParse(dtId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var dataType = _dataTypeService.GetDataType(outInt);
                 if (dataType == null)
@@ -309,7 +310,7 @@ namespace Umbraco.Cms.Core.Packaging
             var languages = new XElement("Languages");
             foreach (var langId in definition.Languages)
             {
-                if (!int.TryParse(langId, out var outInt))
+                if (!int.TryParse(langId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var lang = _languageService.GetLanguageById(outInt);
                 if (lang == null)
@@ -326,7 +327,7 @@ namespace Umbraco.Cms.Core.Packaging
 
             foreach (var dictionaryId in definition.DictionaryItems)
             {
-                if (!int.TryParse(dictionaryId, out var outInt))
+                if (!int.TryParse(dictionaryId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                 {
                     continue;
                 }
@@ -397,7 +398,7 @@ namespace Umbraco.Cms.Core.Packaging
             var macros = new XElement("Macros");
             foreach (var macroId in definition.Macros)
             {
-                if (!int.TryParse(macroId, out int outInt))
+                if (!int.TryParse(macroId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int outInt))
                 {
                     continue;
                 }
@@ -477,7 +478,7 @@ namespace Umbraco.Cms.Core.Packaging
             var templatesXml = new XElement("Templates");
             foreach (var templateId in definition.Templates)
             {
-                if (!int.TryParse(templateId, out var outInt))
+                if (!int.TryParse(templateId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var template = _fileService.GetTemplate(outInt);
                 if (template == null)
@@ -520,7 +521,7 @@ namespace Umbraco.Cms.Core.Packaging
             var docTypesXml = new XElement("DocumentTypes");
             foreach (var dtId in definition.DocumentTypes)
             {
-                if (!int.TryParse(dtId, out var outInt))
+                if (!int.TryParse(dtId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var contentType = _contentTypeService.Get(outInt);
                 if (contentType == null)
@@ -539,7 +540,7 @@ namespace Umbraco.Cms.Core.Packaging
             var mediaTypesXml = new XElement("MediaTypes");
             foreach (var mediaTypeId in definition.MediaTypes)
             {
-                if (!int.TryParse(mediaTypeId, out var outInt))
+                if (!int.TryParse(mediaTypeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var mediaType = _mediaTypeService.Get(outInt);
                 if (mediaType == null)
@@ -555,7 +556,7 @@ namespace Umbraco.Cms.Core.Packaging
         private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
         {
             //Documents and tags
-            if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId, out var contentNodeId))
+            if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
             {
                 if (contentNodeId > 0)
                 {

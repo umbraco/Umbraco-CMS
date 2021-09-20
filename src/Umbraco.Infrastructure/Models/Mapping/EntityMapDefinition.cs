@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Examine;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -224,7 +225,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
             if (source.Values.ContainsKey("parentID"))
             {
-                if (int.TryParse(source.Values["parentID"], out var parentId))
+                if (int.TryParse(source.Values["parentID"], NumberStyles.Integer, CultureInfo.InvariantCulture,out var parentId))
                 {
                     target.ParentId = parentId;
                 }

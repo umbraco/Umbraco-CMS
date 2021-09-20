@@ -300,7 +300,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
         public XPathNavigator CloneWithNewRoot(string id, int maxDepth = int.MaxValue)
         {
             int i;
-            if (int.TryParse(id, out i) == false)
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out i) == false)
                 throw new ArgumentException("Not a valid identifier.", nameof(id));
             return CloneWithNewRoot(id);
         }
@@ -679,7 +679,7 @@ namespace Umbraco.Cms.Core.Xml.XPath
             var navRootId = state.Content.Id;
 
             int contentId;
-            if (int.TryParse(id, out contentId))
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out contentId))
             {
                 if (contentId == navRootId)
                 {

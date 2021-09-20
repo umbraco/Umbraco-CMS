@@ -348,7 +348,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ValidatePasswordResetCode([Bind(Prefix = "u")]int userId, [Bind(Prefix = "r")]string resetCode)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var user = await _userManager.FindByIdAsync(userId.ToString(CultureInfo.InvariantCulture));
             if (user != null)
             {
                 var result = await _userManager.VerifyUserTokenAsync(user, "Default", "ResetPassword", resetCode);

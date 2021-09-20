@@ -76,10 +76,10 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             // Uses same approach as NewInstall Step
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
             IBackOfficeUserManager backOfficeUserManager = scope.ServiceProvider.GetRequiredService<IBackOfficeUserManager>();
-            BackOfficeIdentityUser membershipUser = await backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserId.ToString());
+            BackOfficeIdentityUser membershipUser = await backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
             if (membershipUser == null)
             {
-                throw new InvalidOperationException($"No user found in membership provider with id of {Core.Constants.Security.SuperUserId}.");
+                throw new InvalidOperationException($"No user found in membership provider with id of {Core.Constants.Security.SuperUserIdAsString}.");
             }
 
             //To change the password here we actually need to reset it since we don't have an old one to use to change

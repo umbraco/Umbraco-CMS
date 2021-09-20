@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public int? MaxQueryStringLength { get; set; }
 
         /// <summary>
-        /// Gets or sets a value for the maximum request length.
+        /// Gets or sets a value for the maximum request length in kb.
         /// </summary>
         public int? MaxRequestLength { get; set; }
     }

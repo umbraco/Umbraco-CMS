@@ -535,7 +535,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             var rootId = Cms.Core.Constants.System.RootString;
             var ids = content.Path.Split(Constants.CharArrays.Comma)
-                .Where(x => x != rootId && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
+                .Where(x => x != rootId && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(s =>
+                    int.Parse(s, CultureInfo.InvariantCulture)).ToArray();
             if (ids.Any() == false)
                 return new List<IContent>();
 

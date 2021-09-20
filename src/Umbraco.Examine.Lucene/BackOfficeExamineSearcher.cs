@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -335,7 +336,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             UdiParser.TryParse(searchFrom, true, out var udi);
             searchFrom = udi == null ? searchFrom : entityService.GetId(udi).Result.ToString();
 
-            var entityPath = int.TryParse(searchFrom, out var searchFromId) && searchFromId > 0
+            var entityPath = int.TryParse(searchFrom, NumberStyles.Integer, CultureInfo.InvariantCulture, out var searchFromId) && searchFromId > 0
                 ? entityService.GetAllPaths(objectType, searchFromId).FirstOrDefault()
                 : null;
             if (entityPath != null)

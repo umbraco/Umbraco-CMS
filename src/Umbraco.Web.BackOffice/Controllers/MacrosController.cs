@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -184,7 +185,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return ValidationProblem("Name cannnot be more than 255 characters in length.");
             }
 
-            var macro = _macroService.GetById(int.Parse(macroDisplay.Id.ToString()));
+            var macro = _macroService.GetById(int.Parse(macroDisplay.Id.ToString(), CultureInfo.InvariantCulture));
 
             if (macro == null)
             {

@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Globalization;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -72,7 +73,7 @@ namespace Umbraco.Cms.Core.Events
                 {
                     var originalPath = item.OriginalPath.ToDelimitedList();
                     var originalParentId = originalPath.Count > 2
-                        ? int.Parse(originalPath[originalPath.Count - 2])
+                        ? int.Parse(originalPath[originalPath.Count - 2], CultureInfo.InvariantCulture)
                         : Constants.System.Root;
 
                     //before we can create this relation, we need to ensure that the original parent still exists which
@@ -130,7 +131,7 @@ namespace Umbraco.Cms.Core.Events
                 {
                     var originalPath = item.OriginalPath.ToDelimitedList();
                     var originalParentId = originalPath.Count > 2
-                        ? int.Parse(originalPath[originalPath.Count - 2])
+                        ? int.Parse(originalPath[originalPath.Count - 2], CultureInfo.InvariantCulture)
                         : Constants.System.Root;
                     //before we can create this relation, we need to ensure that the original parent still exists which
                     //may not be the case if the encompassing transaction also deleted it when this item was moved to the bin

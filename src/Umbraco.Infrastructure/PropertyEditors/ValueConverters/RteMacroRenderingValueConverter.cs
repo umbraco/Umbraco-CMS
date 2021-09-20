@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using HtmlAgilityPack;
@@ -110,7 +111,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     foreach (var img in imgNodes)
                     {
                         var nodeId = img.GetAttributeValue("rel", string.Empty);
-                        if (int.TryParse(nodeId, out _))
+                        if (int.TryParse(nodeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
                         {
                             img.Attributes.Remove("rel");
                             modified = true;

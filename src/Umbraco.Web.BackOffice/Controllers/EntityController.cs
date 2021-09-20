@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
@@ -218,7 +219,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return foundContentResult;
             }
 
-            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
+            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(
+                s => int.Parse(s, CultureInfo.InvariantCulture)));
         }
 
         /// <summary>
@@ -236,7 +238,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return foundContentResult;
             }
 
-            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
+            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(
+                s => int.Parse(s, CultureInfo.InvariantCulture)));
         }
 
         /// <summary>
@@ -576,7 +579,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             string filter = "",
             Guid? dataTypeKey = null)
         {
-            if (int.TryParse(id, out var intId))
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
             {
                 return GetPagedChildren(intId, type, pageNumber, pageSize, orderBy, orderDirection, filter);
             }
@@ -859,7 +862,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 // TODO: Need to check for Object types that support hierarchic here, some might not.
 
-                var ids = _entityService.Get(id).Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Distinct().ToArray();
+                var ids = _entityService.Get(id).Path.Split(Constants.CharArrays.Comma).Select(s => int.Parse(s, CultureInfo.InvariantCulture)).Distinct().ToArray();
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
                 if (ignoreUserStartNodes == false)

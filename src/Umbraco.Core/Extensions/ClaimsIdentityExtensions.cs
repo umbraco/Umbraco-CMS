@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -267,7 +268,7 @@ namespace Umbraco.Extensions
         /// <returns>Array of start content nodes</returns>
         public static int[] GetStartContentNodes(this ClaimsIdentity identity) =>
             identity.FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType)
-                .Select(node => int.TryParse(node.Value, out var i) ? i : default)
+                .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : default)
                 .Where(x => x != default).ToArray();
 
         /// <summary>
@@ -277,7 +278,7 @@ namespace Umbraco.Extensions
         /// <returns>Array of start media nodes</returns>
         public static int[] GetStartMediaNodes(this ClaimsIdentity identity) =>
             identity.FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType)
-                .Select(node => int.TryParse(node.Value, out var i) ? i : default)
+                .Select(node => int.TryParse(node.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : default)
                 .Where(x => x != default).ToArray();
 
         /// <summary>
@@ -293,7 +294,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="identity"></param>
         /// <returns>User ID as integer</returns>
-        public static int GetId(this ClaimsIdentity identity) => int.Parse(identity.FindFirstValue(ClaimTypes.NameIdentifier));
+        public static int GetId(this ClaimsIdentity identity) => int.Parse(identity.FindFirstValue(ClaimTypes.NameIdentifier), CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Get the real name belonging to the user from a ClaimsIdentity

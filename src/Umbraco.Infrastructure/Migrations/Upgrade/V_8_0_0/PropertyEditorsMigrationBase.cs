@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -35,7 +36,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
             var splitVals = val.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
             var intVals = splitVals
-                .Select(x => int.TryParse(x, out var i) ? i : int.MinValue)
+                .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : int.MinValue)
                 .Where(x => x != int.MinValue)
                 .ToArray();
 

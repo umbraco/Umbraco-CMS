@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -55,7 +56,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             }
 
             int[] userIds;
-            if (int.TryParse(queryString, out var userId))
+            if (int.TryParse(queryString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var userId))
             {
                 userIds = new[] { userId };
             }

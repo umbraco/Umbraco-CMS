@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -71,7 +72,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(role));
             }
 
-            if (!int.TryParse(role.Id, out int roleId))
+            if (!int.TryParse(role.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out int roleId))
             {
                 return Task.FromResult(IdentityResult.Failed(_intParseError));
             }
@@ -103,7 +104,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(role));
             }
 
-            if (!int.TryParse(role.Id, out int roleId))
+            if (!int.TryParse(role.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out int roleId))
             {
                 throw new ArgumentException("The Id of the role is not an integer");
             }
@@ -184,7 +185,7 @@ namespace Umbraco.Cms.Core.Security
             IMemberGroup memberGroup;
 
             // member group can be found by int or Guid, so try both
-            if (!int.TryParse(roleId, out int id))
+            if (!int.TryParse(roleId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id))
             {
                 if (!Guid.TryParse(roleId, out Guid guid))
                 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -33,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                         {
                             var config = JsonConvert.DeserializeObject<JObject>(datatype.Configuration);
                             var startNodeId = config.Value<string>("startNodeId");
-                            if (!startNodeId.IsNullOrWhiteSpace() && int.TryParse(startNodeId, out var intStartNode))
+                            if (!startNodeId.IsNullOrWhiteSpace() && int.TryParse(startNodeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intStartNode))
                             {
                                 var guid = intStartNode <= 0
                                     ? null
@@ -65,7 +66,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
                                 var objectType = startNodeConfig.Value<string>("type");
                                 if (!objectType.IsNullOrWhiteSpace()
                                     && !startNodeId.IsNullOrWhiteSpace()
-                                    && int.TryParse(startNodeId, out var intStartNode))
+                                    && int.TryParse(startNodeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intStartNode))
                                 {
                                     var guid = intStartNode <= 0
                                         ? null
