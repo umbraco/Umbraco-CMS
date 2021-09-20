@@ -51,7 +51,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings
         [Test]
         [TestCase("en-US")]
         [TestCase(null)]
-        [TestCase("sv-SE")]
         [TestCase("da-DK")]
         [TestCase("tr-TR")]
         public void ConvertToIntegerTest(string culture)
