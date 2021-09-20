@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using NPoco;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
@@ -11,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     public class DbProviderFactoryCreator : IDbProviderFactoryCreator
     {
         private readonly Func<string, DbProviderFactory> _getFactory;
-        private readonly IDictionary<string, IEmbeddedDatabaseCreator> _embeddedDatabaseCreators;
+        private readonly IDictionary<string, IDatabaseCreator> _databaseCreators;
         private readonly IDictionary<string, ISqlSyntaxProvider> _syntaxProviders;
         private readonly IDictionary<string, IBulkSqlInsertProvider> _bulkSqlInsertProviders;
         private readonly IDictionary<string, IProviderSpecificMapperFactory> _providerSpecificMapperFactories;
@@ -20,11 +19,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             Func<string, DbProviderFactory> getFactory,
             IEnumerable<ISqlSyntaxProvider> syntaxProviders,
             IEnumerable<IBulkSqlInsertProvider> bulkSqlInsertProviders,
-            IEnumerable<IEmbeddedDatabaseCreator> embeddedDatabaseCreators,
+            IEnumerable<IDatabaseCreator> databaseCreators,
             IEnumerable<IProviderSpecificMapperFactory> providerSpecificMapperFactories)
         {
             _getFactory = getFactory;
-            _embeddedDatabaseCreators = embeddedDatabaseCreators.ToDictionary(x => x.ProviderName);
+            _databaseCreators = databaseCreators.ToDictionary(x => x.ProviderName);
             _syntaxProviders = syntaxProviders.ToDictionary(x => x.ProviderName);
             _bulkSqlInsertProviders = bulkSqlInsertProviders.ToDictionary(x => x.ProviderName);
             _providerSpecificMapperFactories = providerSpecificMapperFactories.ToDictionary(x => x.ProviderName);
@@ -60,11 +59,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             return result;
         }
 
-        public void CreateDatabase(string providerName)
+        public void CreateDatabase(string providerName, string connectionString)
         {
-            if (_embeddedDatabaseCreators.TryGetValue(providerName, out var creator))
+            if (_databaseCreators.TryGetValue(providerName, out var creator))
             {
-                creator.Create();
+                creator.Create(connectionString);
             }
         }
 
