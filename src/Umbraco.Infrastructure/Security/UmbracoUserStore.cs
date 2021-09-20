@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -28,13 +29,12 @@ namespace Umbraco.Cms.Core.Security
 
         protected static int UserIdToInt(string userId)
         {
-            Attempt<int> attempt = userId.TryConvertTo<int>();
-            if (attempt.Success)
+            if(int.TryParse(userId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
             {
-                return attempt.Result;
+                return result;
             }
 
-            throw new InvalidOperationException("Unable to convert user ID to int", attempt.Exception);
+            throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
         }
 
         protected static string UserIdToString(int userId) => string.Intern(userId.ToString());
