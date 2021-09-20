@@ -302,7 +302,7 @@ namespace Umbraco.Extensions
                     // Because decimal 100.01m will happily convert to integer 100, it
                     // makes sense that string "100.01" *also* converts to integer 100.
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Attempt<object>.If(decimal.TryParse(input2,  out var value2), Convert.ToInt32(value2, CultureInfo.InvariantCulture));
+                    return Attempt<object>.If(decimal.TryParse(input2,  out var value2), Convert.ToInt32(value2));
                 }
 
                 if (target == typeof(long))
