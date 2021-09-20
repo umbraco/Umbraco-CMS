@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             Configure(connectionString, providerName, true);
         }
 
-        public const string LocalDbConnectionString = @"Server=(localdb)\MSSQLLocalDB;Integrated Security=true;AttachDbFileName=|DataDirectory|\Umbraco.mdf";
+        public const string LocalDbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True";
 
         public void ConfigureSqlLocalDbDatabaseConnection()
         {
