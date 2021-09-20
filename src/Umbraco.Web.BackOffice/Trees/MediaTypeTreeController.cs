@@ -42,13 +42,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
-            var intId = id.TryConvertTo<int>();
-            if (intId == false) throw new InvalidOperationException("Id must be an integer");
+            if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+            {
+                throw new InvalidOperationException("Id must be an integer");
+            }
 
             var nodes = new TreeNodeCollection();
 
             nodes.AddRange(
-                _entityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaTypeContainer)
+                _entityService.GetChildren(intId, UmbracoObjectTypes.MediaTypeContainer)
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
@@ -66,7 +68,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var mediaTypes = _mediaTypeService.GetAll();
 
             nodes.AddRange(
-                _entityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaType)
+                _entityService.GetChildren(intId, UmbracoObjectTypes.MediaType)
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {

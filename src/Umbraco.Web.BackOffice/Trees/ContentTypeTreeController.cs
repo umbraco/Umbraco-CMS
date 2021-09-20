@@ -55,13 +55,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
-            var intId = id.TryConvertTo<int>();
-            if (intId == false) throw new InvalidOperationException("Id must be an integer");
+            if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+            {
+                throw new InvalidOperationException("Id must be an integer");
+            }
 
             var nodes = new TreeNodeCollection();
 
             nodes.AddRange(
-                _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentTypeContainer)
+                _entityService.GetChildren(intId, UmbracoObjectTypes.DocumentTypeContainer)
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
@@ -76,7 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             //if the request is for folders only then just return
             if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
-            var children = _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentType).ToArray();
+            var children = _entityService.GetChildren(intId, UmbracoObjectTypes.DocumentType).ToArray();
             var contentTypes = _contentTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(c => c.Id);
             nodes.AddRange(
                 children

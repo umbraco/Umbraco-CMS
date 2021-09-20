@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -133,15 +134,14 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            Attempt<int> asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
+            if (!int.TryParse(user.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
             {
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
             using (IScope scope = _scopeProvider.CreateScope())
             {
-                IUser found = _userService.GetUserById(asInt.Result);
+                IUser found = _userService.GetUserById(asInt);
                 if (found != null)
                 {
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
@@ -441,7 +441,7 @@ namespace Umbraco.Cms.Core.Security
             if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.InviteDateUtc))
                 || (user.InvitedDate?.ToUniversalTime() != identityUser.InviteDateUtc))
             {
-                anythingChanged = true;                
+                anythingChanged = true;
                 user.InvitedDate = identityUser.InviteDateUtc?.ToLocalTime();
             }
 
