@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Configuration
         {
             if (string.IsNullOrEmpty(connectionString))
             {
-                return null;
+                return connectionString;
             }
 
             var builder = new DbConnectionStringBuilder
@@ -41,6 +41,9 @@ namespace Umbraco.Cms.Core.Configuration
                 if (!string.IsNullOrEmpty(dataDirectory))
                 {
                     builder[attachDbFileNameKey] = attachDbFileName.Replace(dataDirectoryPlaceholder, dataDirectory);
+
+                    // Mutate the existing connection string (note: the builder also lowercases the properties)
+                    connectionString = builder.ToString();
                 }
             }
 
@@ -50,7 +53,7 @@ namespace Umbraco.Cms.Core.Configuration
                 providerName = ParseProviderName(builder);
             }
 
-            return builder.ToString();
+            return connectionString;
         }
 
         /// <summary>
