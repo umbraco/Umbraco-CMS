@@ -14,8 +14,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     /// Used to cleanup temporary file locations.
     /// </summary>
     /// <remarks>
-    /// Will run on all servers - even though file upload should only be handled on the master, this will
-    /// ensure that in the case it happes on replicas that they are cleaned up too.
+    /// Will run on all servers - even though file upload should only be handled on the scheduling publisher, this will
+    /// ensure that in the case it happens on subscribers that they are cleaned up too.
     /// </remarks>
     public class TempFileCleanup : RecurringHostedServiceBase
     {
