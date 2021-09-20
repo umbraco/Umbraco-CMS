@@ -65,7 +65,7 @@ angular.module("umbraco.directives")
                     function _filesQueued(files, event) {
                         //Push into the queue
                         Utilities.forEach(files, file => {
-                            if (_filterFile(file) === true) {
+                                if (_filterFile(file) === true) {
 
                                 if (file.$error) {
                                     scope.rejected.push(file);
@@ -192,7 +192,7 @@ angular.module("umbraco.directives")
                             // if queue has no items so there is nothing to choose a type for
                             return false;
                         }
-                        
+
                         if (scope.acceptedMediatypes.length === 1) {
                             // if only one accepted type, then we wont ask to choose.
                             return false;

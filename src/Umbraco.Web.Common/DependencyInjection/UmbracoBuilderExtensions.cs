@@ -103,6 +103,10 @@ namespace Umbraco.Extensions
             var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
             var appCaches = AppCaches.Create(requestCache);
 
+            services.ConfigureOptions<ConfigureKestrelServerOptions>();
+            services.ConfigureOptions<ConfigureIISServerOptions>();
+            services.ConfigureOptions<ConfigureFormOptions>();
+
             IProfiler profiler = GetWebProfiler(config);
 
             ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
