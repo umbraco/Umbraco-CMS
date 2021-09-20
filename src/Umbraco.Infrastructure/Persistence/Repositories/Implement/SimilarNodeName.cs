@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Extensions;
@@ -188,7 +189,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 {
                     var match = matches[0];
                     Text = match.Groups[1].Value;
-                    int number = int.TryParse(match.Groups[2].Value, out number) ? number : 0;
+                    int number = int.TryParse(match.Groups[2].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out number) ? number : 0;
                     Suffix = (uint?)(number);
 
                     return;

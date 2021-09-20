@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -510,7 +511,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> PostSetPassword(SetPasswordModel model)
         {
-            var identityUser = await _userManager.FindByIdAsync(model.UserId.ToString());
+            var identityUser = await _userManager.FindByIdAsync(model.UserId.ToString(CultureInfo.InvariantCulture));
 
             var result = await _userManager.ResetPasswordAsync(identityUser, model.ResetCode, model.Password);
             if (result.Succeeded)
@@ -560,7 +561,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
 
-                _userManager.NotifyForgotPasswordChanged(User, model.UserId.ToString());
+                _userManager.NotifyForgotPasswordChanged(User, model.UserId.ToString(CultureInfo.InvariantCulture));
                 return Ok();
             }
 

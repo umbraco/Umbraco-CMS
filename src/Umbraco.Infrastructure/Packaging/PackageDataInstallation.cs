@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -323,8 +324,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 parentId,
                 contentType,
                 key,
-                int.Parse(level),
-                int.Parse(sortOrder),
+                int.Parse(level, CultureInfo.InvariantCulture),
+                int.Parse(sortOrder, CultureInfo.InvariantCulture),
                 template?.Id);
 
             // Handle culture specific node names
@@ -837,7 +838,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     propertyGroup.Type = type;
                 }
 
-                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, out var sortOrder))
+                if (int.TryParse(propertyGroupElement.Element("SortOrder")?.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var sortOrder))
                 {
                     // Override the sort order with the imported value
                     propertyGroup.SortOrder = sortOrder;
@@ -901,7 +902,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var sortOrderElement = property.Element("SortOrder");
                 if (sortOrderElement != null)
                 {
-                    int.TryParse(sortOrderElement.Value, out sortOrder);
+                    int.TryParse(sortOrderElement.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out sortOrder);
                 }
 
                 var propertyType = new PropertyType(_shortStringHelper, dataTypeDefinition, property.Element("Alias").Value)
@@ -1323,7 +1324,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var cacheDuration = 0;
             if (cacheDurationElement != null && string.IsNullOrEmpty((string)cacheDurationElement) == false)
             {
-                cacheDuration = int.Parse(cacheDurationElement.Value);
+                cacheDuration = int.Parse(cacheDurationElement.Value, CultureInfo.InvariantCulture);
             }
             var cacheByMemberElement = macroElement.Element("cacheByMember");
             var cacheByMember = false;
@@ -1364,7 +1365,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     XAttribute sortOrderAttribute = property.Attribute("sortOrder");
                     if (sortOrderAttribute != null)
                     {
-                        sortOrder = int.Parse(sortOrderAttribute.Value);
+                        sortOrder = int.Parse(sortOrderAttribute.Value, CultureInfo.InvariantCulture);
                     }
 
                     if (macro.Properties.Values.Any(x => string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase)))

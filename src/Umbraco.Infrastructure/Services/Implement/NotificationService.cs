@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (entitiesL.Count == 0) return;
 
             //put all entity's paths into a list with the same indices
-            var paths = entitiesL.Select(x => x.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray()).ToArray();
+            var paths = entitiesL.Select(x => x.Path.Split(Constants.CharArrays.Comma).Select(s => int.Parse(s, CultureInfo.InvariantCulture)).ToArray()).ToArray();
 
             // lazily get versions
             var prevVersionDictionary = new Dictionary<int, IContentBase>();

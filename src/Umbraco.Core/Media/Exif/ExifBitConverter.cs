@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 
 namespace Umbraco.Cms.Core.Media.Exif
@@ -65,12 +66,12 @@ namespace Umbraco.Cms.Core.Media.Exif
                     // yyyy:MM:dd HH:mm:ss
                     // This is the expected format though some cameras
                     // can use single digits. See Issue 21.
-                    return new DateTime(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4]), int.Parse(parts[5]));
+                    return new DateTime(int.Parse(parts[0], CultureInfo.InvariantCulture), int.Parse(parts[1], CultureInfo.InvariantCulture), int.Parse(parts[2], CultureInfo.InvariantCulture), int.Parse(parts[3], CultureInfo.InvariantCulture), int.Parse(parts[4], CultureInfo.InvariantCulture), int.Parse(parts[5], CultureInfo.InvariantCulture));
                 }
                 else if (!hastime && parts.Length == 3)
                 {
                     // yyyy:MM:dd
-                    return new DateTime(int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]));
+                    return new DateTime(int.Parse(parts[0], CultureInfo.InvariantCulture), int.Parse(parts[1], CultureInfo.InvariantCulture), int.Parse(parts[2], CultureInfo.InvariantCulture));
                 }
                 else
                 {

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -79,7 +80,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return menu;
             }
 
-            var macro = _macroService.GetById(int.Parse(id));
+            var macro = _macroService.GetById(int.Parse(id, CultureInfo.InvariantCulture));
             if (macro == null) return menu;
 
             //add delete option for all macros

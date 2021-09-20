@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -60,7 +61,7 @@ namespace Umbraco.Cms.Core.Routing
             {
                 var noSlashPath = path.Substring(1);
 
-                if (int.TryParse(noSlashPath, out nodeId) == false)
+                if (int.TryParse(noSlashPath, NumberStyles.Integer, CultureInfo.InvariantCulture, out nodeId) == false)
                 {
                     nodeId = -1;
                 }

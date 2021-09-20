@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -69,9 +70,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </remarks>
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
-            var intId = id.TryConvertTo<int>();
-            if (intId == false)
+            if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+            {
                 throw new InvalidOperationException("Id must be an integer");
+            }
 
             var nodes = new TreeNodeCollection();
 
@@ -92,7 +94,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             else
             {
                 // maybe we should use the guid as URL param to avoid the extra call for getting dictionary item
-                var parentDictionary = _localizationService.GetDictionaryItemById(intId.Result);
+                var parentDictionary = _localizationService.GetDictionaryItemById(intId);
                 if (parentDictionary == null)
                     return nodes;
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -82,7 +83,7 @@ namespace Umbraco.Cms.Web.Common.Security
                     return false;
                 }
 
-                int memberId = int.Parse(currentMember.Id);
+                int memberId = int.Parse(currentMember.Id, CultureInfo.InvariantCulture);
                 username = currentMember.UserName;
 
                 // If types defined, check member is of one of those types
@@ -192,7 +193,7 @@ namespace Umbraco.Cms.Web.Common.Security
             if (currentMember == null || !currentMember.IsApproved || currentMember.IsLockedOut)
             {
                 return false;
-            }   
+            }
 
             return await _publicAccessService.HasAccessAsync(
                 path,
@@ -231,7 +232,7 @@ namespace Umbraco.Cms.Web.Common.Security
                     async () => await getUserRolesAsync());
             }
             return result;
-        }        
+        }
 
         public IPublishedContent AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
     }

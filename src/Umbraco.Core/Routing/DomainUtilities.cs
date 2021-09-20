@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Web;
@@ -47,7 +48,7 @@ namespace Umbraco.Cms.Core.Routing
             var pos = route.IndexOf('/');
             var domain = pos == 0
                 ? null
-                : DomainForNode(umbracoContext.Domains, siteDomainMapper, int.Parse(route.Substring(0, pos)), current);
+                : DomainForNode(umbracoContext.Domains, siteDomainMapper, int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture), current);
 
             var rootContentId = domain?.ContentId ?? -1;
             var wcDomain = FindWildcardDomainInPath(umbracoContext.Domains.GetAll(true), contentPath, rootContentId);
@@ -329,7 +330,7 @@ namespace Umbraco.Cms.Core.Routing
 
             return path.Split(Constants.CharArrays.Comma)
                        .Reverse()
-                       .Select(int.Parse)
+                       .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
                        .TakeWhile(id => id != stopNodeId)
                        .Select(id => domains.FirstOrDefault(d => d.ContentId == id && d.IsWildcard == false))
                        .SkipWhile(domain => domain == null)
@@ -350,7 +351,7 @@ namespace Umbraco.Cms.Core.Routing
 
             return path.Split(Constants.CharArrays.Comma)
                        .Reverse()
-                       .Select(int.Parse)
+                       .Select(s => int.Parse(s, CultureInfo.InvariantCulture))
                        .TakeWhile(id => id != stopNodeId)
                        .Select(id => domains.FirstOrDefault(d => d.ContentId == id && d.IsWildcard))
                        .FirstOrDefault(domain => domain != null);

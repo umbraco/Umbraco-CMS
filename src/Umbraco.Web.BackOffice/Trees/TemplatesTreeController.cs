@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             var found = id == Constants.System.RootString
                 ? _fileService.GetTemplates(-1)
-                : _fileService.GetTemplates(int.Parse(id));
+                : _fileService.GetTemplates(int.Parse(id, CultureInfo.InvariantCulture));
 
             nodes.AddRange(found.Select(template => CreateTreeNode(
                 template.Id.ToString(CultureInfo.InvariantCulture),
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return menu;
             }
 
-            var template = _fileService.GetTemplate(int.Parse(id));
+            var template = _fileService.GetTemplate(int.Parse(id, CultureInfo.InvariantCulture));
             if (template == null) return menu;
             var entity = FromTemplate(template);
 

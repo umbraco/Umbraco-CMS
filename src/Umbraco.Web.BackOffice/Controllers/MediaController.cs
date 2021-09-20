@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
@@ -898,7 +899,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //if it's not an INT then we'll check for GUID
-            if (int.TryParse(parentId, out intParentId) == false)
+            if (int.TryParse(parentId, NumberStyles.Integer, CultureInfo.InvariantCulture, out intParentId) == false)
             {
                 // if a guid then try to look up the entity
                 Guid idGuid;

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -32,7 +33,7 @@ namespace Umbraco.Cms.Core.Routing
             {
                 return false;
             }
-            if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"), out int pageId))
+            if (int.TryParse(_requestAccessor.GetRequestValue("umbPageID"),  NumberStyles.Integer, CultureInfo.InvariantCulture, out int pageId))
             {
                 IPublishedContent doc = umbracoContext.Content.GetById(pageId);
 
