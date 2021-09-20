@@ -12,7 +12,8 @@ namespace Umbraco.Cms.Web.Common.Security
         public void Configure(IISServerOptions options)
         {
             // convert from KB to bytes
-            options.MaxRequestBodySize = _runtimeSettings.Value.MaxRequestLength.HasValue ? _runtimeSettings.Value.MaxRequestLength.Value * 1024 : long.MaxValue;
+            options.MaxRequestBodySize = _runtimeSettings.Value.MaxRequestLength.HasValue ? _runtimeSettings.Value.MaxRequestLength.Value * 1024 : uint.MaxValue; // ~4GB is the max supported value for IIS and IIS express.
+            //options.IisMaxRequestSizeLimit
         }
     }
 }
