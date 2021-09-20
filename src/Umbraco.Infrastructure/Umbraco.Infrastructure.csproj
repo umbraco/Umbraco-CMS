@@ -19,16 +19,16 @@
 
     <ItemGroup>
       <PackageReference Include="HtmlAgilityPack" Version="1.11.36" />
-      <PackageReference Include="MailKit" Version="2.14.0" />
-      <PackageReference Include="IPNetwork2" Version="2.5.341" />
+      <PackageReference Include="MailKit" Version="2.15.0" />
+      <PackageReference Include="IPNetwork2" Version="2.5.353" />
       <PackageReference Include="Markdown" Version="2.2.1" />
-      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.9" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.10" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
       <PackageReference Include="MiniProfiler.Shared" Version="4.2.22" />
       <PackageReference Include="ncrontab" Version="3.3.1" />
@@ -46,12 +46,12 @@
       <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
       <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
-      <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+      <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
       <PackageReference Include="System.Text.Encodings.Web" Version="5.0.1" /> <!-- Explicit updated this nested dependency due to this https://github.com/dotnet/announcements/issues/178-->
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
-      <PackageReference Include="Examine.Core" Version="2.0.0-beta.154" />
-      <PackageReference Include="Umbraco.Code" Version="1.1.1">
+      <PackageReference Include="Examine.Core" Version="2.0.0-beta.170" />
+      <PackageReference Include="Umbraco.Code" Version="1.2.0">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
     </ItemGroup>
