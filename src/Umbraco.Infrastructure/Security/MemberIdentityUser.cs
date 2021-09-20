@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
@@ -11,7 +12,7 @@ namespace Umbraco.Cms.Core.Security
     /// </summary>
     public class MemberIdentityUser : UmbracoIdentityUser
     {
-        private string _comments;        
+        private string _comments;
 
         // Custom comparer for enumerables
         private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> s_groupsComparer = new DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>>(
@@ -77,7 +78,7 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         public string MemberTypeAlias { get; set; }
 
-        private static string UserIdToString(int userId) => string.Intern(userId.ToString());
+        private static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));
 
         // TODO: Should we support custom member properties for persistence/retrieval?
     }

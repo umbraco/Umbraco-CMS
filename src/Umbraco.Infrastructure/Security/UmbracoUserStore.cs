@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Security
             throw new InvalidOperationException($"Unable to convert user ID ({userId})to int using InvariantCulture");
         }
 
-        protected static string UserIdToString(int userId) => string.Intern(userId.ToString());
+        protected static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));
 
         /// <summary>
         /// Not supported in Umbraco

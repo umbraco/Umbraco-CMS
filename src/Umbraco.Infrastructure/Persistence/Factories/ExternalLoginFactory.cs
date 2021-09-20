@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
     {
         public static IIdentityUserToken BuildEntity(ExternalLoginTokenDto dto)
         {
-            var entity = new IdentityUserToken(dto.Id, dto.ExternalLoginDto.LoginProvider, dto.Name, dto.Value, dto.ExternalLoginDto.UserId.ToString(), dto.CreateDate);
+            var entity = new IdentityUserToken(dto.Id, dto.ExternalLoginDto.LoginProvider, dto.Name, dto.Value, dto.ExternalLoginDto.UserId.ToString(CultureInfo.InvariantCulture), dto.CreateDate);
 
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 
         public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
         {
-            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId.ToString(), dto.CreateDate)
+            var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId.ToString(CultureInfo.InvariantCulture), dto.CreateDate)
             {
                 UserData = dto.UserData
             };

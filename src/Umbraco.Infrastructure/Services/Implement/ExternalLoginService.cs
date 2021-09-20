@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
@@ -25,7 +26,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // TODO: This is temp until we update the external service to support guids for both users and members
-                var asString = userId.ToString();
+                var asString = userId.ToString(CultureInfo.InvariantCulture);
                 return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.UserId == asString))
                     .ToList();
             }
@@ -36,7 +37,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // TODO: This is temp until we update the external service to support guids for both users and members
-                var asString = userId.ToString();
+                var asString = userId.ToString(CultureInfo.InvariantCulture);
                 return _externalLoginRepository.Get(Query<IIdentityUserToken>().Where(x => x.UserId == asString))
                     .ToList();
             }
