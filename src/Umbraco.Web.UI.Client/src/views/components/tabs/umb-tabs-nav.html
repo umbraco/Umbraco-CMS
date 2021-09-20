@@ -1,6 +1,6 @@
 <ul role="tablist" class="umb-tabs-nav">
     <li class="umb-tab" ng-repeat="tab in vm.tabs |  limitTo: vm.maxTabs" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'umb-tab--error': valTab_tabHasError}" val-tab>
-        <button class="btn-reset umb-tab-button" ng-click="vm.clickTab($event, tab)" role="tab" aria-selected="{tab.active}" type="button">
+        <button class="btn-reset umb-tab-button" ng-click="vm.clickTab($event, tab)" role="tab" aria-selected="{{tab.active}}" type="button">
             {{ tab.label }}
             <div ng-show="valTab_tabHasError && !tab.active" class="badge">!</div>
         </button>
@@ -23,7 +23,7 @@
                     ng-class="{'dropdown-menu--active': tab.active}"
                     ng-click="vm.clickTab($event, tab)"
                     role="tab"
-                    aria-selected="{tab.active}" >
+                    aria-selected="{{tab.active}}" >
                     {{ tab.label }}
                     <div ng-show="valTab_tabHasError && !tab.active" class="badge">!</div>
                 </button>
