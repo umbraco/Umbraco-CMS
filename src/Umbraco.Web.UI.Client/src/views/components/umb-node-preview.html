@@ -1,6 +1,6 @@
 <div class="umb-node-preview" ng-class="{'umb-node-preview--sortable': sortable, 'umb-node-preview--unpublished': published === false }">
     <div class="flex"> <!-- div keeps icon and nodename from wrapping -->
-        <umb-icon ng-if="icon" icon="{{icon}}" class="umb-node-preview__icon {{icon}}"></umb-icon>
+        <umb-icon ng-if="icon" icon="{{icon}}" class="umb-node-preview__icon"></umb-icon>
         
         <div class="umb-node-preview__content">
 
@@ -19,59 +19,47 @@
 
         <!-- If editUrl has a value we render a link otherwise a button -->
         <a class="umb-node-preview__action"
-           title="Edit {{name}}"
            ng-href="{{editUrl}}"
            ng-if="allowEdit && editUrl"
            ng-click="onEdit()">
-            <localize key="general_edit">Edit</localize>
-            <span class="sr-only">{{name}}</span>
+            <localize key="general_edit">Edit</localize><span class="sr-only">&nbsp;{{name}}</span>
         </a>
 
         <button type="button"
                 class="umb-node-preview__action"
-                title="Edit {{name}}"
                 ng-if="allowEdit && !editUrl"
                 ng-click="onEdit()">
-            <localize key="general_edit">Edit</localize>
-            <span class="sr-only">{{name}}...</span>
+            <localize key="general_edit">Edit</localize><span class="sr-only">&nbsp;{{name}}...</span>
         </button>
 
         <!-- If openUrl has a value we render a link otherwise a button -->
         <a class="umb-node-preview__action"
-           title="Open {{name}}"
            ng-href="{{openUrl}}"
            ng-if="allowOpen && openUrl"
            ng-click="onOpen()">
-            <localize key="general_open">Open</localize>
-            <span class="sr-only">{{name}}</span>
+            <localize key="general_open">Open</localize><span class="sr-only">&nbsp;{{name}}</span>
         </a>
 
         <button type="button"
                 class="umb-node-preview__action"
-                title="Open {{name}}"
                 ng-if="allowOpen && !openUrl"
                 ng-click="onOpen()">
-            <localize key="general_open">Open</localize>
-            <span class="sr-only">{{name}}...</span>
+            <localize key="general_open">Open</localize><span class="sr-only">&nbsp;{{name}}...</span>
         </button>
 
         <!-- If removeUrl has a value we render a link otherwise a button -->
         <a class="umb-node-preview__action umb-node-preview__action--red"
-           title="Remove {{name}}"
            ng-href="{{removeUrl}}"
            ng-if="allowRemove && removeUrl"
            ng-click="onRemove()">
-            <localize key="general_remove">Remove</localize>
-            <span class="sr-only">{{name}}</span>
+            <localize key="general_remove">Remove</localize><span class="sr-only">&nbsp;{{name}}</span>
         </a>
 
         <button type="button"
                 class="umb-node-preview__action umb-node-preview__action--red"
-                title="Remove {{name}}"
                 ng-if="allowRemove && !removeUrl"
                 ng-click="onRemove()">
-            <localize key="general_remove">Remove</localize>
-            <span class="sr-only">{{name}}</span>
+            <localize key="general_remove">Remove</localize><span class="sr-only">&nbsp;{{name}}</span>
         </button>
     </div>
 

@@ -15,7 +15,7 @@
                         ng-controller="Umbraco.PropertyEditors.MediaPicker3PropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
                         ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
                         <div class="__plus" ng-style="{'top':inlineCreateButtonCtrl.plusPosY}">
-                            <i class="icon icon-add" aria-hidden="true"></i>
+                            <umb-icon icon="icon-add" class="icon"></umb-icon>
                         </div>
                 </button>
 
@@ -27,10 +27,10 @@
                     allowed-types="vm.allowedTypes">
                     <div class="__actions">
                         <button ng-if="vm.supportCopy" type="button" class="btn-reset __action umb-outline" localize="title" title="actions_copy" ng-click="vm.copyMedia(media); $event.stopPropagation();">
-                            <i class="icon icon-documents" aria-hidden="true"></i>
+                            <umb-icon icon="icon-documents" class="icon"></umb-icon>
                         </button>
                         <button type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeMedia(media); $event.stopPropagation();">
-                            <i class="icon icon-trash" aria-hidden="true"></i>
+                            <umb-icon icon="icon-trash" class="icon"></umb-icon>
                         </button>
                     </div>
                 </umb-media-card>
@@ -42,16 +42,17 @@
                 id="{{vm.model.alias}}"
                 type="button"
                 class="btn-reset umb-media-card-grid__create-button umb-outline"
-                disbled="!vm.allowAdd"
+                ng-disabled="!vm.allowAdd"
                 ng-click="vm.addMediaAt(vm.model.value.length, $event)">
                 <div>
-                    <i class="icon icon-add large" aria-hidden="true"></i>
+                    <umb-icon icon="icon-add" class="icon large"></umb-icon>
                     <localize key="general_add">Add</localize>
                 </div>
         </button>
 
     </div>
 
+    <input type="hidden" name="modelValue" ng-model="vm.model.value" val-server="value" />
     <input type="hidden" name="minCount" ng-model="vm.model.value" val-server="minCount" />
     <input type="hidden" name="maxCount" ng-model="vm.model.value" val-server="maxCount" />
 

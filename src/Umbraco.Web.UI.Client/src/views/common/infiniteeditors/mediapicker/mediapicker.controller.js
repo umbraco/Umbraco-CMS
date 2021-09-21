@@ -168,6 +168,7 @@ angular.module("umbraco")
                     var originalTarget = $scope.target;
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
+                    var caption = $scope.target.caption;
 
                     // ID of a UDI or legacy int ID still could be null/undefinied here
                     // As user may dragged in an image that has not been saved to media section yet
@@ -181,6 +182,7 @@ angular.module("umbraco")
                                     $scope.target.url = mediaHelper.resolveFileFromEntity(node);
                                     $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
                                     $scope.target.altText = altText;
+                                    $scope.target.caption = caption;
                                     $scope.target.focalPoint = originalTarget.focalPoint;
                                     $scope.target.coordinates = originalTarget.coordinates;
                                     openDetailsDialog();
@@ -477,9 +479,15 @@ angular.module("umbraco")
                 vm.loading = true;
                 entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
+
                         // update image data to work with image grid
                         if (data.items) {
-                            data.items.forEach(mediaItem => setMediaMetaData(mediaItem));
+                            var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
+
+                            data.items.forEach(function(mediaItem) {
+                                setMediaMetaData(mediaItem);
+                                mediaItem.filtered = allowedTypes && allowedTypes.indexOf(mediaItem.metaData.ContentTypeAlias) < 0;
+                            });
                         }
 
                         // update images

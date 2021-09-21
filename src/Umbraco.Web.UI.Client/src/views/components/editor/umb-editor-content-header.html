@@ -3,8 +3,8 @@
     <div class="flex items-center" style="height: 100%;">
 
         <div ng-if="showBackButton === true && splitViewOpen !== true" style="margin-right: 15px;">
-            <button type="button" class="umb-editor-header__back" ng-click="goBack()" prevent-default>
-                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            <button type="button" class="umb-editor-header__back" ng-click="goBack()">
+                <umb-icon icon="fa fa-arrow-left"></umb-icon>
                 <span class="sr-only"><localize key="visuallyHiddenTexts_goBack">Go back</localize></span>
             </button>
         </div>
@@ -13,9 +13,7 @@
 
             <div id="nameField" class="umb-editor-header__name-and-description" style="flex: 1 1 auto;">
                 <div>
-                    <p tabindex="0" class="sr-only">
-                        {{a11yMessage}}
-                    </p>
+                    <p tabindex="0" class="sr-only">{{a11yMessage}}</p>
                 </div>
                 <div class="umb-editor-header__name-wrapper">
                     <label for="headerName" class="sr-only">{{a11yName}}</label>
@@ -42,7 +40,7 @@
 
                     <button type="button" ng-if="vm.hasVariants === true && hideChangeVariant !== true" class="umb-variant-switcher__toggle umb-outline" ng-click="toggleDropdown()" ng-class="{'--error': vm.errorsOnOtherVariants}" aria-haspopup="true" aria-expanded="{{vm.dropdownOpen}}">
                         <span ng-bind="editor.content.displayName"></span>
-                        <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</umb-icon>
+                        <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand"></umb-icon>
                     </button>
 
                     <span ng-if="vm.hasVariants === true && hideChangeVariant" class="umb-variant-switcher__toggle">
@@ -53,17 +51,18 @@
                         <umb-dropdown-item
                             ng-repeat-start="entry in vm.variantMenu track by entry.key"
                             class="umb-variant-switcher__item"
-                            ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': entry.variant.active !== true && entry.variant.hasError, '--state-notCreated':entry.variant.state==='NotCreated' && entry.variant.name == null, '--state-draft':entry.variant.state==='Draft' || (entry.variant.state==='NotCreated' && entry.variant.name != null)}"
-                        >
+                            ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': entry.variant.active !== true && entry.variant.hasError, '--state-notCreated':entry.variant.state==='NotCreated' && entry.variant.name == null, '--state-draft':entry.variant.state==='Draft' || (entry.variant.state==='NotCreated' && entry.variant.name != null)}">
                             <button type="button" ng-if="entry.subVariants && entry.subVariants.length > 0" class="umb-variant-switcher__item-expand-button umb-outline" ng-click="entry.open = !entry.open">
-                                <i class="icon {{entry.open ? 'icon-navigation-down' : 'icon-navigation-right'}}"></i>
+                                <umb-icon icon="{{entry.open ? 'icon-navigation-down' : 'icon-navigation-right'}}" class="icon"></umb-icon>
                             </button>
                             <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, entry.variant)">
-                                <span class="umb-variant-switcher__name" ng-bind="entry.variant.displayName"></span>
-                                <span class="umb-variant-switcher__state">
-                                    <umb-variant-state variant="entry.variant"></umb-variant-state>
-                                    <span ng-if="entry.variant.language.isMandatory"> - <localize key="general_mandatory"></localize></span>
-                                    <span ng-if="entry.variant.language.isDefault"> - <localize key="general_default"></localize></span>
+                                <span class="umb-variant-switcher__name-content">
+                                    <span class="umb-variant-switcher__name" ng-bind="entry.variant.displayName"></span>
+                                    <span class="umb-variant-switcher__state">
+                                        <umb-variant-state variant="entry.variant"></umb-variant-state>
+                                        <span ng-if="entry.variant.language.isMandatory"> - <localize key="general_mandatory"></localize></span>
+                                        <span ng-if="entry.variant.language.isDefault"> - <localize key="general_default"></localize></span>
+                                    </span>
                                 </span>
                             </button>
                             <div ng-if="splitViewOpen !== true && !entry.variant.active" class="umb-variant-switcher__split-view umb-outline" ng-click="openInSplitView($event, entry.variant)">Open in split view</div>
@@ -79,8 +78,10 @@
                                 ng-class="{'--current': subVariant === editor.content, '--active': subVariant.active && vm.dropdownOpen, '--error': subVariant.active !== true && subVariant.hasError, '--state-notCreated':subVariant.state==='NotCreated', '--state-draft':subVariant.state==='Draft'}"
                             >
                                 <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, subVariant)">
-                                    <span class="umb-variant-switcher__name" ng-bind="subVariant.segment"></span>
-                                    <umb-variant-state variant="subVariant" class="umb-variant-switcher__state"></umb-variant-state>
+                                    <span class="umb-variant-switcher__name-content">
+                                        <span class="umb-variant-switcher__name" ng-bind="subVariant.segment"></span>
+                                        <umb-variant-state variant="subVariant" class="umb-variant-switcher__state"></umb-variant-state>
+                                    </span>
                                 </button>
                                 <div ng-if="splitViewOpen !== true && !subVariant.active" class="umb-variant-switcher__split-view umb-outline" ng-click="openInSplitView($event, subVariant)">Open in split view</div>
                             </umb-dropdown-item>
@@ -93,19 +94,13 @@
 
         </div>
 
-        <div ng-if="splitViewOpen">
-            <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
-                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
-                <span class="sr-only"><localize key="general_closepane">Close Pane</localize></span>
-            </button>
-        </div>
-
         <div ng-if="editor.variantApps && splitViewOpen !== true">
             <umb-editor-navigation
                 data-element="editor-sub-views"
                 navigation="editor.variantApps"
                 on-select="selectNavigationItem(item)"
-                on-anchor-select="selectAnchorItem(item, anchor)">
+                on-anchor-select="selectAnchorItem(item, anchor)"
+                limit="vm.navigationItemLimit">
             </umb-editor-navigation>
         </div>
 
@@ -116,6 +111,13 @@
                 current-section="{{menu.currentSection}}"
                 is-disabled="disableActionsMenu">
             </umb-editor-menu>
+        </div>
+
+        <div ng-if="splitViewOpen">
+            <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
+                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
+                <span class="sr-only"><localize key="general_closepane">Close Pane</localize></span>
+            </button>
         </div>
 
     </div>

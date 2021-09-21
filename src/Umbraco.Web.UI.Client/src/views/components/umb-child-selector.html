@@ -3,7 +3,7 @@
     <div class="umb-child-selector__child -parent">
         <div class="umb-child-selector__child-description">
             <div class="umb-child-selector__child-icon-holder">
-                <umb-icon icon="{{parentIcon}}" class="umb-child-selector__child-icon {{parentIcon}}"></umb-icon>
+                <umb-icon icon="{{parentIcon}}" class="umb-child-selector__child-icon"></umb-icon>
             </div>
             <span class="umb-child-selector__child-name">
                 <strong>{{parentName}}</strong>
@@ -19,13 +19,13 @@
         <div class="umb-child-selector__child" ng-repeat="selectedChild in selectedChildren">
             <div class="umb-child-selector__child-description">
                 <div class="umb-child-selector__child-icon-holder">
-                    <umb-icon icon="{{selectedChild.icon}}" class="umb-child-selector__child-icon {{selectedChild.icon}}"></umb-icon>
+                    <umb-icon icon="{{selectedChild.icon}}" class="umb-child-selector__child-icon"></umb-icon>
                 </div>
                 <span class="umb-child-selector__child-name">{{selectedChild.name}}</span>
             </div>
             <div class="umb-child-selector__child-actions">
                 <button type="button" class="umb-child-selector__child-remove" ng-click="removeChild(selectedChild, $index)">
-                    <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
+                    <umb-icon icon="icon-trash"></umb-icon>
                 </button>
             </div>
         </div>

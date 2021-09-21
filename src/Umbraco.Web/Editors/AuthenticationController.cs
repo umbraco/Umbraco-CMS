@@ -17,7 +17,6 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -34,10 +33,11 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [Mvc.PluginController("UmbracoApi")]
     [ValidationFilter]
     [AngularJsonOnlyConfiguration]
     [IsBackOffice]
+    [DisableBrowserCache]
     public class AuthenticationController : UmbracoApiController
     {
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
@@ -337,7 +337,7 @@ namespace Umbraco.Web.Editors
                         new[] { identityUser.UserName, callbackUrl });
 
                     await UserManager.SendEmailAsync(identityUser.Id,
-                        Services.TextService.Localize("login/resetPasswordEmailCopySubject",
+                        Services.TextService.Localize("login", "resetPasswordEmailCopySubject",
                             // Ensure the culture of the found user is used for the email!
                             UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
                         message);
