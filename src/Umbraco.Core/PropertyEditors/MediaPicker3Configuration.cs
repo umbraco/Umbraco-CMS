@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         [ConfigurationField("enableLocalFocalPoint", "Enable Focal Point", "boolean")]
         public bool EnableLocalFocalPoint { get; set; }
 
-        [ConfigurationField("crops", "Image Crops", "views/propertyeditors/MediaPicker3/prevalue/mediapicker3.crops.html", Description = "Local crops, stored on document")]
+        [ConfigurationField("crops", "Image Crops", "views/propertyeditors/mediapicker3/prevalue/mediapicker3.crops.html", Description = "Local crops, stored on document")]
         public CropConfiguration[] Crops { get; set; }
 
         [DataContract]
