@@ -418,7 +418,7 @@
                 contentType.isElement = true;
             }
 
-            // set isElement checkbox by default
+            // set icon if one is provided
             if (icon !== null) {
                 contentType.icon = icon;
             }
