@@ -21,7 +21,7 @@
 
         function init() {
 
-            mediaTypeResource.getAll().then(function(mediaTypes){
+            mediaTypeResource.getAll().then(mediaTypes => {
 
                 vm.mediaTypes = mediaTypes;
 
@@ -42,24 +42,19 @@
 
             var editor = {
                 multiPicker: true,
-                filterCssClass: "not-allowed not-published",
-                filter: function (item) {
-                    return !_.findWhere(vm.mediaTypes, { udi: item.udi }) || !!_.findWhere(vm.selectedChildren, { udi: item.udi });
-                },
-                submit: function (model) {
-                    Utilities.forEach(model.selection,
-                        function (item) {
-                            mediaTypeResource.getById(item.id).then(function (contentType) {
-                                vm.selectedChildren.push(contentType);
-                                $scope.model.allowedContentTypes.push(item.id);
-                            });
-                        });
+                filterCssClass: 'not-allowed not-published',
+                filter: item => 
+                    !vm.mediaTypes.some(x => x.udi == item.udi) || vm.selectedChildren.some(x => x.udi === item.udi),                
+                submit: model => {
+                    model.selection.forEach(item => 
+                        mediaTypeResource.getById(item.id).then(contentType => {
+                            vm.selectedChildren.push(contentType);
+                            $scope.model.allowedContentTypes.push(item.id);
+                        }));
 
                     editorService.close();
                 },
-                close: function () {
-                    editorService.close();
-                }
+                close: () => editorService.close()                
             };
 
             editorService.mediaTypePicker(editor);
@@ -76,9 +71,7 @@
 
         function sortChildren() {
             // we need to wait until the next digest cycle for vm.selectedChildren to be updated
-            $timeout(function () {
-                $scope.model.allowedContentTypes = _.pluck(vm.selectedChildren, "id");
-            });
+            $timeout(() => $scope.model.allowedContentTypes = vm.selectedChildren.map(x => x.id));
         }
 
         /**
@@ -95,5 +88,5 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.MediaType.PermissionsController", PermissionsController);
+    angular.module('umbraco').controller('Umbraco.Editors.MediaType.PermissionsController', PermissionsController);
 })();

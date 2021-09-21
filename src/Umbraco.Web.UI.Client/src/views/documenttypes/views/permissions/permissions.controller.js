@@ -9,7 +9,7 @@
 (function () {
     'use strict';
 
-    function PermissionsController($scope, $timeout, contentTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService, editorService) {
+    function PermissionsController($scope, $timeout, contentTypeResource, iconHelper, contentTypeHelper, editorService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -34,8 +34,8 @@
 
         function init() {
 
-            contentTypeResource.getAll().then(function (contentTypes) {
-                vm.contentTypes = _.where(contentTypes, { isElement: false });
+            contentTypeResource.getAll().then(contentTypes => {
+                vm.contentTypes = contentTypes.filter(x => !x.isElement);
 
                 // convert legacy icons
                 iconHelper.formatContentTypeIcons(vm.contentTypes);
@@ -49,7 +49,7 @@
 
             // Can only switch to an element type if there are no content nodes already created from the type.
             if ($scope.model.id > 0 && !$scope.model.isElement) {
-                contentTypeResource.hasContentNodes($scope.model.id).then(function (result) {
+                contentTypeResource.hasContentNodes($scope.model.id).then(result => {
                     vm.canToggleIsElement = !result;
                 });
             } else {
@@ -61,24 +61,19 @@
 
             var editor = {
                 multiPicker: true,
-                filterCssClass: "not-allowed not-published",
-                filter: function (item) {
-                    return !_.findWhere(vm.contentTypes, { udi: item.udi }) || !!_.findWhere(vm.selectedChildren, { udi: item.udi });
-                },
-                submit: function (model) {
-                    Utilities.forEach(model.selection,
-                        function (item) {
-                            contentTypeResource.getById(item.id).then(function (contentType) {
-                                vm.selectedChildren.push(contentType);
-                                $scope.model.allowedContentTypes.push(item.id);
-                            });
-                        });
+                filterCssClass: 'not-allowed not-published',
+                filter: item => 
+                    !vm.contentTypes.some(x => x.udi == item.udi) || vm.selectedChildren.some(x => x.udi === item.udi),
+                submit: model => {
+                    model.selection.forEach(item =>
+                        contentTypeResource.getById(item.id).then(contentType => {
+                            vm.selectedChildren.push(contentType);
+                            $scope.model.allowedContentTypes.push(item.id);
+                        }));
 
                     editorService.close();
                 },
-                close: function () {
-                    editorService.close();
-                }
+                close: () => editorService.close()                
             };
 
             editorService.contentTypePicker(editor);
@@ -95,12 +90,10 @@
 
         function sortChildren() {
             // we need to wait until the next digest cycle for vm.selectedChildren to be updated
-            $timeout(function () {
-                $scope.model.allowedContentTypes = _.pluck(vm.selectedChildren, "id");
-            });
+            $timeout(() => $scope.model.allowedContentTypes = vm.selectedChildren.map(x => x.id));
         }
 
-        // note: "safe toggling" here ie handling cases where the value is undefined, etc
+        // note: 'safe toggling' here ie handling cases where the value is undefined, etc
 
         function toggleAllowAsRoot() {
             $scope.model.allowAsRoot = $scope.model.allowAsRoot ? false : true;
@@ -120,5 +113,5 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.DocumentType.PermissionsController", PermissionsController);
+    angular.module('umbraco').controller('Umbraco.Editors.DocumentType.PermissionsController', PermissionsController);
 })();
