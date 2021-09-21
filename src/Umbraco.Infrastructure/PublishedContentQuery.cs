@@ -235,11 +235,6 @@ namespace Umbraco.Cms.Infrastructure
             Search(term, 0, 0, out _, culture, indexName);
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords,
-            string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
-            => Search(term, skip, take, out totalRecords, culture, indexName, null);
-
-        /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null)
         {
             if (skip < 0)
