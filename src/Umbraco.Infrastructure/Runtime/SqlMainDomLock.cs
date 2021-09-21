@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                 if (!_hasTable)
                 {
-                    _logger.LogDebug("The DB does not contain the required table, we must be in an install state we have no choice but to assume we can acquire");
+                    _logger.LogDebug("The DB does not contain the required table so we must be in an install state. We have no choice but to assume we can acquire.");
                     _acquireWhenTablesNotAvailable = true;
                     return true;
                 }
