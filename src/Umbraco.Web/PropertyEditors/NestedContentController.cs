@@ -22,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
                     name = x.Name,
                     alias = x.Alias,
                     icon = x.Icon,
-                    tabs = x.CompositionPropertyGroups.Select(y => y.Name).Distinct()
+                    tabs = x.CompositionPropertyGroups.Where(y => y.Type == Core.Models.PropertyGroupType.Group && !y.Alias.Contains("/")).Select(y => y.Name).Distinct()
                 });
         }
     }
