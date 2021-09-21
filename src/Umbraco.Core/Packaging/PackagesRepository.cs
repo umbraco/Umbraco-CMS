@@ -414,9 +414,10 @@ namespace Umbraco.Cms.Core.Packaging
 
             root.Add(macros);
 
-            // get the partial views for macros and package those
-            IEnumerable<string> views = packagedMacros.Select(x => x.MacroSource).Where(x => x.EndsWith(".cshtml"));
-            PackageMacroPartialViews(views, root);
+            // Get the partial views for macros and package those (exclude views outside of the default directory, e.g. App_Plugins\*\Views)
+            IEnumerable<string> views = packagedMacros.Where(x => x.MacroSource.StartsWith(Constants.SystemDirectories.MacroPartials))
+                .Select(x => x.MacroSource.Substring(Constants.SystemDirectories.MacroPartials.Length).Replace('/', '\\'));
+            PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem);
         }
 
         private void PackageStylesheets(PackageDefinition definition, XContainer root)
@@ -485,33 +486,6 @@ namespace Umbraco.Cms.Core.Packaging
                 templatesXml.Add(_serializer.Serialize(template));
             }
             root.Add(templatesXml);
-        }
-
-        private void PackageMacroPartialViews(IEnumerable<string> viewPaths, XContainer root)
-        {
-            var viewsXml = new XElement("MacroPartialViews");
-            foreach (var viewPath in viewPaths)
-            {
-                // TODO: See TODO note in MacrosController about the inconsistencies of usages of partial views
-                // and how paths are saved. We have no choice currently but to assume that all views are 100% always
-                // on the content path.
-
-                var physicalPath = _hostingEnvironment.MapPathContentRoot(viewPath);
-                if (!File.Exists(physicalPath))
-                {
-                    throw new InvalidOperationException("Could not find partial view at path " + viewPath);
-                }
-
-                var fileContents = File.ReadAllText(physicalPath, Encoding.UTF8);
-
-                viewsXml.Add(
-                    new XElement(
-                        "View",
-                        new XAttribute("path", viewPath),
-                        new XCData(fileContents)));
-            }
-
-            root.Add(viewsXml);
         }
 
         private void PackageDocumentTypes(PackageDefinition definition, XContainer root)

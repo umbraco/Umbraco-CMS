@@ -1270,6 +1270,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     throw new InvalidOperationException("No path attribute found");
                 }
 
+                // Remove prefix to maintain backwards compatibility
+                if (path.StartsWith(Constants.SystemDirectories.MacroPartials))
+                {
+                    path = path.Substring(Constants.SystemDirectories.MacroPartials.Length);
+                }
+                else if (path.StartsWith("~"))
+                {
+                    _logger.LogWarning("Importing macro partial views outside of the Views/MacroPartials directory is not supported: {Path}", path);
+                    continue;
+                }
+
                 IPartialView macroPartialView = _fileService.GetPartialViewMacro(path);
 
                 // only update if it doesn't exist
