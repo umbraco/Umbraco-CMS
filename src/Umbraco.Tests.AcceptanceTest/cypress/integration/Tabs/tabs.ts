@@ -379,7 +379,12 @@ context('Tabs', () => {
       cy.saveDocumentType(tabsDocType);
       OpenDocTypeFolder();
       cy.get('[alias="reorder"]').click();
-      cy.get('.umb-group-builder__tabs-overflow--right > .caret').click().click();
+      cy.get('body')
+      .then(($body) => {
+        while($body.find('.umb-group-builder__tabs-overflow--right > .caret').hasClass('active')){
+          cy.click();
+        }
+      });
       cy.get('.umb-group-builder__tab').last().click();
       cy.get('.umb-group-builder__group-title-icon').last().trigger('mousedown', { which: 1 })
       cy.get('.umb-group-builder__tab').eq(1).trigger('mousemove', {which: 1, force: true});
@@ -426,7 +431,12 @@ context('Tabs', () => {
       OpenDocTypeFolder();
       cy.get('[alias="reorder"]').click();
       //Scroll right so we can see tab 2
-      cy.get('.umb-group-builder__tabs-overflow--right > .caret').click().click();
+      cy.get('body')
+        .then(($body) => {
+          while($body.find('.umb-group-builder__tabs-overflow--right > .caret').hasClass('active')){
+            cy.click();
+          }
+        });
       cy.get('.umb-group-builder__tab-title-icon').eq(1).trigger('mousedown', { which: 1 })
       cy.get('.umb-group-builder__tab').eq(1).trigger('mousemove', {which: 1, force: true});
       cy.get('.umb-group-builder__tab').eq(1).should('have.class', 'is-active').trigger('mouseup', {force:true});
@@ -473,7 +483,12 @@ context('Tabs', () => {
       OpenDocTypeFolder();
       cy.get('[alias="reorder"]').click();
       //Scroll so we are sure we see tab 2
-      cy.get('.umb-group-builder__tabs-overflow--right > .caret').click().click();
+      cy.get('body')
+      .then(($body) => {
+        while($body.find('.umb-group-builder__tabs-overflow--right > .caret').hasClass('active')){
+          cy.click();
+        }
+      });
       //Navigate to tab 2
       cy.get('.umb-group-builder__tab').last().click();
       cy.get('.umb-group-builder__property-meta > .flex > .icon').eq(1).trigger('mousedown', {which: 1})
