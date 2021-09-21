@@ -41,6 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly object _locker = new object();
         private bool _hasTable = false;
         private bool _acquireWhenTablesNotAvailable = false;
+        
         public SqlMainDomLock(
             ILogger<SqlMainDomLock> logger,
             ILoggerFactory loggerFactory,
