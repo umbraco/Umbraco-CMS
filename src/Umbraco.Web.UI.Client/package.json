@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "ace-builds": "1.4.2",
-    "angular": "1.8.0",
+    "angular": "1.8.2",
     "angular-animate": "1.7.5",
     "angular-aria": "1.7.9",
     "angular-chart.js": "^1.1.1",
@@ -35,7 +35,7 @@
     "diff": "3.5.0",
     "flatpickr": "4.6.9",
     "font-awesome": "4.7.0",
-    "jquery": "^3.5.1",
+    "jquery": "^3.6.0",
     "jquery-ui-dist": "1.12.1",
     "jquery-ui-touch-punch": "0.2.3",
     "lazyload-js": "1.0.0",

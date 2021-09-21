@@ -296,6 +296,7 @@
     <key alias="languagesToSchedule">Hvilke sprog vil du gerne planlægge?</key>
     <key alias="languagesToUnpublish">Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil afpublicere alle sprog.</key>
     <key alias="publishedLanguages">Udgivne sprog</key>
+    <key alias="resetFocalPoint">Nulstil fokuspunkt</key>
     <key alias="unpublishedLanguages">Ikke-udgivne sprog</key>
     <key alias="unmodifiedLanguages">Uændrede sprog</key>
     <key alias="untouchedLanguagesForFirstTime">Disse sprog er ikke blevet oprettet</key>

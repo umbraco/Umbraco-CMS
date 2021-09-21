@@ -87,16 +87,17 @@
 
             for (var t = 0; t < fromVariant.tabs.length; t++) {
                 var fromTab = fromVariant.tabs[t];
-                var toTab = toVariant.tabs[t];
+                var toTab = toVariant.tabs.find(tab => tab.alias === fromTab.alias);
 
-                for (var p = 0; p < fromTab.properties.length; p++) {
-                    var fromProp = fromTab.properties[p];
-                    var toProp = toTab.properties[p];
-                    toProp.value = fromProp.value;
+                if (fromTab && fromTab.properties && fromTab.properties.length > 0 && toTab && toTab.properties && toTab.properties.length > 0) {
+                    for (var p = 0; p < fromTab.properties.length; p++) {
+                        var fromProp = fromTab.properties[p];
+                        var toProp = toTab.properties[p];
+                        toProp.value = fromProp.value;
+                    }
                 }
             }
         }
-
 
         /**
          * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
@@ -104,12 +105,14 @@
          */
         function getBlockLabel(blockObject) {
             if (blockObject.labelInterpolator !== undefined) {
-                var labelVars = Object.assign({"$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
-                return blockObject.labelInterpolator(labelVars);
+                var labelVars = Object.assign({"$contentTypeName": blockObject.content.contentTypeName, "$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
+                var label = blockObject.labelInterpolator(labelVars);
+                if (label) {
+                    return label;
+                }
             }
             return blockObject.content.contentTypeName;
         }
-
 
         /**
          * Used to add watchers on all properties in a content or settings model
@@ -604,6 +607,12 @@
                         if (settingsData === null) {
                             console.error("Couldnt find settings data of " + settingsUdi)
                             return null;
+                        }
+
+                        // the Settings model has been changed to a new Element Type.
+                        // we need to update the settingsData with the new Content Type key
+                        if (settingsData.contentTypeKey !== settingsScaffold.contentTypeKey) {
+                            settingsData.contentTypeKey = settingsScaffold.contentTypeKey;
                         }
 
                         blockObject.settingsData = settingsData;

@@ -75,7 +75,7 @@
                                 ng-class="{'trashed': vm.media.trashed}"
                                 extension="{{vm.media.extension}}"
                                 icon="{{vm.media.icon}}"
-                                size="s"
+                                size="m"
                                 text="{{vm.media.name}}">
                             </umb-file-icon>
 
@@ -85,6 +85,9 @@
                                 </button>
                                 <button class="btn btn-link" ng-click="vm.openMedia()">
                                     <umb-icon icon="icon-out"></umb-icon> <localize key="mediaPicker_openMedia">Open media</localize>
+                                </button>
+                                <button type="button" ng-show="vm.model.enableFocalPointSetter && (vm.mediaEntry.focalPoint.left !== 0.5 && vm.mediaEntry.focalPoint.top !== 0.5)" class="btn btn-link" ng-click="vm.focalPointChanged(0.5, 0.5)">
+                                    <umb-icon icon="icon-axis-rotation"></umb-icon> <localize key="content_resetFocalPoint">Reset focal point</localize>
                                 </button>
                             </div>
                         </div>

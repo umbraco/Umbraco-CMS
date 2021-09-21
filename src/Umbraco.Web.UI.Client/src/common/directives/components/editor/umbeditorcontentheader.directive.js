@@ -135,8 +135,10 @@
                 }
 
                 scope.editor.variantApps.forEach((app) => {
+                    // only render quick links on the content app if there are no tabs
                     if (app.alias === "umbContent") {
-                        app.anchors = scope.editor.content.tabs;
+                        const hasTabs = scope.editor.content.tabs && scope.editor.content.tabs.filter(group => group.type === 1).length > 0;
+                        app.anchors = hasTabs ? [] : scope.editor.content.tabs;
                     }
                 });
 
@@ -213,6 +215,10 @@
                     scope.vm.variantMenu.sort(sortVariantsMenu);
                 }
             };
+
+            unsubscribe.push(scope.$watch('splitViewOpen', (newVal) => {
+                scope.vm.navigationItemLimit = newVal === true ? 0 : undefined;
+            }));
 
             onInit();
 

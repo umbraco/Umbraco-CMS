@@ -17,11 +17,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         [DataMember(Order = 0)]
         [JsonProperty("pd")]
         [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<PropertyData[]>))]
+        [MessagePackFormatter(typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<PropertyData[]>))]
         public Dictionary<string, PropertyData[]> PropertyData { get; set; }
 
         [DataMember(Order = 1)]
         [JsonProperty("cd")]
         [JsonConverter(typeof(AutoInterningStringKeyCaseInsensitiveDictionaryConverter<CultureVariation>))]
+        [MessagePackFormatter(typeof(MessagePackAutoInterningStringKeyCaseInsensitiveDictionaryFormatter<CultureVariation>))]
         public Dictionary<string, CultureVariation> CultureData { get; set; }
 
         [DataMember(Order = 2)]

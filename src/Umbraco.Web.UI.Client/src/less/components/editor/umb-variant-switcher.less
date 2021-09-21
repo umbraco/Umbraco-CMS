@@ -108,6 +108,16 @@ button.umb-variant-switcher__toggle {
     cursor: default;
 }
 
+.umb-variant-switcher__name-wrapper {
+    display: flex;
+    align-items: center;
+
+    .umb-variant-switcher__name-content {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
 .umb-variant-switcher__item.--state-notCreated:not(.--active) {
     .umb-variant-switcher__name-wrapper::before {
         content: "+";
