@@ -5,7 +5,7 @@
 
             <ul class="umb-actions umb-actions-child">
                 <li data-element="action-documentType" class="umb-action" ng-hide="model.disableTemplates">
-                    <button type="button" ng-click="createDocType()" class="umb-action-link umb-outline btn-reset" umb-auto-focus>
+                    <button type="button" ng-click="createDocType('icon-document')" class="umb-action-link umb-outline btn-reset" umb-auto-focus>
                         <umb-icon icon="icon-document" class="icon large"></umb-icon>
                         <span class="menu-label">
                             <localize key="create_documentTypeWithTemplate">Document Type with Template</localize>
@@ -14,7 +14,7 @@
                     </button>
                 </li>
                 <li data-element="action-documentTypeWithoutTemplate" class="umb-action">
-                    <button type="button" ng-click="createComponent()" class="umb-action-link umb-outline btn-reset">
+                    <button type="button" ng-click="createComponent('icon-item-arrangement')" class="umb-action-link umb-outline btn-reset">
                         <umb-icon icon="icon-item-arrangement" class="icon large"></umb-icon>
                         <span class="menu-label">
                             <localize key="create_documentType">Document Type</localize>
@@ -23,7 +23,7 @@
                     </button>
                 </li>
                 <li data-element="action-documentTypeWithIsElementTypeChecked" class="umb-action">
-                    <button type="button" ng-click="createElement()" class="umb-action-link umb-outline btn-reset">
+                    <button type="button" ng-click="createElement('icon-science')" class="umb-action-link umb-outline btn-reset">
                         <umb-icon icon="icon-science" class="icon large"></umb-icon>
                         <span class="menu-label">
                             <localize key="create_elementType">Element Type</localize>
@@ -32,7 +32,7 @@
                     </button>
                 </li>
                 <li data-element="action-documentTypeWithoutTemplateForComposition" class="umb-action">
-                    <button type="button" ng-click="createComposition()" class="umb-action-link umb-outline btn-reset">
+                    <button type="button" ng-click="createComposition('icon-defrag')" class="umb-action-link umb-outline btn-reset">
                         <umb-icon icon="icon-defrag" class="icon large"></umb-icon>
                         <span class="menu-label">
                             <localize key="create_composition">Composition</localize>
