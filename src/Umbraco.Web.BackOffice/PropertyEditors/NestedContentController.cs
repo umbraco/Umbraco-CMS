@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -23,9 +24,7 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
         }
 
         [HttpGet]
-        public IEnumerable<object> GetContentTypes()
-        {
-            return _contentTypeService
+        public IEnumerable<object> GetContentTypes() => _contentTypeService
                 .GetAllElementTypes()
                 .OrderBy(x => x.SortOrder)
                 .Select(x => new
@@ -35,8 +34,7 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
                     name = x.Name,
                     alias = x.Alias,
                     icon = x.Icon,
-                    tabs = x.CompositionPropertyGroups.Select(y => y.Name).Distinct()
+                    tabs = x.CompositionPropertyGroups.Where(x => x.Type == PropertyGroupType.Group && x.GetParentAlias() is null).Select(y => y.Name).Distinct()
                 });
-        }
     }
 }
