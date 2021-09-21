@@ -482,6 +482,12 @@ namespace Umbraco.Cms.Core.Security
                 user.FailedPasswordAttempts = identityUser.AccessFailedCount;
             }
 
+            if (user.IsApproved != identityUser.IsApproved)
+            {
+                anythingChanged = true;
+                user.IsApproved = identityUser.IsApproved;
+            }
+
             if (user.IsLockedOut != identityUser.IsLockedOut)
             {
                 anythingChanged = true;
