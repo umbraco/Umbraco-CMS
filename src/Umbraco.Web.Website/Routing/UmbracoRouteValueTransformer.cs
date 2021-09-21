@@ -52,6 +52,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         private readonly IDataProtectionProvider _dataProtectionProvider;
         private readonly IControllerActionSearcher _controllerActionSearcher;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IPublicAccessRequestHandler _publicAccessRequestHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -67,7 +68,8 @@ namespace Umbraco.Cms.Web.Website.Routing
             IRoutableDocumentFilter routableDocumentFilter,
             IDataProtectionProvider dataProtectionProvider,
             IControllerActionSearcher controllerActionSearcher,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IPublicAccessRequestHandler publicAccessRequestHandler)
         {
             if (globalSettings is null)
             {
@@ -85,6 +87,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             _dataProtectionProvider = dataProtectionProvider;
             _controllerActionSearcher = controllerActionSearcher;
             _eventAggregator = eventAggregator;
+            _publicAccessRequestHandler = publicAccessRequestHandler;
         }
 
         /// <inheritdoc/>
@@ -125,19 +128,9 @@ namespace Umbraco.Cms.Web.Website.Routing
                 };
             }
 
-            IPublishedRequest publishedRequest = await RouteRequestAsync(httpContext, umbracoContext);
+            IPublishedRequest publishedRequest = await RouteRequestAsync(umbracoContext);
 
             umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
-
-            // Store the route values as a httpcontext feature
-            httpContext.Features.Set(umbracoRouteValues);
-
-            // Need to check if there is form data being posted back to an Umbraco URL
-            PostedDataProxyInfo postedInfo = GetFormInfo(httpContext, values);
-            if (postedInfo != null)
-            {
-                return HandlePostedValues(postedInfo, httpContext);
-            }
 
             if (!umbracoRouteValues?.PublishedRequest?.HasPublishedContent() ?? false)
             {
@@ -147,6 +140,19 @@ namespace Umbraco.Cms.Web.Website.Routing
                 // it's possible that a developer is handling dynamic routes too.
                 // Our 404 page will be handled with the NotFoundSelectorPolicy
                 return null;
+            }
+
+            // now we need to do some public access checks
+            umbracoRouteValues = await _publicAccessRequestHandler.RewriteForPublishedContentAccessAsync(httpContext, umbracoRouteValues);
+
+            // Store the route values as a httpcontext feature
+            httpContext.Features.Set(umbracoRouteValues);
+
+            // Need to check if there is form data being posted back to an Umbraco URL
+            PostedDataProxyInfo postedInfo = GetFormInfo(httpContext, values);
+            if (postedInfo != null)
+            {
+                return HandlePostedValues(postedInfo, httpContext);
             }
 
             // See https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.routing.dynamicroutevaluetransformer.transformasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Mvc_Routing_DynamicRouteValueTransformer_TransformAsync_Microsoft_AspNetCore_Http_HttpContext_Microsoft_AspNetCore_Routing_RouteValueDictionary_
@@ -164,7 +170,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             return newValues;
         }
 
-        private async Task<IPublishedRequest> RouteRequestAsync(HttpContext httpContext, IUmbracoContext umbracoContext)
+        private async Task<IPublishedRequest> RouteRequestAsync(IUmbracoContext umbracoContext)
         {
             // ok, process
 

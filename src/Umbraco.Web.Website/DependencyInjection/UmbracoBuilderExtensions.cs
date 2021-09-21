@@ -8,8 +8,6 @@ using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Collections;
-using Umbraco.Cms.Web.Website.Controllers;
-using Umbraco.Cms.Web.Website.Middleware;
 using Umbraco.Cms.Web.Website.Models;
 using Umbraco.Cms.Web.Website.Routing;
 using Umbraco.Cms.Web.Website.ViewEngines;
@@ -51,7 +49,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddSingleton<MemberModelBuilderFactory>();
 
-            builder.Services.AddSingleton<PublicAccessMiddleware>();
+            builder.Services.AddSingleton<IPublicAccessRequestHandler, PublicAccessRequestHandler>();
             builder.Services.AddSingleton<BasicAuthenticationMiddleware>();
 
             builder
