@@ -226,7 +226,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                             }
                         }
 
-                        // In case we acquired the main dom doing install, there was no database. We therefore has to insert our lockId now, but only handle this once.
+                        // In case we acquired the main dom doing install when there was no database. We therefore have to insert our lockId now, but only handle this once.
                         if (_acquireWhenTablesNotAvailable)
                         {
                             _acquireWhenTablesNotAvailable = false;
