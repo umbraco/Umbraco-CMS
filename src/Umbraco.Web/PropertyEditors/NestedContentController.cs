@@ -1,0 +1,29 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.Services;
+using Umbraco.Web.Editors;
+using Umbraco.Web.Mvc;
+
+namespace Umbraco.Web.PropertyEditors
+{
+    [PluginController("UmbracoApi")]
+    public class NestedContentController : UmbracoAuthorizedJsonController
+    {
+        [System.Web.Http.HttpGet]
+        public IEnumerable<object> GetContentTypes()
+        {
+            return Services.ContentTypeService
+                .GetAllElementTypes()
+                .OrderBy(x => x.SortOrder)
+                .Select(x => new
+                {
+                    id = x.Id,
+                    guid = x.Key,
+                    name = x.Name,
+                    alias = x.Alias,
+                    icon = x.Icon,
+                    tabs = x.CompositionPropertyGroups.Where(y => y.Type == Core.Models.PropertyGroupType.Group && !y.Alias.Contains("/")).Select(y => y.Name).Distinct()
+                });
+        }
+    }
+}
