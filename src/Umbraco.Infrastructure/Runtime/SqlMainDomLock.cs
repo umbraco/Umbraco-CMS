@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private bool _errorDuringAcquiring;
         private readonly object _locker = new object();
         private bool _hasTable = false;
-
+        private bool _acquireWhenTablesNotAvailable = false;
         public SqlMainDomLock(
             ILogger<SqlMainDomLock> logger,
             ILoggerFactory loggerFactory,
@@ -99,7 +99,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                 if (!_hasTable)
                 {
-                    // the Db does not contain the required table, we must be in an install state we have no choice but to assume we can acquire
+                    _logger.LogDebug("The DB does not contain the required table, we must be in an install state we have no choice but to assume we can acquire");
+                    _acquireWhenTablesNotAvailable = true;
                     return true;
                 }
 
@@ -223,6 +224,13 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                                 // the Db does not contain the required table, we just keep looping since we can't query the db
                                 continue;
                             }
+                        }
+
+                        // In case we acquired the main dom doing install, there was no database. We therefore has to insert our lockId now, but only handle this once.
+                        if (_acquireWhenTablesNotAvailable)
+                        {
+                            _acquireWhenTablesNotAvailable = false;
+                            InsertLockRecord(_lockId, db);
                         }
 
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
@@ -434,7 +442,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private bool IsMainDomValue(string val, IUmbracoDatabase db)
         {
             return db.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoKeyValue WHERE [key] = @key AND [value] = @val",
-                new { key = MainDomKey, val = val }) == 1;
+                    new { key = MainDomKey, val = val }) == 1;
+
+
+
         }
 
         /// <summary>
@@ -446,6 +457,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
         #region IDisposable Support
         private bool _disposedValue = false; // To detect redundant calls
+
 
         protected virtual void Dispose(bool disposing)
         {
