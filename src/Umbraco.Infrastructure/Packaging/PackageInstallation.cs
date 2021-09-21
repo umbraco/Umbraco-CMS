@@ -41,23 +41,41 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             InstallationSummary installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
 
-            //make sure the definition is up to date with everything
+            // Make sure the definition is up to date with everything (note: macro partial views are embedded in macros)
             foreach (var x in installationSummary.DataTypesInstalled)
                 packageDefinition.DataTypes.Add(x.Id.ToInvariantString());
+
             foreach (var x in installationSummary.LanguagesInstalled)
                 packageDefinition.Languages.Add(x.Id.ToInvariantString());
+
             foreach (var x in installationSummary.DictionaryItemsInstalled)
                 packageDefinition.DictionaryItems.Add(x.Id.ToInvariantString());
+
             foreach (var x in installationSummary.MacrosInstalled)
                 packageDefinition.Macros.Add(x.Id.ToInvariantString());
+
             foreach (var x in installationSummary.TemplatesInstalled)
                 packageDefinition.Templates.Add(x.Id.ToInvariantString());
+
             foreach (var x in installationSummary.DocumentTypesInstalled)
                 packageDefinition.DocumentTypes.Add(x.Id.ToInvariantString());
+
+            foreach (var x in installationSummary.MediaTypesInstalled)
+                packageDefinition.MediaTypes.Add(x.Id.ToInvariantString());
+
             foreach (var x in installationSummary.StylesheetsInstalled)
-                packageDefinition.Stylesheets.Add(x.Id.ToInvariantString());
-            var contentInstalled = installationSummary.ContentInstalled.ToList();
-            packageDefinition.ContentNodeId = contentInstalled.Count > 0 ? contentInstalled[0].Id.ToInvariantString() : null;
+                packageDefinition.Stylesheets.Add(x.Path);
+
+            foreach (var x in installationSummary.ScriptsInstalled)
+                packageDefinition.Scripts.Add(x.Path);
+
+            foreach (var x in installationSummary.PartialViewsInstalled)
+                packageDefinition.PartialViews.Add(x.Path);
+
+            packageDefinition.ContentNodeId = installationSummary.ContentInstalled.FirstOrDefault()?.Id.ToInvariantString();
+            
+            foreach (var x in installationSummary.MediaInstalled)
+                packageDefinition.MediaUdis.Add(x.GetUdi());
 
             return installationSummary;
         }
