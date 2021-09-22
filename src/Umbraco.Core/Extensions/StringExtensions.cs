@@ -25,6 +25,7 @@ namespace Umbraco.Extensions
         private const char DefaultEscapedStringEscapeChar = '\\';
         private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
         private static readonly char[] ToCSharpEscapeChars;
+        private static readonly IShortStringHelper _defaultShortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
         static StringExtensions()
         {
@@ -1245,11 +1246,11 @@ namespace Umbraco.Extensions
         /// Cleans a string to produce a string that can safely be used in an alias.
         /// </summary>
         /// <param name="alias">The text to filter.</param>
-        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="shortStringHelper">The short string helper, or null for default helper</param>
         /// <returns>The safe alias.</returns>
-        public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper)
+        public static string ToSafeAlias(this string alias, IShortStringHelper shortStringHelper = null)
         {
-            return shortStringHelper.CleanStringForSafeAlias(alias);
+            return (shortStringHelper ?? _defaultShortStringHelper).CleanStringForSafeAlias(alias);
         }
 
         /// <summary>
@@ -1285,14 +1286,14 @@ namespace Umbraco.Extensions
         /// Cleans a string to produce a string that can safely be used in an url segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
-        /// <param name="shortStringHelper">The short string helper.</param>
+        /// <param name="shortStringHelper">The short string helper, or null for the default helper</param>
         /// <returns>The safe url segment.</returns>
-        public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper)
+        public static string ToUrlSegment(this string text, IShortStringHelper shortStringHelper = null)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
-            return shortStringHelper.CleanStringForUrlSegment(text);
+            return (shortStringHelper ?? _defaultShortStringHelper).CleanStringForUrlSegment(text);
         }
 
         /// <summary>
