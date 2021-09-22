@@ -198,8 +198,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var folders = _dataTypeService.GetContainers(dataType)
                     .OrderBy(x => x.Level);
 
-                    ;
-
                 folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
                 folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
             }
@@ -504,8 +502,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 //get URL encoded folder names
                 var folders = _contentTypeService.GetContainers(contentType)
                     .OrderBy(x => x.Level);
-
-                    ;
 
                 folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
                 folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
