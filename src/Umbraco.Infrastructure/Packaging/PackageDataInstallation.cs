@@ -599,7 +599,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private EntityContainer CreateContentTypeChildFolder(string folderName, Guid folderKey, IUmbracoEntity current)
         {
             var children = _entityService.GetChildren(current.Id).ToArray();
-            var found = children.Any(x => x.Name.InvariantEquals(folderName));
+            var found = children.Any(x => x.Name.InvariantEquals(folderName) ||x.Key.Equals(folderKey));
             if (found)
             {
                 var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
@@ -1123,7 +1123,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private EntityContainer CreateDataTypeChildFolder(string folderName, Guid folderKey, IUmbracoEntity current)
         {
             var children = _entityService.GetChildren(current.Id).ToArray();
-            var found = children.Any(x => x.Name.InvariantEquals(folderName));
+            var found = children.Any(x => x.Name.InvariantEquals(folderName) ||x.Key.Equals(folderKey));
             if (found)
             {
                 var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
