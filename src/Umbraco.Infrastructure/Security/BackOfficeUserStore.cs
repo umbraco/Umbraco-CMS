@@ -83,6 +83,7 @@ namespace Umbraco.Cms.Core.Security
                 StartContentIds = user.StartContentIds ?? new int[] { },
                 StartMediaIds = user.StartMediaIds ?? new int[] { },
                 IsLockedOut = user.IsLockedOut,
+                IsApproved = user.IsApproved
             };
 
             // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
