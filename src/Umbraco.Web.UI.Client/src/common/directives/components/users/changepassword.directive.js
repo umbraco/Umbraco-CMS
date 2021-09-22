@@ -16,7 +16,7 @@
         var unsubscribe = [];
 
         function resetModel(isNew) {
-            //the model config will contain an object, if it does not we'll create defaults            
+            //the model config will contain an object, if it does not we'll create defaults
             /*
             {
                 hasPassword: true/false,
@@ -80,7 +80,7 @@
         }
 
         function onInit() {
-            //listen for the saved event, when that occurs we'll 
+            //listen for the saved event, when that occurs we'll
             //change to changing = false;
             unsubscribe.push($scope.$on("formSubmitted", function () {
                 if (vm.config.disableToggle === false) {
@@ -146,7 +146,7 @@
         }
     };
 
-    angular.module('umbraco.directives').component('changepassword', component);
+    angular.module('umbraco.directives').component('changePassword', component);
 
 
 })();
