@@ -22,12 +22,13 @@ namespace Umbraco.Cms.Web.Common.Filters
         private class AngularJsonOnlyConfigurationFilter : IResultFilter
         {
             private readonly ArrayPool<char> _arrayPool;
-            private readonly IOptions<MvcOptions> _options;
+            private MvcOptions _options;
 
-            public AngularJsonOnlyConfigurationFilter(ArrayPool<char> arrayPool, IOptions<MvcOptions> options)
+            public AngularJsonOnlyConfigurationFilter(ArrayPool<char> arrayPool, IOptionsMonitor<MvcOptions> options)
             {
                 _arrayPool = arrayPool;
-                _options = options;
+                _options = options.CurrentValue;
+                options.OnChange(x => _options = x);
             }
 
             public void OnResultExecuted(ResultExecutedContext context)
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Web.Common.Filters
                     };
 
                     objectResult.Formatters.Clear();
-                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options.Value));
+                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options));
                 }
             }
         }
