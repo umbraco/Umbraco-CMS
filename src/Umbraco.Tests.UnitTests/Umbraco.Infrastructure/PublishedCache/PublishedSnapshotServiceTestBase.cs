@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 => propertyType.EditorAlias == "Umbraco.Void.RTE";
         }
 
-        private static DataType[] GetDefaultDataTypes()
+        protected static DataType[] GetDefaultDataTypes()
         {
             var serializer = new ConfigurationEditorJsonSerializer();
 

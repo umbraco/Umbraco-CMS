@@ -1,19 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Extensions;
 
@@ -34,21 +28,20 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         {
             base.Setup();
 
-            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
-                xml,
-                TestHelper.ShortStringHelper,
-                out ContentType[] contentTypes,
-                out DataType[] dataTypes).ToList();
-            
-            Init(kits, contentTypes, dataTypes);
+            var dataTypes = GetDefaultDataTypes();
+            var cache = CreateCache(dataTypes, out ContentType[] contentTypes);
+
+            Init(cache, contentTypes, dataTypes);
         }
 
-        private IEnumerable<ContentNodeKit> CreateCache()
+        private IEnumerable<ContentNodeKit> CreateCache(IDataType[] dataTypes, out ContentType[] contentTypes)
         {
-            // TODO: These need to be dynamic somehow
-            var contentType = new ContentType(TestHelper.ShortStringHelper, -1)
+            var result = new List<ContentNodeKit>();
+
+            var propertyDataTypes = new Dictionary<string, IDataType>
             {
-                Id = 1
+                // we only have one data type for this test which will be resolved with string empty.
+                [string.Empty] = dataTypes[0]
             };
 
             ContentData item1Data = new ContentDataBuilder()
@@ -62,15 +55,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     .WithPropertyData("welcomeText2", "Welcome")
                     .WithPropertyData("welcomeText2", "Welcome", "en-US")
                     .Build())
-                .Build(TestHelper.ShortStringHelper, "ContentType1", );
+                // build with a dynamically created content type
+                .Build(TestHelper.ShortStringHelper, "ContentType1", propertyDataTypes, out ContentType contentType1);
 
             ContentNodeKit item1 = ContentNodeKitBuilder.CreateWithContent(
-                contentType.Id,
+                contentType1.Id,
                 1, "-1,1",
                 draftData: item1Data,
                 publishedData: item1Data);
 
-            yield return item1;
+            result.Add(item1);
 
             ContentData item2Data = new ContentDataBuilder()
                 .WithName("Content 2")
@@ -79,16 +73,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     .WithPropertyData("welcomeText", "Welcome")
                     .WithPropertyData("welcomeText", "Welcome", "en-US")
                     .Build())
-                .Build();
+                // build while dynamically updating the same content type
+                .Build(TestHelper.ShortStringHelper, propertyDataTypes, contentType1, out contentType1);
 
             ContentNodeKit item2 = ContentNodeKitBuilder.CreateWithContent(
-                contentType.Id,
+                contentType1.Id,
                 2, "-1,1,2",
                 parentContentId: 1,
                 draftData: item2Data,
                 publishedData: item2Data);
 
-            yield return item2;
+            result.Add(item2);
 
             ContentData item3Data = new ContentDataBuilder()
                 .WithName("Content 3")
@@ -97,16 +92,21 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     .WithPropertyData("prop3", "Oxxo")
                     .WithPropertyData("prop3", "Oxxo", "en-US")
                     .Build())
-                .Build();
+                // build with a dynamically created content type
+                .Build(TestHelper.ShortStringHelper, "ContentType2", propertyDataTypes, out ContentType contentType2);
 
             ContentNodeKit item3 = ContentNodeKitBuilder.CreateWithContent(
-                contentType.Id,
+                contentType2.Id,
                 3, "-1,1,2,3",
                 parentContentId: 2,
                 draftData: item3Data,
                 publishedData: item3Data);
 
-            yield return item3;
+            result.Add(item3);
+
+            contentTypes = new[] { contentType1, contentType2 };
+
+            return result;
         }
 
         //protected ServiceContext GetServiceContext()
@@ -224,53 +224,59 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         //    cache.Add(item3);
         //}
 
-        //[Test]
-        //public void Can_Get_Content_For_Populated_Requested_Language()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First();
-        //    var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "en-US");
-        //    Assert.AreEqual("Welcome", value);
-        //}
+        [Test]
+        public void Can_Get_Content_For_Populated_Requested_Language()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First();
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "en-US");
+            Assert.AreEqual("Welcome", value);
+        }
 
-        //[Test]
-        //public void Can_Get_Content_For_Populated_Requested_Non_Default_Language()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First();
-        //    var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "de");
-        //    Assert.AreEqual("Willkommen", value);
-        //}
+        [Test]
+        public void Can_Get_Content_For_Populated_Requested_Non_Default_Language()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First();
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "de");
+            Assert.AreEqual("Willkommen", value);
+        }
 
-        //[Test]
-        //public void Do_Not_Get_Content_For_Unpopulated_Requested_Language_Without_Fallback()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First();
-        //    var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "fr");
-        //    Assert.IsNull(value);
-        //}
+        [Test]
+        public void Do_Not_Get_Content_For_Unpopulated_Requested_Language_Without_Fallback()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First();
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "fr");
+            Assert.IsNull(value);
+        }
 
-        //[Test]
-        //public void Do_Not_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_Unless_Requested()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First();
-        //    var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "es");
-        //    Assert.IsNull(value);
-        //}
+        [Test]
+        public void Do_Not_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_Unless_Requested()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First();
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "es");
+            Assert.IsNull(value);
+        }
 
-        //[Test]
-        //public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First();
-        //    var value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "es", fallback: Fallback.ToLanguage);
-        //    Assert.AreEqual("Welcome", value);
-        //}
+        [Test]
+        public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First();
+            var value = content.Value(PublishedValueFallback, "welcomeText", "es", fallback: Fallback.ToLanguage);
+            Assert.AreEqual("Welcome", value);
+        }
 
-        //[Test]
-        //public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_Over_Two_Levels()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First();
-        //    var value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "it", fallback: Fallback.To(Fallback.Language, Fallback.Ancestors));
-        //    Assert.AreEqual("Welcome", value);
-        //}
+        [Test]
+        public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_Over_Two_Levels()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First();
+            var value = content.Value(PublishedValueFallback, "welcomeText", "it", fallback: Fallback.To(Fallback.Language, Fallback.Ancestors));
+            Assert.AreEqual("Welcome", value);
+        }
 
         //[Test]
         //public void Do_Not_GetContent_For_Unpopulated_Requested_Language_With_Fallback_Over_That_Loops()

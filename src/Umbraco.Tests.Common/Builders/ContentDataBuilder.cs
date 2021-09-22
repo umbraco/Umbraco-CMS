@@ -81,15 +81,40 @@ namespace Umbraco.Cms.Tests.Common.Builders
         }
 
         /// <summary>
+        /// Build and dynamically update an existing content type
+        /// </summary>
+        /// <param name="shortStringHelper"></param>
+        /// <param name="propertyDataTypes"></param>
+        /// <param name="existing"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        public ContentData Build(
+            IShortStringHelper shortStringHelper,
+            Dictionary<string, IDataType> propertyDataTypes,
+            ContentType existing,
+            out ContentType contentType) => Build(shortStringHelper, null, propertyDataTypes, existing, out contentType);
+
+        /// <summary>
         /// Build and dynamically create a matching content type
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public ContentData Build(IShortStringHelper shortStringHelper, string alias, Dictionary<string, IDataType> propertyDataTypes, out ContentType contentType)
+        public ContentData Build(
+            IShortStringHelper shortStringHelper,
+            string alias,
+            Dictionary<string, IDataType> propertyDataTypes,
+            out ContentType contentType) => Build(shortStringHelper, alias, propertyDataTypes, null, out contentType);
+
+        private ContentData Build(
+            IShortStringHelper shortStringHelper,
+            string alias,
+            Dictionary<string, IDataType> propertyDataTypes,
+            ContentType existing,
+            out ContentType contentType)
         {
             var result = Build();
 
-            contentType = new ContentType(shortStringHelper, -1)
+            contentType = existing ?? new ContentType(shortStringHelper, -1)
             {
                 Alias = alias,
                 Name = alias,
