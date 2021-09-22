@@ -72,7 +72,7 @@ function valServer(serverValidationManager) {
                         return modelCtrl.$modelValue;
                     }, function (newValue, oldValue) {
 
-                        if (!newValue || angular.equals(newValue, oldValue)) {
+                        if (!newValue || Utilities.equals(newValue, oldValue)) {
                             return;
                         }
 

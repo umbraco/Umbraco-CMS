@@ -93,7 +93,8 @@ namespace Umbraco.Core.Compose
                         item.Entity.Id,
                         ObjectTypes.GetName(UmbracoObjectTypes.Document),
                         string.Format(textService.Localize(
-                                "recycleBin/contentTrashed"),
+                                "recycleBin","contentTrashed"),
+
                             item.Entity.Id, originalParentId));
                 }
             }
@@ -132,7 +133,7 @@ namespace Umbraco.Core.Compose
                         item.Entity.Id,
                         ObjectTypes.GetName(UmbracoObjectTypes.Media),
                         string.Format(textService.Localize(
-                               "recycleBin/mediaTrashed"),
+                               "recycleBin", "mediaTrashed"),
                             item.Entity.Id, originalParentId));
                 }
             }

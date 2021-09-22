@@ -11,17 +11,17 @@ using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Examine.LuceneEngine;
-
+using Examine.Search;
 namespace Umbraco.Examine
 {
     /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
-    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
+    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex2
     {
         public const string VariesByCultureFieldName = SpecialFieldPrefix + "VariesByCulture";
         protected ILocalizationService LanguageService { get; }
-
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
         #region Constructors
 
         /// <summary>
@@ -131,9 +131,10 @@ namespace Umbraco.Examine
                 var searcher = GetSearcher();
                 var c = searcher.CreateQuery();
                 var filtered = c.NativeQuery(rawQuery);
-                var results = filtered.Execute();
 
-                ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+                var selectedFields = filtered.SelectFields(_idOnlyFieldSet);
+                var results = selectedFields.Execute();
+                ProfilingLogger.Debug<string, long>(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
                 //need to queue a delete item for each one found
                 QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));

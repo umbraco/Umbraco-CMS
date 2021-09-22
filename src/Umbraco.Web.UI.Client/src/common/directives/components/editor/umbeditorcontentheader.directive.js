@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorContentHeader(serverValidationManager, localizationService, editorState) {
+    function EditorContentHeader(serverValidationManager, localizationService, editorState, contentEditingHelper) {
         function link(scope) {
 
             var unsubscribe = [];
@@ -92,7 +92,6 @@
             }
 
             function onInit() {
-
                 // find default + check if we have variants.
                 scope.content.variants.forEach(function (variant) {
                     if (variant.language !== null && variant.language.isDefault) {
@@ -106,8 +105,8 @@
                     }
                 });
 
-                scope.vm.hasVariants = (scope.vm.hasCulture || scope.vm.hasSegments);
-                scope.vm.hasSubVariants = (scope.vm.hasCulture && scope.vm.hasSegments);
+                scope.vm.hasVariants = scope.content.variants.length > 1 && (scope.vm.hasCulture || scope.vm.hasSegments);
+                scope.vm.hasSubVariants = scope.content.variants.length > 1 &&(scope.vm.hasCulture && scope.vm.hasSegments);
 
                 updateVaraintErrors();
 
@@ -115,11 +114,13 @@
                 if (scope.vm.hasCulture) {
                     scope.content.variants.forEach((v) => {
                         if (v.language !== null && v.segment === null) {
+                            const subVariants = scope.content.variants.filter((subVariant) => subVariant.language.culture === v.language.culture && subVariant.segment !== null).sort(contentEditingHelper.sortVariants);
+
                             var variantMenuEntry = {
                                 key: String.CreateGuid(),
                                 open: v.language && v.language.culture === scope.editor.culture,
                                 variant: v,
-                                subVariants: scope.content.variants.filter((subVariant) => subVariant.language.culture === v.language.culture && subVariant.segment !== null)
+                                subVariants
                             };
                             scope.vm.variantMenu.push(variantMenuEntry);
                         }
@@ -134,8 +135,10 @@
                 }
 
                 scope.editor.variantApps.forEach((app) => {
+                    // only render quick links on the content app if there are no tabs
                     if (app.alias === "umbContent") {
-                        app.anchors = scope.editor.content.tabs;
+                        const hasTabs = scope.editor.content.tabs && scope.editor.content.tabs.filter(group => group.type === 1).length > 0;
+                        app.anchors = hasTabs ? [] : scope.editor.content.tabs;
                     }
                 });
 
@@ -147,7 +150,12 @@
                     }
                     unsubscribe.push(serverValidationManager.subscribe(null, variant.language !== null ? variant.language.culture : null, null, onVariantValidation, variant.segment));
                 });
+                
+                scope.vm.variantMenu.sort(sortVariantsMenu);
+            }
 
+            function sortVariantsMenu (a, b) {
+                return contentEditingHelper.sortVariants(a.variant, b.variant);
             }
 
             scope.goBack = function () {
@@ -200,6 +208,18 @@
                 return false;
             }
 
+            scope.toggleDropdown = function () {
+                scope.vm.dropdownOpen = !scope.vm.dropdownOpen;
+                
+                if (scope.vm.dropdownOpen) {
+                    scope.vm.variantMenu.sort(sortVariantsMenu);
+                }
+            };
+
+            unsubscribe.push(scope.$watch('splitViewOpen', (newVal) => {
+                scope.vm.navigationItemLimit = newVal === true ? 0 : undefined;
+            }));
+
             onInit();
 
             scope.$on('$destroy', function () {
@@ -220,6 +240,7 @@
                 nameDisabled: "<?",
                 menu: "=",
                 hideActionsMenu: "<?",
+                disableActionsMenu: "<?",
                 content: "=",
                 editor: "=",
                 hideChangeVariant: "<?",

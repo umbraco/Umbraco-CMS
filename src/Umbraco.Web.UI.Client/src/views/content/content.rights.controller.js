@@ -154,9 +154,10 @@
                     currentForm.$dirty = false;
                   }
                 });
-
+                $scope.dialog.confirmDiscardChanges = false;
                 vm.saveState = "success";
                 vm.saveSuccces = true;
+
             }, function(error){
                 vm.saveState = "error";
                 vm.saveError = error;

@@ -22,10 +22,10 @@
         $timeout = _$timeout_;
 
         contentResource = $injector.get("contentResource");
-        spyOn(contentResource, "getScaffoldByKey").and.callFake(
+        spyOn(contentResource, "getScaffoldByKeys").and.callFake(
             function () {
                 var scaffold = mocksUtils.getMockVariantContent(1234, contentKey, contentUdi);
-                return $q.resolve(scaffold);
+                return $q.resolve([scaffold]);
             }
         );
         // this seems to be required because of the poor promise implementation in localizationService (see TODO in that service)

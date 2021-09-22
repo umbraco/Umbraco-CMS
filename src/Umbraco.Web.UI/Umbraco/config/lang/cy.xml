@@ -1,0 +1,2764 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="cy_gb" intName="Welsh (UK)" localName="Cymraeg (UK)" lcid="1106" culture="cy-GB">
+    <creator>
+        <name>Method4 Ltd</name>
+        <link>https://www.method4.co.uk/</link>
+    </creator>
+    <area alias="actions">
+        <key alias="assignDomain">Diwylliannau ac Enwau Gwesteia</key>
+        <key alias="auditTrail">Trywydd Archwilio</key>
+        <key alias="browse">Dewis Nod</key>
+        <key alias="changeDocType">Newid Math o Ddogfen</key>
+        <key alias="changeDataType">Newid Math o Data</key>
+        <key alias="copy">Copïo</key>
+        <key alias="create">Creu</key>
+        <key alias="export">Allforio</key>
+        <key alias="createPackage">Creu Pecyn</key>
+        <key alias="createGroup">Creu grŵp</key>
+        <key alias="delete">Dileu</key>
+        <key alias="disable">Analluogi</key>
+        <key alias="editSettings">Golygu gosodiadau</key>
+        <key alias="emptyRecycleBin">Gwagu bin ailgylchu</key>
+        <key alias="enable">Galluogi</key>
+        <key alias="exportDocumentType">Allforio Math o Ddogfen</key>
+        <key alias="importDocumentType">Mewnforio Math o Ddogfen</key>
+        <key alias="importPackage">Mewnforio Pecyn</key>
+        <key alias="liveEdit">Golygu mewn Cynfas</key>
+        <key alias="logout">Gadael</key>
+        <key alias="move">Symud</key>
+        <key alias="notify">Hysbysiadau</key>
+        <key alias="protect">Cyrchiad cyhoeddus</key>
+        <key alias="publish">Cyhoeddi</key>
+        <key alias="unpublish">Dadgyhoeddi</key>
+        <key alias="refreshNode">Ail-lwytho</key>
+        <key alias="republish">Ail-gyhoeddi yr holl safle</key>
+        <key alias="remove">Dileu</key>
+        <key alias="rename" version="7.3.0">Ailenwi</key>
+        <key alias="restore" version="7.3.0">Adfer</key>
+        <key alias="SetPermissionsForThePage">Gosod hawliau ar gyfer y dudalen %0%</key>
+        <key alias="chooseWhereToCopy">Dewis ble i copïo</key>
+        <key alias="chooseWhereToMove">Dewis ble i symud</key>
+        <key alias="toInTheTreeStructureBelow">Yn y strwythyr goeden isod</key>
+        <key alias="infiniteEditorChooseWhereToCopy">Dewis ble i gopïo'r eitem(au) a ddewiswyd</key>
+        <key alias="infiniteEditorChooseWhereToMove">Dewis ble i symud yr eitem(au) a ddewiswyd</key>
+        <key alias="wasMovedTo">wedi symud i</key>
+        <key alias="wasCopiedTo">wedi copïo i</key>
+        <key alias="wasDeleted">wedi dileu</key>
+        <key alias="rights">Hawliau</key>
+        <key alias="rollback">Rolio yn ôl</key>
+        <key alias="sendtopublish">Anfon I Gyhoeddi</key>
+        <key alias="sendToTranslate">Anfon I Gyfieithu</key>
+        <key alias="setGroup">Gosod grŵp</key>
+        <key alias="sort">Trefnu</key>
+        <key alias="translate">Cyfieithu</key>
+        <key alias="update">Diweddaru</key>
+        <key alias="setPermissions">Gosod Hawliau</key>
+        <key alias="unlock">Datgloi</key>
+        <key alias="createblueprint">Creu Templed Gynnwys</key>
+        <key alias="resendInvite">Ail-anfon Gwahoddiad</key>
+    </area>
+    <area alias="actionCategories">
+        <key alias="content">Cynnwys</key>
+        <key alias="administration">Gweinyddu</key>
+        <key alias="structure">Strwythyr</key>
+        <key alias="other">Arall</key>
+    </area>
+    <area alias="actionDescriptions">
+        <key alias="assignDomain">Caniatáu hawl i osod to assign diwylliannau ac enwau gwesteia</key>
+        <key alias="auditTrail">Caniatáu hawl i weld cofnod hanes nod</key>
+        <key alias="browse">Caniatáu hawl i weld nod</key>
+        <key alias="changeDocType">Caniatáu hawl i newid math o ddogfen ar gyfer nod</key>
+        <key alias="copy">Caniatáu hawl i gopïo nod</key>
+        <key alias="create">Caniatáu hawl i greu nodau</key>
+        <key alias="delete">Caniatáu hawl i ddileu nodau</key>
+        <key alias="move">Caniatáu hawl i symud nodau</key>
+        <key alias="protect">Caniatáu hawl i osod a newid cyrchiad cyhoeddus ar gyfer nod</key>
+        <key alias="publish">Caniatáu hawl i gyhoeddi nod</key>
+        <key alias="unpublish">Caniatáu hawl i dadgyhoeddi nod</key>
+        <key alias="rights">Caniatáu hawl i newid hawliau ar gyfer nod</key>
+        <key alias="rollback">Caniatáu hawl i rolio nod yn ôl at gyflwr blaenorol</key>
+        <key alias="sendtopublish">Caniatáu hawl i anfon nod am gymeradwyo cyn cyhoeddi</key>
+        <key alias="sendToTranslate">Caniatáu hawl i anfon nod am gyfieithiad</key>
+        <key alias="sort">Caniatáu hawl i newid trefn nodau</key>
+        <key alias="translate">Caniatáu hawl i gyfiethu nod</key>
+        <key alias="update">Caniatáu hawl i achub nod</key>
+        <key alias="createblueprint">Caniatáu hawl i greu Templed Cynnwys</key>
+    </area>
+    <area alias="apps">
+        <key alias="umbContent">Cynnwys</key>
+        <key alias="umbInfo">Gwybodaeth</key>
+    </area>
+    <area alias="assignDomain">
+        <key alias="permissionDenied">Dim hawl.</key>
+        <key alias="addNew">Ychwanegu Parth newydd</key>
+        <key alias="remove">dileu</key>
+        <key alias="invalidNode">Nod annilys.</key>
+        <key alias="invalidDomain">Fformat parth annilys.</key>
+        <key alias="duplicateDomain">Parth wedi'i neilltuo eisoes.</key>
+        <key alias="language">Iaith</key>
+        <key alias="domain">Parth</key>
+        <key alias="domainCreated">Parth newydd '%0%' wedi'i greu</key>
+        <key alias="domainDeleted">Parth '%0%' wedi dileu</key>
+        <key alias="domainExists">Parth '%0%' wedi neilltuo eisoes</key>
+        <key alias="domainUpdated">Parth '%0%' wedi diweddaru</key>
+        <key alias="orEdit">Golygu Parthau Presennol</key>
+        <key alias="domainHelpWithVariants">
+            <![CDATA[Parthau dilys yw: "enghraifft.com", "www.enghraifft.com", "enghraifft.com:8080" neu "https://www.enghraifft.com/". 
+            Mae llwybrau un-lefel mewn parthau wedi'u cefnogi, e.e. "enghraifft.com/cy" neu "/cy".]]>
+        </key>
+        <key alias="inherit">Etifeddu</key>
+        <key alias="setLanguage">Diwylliant</key>
+        <key alias="setLanguageHelp">
+            <![CDATA[Gosod y diwylliant ar gyfer nodau o dan y nod bresennol,<br /> neu etifeddu diwylliant o nodau rhiant. Bydd hyn hefyd<br />
+      yn berthnasol i'r nod bresennol, oni bai fod parth isod yn berthnasol hefyd.]]>
+        </key>
+        <key alias="setDomains">Parthau</key>
+    </area>
+    <area alias="buttons">
+        <key alias="clearSelection">Clirio dewisiad</key>
+        <key alias="select">Dewis</key>
+        <key alias="somethingElse">Gwneud rhywbeth arall</key>
+        <key alias="bold">Trwm</key>
+        <key alias="deindent">Canslo Mewnoliad Paragraff</key>
+        <key alias="formFieldInsert">Mewnosod maes ffurflen</key>
+        <key alias="graphicHeadline">Mewnosod pennawd graffig</key>
+        <key alias="htmlEdit">Golygu Html</key>
+        <key alias="indent">Mewnoli Paragraff</key>
+        <key alias="italic">Italig</key>
+        <key alias="justifyCenter">Canoli</key>
+        <key alias="justifyLeft">Unioni Chwith</key>
+        <key alias="justifyRight">Unioni Dde</key>
+        <key alias="linkInsert">Mewnosod Dolen</key>
+        <key alias="linkLocal">Mewnosod dolen leol (angor)</key>
+        <key alias="listBullet">Rhestr Bwled</key>
+        <key alias="listNumeric">Rhestr rhifol</key>
+        <key alias="macroInsert">Mewnosod macro</key>
+        <key alias="pictureInsert">Mewnosod llun</key>
+        <key alias="publishAndClose">Chyhoeddi a cau</key>
+        <key alias="publishDescendants">Cyhoeddi efo disgynnydd</key>
+        <key alias="relations">Golygu perthnasau</key>
+        <key alias="returnToList">Dychwelyd i'r rhestr</key>
+        <key alias="save">Achub</key>
+        <key alias="saveAndClose">Achub a cau</key>
+        <key alias="saveAndPublish">Achub a chyhoeddi</key>
+        <key alias="saveAndSchedule">Achub ac amserlenni</key>
+        <key alias="saveToPublish">Achub ac anfon am gymeradwyo</key>
+        <key alias="saveListView">Achub gwedd rhestr</key>
+        <key alias="schedulePublish">Amserlenni</key>
+        <key alias="showPage">Rhagolwg</key>
+        <key alias="saveAndPreview">Save and preview</key>
+        <key alias="showPageDisabled">Rhagolwg wedi analluogi gan nad oes templed wedi'i neilltuo</key>
+        <key alias="styleChoose">Dewis arddull</key>
+        <key alias="styleShow">Dangos arddulliau</key>
+        <key alias="tableInsert">Mewnosod tabl</key>
+        <key alias="generateModelsAndClose">Cynhyrchu modelau a cau</key>
+        <key alias="saveAndGenerateModels">Achub a chynhyrchu modelau</key>
+        <key alias="undo">Dadwneud</key>
+        <key alias="redo">Ail-wneud</key>
+        <key alias="rollback">Rolio yn ôl</key>
+        <key alias="deleteTag">Dileu tag</key>
+        <key alias="confirmActionCancel">Canslo</key>
+        <key alias="confirmActionConfirm">Cadarnhau</key>
+        <key alias="morePublishingOptions">Mwy opsiynau cyhoeddi</key>
+        <key alias="submitChanges">Submit</key>
+        <key alias="submitChangesAndClose">Submit and close</key>
+    </area>
+    <area alias="auditTrails">
+        <key alias="atViewingFor">Dangos am</key>
+        <key alias="delete">Cynnwys wedi'i dileu</key>
+        <key alias="unpublish">Cynnwys wedi'i dadgyhoeddi</key>
+        <key alias="unpublishvariant">Cynnwys wedi'i dadgyhoeddi am y ieithoedd: %0% </key>
+        <key alias="publish">Cynnwys wedi'i Achub a Chyhoeddi</key>
+        <key alias="publishvariant">Cynnwys wedi'i Achub a Chyhoeddi am y ieithoedd: %0% </key>
+        <key alias="save">Cynnwys wedi'i achub</key>
+        <key alias="savevariant">Cynnwys wedi'i achub am y ieithoedd: %0%</key>
+        <key alias="move">Cynnwys wedi'i symud</key>
+        <key alias="copy">Cynnwys wedi'i copïo</key>
+        <key alias="rollback">Cynnwys wedi'i rolio yn ôl</key>
+        <key alias="sendtopublish">Cynnwys wedi'i anfon i Gyhoeddi</key>
+        <key alias="sendtopublishvariant">Cynnwys wedi'i anfon i gyhoeddi am y ieithoedd: %0%</key>
+        <key alias="sendtotranslate">Cynnwys wedi'i anfon i gyfieithu</key>
+        <key alias="sort">Trefnu eitemau blant cyflawnwyd gan ddefnyddiwr</key>
+        <key alias="custom">%0%</key>
+        <key alias="smallCopy">Copïo</key>
+        <key alias="smallPublish">Cyhoeddi</key>
+        <key alias="smallPublishVariant">Cyhoeddi</key>
+        <key alias="smallMove">Symud</key>
+        <key alias="smallSave">Achub</key>
+        <key alias="smallSaveVariant">Achub</key>
+        <key alias="smallDelete">Dileu</key>
+        <key alias="smallUnpublish">Dadgyhoeddi</key>
+        <key alias="smallUnpublishVariant">Dadgyhoeddi</key>
+        <key alias="smallRollBack">Rolio yn ôl</key>
+        <key alias="smallSendToPublish">Anfon i Gyhoeddi</key>
+        <key alias="smallSendToPublishVariant">Anfon i Gyhoeddi</key>
+        <key alias="smallSendToTranslate">Anfon i Gyfieithu</key>
+        <key alias="smallSort">Tefnu</key>
+        <key alias="smallCustom">Arferu</key>
+        <key alias="historyIncludingVariants">Hanes (pob amrywiad)</key>
+    </area>
+    <area alias="codefile">
+        <key alias="createFolderFailedById">Methwyd creu ffolder o dan id rhiant %0%</key>
+        <key alias="createFolderFailedByName">Methwyd creu ffolder o dan rhiant efo enw %0%</key>
+        <key alias="createFolderIllegalChars">Mae'r enw'r ffolder methu cynnwys nodau anghyfreithlon.</key>
+        <key alias="deleteItemFailed">Methwyd dileu eitem: %0%</key>
+    </area>
+    <area alias="content">
+        <key alias="isPublished" version="7.2">Wedi Cyhoeddi</key>
+        <key alias="about">Am y dudlaen yma</key>
+        <key alias="alias">Enw arall</key>
+        <key alias="alternativeTextHelp">(sut fyddwch chi'n disgrifio'r llun dros y ffôn)</key>
+        <key alias="alternativeUrls">Dolenni Amgen</key>
+        <key alias="clickToEdit">Cliwich i olygu'r eitem yma</key>
+        <key alias="createBy">Creuwyd gan</key>
+        <key alias="createByDesc" version="7.0">Awdur gwreiddiol</key>
+        <key alias="updatedBy" version="7.0">Diweddarwyd gan</key>
+        <key alias="createDate">Creuwyd</key>
+        <key alias="createDateDesc" version="7.0">Dyddiad/amser creuwyd y ddogfen yma</key>
+        <key alias="documentType">Math o Ddogfen</key>
+        <key alias="editing">Yn golygu</key>
+        <key alias="expireDate">Dileu am</key>
+        <key alias="itemChanged">Mae'r eitem yma wedi cael ei newid ar ôl cyhoeddi</key>
+        <key alias="itemNotPublished">Nid yw'r eitem yma wedi cael ei gyhoeddi</key>
+        <key alias="lastPublished">Cyhoeddiad ddiwethaf</key>
+        <key alias="noItemsToShow">Nid oes unrhyw eitemau i ddangos</key>
+        <key alias="listViewNoItems" version="7.1.5">Nid oes unrhyw eitemau i ddangos yn y rhestr.</key>
+        <key alias="listViewNoContent">Nid oes unrhyw gynnwys wedi'i ychwanegu</key>
+        <key alias="listViewNoMembers">Nid oes unrhyw aelodau wedi'u ychwanegu</key>
+        <key alias="mediatype">Math o Gyfrwng</key>
+        <key alias="mediaLinks">Dolen i eitem gyfrwng(au)</key>
+        <key alias="membergroup">Grŵp Aelod</key>
+        <key alias="memberrole">Rôl</key>
+        <key alias="membertype">Math o Aelod</key>
+        <key alias="noChanges">Dim newidiadau wedi'u gwneud</key>
+        <key alias="noDate">Dim dyddiad wedi'i ddewis</key>
+        <key alias="nodeName">Teitl tudalen</key>
+        <key alias="noMediaLink">Does dim dolen gan yr eitem gyfrwng yma</key>
+        <key alias="noProperties">Ni all unrhyw gynnwys cael ei hychwanegu am eitem hon</key>
+        <key alias="otherElements">Priodweddau</key>
+        <key alias="parentNotPublished">Mae'r ddogfen yma wedi'i gyhoeddi ond nid yw'n weladwy gan nad yw'r rhiant '%0%' wedi'i gyhoeddi</key>
+        <key alias="parentCultureNotPublished">Mae'r diwylliant yma yn cyhoeddedig ond ddim yn weladwy oherwydd mae'n anghyhoeddedig ar rhiant '%0%'</key>
+        <key alias="parentNotPublishedAnomaly">Mae'r ddogfen yma wedi'i gyhoeddi ond nid yw'n bodoli yn y storfa</key>
+        <key alias="getUrlException">Ni ellir nôl y url</key>
+        <key alias="routeError">Mae'r ddogfen yma wedi'i gyhoeddi ond byddai'r url yn gwrthdaro gyda chynnwys %0%</key>
+        <key alias="routeErrorCannotRoute">Mae'r ddogfen yma wedi'i gyhoeddi ond mae'r url methu cael ei cyfeirio</key>
+        <key alias="publish">Cyhoeddi</key>
+        <key alias="published">Wedi cyhoeddi</key>
+        <key alias="publishedPendingChanges">Wedi cyhoeddi (newidiadau nes arddodiad)</key>
+        <key alias="publishStatus">Statws Cyhoeddi</key>
+        <key alias="publishDescendantsHelp"><![CDATA[Click <em>Cyhoeddi efo disgynnyddion</em> i cyhoeddi <strong>%0%</strong> ac yr holl eitemau cynnwys o dan ac a thrwy hynny wneud eu cynnwys ar gael i'r cyhoedd.]]></key>
+        <key alias="publishDescendantsWithVariantsHelp"><![CDATA[Click <em>Cyhoeddi efo disgynnyddion</em> i cyhoeddi <strong>y ieithoedd a ddewiswyd</strong> ac yr un ieithoedd o'r eitemau o dan a thrwy hynny wneud eu cynnwys ar gael i'r cyhoedd.]]></key>
+        <key alias="releaseDate">Cyhoeddi am</key>
+        <key alias="unpublishDate">Dadgyhoeddi am</key>
+        <key alias="removeDate">Clirio Dyddiad</key>
+        <key alias="setDate">Gosod dyddiad</key>
+        <key alias="sortDone">Trefn wedi diweddaru</key>
+        <key alias="sortHelp">Er mwyn trefnu'r nodau, llusgwch y nodau neu cliciwch un o benynnau'r colofnau. Gallwch ddewis nifer o nodau gan ddal y botwm "shift" neu "control" wrth ddewis</key>
+        <key alias="statistics">Ystadegau</key>
+        <key alias="titleOptional">Teitl (dewisol)</key>
+        <key alias="altTextOptional">Testyn amgen (dewisol)</key>
+        <key alias="type">Math</key>
+        <key alias="unpublish">Dadgyhoeddi</key>
+        <key alias="unpublished">Wedi dadgyhoeddi</key>
+        <key alias="notCreated">Heb ei greu</key>
+        <key alias="updateDate">Golygwyd ddiwethaf</key>
+        <key alias="updateDateDesc" version="7.0">Dyddiad/amser golygwyd y ddogfen yma</key>
+        <key alias="uploadClear">Dileu ffeil(iau)</key>
+        <key alias="uploadClearImageContext">Cliciwch yma i dileu'r llun oddi wrth y eitem cyfrwng</key>
+        <key alias="uploadClearFileContext">Cliciwch yma i dileu'r ffeil oddi wrth y eitem cyfrwng</key>
+        <key alias="urls">Dolen i ddogfen</key>
+        <key alias="memberof">Aeold o grŵp(iau)</key>
+        <key alias="notmemberof">Ddim yn aelod o'r grŵp(iau)</key>
+        <key alias="childItems" version="7.0">Eitemau blentyn</key>
+        <key alias="target" version="7.0">Targed</key>
+        <key alias="scheduledPublishServerTime">Mae hyn yn trawsnewid at yr amser ganlynol ar y gweinydd:</key>
+        <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Beth mae hyn yn golygu?</a>]]></key>
+        <key alias="nestedContentDeleteItem">Ydych chi'n sicr eich bod eisiau dileu'r eitem yma?</key>
+        <key alias="nestedContentEditorNotSupported">Mae'r priodwedd %0% yn defnyddio'r golygydd %1% sydd ddim yn cyd-fynd â Chynnwys Amnyth.</key>
+        <key alias="nestedContentDeleteAllItems">Wyt ti'n siŵr fod ti eisiau dileu pob eitem?</key>
+        <key alias="nestedContentNoContentTypes">Nid oes unrhyw fathau o gynnwys wedi'u ffurfweddu ar gyfer yr eiddo hwn.</key>
+        <key alias="nestedContentAddElementType">Ychwanegu teip elfen</key>
+        <key alias="nestedContentSelectElementTypeModalTitle">Dewis teip elfen</key>
+        <key alias="nestedContentGroupHelpText">Dewis y grŵp dylid arddangos ei briodweddau. Os caiff ei adael yn wag, bydd y grŵp cyntaf ar yr elfen yn cael ei defnyddio.</key>
+        <key alias="nestedContentTemplateHelpTextPart1">Rhowch fynegiad angular i werthuso yn erbyn pib eitem am ei enw. Defnyddiwch</key>
+        <key alias="nestedContentTemplateHelpTextPart2">i ddangos y mynegai'r eitem</key>
+        <key alias="addTextBox">Ychwanegu blwch testun arall</key>
+        <key alias="removeTextBox">Dileu'r blwch testun yma</key>
+        <key alias="contentRoot">Gwraidd cynnwys</key>
+        <key alias="includeUnpublished">Cynnwys eitemau cynnwys heb eu cyhoeddi.</key>
+        <key alias="isSensitiveValue">Mae'r gwerth yma'n gudd. Os ydych chi angen hawl i weld y gwerth yma, cysylltwch â gweinyddwr eich gwefan.</key>
+        <key alias="isSensitiveValue_short">Mae'r gwerth yma'n gudd.</key>
+        <key alias="languagesToPublishForFirstTime">Pa ieithoedd yr hoffech chi eu cyhoeddi? Mae pob iaith sydd â chynnwys wei cael ei arbed!</key>
+        <key alias="languagesToPublish">Pa ieithoedd yr hoffech chi eu cyhoeddi? </key>
+        <key alias="languagesToSave">Pa ieithoedd yr hoffech chi eu arbed?</key>
+        <key alias="languagesToSaveForFirstTime">Mae pob iaith sydd â chynnwys yn cael ei arbed wrth greu!</key>
+        <key alias="languagesToSendForApproval">Pa ieithoedd hoffech chi anfon am gymeradwyaeth?</key>
+        <key alias="languagesToSchedule">Pa ieithoedd yr hoffech chi eu hamserlennu?</key>
+        <key alias="languagesToUnpublish">Dewiswch yr ieithoedd i'w anghyhoeddi. Bydd anghyhoeddi iaith orfodol yn anghyhoeddi pob iaith.</key>
+        <key alias="publishedLanguages">Ieithoedd Cyhoeddedig</key>
+        <key alias="unpublishedLanguages">Ieithoedd heb ei gyhoeddi</key>
+        <key alias="unmodifiedLanguages">Ieithoedd heb eu haddasu</key>
+        <key alias="untouchedLanguagesForFirstTime">Nid yw'r ieithoedd hyn wedi'u creu</key>
+        <key alias="variantsWillBeSaved">Bydd pob amrywiad newydd yn cael ei arbed.</key>
+        <key alias="variantsToPublish">P'un amrywiadau wyt ti eisiau cyhoeddi?</key>
+        <key alias="variantsToSave">Dewiswch pa amrywiadau wyt ti eisiau arbed.</key>
+        <key alias="variantsToSendForApproval">Dewiswch pa amrywiadau i anfon am gymeradwyaeth.</key>
+        <key alias="variantsToSchedule">Gosod cyhoeddi rhestredig...</key>
+        <key alias="variantsToUnpublish">Dewiswch yr amrywiadau i'w anghyhoeddi. Bydd anghyhoeddi iaith orfodol yn anghyhoeddi pob amrywiad.</key>
+        <key alias="publishRequiresVariants">Mae'r amrywiadau canlynol yn ofynnol er mwyn i gyhoeddi:</key>
+        <key alias="notReadyToPublish">Ni ddim yn barod i Gyhoeddi</key>
+        <key alias="readyToPublish">Barod i Gyhoeddi?</key>
+        <key alias="readyToSave">Barod i Arbed?</key>
+        <key alias="sendForApproval">Anfonwch am gymeradwyaeth</key>
+        <key alias="schedulePublishHelp">Dewiswch y dyddiad a'r amser i gyhoeddi a / neu anghyhoeddi'r eitem gynnwys.</key>
+        <key alias="createEmpty">Creu newydd</key>
+        <key alias="createFromClipboard">Gludo o'r clipfwrdd</key>
+        <key alias="nodeIsInTrash">Mae'r eitem yma yn y Bin Ailgylchu</key>
+    </area>
+    <area alias="blueprints">
+        <key alias="createBlueprintFrom">Creu Templed Cynnwys newydd o '%0%'</key>
+        <key alias="blankBlueprint">Gwag</key>
+        <key alias="selectBlueprint">Dewis Templed Cynnwys</key>
+        <key alias="createdBlueprintHeading">Templed Cynnwys wedi'i greu</key>
+        <key alias="createdBlueprintMessage">Creuwyd Templed Cynnwys o '%0%'</key>
+        <key alias="duplicateBlueprintMessage">Mae Templed Cynnwys gyda'r un enw yn bodoli eisoes</key>
+        <key alias="blueprintDescription">Mae Templed Cynnwys yn gynnwys sydd wedi'i ddiffinio o flaen llaw y gellir ei ddewis gan olygwr i'w ddefnyddio fel sail ar gyfer creu cynnwys newydd</key>
+    </area>
+    <area alias="media">
+        <key alias="clickToUpload">Cliciwch i lanlwytho</key>
+        <key alias="dropFilesHere">Gollyngwch eich ffeiliau yma...</key>
+        <key alias="urls">Dolen i gyfrwng</key>
+        <key alias="orClickHereToUpload">neu cliciwch yma i ddewis ffeiliau</key>
+        <key alias="dragFilesHereToUpload">Gallwch lusgo ffeiliau yma i lanlwtho.</key>
+        <key alias="onlyAllowedFiles">Dim ond mathau caniatol o ffeil sydd</key>
+        <key alias="disallowedFileType">Ni ellir lanlwytho'r ffeil yma, nid yw math y ffeil yn wedi'i gymeradwyo</key>
+        <key alias="maxFileSize">Maint ffeil uchaf</key>
+        <key alias="mediaRoot">Gwraidd gyfrwng</key>
+        <key alias="moveFailed">Methwyd symud cyfrwng</key>
+        <key alias="moveToSameFolderFailed">Ni all y ffolderi rhiant a chyrchfan fod yr un peth</key>
+        <key alias="copyFailed">Methwyd copïo cyfrwng</key>
+        <key alias="createFolderFailed">Methwyd creu ffolder o dan id rhiant %0%</key>
+        <key alias="renameFolderFailed">Methwyd ailenwi'r ffolder gyda id %0%</key>
+        <key alias="dragAndDropYourFilesIntoTheArea">Llusgo a gollwng eich ffeil(iau) i mewn i'r ardal</key>
+        <key alias="uploadNotAllowed">Ni chaniateir llwytho i fyny yn y lleoliad hwn.</key>
+    </area>
+    <area alias="member">
+        <key alias="createNewMember">Creu aelod newydd</key>
+        <key alias="allMembers">Pob Aelod</key>
+        <key alias="memberGroupNoProperties">Nid oes gan grwpiau aelodau unrhyw eiddo ychwanegol ar gyfer golygu.</key>
+    </area>
+    <area alias="create">
+        <key alias="chooseNode">Ble hoffwch greu eitem newydd %0%</key>
+        <key alias="createUnder">Creu eitem o dan</key>
+        <key alias="createContentBlueprint">Dewiswch y fath o ddogfen hoffwch greu templed dogfen ar ei gyfer</key>
+        <key alias="enterFolderName">Rhoi enw ffolder i mewn</key>
+        <key alias="updateData">Dewiswch fath a theitl</key>
+        <key alias="noDocumentTypes" version="7.0"><![CDATA[Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Mathau o nod blentyn caniataol</strong> o dan <strong>Caniatadau</strong>]]></key>
+        <key alias="noDocumentTypesAtRoot"><![CDATA[Nid oes unrhyw fathau o ddogfennau ar gael. Rhaid i chi creu rhain yn <strong>Mathau o Ddogfennau</strong> tu fewn y adran <strong>Gosodiadau</strong>.]]></key>
+        <key alias="noDocumentTypesWithNoSettingsAccess">Nid yw'r dudalen a ddewiswyd yn y goeden gynnwys yn caniatáu i unrhyw dudalennau gael eu creu oddi tani.</key>
+        <key alias="noDocumentTypesEditPermissions">Golygu caniatâd ar gyfer y math hwn o ddogfen</key>
+        <key alias="noDocumentTypesCreateNew">Creu Math o Ddogfen newydd</key>
+        <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Caniatáu fel gwraidd</strong> o dan <strong>Caniatadau</strong>]]></key>
+        <key alias="noMediaTypes" version="7.0"><![CDATA[Nid oes unrhyw fathau o gyfrwng caniataol ar gael. Rhaid i chi alluogi'r rhain yn yr adran gosodiadau o dan <strong>"mathau o gyfrwng"</strong>.]]></key>
+        <key alias="noMediaTypesWithNoSettingsAccess">Nid yw'r cyfryngau a ddewiswyd yn y goeden yn caniatáu i unrhyw gyfryngau eraill gael eu creu oddi tano.</key>
+        <key alias="noMediaTypesEditPermissions">Golygu caniatâd ar gyfer y math hwn o gyfryngau</key>
+        <key alias="documentTypeWithoutTemplate">Math o Ddogfen heb dempled</key>
+        <key alias="newFolder">Ffolder newydd</key>
+        <key alias="newDataType">Math o ddata newydd</key>
+        <key alias="newJavascriptFile">Ffeil JavaScript newydd</key>
+        <key alias="newEmptyPartialView">Rhan-wedd wag newydd</key>
+        <key alias="newPartialViewMacro">Macro rhan-wedd newydd</key>
+        <key alias="newPartialViewFromSnippet">Rhan-wedd newydd o damaid</key>
+        <key alias="newPartialViewMacroFromSnippet">Macro rhan-wedd wag newydd o damaid</key>
+        <key alias="newPartialViewMacroNoMacro">Macro rhan-wedd newydd (heb macro)</key>
+        <key alias="newStyleSheetFile">Ffeil ddalen arddull newydd</key>
+        <key alias="newRteStyleSheetFile">Ffeil ddalen arddull Golygydd Testun Cyfoethog newydd</key>
+        <key alias="newEmptyPartialViewMacro">Macro rhan-wedd wag newydd</key>
+    </area>
+    <area alias="dashboard">
+        <key alias="browser">Pori eich gwefan</key>
+        <key alias="dontShowAgain">- Cuddio</key>
+        <key alias="nothinghappens">Os nad yw Umbraco yn agor, efallai byddwch angen galluogi popups o'r safle yma</key>
+        <key alias="openinnew">wedi agor mewn ffenestr newydd</key>
+        <key alias="restart">Ailgychwyn</key>
+        <key alias="visit">Ymweld â</key>
+        <key alias="welcome">Croeso</key>
+    </area>
+    <area alias="prompt">
+        <key alias="stay">Aros</key>
+        <key alias="discardChanges">Hepgor newidiadau</key>
+        <key alias="unsavedChanges">Mae gennych chi newidiadau sydd heb eu achub</key>
+        <key alias="unsavedChangesWarning">Ydych chi'n sicr eich bod eisiau llywio i ffwrdd o'r dudalen yma? - mae gennych chi newidiadau sydd heb eu achub</key>
+        <key alias="confirmListViewPublish">Bydd cyhoeddi yn gwneud yr eitemau a ddewiswyd yn weladwy ar y wefan.</key>
+        <key alias="confirmListViewUnpublish">Bydd anghyhoeddi yn tynnu'r eitemau a ddewiswyd a'u holl ddisgynyddion o'r safle.</key>
+        <key alias="confirmUnpublish">Bydd dadgyhoeddi yn dileu'r dudalen yma a phob un o'i phlant o'r safle.</key>
+        <key alias="doctypeChangeWarning">Mae gennych chi newidiadau heb eu cadw. Bydd gwneud newidiadau i'r Math o Ddogfen yn taflu'r newidiadau i ffwrdd.</key>
+    </area>
+    <area alias="bulk">
+        <key alias="done">Wedi gwneud</key>
+        <key alias="deletedItem">Wedi dileu eitem %0%</key>
+        <key alias="deletedItems">Wedi dileu %0% eitem</key>
+        <key alias="deletedItemOfItem">Wedi dileu %0% allan o %1% eitem</key>
+        <key alias="deletedItemOfItems">Wedi dileu %0% allan o %1% o eitemau</key>
+        <key alias="publishedItem">Wedi cyhoeddi eitem %0%</key>
+        <key alias="publishedItems">Wedi cyhoeddi %0% o eitemau</key>
+        <key alias="publishedItemOfItem">Wedi cyhoeddi %0% allan o %1% eitem</key>
+        <key alias="publishedItemOfItems">Wedi cyhoeddi %0% allan o %1% eitemau</key>
+        <key alias="unpublishedItem">Wedi dadgyhoeddi eitem %0%</key>
+        <key alias="unpublishedItems">Wedi dadgyhoeddi %0% o eitemau</key>
+        <key alias="unpublishedItemOfItem">Wedi dadgyhoeddi %0% allan o %1% eitem</key>
+        <key alias="unpublishedItemOfItems">Wedi dadgyhoeddi %0% allan o %1% o eitemau</key>
+        <key alias="movedItem">Wedi symud eitem %0%</key>
+        <key alias="movedItems">Wedi symud %0% o eitemau</key>
+        <key alias="movedItemOfItem">Wedi symud %0% allan o %1% eitem</key>
+        <key alias="movedItemOfItems">Wedi symud %0% allan o %1% o eitemau</key>
+        <key alias="copiedItem">Wedi copïo eitem %0%</key>
+        <key alias="copiedItems">Wedi copïo %0% o eitemau</key>
+        <key alias="copiedItemOfItem">Wedi copïo %0% allan o %1% eitem</key>
+        <key alias="copiedItemOfItems">Wedi copïo %0% allan o %1% eitemau</key>
+    </area>
+    <area alias="defaultdialogs">
+        <key alias="nodeNameLinkPicker">Teitl y ddolen</key>
+        <key alias="urlLinkPicker">Dolen</key>
+        <key alias="anchorLinkPicker">Angor / llinyn ymholi</key>
+        <key alias="anchorInsert">Enw</key>
+        <key alias="assignDomain">Gweinyddu enwau gwesteia</key>
+        <key alias="closeThisWindow">Cau'r ffenestr yma</key>
+        <key alias="confirmdelete">Ydych chi'n sicr eich bod eisiau dileu</key>
+        <key alias="confirmdeleteXofX">Wyt ti'n siŵr fod ti eisiau dileu %0% yn seiliedig ar %1%</key>
+
+        <key alias="confirmdisable">Ydych chi'n sicr eich bod eisiau analluogi</key>
+
+        <key alias="confirmremove">Wyt ti'n siŵr fod ti eisiau dileu</key>
+        <key alias="confirmremoveusageof"><![CDATA[Ydych chi'n siŵr bod chi am gael gwared ar y defnydd o <b>%0%</b>]]></key>
+        <key alias="confirmremovereferenceto"><![CDATA[Ydych chi'n siŵr bod chi am gael gwared ar y cyfeirnod i <b>%0%</b>]]></key>
+
+        <key alias="confirmlogout">Ydych chi'n sicr?</key>
+        <key alias="confirmSure">Ydych chi'n sicr?</key>
+        <key alias="cut">Torri</key>
+        <key alias="editdictionary">Golygu Eitem Geiriadur</key>
+        <key alias="editlanguage">Golygu Iaith</key>
+        <key alias="editSelectedMedia">Golygu cyfrwng a dewiswyd</key>
+        <key alias="insertAnchor">Mewnosod dolen leol</key>
+        <key alias="insertCharacter">Mewnosod nod</key>
+        <key alias="insertgraphicheadline">Mewnosod pennawd graffig</key>
+        <key alias="insertimage">Mewnosod llun</key>
+        <key alias="insertlink">Mewnosod dolen</key>
+        <key alias="insertMacro">Cliciwch i ychwanegu Macro</key>
+        <key alias="inserttable">Mewnosod tabl</key>
+        <key alias="languagedeletewarning">Bydd hyn yn dileu'r iaith</key>
+        <key alias="languageChangeWarning">Gall newid y diwylliant ar gyfer iaith fod yn weithrediad drud a bydd yn arwain at ailadeiladu'r storfa cynnwys a'r mynegeion</key>
+        <key alias="lastEdited">Golygwyd ddiwethaf</key>
+        <key alias="link">Dolen</key>
+        <key alias="linkinternal">Dolen fewnol:</key>
+        <key alias="linklocaltip">Wrth ddefnyddio dolenni leol, defnyddiwch "#" o flaen y ddolen</key>
+        <key alias="linknewwindow">Agor mewn ffenestr newydd?</key>
+        <key alias="macroContainerSettings">Gosodiadau Macro</key>
+        <key alias="macroDoesNotHaveProperties">Nid yw'r macro yma yn cynnwys unrhyw briodweddau gallwch chi olygu</key>
+        <key alias="paste">Gludo</key>
+        <key alias="permissionsEdit">Golygu hawliau ar gyfer</key>
+        <key alias="permissionsSet">Gosod hawliau ar gyfer</key>
+        <key alias="permissionsSetForGroup">Gosod hawliau ar gyfer %0% ar gyfer y grŵp defnyddwyr %1%</key>
+        <key alias="permissionsHelp">Dewiswch y grŵpiau defnyddwyr yr ydych eisiau gosod hwaliau ar eu cyfer</key>
+        <key alias="recycleBinDeleting">Mae'r eitemau yn y bin ailgylchu yn cael eu dileu. Peidiwch â chau'r ffenestr yma wrth i'r gweithrediad gymryd lle</key>
+        <key alias="recycleBinIsEmpty">Mae'r bin ailgylchu yn awr yn wag</key>
+        <key alias="recycleBinWarning">Pan gaiff eitemau eu dileu o'r bin ailgylchu, byddent yn diflannu am byth</key>
+        <key alias="regexSearchError"><![CDATA[Mae problem gyda gwasanaeth gwe <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> ar hyn o bryd, nid oes gennym reolaeth dros hyn. Mae'n ddrwg iawn gennym ni am yr anghyfleustra.]]></key>
+        <key alias="regexSearchHelp">Chwiliwch am fynegiad cyson er mwyn ychwanegu dilysiad i faes ffurflen. Enghraifft: 'email, 'zip-code' 'url'</key>
+        <key alias="removeMacro">Dileu Macro</key>
+        <key alias="requiredField">Maes Gofynnol</key>
+        <key alias="sitereindexed">Safle wedi'i ail-fynegi</key>
+        <key alias="siterepublished">Mae storfa'r wefan wedi'i ddiweddaru. Mae holl gynnwys cyhoeddi wedi'i ddiweddaru, ac mae'r holl gynnwys sydd heb ei gyhoeddi yn dal i fod heb ei gyhoeddi</key>
+        <key alias="siterepublishHelp">Bydd storfa'r wefan yn cael ei adnewyddu. Bydd holl gynnwys cyhoeddi yn cael ei ddiweddaru, ac bydd holl gynnwys sydd heb ei gyhoeddi yn dal i fod heb ei gyhoeddi.</key>
+        <key alias="tableColumns">Nifer o golofnau</key>
+        <key alias="tableRows">Nifer o resi</key>
+        <key alias="templateContentAreaHelp">
+            <![CDATA[<strong>Gosodwch id dalfan</strong> wrth osod ID ar eich dalfan gallwch chwistrellu cynnwys i mewn i'r templed yma o dempledi blentyn,
+      wrth gyfeirio at yr ID yma gan ddefnyddio elfen <code>&lt;asp:content /&gt;</code>.]]>
+        </key>
+        <key alias="templateContentPlaceHolderHelp">
+            <![CDATA[<strong>Dewiswch id dalfan</strong> o'r rhestr isod. Gallwch ddim ond
+      ddewis Id (neu sawl) o feistr y dempled bresennol.]]>
+        </key>
+        <key alias="thumbnailimageclickfororiginal">Cliciwch ar y llun i weld y maint llawn</key>
+        <key alias="treepicker">Dewis eitem</key>
+        <key alias="viewCacheItem">Gweld Eitem Storfa</key>
+        <key alias="createFolder">Creu ffolder...</key>
+        <key alias="relateToOriginalLabel">Perthnasu at y gwreiddiol</key>
+        <key alias="includeDescendants">Cynnwys disgynyddion</key>
+        <key alias="theFriendliestCommunity">Y gymuned fwyaf cyfeillgar</key>
+        <key alias="linkToPage">Dolen i dudalen</key>
+        <key alias="openInNewWindow">Agor y ddolen ddogfen mewn ffenestr neu tab newydd</key>
+        <key alias="linkToMedia">Dolen i gyfrwng</key>
+        <key alias="linkToFile">Dolen i ffeil</key>
+        <key alias="selectContentStartNode">Dewis nod cychwyn cynnwys</key>
+        <key alias="selectMedia">Dewis cyfrwng</key>
+        <key alias="selectMediaType">Dewis y math o gyfrwng</key>
+        <key alias="selectIcon">Dewis eicon</key>
+        <key alias="selectItem">Dewis eitem</key>
+        <key alias="selectLink">Dewis dolen</key>
+        <key alias="selectMacro">Dewis macro</key>
+        <key alias="selectContent">Dewis cynnwys</key>
+        <key alias="selectContentType">Dewiswch y math o gynnwys</key>
+        <key alias="selectMediaStartNode">Dewis nod cychwyn cyfrwng</key>
+        <key alias="selectMember">Dewis aelod</key>
+        <key alias="selectMemberGroup">Dewis grŵp aelod</key>
+        <key alias="selectMemberType">Dewiswch fath aelod</key>
+        <key alias="selectNode">Dewis nod</key>
+        <key alias="selectSections">Dewis adran</key>
+        <key alias="selectUser">Dewis defnyddiwr</key>
+        <key alias="selectUsers">Dewis defnyddwyr</key>
+        <key alias="noIconsFound">Dim eiconau wedi'u darganfod</key>
+        <key alias="noMacroParams">Does dim paramedrau ar gyfer y macro yma</key>
+        <key alias="noMacros">Does dim macro ar gael i fewnosod</key>
+        <key alias="externalLoginProviders">Darparwyr mewngofnodi allanol</key>
+        <key alias="exceptionDetail">Manylion Eithriad</key>
+        <key alias="stacktrace">Trywydd stac</key>
+        <key alias="innerException">Eithriad Fewnol</key>
+        <key alias="linkYour">Dolenni eich</key>
+        <key alias="unLinkYour">Dad-ddolenni eich</key>
+        <key alias="account">cyfrif</key>
+        <key alias="selectEditor">Dewiswch olygwr</key>
+        <key alias="selectEditorConfiguration">Dewiswch ffurfweddiad</key>
+        <key alias="selectSnippet">Dewiswch damaid</key>
+        <key alias="variantdeletewarning">Bydd hyn yn dileu'r nod a'i holl ieithoedd. Os mai dim ond un iaith yr ydych am ei dileu, ewch i'w anghyhoedd yn lle.</key>
+        <key alias="propertyuserpickerremovewarning"><![CDATA[Bydd hyn yn cael gwared ar y defnyddiwr <b>%0%</b>.]]></key>
+        <key alias="userremovewarning"><![CDATA[bydd hyn yn cael gwared ar y defnyddiwr <b>%0%</b> o'r grŵp <b>%1%</b>]]></key>
+        <key alias="yesRemove">Ydw, dileu</key>
+    </area>
+    <area alias="dictionary">
+        <key alias="noItems">Nid oes unrhyw eitemau geiriadur.</key>
+    </area>
+    <area alias="dictionaryItem">
+        <key alias="description">
+            <![CDATA[
+            Golygwch y fersiynau iaith gwahanol ar gyfer yr eitem geiriadur '<em>%0%</em>' islaw<br/>Gallwch ychwanegu ieithoedd ychwanegol o dan 'ieithoedd' yn y ddewislen ar y chwith
+            ]]>
+        </key>
+        <key alias="displayName">Enw Diwylliant</key>
+        <key alias="changeKey">Golygu allwedd yr eitem geiriadur.</key>
+        <key alias="changeKeyError">
+            <![CDATA[
+            Mae'r allwedd '%0%' yn bodoli eisoes.
+            ]]>
+        </key>
+        <key alias="overviewTitle">Trosolwg Geiriadur</key>
+    </area>
+    <area alias="examineManagement">
+        <key alias="configuredSearchers">Chwilwyr wedi'u Ffurfweddu</key>
+        <key alias="configuredSearchersDescription">Yn dangos priodweddau ac offer ar gyfer unrhyw Chwiliwr wedi'i ffurfweddu (h.y. fel chwiliwr aml-fynegai)</key>
+        <key alias="fieldValues">Gwerthoedd maes</key>
+        <key alias="healthStatus">Statws iechyd</key>
+        <key alias="healthStatusDescription">Statws iechyd y mynegai ac os gellir ei ddarllen</key>
+        <key alias="indexers">Mynegewyr</key>
+        <key alias="indexInfo">Gwybodaeth mynegai</key>
+        <key alias="indexInfoDescription">Yn rhestru priodweddau'r mynegai</key>
+        <key alias="manageIndexes">Rheoli mynegeion Examine</key>
+        <key alias="manageIndexesDescription">Yn caniatáu ichi weld manylion pob mynegai ac yn darparu rhai offer ar gyfer rheoli'r mynegeion</key>
+        <key alias="rebuildIndex">Ailadeiladu mynegai </key>
+        <key alias="rebuildIndexWarning">
+            <![CDATA[
+            Bydd hyn yn achosi i'r mynegai gael ei ailadeiladu.<br />
+            Yn dibynnu ar faint o gynnwys sydd yn eich gwefan, gallai hyn gymryd cryn amser.<br />
+            Ni argymhellir ailadeiladu mynegai ar adegau o draffig gwefan uchel neu pan fydd golygyddion yn golygu cynnwys.
+            ]]>
+        </key>
+        <key alias="searchers">Chwilwyr</key>
+        <key alias="searchDescription">Chwiliwch y mynegai a gweld y canlyniadau</key>
+        <key alias="tools">Offer</key>
+        <key alias="toolsDescription">Offer i reoli'r mynegai</key>
+        <key alias="fields">meysydd</key>
+        <key alias="indexCannotRead">Ni ellir darllen yr mynegai a bydd angen ei ailadeiladu</key>
+        <key alias="processIsTakingLonger">Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log Umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn</key>
+        <key alias="indexCannotRebuild">Ni ellir ailadeiladu'r mynegai hwn oherwydd nad yw wedi'i aseinio</key>
+        <key alias="iIndexPopulator">IIndexPopulator</key>
+    </area>
+    <area alias="placeholders">
+        <key alias="username">Darparwch eich enw defnyddiwr</key>
+        <key alias="password">Darparwch eich cyfrinair</key>
+        <key alias="confirmPassword">Cadarnhewch eich cyfrinair</key>
+        <key alias="nameentity">Enwch y %0%...</key>
+        <key alias="entername">Darparwch enw...</key>
+        <key alias="enteremail">Darparwch ebost...</key>
+        <key alias="enterusername">Darparwch enw defnyddiwr...</key>
+        <key alias="label">Label...</key>
+        <key alias="enterDescription">Darparwch ddisgrifiad...</key>
+        <key alias="search">Teipiwch i chwilio...</key>
+        <key alias="filter">Teipiwch i hidlo...</key>
+        <key alias="enterTags">Teipiwch i ychwanegu tagiau (gwasgwch enter ar ôl pob tag)...</key>
+        <key alias="email">Darparwch eich ebost</key>
+        <key alias="enterMessage">Darparwch neges...</key>
+        <key alias="usernameHint">Mae eich enw defnyddiwr fel arfer eich cyfeiriad ebost</key>
+        <key alias="anchor">#gwerth neu ?allwedd=gwerth</key>
+        <key alias="enterAlias">Darparwch enw arall...</key>
+        <key alias="generatingAlias">Yn generadu enw arall...</key>
+        <key alias="a11yCreateItem">Creu eitem</key>
+        <key alias="a11yCreate">Creu</key>
+        <key alias="a11yEdit">Golygu</key>
+        <key alias="a11yName">Enw</key>
+    </area>
+    <area alias="editcontenttype">
+        <key alias="allowAtRoot" version="7.2">Caniatáu ar y gwraidd</key>
+        <key alias="allowAtRootDesc" version="7.2">Dim ond Mathau o Gynnwys gyda hwn wedi ticio all gael eu creu ar lefel wraidd coed Cynnwys a Chyfrwng</key>
+        <key alias="allowedchildnodetypes">Mathau o nod blentyn caniataol</key>
+        <key alias="contenttypecompositions">Cyfansoddiadau Mathau o Ddogfen</key>
+        <key alias="create">Creu</key>
+        <key alias="deletetab">Dileu tab</key>
+        <key alias="description">Disgrifiad</key>
+        <key alias="newtab">Tab newydd</key>
+        <key alias="tab">Tab</key>
+        <key alias="thumbnail">Ciplun bach</key>
+        <key alias="hasListView">Galluogi gwedd rhestr</key>
+        <key alias="hasListViewDesc" version="7.2">Ffurfweddu'r eitem gynnwysi ddangos rhestr trefnadwy &amp; a chwiladwy o'i phlant, ni fydd y plant yn cael eu dangos yn y goeden</key>
+        <key alias="currentListView" version="7.2">Gwedd rhestr bresennol</key>
+        <key alias="currentListViewDesc" version="7.2">Y fath o ddata gwedd rhestr gweithredol</key>
+        <key alias="createListView" version="7.2">Creu gwedd rhestr pwrpasol</key>
+        <key alias="removeListView" version="7.2">Dileu gwedd rhestr pwrpasol</key>
+        <key alias="aliasAlreadyExists">Mae math o gynnwys, math o gyfrwng neu math o aeold gyda'r enw arall yma'n bodoli eisoes</key>
+    </area>
+    <area alias="renamecontainer">
+        <key alias="renamed">Wedi ailenwi</key>
+        <key alias="enterNewFolderName">Darparwch enw ffolder newydd yma</key>
+        <key alias="folderWasRenamed">%0% wedi ailenwi i %1%</key>
+    </area>
+    <area alias="editdatatype">
+        <key alias="addPrevalue">Ychwanegu cyn-werth</key>
+        <key alias="dataBaseDatatype">Math o ddata cronfa ddata</key>
+        <key alias="guid">GUID golygydd priodwedd</key>
+        <key alias="renderControl">Golygydd priodwedd</key>
+        <key alias="rteButtons">Botymau</key>
+        <key alias="rteEnableAdvancedSettings">Galluogi gosodiadau datblygedig ar gyfer</key>
+        <key alias="rteEnableContextMenu">Galluogi dewislen cyd-destun</key>
+        <key alias="rteMaximumDefaultImgSize">Maint fwyaf diofyn llun wedi'i fewnosod</key>
+        <key alias="rteRelatedStylesheets">Taflenni arddull perthnasol</key>
+        <key alias="rteShowLabel">Dangos label</key>
+        <key alias="rteWidthAndHeight">Lled ac uchder</key>
+        <key alias="allPropTypes">Holl fathau o briodweddau &amp; data priodwedd</key>
+        <key alias="willBeDeleted">yn defnyddio'r fath yma o ddata yn cael eu dileu yn barhaol, cadarnhewch eich bod eisiau dileu'r rhain hefyd</key>
+        <key alias="yesDelete">Iawn, dileu</key>
+        <key alias="andAllRelated">a holl fathau o briodwedd &amp; data priodwedd sy'n defnyddio'r math o ddata yma</key>
+        <key alias="selectFolder">Dewiswch y ffolder i symud</key>
+        <key alias="inTheTree">i'r strwythyr goeden isod</key>
+        <key alias="wasMoved">wedi symud o dan</key>
+
+        <key alias="hasReferencesDeleteConsequence"><![CDATA[Bydd dileu <strong>%0%</strong> yn dileu'r briodweddau a'i data o'r eitemau canlynol]]></key>
+        <key alias="acceptDeleteConsequence">Rwy'n deall y weithred hon yn dileu'r holl briodweddau a data sy'n seiliedig ar Fath o Ddata hon</key>
+    </area>
+    <area alias="errorHandling">
+        <key alias="errorButDataWasSaved">Mae eich data wedi'i achub, ond cyn i chi allu cyhoeddi'r dudalen yma, mae yna wallau yr ydych angen eu gwirio yn gyntaf:</key>
+        <key alias="errorChangingProviderPassword">Nid yw'r darparwr aeoldaeth bresennol yn cefnogi newid cyfrinair (EnablePasswordRetrieval angen cael ei osod i true)</key>
+        <key alias="errorExistsWithoutTab">%0% yn bodoli eisoes</key>
+        <key alias="errorHeader">Roedd yna wallau:</key>
+        <key alias="errorHeaderWithoutTab">Roedd yna wallau:</key>
+        <key alias="errorInPasswordFormat">Dylai'r cyfrinair fod o leiaf %0% nod o hyd a chynnwys o leiaf %1% nod(au) sydd ddim yn llythyren na rhif</key>
+        <key alias="errorIntegerWithoutTab">%0% angen bod yn gyfanrif</key>
+        <key alias="errorMandatory">Mae'r maes %0% yn y tab %1% yn ofynnol</key>
+        <key alias="errorMandatoryWithoutTab">%0% yn faes ofynnol</key>
+        <key alias="errorRegExp">%0% yn %1% mewn fformat annilys</key>
+        <key alias="errorRegExpWithoutTab">%0% mewn fformat annilys</key>
+    </area>
+    <area alias="errors">
+        <key alias="receivedErrorFromServer">Derbynwyd gwall o'r gweinydd</key>
+        <key alias="dissallowedMediaType">Mae'r math o ffeil yma wedi'i wahardd gan y gweinyddwr</key>
+        <key alias="codemirroriewarning">NODYN! Er bod CodeMirror wedi'i alluogi gan y ffurfwedd, mae o wedi'i analluogi mewn Internet Explorer gan nad yw'n ddigon cadarn.</key>
+        <key alias="contentTypeAliasAndNameNotNull">Darparwch yr enw ac yr enw arall ar y math o briodwedd newydd!</key>
+        <key alias="filePermissionsError">Mae yna broblem gyda hawliau darllen/ysgrifennu i ffeil neu ffolder penodol</key>
+        <key alias="macroErrorLoadingPartialView">Gwall yn llwytho sgript Rhan-Wedd (ffeil: %0%)</key>
+        <key alias="macroErrorLoadingUsercontrol">Gwall yn llwytho Rheolydd Defnyddiwr '%0%'</key>
+        <key alias="macroErrorLoadingCustomControl">Gwall yn llwytho Rheolydd Pwrpasol (Gwasaneth: %0%, Math: '%1%')</key>
+        <key alias="macroErrorLoadingMacroEngineScript">Gwall yn llwytho sgript MacroEngine (ffeil: %0%)</key>
+        <key alias="macroErrorParsingXSLTFile">"Gwall yn dosbarthu'r ffeil XSLT: %0%</key>
+        <key alias="macroErrorReadingXSLTFile">"Gwall yn darllen y ffeil XSLT: %0%</key>
+        <key alias="missingTitle">Darparwch deitl</key>
+        <key alias="missingType">Dewiswch fath</key>
+        <key alias="pictureResizeBiggerThanOrg">Rydych ar fîn gwneud y llun yn fwy 'na'r maint gwreiddiol. Ydych chi'n sicr eich bod eisiau parhau?</key>
+        <key alias="pythonErrorHeader">Gwall yn y sgript python</key>
+        <key alias="pythonErrorText">Nid yw'r sgript python wedi'i achub gan ei fod yn cynnwys gwall(au)</key>
+        <key alias="startNodeDoesNotExists">Nod gychwynnol wedi'i ddileu, cysylltwch â'ch gweinyddwr</key>
+        <key alias="stylesMustMarkBeforeSelect">Marciwch gynnwys cyn newid arddull</key>
+        <key alias="stylesNoStylesOnPage">Dim arddulliau gweithredol ar gael</key>
+        <key alias="tableColMergeLeft">Symudwch y cyrchwr ar ochr chwith y ddwy gell yr ydych eisiau cyfuno</key>
+        <key alias="tableSplitNotSplittable">Ni allwch hollti cell sydd heb ei gyfuno.</key>
+        <key alias="propertyHasErrors">Mae gan briodwedd hon gwallau</key>
+        <key alias="xsltErrorHeader">Gwall yn y ffynhonnell XSLT</key>
+        <key alias="xsltErrorText">Nid yw'r XSLTwedi'i achub gan ei fod yn cynnwys gwall(au)</key>
+        <key alias="missingPropertyEditorErrorMessage">Mae gwall ffurfwedd gyda'r math o ddata sy'n cael ei ddefnyddio ar gyfer y priodwedd yma, gwiriwch y fath o ddata</key>
+    </area>
+    <area alias="general">
+        <key alias="options">Dewisiadau</key>
+        <key alias="about">Amdano</key>
+        <key alias="action">Gweithred</key>
+        <key alias="actions">Gweithredoedd</key>
+        <key alias="add">Ychwanegu</key>
+        <key alias="alias">Enw arall</key>
+        <key alias="all">Holl</key>
+        <key alias="areyousure">Ydych chi'n sicr?</key>
+        <key alias="back">Yn ôl</key>
+        <key alias="backToOverview">Yn ôl i'r trosolwg</key>
+        <key alias="border">Ffin</key>
+        <key alias="by">wrth</key>
+        <key alias="cancel">Canslo</key>
+        <key alias="cellMargin">Ymyl cell</key>
+        <key alias="choose">Dewis</key>
+        <key alias="clear">Clirio</key>
+        <key alias="close">Cau</key>
+        <key alias="closewindow">Cau Ffenest</key>
+        <key alias="comment">Sylw</key>
+        <key alias="confirm">Cadarnhau</key>
+        <key alias="constrain">Gorfodi</key>
+        <key alias="constrainProportions">Gorfodi cyfraneddau</key>
+        <key alias="content">Cynnwys</key>
+        <key alias="continue">Bwrw ymlaen</key>
+        <key alias="copy">Copïo</key>
+        <key alias="create">Creu</key>
+        <key alias="cropSection">Adran tocio</key>
+        <key alias="database">Cronfa ddata</key>
+        <key alias="date">Dyddiad</key>
+        <key alias="default">Diofyn</key>
+        <key alias="delete">Dileu</key>
+        <key alias="deleted">Wedi dileu</key>
+        <key alias="deleting">Yn dileu...</key>
+        <key alias="design">Cynllun</key>
+        <key alias="dictionary">Geiriadur</key>
+        <key alias="dimensions">Dimensiynau</key>
+        <key alias="discard">Gwaredu</key>
+        <key alias="down">I lawr</key>
+        <key alias="download">Lawrlwytho</key>
+        <key alias="edit">Golygu</key>
+        <key alias="edited">Golygwyd</key>
+        <key alias="elements">Elfennau</key>
+        <key alias="email">Ebost</key>
+        <key alias="error">Gwall</key>
+        <key alias="field">Maes</key>
+        <key alias="findDocument">Canfod</key>
+        <key alias="first">Cyntaf</key>
+        <key alias="focalPoint">Canolbwynt</key>
+        <key alias="general">Cyffredinol</key>
+        <key alias="groups">Grŵpiau</key>
+        <key alias="group">Grŵp</key>
+        <key alias="height">Uchder</key>
+        <key alias="help">Help</key>
+        <key alias="hide">Cuddio</key>
+        <key alias="history">Hanes</key>
+        <key alias="icon">Eicon</key>
+        <key alias="id">Id</key>
+        <key alias="import">Mewnforio</key>
+        <key alias="includeFromsubFolders">Cynnwys is-ffolderi wrth chwilio</key>
+        <key alias="excludeFromSubFolders">Search only this folder Chwilio yn ffolder hwn yn unig</key>
+        <key alias="info">Gwybodaeth</key>
+        <key alias="innerMargin">Ymyl mewnol</key>
+        <key alias="insert">Mewnosod</key>
+        <key alias="install">Gosod</key>
+        <key alias="invalid">Annilys</key>
+        <key alias="justify">Unioni</key>
+        <key alias="label">Label</key>
+        <key alias="language">Iaith</key>
+        <key alias="last">Olaf</key>
+        <key alias="layout">Gosodiad</key>
+        <key alias="links">Dolenni</key>
+        <key alias="loading">Yn llwytho</key>
+        <key alias="locked">Wedi cloi</key>
+        <key alias="login">Mewngofnodi</key>
+        <key alias="logoff">Allgofnodi</key>
+        <key alias="logout">Allgofnodi</key>
+        <key alias="macro">Macro</key>
+        <key alias="mandatory">Gofynnol</key>
+        <key alias="message">Neges</key>
+        <key alias="move">Symud</key>
+        <key alias="more">Mwy</key>
+        <key alias="name">Enw</key>
+        <key alias="new">Newydd</key>
+        <key alias="next">Nesaf</key>
+        <key alias="no">Na</key>
+        <key alias="of">o</key>
+        <key alias="off">I ffwrdd</key>
+        <key alias="ok">Iawn</key>
+        <key alias="open">Agor</key>
+        <key alias="options">Opsiynau</key>
+        <key alias="on">Ymlaen</key>
+        <key alias="or">neu</key>
+        <key alias="orderBy">Trefnu wrth</key>
+        <key alias="password">Cyfrinair</key>
+        <key alias="path">Llwybr</key>
+        <key alias="placeHolderID">ID Dalfan</key>
+        <key alias="pleasewait">Un eiliad os gwelwch yn dda...</key>
+        <key alias="previous">Blaenorol</key>
+        <key alias="properties">Priodweddau</key>
+        <key alias="rebuild">Ailadeiladu</key>
+        <key alias="reciept">Ebost i dderbyn data ffurflen</key>
+        <key alias="recycleBin">Bin Ailgylchu</key>
+        <key alias="recycleBinEmpty">Mae eich bin ailgylchu yn wag</key>
+        <key alias="reload">Ail-lwytho</key>
+        <key alias="remaining">Ar ôl</key>
+        <key alias="remove">Dileu</key>
+        <key alias="rename">Ailenwi</key>
+        <key alias="renew">Adnewyddu</key>
+        <key alias="required" version="7.0">Gofynnol</key>
+        <key alias="retrieve">Adfer</key>
+        <key alias="retry">Ceisio eto</key>
+        <key alias="rights">Hawliau</key>
+        <key alias="scheduledPublishing">Cyhoeddi ar amserlen</key>
+        <key alias="search">Chwilio</key>
+        <key alias="searchNoResult">Mae'n ddrwg gennym ni, ni all ganfod beth roeddwch chi'n chwilio amdano.</key>
+        <key alias="noItemsInList">Dim eitemau wedi'u hychwanegu</key>
+        <key alias="server">Gweinydd</key>
+        <key alias="settings">Gosodiadau</key>
+        <key alias="show">Dangos</key>
+        <key alias="showPageOnSend">Dangos y dudlaen wrth Anfon</key>
+        <key alias="size">Maint</key>
+        <key alias="sort">Trefnu</key>
+        <key alias="status">Statws</key>
+        <key alias="submit">Cyflwyno</key>
+        <key alias="success">Llwyddiant</key>
+        <key alias="type">Math</key>
+        <key alias="typeToSearch">Math i chwilio...</key>
+        <key alias="under">o dan</key>
+        <key alias="up">I fyny</key>
+        <key alias="update">Diweddaru</key>
+        <key alias="upgrade">Uwchraddio</key>
+        <key alias="upload">Lanlwytho</key>
+        <key alias="url">Url</key>
+        <key alias="user">Defnyddiwr</key>
+        <key alias="username">Enw defnyddiwr</key>
+        <key alias="value">Gwerth</key>
+        <key alias="view">Gwedd</key>
+        <key alias="welcome">Croeso...</key>
+        <key alias="width">Lled</key>
+        <key alias="yes">Ie</key>
+        <key alias="folder">Ffolder</key>
+        <key alias="searchResults">Canlyniadau chwilio</key>
+        <key alias="reorder">Ail-drefnu</key>
+        <key alias="reorderDone">Rydw i wedi gorffen ail-drefnu</key>
+        <key alias="preview">Rhagolwg</key>
+        <key alias="changePassword">Newid cyfrinair</key>
+        <key alias="to">i</key>
+        <key alias="listView">Gwedd rhestr</key>
+        <key alias="saving">Yn achub...</key>
+        <key alias="current">presennol</key>
+        <key alias="embed">Mewnblannu</key>
+        <key alias="retrieve">Adfer</key>
+        <key alias="selected">dewiswyd</key>
+        <key alias="other">Arall</key>
+        <key alias="articles">Erthyglau</key>
+        <key alias="videos">Fideos</key>
+        <key alias="clear">Clirio</key>
+        <key alias="installing">Arsefydlu</key>
+    </area>
+    <area alias="colors">
+        <key alias="black">Du</key>
+        <key alias="green">Gwyrdd</key>
+        <key alias="yellow">Melyn</key>
+        <key alias="orange">Oren</key>
+        <key alias="blue">Glas</key>
+        <key alias="bluegrey">Llwyd Las</key>
+        <key alias="grey">Llwyd</key>
+        <key alias="brown">Brown</key>
+        <key alias="lightblue">Glas Golau</key>
+        <key alias="cyan">Gwyrddlas</key>
+        <key alias="lightgreen">Gwyrdd Golau</key>
+        <key alias="lime">Leim</key>
+        <key alias="amber">Melyngoch</key>
+        <key alias="deeporange">Oren Ddwfn</key>
+        <key alias="red">Coch</key>
+        <key alias="pink">Pinc</key>
+        <key alias="purple">Piws</key>
+        <key alias="deeppurple">Piws Ddwfn</key>
+        <key alias="indigo">Dulas</key>
+    </area>
+    <area alias="shortcuts">
+        <key alias="addTab">Ychwanegu tab</key>
+        <key alias="addGroup">Ychwanegu grŵp</key>
+        <key alias="addProperty">Ychwanegu priodwedd</key>
+        <key alias="addEditor">Ychwanegu golygydd</key>
+        <key alias="addTemplate">Ychwanegu templed</key>
+        <key alias="addChildNode">Ychwanegu nod blentyn</key>
+        <key alias="addChild">Ychwanegu plentyn</key>
+        <key alias="editDataType">Golygu math o ddata</key>
+        <key alias="navigateSections">Llywio adrannau</key>
+        <key alias="shortcut">Llwybrau byr</key>
+        <key alias="showShortcuts">dangos llwybrau byr</key>
+        <key alias="toggleListView">Toglo gwedd rhestr</key>
+        <key alias="toggleAllowAsRoot">Toglo caniatáu fel gwraidd</key>
+        <key alias="commentLine">Sylwi/Dad-sylwi llinellau</key>
+        <key alias="removeLine">Dileu llinell</key>
+        <key alias="copyLineUp">Copïo llinellau i fyny</key>
+        <key alias="copyLineDown">Copïo llinellau i lawr</key>
+        <key alias="moveLineUp">Symud Llinellau I Fyny</key>
+        <key alias="moveLineDown">Symud Llinellau I Lawr</key>
+        <key alias="generalHeader">Cyffredinol</key>
+        <key alias="editorHeader">Golygydd</key>
+        <key alias="toggleAllowCultureVariants">Toglo caniatáu amrywiadau diwylliant</key>
+        <key alias="toggleAllowSegmentVariants">Toglo caniatáu segmentiad</key>
+    </area>
+    <area alias="graphicheadline">
+        <key alias="backgroundcolor">Lliw cefndir</key>
+        <key alias="bold">Trwm</key>
+        <key alias="color">Lliw ffont</key>
+        <key alias="font">Ffont</key>
+        <key alias="text">Testun</key>
+    </area>
+    <area alias="headers">
+        <key alias="page">Tudalen</key>
+    </area>
+    <area alias="installer">
+        <key alias="databaseErrorCannotConnect">Ni all y gosodydd gysylltu â'r gronfa ddata.</key>
+        <key alias="databaseErrorWebConfig">Methwyd achub y ffeil web.config. Ceisiwch newid y llinyn gyswllt yn uniongyrchol.</key>
+        <key alias="databaseFound">Canfwyd eich cronfa ddata ac mae'n cael ei adnabod fel</key>
+        <key alias="databaseHeader">Ffurfwedd gronfa ddata</key>
+        <key alias="databaseInstall">
+            <![CDATA[
+      Gwasgwch y botwm <strong>gosod</strong> i osod y gronfa ddata %0% Umbraco
+    ]]>
+        </key>
+        <key alias="databaseInstallDone"><![CDATA[Mae Umbraco %0% yn awr wedi copïo i'ch gronfa ddata. Gwasgwch <strong>Nesaf</strong> i fwrw ymlaen.]]></key>
+        <key alias="databaseNotFound">
+            <![CDATA[<p>Cronfa ddata heb ei ganfod! Gwiriwch fod y gwybodaeth yn y "llinyn gyswllt" o'r ffeil "web.config" yn gywir.</p>
+              <p>Er mwyn parhau, newidiwch y ffeil "web.config" (gan ddefnyddio Visual Studio neu eich hoff olygydd testun), rholiwch at y gwaelod, ychwanegwch y llinyn gyswllt ar gyfer eich cronfa ddata yn yr allwedd o'r enw "UmbracoDbDSN" ac achub y ffeil. </p>
+              <p>
+              Cliciwch y botwm <strong>ceisio eto</strong> pan rydych wedi
+              gorffen.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              Mwy o wybodaeth am newid y ffeil web.config yma</a>.</p>]]>
+        </key>
+        <key alias="databaseText">
+            <![CDATA[Er mwyn cwblhau'r cam yma, rhaid i chi berchen gwybodaeth am eich gweinydd gronfa ddata ("llinyn gyswllt").<br />
+        Cysylltwch â'ch darparwr gwe (ISP) os oes angen.
+        Os ydych chi'n gosod ar beiriant leol neu weinydd, efallai bydd angen gwybodaeth o'ch gweinyddwr system arnoch.]]>
+        </key>
+        <key alias="databaseUpgrade">
+            <![CDATA[
+      <p>
+      Gwasgwch y botwm <strong>uwchraddio</strong> i uwchraddio eoch gronfa ddata i Umbraco %0%</p>
+      <p>
+      Peidiwch â phoeni - ni fydd unrhyw gynnwys yn cael ei ddileu a bydd popeth yn parhau i weithio wedyn!
+      </p>
+      ]]>
+        </key>
+        <key alias="databaseUpgradeDone">
+            <![CDATA[Mae eich cronfa ddata wedi'u uwchraddio at y fersiwn terfynol %0%.<br />Gwasgwch <strong>Nesaf</strong> i
+      barhau. ]]>
+        </key>
+        <key alias="databaseUpToDate"><![CDATA[Mae eich cronfa ddata bresennol wedi diweddaru eisoes!. Cliciwch <strong>nesaf</strong> i barhau gyda'r dewin ffurfwedd]]></key>
+        <key alias="defaultUserChangePass"><![CDATA[<strong>Mae angen newid cyfrinair y defnyddiwr Diofyn!</strong>]]></key>
+        <key alias="defaultUserDisabled"><![CDATA[<strong>Mae'r defnyddiwr Diofyn wedi'u analluogi neu does dim hawliau i Umbraco!</strong></p><p>Does dim angen unrhyw weithredoedd pellach. Cliciwch <b>Nesaf</b> i barhau.]]></key>
+        <key alias="defaultUserPassChanged"><![CDATA[<strong>Mae cyfrinair y defnyddiwr Diofyn wedi'i newid yn llwyddiannus ers y gosodiad!</strong></p><p>Does dim angen unrhyw weithredoedd pellach. Cliciwch <strong>Nesaf</strong> i barhau.]]></key>
+        <key alias="defaultUserPasswordChanged">Mae'r cyfrinair wedi'i newid!</key>
+        <key alias="greatStart">Cewch gychwyn gwych, gwyliwch ein fideos rhaglith</key>
+        <key alias="licenseText">Wrth glicio'r botwm nesaf (neu newid y umbracoConfigurationStatus yn web.config), rydych yn derbyn y trwydded ar gyfer y meddalwedd yma fel y nodir yn y blwch isod. Sylwch fod y dosbarthiad Umbraco yma yn cynnwys 2 drwydded gwahanol, y trwydded cod agored MIT ar gyfer y fframwaith ac y trwydded Umbraco rhadwedd sy'n ymdrin â'r Rhyngwyneb Defnyddiwr.</key>
+        <key alias="None">Heb osod eto.</key>
+        <key alias="permissionsAffectedFolders">Ffeiliau a ffolderi wedi'u effeithio</key>
+        <key alias="permissionsAffectedFoldersMoreInfo">Mwy o wybodaeth am osod hawliau ar gyfer Umbraco yma</key>
+        <key alias="permissionsAffectedFoldersText">Rydych angen caniatáu i ASP.NET newid hawliau ar y ffeiliau/ffolderi canlynol</key>
+        <key alias="permissionsAlmostPerfect">
+            <![CDATA[<strong>Mae eich gosodiadau hawliau bron a bod yn berffaith!</strong><br /><br />
+        Gallwch redeg Umbraco heb broblemau, ond ni fydd yn bosibl i chi osod pecynnau sydd wedi'u hargymell er mwyn cymryd mantais llawn o Umbraco.]]>
+        </key>
+        <key alias="permissionsHowtoResolve">Sut i Gywiro</key>
+        <key alias="permissionsHowtoResolveLink">Cliciwch yma i ddarllen y ferswin destun</key>
+        <key alias="permissionsHowtoResolveText"><![CDATA[Gwyliwch ein <strong>fideo tiwtorial</strong> ar osod hawliau ffolder ar gyfer Umbraco neu darllenwch y fersiwn destun.]]></key>
+        <key alias="permissionsMaybeAnIssue">
+            <![CDATA[<strong>Gall eich gosodiadau hawliau fod yn broblem!</strong>
+      <br/><br />
+      Gallwch redeg Umbraco heb broblemau, ond ni fydd yn bosibl i chi greu ffolderi neu gosod pecynnau sydd wedi'u hargymell er mwyn cymryd mantais llawn o Umbraco.]]>
+        </key>
+        <key alias="permissionsNotReady">
+            <![CDATA[<strong>Nid yw eich gosodiadau hawliau yn barod ar gyfer Umbraco!</strong>
+          <br /><br />
+          Er mwyn rhedeg Umbraco, bydd angen i chi ddiweddaru eich gosodiadau hawliau.]]>
+        </key>
+        <key alias="permissionsPerfect">
+            <![CDATA[<strong>Mae eich gosodiadau hawliau yn berffaith!</strong><br /><br />
+              Rydych yn barod i redeg Umbraco a gosod pecynnau!]]>
+        </key>
+        <key alias="permissionsResolveFolderIssues">Yn datrys y broblem ffolder</key>
+        <key alias="permissionsResolveFolderIssuesLink">Dilynwch y ddolen yma ar gyfer mwy o wybodaethar broblemau gyda ASP.NET a chreu ffolderi</key>
+        <key alias="permissionsSettingUpPermissions">Gosod hawliau ffolderi</key>
+        <key alias="permissionsText">
+            <![CDATA[
+      Mae Umbraco angen hawliau ysgrifennu/newid er mwyn creu rhai ffolderi ar gyfer cadw ffeiliau fel lluniau a PDFs.
+      Mae Umbraco hefyd yn cadw data dros-dro (storfa) ar gyfer mwyhau perfformiad eich gwefan.
+    ]]>
+        </key>
+        <key alias="runwayFromScratch">Rydw i eisiau ail-gychwyn</key>
+        <key alias="runwayFromScratchText">
+            <![CDATA[
+        Mae eich gwefan yn hollol wag ar hyn o bryd, felly mae hynny'n berffaith os rydych chi eisiau cychwyn eto a chreu eich mathau o ddogfennau a thempledi eich hunain.
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dysgwch sut</a>)
+        Gallwch ddewis i osod Runway yn hwyrach os hoffwch chi. Ewch at yr adran Datblygwr a dewiswch Pecynnau.
+      ]]>
+        </key>
+        <key alias="runwayHeader">Rydych newydd osod platfform glân Umbraco. Beth hoffwch chi wneud nesaf?</key>
+        <key alias="runwayInstalled">Mae Runway wedi'i osod</key>
+        <key alias="runwayInstalledText">
+            <![CDATA[
+      Mae gennych chi'r sylfaen yn ei lle. Dewiswchpa fodylau yr hoffwch osod ar ei phen.<br />
+      Dyma ein rhestr o fodylau yr ydym yn argymell, ticiwch y rhai hoffwch chi'u gosod,  neu gwelwch yr <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">holl restr o fodylau</a>
+      ]]>
+        </key>
+        <key alias="runwayOnlyProUsers">Dim ond wedi'i argymell ar gyfer defnyddwyr brofiadol</key>
+        <key alias="runwaySimpleSite">Hoffwn i gychwyn gyda gwefan syml</key>
+        <key alias="runwaySimpleSiteText">
+            <![CDATA[
+      <p>
+        Mae "Runway" yn wefan syml sy'n darparu mathau o ddogfennau a thempledi syml. Gall y gosodwr osod Runway i chi yn awtomatig,
+        ond gallwch olygu, estyn neu ei ddileu yn hawdd. Nid yw'n angenrheidiol a gallwch ddefnyddio Umbraco yn berffaith heb. Ond, 
+        mae Runwayyn cynnig sylfaen hawdd wedi'i seilio ar arferion gorau er mwyn i chi gychwyn yn gyflymach nag erioed.
+        Os rydych chi'n dewis gosod Runway, gallwch ddewis blociau adeiliadu syml o'r enw Modylau Runway er mwyn mwyhau eich tudalennau Runway.
+        </p>
+        <small>
+        <em>Wedi cynnwys gyda Runway:</em> Tudalen Hafan, Tudalen Cychwyn Allan, Tudalen Gosod Modylau.<br />
+        <em>Modylau Dewisol:</em> Llywio Dop, Map o'r wefan, Cysylltu, Oriel.
+        </small>
+      ]]>
+        </key>
+        <key alias="runwayWhatIsRunway">Beth yw Runway</key>
+        <key alias="step1">Cam 1/5 Derbyn trwydded</key>
+        <key alias="step2">Cam 2/5: Ffurfwedd Gronfa Ddata</key>
+        <key alias="step3">Cam 3/5: Dilysu Hawliau Ffeiliau</key>
+        <key alias="step4">Cam 4/5: Gwirio Diogelwch Umbraco</key>
+        <key alias="step5">Cam 5/5: Mae Umbraco yn barod i chi gychwyn</key>
+        <key alias="thankYou">Diolch am ddewis Umbraco</key>
+        <key alias="theEndBrowseSite">
+            <![CDATA[<h3>Porwch eich safle newydd</h3>
+Rydych wedi gosod Runway, felly beth am weld sut mae eich gwefan newydd yn edrych.]]>
+        </key>
+        <key alias="theEndFurtherHelp">
+            <![CDATA[<h3>Cymorth a gwyboaeth bellach</h3>
+Cewch gymorth o'n cymuned gwobrwyol, porwch drwy ein dogfennaeth neu gwyliwch fideos yn rhad ac am ddim ar sut i adeiladu gwefan syml, sut i ddefnyddio pecynnau a chanllaw cyflym i dermeg Umbraco]]>
+        </key>
+        <key alias="theEndHeader">Mae Umbraco wedi'i osod %0% ac mae'n barod i'w ddefnyddio</key>
+        <key alias="theEndInstallFailed">
+            <![CDATA[Er mwyn gorffen y gosodiad, bydd angen i chi
+        olygu'r ffeil <strong>/web.config</strong> a diweddaru'r allwedd AppSetting <strong>UmbracoConfigurationStatus</strong> yng ngwaelod y gwerth o <strong>'%0%'</strong>.]]>
+        </key>
+        <key alias="theEndInstallSuccess">
+            <![CDATA[Gallwch gychwyn <strong>yn syth</strong> wrth glicio ar y botwm "Cychwyn Umbraco" isod. <br />Os ydych yn <strong>newydd i Umbraco</strong>,
+gallwch ddarganfod digonedd o adnoddau ar ein tudalennau cychwyn allan.]]>
+        </key>
+        <key alias="theEndOpenUmbraco">
+            <![CDATA[<h3>Cychwyn Umbraco</h3>
+Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwangeu cynnwys, diweddaru'r templedi a thaflenni arddull neu ychwanegu nodweddion newydd]]>
+        </key>
+        <key alias="Unavailable">Methwyd cysylltu â'r gronfa ddata.</key>
+        <key alias="Version3">Umbraco Fersiwn 3</key>
+        <key alias="Version4">Umbraco Fersiwn 4</key>
+        <key alias="watch">Gwylio</key>
+        <key alias="welcomeIntro">
+            <![CDATA[Bydd y dewin yma yn eich llywio drwy'r broses o ffurfweddi <strong>Umbraco %0%</strong> ar gyfer gosodiad ffres neu uwchraddio o ferswin 3.0.
+                                <br /><br />
+                                Gwasgwch <strong>"nesaf"</strong> i gychwyn y dewin.]]>
+        </key>
+    </area>
+    <area alias="language">
+        <key alias="cultureCode">Côd Diwylliant</key>
+        <key alias="displayName">Enw Diwylliant</key>
+    </area>
+    <area alias="lockout">
+        <key alias="lockoutWillOccur">Rydych wedi segura a bydd allgofnodi awtomatig yn digwydd mewn</key>
+        <key alias="renewSession">Adnewyddwch rwan er mwyn achub eich gwaith</key>
+    </area>
+    <area alias="login">
+        <key alias="greeting0">Dydd Sul Swmpus</key>
+        <key alias="greeting1">Dydd Llun Llwyddiannus</key>
+        <key alias="greeting2">Dydd Mawrth Moethus</key>
+        <key alias="greeting3">Dydd Mercher Melys</key>
+        <key alias="greeting4">Dydd Iau Iachus</key>
+        <key alias="greeting5">Dydd Gwener Gwych</key>
+        <key alias="greeting6">Dydd Sadwrn Syfrdannus</key>
+        <key alias="instruction">Mewngofnodwch isod</key>
+        <key alias="signInWith">Mewngofnodwch gyda</key>
+        <key alias="timeout">Sesiwn wedi cyrraedd terfyn amser</key>
+        <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
+        <key alias="forgottenPassword">Wedi anghofio eich cyfrinair?</key>
+        <key alias="forgottenPasswordInstruction">Bydd ebost yn cael ei anfon i'r cyfeiriad darparwyd gyda dolen i ailosod eich cyfrinair</key>
+        <key alias="requestPasswordResetConfirmation">Bydd ebost gyda chyfarwyddiadau ailosod cyfrinair yn cael ei anfon at y cyfeiriad darparwyd os yw'n cyfateb â'n cofnodion</key>
+        <key alias="showPassword">Dangos cyfrinair</key>
+        <key alias="hidePassword">Cuddio cyfrinair</key>
+        <key alias="returnToLogin">Dychwelyd i'r ffurflen mewngofnodi</key>
+        <key alias="setPasswordInstruction">Darparwch gyfrinair newydd</key>
+        <key alias="setPasswordConfirmation">Mae eich cyfrinair wedi'i ddiweddaru</key>
+        <key alias="resetCodeExpired">Mae'r ddolen rydych wedi clicio arno naill ai yn annilys neu wedi dod i ben</key>
+        <key alias="resetPasswordEmailCopySubject">Umbraco: Ailosod Cyfrinair</key>
+        <key alias="resetPasswordEmailCopyFormat">
+            <![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Ailosod cyfrinair wedi dymuno
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Eich enw defnyddiwr ar gyfer swyddfa gefn Umbraco yw: <strong>%0%</strong>
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																<tbody>
+																	<tr>
+																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																				Cliciwch y ddolen yma er mwyn ailosod eich cyfrinair
+																			</a>
+																		</td>
+																	</tr>
+																</tbody>
+															</table>
+														</p>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Os na allwch glicio ar y ddolen yma, copïwch a gludwch y URL i mewn i'ch porwr:</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>
+																		</font>
+																	</td>
+																</tr>
+															</table>
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	]]>
+        </key>
+    </area>
+    <area alias="main">
+        <key alias="dashboard">Dashfwrdd</key>
+        <key alias="sections">Adrannau</key>
+        <key alias="tree">Cynnwys</key>
+    </area>
+    <area alias="moveOrCopy">
+        <key alias="choose">Dewis tudalen uwchben...</key>
+        <key alias="copyDone">%0% wedi copïo i %1%</key>
+        <key alias="copyTo">Dewiswch ble ddylai'r ddogfen %0% gael ei gopïo i isod</key>
+        <key alias="moveDone">%0% wedi ei symud i %1%</key>
+        <key alias="moveTo">Dewiswch ble ddylai'r ddogfen %0% gael ei symud i isod</key>
+        <key alias="nodeSelected">wedi ei ddewis fel gwraidd eich cynnwys newydd, cliciwch 'iawn' isod.</key>
+        <key alias="noNodeSelected">Dim nod wedi'i ddewis eto, dewiswch nod yn y rhestr uchod yn gyntaf cyn clicio 'iawn'</key>
+        <key alias="notAllowedByContentType">Nid yw'r nod bresennol yn cael ei ganiatáu o dan y nod ddewiswyd oherwydd ei fath</key>
+        <key alias="notAllowedByPath">Ni all y nod bresennol gael ei symud i un o'i is-dudalennau</key>
+        <key alias="notAllowedAtRoot">Ni all y nod bresennol fodoli ar y gwraidd</key>
+        <key alias="notValid">Nid yw'r gweithred wedi'i ganiatáu gan nad oes gennych ddigon o hawliau ar gyfer 1 neu fwy o ddogfennau blentyn.</key>
+        <key alias="relateToOriginal">Perthnasu eitemau wedi'u copïo at y rhai gwreiddiol</key>
+    </area>
+    <area alias="notifications">
+        <key alias="editNotifications"><![CDATA[Golygu eich hysbysiad ar gyfer <strong>%0%</strong>]]></key>
+        <key alias="notificationsSavedFor">Gosodiad hysbysiadau wedi cadw am</key>
+        <key alias="mailBody">
+            <![CDATA[
+        Helo %0%
+        
+        Mae hyn yn ebost awtomatig i'ch hysbysu fod y dasg '%1%'
+        wedi'i berfformio ar y dudalen '%2%'
+        gan y defnyddiwr '%3%'
+        
+        Ewch at http://%4%/#/content/content/edit/%5% i olygu.
+
+        Mwynhewch eich diwrnod!
+        
+        Hwyl fawr oddi wrth y robot Umbraco
+        ]]>
+        </key>
+        <key alias="mailBodyVariantSummary">Mae'r ieithoedd canlynol wedi'u haddasu %0%</key>
+        <key alias="mailBodyHtml">
+            <![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Helo %0%,
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Mae hyn yn ebost awtomatig i'ch hysbysu fod y dasg <strong>'%1%'</strong> wedi'i berfformio ar y dudalen <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> gan y defnyddiwr <strong>'%3%'</strong>
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
+																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>GOLYGU</a> </td> </tr></tbody></table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<h3>Crynodeb diweddariad:</h3>
+															<table style="width: 100%;">
+																 %6%
+															</table>
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Mwynhewch eich diwrnod!<br /><br />
+															Hwyl fawr oddi wrth y robot Umbraco
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+		</html>
+	]]>
+        </key>
+        <key alias="mailBodyVariantHtmlSummary">
+            <![CDATA[<p>Mae'r ieithoedd canlynol wedi'u haddasu:</p>
+        %0%
+    ]]>
+        </key>
+        <key alias="mailSubject">[%0%] Hysbysiad am %1% wedi perfformio am %2%</key>
+        <key alias="notifications">Hysbysiadau</key>
+    </area>
+    <area alias="packager">
+        <key alias="actions">Gweithredoedd</key>
+        <key alias="created">Creu</key>
+        <key alias="createPackage">Creu pecyn</key>
+        <key alias="chooseLocalPackageText">
+            <![CDATA[
+      Dewiswch becyn o'ch peiriant, gan glicio ar y botwm<br />
+         Pori a darganfod y pecyn. Fel arfer, mae gen becynnau Umbraco estyniadau ".umb" neu ".zip".
+      ]]>
+        </key>
+        <key alias="deletewarning">Bydd hwn yn dileu'r pecyn</key>
+        <key alias="dropHere">Gollwng i lanlwytho</key>
+        <key alias="includeAllChildNodes">Cynhwyswch yr holl nodau plentyn</key>
+        <key alias="orClickHereToUpload">neu cliciwch yma i ddewis ffeil pecyn</key>
+        <key alias="uploadPackage">Lanlwytho pecyn</key>
+        <key alias="localPackageDescription">Gosod pecyn leol wrth ddewis o'ch peiriant. Dylwch ddim ond osod pecynnau o ffynonellau yr ydych yn adnabod a bod gennych hyder ynddynt</key>
+        <key alias="uploadAnother">Lanlwytho pecyn arall</key>
+        <key alias="cancelAndUploadAnother">Canslo a lanlwytho pecyn arall</key>
+        <key alias="packageLicense">Trwydded</key>
+        <key alias="accept">Rydw i'n derbyn</key>
+        <key alias="termsOfUse">termau defnydd</key>
+        <key alias="pathToFile">Llwybr i'r ffeil</key>
+        <key alias="pathToFileDescription">Llwybr llwyr i'r ffeil (ie: /bin/umbraco.bin)</key>
+        <key alias="installed">Wedi'i osod</key>
+        <key alias="installLocal">Gosod yn lleol</key>
+        <key alias="packageInstall">Gosod pecyn</key>
+        <key alias="installFinish">Gorffen</key>
+        <key alias="installedPackages">Pecynnau wedi'u gosod</key>
+        <key alias="noPackages">Nid oes gennych unrhyw becynnau wedi'u gosod</key>
+        <key alias="noPackagesDescription"><![CDATA[Nid oes gennych unrhyw becynnau wedi'u gosod. Naill ai gosodwch becyn leol wrth ddewis o'ch peiriant, neu porwch drwy pecynnau sydd ar gael wrth ddefnyddio'r eicon <strong>'Pecynnau'</strong> yng nghornel dop, dde eich sgrîn]]></key>
+        <key alias="noConfigurationView">Nid oes gan y pecyn hwn unrhyw olwg cyfluniad</key>
+        <key alias="noPackagesCreated">Nid oes unrhyw becynnau wedi'u creu eto</key>
+        <key alias="packageActions">Camau Gweithredu Pecyn</key>
+        <key alias="packageAuthorUrl">URL y Awdur</key>
+        <key alias="packageContent">Cynnwys y Pecyn</key>
+        <key alias="packageFiles">Ffeiliau y Pecyn</key>
+        <key alias="packageIconUrl">URL Eicon</key>
+        <key alias="packageInstall">Gosod pecyn</key>
+        <key alias="packageLicense">Trwydded</key>
+        <key alias="packageLicenseUrl">URL Trwydded</key>
+        <key alias="packageProperties">Priodweddau Pecyn</key>
+        <key alias="packageSearch">Chwilio am becynnau</key>
+        <key alias="packageSearchResults">Canlyniadau ar gyfer</key>
+        <key alias="packageNoResults">Ni allwn ddarganfod unrhyw beth ar gyfer</key>
+        <key alias="packageNoResultsDescription">Ceisiwch chwilio am becyn arall neu porwch drwy'r categorïau</key>
+        <key alias="packagesPopular">Poblogaidd</key>
+        <key alias="packagesNew">Pecynnau newydd</key>
+        <key alias="packageHas">yn cynnwys</key>
+        <key alias="packageKarmaPoints">pwyntiau karma</key>
+        <key alias="packageInfo">Gwybodaeth</key>
+        <key alias="packageOwner">Perchennog</key>
+        <key alias="packageContrib">Cyfranwyr</key>
+        <key alias="packageCreated">Creuwyd</key>
+        <key alias="packageCurrentVersion">Fersiwn bresennol</key>
+        <key alias="packageNetVersion">Fersiwn .NET</key>
+        <key alias="packageDownloads">Lawrlwythiadau</key>
+        <key alias="packageLikes">Hoffi</key>
+        <key alias="packageCompatibility">Cydweddoldeb</key>
+        <key alias="packageCompatibilityDescription">Mae'r pecyn yma yn gydnaws â'r fersiynau canlynol o Umbraco, fel y mae aelodau'r gymued yn adrodd yn ôl. Ni all warantu cydweddoldeb cyflawn ar gyfer fersiynau sydd wedi'u hadrodd o dan 100%</key>
+        <key alias="packageExternalSources">Ffynonellau allanol</key>
+        <key alias="packageAuthor">Awdur</key>
+        <key alias="packageDemonstration">Arddangosiad</key>
+        <key alias="packageDocumentation">Dogfennaeth</key>
+        <key alias="packageMetaData">Meta ddata pecynnau</key>
+        <key alias="packageName">Enw pecyn</key>
+        <key alias="packageNoItemsHeader">Does dim eitemau o fewn y pecyn</key>
+        <key alias="packageNoItemsText">
+            <![CDATA[Nid yw'r pecyn yma yn cynnwys unrhyw eitemau i ddadosod.<br/><br/>
+      Gallwch ddileu hyn yn ddiogel o'r system wrth glicio "dadosod pecyn" isod.]]>
+        </key>
+        <key alias="packageNoUpgrades">Dim uwchraddiadau ar gael</key>
+        <key alias="packageOptions">Dewisiadau pecyn</key>
+        <key alias="packageReadme">Readme pecyn</key>
+        <key alias="packageRepository">Ystorfa pecyn</key>
+        <key alias="packageUninstallConfirm">Cadarnhau dadosod pecyn</key>
+        <key alias="packageUninstalledHeader">Pecyn wedi dadosod</key>
+        <key alias="packageUninstalledText">Cafodd y pecyn ei ddadosod yn llwyddiannus</key>
+        <key alias="packageUninstallHeader">Dadosod pecyn</key>
+        <key alias="packageUninstallText">
+            <![CDATA[Gallwch ddi-ddewis eitemau dydych chi ddim eisiau dileu, rwan, isod. Wrth glicio "cadarnhau dadosod" bydd yr holl eitemau ddewiswyd yn cael eu dileu.<br />
+      <span style="color: Red; font-weight: bold;">Rhybudd:</span> bydd unrhyw ddogfennau, cyfrwng ayyb sy'n dibynnu ar yr eitemau yr ydych am ddileu yn torri, a gall arwain at system ansefydlog,
+      felly dadosodwch gyda gofal. Os oes unrhyw amheuaeth, cysylltwch ag awdur y pecyn.]]>
+        </key>
+        <key alias="packageUpgradeDownload">Lawrlwytho diweddariad o'r ystorfa</key>
+        <key alias="packageUpgradeHeader">Uwchraddio pecyn</key>
+        <key alias="packageUpgradeInstructions">Cyfarwyddiadau uwchraddio</key>
+        <key alias="packageUpgradeText"> Mae yna uwchraddiad ar gael ar gyfer y pecyn yma. Gallwch lawrlwytho'n uniongyrchol o'r ystorfa pecynnau Umbraco.</key>
+        <key alias="packageVersion">Fersiwn pecyn</key>
+        <key alias="packageVersionUpgrade">Uwchraddio o ferswin</key>
+        <key alias="packageVersionHistory">Hanes ferswin pecyn</key>
+        <key alias="viewPackageWebsite">Gweld gwefan pecyn</key>
+        <key alias="packageAlreadyInstalled">Pecyn wedi'i osod eisoes</key>
+        <key alias="targetVersionMismatch">Ni all y pecyn yma gael ei osod, mae angen fersiwn Umrbaco o leiaf</key>
+        <key alias="installStateUninstalling">Dadosod...</key>
+        <key alias="installStateDownloading">Lawrlwytho...</key>
+        <key alias="installStateImporting">Mewnforio...</key>
+        <key alias="installStateInstalling">Gosod...</key>
+        <key alias="installStateRestarting">Ailgychwyn, arhoswch...</key>
+        <key alias="installStateComplete">Wedi cwblhau, bydd eich porwr yn adnewyddu, arhoswch...</key>
+        <key alias="installStateCompleted">Cliciwch 'Cwblhau' i orffen y gosodiad ac adnewyddu'r dudalen.</key>
+        <key alias="installStateUploading">Lanlwytho pecyn...</key>
+    </area>
+    <area alias="paste">
+        <key alias="doNothing">Gludo gyda fformatio llawn (Heb ei argymell)</key>
+        <key alias="errorMessage">Mae'r testun yr ydych yn ceisio gludo yn cynnwys nodauneu fformatio arbennig. Gall hyn gael ei achosi gan ludo testun o Microsoft Word. Gall Umbraco ddileu nodau neu fformatio arbennig yn awtomatig, fel bod y cynnwys sy'n cael ei ludo yn fwy addas ar gyfer y we.</key>
+        <key alias="removeAll">Gludo fel testun crai heb unrhyw fformatio</key>
+        <key alias="removeSpecialFormattering">Gludo, ond dileu fformatio (Wedi'i hargymell)</key>
+    </area>
+    <area alias="publicAccess">
+        <key alias="paGroups">Amddiffyniad yn seiliedig grŵp</key>
+        <key alias="paGroupsHelp">Os ydych chi am ganiatáu mynediad i bob aelod o grwpiau aelodau penodol</key>
+        <key alias="paGroupsNoGroups">Mae angen i chi greu grŵp aelod cyn y gallwch ddefnyddio dilysiad grŵp</key>
+        <key alias="paAdvanced">Amddiffyn ar sail rôl</key>
+        <key alias="paAdvancedHelp">Os hoffwch reoli cyrchiad i'r dudalen wrth ddefnyddio dilysu ar sail rôl, gan ddefnyddio grwpiau aelodaeth Umbraco.</key>
+        <key alias="paAdvancedNoGroups">Mae angen i chi greu grŵp aeloadeth cyn i chi allu defnyddio dilysu ar sail rôl</key>
+        <key alias="paErrorPage">Tudalen Wall</key>
+        <key alias="paErrorPageHelp">Wedi'i ddefnyddio pan mae defnyddwyr wedi mewngofnodi, ond nid oes ganddynt hawliau</key>
+        <key alias="paHowWould">Dewiswch sut i gyfyngu hawliau at y dudalen yma</key>
+        <key alias="paIsProtected">%0% wedi amddiffyn rwan</key>
+        <key alias="paIsRemoved">Amddiffyniad wedi dileu o %0%</key>
+        <key alias="paLoginPage">Tudalen Mewngofnodi</key>
+        <key alias="paLoginPageHelp">Dewiswch y dudalen sy'n cynnwys y ffurflen mewngofnodi</key>
+        <key alias="paRemoveProtection">Dileu Amddiffyniad</key>
+        <key alias="paSelectPages">Dewiswch y tudalennau sy'n cynnwys ffurflenni mewngofnodi a negeseuon gwall</key>
+        <key alias="paSelectRoles">Dewiswch y rolau sydd a hawliau i'r dudlaen yma</key>
+        <key alias="paSetLogin">Gosodwch yr enw defnyddiwr a chyfrinair ar gyfer y dudalen yma</key>
+        <key alias="paSimple">Amddiffyniad defnyddiwr unigol</key>
+        <key alias="paSimpleHelp">Os hoffwch osod amddifyniad syml wrth ddefnyddio enw defnyddiwr a chyfrinair sengl</key>
+        <key alias="paRemoveProtectionConfirm"><![CDATA[Ydych chi'n siŵr eich bod chi am gael gwared ar yr amddiffyniad o'r dudalen <strong>%0%</strong>?]]></key>
+        <key alias="paSelectGroups"><![CDATA[Dewiswch y grwpiau sydd â mynediad i'r dudalen <strong>%0%</strong>]]></key>
+        <key alias="paSelectMembers"><![CDATA[Dewiswch yr aelodau sydd â mynediad i'r dudalen <strong>%0%</strong>]]></key>
+        <key alias="paMembers">Amddiffyn aelodau penodol</key>
+        <key alias="paMembersHelp">Os ydych am ganiatáu mynediad i aelodau penodol</key>
+    </area>
+    <area alias="publish">
+        <key alias="invalidPublishBranchPermissions">Caniatâd annigonol gan ddefnyddwyr i gyhoeddi'r holl ddogfennau disgynyddion</key>
+        <key alias="contentPublishedFailedIsTrashed">
+            <![CDATA[Methwyd cyhoeddi %0% oherwydd mae'r eitem yn y bin ailgylchu.]]>
+        </key>
+        <key alias="contentPublishedFailedAwaitingRelease">
+            <![CDATA[Methwyd cyhoeddi %0% oherwydd mae'r eitem wedi ei amserlenni ar gyfer rhyddhad.]]>
+        </key>
+        <key alias="contentPublishedFailedExpired">
+            <![CDATA[Methwyd cyhoeddi %0% oherwydd mae'r eitem wedi terfynu.]]>
+        </key>
+        <key alias="contentPublishedFailedInvalid">
+            <![CDATA[Methwyd cyhoeddi %0% oherwydd nid oedd y priodweddau canlynol:  %1%  yn pasio'r rheolau dilysu.]]>
+        </key>
+        <key alias="contentPublishedFailedByEvent">
+            <![CDATA[Methwyd cyhoeddi %0% oherwydd cafodd y gweithred ei ganslo gan 3-ydd parti.]]>
+        </key>
+        <key alias="contentPublishedFailedByParent">
+            <![CDATA[Methwyd cyhoeddi %0% oherwydd mae yna dudlaen rhiant sydd heb ei gyhoeddi.]]>
+        </key>
+        <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% ni ellir ei gyhoeddi, oherwydd ei enw ar goll.]]></key>
+        <key alias="contentPublishedFailedReqCultureValidationError">Methodd y dilysiad ar gyfer yr iaith ofynnol '%0%'. Roedd yr iaith wedi cael ei arbed ond nid ei chyhoeddi.</key>
+        <key alias="includeUnpublished">Cynnwys is-dudalennau heb eu cyhoeddi</key>
+        <key alias="inProgress">Cyhoeddi ar waith - arhoswch...</key>
+        <key alias="inProgressCounter">%0% allan o %1% o dudalennau wedi eu cyhoeddi...</key>
+        <key alias="nodePublish">%0% wedi ei gyhoeddi</key>
+        <key alias="nodePublishAll">%0% ac eu is-dudalennau wedi'u cyhoeddi</key>
+        <key alias="publishAll">Cyhoeddi %0% ac ei holl is-dudalennau</key>
+        <key alias="publishHelp">
+            <![CDATA[Cliciwch <em>Cyhoeddi</em> er mwyn cyhoeddi <strong>%0%</strong> a felly yn gwneud i'r cynnwys berthnasol fod ar gael i'r cyhoedd.<br/><br />
+      Gallwch gyhoeddi'r dudalen yma ac ei holl is-dudalennau wrth dicio <em>Cynnwys tudalennau heb eu cyhoeddi</em> isod.
+      ]]>
+        </key>
+    </area>
+    <area alias="colorpicker">
+        <key alias="noColors">Nid ydych chi wedi ffurfweddu unrhyw liwiau sydd wedi'u cymeradwyo</key>
+    </area>
+    <area alias="contentPicker">
+        <key alias="allowedItemTypes">Gallwch ond ddewis eitemau o'r math(au): %0%</key>
+        <key alias="pickedTrashedItem">Rydych wedi dewis eitem gynnwys sydd naill ai wedi'i ddileu neu yn y bin ailgylchu</key>
+        <key alias="pickedTrashedItems">Rydych wedi dewis eitemau gynnwys sydd naill ai wedi'u dileu neu yn y bin ailgylchu</key>
+    </area>
+    <area alias="mediaPicker">
+        <key alias="pickedTrashedItem">Rydych wedi dewis eitem gyfrwng sydd naill ai wedi'i ddileu neu yn y bin ailgylchu</key>
+        <key alias="pickedTrashedItems">Rydych wedi dewis eitemau gyfrwng sydd naill ai wedi'u dileu neu yn y bin ailgylchu</key>
+        <key alias="deletedItem">Eitem wedi'i ddileu</key>
+        <key alias="trashed">Yn sbwriel</key>
+    </area>
+    <area alias="relatedlinks">
+        <key alias="enterExternal">Darparwch ddolen allanol</key>
+        <key alias="chooseInternal">Dewiswch dudalen fewnol</key>
+        <key alias="caption">Capsiwn</key>
+        <key alias="link">Dolen</key>
+        <key alias="newWindow">Agor mewn ffenestr newydd</key>
+        <key alias="captionPlaceholder">Darparwch y capsiwn arddangos</key>
+        <key alias="externalLinkPlaceholder">Darparwch y ddolen</key>
+    </area>
+    <area alias="imagecropper">
+        <key alias="reset">Ailosod tocio</key>
+        <key alias="saveCrop">Achub tocio</key>
+        <key alias="addCrop">Ychwanegu tocio newydd</key>
+        <key alias="updateEditCrop">Wedi gwneud</key>
+        <key alias="undoEditCrop">Dadwneud golygion</key>
+        <key alias="customCrop">Diffiniad defnyddiwr</key>
+    </area>
+    <area alias="rollback">
+        <key alias="headline">Dewis fersiwn i gymharu efo fersiwn bresennol</key>
+        <key alias="changes">Newidiadau</key>
+        <key alias="created">Creuwyd</key>
+        <key alias="currentVersion">Fersiwn bresennol</key>
+        <key alias="diffHelp"><![CDATA[May hyn yn dangos y gwahaniaeth rhwng y fersiwn bresennol ac y fersiwn dewiswyd<br />Ni fydd testun <del>coch</del> yn cael ei ddangos yn y fersiwn dewiswyd. , <ins>mae gwyrdd yn golygu wedi'i ychwanegu</ins>]]></key>
+        <key alias="documentRolledBack">Dogfen wedi'i rolio yn ôl</key>
+        <key alias="htmlHelp">Mae hyn yn dangos y fersiwn dewiswyd ar ffurf HTML, os hoffwch weld y gwahaniaeth rhwng 2 fersiwn ar yr un pryd, defnyddiwch y wedd gwahaniaethol</key>
+        <key alias="rollbackTo">Rolio yn ôl at</key>
+        <key alias="selectVersion">Dewis fersiwn</key>
+        <key alias="view">Gwedd</key>
+    </area>
+    <area alias="scripts">
+        <key alias="editscript">Golygu ffeil sgript</key>
+    </area>
+    <area alias="sections">
+        <key alias="concierge">Gwas</key>
+        <key alias="content">Cynnwys</key>
+        <key alias="courier">Tywyswr</key>
+        <key alias="developer">Datblygwr</key>
+        <key alias="forms">Ffurflenni</key>
+        <key alias="help" version="7.0">Cymorth</key>
+        <key alias="installer">Dewin Ffurfweddu Umbraco</key>
+        <key alias="media">Cyfrwng</key>
+        <key alias="member">Aelodau</key>
+        <key alias="newsletters">Cylchlythyrau</key>
+        <key alias="packages">Pecynnau</key>
+        <key alias="settings">Gosodiadau</key>
+        <key alias="statistics">Ystadegau</key>
+        <key alias="translation">Cyfieithiad</key>
+        <key alias="users">Defnyddwyr</key>
+        <key alias="analytics">Dadansoddeg</key>
+    </area>
+    <area alias="help">
+        <key alias="goTo">ewch i</key>
+        <key alias="helpTopicsFor">Pynciau cymorth ar gyfer</key>
+        <key alias="videoChaptersFor">Penodau fideo ar gyfer</key>
+        <key alias="tours">Teithiau</key>
+        <key alias="theBestUmbracoVideoTutorials">Y fideos tiwtorial Umbraco gorau</key>
+        <key alias="umbracoForum">Ymweld â our.umbraco.com</key>
+        <key alias="umbracoTv">Ymweld â umbraco.tv</key>
+    </area>
+    <area alias="settings">
+        <key alias="defaulttemplate">Templed diofyn</key>
+        <key alias="dictionary editor egenskab">Allwedd Geiriadur</key>
+        <key alias="importDocumentTypeHelp">Er mwyn mewnforio math o ddogfen, darganfyddwch y ffeil ".udt" ar ecih cyfrifiadur wrth glicio ar y botwn "Pori" a cliciwch "Mewnforio" (byddwch yn cael eich gofyn i gadarnhau ar y sgrîn nesaf)</key>
+        <key alias="newtabname">Teitl Tab Newydd</key>
+        <key alias="nodetype">Math o nod</key>
+        <key alias="objecttype">Math</key>
+        <key alias="stylesheet">Taflen arddull</key>
+        <key alias="script">Sgript</key>
+        <key alias="stylesheet editor egenskab">Priodwedd taflen arddull</key>
+        <key alias="tab">Tab</key>
+        <key alias="tabname">Teitl Tab</key>
+        <key alias="tabs">Tabiau</key>
+        <key alias="contentTypeEnabled">Math o Gynnwys Meistr wedi'i alluogi</key>
+        <key alias="contentTypeUses">Mae'r Math o Gynnwys yma yn defnyddio</key>
+        <key alias="noPropertiesDefinedOnTab">Dim priodweddau wedi'u diffinio ar y tab yma. Cliciwch ar y ddolen "ychwanegu priodwedd newydd" ar y topi greu priodwedd newydd.</key>
+        <key alias="masterDocumentType">Math o Ddogfen Feistr</key>
+        <key alias="createMatchingTemplate">Creu templedi cydweddol</key>
+        <key alias="addIcon">Ychwanegu eicon</key>
+    </area>
+    <area alias="sort">
+        <key alias="sortOrder">Trefn</key>
+        <key alias="sortCreationDate">Dyddiad creu</key>
+        <key alias="sortDone">Trefnu wedi'i gwblhau.</key>
+        <key alias="sortHelp">Llusgwch yr eitemau gwahanol i fyny neu i lawr isod er mwyn gosod sut dylen nhw gael eu trefnu. Neu cliciwch ar beniadau'r golofnau i drefnu'r holl gasgliad o eitemau</key>
+        <key alias="sortPleaseWait"><![CDATA[Arhoswch. Mae'r eitemau yn cael eu trefnu, gall hyn gymryd amser.]]></key>
+        <key alias="sortEmptyState">Nid oes gan y nod hwn nodau plentyn i trefnu</key>
+    </area>
+    <area alias="speechBubbles">
+        <key alias="validationFailedHeader">Dilysiad</key>
+        <key alias="validationFailedMessage">Rhaid i wallau dilysu gael eu trwsio cyn gall yr eitem gael ei achub</key>
+        <key alias="operationFailedHeader">Wedi methu</key>
+        <key alias="operationSavedHeader">Wedi achub</key>
+        <key alias="invalidUserPermissionsText">Diffyg hawliau defnyddiwr, ni ellir cwblhau'r gweithred</key>
+        <key alias="operationCancelledHeader">Wedi canslo</key>
+        <key alias="operationCancelledText">Gweithred wedi'i ganslo gan ymestyniad 3-ydd parti</key>
+        <key alias="contentPublishedFailedByEvent">Cyhoeddi wedi'i ganslo gan ymestyniad 3-ydd parti</key>
+        <key alias="contentTypeDublicatePropertyType">Math o briodwedd yn bodoli eisoes</key>
+        <key alias="contentTypePropertyTypeCreated">Math o briodwedd wedi'i greu</key>
+        <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Enw: %0% <br /> Math o ddata: %1%]]></key>
+        <key alias="contentTypePropertyTypeDeleted">math o briodwedd wedi'i ddileu</key>
+        <key alias="contentTypeSavedHeader">Math o Ddogfen wedi'u achub</key>
+        <key alias="contentTypeTabCreated">Tab wedi'i greu</key>
+        <key alias="contentTypeTabDeleted">Tab wedi'i ddileu</key>
+        <key alias="contentTypeTabDeletedText">Tab gyda id: %0% wedi'i ddileu</key>
+        <key alias="cssErrorHeader">Taflen arddull heb ei achub</key>
+        <key alias="cssSavedHeader">Taflen arddull wedi'i achub</key>
+        <key alias="cssSavedText">Taflen arddull wedi'i achub heb unrhyw wallau</key>
+        <key alias="dataTypeSaved">Math o ddata wedi'i achub</key>
+        <key alias="dictionaryItemSaved">Eitem geiriadur wedi'i achub</key>
+        <key alias="editContentPublishedFailedByParent">Cyhoeddi wedi methu gan nad yw'r dudalen rhiant wedi'i gyhoeddi</key>
+        <key alias="editContentPublishedHeader">Cynnwys wedi'i gyhoeddi</key>
+        <key alias="editContentPublishedText">ac yn weladwy ar y wefan</key>
+        <key alias="editMultiContentPublishedText">%0% dogfennau wedi'i gyhoeddi ac yn gweledig ar y wefan</key>
+        <key alias="editVariantPublishedText">%0% gyhoeddi ac yn gweledig ar y wefan</key>
+        <key alias="editMultiVariantPublishedText">%0% dogfennau wedi'i gyhoeddi am yr ieithoedd %1% ac yn gweledig ar y wefan</key>
+        <key alias="editContentPublishedWithExpireDateText">ac yn weladwy ar y wefan tan %0% at %1%</key>
+        <key alias="editContentSavedHeader">Cynnwys wedi'i achub</key>
+        <key alias="editContentSavedText">Cofiwch gyhoeddi er mwyn i'r newidiadau fod yn weladwy</key>
+        <key alias="editContentScheduledSavedText">Mae amserlen ar gyfer cyhoeddi wedi'i diweddaru</key>
+        <key alias="editVariantSavedText">%0% wedi arbed</key>
+        <key alias="editContentSavedWithReleaseDateText">Bydd newidiadau yn cael ei gymerdwyo ar %0% at %1%</key>
+        <key alias="editContentSendToPublish">Wedi'i anfon am gymeradwyo</key>
+        <key alias="editContentSendToPublishText">Newidiadau wedi'u hanfon am gymeradwyo</key>
+        <key alias="editVariantSendToPublishText">%0% newidiadau wedi'u hanfon am gymeradwyo</key>
+        <key alias="editMediaSaved">Cyfrwng wedi'i achub</key>
+        <key alias="editMemberGroupSaved">Grŵp aeloadeth wedi'i achub</key>
+        <key alias="editMediaSavedText">Cyfrwng wedi'i achub heb unrhyw wallau</key>
+        <key alias="editMemberSaved">Aelod wedi'i achub</key>
+        <key alias="editStylesheetPropertySaved">Priodwedd taflen arddull wedi'i achub</key>
+        <key alias="editStylesheetSaved">Taflen arddull wedi'i achub</key>
+        <key alias="editTemplateSaved">Templed wedi'i achub</key>
+        <key alias="editUserError">Gwall yn achub y defnyddiwr (gwiriwch y log)</key>
+        <key alias="editUserSaved">Defnyddiwr wedi'i achub</key>
+        <key alias="editUserTypeSaved">math o ddefnyddiwr wedi'i achub</key>
+        <key alias="editUserGroupSaved">Grŵp defnyddwyr wedi'i achub</key>
+        <key alias="editCulturesAndHostnamesSaved">Diwylliannau ac enwau gwesteia wedi'i achub</key>
+        <key alias="editCulturesAndHostnamesError">Gwall wrth achub diwylliannau ac enwau gwesteia</key>
+        <key alias="fileErrorHeader">Ffeil heb ei achub</key>
+        <key alias="fileErrorText">Ni ellir achub y ffeil. Gwiriwch hawliau'r ffeil</key>
+        <key alias="fileSavedHeader">Ffeil wedi'i achub</key>
+        <key alias="fileSavedText">Ffeil wedi'i achub heb unrhyw wallau</key>
+        <key alias="languageSaved">Iaith wedi'i achub</key>
+        <key alias="mediaTypeSavedHeader">Math o Gyfrwng wedi'i achub</key>
+        <key alias="memberTypeSavedHeader">Math o Aelod wedi'i achub</key>
+        <key alias="memberGroupSavedHeader">Grŵp Aelod wedi'i achub</key>
+        <key alias="pythonErrorHeader">Sgript Python heb ei achub</key>
+        <key alias="pythonErrorText">Ni ellir achub y sgript Python oherwydd gwall</key>
+        <key alias="pythonSavedHeader">Sgript Python wedi'i achub</key>
+        <key alias="pythonSavedText">Dim gwallau yn y sgript Python</key>
+        <key alias="templateErrorHeader">Templed heb ei achub</key>
+        <key alias="templateErrorText">Sicrhewch nad oes gennych 2 dempled gyda'r un enw arall</key>
+        <key alias="templateSavedHeader">Templed wedi'i achub</key>
+        <key alias="templateSavedText">Templed wedi'i achub heb unrhyw wallau!</key>
+        <key alias="xsltErrorHeader">XSLT heb ei achub</key>
+        <key alias="xsltErrorText">XSLT yn cynnwys gwall</key>
+        <key alias="xsltPermissionErrorText">Ni ellir achub y ffeil XSLT, gwiriwch hawliau ffeil</key>
+        <key alias="xsltSavedHeader">XSLT wedi'i achub</key>
+        <key alias="xsltSavedText">Dim gwallau yn yr XSLT</key>
+        <key alias="contentUnpublished">Cynnwys wedi'i ddadgyhoeddi</key>
+        <key alias="contentCultureUnpublished">amrywiad cynnwys %0% wedi'i dadgyhoeddi</key>
+        <key alias="contentMandatoryCultureUnpublished">Roedd yr iaith orfodol '%0%' wedi'i dadgyhoeddi. Mae'r holl ieithoedd ar gyfer yr eitem gynnwys hon bellach wedi'i dadgyhoeddi.</key>
+        <key alias="partialViewSavedHeader">Rhan-wedd wedi'i achub</key>
+        <key alias="partialViewSavedText">Rhan-wedd wedi'i achub heb unrhyw wallau!</key>
+        <key alias="partialViewErrorHeader">Rhan-wedd heb ei achub</key>
+        <key alias="partialViewErrorText">Bu gwall yn ystod achub y ffeil.</key>
+        <key alias="permissionsSavedFor">Hawliau wedi'u hachub ar gyfer</key>
+        <key alias="scriptSavedHeader">Gwedd sgript wedi'i achub</key>
+        <key alias="scriptSavedText">Gwedd sgript wedi'i achub heb unrhyw wallau!</key>
+        <key alias="scriptErrorHeader">Gwedd sgript heb ei achub</key>
+        <key alias="scriptErrorText">Bu gwall yn ystod achub y ffeil.</key>
+        <key alias="cssErrorText">Bu gwall yn ystod achub y ffeil.</key>
+        <key alias="deleteUserGroupsSuccess">Wedi dileu %0% o rwpiau defnwyddwr</key>
+        <key alias="deleteUserGroupSuccess">%0% wedi'i ddileu</key>
+        <key alias="enableUsersSuccess">%0% o ddefnyddwyr wedi'u galluogi</key>
+        <key alias="enableUsersError">Bu gwall yn ystod galluogi'r defnyddwyr</key>
+        <key alias="disableUsersSuccess">Wedi analluogi %0% o ddefnyddwyr</key>
+        <key alias="disableUsersError">Bu gwall yn ystod analluogi'r defnyddwyr</key>
+        <key alias="enableUserSuccess">%0% yn awr wedi galluogi</key>
+        <key alias="enableUserError">Bu gwall yn ystod galluogi'r defnyddiwr</key>
+        <key alias="disableUserSuccess">%0% yn awr wedi analluogi</key>
+        <key alias="disableUserError">Bu gwall yn ystod analluogi'r defnyddiwr</key>
+        <key alias="setUserGroupOnUsersSuccess">Grwpiau defnyddiwr wedi'u gosod</key>
+        <key alias="deleteUserGroupsSuccess">Wedi dileu %0% o rwpiau defnyddwyr</key>
+        <key alias="deleteUserGroupSuccess">%0% wedi dileu</key>
+        <key alias="unlockUsersSuccess">Wedi datgloi %0% o ddefnyddwyr</key>
+        <key alias="unlockUsersError">Bu gwall yn ystod datgloi'r defnyddwyr</key>
+        <key alias="unlockUserSuccess">%0% yn awr wedi datgloi</key>
+        <key alias="unlockUserError">Bu gwall yn ystod datgloi'r defnyddiwr</key>
+        <key alias="memberExportedSuccess">Allforwyd yr aelod at ffeil</key>
+        <key alias="memberExportedError">Bu gwall yn ystod allforio'r aelod</key>
+        <key alias="deleteUserSuccess">Defnyddiwr %0% wedi'i ddileu</key>
+        <key alias="resendInviteHeader">Gawhodd defnyddiwr</key>
+        <key alias="resendInviteSuccess">Gwahoddiad wedi'i ail-anfon at %0%</key>
+        <key alias="contentReqCulturePublishError">Methu cyhoeddi'r ddogfen gan nad yw'r gofynnol '%0%' wedi cael ei gyhoeddi</key>
+        <key alias="contentCultureValidationError">Methodd dilysiad ar gyfer iaith '%0%'</key>
+        <key alias="documentTypeExportedSuccess">Mae'r math dogfen wedi ei allforio i ffeil</key>
+        <key alias="documentTypeExportedError">Digwyddodd gwall wrth allforio'r math dogfen</key>
+        <key alias="scheduleErrReleaseDate1">Ni all y dyddiad rhyddhau fod yn y gorffennol</key>
+        <key alias="scheduleErrReleaseDate2">Ni all drefnu'r ddogfen i'w chyhoeddi gan nad yw'r gofynnol '%0%' wedi cael ei gyhoeddi</key>
+        <key alias="scheduleErrReleaseDate3">Ni all drefnu'r ddogfen i'w chyhoeddi oherwydd mae ganddo'r gofynnol '%0%' ddyddiad cyhoeddi yn hwyrach nag iaith nad yw'n orfodol</key>
+        <key alias="scheduleErrExpireDate1">Ni all y dyddiad terfyn fod yn y gorffennol</key>
+        <key alias="scheduleErrExpireDate2">Ni all y dyddiad terfyn fod cyn y dyddiad rhyddhau</key>
+    </area>
+    <area alias="stylesheet">
+        <key alias="aliasHelp">Yn defnyddio cystrawen CSS e.e: h1, .coch, .glas</key>
+        <key alias="addRule">Ychwanegu ardull</key>
+        <key alias="editRule">Golygu ardull</key>
+        <key alias="editorRules">Ardull golygydd testun cyfoethog</key>
+        <key alias="editorRulesHelp">Diffiniwch yr arddulliau a ddylai fod ar gael yn y golygydd testun cyfoethog ar gyfer y daflen arddull hon</key>
+        <key alias="editstylesheet">Golygu taflen arddull</key>
+        <key alias="editstylesheetproperty">Golygu priodwedd taflen arddull</key>
+        <key alias="nameHelp">Enw ar gyfer adnabod y priodwedd arddull yn y golygydd testun gyfoethog</key>
+        <key alias="preview">Rhagolwg</key>
+        <key alias="previewHelp">Sut fydd y testun yn edrych yn y golygydd testun cyfoethog.</key>
+        <key alias="selector">Dewisydd</key>
+        <key alias="selectorHelp">Yn defnyddio cystrawen CSS e.e: h1, .coch, .glas</key>
+        <key alias="styles">Arddulliau</key>
+        <key alias="stylesHelp">Dyled y CSS ei gymhwyso yn y golygydd testun cyfoethog, e.g. "color:red;"</key>
+        <key alias="tabCode">Côd</key>
+        <key alias="tabRules">Golygydd</key>
+    </area>
+
+    <area alias="template">
+        <key alias="deleteByIdFailed">Methwyd dileu templed efo'r ID %0%</key>
+        <key alias="edittemplate">Golygu templed</key>
+        <key alias="insertSections">Adrannau</key>
+        <key alias="insertContentArea">Mewnosod ardal cynnwys</key>
+        <key alias="insertContentAreaPlaceHolder">Mewnosod dalfan ar gyfer ardal cynnwys</key>
+        <key alias="insert">Mewnosod</key>
+        <key alias="insertDesc">Dewiswch beth i fewnosod i mewn i'ch templed</key>
+        <key alias="insertDictionaryItem">Eitem geiriadaur</key>
+        <key alias="insertDictionaryItemDesc">Mae eitem geiriadur yn ddalfan ar gyfer darn o destun y gall gael ei gyfieithu, sy'n ei wneud yn hawdd i greu dyluniadau ar gyfer gwefannau aml-ieithog.</key>
+        <key alias="insertMacro">Macro</key>
+        <key alias="insertMacroDesc">
+            Mae Macro yn gydran ffurfweddol sy'n wych ar gyfer
+            darnau o'ch dyluniad sy'n cael eu ail-ddefnyddio, ble mae angen y dewis i ddarparu paramedrau,
+            er enghraifft orielau, ffurflenni a rhestri.
+        </key>
+        <key alias="insertPageField">Gwerth</key>
+        <key alias="insertPageFieldDesc">Yn dangos gwerth maes penodol o'r dudalen bresennol, gyda'r dewisiadau i newid y gwerth neu syrthio'n ôl at werthoedd eraill.</key>
+        <key alias="insertPartialView">Rhan-wedd</key>
+        <key alias="insertPartialViewDesc">
+            Mae rhan-wedd yn ffeil templed ar wahân y gall gael ei ddatganu o fewn templed arall,
+            mae'n wych ar gyfer ail-ddefnyddio côd neu ar gyfer gwahanu templedi cymhleth i mewn i ffeiliau gwahanol.
+        </key>
+        <key alias="mastertemplate">Templed Meistr</key>
+        <key alias="noMastertemplate">Dim templed meistr</key>
+        <key alias="noMaster">Dim meistr</key>
+
+        <key alias="renderBody">Datganu templed blentyn</key>
+        <key alias="renderBodyDesc">
+            <![CDATA[
+            Yn datganu cynnwys templed blentyn, wrth fewnosod dalfan
+            <code>@RenderBody()</code>.
+            ]]>
+        </key>
+        <key alias="defineSection">Diffiniwch adran benodol</key>
+        <key alias="defineSectionDesc">
+            <![CDATA[
+            Yn diffinio rhan o'ch templed fel adran benodol gan ei lapio mewn
+            <code>@section { ... }</code>. Gall hyn gael ei ddatganu mewn adran
+            benodol o rhiant y templed yma, wrth ddefnyddio <code>@RenderSection</code>.
+            ]]>
+        </key>
+        <key alias="renderSection">Datganu adran benodol</key>
+        <key alias="renderSectionDesc">
+            <![CDATA[
+            Yn datganu adran benodol o dempled blentyn, wrth fewnosod dalfan <code>@RenderSection(name)</code>.
+            mae hyn yn datganu  adran o dempled blentyn sydd wedi'i lapio mewn diffiniad berthnasol o <code>@section [name]{ ... }</code>.
+            ]]>
+        </key>
+        <key alias="sectionName">Enw Adran</key>
+        <key alias="sectionMandatory">Mae Adran yn ofynnol</key>
+        <key alias="sectionMandatoryDesc"><![CDATA[
+            Os yn ofynnol, rhaid i'r templed blentyn gynnwys diffiniad adran <code>@section</code>, fel arall bydd gwall yn cael ei ddangos.
+        ]]></key>
+        <key alias="queryBuilder">Adeiladwr ymholiad</key>
+        <key alias="buildQuery">Adeiladu ymholiad</key>
+        <key alias="itemsReturned">o eitemau wedi dychwelyd, mewn</key>
+        <key alias="copyToClipboard">Copi i'r clipfwrdd</key>
+        <key alias="iWant">Rydw i eisiau</key>
+        <key alias="allContent">holl gynnwys</key>
+        <key alias="contentOfType">cynnwys o'r fath &quot;%0%&quot;</key>
+        <key alias="from">o</key>
+        <key alias="websiteRoot">fy wefan</key>
+        <key alias="where">ble</key>
+        <key alias="and">ac</key>
+        <key alias="is">yn</key>
+        <key alias="isNot">ddim yn</key>
+        <key alias="before">cyn</key>
+        <key alias="beforeIncDate">cyn (gan gynnwys y dyddiad dewiswyd)</key>
+        <key alias="after">ar ôl</key>
+        <key alias="afterIncDate">ar ôl (gan gynnwys y dyddiad dewiswyd)</key>
+        <key alias="equals">yn gyfartal i</key>
+        <key alias="doesNotEqual">ddim yn gyfartal i</key>
+        <key alias="contains">yn cynnwys</key>
+        <key alias="doesNotContain">ddim yn cynnwys</key>
+        <key alias="greaterThan">yn fwy na</key>
+        <key alias="greaterThanEqual">yn fwy na neu yn gyfartal i</key>
+        <key alias="lessThan">llai na</key>
+        <key alias="lessThanEqual">llai na neu yn gyfartal i</key>
+        <key alias="id">Id</key>
+        <key alias="name">Enw</key>
+        <key alias="createdDate">Dyddiad Creu</key>
+        <key alias="lastUpdatedDate">Dyddiad Diweddariad Ddiwethaf</key>
+        <key alias="orderBy">trefnu wrth</key>
+        <key alias="ascending">esgynnol</key>
+        <key alias="descending">disgynnol</key>
+        <key alias="template">Templed</key>
+    </area>
+    <area alias="grid">
+        <key alias="rte">Golygydd Testun Gyfoethog</key>
+        <key alias="media">Llun</key>
+        <key alias="macro">Macro</key>
+        <key alias="embed">Mewnosod</key>
+        <key alias="headline">Pennawd</key>
+        <key alias="quote">Dyfyniad</key>
+        <key alias="insertControl">Dewis math o gynnwys</key>
+        <key alias="chooseLayout">Dewis cynllun</key>
+        <key alias="addRows">Ychwanegu rhes</key>
+        <key alias="addElement">Ychwanegu cynnwys</key>
+        <key alias="dropElement">Gollwng cynnwys</key>
+        <key alias="settingsApplied">Gosodiadau wedi'u hymgeisio</key>
+        <key alias="contentNotAllowed">Nid yw'r cynnwys yma wedi'i ganiatáu yma</key>
+        <key alias="contentAllowed">Caniateir y cynnwys yma</key>
+        <key alias="clickToEmbed">Cliciwch i fewnblannu</key>
+        <key alias="clickToInsertImage">Cliciwch i fewnosod llun</key>
+        <key alias="placeholderImageCaption">Capsiwn llun...</key>
+        <key alias="placeholderWriteHere">Ysgrifennwch yma...</key>
+        <key alias="gridLayouts">Cynlluniau Grid</key>
+        <key alias="gridLayoutsDetail">Cynlluniau yw'r holl ardal weithio gyfan ar gyfer y golygydd grid, fel arfer rydych ddim ond angen un neu ddau gynllun gwahanol</key>
+        <key alias="addGridLayout">Ychwanegu Cynllun Grid</key>
+        <key alias="editGridLayout">Golygu Cynllun Grid</key>
+        <key alias="addGridLayoutDetail">Newid y cynllun wrth osod lledau colofnau ac ychwanegu adrannau ychwanegol</key>
+        <key alias="rowConfigurations">Ffurfweddau rhes</key>
+        <key alias="rowConfigurationsDetail">Mae rhesi yn gelloedd sydd wedi'u trefnu yn llorweddol</key>
+        <key alias="addRowConfiguration">Ychwanegu Ffurfwedd rhes</key>
+        <key alias="editRowConfiguration">Golygu Ffurfwedd rhes</key>
+        <key alias="addRowConfigurationDetail">Newidiwch y rhes wrth osod lledau colofn ac ychwanegu adrannau ychwanegol</key>
+        <key alias="noConfiguration">Nid oes ffurfwedd pellach ar gael</key>
+        <key alias="columns">Colofnau</key>
+        <key alias="columnsDetails">Cyfanswm y nifer o golofnau yn y cynllun grid</key>
+        <key alias="settings">Gosodiadau</key>
+        <key alias="settingsDetails">Ffurfweddu pa osodiadau gall olygyddion eu newid</key>
+        <key alias="styles">Ardduliau</key>
+        <key alias="stylesDetails">Ffurfweddu pa arddulliau gall olygyddion eu newid</key>
+        <key alias="settingDialogDetails">Bydd gosodiadau dim ond yn newid os mae'r ffurfwedd json yn ddilys</key>
+        <key alias="allowAllEditors">Caniatáu pob golygydd</key>
+        <key alias="allowAllRowConfigurations">Caniatáu holl ffurfweddi rhes</key>
+        <key alias="maxItems">Uchafswm o eitemau</key>
+        <key alias="maxItemsDescription">Gadewch yn wag neu gosod i 0 ar gyfer diderfyn</key>
+        <key alias="setAsDefault">Gosod fel diofyn</key>
+        <key alias="chooseExtra">Dewis ychwanegol</key>
+        <key alias="chooseDefault">Dewis diofyn</key>
+        <key alias="areAdded">wedi'u hychwanegu</key>
+        <key alias="warning">Rhybudd</key>
+        <key alias="youAreDeleting">Rydych chi'n dileu'r ffurfwedd rhes</key>
+        <key alias="deletingARow">Bydd dileu enw ffurfwedd rhes yn arwain at golli data ar gyfer unrhyw gynnwys cynfodol sy'n seiliedig ar ffurfwedd hwn.</key>
+    </area>
+    <area alias="contentTypeEditor">
+        <key alias="compositions">Cyfansoddiadau</key>
+        <key alias="noTabs">Nid ydych wedi ychwanegu unrhyw dabiau</key>
+        <key alias="addNewTab">Ychwanegu tab newydd</key>
+        <key alias="addAnotherTab">Ychwanegu tab arall</key>
+        <key alias="group">Grŵp</key>
+        <key alias="noGroups">Nid ydych wedi ychwanegu unrhyw grwpiau</key>
+        <key alias="addGroup">Ychwanegu grŵp</key>
+        <key alias="inheritedFrom">Wedi etifeddu o</key>
+        <key alias="addProperty">Ychwanegu priodwedd</key>
+        <key alias="requiredLabel">Label gofynnol</key>
+        <key alias="enableListViewHeading">Caniatáu gwedd rhestr</key>
+        <key alias="enableListViewDescription">Ffurfweddi yr eitem gynnwys i ddangos rhestr trefnadwy a chwiladwy o'i phlant, ni fydd y plant yn cael eu dangos yn y goeden</key>
+        <key alias="allowedTemplatesHeading">Templedi Caniateir</key>
+        <key alias="allowedTemplatesDescription">Dewiswch pa olygoddion templedi sy'n cael defnyddio cynnwys o'r fath yma</key>
+        <key alias="allowAsRootHeading">Caniatáu fel gwraidd</key>
+        <key alias="allowAsRootDescription">Caniatáu golygyddion i greu cynnwys o'r fath yma yng ngwraidd y goeden gynnwys</key>
+        <key alias="allowAsRootCheckbox">Iawn - caniatáu cynnwys o'r fath yma yn y gwraidd</key>
+        <key alias="childNodesHeading">Mathau o nod blentyn caniateir</key>
+        <key alias="childNodesDescription">Caniatáu cynnwys o'r mathau benodol i gael eu creu o dan cynnwys o'r fath yma</key>
+        <key alias="chooseChildNode">Dewis nod blentyn</key>
+        <key alias="compositionsDescription">Etifeddu tabiau a phriodweddau o fath o ddogfen sy'n bodoli eisoes. Bydd tabiau newydd yn cael eu ychwanegu at y fath o ddogfen bresennol neu eu cyfuno os mae tab gyda enw yr union yr un fath yn bodoli eisoes.</key>
+        <key alias="compositionInUse">Mae'r math o gynnwys yma wedi'i ddefnyddio mewn cyfansoddiad, felly ni ellir ei gyfansoddi ei hunan.</key>
+        <key alias="noAvailableCompositions">Nid oes unrhyw fathau o gynnwys ar gael i'w defnyddio fel cyfansoddiad.</key>
+        <key alias="compositionRemoveWarning">Bydd dileu cyfansoddiad yn dileu'r holl ddata eiddo priodwedd gysylltiedig. Ar ôl i chi arbed y math o ddogfen, bydd ddim ffordd nôl.</key>
+        <key alias="availableEditors">Golygyddion ar gael</key>
+        <key alias="reuse">Ail-ddefnyddio</key>
+        <key alias="editorSettings">Gosodiadau golygydd</key>
+        <key alias="searchResultSettings">Ffurfweddau sydd ar gael</key>
+        <key alias="searchResultEditors">Creu ffurfwedd newydd</key>
+        <key alias="configuration">Ffurfwedd</key>
+        <key alias="yesDelete">Iawn, dileu</key>
+        <key alias="movedUnderneath">wedi symud islaw</key>
+        <key alias="copiedUnderneath">wedi copïo islaw</key>
+        <key alias="folderToMove">Dewiswch y ffolder i symud</key>
+        <key alias="folderToCopy">Dewiswch y ffolder i gopïo</key>
+        <key alias="structureBelow">i yn y strwythyr goeden isod</key>
+        <key alias="allDocumentTypes">Holl Fathau o Ddogfennau</key>
+        <key alias="allDocuments">Holl Ddogfennau</key>
+        <key alias="allMediaItems">Holl eitemau gyfrwng</key>
+        <key alias="usingThisDocument">sy'n defnyddio'r fath o ddogfen yma fydd yn cael eu dileu yn barhaol, cadarnhewch os hoffwch ddileu'r rhain hefyd.</key>
+        <key alias="usingThisMedia">sy'n defnyddio'r fath o gyfrwng yma fydd yn cael eu dileu yn barhaol, cadarnhewch os hoffwch ddileu'r rhain hefyd.</key>
+        <key alias="usingThisMember">sy'n defnyddio'r fath o aelod yma fydd yn cael eu dileu yn barhaol, cadarnhewch os hoffwch ddileu'r rhain hefyd.</key>
+        <key alias="andAllDocuments">a phob dogfen sy'n defnyddio'r fath yma</key>
+        <key alias="andAllMediaItems">a phob eitem gyfrwng sy'n defnyddio'r fath yma</key>
+        <key alias="andAllMembers">a phob aelod sy'n defnyddio'r fath yma</key>
+        <key alias="thisEditorUpdateSettings">sy'n defnyddio'r golygydd yma fydd yn cael eu diweddaru gyda'r gosodiadau newydd</key>
+        <key alias="memberCanEdit">Aeloed yn gallu golygu</key>
+        <key alias="memberCanEditDescription">Caniatáu i'r gwerth briodwedd yma gael ei olygu gan yr aelod ar eu tudalen broffil</key>
+        <key alias="isSensitiveData">Yn ddata sensitif</key>
+        <key alias="isSensitiveDataDescription">Cuddio'r priodwedd yma o'r golygyddion cynnwys sydd heb hawliau i weld gwybodaeth sensitif</key>
+        <key alias="showOnMemberProfile">Dangos ar broffil aelod</key>
+        <key alias="showOnMemberProfileDescription">Caniatáu i'r gwerth briodwedd yma gael ei ddangos ar y dudalen broffil aelod</key>
+        <key alias="tabHasNoSortOrder">does dim rhif trefnu gan y tab</key>
+        <key alias="compositionUsageHeading">Ble mae'r cyfansoddiad yma'n cael ei ddefnyddio?</key>
+        <key alias="compositionUsageSpecification">Mae'r cyfansoddiad yma yn cael ei ddefnyddio'n bresennol yng nghyfansoddiad o'r mathau o gynnwys ganlynol:</key>
+        <key alias="variantsHeading">Caniatáu amrywiadau</key>
+        <key alias="cultureVariantHeading">Caniatáu amrywiad  yn ôl ddiwylliant</key>
+        <key alias="segmentVariantHeading">Caniatáu segmentiad</key>
+        <key alias="cultureVariantLabel">Amrywio gan ddiwylliant</key>
+        <key alias="segmentVariantLabel">Amrywio gan segmentiad</key>
+        <key alias="variantsDescription">Caniatáu i olygyddion greu cynnwys o'r math hwn mewn gwahanol ieithoedd</key>
+        <key alias="cultureVariantDescription">Caniatáu golygyddion i greu cynnwys o ieithoedd gwahanol</key>
+        <key alias="segmentVariantDescription">Caniatáu golygyddion i greu segmentiadau o'r cynnwys hwn</key>
+        <key alias="allowVaryByCulture">Caniatáu amrywio yn ôl diwylliant</key>
+        <key alias="allowVaryBySegment">Caniatáu segmentiad</key>
+        <key alias="elementType">Math o elfen</key>
+        <key alias="elementHeading">Yn fath Elfen</key>
+        <key alias="elementDescription">Mae math Elfen i fod i gael ei ddefnyddio er enghraifft mewn Cynnwys Nythu, ac nid yn y goeden</key>
+        <key alias="elementCannotToggle">Ni ellir newid math o ddogfen i fath Elfen ar ôl mae'n cael ei defnyddio i greu un neu fwy o eitemau cynnwys.</key>
+        <key alias="elementDoesNotSupport">Nid yw hyn yn berthnasol ar gyfer math Elfen</key>
+        <key alias="propertyHasChanges">Rydych wedi gwneud newidiadau i'r eiddo hwn. Ydych chi'n siŵr eich bod chi am eu taflu?</key>
+    </area>
+    <area alias="languages">
+        <key alias="addLanguage">Ychwanegu iaith</key>
+        <key alias="mandatoryLanguage">Iath gorfodol</key>
+        <key alias="mandatoryLanguageHelp">Rhaid llenwi eiddo ar yr iaith hon cyn y gellir cyhoeddi'r nod.</key>
+        <key alias="defaultLanguage">Iaith diofyn</key>
+        <key alias="defaultLanguageHelp">Gall wefan Umbraco ddim ond cael un iaith ddiofyn.</key>
+        <key alias="changingDefaultLanguageWarning">Gall newid iaith ddiofyn arwain at golli cynnwys diofyn.</key>
+        <key alias="fallsbackToLabel">Syrthio yn ôl i</key>
+        <key alias="noFallbackLanguageOption">Dim iaith cwympo yn ôl</key>
+        <key alias="fallbackLanguageDescription">Er mwyn caniatáu i gynnwys amlieithog ddisgyn yn ôl i iaith arall os nad yw'n bresennol yn yr iaith y gofynnwyd amdani, dewiswch hi yma.</key>
+        <key alias="fallbackLanguage">Iaith cwympo yn ôl</key>
+        <key alias="none">dim</key>
+    </area>
+    <area alias="macro">
+        <key alias="addParameter">Ychwanegu paramedr</key>
+        <key alias="editParameter">Golygu paramedr</key>
+        <key alias="enterMacroName">Rhowch enw macro</key>
+        <key alias="parameters">Paramedrau</key>
+        <key alias="parametersDescription">Diffiniwch y paramedrau a ddylai fod ar gael wrth ddefnyddio'r macro hwn.</key>
+        <key alias="selectViewFile">Dewiswch ffeil macro golwg rhannol</key>
+    </area>
+    <area alias="modelsBuilder">
+        <key alias="buildingModels">Adeiladu modelau</key>
+        <key alias="waitingMessage">gall hyn gymryd amser, peidiwch â phoeni</key>
+        <key alias="modelsGenerated">Modelau wedi'u generadu</key>
+        <key alias="modelsGeneratedError">Methwyd generadu modelau</key>
+        <key alias="modelsExceptionInUlog">Methwyd generadu modelau, gweler yr eithriadau yn y log Umbraco</key>
+    </area>
+    <area alias="templateEditor">
+        <key alias="addFallbackField">Ychwanegu maes rolio yn ôl</key>
+        <key alias="fallbackField">Maes rolio yn ôl</key>
+        <key alias="addDefaultValue">Ychwanegu gwerth diofyn</key>
+        <key alias="defaultValue">Gwerth diofyn</key>
+        <key alias="alternativeField">Maes rolio yn ôl</key>
+        <key alias="alternativeText">Gwerth diofyn</key>
+        <key alias="casing">Cyflwr</key>
+        <key alias="encoding">Amgodiad</key>
+        <key alias="chooseField">Dewis maes</key>
+        <key alias="convertLineBreaks">Trawsnewid torriadau llinellau</key>
+        <key alias="convertLineBreaksDescription">Iawn, trawsnewid torriadau llinellau</key>
+        <key alias="convertLineBreaksHelp">Cyfnewid torriadau llinellau gyda tag html 'br'</key>
+        <key alias="customFields">Meysydd bersonol</key>
+        <key alias="dateOnly">Dyddiad yn unig</key>
+        <key alias="formatAndEncoding">Fformat ac amgodiad</key>
+        <key alias="formatAsDate">Fformatio ar ffurf dyddiad</key>
+        <key alias="formatAsDateDescr">Fformatio'r gwerth ar ffurf dyddiad, neu dyddiad gyda amser, yn ôl y diwylliant gweithredol</key>
+        <key alias="htmlEncode">Amgodi HTML</key>
+        <key alias="htmlEncodeHelp">Bydd yn cyfnewid nodau arbennig gyda'u nodau HTML cyfatebol.</key>
+        <key alias="insertedAfter">Bydd yn cael ei fewnosod ar ôl y gwerth maes</key>
+        <key alias="insertedBefore">Bydd yn cael ei fewnosod cyn y gwerth maes</key>
+        <key alias="lowercase">Llythrennau bach</key>
+        <key alias="modifyOutput">Newid allbwn</key>
+        <key alias="none">Dim</key>
+        <key alias="outputSample">Sampl allbwn</key>
+        <key alias="postContent">Mewnosod ar ôl maes</key>
+        <key alias="preContent">Mewnosod cyn maes</key>
+        <key alias="recursive">Ailadroddus</key>
+        <key alias="recursiveDescr">Iawn, gwnewch yn ailadroddus</key>
+        <key alias="separator">Gwahanwr</key>
+        <key alias="standardFields">Meysydd Safonol</key>
+        <key alias="uppercase">Llythrennau bras</key>
+        <key alias="urlEncode">Amgodi URL</key>
+        <key alias="urlEncodeHelp">Bydd yn fformatio nodau arbennig o fewn URL</key>
+        <key alias="usedIfAllEmpty">Bydd ddim ond yn cael ei ddefnyddio pan mae'r gwerthoedd maes uchod yn wag</key>
+        <key alias="usedIfEmpty">Bydd y maes yma ddim ond yn cael ei ddefnyddio os mae'r maes gynradd yn wag</key>
+        <key alias="withTime">Dyddiad ac amser</key>
+    </area>
+    <area alias="translation">
+        <key alias="assignedTasks">Tasgau wedi'u neilltuo i chi</key>
+        <key alias="assignedTasksHelp">
+            <![CDATA[ Mae'r rhestr isod yn dangostasgau cyfieithu <strong>wedi'u neilltuo i chi</strong>. Er mwyn gweld gwedd fanwl gan gynnwys sylwadau, cliciwch ar "Manylion" neu enw'r dudalen.
+     Gallwch hefyd lawrlwytho'r dudalen ar ffurf XML yn uniongyrchol gan glicio'r ddolen "Lawrlwytho Xml". <br/>
+     Er mwyn cau tasg cyfieithu, ewch at y wedd fanylion a cliciwch ar y botwm "Cau".
+    ]]>
+        </key>
+        <key alias="closeTask">cau tasg</key>
+        <key alias="details">Manylion cyfieithiad</key>
+        <key alias="downloadAllAsXml">Lawrlwytho pob tasg cyfieithu ar ffurf XML</key>
+        <key alias="downloadTaskAsXml">Lawrlwytho XML</key>
+        <key alias="DownloadXmlDTD">Lawrlwytho XML DTD</key>
+        <key alias="fields">Meysydd</key>
+        <key alias="includeSubpages">Cynnwys is-dudalennau</key>
+        <key alias="mailBody">
+            <![CDATA[
+      Helo %0%
+
+      mae hyn yn ebost awtomatig i'ch hysbysu fod y ddogfen '%1%'
+      wedi'i hanfon am gyfieithiad i mewn i '%5%' gan %2%.
+
+      Ewch at http://%3%/translation/details.aspx?id=%4% i olygu.
+
+      Neu mewngofnodwch i Umbraco i gael trosolwg o'ch tasgau cyfieithu
+      http://%3%
+
+      Mwynhewch eich diwrnod!
+
+      Hwyl fawr oddi wrth y robot Umbraco
+    ]]>
+        </key>
+        <key alias="mailSubject">[%0%] Tasg cyfieithu ar gyfer %1%</key>
+        <key alias="noTranslators">Dim defnyddwyr cyfieithu wedi'u darganfod. Creuwch ddefnyddiwr cyfieithu cyn i chi gychwyn anfon cynnwys am gyfieithiadau</key>
+        <key alias="ownedTasks">Tasgau wedi'u creu gennych chi</key>
+        <key alias="ownedTasksHelp">
+            <![CDATA[ Mae'r rhestr isod yn dangos tudalennau <strong>wedi'u creu gennych chi</strong>. Er mwyn gweld gwedd fanwl sy'n cynnwys sylwadau,
+     cliciwch ar "Manylion" neu enw'r dudalen. Gallwch hefyd lawrlwytho'r dudalen ar ffurf XML yn uniongyrchol gan glicio ar y ddolen "Lawrlwytho Xml".
+     Er mwyn cau tasgau cyfieithu, ewch at y wedd fanylion a cliciwch y botwm "Cau".
+    ]]>
+        </key>
+        <key alias="pageHasBeenSendToTranslation">Mae'r dudalen '%0%' wedi cael ei anfon am gyfieithiad</key>
+        <key alias="noLanguageSelected">Dewiswch yr iaith y dylai'r cynnwys gael ei gyfieithu i</key>
+        <key alias="sendToTranslate">Anfon y dudalen '%0%' am gyfieithiad</key>
+        <key alias="taskAssignedBy">Wedi'i neilltuo gan</key>
+        <key alias="taskOpened">Tasg wedi'i hagor</key>
+        <key alias="totalWords">Cyfanswm o eiriau</key>
+        <key alias="translateTo">Cyfieithu i</key>
+        <key alias="translationDone">Cyfieithiad wedi'i gwblhau.</key>
+        <key alias="translationDoneHelp">Gallwch ragolygu'r tudalennau yr ydych newydd gyfieithu gan glicio isod. Os mae'r dudalen gwreiddiol wedi'i ganfod, byddwch yn cael cymhariaeth o'r 2 dudalen.</key>
+        <key alias="translationFailed">Cyfieithiad wedi methu, mae'n bosib fod y ffeil XML wedi llygru</key>
+        <key alias="translationOptions">Dewisiadau cyfieithu</key>
+        <key alias="translator">Cyfieithydd</key>
+        <key alias="uploadTranslationXml">Lanlwytho cyfieithiad XML</key>
+    </area>
+    <area alias="treeHeaders">
+        <key alias="content">Cynnwys</key>
+        <key alias="contentBlueprints">Templedi Cynnwys</key>
+        <key alias="media">Cyfrwng</key>
+        <key alias="cacheBrowser">Porwr Storfa</key>
+        <key alias="contentRecycleBin">Bin Ailgylchu</key>
+        <key alias="createdPackages">Pecynnau wedi'u creu</key>
+        <key alias="dataTypes">Mathau o Ddata</key>
+        <key alias="dictionary">Geiriadur</key>
+        <key alias="installedPackages">Pecynnau wedi'u gosod</key>
+        <key alias="installSkin">Gosod croen</key>
+        <key alias="installStarterKit">Gosod cit gychwynol</key>
+        <key alias="languages">Ieithoedd</key>
+        <key alias="localPackage">Gosod pecyn leol</key>
+        <key alias="macros">Macros</key>
+        <key alias="mediaTypes">Mathau o Gyfrwng</key>
+        <key alias="member">Aelodau</key>
+        <key alias="memberGroups">Grwpiau Aelodau</key>
+        <key alias="memberRoles">Grwpiau Rolau</key>
+        <key alias="memberTypes">Mathau o Aelod</key>
+        <key alias="documentTypes">Mathau o Ddogfen</key>
+        <key alias="relationTypes">Math o Berthynas</key>
+        <key alias="packager">Pecynnydd</key>
+        <key alias="packages">Pecynnau</key>
+        <key alias="partialViews">Rhan-weddi</key>
+        <key alias="partialViewMacros">Ffeiliau Rhan-wedd Macro</key>
+        <key alias="python">Ffeiliau Python</key>
+        <key alias="repositories">Gosod o ystorfa</key>
+        <key alias="runway">Gosod Runway</key>
+        <key alias="runwayModules">Modylau Runway</key>
+        <key alias="scripting">Ffeiliau Sgriptio</key>
+        <key alias="scripts">Sgriptiau</key>
+        <key alias="stylesheets">Taflenni arddull</key>
+        <key alias="templates">Templedi</key>
+        <key alias="xslt">Ffeiliau XSLT</key>
+        <key alias="analytics">Dadansoddeg</key>
+        <key alias="logViewer">Gwyliwr Log</key>
+        <key alias="users">Defnyddwyr</key>
+        <key alias="settingsGroup">Gosodiadau</key>
+        <key alias="templatingGroup">Templedi</key>
+        <key alias="thirdPartyGroup">Trydydd parti</key>
+    </area>
+    <area alias="update">
+        <key alias="updateAvailable">Diweddariad newydd yn barod</key>
+        <key alias="updateDownloadText">%0% yn barod, cliciwch yma i lawrlwytho</key>
+        <key alias="updateNoServer">Dim cysylltiad at y gweinydd</key>
+        <key alias="updateNoServerError">Gwall yn chwilio am ddiweddariad. Ceisiwch wirio'r trywydd stac am fwy o wybodaeth</key>
+    </area>
+    <area alias="user">
+        <key alias="access">Mynediad</key>
+        <key alias="accessHelp">Ar sail y grwpiau aelodaeth ac y nodau cychwyn, mae gan y defnyddiwr hawliau at y nodau ganlynol</key>
+        <key alias="assignAccess">Neilltuo hawl</key>
+        <key alias="administrators">Gweinyddwr</key>
+        <key alias="categoryField">Maes categori</key>
+        <key alias="createDate">Defnyddiwr wedi'i greu</key>
+        <key alias="changePassword">Newidiwch Eich Cyfrinair</key>
+        <key alias="changePhoto">Newidiwch lun</key>
+        <key alias="newPassword">Cyfrinair newydd</key>
+        <key alias="noLockouts">ddim wedi cloi allan</key>
+        <key alias="noPasswordChange">Nid yw'r cyfrinair wedi'i newid</key>
+        <key alias="confirmNewPassword">Cadarnhau cyfrinair newydd</key>
+        <key alias="changePasswordDescription">Gallwch newid eich cyfrinair i gyrchu Swyddfa Gefn Umbracogan lenwi allan y ffurflen isod a chlicio'r botwm 'Newid Cyfrinair'</key>
+        <key alias="contentChannel">Sianel Gynnwys</key>
+        <key alias="createAnotherUser">Creu defnyddiwr arall</key>
+        <key alias="createUserHelp">Creu defnyddwyr newydd i roi hawliau iddynt gyrchu Umbraco. Pan mae defnyddiwr newydd yn cael ei greu, bydd cyfrinair yn cael ei generadu y gallwch chi rannu gyda'r defnyddiwr.</key>
+        <key alias="descriptionField">Maes disgrifiad</key>
+        <key alias="disabled">Analluogi Defnyddiwr</key>
+        <key alias="documentType">Math o Ddogfen</key>
+        <key alias="editors">Golygydd</key>
+        <key alias="excerptField">Maes dyfyniad</key>
+        <key alias="failedPasswordAttempts">Nifer o fethiannau ceisio mewngofnodi</key>
+        <key alias="goToProfile">Ewch at broffil defnyddiwr</key>
+        <key alias="groupsHelp">Ychwanegu grwpiau i neilltuo mynediad a hawliau</key>
+        <key alias="inviteAnotherUser">Gwahodd defnyddiwr arall</key>
+        <key alias="inviteUserHelp">Gwahodd defnyddwyr newydd i roi hawliau iddynt gyrchu Umbraco. Bydd gwahoddiad ebost yn cael ei anfon at y defnyddiwr gyda gwybodaeth ar sut i fewngofnodi i Umbraco. Mae gwahoddiadau yn para am 72 awr.</key>
+        <key alias="language">Iaith</key>
+        <key alias="languageHelp">Gosod yr iaith fyddwch chi'n gweld yn y dewislenni a'r deialogau</key>
+        <key alias="lastLockoutDate">Dyddiad cloi allan diweddaraf</key>
+        <key alias="lastLogin">Mewngofnodi diweddaraf</key>
+        <key alias="lastPasswordChangeDate">Cyfrinair wedi'i newid ddiwethaf</key>
+        <key alias="loginname">Enw defnyddiwr</key>
+        <key alias="mediastartnode">Nod gychwynol gyfrwng</key>
+        <key alias="mediastartnodehelp">Cyfyngu'r llyfrgell gyfrwng at nod gychwynol benodol</key>
+        <key alias="mediastartnodes">Nodau gychwynol gyfrwng</key>
+        <key alias="mediastartnodeshelp">Cyfyngu'r llyfrgell gyfrwng at nodau gychwynol benodol</key>
+        <key alias="modules">Adrannau</key>
+        <key alias="noConsole">Analluogi Mynediad Umbraco</key>
+        <key alias="noLogin">ddim wedi mewngofnodi eto</key>
+        <key alias="oldPassword">Hen gyfrinair</key>
+        <key alias="password">Cyfrinair</key>
+        <key alias="resetPassword">Ailosod cyfrinair</key>
+        <key alias="passwordChanged">Mae eich cyfrinair wedi'i newid!</key>
+        <key alias="passwordChangedGeneric">Cyfrinair wedi'i newid</key>
+        <key alias="passwordConfirm">Cadarnhewch y cyfrinair newydd</key>
+        <key alias="passwordEnterNew">Darparwch eich cyfrinair newydd</key>
+        <key alias="passwordIsBlank">Ni all eich cyfrinair newydd fod yn wag!</key>
+        <key alias="passwordCurrent">Cyfrinair bresennol</key>
+        <key alias="passwordInvalid">Cyfrinair bresennol annilys</key>
+        <key alias="passwordIsDifferent">Roedd gwahaniaeth rhwng y cyfrinair newydd ac y cyfrinair i gadarnhau. Ceisiwch eto!</key>
+        <key alias="passwordMismatch">Nid yw'r cyfrinair cadarnhau yn cyfateb â'r cyfrinair newydd!</key>
+        <key alias="permissionReplaceChildren">Cyfnewid hawliau nod blentyn</key>
+        <key alias="permissionSelectedPages">Rydych ar hyn o bryd yn newid hawliau ar gyfer y tudalennau:</key>
+        <key alias="permissionSelectPages">Dewis tudalennau i newid eu hawliau</key>
+        <key alias="removePhoto">Dileu llun</key>
+        <key alias="permissionsDefault">Hawliau diofyn</key>
+        <key alias="permissionsGranular">Hawliau gronynnog</key>
+        <key alias="permissionsGranularHelp">Gosod hawliau ar gyfer nodau penodol</key>
+        <key alias="profile">Proffil</key>
+        <key alias="searchAllChildren">Chwilio holl blant</key>
+        <key alias="sectionsHelp">Ychwanegu adrannau i roi hawliau i ddefnyddwyr</key>
+        <key alias="selectUserGroups">Dewis grwpiau defnyddwir</key>
+        <key alias="noStartNode">Dim nod gychwynol wedi'i ddewis</key>
+        <key alias="noStartNodes">Dim nodau cychwynol wedi'u dewis</key>
+        <key alias="startnode">Nod gynnwys gychwynol</key>
+        <key alias="startnodehelp">Cyfyngu'r goeden gynnwys i nod gychwynol benodol</key>
+        <key alias="startnodes">Nodau cynnwys gychwynol</key>
+        <key alias="startnodeshelp">Cyfyngu'r goeden gynnwys i nodau gychwynol benodol</key>
+        <key alias="updateDate">Defnyddiwr wedi diweddaru ddiwethaf</key>
+        <key alias="userCreated">wedi ei greu</key>
+        <key alias="userCreatedSuccessHelp">Mae'r defnyddiwr newydd wedi'i greu. Er mwyn mewngofnodi i Umbraco defnyddiwch y cyfrinair isod.</key>
+        <key alias="userManagement">Rheoli defnyddwyr</key>
+        <key alias="username">Enw</key>
+        <key alias="userPermissions">Hawliau defnyddiwr</key>
+        <key alias="userGroupPermissions">Hawliau grwpiau defnyddiwr</key>
+        <key alias="usergroup">Grŵp defnyddiwr</key>
+        <key alias="userGroups">Grwpiau defnyddiwr</key>
+        <key alias="userInvited">wedi'i wahodd</key>
+        <key alias="userInvitedSuccessHelp">Mae gwahoddiad wedi cael ei anfon at y defnyddiwr newydd gyda manylion ar sut i fewngofnodi i Umbraco.</key>
+        <key alias="userinviteWelcomeMessage">Helo a chroeso i Umbraco! Mewn 1 munud yn unig, byddech chi'n barod i fynd, rydym dim ond angen gosod cyfrinair a llun ar gyfer eich avatar.</key>
+        <key alias="userinviteExpiredMessage">Croeso i Umbraco! Yn anffodus, mae eich gwahoddiad wedi terfynu. Cysylltwch â'ch gweinyddwr a gofynnwch iddynt ail-anfon.</key>
+        <key alias="userinviteAvatarMessage">Lanlwythwch lun i wneud o'n haws i boble eich adnabod chi.</key>
+        <key alias="writer">Ysgrifennydd</key>
+        <key alias="translator">Cyfieithydd</key>
+        <key alias="change">Newid</key>
+        <key alias="yourProfile" version="7.0">Eich proffil</key>
+        <key alias="yourHistory" version="7.0">Eich hanes diweddar</key>
+        <key alias="sessionExpires" version="7.0">Sesiwn yn terfynu mewn</key>
+        <key alias="inviteUser">Gwahodd defnyddiwr</key>
+        <key alias="createUser">Creu defnyddiwr</key>
+        <key alias="sendInvite">Anfon gwahoddiad</key>
+        <key alias="backToUsers">Yn ôl at ddefnyddwyr</key>
+        <key alias="inviteEmailCopySubject">Umbraco: Gwahoddiad</key>
+        <key alias="inviteEmailCopyFormat">
+            <![CDATA[
+        <html>
+			<head>
+				<meta name='viewport' content='width=device-width'>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+			</head>
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr>
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top">
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr>
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]-->
+										<div> </div>
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->
+									</td>
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr>
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr>
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Helo %0%,
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Rydych wedi cael eich gwahodd gan <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> i'r Swyddfa Gefn Umbraco.
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Neges oddi wrth <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
+															<br/>
+															<em>%2%</em>
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																			<tbody>
+																				<tr>
+																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
+																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																							Cliciwch y ddolen yma i dderbyn y gwahoddiad
+																						</a>
+																					</td>
+																				</tr>
+																			</tbody>
+																		</table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Os na allwch chi glicio ar y ddolen, copiwch a gludwch y URL i mewn i'ch porwr:</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+																		</font>
+																	</td>
+																</tr>
+															</table>
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br>
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
+					</tr>
+				</table>
+			</body>
+    </html>]]>
+        </key>
+        <key alias="invite">Gwahoddiad</key>
+        <key alias="defaultInvitationMessage">Yn ail-anfon y gwahoddiad...</key>
+        <key alias="deleteUser">Dileu Defnyddiwr</key>
+        <key alias="deleteUserConfirmation">Ydych chi'n sicr eich bod eisiau dileu'r cyfrif defnyddiwr yma?</key>
+        <key alias="stateAll">Pob</key>
+        <key alias="stateActive">Gweithredol</key>
+        <key alias="stateDisabled">Wedi analluogi</key>
+        <key alias="stateLockedOut">Wedi cloi allan</key>
+        <key alias="stateInvited">Wedi gwahodd</key>
+        <key alias="stateInactive">Anactif</key>
+        <key alias="sortNameAscending">Enw (A-Y)</key>
+        <key alias="sortNameDescending">Enw (Y-A)</key>
+        <key alias="sortCreateDateAscending">Hynaf</key>
+        <key alias="sortCreateDateDescending">Diweddaraf</key>
+        <key alias="sortLastLoginDateDescending">Mewngofnodi diweddaraf</key>
+        <key alias="noUserGroupsAdded">No user groups have been added</key>
+    </area>
+    <area alias="validation">
+        <key alias="validation">Dilysiad</key>
+        <key alias="noValidation">Dim dilysiad</key>
+        <key alias="validateAsEmail">Dilysu fel cyfeiriad ebost</key>
+        <key alias="validateAsNumber">Dilysu fel rhif</key>
+        <key alias="validateAsUrl">Dilysu fel URL</key>
+        <key alias="enterCustomValidation">...neu darparwch ddilysiad bersonol</key>
+        <key alias="fieldIsMandatory">Maes yn ofynnol</key>
+        <key alias="mandatoryMessage">Darparwch neges gwall dilysiad arferu (opsiynol)</key>
+        <key alias="validationRegExp">Darparwch fynegiad rheoliadd</key>
+        <key alias="validationRegExpMessage">Darparwch neges gwall dilysiad arferu (opsiynol)</key>
+        <key alias="minCount">Mae angen i chi ychwanegu o leiaf</key>
+        <key alias="maxCount">gallwch ddim ond gael</key>
+        <key alias="addUpTo">Adio lan i</key>
+        <key alias="items">o eitemau</key>
+        <key alias="urls">url(s)</key>
+        <key alias="urlsSelected">url(s) wedi'i ddewis</key>
+        <key alias="itemsSelected">o eitemau wedi'u dewis</key>
+        <key alias="invalidDate">Dyddiad annilys</key>
+        <key alias="invalidNumber">Ddim yn rif</key>
+        <key alias="invalidEmail">Ebost annilys</key>
+        <key alias="invalidNull">Ni all y gwerth fod yn null</key>
+        <key alias="invalidEmpty">Ni all y gwerth fod yn gwag</key>
+        <key alias="invalidPattern">Mae'r gwerth yn annilys, nid yw'n cyfateb i'r patrwm cywir</key>
+        <key alias="customValidation">Dilysiad arferu</key>
+        <key alias="entriesShort"><![CDATA[Lleiafswm o %0% gofnodion, angen <strong>%1%</strong> mwy.]]></key>
+        <key alias="entriesExceed"><![CDATA[Uchafswm o %0% gofnodion, <strong>%1%</strong> gormod.]]></key>
+    </area>
+    <area alias="healthcheck">
+        <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: XPath
+		   3: Configuration file path
+	  -->
+        <key alias="checkSuccessMessage">Gwerth wedi'i osod at y gwerth argymhellwyd: '%0%'.</key>
+        <key alias="rectifySuccessMessage">Gwerth wedi'i osod at '%1%' ar gyfer XPath '%2%' yn y ffeil ffurfweddu '%3%'.</key>
+        <key alias="checkErrorMessageDifferentExpectedValue">Yn disgwyl y gwerth '%1%' ar gyfer '%2%' yn y ffeil ffurfweddu '%3%', ond darganfyddwyd '%0%'.</key>
+        <key alias="checkErrorMessageUnexpectedValue">Darganfyddwyd gwerth annisgwyl '%0%' ar gyfer '%2%' yn y ffeil ffurfweddu '%3%'.</key>
+        <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+	  -->
+        <key alias="customErrorsCheckSuccessMessage">Gwallau bersonol wedi gosod at '%0%'.</key>
+        <key alias="customErrorsCheckErrorMessage">Gwallau bersonol wedi gosod at '%0%' yn bresennol. Argymhellwyd i osod hyn i '%1%' cyn mynd yn fyw.</key>
+        <key alias="customErrorsCheckRectifySuccessMessage">Gwallau bersonol wedi gosod at '%0%' yn llwyddiannus.</key>
+
+        <key alias="macroErrorModeCheckSuccessMessage">Gwallau Macro wedi gosod at '%0%'.</key>
+        <key alias="macroErrorModeCheckErrorMessage">Gwallau Macro wedi gosod at '%0%' a fydd yn atal rhai neu holl dudalennau yn eich safle rhag llwytho'n gyfan gwbl os oes unrhyw wallau o fewn macros. Bydd cywiro hyn yn gosod y gwerth at '%1%'.</key>
+        <key alias="macroErrorModeCheckRectifySuccessMessage">Gwallau Macro wedi gosod at '%0%' yn llwyddiannus.</key>
+        <!-- The following keys get these tokens passed in:
+	     0: Current value
+		   1: Recommended value
+		   2: Server version
+	  -->
+        <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Ceisio sgipio Gwallau IIS Bersonol wedi'i osod at '%0%' ac rydych yn defnyddio fersiwn IIS '%1%'.</key>
+        <key alias="trySkipIisCustomErrorsCheckErrorMessage">Ceisio sgipio Gwallau IIS Bersonol wedi'i osod at '%0%'. Argymhellwyd gosod hyn at '%1%' ar gyfer eich fersiwn IIS (%2%).</key>
+        <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Ceisio sgipio Gwallau IIS Bersonol wedi'i osod at '%0%' yn llwyddiannus.</key>
+        <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+        <key alias="configurationServiceFileNotFound">Ffeil ddim yn bodoli: '%0%'.</key>
+        <key alias="configurationServiceNodeNotFound"><![CDATA[Methwyd darganfod <strong>'%0%'</strong> yn y ffeil ffurfweddu <strong>'%1%'</strong>.]]></key>
+        <key alias="configurationServiceError">Bu gwall, gwiriwch y log ar gyfer y gwall cyflawn: %0%.</key>
+        <key alias="xmlDataIntegrityCheckMembers">Aelodau - Cyfanswm XML: %0%, Cyfanswm: %1%, Cyfanswm annilys: %2%</key>
+        <key alias="xmlDataIntegrityCheckMedia">Cyfrwng - Cyfanswm XML: %0%, Cyfanswm: %1%, Cyfanswm annilys: %2%</key>
+        <key alias="xmlDataIntegrityCheckContent">Cynnwys - Cyfanswm XML: %0%, Cyfanswm wedi cyhoeddi: %1%, Cyfanswm annilys: %2%</key>
+        <key alias="databaseSchemaValidationCheckDatabaseOk">Cronfa ddata - Mae'r sgema gronfa ddata yn gywir ar gyfer y fersiwn yma o Umbraco</key>
+        <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% o broblemau wedi'u canfod gyda'ch sgema gronfa ddata (Gwiriwch y log am fanylion)</key>
+        <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Darganfyddwyd gwallau wrth ddilysu'r sgema gronfa ddata yn erbyn y fersiwn bresennol o Umbraco.</key>
+        <key alias="httpsCheckValidCertificate">Mae tystysgrif eich gwefan yn ddilys.</key>
+        <key alias="httpsCheckInvalidCertificate">Gwall dilysu tystysgrif: '%0%'</key>
+        <key alias="httpsCheckExpiredCertificate">Mae tystysgrif SSL eich gwefan wedi terfynu.</key>
+        <key alias="httpsCheckExpiringCertificate">Mae tystysgrif SSL eich gwefan am derfynu mewn %0% diwrnod.</key>
+        <key alias="healthCheckInvalidUrl">Gwall yn pingio'r URL %0% - '%1%'</key>
+        <key alias="httpsCheckIsCurrentSchemeHttps">Rydych yn bresennol %0% yn gweld y wefan yn defnyddio'r cynllun HTTPS.</key>
+        <key alias="httpsCheckConfigurationRectifyNotPossible">Mae'r appSetting 'umbracoUseSSL' wedi'i osod at 'false' yn eich ffeil web.config. Unwaith rydych yn ymweld â'r safle gan ddefnyddio'r cynllun HTTPS, dylai hynny gael ei osod i 'true'.</key>
+        <key alias="httpsCheckConfigurationCheckResult">Mae'r appSetting 'umbracoUseSSL' wedi'i osod at '%0%' yn eich ffeil web.config, mae eich cwcis %1% marcio yn ddiogel.</key>
+        <key alias="httpsCheckEnableHttpsError">Ni ellir diweddaru'r gosodiad 'umbracoUseSSL' yn eich ffeil web.config. Gwall: %0%</key>
+        <!-- The following keys don't get tokens passed in -->
+        <key alias="httpsCheckEnableHttpsButton">Galluogi HTTPS</key>
+        <key alias="httpsCheckEnableHttpsDescription">Yn gosod umbracoSSL i true yn yr appSettings yn y ffeil web.config.</key>
+        <key alias="httpsCheckEnableHttpsSuccess">Mae'r appSetting 'umbracoUseSSL' yn awr wedi'i osod at 'true' yn eich ffeil web.config, bydd eich cwcis wedi eu marcio yn ddiogel.</key>
+        <key alias="rectifyButton">Trwsio</key>
+        <key alias="cannotRectifyShouldNotEqual">Ni ellir trwsio gwiriad gyda math chymhariaeth gwerth o 'ShouldNotEqual'.</key>
+        <key alias="cannotRectifyShouldEqualWithValue">Ni ellir trwsio gwiriad gyda math chymhariaeth gwerth o 'ShouldEqual' gyda gwerth a ddarparwyd.</key>
+        <key alias="valueToRectifyNotProvided">Gwerth i drwrsio gwiriad heb ei ddarparu.</key>
+        <key alias="compilationDebugCheckSuccessMessage">Modd casgliad dadfygio wedi'i analluogi.</key>
+        <key alias="compilationDebugCheckErrorMessage">Modd casgliad dadfygio wedi'i alluogi. Argymhellwyd analluogi'r gosodiad yma cyn mynd yn fyw.</key>
+        <key alias="compilationDebugCheckRectifySuccessMessage">Modd casgliad dadfygio wedi'i analluogi yn llwyddiannus.</key>
+        <key alias="traceModeCheckSuccessMessage">Modd olrhain wedi'i analluogi.</key>
+        <key alias="traceModeCheckErrorMessage">Modd olrhain wedi'i alluogi. Argymhellwyd analluogi'r gosodiad yma cyn mynd yn fyw.</key>
+        <key alias="traceModeCheckRectifySuccessMessage">Modd olrhain wedi'i analluogi yn llwyddiannus.</key>
+        <key alias="folderPermissionsCheckMessage">Mae gan pob ffolder yr hawliau cywir wedi'u gosod.</key>
+        <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+        <key alias="requiredFolderPermissionFailed"><![CDATA[Mae angen i'r ffolderi ganlynol gael eu gosod gyda hawliau golygu ond ni ellir eu cyrchu: <strong>%0%</strong>.]]></key>
+        <key alias="optionalFolderPermissionFailed"><![CDATA[Mae angen i'r ffolderi ganlynol gael eu gosod gyda hawliau golygu ar gyfer rhai gweithredoedd Umbraco penodol er mwyn gweithio, ond ni ellir eu cyrchu: <strong>%0%</strong>. Os nad ydyn nhw'n cael eu ysgrifennu atynt, does dim angen unrhyw weithred.]]></key>
+        <key alias="filePermissionsCheckMessage">Mae gan pob ffeil yr hawliau cywir wedi'u gosod.</key>
+        <!-- The following keys get these tokens passed in:
+	    0: Comma delimitted list of failed folder paths
+  	-->
+        <key alias="requiredFilePermissionFailed"><![CDATA[Mae angen i'r ffeiliau ganlynol gael eu gosod gyda hawliau ysgrifennu ond ni ellir eu cyrchu: <strong>%0%</strong>.]]></key>
+        <key alias="optionalFilePermissionFailed"><![CDATA[Mae angen i'r ffeiliau ganlynol gael eu gosod gyda hawliau ysgrifennu ar gyfer rhai gweithredoedd Umbraco penodol er mwyn gweithio, ond ni ellir eu cyrchu: <strong>%0%</strong>. Os nad ydyn nhw'n cael eu ysgrifennu atynt, does dim angen unrhyw weithred.]]></key>
+        <key alias="clickJackingCheckHeaderFound"><![CDATA[Mae'r peniad neu meta-tag <strong>X-Frame-Options</strong> sy'n cael ei ddefnyddio i reoli os mae safle'n gallu cael ei osod o fewn IFRAME gan safle arall wedi'i ganfod.]]></key>
+        <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nid yw'r peniad neu meta-tag <strong>X-Frame-Options</strong> sy'n cael ei ddefnyddio i reoli os mae safle'n gallu cael ei osod o fewn IFRAME gan safle arall wedi'i ganfod.]]></key>
+        <key alias="setHeaderInConfig">Gosod Peniad o fewn Ffurfwedd</key>
+        <key alias="clickJackingSetHeaderInConfigDescription">Ychwanegu gwerth at yr adran httpProtocol/customHeaders o'r ffeil web.config er mwyn atal y safle rhag cael ei ddangos o fewn IFRAME gan safleoedd eraill.</key>
+        <key alias="clickJackingSetHeaderInConfigSuccess">Gosodiad ar gyfer creu peniad sy'n atal y wefan rhag cael ei ddangos o fewn IFRAME ar safle arall wedi'i ychwanegu at eich ffeil web.config.</key>
+        <key alias="setHeaderInConfigError">Ni ellir diweddaru'r ffeil web.config. Gwall: %0%</key>
+        <key alias="noSniffCheckHeaderFound"><![CDATA[Mae'r peniad neu meta-tag <strong>X-Content-Type-Options</strong> sy'n cael ei ddefnyddio i amddiffyn yn erbyn gwendidau sniffio MIME wedi'i ganfod.]]></key>
+        <key alias="noSniffCheckHeaderNotFound"><![CDATA[Nid yw'r peniad neu meta-tag <strong>X-Content-Type-Options</strong> sy'n cael ei ddefnyddio i amddiffyn yn erbyn gwendidau sniffio MIME wedi'i ganfod.]]></key>
+        <key alias="noSniffSetHeaderInConfigDescription">Ychwanegu gwerth at yr adran httpProtocol/customHeaders o'r ffeil web.config er mwyn amddiffyn yn erbyn gwendidau sniffio MIME.</key>
+        <key alias="noSniffSetHeaderInConfigSuccess">Gosodiad ar gyfer creu peniad sy'n amddiffyn yn erbyn gwendidau sniffio MIME wedi'i ychwanegu at eich ffeil web.config.</key>
+        <key alias="hSTSCheckHeaderFound"><![CDATA[Mae'r peniad <strong>Strict-Transport-Security</strong>, hefyd wedi'i adnabod fel HSTS-header, wedi'i ganfod.]]></key>
+        <key alias="hSTSCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>Strict-Transport-Security</strong> wedi'i ganfod.]]></key>
+        <key alias="hSTSSetHeaderInConfigDescription">Ychwanegu'r peniad 'Strict-Transport-Security' gyda'r gwerth 'max-age=10886400; preload' i'r adran httpProtocol/customHeaders o'r ffeil web.config. Defnyddiwch y trwsiad hyn dim ond os bydd gennych chi eich parthau yn rhedeg gyda https am yr 18 wythnos nesaf (o leiaf).</key>
+        <key alias="hSTSSetHeaderInConfigSuccess">Mae'r peniad HSTS wedi'i ychwanegu at y ffeil web.config.</key>
+        <key alias="xssProtectionCheckHeaderFound"><![CDATA[Mae'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
+        <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
+        <key alias="xssProtectionSetHeaderInConfigDescription">Ychwanegu'r peniad 'X-XSS-Protection' gyda'r gwerth '1; mode=block' at yr adran httpProtocol/customHeaders yn y ffeil web.config. </key>
+        <key alias="xssProtectionSetHeaderInConfigSuccess">Mae'r peniad X-XSS-Protection wedi'i ychwanegu at y ffeil web.config.</key>
+        <!-- The following key get these tokens passed in:
+	    0: Comma delimitted list of headers found
+  	-->
+        <key alias="excessiveHeadersFound"><![CDATA[Mae'r peniadau canlynol sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod: <strong>%0%</strong>.]]></key>
+        <key alias="excessiveHeadersNotFound">Dim peniadau sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod.</key>
+        <key alias="smtpMailSettingsNotFound">Ni ellir darganfod system.net/mailsettings yn y ffeil Web.config.</key>
+        <key alias="smtpMailSettingsHostNotConfigured">Yn yr adran system.net/mailsettings o'r ffeil Web.config, nid yw'r "host" wedi ffurfweddu.</key>
+        <key alias="smtpMailSettingsConnectionSuccess">Gosodiadau SMTP wedi ffurfweddu'n gywir ac mae'r gwasanaeth yn gweithio fel y disgwylir.</key>
+        <key alias="smtpMailSettingsConnectionFail">Ni ellir cysylltu â gweinydd SMTP sydd wedi ffurfweddu gyda "host" '%0%' a phorth '%1%'. Gwiriwch fod y gosodiadau SMTP yn y ffeil Web.config, system.net/mailsettings yn gywir.</key>
+        <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Ebost hysbusu wedi'i osod at <strong>%0%</strong>.]]></key>
+        <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Ebost hysbusu yn dal wedi'i osod at y gwerth diofyn o <strong>%0%</strong>.]]></key>
+        <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Canlyniadau'r gwiriad Statws Iechyd Umbraco ar amserlen rhedwyd ar %0% am %1% fel y ganlyn:</p>%2%</body></html>]]></key>
+        <key alias="scheduledHealthCheckEmailSubject">Statws Iechyd Umbraco: %0%</key>
+        <key alias="checkAllGroups">Gwiriwch Pob Grŵp</key>
+        <key alias="checkGroup">Gwiriwch y grŵp</key>
+        <key alias="helpText">
+            <![CDATA[
+            <p>Mae'r gwiriwr iechyd yn gwerthuso gwahanol rannau o'ch gwefan ar gyfer gosodiadau arfer gorau, cyfluniad, problemau posibl, ac ati. Gallwch chi drwsio problemau yn hawdd trwy wasgu botwm.
+            Gallwch chi ychwanegu eich gwiriadau iechyd eich hun, edrych ar <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">y ddogfennaeth i gael mwy o wybodaeth</a> am wiriadau iechyd arferu.</p>
+            ]]>
+        </key>
+        <key alias="tls12HealthCheckSuccess">Eich wefan gallu defnyddio y protocol gwarchodaeth TLS 1.2 wrth wneud cysylltiadau allanol i endpoints HTTPS</key>
+        <key alias="tls12HealthCheckWarn">Nid yw'ch gwefan wedi'i ffurfweddu i ganiatáu protocol diogelwch TLS 1.2 wrth wneud cysylltiadau allanol: efallai na fydd modd cyrchu rhai endpoints HTTPS gan ddefnyddio protocol llai diogel.</key>
+    </area>
+    <area alias="redirectUrls">
+        <key alias="disableUrlTracker">Analluogi olinydd URL</key>
+        <key alias="enableUrlTracker">Galluogi olinydd URL</key>
+        <key alias="culture">Diwylliant</key>
+        <key alias="originalUrl">URL gwreiddiol</key>
+        <key alias="redirectedTo">Ailgyfeirwyd I</key>
+        <key alias="redirectUrlManagement">Gweinyddu Ailgyfeirio URLs</key>
+        <key alias="panelInformation">Mae'r URLs ganlynol yn ailgyfeirio at yr eitem gynnwys yma:</key>
+        <key alias="noRedirects">Dim ailgyfeiriadau wedi'u gwneud</key>
+        <key alias="noRedirectsDescription">Pan mae tudalen wedi'i gyhoeddi yn cael ei ailenwi neu symud bydd ailgyfeiriad yn cael ei greu yn awtomatig at y dudalen newydd.</key>
+        <key alias="removeButton">Dileu</key>
+        <key alias="confirmRemove">Ydych chi'n sicr eich bod eisiau dileu'r ailgyfeiriad o '%0%' at '%1%'?</key>
+        <key alias="redirectRemoved">URL ailgyfeirio wedi'i ddileu.</key>
+        <key alias="redirectRemoveError">Gwall yn dileu'r URL.</key>
+        <key alias="redirectRemoveWarning">Bydd hyn yn dileu'r ailgyfeiriad</key>
+        <key alias="confirmDisable">Ydych chi'n sicr eich bod eisiau analluogi'r olinydd URL?</key>
+        <key alias="disabledConfirm">Mae'r olinydd URL wedi cael ei analluogi.</key>
+        <key alias="disableError">Gwall yn ystod analluogi'r olinydd URL, gall fwy o wybodaeth gael ei ddarganfod yn eich ffeil log.</key>
+        <key alias="enabledConfirm">Mae'r olinydd URL wedi cael ei alluogi.</key>
+        <key alias="enableError">Gwall yn ystod galluogi'r olinydd URL, gall fwy o wybodaeth gael ei ddarganfod yn eich ffeil log.</key>
+    </area>
+    <area alias="emptyStates">
+        <key alias="emptyDictionaryTree">Dim eitemau Geiriadur i ddewis ohonynt</key>
+    </area>
+    <area alias="textbox">
+        <key alias="characters_left">o nodau ar ôl</key>
+        <key alias="characters_exceed"><![CDATA[Uchafswm o %0% nodau cyfrannol, <strong>%1%</strong> gormod.]]></key>
+    </area>
+    <area alias="recycleBin">
+        <key alias="contentTrashed">Wedi chwalu cynnwys gyda Id: {0} yn berthnasol i gynnwys rhiant gwreiddiol gyda Id: {1}</key>
+        <key alias="mediaTrashed">Wedi chwalu cyfrwng gyda Id: {0} yn berthnasol i gyfrwng rhiant gwreiddiol gyda Id: {1}</key>
+        <key alias="itemCannotBeRestored">Ni ellir adfer yr eitem yma yn awtomatig</key>
+        <key alias="itemCannotBeRestoredHelpText">Nid oes unrhyw leoliad lle gellir adfer yr eitem hon yn awtomatig. Gallwch chi symud yr eitem â llaw gan ddefnyddio'r goeden isod.</key>
+        <key alias="wasRestored">oedd adferwyd o dan</key>
+        <key alias="noRestoreRelation">Does dim perthynas 'adfer' ar gael ar gyfer y nod yma. Defnyddiwch y ddewislen Symud i'w symud â llaw.</key>
+        <key alias="restoreUnderRecycled">Mae'r eitem yr ydych eisiau adfer yr item oddi tan ('%0%') yn y bin ailgylchu. Defnyddiwch y ddewislen Symud i'w symud â llaw.</key>
+    </area>
+    <area alias="relationType">
+        <key alias="direction">Cyfeiriad</key>
+        <key alias="parentToChild">Rhiant i plentyn</key>
+        <key alias="bidirectional">Deugyfeiriadol</key>
+        <key alias="parent">Rhiant</key>
+        <key alias="child">Plentyn</key>
+        <key alias="count">Cyfrif</key>
+        <key alias="relations">Cysylltiadau</key>
+        <key alias="created">Creu</key>
+        <key alias="comment">Sylw</key>
+        <key alias="name">Enw</key>
+        <key alias="noRelations">Dim cysylltiadau ar gyfer y math hwn o berthynas.</key>
+        <key alias="tabRelationType">Math o Berthynas</key>
+        <key alias="tabRelations">Cysylltiadau</key>
+    </area>
+    <area alias="dashboardTabs">
+        <key alias="contentIntro">Dechrau Arni</key>
+        <key alias="contentRedirectManager">Rheolaeth Ailgyfeirio URL</key>
+        <key alias="mediaFolderBrowser">Cynnwys</key>
+        <key alias="settingsWelcome">Croeso</key>
+        <key alias="settingsExamine">Rheolaeth Examine</key>
+        <key alias="settingsPublishedStatus">Statws Cyhoeddedig</key>
+        <key alias="settingsModelsBuilder">Adeiladwr Modelau</key>
+        <key alias="settingsHealthCheck">Gwiriad Iechyd</key>
+        <key alias="settingsProfiler">Proffilio</key>
+        <key alias="memberIntro">Dechrau Arni</key>
+        <key alias="formsInstall">Gosod Ffurflenni Umbraco</key>
+    </area>
+    <area alias="visuallyHiddenTexts">
+        <key alias="goBack">Mynd yn ôl</key>
+        <key alias="activeListLayout">Cynllun gweithredol:</key>
+        <key alias="jumpTo">Neidio i</key>
+        <key alias="group">grŵp</key>
+        <key alias="passed">pasio</key>
+        <key alias="warning">rhybudd</key>
+        <key alias="failed">methu</key>
+        <key alias="suggestion">awgrym</key>
+        <key alias="checkPassed">Gwiriad wedi'i basio</key>
+        <key alias="checkFailed">Gwiriad wedi'i methu</key>
+        <key alias="openBackofficeSearch">Agor chwiliad swyddfa gefn</key>
+        <key alias="openCloseBackofficeHelp">Agor/Cau cymorth swyddfa gefn</key>
+        <key alias="openCloseBackofficeProfileOptions">Agor/Cau eich opsiynau proffil</key>
+        <key alias="assignDomainDescription">Sefydli Diwylliannau ac Enwau Gwesteia am %0%</key>
+        <key alias="createDescription">Creu nod newydd o dan %0%</key>
+        <key alias="protectDescription">Sefydli Mynediad Cyhoeddus ar %0%</key>
+        <key alias="rightsDescription">Sefydli Caniataid ar %0%</key>
+        <key alias="sortDescription"> Newid y trefniad am %0%</key>
+        <key alias="createblueprintDescription">Creu templed cynnwys yn seiliedig ar %0%</key>
+        <key alias="openContextMenu">Agor dewislen cyd-destun ar gyfer</key>
+        <key alias="currentLanguage">Iaith gyfredol</key>
+        <key alias="switchLanguage">Newid iaith i</key>
+        <key alias="createNewFolder">Creu ffolder newydd</key>
+        <key alias="newPartialView">Golwg Rhannol</key>
+        <key alias="newPartialViewMacro">Macro Golwg Rhannol</key>
+        <key alias="newMember">Aelod</key>
+        <key alias="newDataType">Math o ddata</key>
+        <key alias="redirectDashboardSearchLabel">Chwilio'r dangosfwrdd ailgyfeirio</key>
+        <key alias="userGroupSearchLabel">Chwilio'r adran grŵp defnyddwyr</key>
+        <key alias="userSearchLabel">Chwilio'r adran defnyddwyr</key>
+        <key alias="createItem">Creu eitem</key>
+        <key alias="create">Creu</key>
+        <key alias="edit">Golygu</key>
+        <key alias="name">Enw</key>
+        <key alias="addNewRow">Ychwanegu rhes newydd</key>
+        <key alias="tabExpand">Gweld mwy o opsiynau</key>
+        <key alias="hasTranslation">Wedi cyfieithu</key>
+        <key alias="noTranslation">Cyfieithiad ar goll</key>
+        <key alias="dictionaryListCaption">Eitemau geiriadur</key>
+    </area>
+    <area alias="references">
+        <key alias="tabName">Cyfeiriadau</key>
+        <key alias="DataTypeNoReferences">This Data Type has no references. Nid oes gan y Math o Ddata hwn unrhyw gyferiadau.</key>
+        <key alias="labelUsedByDocumentTypes">Defnyddir mewn Mathau o Ddogfennau</key>
+        <key alias="noDocumentTypes">Ddim cyfeiriadau i Fathau o Ddogfennau.</key>
+        <key alias="labelUsedByMediaTypes">Defnyddir mewm Mathau o Gyfrwng</key>
+        <key alias="noMediaTypes">Ddim cyfeiriadau i Fathau o Gyfrwng.</key>
+        <key alias="labelUsedByMemberTypes">Defnyddir mewn Mathau o Aelod</key>
+        <key alias="noMemberTypes">Ddim cyfeiriadau i Fathau o Aelod.</key>
+        <key alias="usedByProperties">Defnyddir gan</key>
+        <key alias="labelUsedByDocuments">A ddefnyddir yn Ddogfennau</key>
+        <key alias="labelUsedByMembers">A ddefnyddir yn Aelodau</key>
+        <key alias="labelUsedByMedia">A ddefnyddir yn Cyfryngau</key>
+    </area>
+    <area alias="logViewer">
+        <key alias="deleteSavedSearch">Dileu Chwiliad Cadwedig</key>
+        <key alias="logLevels">Lefelau Log</key>
+        <key alias="selectAllLogLevelFilters">Dewiswch y cyfan</key>
+        <key alias="deselectAllLogLevelFilters">Dad-ddewiswch bawb</key>
+        <key alias="savedSearches">Chwiliadau Cadwedig</key>
+        <key alias="saveSearch">Arbed Chwiliad</key>
+        <key alias="saveSearchDescription">Rhoi enw cyfeillgar am eich ymholiad chwilio</key>
+        <key alias="filterSearch">Hidlo Chwiliad</key>
+        <key alias="totalItems">Cyfanswm o Eitemau</key>
+        <key alias="timestamp">Stamp Amser</key>
+        <key alias="level">Lefel</key>
+        <key alias="machine">Peiriant</key>
+        <key alias="message">Neges</key>
+        <key alias="exception">Eithriad</key>
+        <key alias="properties">Priodweddau</key>
+        <key alias="searchWithGoogle">Chwilio efo Google</key>
+        <key alias="searchThisMessageWithGoogle">Chwiliwch y neges hon efo Google</key>
+        <key alias="searchWithBing">Chwilio efo Bing</key>
+        <key alias="searchThisMessageWithBing">Chwiliwch y neges hon efo Bing</key>
+        <key alias="searchOurUmbraco">Chwilio Our Umbraco</key>
+        <key alias="searchThisMessageOnOurUmbracoForumsAndDocs">Chwiliwch y neges hon arno Our Umbraco fforymau a dogfennau</key>
+        <key alias="searchOurUmbracoWithGoogle">Chwilio Our Umbraco efo Google</key>
+        <key alias="searchOurUmbracoForumsUsingGoogle">Chwilio Our Umbraco fforymau efo Google</key>
+        <key alias="searchUmbracoSource">Chwilio'r cod gwreiddiol Umbraco</key>
+        <key alias="searchWithinUmbracoSourceCodeOnGithub">Chwilio tu fewn y cod gwreiddiol Umbraco ar Github</key>
+        <key alias="searchUmbracoIssues">Chwilio Problemau Umbraco</key>
+        <key alias="searchUmbracoIssuesOnGithub">Chwilio Problemau Umbraco ar Github</key>
+        <key alias="deleteThisSearch">Dileu chwiliad hon</key>
+        <key alias="findLogsWithRequestId">Darganfod logiau efo ID y Cais</key>
+        <key alias="findLogsWithNamespace">Darganfod logiau efo Namespace</key>
+        <key alias="findLogsWithMachineName">Darganfod logiau efo Enw Peiriant</key>
+        <key alias="open">Agor</key>
+    </area>
+    <area alias="clipboard">
+        <key alias="labelForCopyAllEntries">Copi %0%</key>
+        <key alias="labelForArrayOfItemsFrom">%0% o %1%</key>
+        <key alias="labelForRemoveAllEntries">Dileu pob eitem</key>
+        <key alias="labelForClearClipboard">Clirio y clipfwrdd</key>
+    </area>
+    <area alias="propertyActions">
+        <key alias="tooltipForPropertyActionsMenu">Agor Gweithredoedd Priodweddau</key>
+        <key alias="tooltipForPropertyActionsMenuClose">Cau Gweithredoedd Priodweddau</key>
+    </area>
+    <area alias="nuCache">
+        <key alias="wait">Aros</key>
+        <key alias="refreshStatus">Adnewyddu statws</key>
+        <key alias="memoryCache">Cuddstôr Cof</key>
+        <key alias="memoryCacheDescription">
+            <![CDATA[
+                Mae'r botwm hwn yn caniatáu ichi ail-lwytho'r cuddstôr mewn-cof, gan ail-lwytho fo o'r stôr cronfa ddata 
+                (ond nid yw'n ailadeiladu stôr cronfa ddata hwnna). Mae hyn yn gymharol o gyflym.
+                Defnyddio fo pan ti'n feddwl nad yw'r stôr gof wedi'i hadnewyddu'n iawn, ar ôl i rai digwyddiad 
+                digwydd&mdash;a fyddai'n arwydd o broblem fach efo Umbraco.
+                (nodyn: mae hyn yn achosi ail-lwytho ar pob gweinydd mewn amgylchedd LB).
+        ]]>
+        </key>
+        <key alias="reload">Ail-lwytho</key>
+        <key alias="databaseCache">Cuddstôr Cronfa Ddata </key>
+        <key alias="databaseCacheDescription">
+            <![CDATA[
+            Mae'r botwm hwn yn caniatáu ichi ailadeiladu'r cuddstôr cronfa ddata, h.y. y cynnwys o'r tabl cmsContentNu.
+            <strong>Gall ailadeiladu fod yn ddrud.</strong>
+            Defnyddio fo pan mae ail-lwytho ddim yn ddigon, a ti'n feddwl mai'r stôr cronfa ddata heb gael ei 
+            chynhyrchu'n iawn&mdash;a fyddai'n arwydd o broblem gritigol efo Umbraco.
+        ]]>
+        </key>
+        <key alias="rebuild">Ailadeiladu</key>
+        <key alias="internals">Mewnol</key>
+        <key alias="internalsDescription">
+            <![CDATA[
+        Mae'r botwm hwn yn caniatáu ichi sbarduno casgliad cipluniau o NuCache (ar ôl rhedeg fullCLR GC)
+        Oni bai chi'n gwybod beth mae hynny'n ei olygu, mae'n debyg <em>nad</em> oes angeni chi ei defnyddio.
+        ]]>
+        </key>
+        <key alias="collect">Casglu</key>
+        <key alias="publishedCacheStatus">Statws Cuddstôr Cyhoeddedig</key>
+        <key alias="caches">Cuddstorau</key>
+    </area>
+    <area alias="profiling">
+        <key alias="performanceProfiling">Proffilio perfformiad</key>
+        <key alias="performanceProfilingDescription">
+            <![CDATA[
+                <p>
+                    Mae Umbraco yn rhedeg mewn modd dadfygio. Mae hyn yn golygu y gallwch chi ddefnyddio'r proffiliwr perfformiad adeiledig i asesu'r perfformiad wrth rendro tudalennau.
+                </p>
+                <p>
+                    OS ti eisiau actifadu'r proffiliwr am rendro tudalen penodol, bydd angen ychwanegu <b>umbDebug=true</b> i'r ymholiad wrth geisio am y tudalen
+                </p>
+                <p>
+                    Os ydych chi am i'r proffiliwr gael ei actifadu yn ddiofyn am bob rendrad tudalen, gallwch chi ddefnyddio'r togl isod.
+                    Bydd e'n gosod cwci yn eich porwr, sydd wedyn yn actifadu'r proffiliwr yn awtomatig.
+                    Mewn geiriau eraill, bydd y proffiliwr dim ond yn actif yn ddiofyn yn eich porwr <i>chi</i> - nid porwr pawb eraill.
+                </p>
+        ]]>
+        </key>
+        <key alias="activateByDefault">Actifadu y proffiliwr yn ddiofyn</key>
+        <key alias="reminder">Nodyn atgoffa cyfeillgar</key>
+        <key alias="reminderDescription">
+            <![CDATA[
+            <p>
+                Ni ddylech chi fyth adael i safle cynhyrchu redeg yn y modd dadfygio. Mae'r modd dadfygio yn gallu cael ei diffodd trwy ychwanegu'r gosodiad <b>debug="false"</b> ar yr elfen <b>&lt;grynhoi /&gt;</b> yn web.config.
+            </p>
+        ]]>
+        </key>
+        <key alias="profilerEnabledDescription">
+            <![CDATA[
+            <p>
+                Mae Umbraco ddim yn rhedeg mewn modd dadfygio ar hyn o bryd, felly nid allwch chi ddefnyddio'r proffiliwer adeiledig. Dyma sut y dylai fod ar gyfer safle cynhyrchu.
+            </p>
+            <p>
+                Mae'r modd dadfygio yn gallu cael ei throi arno gan ychwanegu'r gosodiad <b>debug="true"</b> ar yr elfen <b>&lt;grynhoi /&gt;</b> yn web.config.
+            </p>
+        ]]>
+        </key>
+    </area>
+    <area alias="settingsDashboardVideos">
+        <key alias="trainingHeadline">Oriau o fideos hyfforddiant Umbraco ddim ond un clic i fwrdd</key>
+        <key alias="trainingDescription">
+            <![CDATA[
+                <P>Eisiau meistroli Umbraco? Treuliwch gwpl o funudau yn dysgu rhai o'r arferion gorau gan wylio un o'r fideos hyn am sut i ddefnyddio Umbraco. Ac ymweld â <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> am fwy o fideos am Umbraco</p>
+            ]]>
+        </key>
+        <key alias="getStarted">I roi cychwyn i chi</key>
+    </area>
+    <area alias="settingsDashboard">
+        <key alias="start">Dechrau yma</key>
+        <key alias="startDescription">Mae'r adran hon yn cynnwys y blociau adeiladu am eich safle Umbraco. Dilyn y dolenni isod i ddarganfod fwy am weithio gyda'r eitemau yn yr adran Gosodiadau</key>
+        <key alias="more">Ddarganfod fwy</key>
+        <key alias="bulletPointOne">
+            <![CDATA[
+            Darllenwch fwy am weithio efo'r eitemau yn yr adran Gosodiadau <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">fewn yr adran Dogfennaeth</a> o Our Umbraco
+        ]]>
+        </key>
+        <key alias="bulletPointTwo">
+            <![CDATA[
+            Gofynnwch gwestiwn yn y <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Fforwm Cymunedol</a>
+        ]]>
+        </key>
+        <key alias="bulletPointThree">
+            <![CDATA[
+            Gwyliwch ein <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">fideos tiwtorial</a> (mae rhai am ddim, ond bydd angen tanysgrifiad am rhai eraill)
+        ]]>
+        </key>
+        <key alias="bulletPointFour">
+            <![CDATA[
+            Darganfyddwch fwy am ein <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">hoffer hybu cynhyrchiant a chefnogaeth fasnachol</a>
+        ]]>
+        </key>
+        <key alias="bulletPointFive">
+            <![CDATA[
+            Darganfyddwch fwy am gyfleoedd <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">hyfforddi ac ardystio</a>
+        ]]>
+        </key>
+    </area>
+    <area alias="startupDashboard">
+        <key alias="fallbackHeadline">Croeso i'r SRC cyfeillgar</key>
+        <key alias="fallbackDescription">Diolch am ddewis Umbraco - rydyn ni'n credu y gallai hyn fod dechreuad i rywbeth prydferth. Er y gallai deilo'n llethol ar y dechrau, rydym wedi gwneud llawer i wneud y gromlin ddysgu mor llyfn a chyflym a phosib.</key>
+    </area>
+    <area alias="formsDashboard">
+        <key alias="formsHeadline">Ffurflenni Umbraco</key>
+        <key alias="formsDescription">Creu ffurflenni gan ddefnyddio rhyngwyneb llusgo a gollwng sythweledol. O ffurflenni cyswllt syml sy'n anfon e-byst, i holiaduron mwy datblygedig sy'n integreiddio efo systemau CRM. Bydd eich cleientiaid wrth ei modd!</key>
+    </area>
+    <area alias="blockEditor">
+        <key alias="headlineCreateBlock">Creu bloc newydd</key>
+        <key alias="headlineAddSettingsElementType">Atodwch adran gosodiadau</key>
+        <key alias="headlineAddCustomView">Dewis golygfa</key>
+        <key alias="headlineAddCustomStylesheet">Dewis taflen arddull</key>
+        <key alias="headlineAddThumbnail">Dewis delwedd bawd</key>
+        <key alias="labelcreateNewElementType">Creu newydd</key>
+        <key alias="labelCustomStylesheet">Taflen arddull arferu</key>
+        <key alias="addCustomStylesheet">Ychwanegu taflen arddull</key>
+        <key alias="headlineEditorAppearance">Ymddangosiad y golygydd</key>
+        <key alias="headlineDataModels">Modelau data</key>
+        <key alias="headlineCatalogueAppearance">Ymddangosiad y catalog</key>
+        <key alias="labelBackgroundColor">Lliw cefndir</key>
+        <key alias="labelIconColor">Lliw eicon</key>
+        <key alias="labelContentElementType">Model Cynnwys</key>
+        <key alias="labelLabelTemplate">Label</key>
+        <key alias="labelCustomView">Golygfa arferu</key>
+        <key alias="labelCustomViewInfoTitle">Ddangos disgrifiad golygfa arferu</key>
+        <key alias="labelCustomViewDescription">Trosysgrifo sut mae'r bloc hwn yn ymddangos yn yr UI y swyddfa gefn. Dewis ffeil .html sy'n cynnwys eich cyflwyniad.</key>
+        <key alias="labelSettingsElementType">Model gosodiadau</key>
+        <key alias="labelEditorSize">Maint y golygydd troshaen</key>
+        <key alias="addCustomView">Ychwanegu golygfa arferu</key>
+        <key alias="addSettingsElementType">Ychwanegu gosodiadau</key>
+        <key alias="labelTemplatePlaceholder">Trosysgrifo templed label</key>
+        <key alias="confirmDeleteBlockMessage"><![CDATA[Ydych chi'n siŵr eich bod chi am ddileu'r cynnwys o <strong>%0%</strong>.]]></key>
+        <key alias="confirmDeleteBlockTypeMessage"><![CDATA[Ydych chi'n siŵr eich bod chi am ddileu'r cyfluniad bloc o <strong>%0%</strong>.]]></key>
+        <key alias="confirmDeleteBlockTypeNotice">Bydd cynnwys y bloc hwn yn dal i fod yn bresennol, ni fydd golygu'r cynnwys hwn ar gael mwyach a bydd yn cael ei ddangos fel cynnwys heb gefnogaeth.</key>
+        <key alias="blockConfigurationOverlayTitle"><![CDATA[Cyfluniad o '%0%']]></key>
+        <key alias="thumbnail">Delwedd bawd</key>
+        <key alias="addThumbnail">Ychwanegu delwedd bawd</key>
+        <key alias="tabCreateEmpty">Creu gwag</key>
+        <key alias="tabClipboard">Clipfwrdd</key>
+        <key alias="tabBlockSettings">Gosodiadau</key>
+        <key alias="headlineAdvanced">Datblygedig</key>
+        <key alias="forceHideContentEditor">Gorfodi cuddio'r golygydd cynnwys</key>
+        <key alias="blockHasChanges">Rydych chi wedi gwneud newidiadau i'r cynnwys hwn. Wyt ti'n siŵr eich bod chi am eu taflu ei fwrdd?</key>
+        <key alias="confirmCancelBlockCreationHeadline">Gwaredu cread?</key>
+        <key alias="confirmCancelBlockCreationMessage"><![CDATA[Ydych chi'n siŵr eich bod chi'n am ganslo'r cread?]]></key>
+        <key alias="propertyEditorNotSupported">Priodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim yn cael ei gefnogi mewn blociau.</key>
+    </area>
+    <area alias="contentTemplatesDashboard">
+        <key alias="whatHeadline">Beth yw Templedi Gynnwys</key>
+        <key alias="whatDescription">Mae Templedi Gynnwys yn gynnwys cyn-diffiniedig sydd yn gallu cael ei ddewis wrth greu nod cynnwys newydd.</key>
+        <key alias="createHeadline">Sut ydw i'n creu Templed Gynnwys?</key>
+        <key alias="createDescription">
+            <![CDATA[
+                <p>Mae yna ddwy ffordd i greu Templed Gynnwys:</p>
+                <ul>
+                    <li>Gliciwch-de ar nod cynnwys a dewis "Creu Templed Gynnwys" i greu Templed Gynnwys newydd.</li>
+                    <li>Gliciwch-de ar y goeden Templedi Gynnwys yn yr adran Gosodiadau a dewis y Math of Dogfen ti eisiau creu Templed Gynnwys am.</li>
+                </ul>
+                <p>Unwaith y rhoddir enw, gall golygyddion ddechrau defnyddio'r Templed Gynnwys fel sylfaen am ei thudalen newydd.</p>
+            ]]>
+        </key>
+        <key alias="manageHeadline">Sut ydw i'n rheoli Templedi Gynnwys</key>
+        <key alias="manageDescription">Gallwch chi olygu a dileu Templedi Gynnwys o'r goeden "Templedi Gynnwys" yn yr adran Gosodiadau. Ehangwch y Math o Ddogfen mae'r Templed Gynnwys yn seiliedig arno a chlicio fo i'w golygu neu ddileu.</key>
+    </area>
+</language>

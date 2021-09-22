@@ -22,20 +22,21 @@
     align-items: center;
     margin-bottom: 30px;
     transition: 100ms box-shadow ease, 100ms border ease;
-    
+
     &.drag-over {
         border-color: @ui-action-border-hover;
         border-style: solid;
         box-shadow: 0 3px 8px rgba(0,0,0, .1);
         transition: 100ms box-shadow ease, 100ms border ease;
     }
-}
 
-.umb-upload-local__dropzone i {
-    display: block;
-    color: @ui-action-type;
-    font-size: 110px;
-    line-height: 1;
+    .umb-icon {
+        display: block;
+        color: @ui-action-type;
+        font-size: 6.75rem;
+        line-height: 1;
+        margin: 0 auto;
+    }
 }
 
 .umb-upload-local__select-file {

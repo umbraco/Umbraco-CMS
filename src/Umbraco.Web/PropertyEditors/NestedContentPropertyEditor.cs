@@ -126,7 +126,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.RawPropertyValues.Remove(prop.Key);
-                            _logger.Warn<NestedContentPropertyValueEditor>(
+                            _logger.Warn<NestedContentPropertyValueEditor, string, Guid, string>(
                                 ex,
                                 "ConvertDbToString removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Id, propertyType.Alias);
@@ -156,6 +156,7 @@ namespace Umbraco.Web.PropertyEditors
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
+                var valEditors = new Dictionary<int, IDataValueEditor>();
 
                 var rows = _nestedContentValues.GetPropertyValues(val);
 
@@ -184,8 +185,15 @@ namespace Umbraco.Web.PropertyEditors
                                 continue;
                             }
 
-                            var tempConfig = dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
-                            var valEditor = propEditor.GetValueEditor(tempConfig);
+                            var dataTypeId = prop.Value.PropertyType.DataTypeId;
+                            if (!valEditors.TryGetValue(dataTypeId, out var valEditor))
+                            {
+                                var tempConfig = dataTypeService.GetDataType(dataTypeId).Configuration;
+                                valEditor = propEditor.GetValueEditor(tempConfig);
+
+                                valEditors.Add(dataTypeId, valEditor);
+                            }
+
                             var convValue = valEditor.ToEditor(tempProp, dataTypeService);
 
                             // update the raw value since this is what will get serialized out
@@ -195,7 +203,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.RawPropertyValues.Remove(prop.Key);
-                            _logger.Warn<NestedContentPropertyValueEditor>(
+                            _logger.Warn<NestedContentPropertyValueEditor, string, Guid, string>(
                                 ex,
                                 "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Id, property.PropertyType.Alias);
@@ -363,7 +371,10 @@ namespace Umbraco.Web.PropertyEditors
             {
                 if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
                     return new List<NestedContentRowValue>();
-
+                
+                 if (!propertyValue.ToString().DetectIsJson())
+                    return new List<NestedContentRowValue>();
+                    
                 var rowValues = JsonConvert.DeserializeObject<List<NestedContentRowValue>>(propertyValue.ToString());
 
                 // There was a note here about checking if the result had zero items and if so it would return null, so we'll continue to do that
@@ -388,23 +399,26 @@ namespace Umbraco.Web.PropertyEditors
                         propertyTypes = contentTypePropertyTypes[contentType.Alias] = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
 
                     // find any keys that are not real property types and remove them
-                    foreach(var prop in row.RawPropertyValues.ToList())
+                    if (row.RawPropertyValues != null)
                     {
-                        if (IsSystemPropertyKey(prop.Key)) continue;
-
-                        // doesn't exist so remove it
-                        if (!propertyTypes.TryGetValue(prop.Key, out var propType))
-                        {                            
-                            row.RawPropertyValues.Remove(prop.Key); 
-                        }   
-                        else
+                        foreach (var prop in row.RawPropertyValues.ToList())
                         {
-                            // set the value to include the resolved property type
-                            row.PropertyValues[prop.Key] = new NestedContentPropertyValue
+                            if (IsSystemPropertyKey(prop.Key)) continue;
+
+                            // doesn't exist so remove it
+                            if (!propertyTypes.TryGetValue(prop.Key, out var propType))
                             {
-                                PropertyType = propType,
-                                Value = prop.Value
-                            };
+                                row.RawPropertyValues.Remove(prop.Key);
+                            }
+                            else
+                            {
+                                // set the value to include the resolved property type
+                                row.PropertyValues[prop.Key] = new NestedContentPropertyValue
+                                {
+                                    PropertyType = propType,
+                                    Value = prop.Value
+                                };
+                            }
                         }
                     }
                 }

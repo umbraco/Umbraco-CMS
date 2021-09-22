@@ -20,7 +20,7 @@ TODO
 
 angular.module("umbraco.directives")
     .directive('umbFileDropzone',
-        function ($timeout, Upload, localizationService, umbRequestHelper, overlayService) {
+        function ($timeout, Upload, localizationService, umbRequestHelper, overlayService, mediaHelper, mediaTypeHelper) {
             return {
                 restrict: 'E',
                 replace: true,
@@ -64,44 +64,33 @@ angular.module("umbraco.directives")
 
                     function _filesQueued(files, event) {
                         //Push into the queue
-                        angular.forEach(files,
-                            function(file) {
+                        Utilities.forEach(files, file => {
+                            if (_filterFile(file) === true) {
 
-                                if (_filterFile(file) === true) {
-
-                                    if (file.$error) {
-                                        scope.rejected.push(file);
-                                    } else {
-                                        scope.queue.push(file);
-                                    }
+                                if (file.$error) {
+                                    scope.rejected.push(file);
+                                } else {
+                                    scope.queue.push(file);
                                 }
-                            });
+                            }
+                        });
 
                         //when queue is done, kick the uploader
                         if (!scope.working) {
                             // Upload not allowed
                             if (!scope.acceptedMediatypes || !scope.acceptedMediatypes.length) {
-                                files.map(function(file) {
+                                files.map(file => {
                                     file.uploadStatus = "error";
                                     file.serverErrorMessage = "File type is not allowed here";
                                     scope.rejected.push(file);
                                 });
                                 scope.queue = [];
                             }
-                            // One allowed type
-                            if (scope.acceptedMediatypes && scope.acceptedMediatypes.length === 1) {
-                                // Standard setup - set alias to auto select to let the server best decide which media type to use
-                                if (scope.acceptedMediatypes[0].alias === 'Image') {
-                                    scope.contentTypeAlias = "umbracoAutoSelect";
-                                } else {
-                                    scope.contentTypeAlias = scope.acceptedMediatypes[0].alias;
-                                }
+                            // If we have Accepted Media Types, we will ask to choose Media Type, if Choose Media Type returns false, it only had one choice and therefor no reason to
+                            if (scope.acceptedMediatypes && _requestChooseMediaTypeDialog() === false) {
+                                scope.contentTypeAlias = "umbracoAutoSelect";
 
                                 _processQueueItem();
-                            }
-                            // More than one, open dialog
-                            if (scope.acceptedMediatypes && scope.acceptedMediatypes.length > 1) {
-                                _chooseMediaType();
                             }
                         }
                     }
@@ -146,8 +135,8 @@ angular.module("umbraco.directives")
                                   // set percentage property on file
                                   file.uploadProgress = progressPercentage;
                                   // set uploading status on file
-                                  file.uploadStatus = "uploading"; 
-                                }                                
+                                  file.uploadStatus = "uploading";
+                                }
                             })
                             .success(function(data, status, headers, config) {
                                 if (data.notifications && data.notifications.length > 0) {
@@ -183,6 +172,8 @@ angular.module("umbraco.directives")
                                     }
                                 } else if (evt.Message) {
                                     file.serverErrorMessage = evt.Message;
+                                } else if (evt && typeof evt === 'string') {
+                                    file.serverErrorMessage = evt;
                                 }
                                 // If file not found, server will return a 404 and display this message
                                 if (status === 404) {
@@ -195,42 +186,80 @@ angular.module("umbraco.directives")
                             });
                     }
 
-                    function _chooseMediaType() {
+                    function _requestChooseMediaTypeDialog() {
 
-                        const dialog = {
-                            view: "itempicker",
-                            filter: scope.acceptedMediatypes.length > 15,
-                            availableItems: scope.acceptedMediatypes,
-                            submit: function (model) {
-                                scope.contentTypeAlias = model.selectedItem.alias;
-                                _processQueueItem();
+                        if (scope.queue.length === 0) {
+                            // if queue has no items so there is nothing to choose a type for
+                            return false;
+                        }
+                        
+                        if (scope.acceptedMediatypes.length === 1) {
+                            // if only one accepted type, then we wont ask to choose.
+                            return false;
+                        }
 
-                                overlayService.close();
-                            },
-                            close: function () {
+                        var uploadFileExtensions = scope.queue.map(file => mediaHelper.getFileExtension(file.name));
 
-                                scope.queue.map(function (file) {
-                                    file.uploadStatus = "error";
-                                    file.serverErrorMessage = "Cannot upload this file, no mediatype selected";
-                                    scope.rejected.push(file);
-                                });
-                                scope.queue = [];
+                        var filteredMediaTypes = mediaTypeHelper.getTypeAcceptingFileExtensions(scope.acceptedMediatypes, uploadFileExtensions);
 
-                                overlayService.close();
-                            }
-                        };
+                        var mediaTypesNotFile = filteredMediaTypes.filter(mediaType => mediaType.alias !== "File");
 
-                        localizationService.localize("defaultdialogs_selectMediaType").then(value => {
-                            dialog.title = value;
+                        if (mediaTypesNotFile.length <= 1) {
+                            // if only one  or less accepted types when we have filtered type 'file' out, then we wont ask to choose.
+                            return false;
+                        }
+
+
+                        localizationService.localizeMany(["defaultdialogs_selectMediaType", "mediaType_autoPickMediaType"]).then(function (translations) {
+
+                            filteredMediaTypes.push({
+                                alias: "umbracoAutoSelect",
+                                name: translations[1],
+                                icon: "icon-wand"
+                            });
+
+                            const dialog = {
+                                view: "itempicker",
+                                filter: filteredMediaTypes.length > 8,
+                                availableItems: filteredMediaTypes,
+                                submit: function (model) {
+                                    scope.contentTypeAlias = model.selectedItem.alias;
+                                    _processQueueItem();
+
+                                    overlayService.close();
+                                },
+                                close: function () {
+
+                                    scope.queue.map(function (file) {
+                                        file.uploadStatus = "error";
+                                        file.serverErrorMessage = "No files uploaded, no mediatype selected";
+                                        scope.rejected.push(file);
+                                    });
+                                    scope.queue = [];
+
+                                    overlayService.close();
+                                }
+                            };
+
+                            dialog.title = translations[0];
                             overlayService.open(dialog);
                         });
+
+                        return true;// yes, we did open the choose-media dialog, therefor we return true.
                     }
 
-                    scope.handleFiles = function(files, event) {
+                    scope.handleFiles = function(files, event, invalidFiles) {
+                        const allFiles = [...files, ...invalidFiles];
+
+                        // add unique key for each files to use in ng-repeats
+                        allFiles.forEach(file => {
+                            file.key = String.CreateGuid();
+                        });
+
                         if (scope.filesQueued) {
-                            scope.filesQueued(files, event);
+                            scope.filesQueued(allFiles, event);
                         }
-                        _filesQueued(files, event);
+                        _filesQueued(allFiles, event);
                     };
                 }
             };

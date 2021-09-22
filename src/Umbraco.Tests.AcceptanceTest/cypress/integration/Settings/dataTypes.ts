@@ -23,7 +23,7 @@ context('Data Types', () => {
     cy.umbracoEditorHeaderName(name);
 
 
-    cy.get('select[name="selectedEditor"]').select('Label');
+    cy.get('select[name="selectedEditor"]', {timeout: 5000}).select('Label');
 
     cy.get('.umb-property-editor select').select('Time');
 

@@ -19,19 +19,17 @@
                         <tr>
                             <th colspan="2">
                                 <button type="button" class="btn-reset" ng-click="vm.sort('name')">
-                                    <b><localize key="general_name">Name</localize></b>
-                                    <span ng-if="vm.sortOrder.column === 'name'" aria-hidden="true">
-                                        <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
-                                        <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
+                                    <strong><localize key="general_name">Name</localize></strong>
+                                    <span ng-if="vm.sortOrder.column === 'name'">
+                                        <umb-icon icon="{{vm.sortOrder.reverse ? 'icon-navigation-up' : 'icon-navigation-down'}}"></umb-icon>
                                     </span>
                                 </button>
                             </th>
                             <th>
                                 <button type="button" class="btn-reset" ng-click="vm.sort('createDate')">
-                                    <b><localize key="sort_sortCreationDate">Creation date</localize></b>
-                                    <span ng-if="vm.sortOrder.column === 'createDate'" aria-hidden="true">
-                                        <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
-                                        <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
+                                    <strong><localize key="sort_sortCreationDate">Creation date</localize></strong>
+                                    <span ng-if="vm.sortOrder.column === 'createDate'">
+                                        <umb-icon icon="{{vm.sortOrder.reverse ? 'icon-navigation-up' : 'icon-navigation-down'}}"></umb-icon>
                                     </span>
                                 </button>
                             </th>
@@ -39,9 +37,11 @@
                     </thead>
                     <tbody ui-sortable="vm.sortableOptions" ng-model="vm.children">
                         <tr ng-repeat="child in vm.children">
-                            <td class="tree-icon"><i class="{{ child.icon }}"></i></td>
-                            <td>{{ child.name }}</td>
-                            <td>{{ child.createDate }}</td>
+                            <td class="tree-icon">
+                                <umb-icon icon="{{child.icon}}"></umb-icon>
+                            </td>
+                            <td>{{child.name}}</td>
+                            <td>{{child.createDate}}</td>
                         </tr>
                     </tbody>
                 </table>

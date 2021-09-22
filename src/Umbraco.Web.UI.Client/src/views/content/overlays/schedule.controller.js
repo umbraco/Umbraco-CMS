@@ -1,7 +1,7 @@
 (function () {
     "use strict";
     
-    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService) {
+    function ScheduleContentController($scope, $timeout, localizationService, dateHelper, userService, contentEditingHelper) {
 
         var vm = this;
 
@@ -43,26 +43,7 @@
             // Check for variants: if a node is invariant it will still have the default language in variants
             // so we have to check for length > 1
             if (vm.variants.length > 1) {
-
-                vm.displayVariants.sort((a, b) => {
-                    if (a.language && b.language) {
-                        if (a.language.name < b.language.name) {
-                            return -1;
-                        }
-                        if (a.language.name > b.language.name) {
-                            return 1;
-                        }
-                    }
-                    if (a.segment && b.segment) {
-                        if (a.segment < b.segment) {
-                            return -1;
-                        }
-                        if (a.segment > b.segment) {
-                            return 1;
-                        }
-                    }
-                    return 0;
-                });
+                vm.displayVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.displayVariants);
 
                 vm.variants.forEach(v => {
                     if (v.active) {
@@ -140,11 +121,25 @@
          * @param {any} type publish or unpublish
          */
         function datePickerShow(variant, type) {
+            var activeDatePickerInstance;
             if (type === 'publish') {
                 variant.releaseDatePickerOpen = true;
+                activeDatePickerInstance = variant.releaseDatePickerInstance;
             } else if (type === 'unpublish') {
                 variant.expireDatePickerOpen = true;
+                activeDatePickerInstance = variant.expireDatePickerInstance;
             }
+
+            // Prevent enter key in time fields from submitting the overlay before the associated input gets the updated time
+            if (activeDatePickerInstance && !activeDatePickerInstance.hourElement.hasAttribute("overlay-submit-on-enter"))
+            {
+                activeDatePickerInstance.hourElement.setAttribute("overlay-submit-on-enter", "false");
+            }
+            if (activeDatePickerInstance && !activeDatePickerInstance.minuteElement.hasAttribute("overlay-submit-on-enter"))
+            {
+                activeDatePickerInstance.minuteElement.setAttribute("overlay-submit-on-enter", "false");
+            }
+
             checkForBackdropClick();
             $scope.model.disableSubmitButton = !canSchedule();
         }

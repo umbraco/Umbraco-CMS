@@ -49,7 +49,7 @@ function resetTourData() {
     {
         "alias": "umbIntroIntroduction",
         "completed": false,
-        "disabled": false
+        "disabled": true
     };
 
     cy.getCookie('UMB-XSRF-TOKEN', { log: false }).then((token) => {
@@ -71,7 +71,7 @@ function resetTourData() {
 function runBackOfficeIntroTour(percentageComplete, buttonText, timeout) {
     cy.get('[data-element="help-tours"]').should("be.visible");
     cy.get('[data-element="help-tours"]').click();
-    cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: timeout }).get('[percentage]').contains(percentageComplete + '%');
+    cy.get('[data-element="help-tours"] .umb-progress-circle', { timeout: timeout }).get('[percentage]').contains(percentageComplete + '%', { timeout: timeout });
     cy.get('[data-element="help-tours"]').click();
     cy.get('[data-element="tour-umbIntroIntroduction"] .umb-button').should("be.visible");
     cy.get('[data-element="tour-umbIntroIntroduction"] .umb-button').contains(buttonText);

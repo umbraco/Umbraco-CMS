@@ -10,7 +10,7 @@ using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    internal sealed class PropertyEditorsComponent : IComponent
+    public sealed class PropertyEditorsComponent : IComponent
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly List<Action> _terminate = new List<Action>();

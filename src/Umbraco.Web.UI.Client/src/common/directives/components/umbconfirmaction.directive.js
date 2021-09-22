@@ -14,10 +14,10 @@ The prompt can be opened in four direction up, down, left or right.</p>
     <div ng-controller="My.Controller as vm">
 
         <div class="my-action" style="position:relative;">
+            <umb-icon icon="icon-trash" ng-click="vm.showPrompt()"></umb-icon>
             <umb-confirm-action
-                show="vm.promptIsVisible"
+                ng-if="vm.promptIsVisible"
                 direction="left"
-                on-delete="vm.showPrompt()"
                 on-confirm="vm.confirmAction()"
                 on-cancel="vm.hidePrompt()">
             </umb-confirm-action>
@@ -71,23 +71,17 @@ The prompt can be opened in four direction up, down, left or right.</p>
 
     function link(scope, el, attr, ctrl) {
 
-        scope.clickButton = function (event) {
-            if(scope.onDelete) {
-                scope.onDelete({$event: event});
-            }
-        }
+      scope.clickConfirm = function() {
+          if(scope.onConfirm) {
+              scope.onConfirm();
+          }
+      };
 
-        scope.clickConfirm = function() {
-            if(scope.onConfirm) {
-                scope.onConfirm();
-            }
-        };
-
-        scope.clickCancel = function() {
-            if(scope.onCancel) {
-                scope.onCancel();
-            }
-        };
+      scope.clickCancel = function() {
+          if(scope.onCancel) {
+              scope.onCancel();
+          }
+      };
 
     }
 
@@ -97,8 +91,6 @@ The prompt can be opened in four direction up, down, left or right.</p>
       templateUrl: 'views/components/umb-confirm-action.html',
       scope: {
         direction: "@",
-        show: "<",
-        onDelete: "&?",
         onConfirm: "&",
         onCancel: "&"
       },

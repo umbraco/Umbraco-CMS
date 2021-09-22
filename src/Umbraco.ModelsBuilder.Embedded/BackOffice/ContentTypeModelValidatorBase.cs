@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Umbraco.Core;
@@ -24,6 +25,13 @@ namespace Umbraco.ModelsBuilder.Embedded.BackOffice
         {
             //don't do anything if we're not enabled
             if (!_config.Enable) yield break;
+
+            //list of reserved/disallowed aliases for content/media/member types - more can be added as the need arises
+            var reservedModelAliases = new[] { "system" };
+            if(reservedModelAliases.Contains(model.Alias, StringComparer.OrdinalIgnoreCase))
+            {
+                yield return new ValidationResult($"The model alias {model.Alias} is a reserved term and cannot be used", new[] { "Alias" });
+            }
 
             var properties = model.Groups.SelectMany(x => x.Properties)
                 .Where(x => x.Inherited == false)

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -101,7 +103,7 @@ namespace Umbraco.Web.Editors
 
             //get the file info
             var file = result.FileData[0];
-            var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
+            var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
@@ -302,7 +304,7 @@ namespace Umbraco.Web.Editors
             CheckUniqueEmail(userSave.Email, null);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService, AppCaches);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -396,7 +398,7 @@ namespace Umbraco.Web.Editors
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService, AppCaches);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -443,9 +445,9 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error<UsersController>(ex, "An error occured in a custom event handler while inviting the user");
+                Logger.Error<UsersController>(ex, "An error occurred in a custom event handler while inviting the user");
                 throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse($"An error occured inviting the user (check logs for more info): {ex.Message}"));
+                    Request.CreateNotificationValidationErrorResponse($"An error occurred inviting the user (check logs for more info): {ex.Message}"));
             }
 
             // If the event is handled then no need to send the email
@@ -468,7 +470,7 @@ namespace Umbraco.Web.Editors
                 await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);                
             }
 
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/resendInviteHeader"), Services.TextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", "resendInviteHeader"), Services.TextService.Localize("speechBubbles", "resendInviteSuccess", new[] { user.Name }));
             return display;
         }
 
@@ -527,10 +529,10 @@ namespace Umbraco.Web.Editors
             var applicationUri = RuntimeState.ApplicationUrl;
             var inviteUri = new Uri(applicationUri, action);
 
-            var emailSubject = Services.TextService.Localize("user/inviteEmailCopySubject",
+            var emailSubject = Services.TextService.Localize("user", "inviteEmailCopySubject",
                 //Ensure the culture of the found user is used for the email!
                 UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings));
-            var emailBody = Services.TextService.Localize("user/inviteEmailCopyFormat",
+            var emailBody = Services.TextService.Localize("user", "inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
                 UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
@@ -571,7 +573,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService, AppCaches);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -632,7 +634,15 @@ namespace Umbraco.Web.Editors
 
             var display = Mapper.Map<UserDisplay>(user);
 
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
+            // determine if the user has changed their own language;
+            var userHasChangedOwnLanguage =
+                user.Id == Security.CurrentUser.Id && Security.CurrentUser.Language != user.Language;
+
+            var textToLocaliseAlias = userHasChangedOwnLanguage ? "operationSavedHeaderReloadUser" : "operationSavedHeader";
+            var culture = userHasChangedOwnLanguage
+                ? CultureInfo.GetCultureInfo(user.Language)
+                : Thread.CurrentThread.CurrentUICulture;
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", textToLocaliseAlias, culture), Services.TextService.Localize("speechBubbles","editUserSaved", culture));
             return display;
         }
 
@@ -668,7 +678,7 @@ namespace Umbraco.Web.Editors
             if (passwordChangeResult.Success)
             {
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
-                result.AddSuccessNotification(Services.TextService.Localize("general/success"), Services.TextService.Localize("user/passwordChangedGeneric"));
+                result.AddSuccessNotification(Services.TextService.Localize("general", "success"), Services.TextService.Localize("user", "passwordChangedGeneric"));
                 return result;
             }
 
@@ -706,11 +716,11 @@ namespace Umbraco.Web.Editors
             if (users.Length > 1)
             {
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/disableUsersSuccess", new[] {userIds.Length.ToString()}));
+                    Services.TextService.Localize("speechBubbles", "disableUsersSuccess", new[] {userIds.Length.ToString()}));
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/disableUserSuccess", new[] { users[0].Name }));
+                Services.TextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
@@ -730,11 +740,11 @@ namespace Umbraco.Web.Editors
             if (users.Length > 1)
             {
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/enableUsersSuccess", new[] { userIds.Length.ToString() }));
+                    Services.TextService.Localize("speechBubbles", "enableUsersSuccess", new[] { userIds.Length.ToString() }));
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));
+                Services.TextService.Localize("speechBubbles", "enableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
@@ -757,7 +767,7 @@ namespace Umbraco.Web.Editors
                 }
                 var user = await UserManager.FindByIdAsync(userIds[0]);
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));
+                    Services.TextService.Localize("speechBubbles", "unlockUserSuccess", new[] { user.Name }));
             }
 
             foreach (var u in userIds)
@@ -771,7 +781,7 @@ namespace Umbraco.Web.Editors
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] { userIds.Length.ToString() }));
+                Services.TextService.Localize("speechBubbles", "unlockUsersSuccess", new[] { userIds.Length.ToString() }));
         }
 
         [AdminUsersAuthorize("userIds")]
@@ -789,7 +799,7 @@ namespace Umbraco.Web.Editors
             }
             Services.UserService.Save(users);
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/setUserGroupOnUsersSuccess"));
+                Services.TextService.Localize("speechBubbles", "setUserGroupOnUsersSuccess"));
         }
 
         /// <summary>
@@ -820,7 +830,7 @@ namespace Umbraco.Web.Editors
             Services.UserService.Delete(user, true);
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));
+                Services.TextService.Localize("speechBubbles", "deleteUserSuccess", new[] { userName }));
         }
 
         public class PagedUserResult : PagedResult<UserBasic>

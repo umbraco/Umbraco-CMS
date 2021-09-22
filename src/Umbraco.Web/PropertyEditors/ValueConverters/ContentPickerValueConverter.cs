@@ -36,9 +36,14 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             if (source == null) return null;
 
-            var attemptConvertInt = source.TryConvertTo<int>();
-            if (attemptConvertInt.Success)
-                return attemptConvertInt.Result;
+            //Don't attempt to convert to int for UDI
+            if(!(source is string) || source is string strSource && !string.IsNullOrWhiteSpace(strSource) && !strSource.StartsWith("umb"))
+            {
+                 var attemptConvertInt = source.TryConvertTo<int>();
+                    if (attemptConvertInt.Success)
+                        return attemptConvertInt.Result;
+            }
+
             var attemptConvertUdi = source.TryConvertTo<Udi>();
             if (attemptConvertUdi.Success)
                 return attemptConvertUdi.Result;

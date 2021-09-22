@@ -67,14 +67,14 @@ namespace Umbraco.Web.Media
                 {
                     using (var filestream = _mediaFileSystem.OpenFile(filepath))
                     {
-                        var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
+                        var extension = (Path.GetExtension(filepath) ?? "").TrimStart(Constants.CharArrays.Period);
                         var size = _contentSection.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
                         SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(typeof(UploadAutoFillProperties), ex, "Could not populate upload auto-fill properties for file '{File}'.", filepath);
+                    _logger.Error<string>(typeof(UploadAutoFillProperties), ex, "Could not populate upload auto-fill properties for file '{File}'.", filepath);
                     ResetProperties(content, autoFillConfig, culture, segment);
                 }
             }
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Media
             }
             else
             {
-                var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
+                var extension = (Path.GetExtension(filepath) ?? "").TrimStart(Constants.CharArrays.Period);
                 var size = _contentSection.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
                 SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
             }

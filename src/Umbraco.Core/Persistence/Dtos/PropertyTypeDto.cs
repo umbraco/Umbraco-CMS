@@ -10,8 +10,10 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class PropertyTypeDto
     {
+        private string _alias;
+
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 50)]
+        [PrimaryKeyColumn(IdentitySeed = 100)]
         public int Id { get; set; }
 
         [Column("dataTypeId")]
@@ -29,7 +31,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyTypeAlias")]
         [Column("Alias")]
-        public string Alias { get; set; }
+        public string Alias { get => _alias; set => _alias = value == null ? null : string.Intern(value); }
 
         [Column("Name")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -61,6 +63,10 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(2000)]
         public string Description { get; set; }
+
+        [Column("labelOnTop")]
+        [Constraint(Default = "0")]
+        public bool LabelOnTop { get; set; }
 
         [Column("variations")]
         [Constraint(Default = "1" /*ContentVariation.InvariantNeutral*/)]

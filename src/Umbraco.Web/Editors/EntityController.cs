@@ -29,8 +29,8 @@ using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-
 using Constants = Umbraco.Core.Constants;
+
 namespace Umbraco.Web.Editors
 {
     /// <summary>
@@ -174,7 +174,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetResultForId(id, type);
 
-            return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetResultForKey(id, type);
 
-            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace Umbraco.Web.Editors
                 getPath: nodeid =>
                 {
                     var ent = Services.EntityService.Get(nodeid);
-                    return ent.Path.Split(',').Reverse();
+                    return ent.Path.Split(Constants.CharArrays.Comma).Reverse();
                 },
                 publishedContentExists: i => Umbraco.Content(i) != null);
         }
@@ -456,7 +456,7 @@ namespace Umbraco.Web.Editors
             }
 
             //all udi types will need to be the same in this list so we'll determine by the first
-            //currently we only support GuidIdi for this method
+            //currently we only support GuidUdi for this method
 
             var guidUdi = ids[0] as GuidUdi;
             if (guidUdi != null)
@@ -670,9 +670,9 @@ namespace Umbraco.Web.Editors
             switch (type)
             {
                 case UmbracoEntityTypes.Document:
-                    return Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                    return Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
                 case UmbracoEntityTypes.Media:
-                    return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                    return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
                 default:
                     return  Array.Empty<int>();
             }
@@ -802,7 +802,7 @@ namespace Umbraco.Web.Editors
             {
                 // TODO: Need to check for Object types that support hierarchic here, some might not.
 
-                var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
+                var ids = Services.EntityService.Get(id).Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Distinct().ToArray();
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
                 if (ignoreUserStartNodes == false)
@@ -811,10 +811,10 @@ namespace Umbraco.Web.Editors
                     switch (entityType)
                     {
                         case UmbracoEntityTypes.Document:
-                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
                             break;
                         case UmbracoEntityTypes.Media:
-                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
                             break;
                     }
 
@@ -1114,7 +1114,7 @@ namespace Umbraco.Web.Editors
         {
             if (postFilter.IsNullOrWhiteSpace()) return entities;
 
-            var postFilterConditions = postFilter.Split('&');
+            var postFilterConditions = postFilter.Split(Constants.CharArrays.Ampersand);
 
             foreach (var postFilterCondition in postFilterConditions)
             {
@@ -1131,19 +1131,21 @@ namespace Umbraco.Web.Editors
             return entities;
         }
 
+        private static readonly string[] _postFilterSplitStrings = new[]
+        {
+            "=",
+            "==",
+            "!=",
+            "<>",
+            ">",
+            "<",
+            ">=",
+            "<="
+        };
+
         private static QueryCondition BuildQueryCondition<T>(string postFilter)
         {
-            var postFilterParts = postFilter.Split(new[]
-            {
-                "=",
-                "==",
-                "!=",
-                "<>",
-                ">",
-                "<",
-                ">=",
-                "<="
-            }, 2, StringSplitOptions.RemoveEmptyEntries);
+            var postFilterParts = postFilter.Split(_postFilterSplitStrings, 2, StringSplitOptions.RemoveEmptyEntries);
 
             if (postFilterParts.Length != 2)
             {

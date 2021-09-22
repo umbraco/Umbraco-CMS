@@ -4,12 +4,26 @@
 @using Umbraco.Core.IO
 @using Umbraco.Web
 @using Umbraco.Core.Configuration
+@using Umbraco.Core.Composing
+@using Umbraco.Core.Services
 
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficePreviewModel>
 @{
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
 
     Html.RequiresCss("assets/css/canvasdesigner.css", "Umbraco");
+
+    // See if we can get without using Current
+    var textService = Current.Services.TextService;
+
+    var EndLabel = textService.Localize("preview", "endLabel");
+    var EndTitle = textService.Localize("preview", "endTitle");
+    var OpenWebsiteLabel = textService.Localize("preview", "openWebsiteLabel");
+    var OpenWebsiteTitle = textService.Localize("preview", "openWebsiteTitle");
+    var returnToPreviewHeadline = textService.Localize("preview", "returnToPreviewHeadline");
+    var returnToPreviewDescription = textService.Localize("preview", "returnToPreviewDescription");
+    var returnToPreviewAcceptButton = textService.Localize("preview", "returnToPreviewAcceptButton");
+    var returnToPreviewDeclineButton = textService.Localize("preview", "returnToPreviewDeclineButton");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -22,6 +36,14 @@
     @Html.RenderCssHere(
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
 
+    <script type="text/javascript">
+        window.umbLocalizedVars = {
+            'returnToPreviewHeadline': '@returnToPreviewHeadline',
+            'returnToPreviewDescription':'@returnToPreviewDescription',
+            'returnToPreviewAcceptButton':'@returnToPreviewAcceptButton',
+            'returnToPreviewDeclineButton':'@returnToPreviewDeclineButton'
+        };
+    </script>
 </head>
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-controller="previewController" ng-class="{'tabbing-active': tabbingActive === true}" ng-click="windowClickHandler($event)">
     <div class="wait" ng-show="!frameLoaded"></div>
@@ -65,7 +87,10 @@
                     </div>
                 }
 
-                <button ng-click="exitPreview()" title="Exit Preview" class="menu-bar__button umb-outline"><i class="icon icon-power"></i><span>Exit</span>
+                <button ng-click="openInBrowser()" title="Open preview in the browser" class="menu-bar__button umb-outline"><i class="icon icon-out"></i><span>Open in browser</span>
+                </button>
+
+                <button ng-click="exitPreview()" title="@EndTitle" class="menu-bar__button umb-outline"><i class="icon icon-power"></i><span>@EndLabel</span>
                 </button>
 
             </div>

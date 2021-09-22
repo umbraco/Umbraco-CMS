@@ -34,10 +34,13 @@ namespace Umbraco.Core.Persistence.Factories
                     if (groupDto.ContentTypeNodeId == contentTypeId)
                         group.Id = groupDto.Id;
 
-                    group.Name = groupDto.Text;
-                    group.SortOrder = groupDto.SortOrder;
-                    group.PropertyTypes = new PropertyTypeCollection(isPublishing);
                     group.Key = groupDto.UniqueId;
+                    group.Type = (PropertyGroupType)groupDto.Type;
+                    group.Name = groupDto.Text;
+                    group.Alias = groupDto.Alias;
+                    group.SortOrder = groupDto.SortOrder;
+
+                    group.PropertyTypes = new PropertyTypeCollection(isPublishing);
 
                     //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
                     var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
@@ -103,10 +106,12 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new PropertyTypeGroupDto
             {
+                UniqueId = propertyGroup.Key,
+                Type = (short)propertyGroup.Type,
                 ContentTypeNodeId = contentTypeId,
-                SortOrder = propertyGroup.SortOrder,
                 Text = propertyGroup.Name,
-                UniqueId = propertyGroup.Key
+                Alias = propertyGroup.Alias,
+                SortOrder = propertyGroup.SortOrder
             };
 
             if (propertyGroup.HasIdentity)
@@ -117,7 +122,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        internal static PropertyTypeDto BuildPropertyTypeDto(int tabId, PropertyType propertyType, int contentTypeId)
+        internal static PropertyTypeDto BuildPropertyTypeDto(int groupId, PropertyType propertyType, int contentTypeId)
         {
             var propertyTypeDto = new PropertyTypeDto
             {
@@ -132,12 +137,13 @@ namespace Umbraco.Core.Persistence.Factories
                 ValidationRegExp = propertyType.ValidationRegExp,
                 ValidationRegExpMessage = propertyType.ValidationRegExpMessage,
                 UniqueId = propertyType.Key,
-                Variations = (byte)propertyType.Variations
+                Variations = (byte)propertyType.Variations,
+                LabelOnTop = propertyType.LabelOnTop
             };
 
-            if (tabId != default)
+            if (groupId != default)
             {
-                propertyTypeDto.PropertyTypeGroupId = tabId;
+                propertyTypeDto.PropertyTypeGroupId = groupId;
             }
             else
             {

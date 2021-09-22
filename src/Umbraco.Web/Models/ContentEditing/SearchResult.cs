@@ -16,6 +16,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public int FieldCount => Values?.Count ?? 0;
 
         [DataMember(Name = "values")]
-        public IReadOnlyDictionary<string, string> Values { get; set; }
+        public IReadOnlyDictionary<string, IReadOnlyList<string>> Values { get; set; }
     }
 }

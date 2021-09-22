@@ -54,13 +54,19 @@
 
                                     <div class="umb-package-numbers">
                                         <small class="umb-package-downloads">
-                                            <i class="icon-download-alt" aria-hidden="true"></i>
+                                            <umb-icon icon="icon-download-alt"></umb-icon>
                                             <strong>{{package.downloads}}</strong>
                                         </small>
                                         <small class="umb-package-likes">
-                                            <i class="icon-hearts" aria-hidden="true"></i>
+                                            <umb-icon icon="icon-hearts"></umb-icon>
                                             <strong>{{package.likes}}</strong>
                                         </small>
+                                    </div>
+                                    <div class="umb-package-cloud">
+                                        <div ng-if="package.certifiedToWorkOnUmbracoCloud">
+                                            <umb-icon icon="icon-cloud"></umb-icon>
+                                            <span><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</localize></span>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -93,18 +99,24 @@
 
                                     <div class="umb-package-numbers">
                                         <small class="umb-package-downloads">
-                                            <i class="icon-download-alt" aria-hidden="true"></i>
-                                            <strong>{{ package.downloads }}</strong>
+                                            <umb-icon icon="icon-download-alt"></umb-icon>
+                                            <strong>{{package.downloads}}</strong>
                                         </small>
                                         <small class="umb-package-likes">
-                                            <i class="icon-hearts" aria-hidden="true"></i>
-                                            <strong>{{ package.likes }}</strong>
+                                            <umb-icon icon="icon-hearts"></umb-icon>
+                                            <strong>{{package.likes}}</strong>
                                         </small>
+                                    </div>
+                                    <div class="umb-package-cloud">
+                                        <div ng-if="package.certifiedToWorkOnUmbracoCloud">
+                                            <umb-icon icon="icon-cloud"></umb-icon>
+                                            <span><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</localize></span>
+                                        </div>
                                     </div>
 
                                 </div>
                             </div>
-                            
+
                         </button>
                     </div> <!-- end package -->
 
@@ -269,6 +281,10 @@
                                     <div class="umb-package-details__information-item-content">{{vm.package.likes}}</div>
                                 </div>
 
+                                <div class="umb-package-details__information-item" ng-if="vm.package.certifiedToWorkOnUmbracoCloud">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco CLoud</localize></div>
+                                </div>
+
                             </div>
                         </umb-box-content>
                     </umb-box>
@@ -294,8 +310,8 @@
                             <div class="umb-package-details__section-title"><localize key="packager_packageExternalSources">External sources</localize></div>
                             <div>
                                 <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
-                                    <a class="umb-package-details__link" target="_blank" href="{{ externalSource.url }}">
-                                        <i class="icon-out" aria-hidden="true"></i>
+                                    <a class="umb-package-details__link" href="{{ externalSource.url }}" target="_blank" rel="noopener noreferrer">
+                                        <umb-icon icon="icon-out"></umb-icon>
                                         {{ externalSource.name }}
                                     </a>
                                 </div>
@@ -325,7 +341,7 @@
 
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.icon" class="icon-box" aria-hidden="true"></i>
+                            <umb-icon ng-if="!vm.localPackage.icon" icon="icon-box"></umb-icon>
                             <img ng-if="vm.localPackage.icon" ng-src="{{vm.localPackage.icon}}" alt="" />
                         </div>
 
@@ -335,7 +351,7 @@
 
                             <div class="umb-info-local-item">
                                 <strong>Author</strong>
-                                <a href="{{ vm.localPackage.authorLink }}" target="_blank">{{ vm.localPackage.author }}</a>
+                                <a href="{{ vm.localPackage.authorLink }}" target="_blank" rel="noopener noreferrer">{{ vm.localPackage.author }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
@@ -345,7 +361,7 @@
 
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageLicense">License</localize></strong>
-                                <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">{{ vm.localPackage.license }}</a>
+                                <a href="{{ vm.localPackage.licenseUrl }}" target="_blank" rel="noopener noreferrer">{{ vm.localPackage.license }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
@@ -357,7 +373,7 @@
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
 
                                 <umb-checkbox model="vm.localPackage.packageLicenseAccept" required="true">
-                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="#" ng-href="{{vm.localPackage.licenseUrl}}" target="_blank" rel="noopener"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
+                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="#" ng-href="{{vm.localPackage.licenseUrl}}" target="_blank" rel="noopener noreferrer"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
                                 </umb-checkbox>
 
                                 <umb-button ng-if="vm.installState.type !== 'error'"

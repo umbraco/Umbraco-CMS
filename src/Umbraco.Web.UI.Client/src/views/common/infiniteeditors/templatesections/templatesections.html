@@ -17,29 +17,33 @@
                 <umb-box-content>
 
                     <div class="umb-insert-code-box" ng-click="vm.select('renderBody')">
-                        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderBody'  }"><i class="icon icon-check"></i></div>
+                        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderBody'  }">
+                            <umb-icon icon="icon-check" class="icon"></umb-icon>
+                        </div>
             
-                        <div class="umb-insert-code-box__title"><localize key="template_renderBody" /></div>
+                        <div class="umb-insert-code-box__title"><localize key="template_renderBody"></localize></div>
             
                         <div class="umb-insert-code-box__description">
-                            <localize key="template_renderBodyDesc" />
+                            <localize key="template_renderBodyDesc"></localize>
                         </div>
                     </div>
             
                     <div class="umb-insert-code-box" ng-click="vm.select('renderSection')">
             
-                        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderSection' }"><i class="icon icon-check"></i></div>
-                        <div class="umb-insert-code-box__title"><localize key="template_renderSection" /></div>
+                        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'renderSection' }">
+                            <umb-icon icon="icon-check" class="icon"></umb-icon>
+                        </div>
+                        <div class="umb-insert-code-box__title"><localize key="template_renderSection"></localize></div>
                         <div class="umb-insert-code-box__description">
-                            <localize key="template_renderSectionDesc" />
+                            <localize key="template_renderSectionDesc"></localize>
                         </div>
             
                         <div ng-if="model.insertType === 'renderSection'" style="margin-top: 20px;">
                             <div style="margin-bottom: 20px;">
-                                <label class="bold"><localize key="template_sectionName" /> <span class="red">*</span></label>
+                                <label class="bold"><localize key="template_sectionName"></localize> <span class="red">*</span></label>
                                 <input type="text" name="renderSectionName" class="-full-width-input" ng-model="model.renderSectionName" required umb-auto-focus />
                                 <span ng-messages="templateSectionsForm.renderSectionName.$error" show-validation-on-submit>
-                                    <small class="red" ng-message="required"><localize key="required" /></small>
+                                    <small class="red" ng-message="required"><localize key="required"></localize></small>
                                 </span>
                             </div>
             
@@ -51,7 +55,7 @@
                                 </div>
 
                                 <div class="umb-insert-code-box__description">
-                                    <localize key="template_sectionMandatoryDesc" />
+                                    <localize key="template_sectionMandatoryDesc"></localize>
                                 </div>
                             </div>
                         </div>
@@ -60,18 +64,20 @@
             
                     <div class="umb-insert-code-box" ng-click="vm.select('addSection')">
             
-                        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'addSection'  }"><i class="icon icon-check"></i></div>
-                        <div class="umb-insert-code-box__title"><localize key="template_defineSection" /></div>
+                        <div class="umb-insert-code-box__check" ng-class="{'umb-insert-code-box__check--checked': model.insertType === 'addSection'  }">
+                            <umb-icon icon="icon-check" class="icon"></umb-icon>
+                        </div>
+                        <div class="umb-insert-code-box__title"><localize key="template_defineSection"></localize></div>
                         <div class="umb-insert-code-box__description">
-                            <localize key="template_defineSectionDesc" />
+                            <localize key="template_defineSectionDesc"></localize>
                         </div>
             
                         <div ng-if="model.insertType === 'addSection'" style="margin-top: 20px;">
                             <div>
-                                <label class="bold"><localize key="template_sectionName" /> <span class="red">*</span></label>
+                                <label class="bold"><localize key="template_sectionName"></localize> <span class="red">*</span></label>
                                 <input type="text" name="sectionName" class="-full-width-input" ng-model="model.sectionName" required umb-auto-focus />
                                 <span ng-messages="templateSectionsForm.sectionName.$error" show-validation-on-submit>
-                                    <small class="red" ng-message="required"><localize key="required" /></small>
+                                    <small class="red" ng-message="required"><localize key="required"></localize></small>
                                 </span>
                             </div>
                         </div>
