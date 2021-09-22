@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
     public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBeginNotification>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private WebRoutingSettings _webRoutingSettings;
         private readonly ISet<string> _applicationUrls = new HashSet<string>();
         private Uri _currentApplicationUrl;
         private object _initLocker = new object();
@@ -27,10 +27,11 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         /// </summary>
         public AspNetCoreRequestAccessor(
             IHttpContextAccessor httpContextAccessor,
-            IOptions<WebRoutingSettings> webRoutingSettings)
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
         {
             _httpContextAccessor = httpContextAccessor;
-            _webRoutingSettings = webRoutingSettings.Value;
+            _webRoutingSettings = webRoutingSettings.CurrentValue;
+            webRoutingSettings.OnChange(x => _webRoutingSettings = x);
 
         }
 
@@ -40,7 +41,8 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         private string GetFormValue(string name)
         {
             var request = _httpContextAccessor.GetRequiredHttpContext().Request;
-            if (!request.HasFormContentType) return null;
+            if (!request.HasFormContentType)
+                return null;
             return request.Form[name];
         }
 
