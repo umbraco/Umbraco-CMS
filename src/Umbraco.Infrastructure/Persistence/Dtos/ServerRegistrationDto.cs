@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Index(IndexTypes.NonClustered)]
         public bool IsActive { get; set; }
 
-        [Column("isMaster")]
+        [Column("isSchedulingPublisher")]
         public bool IsSchedulingPublisher { get; set; }
     }
 }
