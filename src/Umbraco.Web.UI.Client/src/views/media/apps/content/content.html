@@ -1,5 +1,5 @@
 <div class="form-horizontal" ng-controller="Umbraco.Editors.Media.Apps.ContentController as vm">
-    
+
     <umb-editor-tab-bar ng-if="vm.tabs.length > 0">
         <umb-tabs-nav tabs="vm.tabs" on-tab-change="vm.setActiveTab(tab)"></umb-tabs-nav>
     </umb-editor-tab-bar>
@@ -16,12 +16,13 @@
             </umb-property>
         </umb-box-content>
     </umb-box>
-    
-    <div 
+
+    <div
         class="umb-group-panel"
         data-element="group-{{group.alias}}"
         ng-repeat="group in content.tabs | filter: { hide : '!' + true } track by group.id"
-        ng-show="(group.parentAlias === vm.activeTabAlias && group.type === 'Group') || vm.tabs.length === 0">
+        ng-if="group.type === 'Group'"
+        ng-show="group.parentAlias === vm.activeTabAlias || vm.tabs.length === 0">
 
         <div class="umb-group-panel__header">
             <div>{{ group.label }}</div>
