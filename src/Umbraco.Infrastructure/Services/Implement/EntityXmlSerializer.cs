@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Xml.Linq;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -319,6 +317,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var xml = new XElement("Template");
             xml.Add(new XElement("Name", template.Name));
+            xml.Add(new XElement("Key", template.Key));
             xml.Add(new XElement("Alias", template.Alias));
             xml.Add(new XElement("Design", new XCData(template.Content)));
 

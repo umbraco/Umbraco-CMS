@@ -327,7 +327,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                 Assert.Multiple(() =>
                 {
                     Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
-                    Assert.AreEqual($"<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
+                    Assert.AreEqual($"<Templates><Template><Name>Text page</Name><Key>{template.Key}</Key><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
                     Assert.IsNull(xml.DocumentType);
                     Assert.IsNull(xml.Parent);
                     Assert.IsNull(xml.NextNode);
