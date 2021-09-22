@@ -205,14 +205,14 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                     "name": values[0],
                     "alias": "settings",
                     "icon": "icon-settings",
-                    "view": "views/datatypes/views/datatype.settings.html",
+                    "view": "views/dataTypes/views/datatype.settings.html",
                     "active": true
                 },
                 {
                     "name": values[1],
                     "alias": "info",
                     "icon": "icon-info",
-                    "view": "views/datatypes/views/datatype.info.html"
+                    "view": "views/dataTypes/views/datatype.info.html"
                 }
             ];
         });

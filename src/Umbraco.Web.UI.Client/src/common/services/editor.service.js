@@ -655,7 +655,7 @@ When building a custom infinite editor view you can use the same components as a
          * @returns {object} editor object.
          */
         function documentTypeEditor(editor) {
-            editor.view = "views/documenttypes/edit.html";
+            editor.view = "views/documentTypes/edit.html";
             open(editor);
         }
 
@@ -673,7 +673,7 @@ When building a custom infinite editor view you can use the same components as a
          * @returns {object} editor object.
          */
         function mediaTypeEditor(editor) {
-            editor.view = "views/mediatypes/edit.html";
+            editor.view = "views/mediaTypes/edit.html";
             open(editor);
         }
 
@@ -691,7 +691,7 @@ When building a custom infinite editor view you can use the same components as a
          * @returns {object} editor object.
          */
         function memberTypeEditor(editor) {
-            editor.view = "views/membertypes/edit.html";
+            editor.view = "views/memberTypes/edit.html";
             open(editor);
         }
 

@@ -146,7 +146,7 @@
         }
     };
 
-    angular.module('umbraco.directives').component('changePassword', component);
+    angular.module('umbraco.directives').component('changepassword', component);
 
 
 })();

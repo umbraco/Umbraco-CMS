@@ -85,19 +85,19 @@
                     "name": vm.labels.design,
                     "alias": "design",
                     "icon": "icon-document-dashed-line",
-                    "view": "views/mediatypes/views/design/design.html"
+                    "view": "views/mediaTypes/views/design/design.html"
                 },
                 {
                     "name": vm.labels.listview,
                     "alias": "listView",
                     "icon": "icon-list",
-                    "view": "views/mediatypes/views/listview/listview.html"
+                    "view": "views/mediaTypes/views/listview/listview.html"
                 },
                 {
                     "name": vm.labels.permissions,
                     "alias": "permissions",
                     "icon": "icon-keychain",
-                    "view": "views/mediatypes/views/permissions/permissions.html"
+                    "view": "views/mediaTypes/views/permissions/permissions.html"
                 }
             ];
 
@@ -166,7 +166,7 @@
             var initialViewSetFromRouteParams = false;
             var view = $routeParams.view;
             if (view) {
-                var viewPath = "views/mediatypes/views/" + view + "/" + view + ".html";
+                var viewPath = "views/mediaTypes/views/" + view + "/" + view + ".html";
                 for (var i = 0; i < vm.page.navigation.length; i++) {
                     if (vm.page.navigation[i].view === viewPath) {
                         vm.page.navigation[i].active = true;

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.ContentApps
                         Alias = "templates",
                         Name = "Templates",
                         Icon = "icon-layout",
-                        View = "views/documenttypes/views/templates/templates.html",
+                        View = "views/documentTypes/views/templates/templates.html",
                         Weight = Weight
                     });
                 default:

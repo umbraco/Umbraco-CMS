@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.ContentApps
                         Alias = "design",
                         Name = "Design",
                         Icon = "icon-document-dashed-line",
-                        View = "views/documenttypes/views/design/design.html",
+                        View = "views/documentTypes/views/design/design.html",
                         Weight = Weight
                     });
                 default:
