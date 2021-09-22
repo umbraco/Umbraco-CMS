@@ -17,7 +17,7 @@
 
         function onInit() {
 
-            /* make a copy of the init model so it is possible to roll 
+            /* make a copy of the init model so it is possible to roll
             back the changes on cancel */
             oldModel = Utilities.copy($scope.model);
 
@@ -29,7 +29,7 @@
             vm.availableGroups = $filter("orderBy")(
                 _.map(
                     _.groupBy($scope.model.availableCompositeContentTypes, function (compositeContentType) {
-                        
+
                         compositeContentType.selected = isSelected(compositeContentType.contentType.alias);
 
                         return compositeContentType.contentType.metaData.containerPath;
@@ -44,7 +44,7 @@
                 });
         }
 
-        
+
         function isSelected(alias) {
             if ($scope.model.contentType.compositeContentTypes.indexOf(alias) !== -1) {
                 return true;
@@ -53,13 +53,13 @@
         }
 
         function openContentType(contentType, section) {
-            var url = (section === "documentType" ? "/settings/documenttypes/edit/" : "/settings/mediaTypes/edit/") + contentType.id;
+            var url = (section === "documentType" ? "/settings/documentTypes/edit/" : "/settings/mediaTypes/edit/") + contentType.id;
             $location.path(url);
         }
 
         function selectCompositeContentType(compositeContentType) {
             vm.loadingAlias = compositeContentType.contentType.alias
-            
+
             var contentType = compositeContentType.contentType;
 
             $scope.model.selectCompositeContentType(contentType).then(function (response) {

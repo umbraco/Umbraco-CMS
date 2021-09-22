@@ -10,7 +10,7 @@
     "use strict";
 
     function MediaTypesEditController($scope, $routeParams, $q,
-        mediaTypeResource, editorState, contentEditingHelper, 
+        mediaTypeResource, editorState, contentEditingHelper,
         navigationService, iconHelper, contentTypeHelper, notificationsService,
         localizationService, overlayHelper, eventsService, angularHelper) {
 
@@ -248,7 +248,7 @@
         });
 
         if (create) {
-            
+
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
@@ -350,7 +350,7 @@
                     }
 
                     deferred.resolve(data);
-                    
+
                 }, function (err) {
                     //error
                     if (err) {
@@ -402,7 +402,7 @@
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
-            navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function(syncArgs) {
+            navigationService.syncTree({ tree: "mediaTypes", path: path.split(","), forceReload: initialLoad !== true }).then(function(syncArgs) {
                 vm.currentNode = syncArgs.node;
             });
         }
@@ -428,7 +428,7 @@
             }
         });
 
-        // changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty 
+        // changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty
         $scope.$watch("vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.isContainer + vm.contentType.compositeContentTypes.length", function (newVal, oldVal) {
             if (oldVal === undefined) {
                 // still initializing, ignore

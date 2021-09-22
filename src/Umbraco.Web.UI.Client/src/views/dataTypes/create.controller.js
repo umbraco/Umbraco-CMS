@@ -40,7 +40,7 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
 
     $scope.createDataType = function() {
         $location.search('create', null);
-        $location.path("/" + section + "/datatypes/edit/" + node.id).search("create", "true");
+        $location.path("/" + section + "/dataTypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     };
 
@@ -48,7 +48,7 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
         const showMenu = true;
         navigationService.hideDialog(showMenu);
     };
-    
+
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.DataType.CreateController", DataTypeCreateController);
