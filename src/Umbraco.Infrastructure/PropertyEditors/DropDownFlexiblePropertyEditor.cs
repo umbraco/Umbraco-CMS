@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     [DataEditor(
         Constants.PropertyEditors.Aliases.DropDownListFlexible,
         "Dropdown",
-        "dropdownFlexible",
+        "dropdownflexible",
         Group = Constants.PropertyEditors.Groups.Lists,
         Icon = "icon-indent")]
     public class DropDownFlexiblePropertyEditor : DataEditor
