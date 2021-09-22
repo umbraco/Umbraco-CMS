@@ -96,7 +96,7 @@
     <key alias="atViewingFor">Наблюдать за</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Создать новый шаблон содержимого из '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Создать новый шаблон содержимого из <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Пустой</key>
     <key alias="selectBlueprint">Выбрать шаблон содержимого</key>
     <key alias="createdBlueprintHeading">Шаблон содержимого создан</key>

@@ -315,7 +315,7 @@
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Blank</key>
     <key alias="selectBlueprint">Select a Content Template</key>
     <key alias="createdBlueprintHeading">Content Template created</key>
