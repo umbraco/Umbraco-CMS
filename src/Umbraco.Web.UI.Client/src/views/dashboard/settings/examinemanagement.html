@@ -313,19 +313,21 @@
                                                                     <td class="nowrap">{{result.id}}</td>
                                                                     <td>
                                                                         <a ng-show="result.editUrl" ng-click="vm.goToResult(result, $event)" ng-href="#{{result.editUrl}}">
-                                                                            {{result.values['nodeName']}}
+                                                                            {{ ::result.values['nodeName'] | umbCmsJoinArray:', ' }}
                                                                         </a>
-                                                                        <span ng-hide="result.editUrl">{{result.values['nodeName']}}</span>
+                                                                        <span ng-hide="result.editUrl">{{ ::result.values['nodeName'] | umbCmsJoinArray:', ' }}</span>
                                                                     </td>
                                                                     <td ng-repeat="field in vm.showSearchResultFields">
-                                                                        {{ result.values[field] }}
+                                                                        {{ ::result.values[field] | umbCmsJoinArray:', ' }}
                                                                     </td>
                                                                     <td class="tr nowrap">
-                                                                        <button type="button" class="table__action-overlay color-green" ng-click="vm.showSearchResultDialog(result.values)">({{result.fieldCount}} <localize key="examineManagement_fields">fields</localize>)</button>
+                                                                        <button type="button" 
+                                                                            class="table__action-overlay color-green" 
+                                                                            ng-click="vm.showSearchResultDialog(result.values)">({{ ::result.fieldCount }} <localize key="examineManagement_fields">fields</localize>)</button>
                                                                     </td>
                                                                     <td class="tr nowrap umb-avatar--white">
                                                                         <span title="{{ result.score }}">
-                                                                            {{ result.score | number:4 }}
+                                                                            {{ ::result.score | number:4 }}
                                                                         </span>
                                                                     </td>
                                                                 </tr>
