@@ -29,7 +29,8 @@
             data-app-anchor="{{group.id}}"
             data-element="group-{{group.alias}}"
             ng-repeat="group in content.tabs track by group.key"
-            ng-show="(group.parentAlias === activeTabAlias && group.type === 'Group') || tabs.length === 0">
+            ng-if="group.type === 'Group'"
+            ng-show="group.parentAlias === activeTabAlias || tabs.length === 0">
 
             <div class="umb-group-panel__header">
                 <div id="group-{{group.id}}">{{ group.label }}</div>

@@ -17,20 +17,21 @@
         </umb-box-content>
     </umb-box>
 
-    <div 
+    <div
     class="umb-group-panel"
     data-element="group-{{group.alias}}"
     ng-repeat="group in content.tabs"
-    ng-show="(group.parentAlias === vm.activeTabAlias && group.type === 'Group') || vm.tabs.length === 0">
+    ng-if="group.type === 'Group'"
+    ng-show="group.parentAlias === vm.activeTabAlias || vm.tabs.length === 0">
 
         <div class="umb-group-panel__header">
             <div>{{ group.label }}</div>
         </div>
 
         <div class="umb-group-panel__content" data-element="tab-content-{{group.type === 'Group' ? group.parentAlias : group.alias}}">
-            <umb-property 
-                data-element="property-{{group.alias}}" 
-                ng-repeat="property in group.properties | filter:vm.hideSystemProperties track by property.alias" 
+            <umb-property
+                data-element="property-{{group.alias}}"
+                ng-repeat="property in group.properties | filter:vm.hideSystemProperties track by property.alias"
                 property="property">
 
                 <umb-property-editor model="property"></umb-property-editor>
