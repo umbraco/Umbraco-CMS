@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.ContentApps
                         Alias = "listView",
                         Name = "List view",
                         Icon = "icon-list",
-                        View = "views/documenttypes/views/listview/listview.html",
+                        View = "views/documentTypes/views/listview/listview.html",
                         Weight = Weight
                     });
                 default:

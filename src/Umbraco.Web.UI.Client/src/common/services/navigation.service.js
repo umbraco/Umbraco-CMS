@@ -648,7 +648,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                     "/backoffice/" + treeAlias + "/" + action + ".html");
             }
             else {
-                return ("views/" + treeAlias + "/" + action + ".html").toLowerCase();
+                return "views/" + treeAlias + "/" + action + ".html";
             }
         },
 

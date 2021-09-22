@@ -28,7 +28,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";
-                navigationService.syncTree({ tree: "mediatypes", path: currPath + "," + folderId, forceReload: true, activate: true });
+                navigationService.syncTree({ tree: "mediaTypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
                 formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm });
 
@@ -43,7 +43,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
 
     $scope.createMediaType = function() {
         $location.search('create', null);
-        $location.path("/settings/mediatypes/edit/" + node.id).search("create", "true");
+        $location.path("/settings/mediaTypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     };
 

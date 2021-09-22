@@ -7,7 +7,7 @@
  * The controller for the content editor
  */
 function DataTypeEditController($scope, $routeParams, appState, navigationService, dataTypeResource, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper, eventsService, localizationService) {
-    
+
     var evts = [];
     var vm = this;
 
@@ -33,21 +33,21 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
 
     //setup the pre-values as props
     vm.preValues = [];
-    
-    
+
+
     //method used to configure the pre-values when we retrieve them from the server
     function createPreValueProps(preVals) {
         vm.preValues = dataTypeHelper.createPreValueProps(preVals);
     }
-    
-    
+
+
     function setHeaderNameState(content) {
         if(content.isSystem == 1) {
             vm.page.nameLocked = true;
         }
     }
-    
-    
+
+
     function loadDataType() {
 
         vm.page.loading = true;
@@ -73,7 +73,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.notifyAndClearAllSubscriptions();
 
-                navigationService.syncTree({ tree: "datatypes", path: data.path }).then(function (syncArgs) {
+                navigationService.syncTree({ tree: "dataTypes", path: data.path }).then(function (syncArgs) {
                     vm.page.menu.currentNode = syncArgs.node;
                 });
 
@@ -107,7 +107,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                     //share state
                     editorState.set(vm.content);
 
-                    navigationService.syncTree({ tree: "datatypes", path: data.path, forceReload: true }).then(function (syncArgs) {
+                    navigationService.syncTree({ tree: "dataTypes", path: data.path, forceReload: true }).then(function (syncArgs) {
                         vm.page.menu.currentNode = syncArgs.node;
                     });
 
@@ -132,13 +132,13 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
         }
 
     };
-    
+
     vm.save = saveDataType;
-    
+
     evts.push(eventsService.on("app.refreshEditor", function(name, error) {
         loadDataType();
     }));
-    
+
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {
         for (var e in evts) {
@@ -147,9 +147,9 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
     });
 
     function init() {
-        
+
         $scope.$watch("vm.content.selectedEditor", function (newVal, oldVal) {
-            
+
             //when the value changes, we need to dynamically load in the new editor
             if (newVal && (newVal != oldVal && (oldVal || $routeParams.create))) {
                 //we are editing so get the content item from the server
@@ -159,20 +159,20 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                         vm.preValuesLoaded = true;
                         vm.content.preValues = data;
                         createPreValueProps(vm.content.preValues);
-                        
+
                         setHeaderNameState(vm.content);
-                        
+
                         //share state
                         editorState.set(vm.content);
                     });
             }
         });
-        
+
         if ($routeParams.create) {
-            
+
             vm.page.loading = true;
             vm.showIdentifier = false;
-            
+
             //we are creating so get an empty data type item
             dataTypeResource.getScaffold($routeParams.id)
                 .then(function(data) {
@@ -192,27 +192,27 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
         else {
             loadDataType();
         }
-        
+
         var labelKeys = [
             "general_settings",
             "general_info"
         ];
-        
+
         localizationService.localizeMany(labelKeys).then(function (values) {
-            
+
             vm.page.navigation = [
                 {
                     "name": values[0],
                     "alias": "settings",
                     "icon": "icon-settings",
-                    "view": "views/datatypes/views/datatype.settings.html",
+                    "view": "views/dataTypes/views/datatype.settings.html",
                     "active": true
                 },
                 {
                     "name": values[1],
                     "alias": "info",
                     "icon": "icon-info",
-                    "view": "views/datatypes/views/datatype.info.html"
+                    "view": "views/dataTypes/views/datatype.info.html"
                 }
             ];
         });
