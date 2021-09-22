@@ -546,13 +546,33 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     var alias = documentType.Element("Info").Element("Alias").Value;
                     var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
+
+                    var folderKeysAttribute = documentType.Attribute("FolderKeys");
+
+                    var folderKeys = Array.Empty<Guid>();
+                    if (folderKeysAttribute != null)
+                    {
+                        folderKeys = folderKeysAttribute.Value.Split(Constants.CharArrays.ForwardSlash).Select(x=>Guid.Parse(x)).ToArray();
+                    }
+
                     var rootFolder = WebUtility.UrlDecode(folders[0]);
-                    //level 1 = root level folders, there can only be one with the same name
-                    var current = _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
+
+                    EntityContainer current;
+                    Guid? rootFolderKey = null;
+                    if (folderKeys.Length == folders.Length && folderKeys.Length > 0)
+                    {
+                        rootFolderKey = folderKeys[0];
+                        current = _contentTypeService.GetContainer(rootFolderKey.Value);
+                    }
+                    else
+                    {
+                        //level 1 = root level folders, there can only be one with the same name
+                        current = _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
+                    }
 
                     if (current == null)
                     {
-                        var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolder);
+                        var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolderKey ?? Guid.NewGuid(), rootFolder);
                         if (tryCreateFolder == false)
                         {
                             _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
@@ -567,7 +587,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     for (var i = 1; i < folders.Length; i++)
                     {
                         var folderName = WebUtility.UrlDecode(folders[i]);
-                        current = CreateContentTypeChildFolder(folderName, current);
+                        Guid? folderKey = (folderKeys.Length == folders.Length) ? folderKeys[i] : null;
+                        current = CreateContentTypeChildFolder(folderName, folderKey ?? Guid.NewGuid(), current);
                         importedFolders[alias] = current.Id;
                     }
                 }
@@ -576,17 +597,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return importedFolders;
         }
 
-        private EntityContainer CreateContentTypeChildFolder(string folderName, IUmbracoEntity current)
+        private EntityContainer CreateContentTypeChildFolder(string folderName, Guid folderKey, IUmbracoEntity current)
         {
             var children = _entityService.GetChildren(current.Id).ToArray();
-            var found = children.Any(x => x.Name.InvariantEquals(folderName));
+            var found = children.Any(x => x.Name.InvariantEquals(folderName) ||x.Key.Equals(folderKey));
             if (found)
             {
                 var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
                 return _contentTypeService.GetContainer(containerId);
             }
 
-            var tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderName);
+            var tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderKey, folderName);
             if (tryCreateFolder == false)
             {
                 _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
@@ -1057,17 +1078,26 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             foreach (var datatypeElement in datatypeElements)
             {
                 var foldersAttribute = datatypeElement.Attribute("Folders");
+
                 if (foldersAttribute != null)
                 {
                     var name = datatypeElement.Attribute("Name").Value;
                     var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
+                    var folderKeysAttribute = datatypeElement.Attribute("FolderKeys");
+
+                    var folderKeys = Array.Empty<Guid>();
+                    if (folderKeysAttribute != null)
+                    {
+                        folderKeys = folderKeysAttribute.Value.Split(Constants.CharArrays.ForwardSlash).Select(x=>Guid.Parse(x)).ToArray();
+                    }
                     var rootFolder = WebUtility.UrlDecode(folders[0]);
+                    var rootFolderKey = folderKeys.Length > 0 ? folderKeys[0] : Guid.NewGuid();
                     //there will only be a single result by name for level 1 (root) containers
                     var current = _dataTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
 
                     if (current == null)
                     {
-                        var tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolder);
+                        var tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolderKey, rootFolder);
                         if (tryCreateFolder == false)
                         {
                             _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
@@ -1081,7 +1111,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     for (var i = 1; i < folders.Length; i++)
                     {
                         var folderName = WebUtility.UrlDecode(folders[i]);
-                        current = CreateDataTypeChildFolder(folderName, current);
+                        Guid? folderKey = (folderKeys.Length == folders.Length) ? folderKeys[i] : null;
+                        current = CreateDataTypeChildFolder(folderName, folderKey ?? Guid.NewGuid(), current);
                         importedFolders[name] = current.Id;
                     }
                 }
@@ -1090,17 +1121,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return importedFolders;
         }
 
-        private EntityContainer CreateDataTypeChildFolder(string folderName, IUmbracoEntity current)
+        private EntityContainer CreateDataTypeChildFolder(string folderName, Guid folderKey, IUmbracoEntity current)
         {
             var children = _entityService.GetChildren(current.Id).ToArray();
-            var found = children.Any(x => x.Name.InvariantEquals(folderName));
+            var found = children.Any(x => x.Name.InvariantEquals(folderName) ||x.Key.Equals(folderKey));
             if (found)
             {
                 var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
                 return _dataTypeService.GetContainer(containerId);
             }
 
-            var tryCreateFolder = _dataTypeService.CreateContainer(current.Id, folderName);
+            var tryCreateFolder = _dataTypeService.CreateContainer(current.Id, folderKey,folderName);
             if (tryCreateFolder == false)
             {
                 _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);

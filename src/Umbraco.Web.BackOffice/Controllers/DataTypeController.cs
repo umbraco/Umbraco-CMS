@@ -260,7 +260,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IActionResult PostCreateContainer(int parentId, string name)
         {
             var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-            var result = _dataTypeService.CreateContainer(parentId, name, currentUser.Id);
+            var result = _dataTypeService.CreateContainer(parentId, Guid.NewGuid(), name, currentUser.Id);
 
             if (result.Success)
                 return Ok(result.Result); //return the id

@@ -261,7 +261,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
         public IActionResult PostCreateContainer(int parentId, string name)
         {
-            var result = _mediaTypeService.CreateContainer(parentId, name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
+            var result = _mediaTypeService.CreateContainer(parentId, Guid.NewGuid(), name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
 
             if (result.Success)
                 return Ok(result.Result); //return the id
