@@ -558,7 +558,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     var rootFolder = WebUtility.UrlDecode(folders[0]);
 
                     EntityContainer current;
-                    if(folderKeys.Length == folders.Length)
+                    if(folderKeys.Length == folders.Length && folderKeys.Length > 0)
                     {
                         var rootFolderKey = folderKeys[0];
                         current = _contentTypeService.GetContainer(rootFolderKey);
