@@ -1562,7 +1562,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var template = existingTemplate ?? new Template(_shortStringHelper, templateName, alias);
 
                 // For new templates, use the serialized key if avaialble.
-                if (existingTemplate == null && Guid.TryParse(templateElement.Element("Key")?.Value, out var key)
+                if (existingTemplate == null && Guid.TryParse(templateElement.Element("Key")?.Value, out var key))
                 {
                     template.Key = key;
                 }
