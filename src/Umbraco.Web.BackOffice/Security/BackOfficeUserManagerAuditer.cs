@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
@@ -55,7 +56,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         private void WriteAudit(string performingId, string affectedId, string ipAddress, string eventType, string eventDetails, string affectedDetails = null)
         {
             IUser performingUser = null;
-            if (int.TryParse(performingId, out int asInt))
+            if (int.TryParse(performingId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int asInt))
             {
                 performingUser = _userService.GetUserById(asInt);
             }
@@ -64,12 +65,12 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 ? $"User UNKNOWN:{performingId}"
                 : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
 
-            if (!int.TryParse(performingId, out int performingIdAsInt))
+            if (!int.TryParse(performingId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int performingIdAsInt))
             {
                 performingIdAsInt = 0;
             }
 
-            if (!int.TryParse(affectedId, out int affectedIdAsInt))
+            if (!int.TryParse(affectedId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int affectedIdAsInt))
             {
                 affectedIdAsInt = 0;
             }

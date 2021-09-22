@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
@@ -57,7 +58,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             //Get all ids in the path for the content item and ensure they all
             // parse to ints that are not -1.
             var ids = contentPath.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => int.TryParse(x, out int val) ? val : -1)
+                .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out int val) ? val : -1)
                 .Where(x => x != -1)
                 .ToList();
 

@@ -16,7 +16,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.9" />
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.10" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
@@ -29,7 +29,7 @@
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
         <PackageReference Include="System.Runtime.Caching" Version="5.0.0" />
-        <PackageReference Include="Umbraco.Code" Version="1.1.1">
+        <PackageReference Include="Umbraco.Code" Version="1.2.0">
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
     </ItemGroup>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -294,7 +295,7 @@ namespace Umbraco.Cms.Core.Packaging
             var dataTypes = new XElement("DataTypes");
             foreach (var dtId in definition.DataTypes)
             {
-                if (!int.TryParse(dtId, out var outInt))
+                if (!int.TryParse(dtId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var dataType = _dataTypeService.GetDataType(outInt);
                 if (dataType == null)
@@ -309,7 +310,7 @@ namespace Umbraco.Cms.Core.Packaging
             var languages = new XElement("Languages");
             foreach (var langId in definition.Languages)
             {
-                if (!int.TryParse(langId, out var outInt))
+                if (!int.TryParse(langId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var lang = _languageService.GetLanguageById(outInt);
                 if (lang == null)
@@ -326,7 +327,7 @@ namespace Umbraco.Cms.Core.Packaging
 
             foreach (var dictionaryId in definition.DictionaryItems)
             {
-                if (!int.TryParse(dictionaryId, out var outInt))
+                if (!int.TryParse(dictionaryId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                 {
                     continue;
                 }
@@ -397,7 +398,7 @@ namespace Umbraco.Cms.Core.Packaging
             var macros = new XElement("Macros");
             foreach (var macroId in definition.Macros)
             {
-                if (!int.TryParse(macroId, out int outInt))
+                if (!int.TryParse(macroId, NumberStyles.Integer, CultureInfo.InvariantCulture, out int outInt))
                 {
                     continue;
                 }
@@ -414,9 +415,10 @@ namespace Umbraco.Cms.Core.Packaging
 
             root.Add(macros);
 
-            // get the partial views for macros and package those
-            IEnumerable<string> views = packagedMacros.Select(x => x.MacroSource).Where(x => x.EndsWith(".cshtml"));
-            PackageMacroPartialViews(views, root);
+            // Get the partial views for macros and package those (exclude views outside of the default directory, e.g. App_Plugins\*\Views)
+            IEnumerable<string> views = packagedMacros.Where(x => x.MacroSource.StartsWith(Constants.SystemDirectories.MacroPartials))
+                .Select(x => x.MacroSource.Substring(Constants.SystemDirectories.MacroPartials.Length).Replace('/', '\\'));
+            PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem);
         }
 
         private void PackageStylesheets(PackageDefinition definition, XContainer root)
@@ -477,7 +479,7 @@ namespace Umbraco.Cms.Core.Packaging
             var templatesXml = new XElement("Templates");
             foreach (var templateId in definition.Templates)
             {
-                if (!int.TryParse(templateId, out var outInt))
+                if (!int.TryParse(templateId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var template = _fileService.GetTemplate(outInt);
                 if (template == null)
@@ -487,40 +489,13 @@ namespace Umbraco.Cms.Core.Packaging
             root.Add(templatesXml);
         }
 
-        private void PackageMacroPartialViews(IEnumerable<string> viewPaths, XContainer root)
-        {
-            var viewsXml = new XElement("MacroPartialViews");
-            foreach (var viewPath in viewPaths)
-            {
-                // TODO: See TODO note in MacrosController about the inconsistencies of usages of partial views
-                // and how paths are saved. We have no choice currently but to assume that all views are 100% always
-                // on the content path.
-
-                var physicalPath = _hostingEnvironment.MapPathContentRoot(viewPath);
-                if (!File.Exists(physicalPath))
-                {
-                    throw new InvalidOperationException("Could not find partial view at path " + viewPath);
-                }
-
-                var fileContents = File.ReadAllText(physicalPath, Encoding.UTF8);
-
-                viewsXml.Add(
-                    new XElement(
-                        "View",
-                        new XAttribute("path", viewPath),
-                        new XCData(fileContents)));
-            }
-
-            root.Add(viewsXml);
-        }
-
         private void PackageDocumentTypes(PackageDefinition definition, XContainer root)
         {
             var contentTypes = new HashSet<IContentType>();
             var docTypesXml = new XElement("DocumentTypes");
             foreach (var dtId in definition.DocumentTypes)
             {
-                if (!int.TryParse(dtId, out var outInt))
+                if (!int.TryParse(dtId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var contentType = _contentTypeService.Get(outInt);
                 if (contentType == null)
@@ -539,7 +514,7 @@ namespace Umbraco.Cms.Core.Packaging
             var mediaTypesXml = new XElement("MediaTypes");
             foreach (var mediaTypeId in definition.MediaTypes)
             {
-                if (!int.TryParse(mediaTypeId, out var outInt))
+                if (!int.TryParse(mediaTypeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
                     continue;
                 var mediaType = _mediaTypeService.Get(outInt);
                 if (mediaType == null)
@@ -555,7 +530,7 @@ namespace Umbraco.Cms.Core.Packaging
         private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
         {
             //Documents and tags
-            if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId, out var contentNodeId))
+            if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
             {
                 if (contentNodeId > 0)
                 {

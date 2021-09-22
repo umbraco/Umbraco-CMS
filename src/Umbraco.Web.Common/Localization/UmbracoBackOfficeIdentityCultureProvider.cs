@@ -36,13 +36,20 @@ namespace Umbraco.Cms.Web.Common.Localization
             lock (_locker)
             {
                 // We need to dynamically change the supported cultures since we won't ever know what languages are used since
-                // they are dynamic within Umbraco.
+                // they are dynamic within Umbraco. We have to handle this for both UI and Region cultures, in case people run different region and UI languages
                 var cultureExists = _localizationOptions.SupportedCultures.Contains(culture);
 
                 if (!cultureExists)
                 {
                     // add this as a supporting culture
                     _localizationOptions.SupportedCultures.Add(culture);
+                }
+
+                var uiCultureExists = _localizationOptions.SupportedCultures.Contains(culture);
+
+                if (!uiCultureExists)
+                {
+                    // add this as a supporting culture
                     _localizationOptions.SupportedUICultures.Add(culture);
                 }
 

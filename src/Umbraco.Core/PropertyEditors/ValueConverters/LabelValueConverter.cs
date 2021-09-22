@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 case ValueTypes.Integer:
                     if (source is int sourceInt) return sourceInt;
                     if (source is string sourceIntString)
-                        return int.TryParse(sourceIntString, out var i) ? i : 0;
+                        return int.TryParse(sourceIntString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? i : 0;
                     return 0;
                 case ValueTypes.Bigint:
                     if (source is string sourceLongString)

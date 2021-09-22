@@ -28,6 +28,7 @@ using RouteDirection = Umbraco.Cms.Core.Routing.RouteDirection;
 
 namespace Umbraco.Cms.Web.Website.Routing
 {
+
     /// <summary>
     /// The route value transformer for Umbraco front-end routes
     /// </summary>
@@ -51,6 +52,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         private readonly IDataProtectionProvider _dataProtectionProvider;
         private readonly IControllerActionSearcher _controllerActionSearcher;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IPublicAccessRequestHandler _publicAccessRequestHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -66,7 +68,8 @@ namespace Umbraco.Cms.Web.Website.Routing
             IRoutableDocumentFilter routableDocumentFilter,
             IDataProtectionProvider dataProtectionProvider,
             IControllerActionSearcher controllerActionSearcher,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IPublicAccessRequestHandler publicAccessRequestHandler)
         {
             if (globalSettings is null)
             {
@@ -84,6 +87,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             _dataProtectionProvider = dataProtectionProvider;
             _controllerActionSearcher = controllerActionSearcher;
             _eventAggregator = eventAggregator;
+            _publicAccessRequestHandler = publicAccessRequestHandler;
         }
 
         /// <inheritdoc/>
@@ -92,31 +96,54 @@ namespace Umbraco.Cms.Web.Website.Routing
             // If we aren't running, then we have nothing to route
             if (_runtime.Level != RuntimeLevel.Run)
             {
-                return values;
+                return null;
             }
             // will be null for any client side requests like JS, etc...
-            if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext))
+            if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext umbracoContext))
             {
-                return values;
+                return null;
             }
 
             if (!_routableDocumentFilter.IsDocumentRequest(httpContext.Request.Path))
             {
-                return values;
+                return null;
+            }
+
+            // Don't execute if there are already UmbracoRouteValues assigned.
+            // This can occur if someone else is dynamically routing and in which case we don't want to overwrite
+            // the routing work being done there.
+            UmbracoRouteValues umbracoRouteValues = httpContext.Features.Get<UmbracoRouteValues>();
+            if (umbracoRouteValues != null)
+            {
+                return null;
             }
 
             // Check if there is no existing content and return the no content controller
             if (!umbracoContext.Content.HasContent())
             {
-                values[ControllerToken] = ControllerExtensions.GetControllerName<RenderNoContentController>();
-                values[ActionToken] = nameof(RenderNoContentController.Index);
-
-                return values;
+                return new RouteValueDictionary
+                {
+                    [ControllerToken] = ControllerExtensions.GetControllerName<RenderNoContentController>(),
+                    [ActionToken] = nameof(RenderNoContentController.Index)
+                };
             }
 
-            IPublishedRequest publishedRequest = await RouteRequestAsync(httpContext, umbracoContext);
+            IPublishedRequest publishedRequest = await RouteRequestAsync(umbracoContext);
 
-            UmbracoRouteValues umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
+            umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
+
+            if (!umbracoRouteValues?.PublishedRequest?.HasPublishedContent() ?? false)
+            {
+                // No content was found, not by any registered 404 handlers and
+                // not by the IContentLastChanceFinder. In this case we want to return
+                // our default 404 page but we cannot return route values now because
+                // it's possible that a developer is handling dynamic routes too.
+                // Our 404 page will be handled with the NotFoundSelectorPolicy
+                return null;
+            }
+
+            // now we need to do some public access checks
+            umbracoRouteValues = await _publicAccessRequestHandler.RewriteForPublishedContentAccessAsync(httpContext, umbracoRouteValues);
 
             // Store the route values as a httpcontext feature
             httpContext.Features.Set(umbracoRouteValues);
@@ -125,19 +152,25 @@ namespace Umbraco.Cms.Web.Website.Routing
             PostedDataProxyInfo postedInfo = GetFormInfo(httpContext, values);
             if (postedInfo != null)
             {
-                return HandlePostedValues(postedInfo, httpContext, values);
+                return HandlePostedValues(postedInfo, httpContext);
             }
 
-            values[ControllerToken] = umbracoRouteValues.ControllerName;
+            // See https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.routing.dynamicroutevaluetransformer.transformasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Mvc_Routing_DynamicRouteValueTransformer_TransformAsync_Microsoft_AspNetCore_Http_HttpContext_Microsoft_AspNetCore_Routing_RouteValueDictionary_
+            // We should apparenlty not be modified these values.
+            // So we create new ones.
+            var newValues = new RouteValueDictionary
+            {
+                [ControllerToken] = umbracoRouteValues.ControllerName
+            };
             if (string.IsNullOrWhiteSpace(umbracoRouteValues.ActionName) == false)
             {
-                values[ActionToken] = umbracoRouteValues.ActionName;
+                newValues[ActionToken] = umbracoRouteValues.ActionName;
             }
 
-            return values;
+            return newValues;
         }
 
-        private async Task<IPublishedRequest> RouteRequestAsync(HttpContext httpContext, IUmbracoContext umbracoContext)
+        private async Task<IPublishedRequest> RouteRequestAsync(IUmbracoContext umbracoContext)
         {
             // ok, process
 
@@ -196,11 +229,14 @@ namespace Umbraco.Cms.Web.Website.Routing
             };
         }
 
-        private RouteValueDictionary HandlePostedValues(PostedDataProxyInfo postedInfo, HttpContext httpContext, RouteValueDictionary values)
+        private RouteValueDictionary HandlePostedValues(PostedDataProxyInfo postedInfo, HttpContext httpContext)
         {
             // set the standard route values/tokens
-            values[ControllerToken] = postedInfo.ControllerName;
-            values[ActionToken] = postedInfo.ActionName;
+            var values = new RouteValueDictionary
+            {
+                [ControllerToken] = postedInfo.ControllerName,
+                [ActionToken] = postedInfo.ActionName
+            };
 
             ControllerActionDescriptor surfaceControllerDescriptor = _controllerActionSearcher.Find<SurfaceController>(httpContext, postedInfo.ControllerName, postedInfo.ActionName);
 

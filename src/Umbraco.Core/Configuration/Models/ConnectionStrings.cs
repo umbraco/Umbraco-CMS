@@ -26,6 +26,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the Umbraco database connection string..
         /// </summary>
-        public ConfigConnectionString UmbracoConnectionString { get; set; }
+        public ConfigConnectionString UmbracoConnectionString { get; set; } = new ConfigConnectionString(Constants.System.UmbracoConnectionName, null);
     }
 }

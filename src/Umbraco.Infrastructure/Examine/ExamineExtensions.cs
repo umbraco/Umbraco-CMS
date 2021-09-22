@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Examine;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -32,7 +33,7 @@ namespace Umbraco.Extensions
 
             foreach (var result in results)
             {
-                if (int.TryParse(result.Id, out var contentId) &&
+                if (int.TryParse(result.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentId) &&
                     cache.GetById(contentId) is IPublishedContent content)
                 {
                     publishedSearchResults.Add(new PublishedSearchResult(content, result.Score));
@@ -62,7 +63,7 @@ namespace Umbraco.Extensions
 
             foreach (var result in results)
             {
-                if (int.TryParse(result.Id, out var contentId) &&
+                if (int.TryParse(result.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentId) &&
                     result.Values.TryGetValue(ExamineFieldNames.CategoryFieldName, out var indexType))
                 {
                     IPublishedContent content;

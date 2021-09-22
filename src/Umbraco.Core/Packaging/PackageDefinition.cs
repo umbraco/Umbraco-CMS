@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Packaging
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The full path to the package's xml file
+        /// The full path to the package's XML file.
         /// </summary>
         [ReadOnly(true)]
         [DataMember(Name = "packagePath")]
@@ -71,12 +71,9 @@ namespace Umbraco.Cms.Core.Packaging
         public IList<string> DataTypes { get; set; } = new List<string>();
 
         [DataMember(Name = "mediaUdis")]
-        public IList<GuidUdi> MediaUdis { get; set; } = Array.Empty<GuidUdi>();
+        public IList<GuidUdi> MediaUdis { get; set; } = new List<GuidUdi>();
 
         [DataMember(Name = "mediaLoadChildNodes")]
         public bool MediaLoadChildNodes { get; set; }
-
-
     }
-
 }

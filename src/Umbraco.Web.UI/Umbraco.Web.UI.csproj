@@ -66,12 +66,12 @@
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Umbraco.Code" Version="1.1.1">
+    <PackageReference Include="Umbraco.Code" Version="1.2.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>

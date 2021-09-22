@@ -263,7 +263,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
                 var match = sqlErrorCodeRegEx.Match(error.Message);
                 int reasonCode;
 
-                if (match.Success && int.TryParse(match.Groups[1].Value, out reasonCode))
+                if (match.Success && int.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out reasonCode))
                 {
                     return FromReasonCode(reasonCode);
                 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
@@ -9,23 +9,27 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 
 namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
-        "DatabaseInstall", 11, "")]
+    [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade, "DatabaseInstall", 11, "")]
     public class DatabaseInstallStep : InstallSetupStep<object>
     {
-        private readonly DatabaseBuilder _databaseBuilder;
         private readonly IRuntimeState _runtime;
+        private readonly DatabaseBuilder _databaseBuilder;
 
-        public DatabaseInstallStep(DatabaseBuilder databaseBuilder, IRuntimeState runtime)
+        public DatabaseInstallStep(IRuntimeState runtime, DatabaseBuilder databaseBuilder)
         {
-            _databaseBuilder = databaseBuilder;
             _runtime = runtime;
+            _databaseBuilder = databaseBuilder;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
         {
             if (_runtime.Level == RuntimeLevel.Run)
                 throw new Exception("Umbraco is already configured!");
+
+            if (_runtime.Reason == RuntimeLevelReason.InstallMissingDatabase)
+            {
+                _databaseBuilder.CreateDatabase();
+            }
 
             var result = _databaseBuilder.CreateSchemaAndData();
 
@@ -39,16 +43,13 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 return Task.FromResult<InstallSetupResult>(null);
             }
 
-            //upgrade is required so set the flag for the next step
+            // Upgrade is required, so set the flag for the next step
             return Task.FromResult(new InstallSetupResult(new Dictionary<string, object>
             {
-                {"upgrade", true}
+                { "upgrade", true}
             }));
         }
 
-        public override bool RequiresExecution(object model)
-        {
-            return true;
-        }
+        public override bool RequiresExecution(object model) => true;
     }
 }

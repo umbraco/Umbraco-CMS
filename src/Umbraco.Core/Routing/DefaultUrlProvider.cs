@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -56,7 +57,7 @@ namespace Umbraco.Cms.Core.Routing
             var path = pos == 0 ? route : route.Substring(pos);
             var domainUri = pos == 0
                 ? null
-                : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, int.Parse(route.Substring(0, pos)), current, culture);
+                : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, int.Parse(route.Substring(0, pos), CultureInfo.InvariantCulture), current, culture);
 
             // assemble the URL from domainUri (maybe null) and path
             var url = AssembleUrl(domainUri, path, current, mode).ToString();

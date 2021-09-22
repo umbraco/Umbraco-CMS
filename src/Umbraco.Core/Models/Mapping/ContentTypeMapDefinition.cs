@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -601,7 +602,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 return Enumerable.Empty<string>();
 
             var aliases = new List<string>();
-            var ancestorIds = parent.Path.Split(Constants.CharArrays.Comma).Select(int.Parse);
+            var ancestorIds = parent.Path.Split(Constants.CharArrays.Comma).Select(s => int.Parse(s, CultureInfo.InvariantCulture));
             // loop through all content types and return ordered aliases of ancestors
             var allContentTypes = _contentTypeService.GetAll().ToArray();
             foreach (var ancestorId in ancestorIds)

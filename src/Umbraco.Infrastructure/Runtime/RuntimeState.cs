@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,6 +12,7 @@ using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
 {
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     // cannot connect to configured database, this is bad, fail
                     _logger.LogDebug("Could not connect to database.");
 
-                    if (_globalSettings.Value.InstallMissingDatabase)
+                    if (_globalSettings.Value.InstallMissingDatabase || CanAutoInstallMissingDatabase(_databaseFactory))
                     {
                         // ok to install on a configured but missing database
                         Level = RuntimeLevel.Install;
@@ -170,6 +170,17 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     Reason = RuntimeLevelReason.Run;
                 }
                 break;
+            }
+        }
+
+        public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception bootFailedException = null)
+        {
+            Level = level;
+            Reason = reason;
+
+            if (bootFailedException != null)
+            {
+                BootFailedException = new BootFailedException(bootFailedException.Message, bootFailedException);
             }
         }
 
@@ -233,17 +244,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
         }
 
-        public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception bootFailedException = null)
-        {
-            Level = level;
-            Reason = reason;
-
-            if (bootFailedException != null)
-            {
-                BootFailedException = new BootFailedException(bootFailedException.Message, bootFailedException);
-            }
-        }
-
         private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string> keyValues)
         {
             var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
@@ -277,6 +277,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             return canConnect;
         }
 
-
+        private bool CanAutoInstallMissingDatabase(IUmbracoDatabaseFactory databaseFactory)
+            => databaseFactory.ProviderName == Constants.DatabaseProviders.SqlCe ||
+               databaseFactory.ConnectionString?.InvariantContains("(localdb)") == true;
     }
 }

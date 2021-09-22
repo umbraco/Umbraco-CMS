@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -122,7 +123,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public ActionResult<MemberGroupDisplay> PostSave(MemberGroupSave saveModel)
         {
 
-            var id = int.Parse(saveModel.Id.ToString());
+            var id = int.Parse(saveModel.Id.ToString(), CultureInfo.InvariantCulture);
             IMemberGroup memberGroup = id > 0 ? _memberGroupService.GetById(id) : new MemberGroup();
             if (memberGroup == null)
             {

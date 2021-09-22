@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -51,7 +52,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return menu;
             }
 
-            var relationType = _relationService.GetRelationTypeById(int.Parse(id));
+            var relationType = _relationService.GetRelationTypeById(int.Parse(id, CultureInfo.InvariantCulture));
             if (relationType == null) return menu;
 
             if (relationType.IsSystemRelationType() == false)

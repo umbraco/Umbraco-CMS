@@ -191,7 +191,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPoco
                     DateRegistered = DateTime.Now,
                     IsActive = true,
                     DateAccessed = DateTime.Now,
-                    IsMaster = true
+                    IsSchedulingPublisher = true
                 });
             }
 

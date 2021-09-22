@@ -1,18 +1,12 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Install.Models
 {
     [DataContract(Name = "database", Namespace = "")]
     public class DatabaseModel
     {
-        public DatabaseModel()
-        {
-            //defaults
-            DatabaseType = DatabaseType.SqlCe;
-        }
-
         [DataMember(Name = "dbType")]
-        public DatabaseType DatabaseType { get; set; }
+        public DatabaseType DatabaseType { get; set; } = DatabaseType.SqlServer;
 
         [DataMember(Name = "server")]
         public string Server { get; set; }

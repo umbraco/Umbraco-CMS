@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Umbraco.Cms.Core;
@@ -189,7 +190,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             switch (condition.Property.Type)
             {
                 case "int":
-                    return int.Parse(condition.ConstraintValue);
+                    return int.Parse(condition.ConstraintValue, CultureInfo.InvariantCulture);
                 case "datetime":
                     DateTime dt;
                     return DateTime.TryParse(condition.ConstraintValue, out dt) ? dt : DateTime.Today;

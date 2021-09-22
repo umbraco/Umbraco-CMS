@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -122,7 +123,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return menu;
             }
 
-            if (int.TryParse(id, out var iid) == false)
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var iid) == false)
             {
                 return NotFound();
             }

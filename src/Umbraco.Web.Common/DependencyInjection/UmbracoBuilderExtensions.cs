@@ -94,6 +94,9 @@ namespace Umbraco.Extensions
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
+            // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
+            AppDomain.CurrentDomain.SetData("DataDirectory", tempHostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
+
             // Manually create and register the HttpContextAccessor. In theory this should not be registered
             // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
             // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
@@ -102,6 +105,10 @@ namespace Umbraco.Extensions
 
             var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
             var appCaches = AppCaches.Create(requestCache);
+
+            services.ConfigureOptions<ConfigureKestrelServerOptions>();
+            services.ConfigureOptions<ConfigureIISServerOptions>();
+            services.ConfigureOptions<ConfigureFormOptions>();
 
             IProfiler profiler = GetWebProfiler(config);
 
@@ -150,7 +157,7 @@ namespace Umbraco.Extensions
                 DbProviderFactories.GetFactory,
                 factory.GetServices<ISqlSyntaxProvider>(),
                 factory.GetServices<IBulkSqlInsertProvider>(),
-                factory.GetServices<IEmbeddedDatabaseCreator>(),
+                factory.GetServices<IDatabaseCreator>(),
                 factory.GetServices<IProviderSpecificMapperFactory>()
             ));
 
@@ -357,17 +364,17 @@ namespace Umbraco.Extensions
 
                     Type sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider");
                     Type sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeBulkSqlInsertProvider");
-                    Type sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeEmbeddedDatabaseCreator");
+                    Type sqlCeDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeDatabaseCreator");
                     Type sqlCeSpecificMapperFactory = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSpecificMapperFactory");
 
                     if (!(sqlCeSyntaxProviderType is null
                           || sqlCeBulkSqlInsertProviderType is null
-                          || sqlCeEmbeddedDatabaseCreatorType is null
+                          || sqlCeDatabaseCreatorType is null
                           || sqlCeSpecificMapperFactory is null))
                     {
                         builder.Services.AddSingleton(typeof(ISqlSyntaxProvider), sqlCeSyntaxProviderType);
                         builder.Services.AddSingleton(typeof(IBulkSqlInsertProvider), sqlCeBulkSqlInsertProviderType);
-                        builder.Services.AddSingleton(typeof(IEmbeddedDatabaseCreator), sqlCeEmbeddedDatabaseCreatorType);
+                        builder.Services.AddSingleton(typeof(IDatabaseCreator), sqlCeDatabaseCreatorType);
                         builder.Services.AddSingleton(typeof(IProviderSpecificMapperFactory), sqlCeSpecificMapperFactory);
                     }
 
@@ -397,7 +404,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
             builder.Services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
-            builder.Services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
+            builder.Services.AddSingleton<IDatabaseCreator, SqlServerDatabaseCreator>();
 
             return builder;
         }

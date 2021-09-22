@@ -13,9 +13,9 @@ namespace Umbraco.Cms.Core.Packaging
     public class InstallationSummary
     {
         public InstallationSummary(string packageName)
-        {
-            PackageName = packageName;
-        }
+            => PackageName = packageName;
+
+        public string PackageName { get; }
 
         public InstallWarnings Warnings { get; set; } = new InstallWarnings();
 
@@ -23,6 +23,7 @@ namespace Umbraco.Cms.Core.Packaging
         public IEnumerable<ILanguage> LanguagesInstalled { get; set; } = Enumerable.Empty<ILanguage>();
         public IEnumerable<IDictionaryItem> DictionaryItemsInstalled { get; set; } = Enumerable.Empty<IDictionaryItem>();
         public IEnumerable<IMacro> MacrosInstalled { get; set; } = Enumerable.Empty<IMacro>();
+        public IEnumerable<IPartialView> MacroPartialViewsInstalled { get; set; } = Enumerable.Empty<IPartialView>();
         public IEnumerable<ITemplate> TemplatesInstalled { get; set; } = Enumerable.Empty<ITemplate>();
         public IEnumerable<IContentType> DocumentTypesInstalled { get; set; } = Enumerable.Empty<IContentType>();
         public IEnumerable<IMediaType> MediaTypesInstalled { get; set; } = Enumerable.Empty<IMediaType>();
@@ -31,73 +32,55 @@ namespace Umbraco.Cms.Core.Packaging
         public IEnumerable<IPartialView> PartialViewsInstalled { get; set; } = Enumerable.Empty<IPartialView>();
         public IEnumerable<IContent> ContentInstalled { get; set; } = Enumerable.Empty<IContent>();
         public IEnumerable<IMedia> MediaInstalled { get; set; } = Enumerable.Empty<IMedia>();
-        public string PackageName { get; }
 
         public override string ToString()
         {
             var sb = new StringBuilder();
-            var macroConflicts = Warnings.ConflictingMacros.ToList();
-            if (macroConflicts.Count > 0)
+
+            void WriteConflicts<T>(IEnumerable<T> source, Func<T, string> selector, string message, bool appendLine = true)
             {
-                sb.Append("Conflicting macros found, they will be overwritten:");
-                foreach(IMacro m in macroConflicts)
+                var result = source?.Select(selector).ToList();
+                if (result?.Count > 0)
                 {
-                    sb.Append(m.Alias);
-                    sb.Append(',');
+                    sb.Append(message);
+                    sb.Append(string.Join(", ", result));
+
+                    if (appendLine)
+                    {
+                        sb.AppendLine();
+                    }
                 }
-                sb.AppendLine(". ");
-            }
-            var templateConflicts = Warnings.ConflictingTemplates.ToList();
-            if (templateConflicts.Count > 0)
-            {
-                sb.Append("Conflicting templates found, they will be overwritten:");
-                foreach (ITemplate m in templateConflicts)
-                {
-                    sb.Append(m.Alias);
-                    sb.Append(',');
-                }
-                sb.AppendLine(". ");
-            }
-            var stylesheetConflicts = Warnings.ConflictingStylesheets.ToList();
-            if (stylesheetConflicts.Count > 0)
-            {
-                sb.Append("Conflicting stylesheets found, they will be overwritten:");
-                foreach (IFile m in stylesheetConflicts)
-                {
-                    sb.Append(m.Alias);
-                    sb.Append(',');
-                }
-                sb.AppendLine(". ");
             }
 
-            sb.Append("Content items installed: ");
-            sb.Append(ContentInstalled.Count());
-            sb.AppendLine(". ");
-            sb.Append("Media items installed: ");
-            sb.Append(MediaInstalled.Count());
-            sb.AppendLine(". ");
-            sb.Append("Dictionary items installed: ");
-            sb.Append(DictionaryItemsInstalled.Count());
-            sb.AppendLine(". ");
-            sb.Append("Macros installed: ");
-            sb.Append(MacrosInstalled.Count());
-            sb.AppendLine(". ");
-            sb.Append("Stylesheets installed: ");
-            sb.Append(StylesheetsInstalled.Count());
-            sb.AppendLine(". ");
-            sb.Append("Templates installed: ");
-            sb.Append(TemplatesInstalled.Count());
-            sb.AppendLine();
-            sb.Append("Document types installed: ");
-            sb.Append(DocumentTypesInstalled.Count());
-            sb.AppendLine(". ");
-            sb.Append("Media types installed: ");
-            sb.Append(MediaTypesInstalled.Count());
-            sb.AppendLine(". ");
-            sb.Append("Data types items installed: ");
-            sb.Append(DataTypesInstalled.Count());
+            void WriteCount<T>(string message, IEnumerable<T> source, bool appendLine = true)
+            {
+                sb.Append(message);
+                sb.Append(source?.Count() ?? 0);
+
+                if (appendLine)
+                {
+                    sb.AppendLine();
+                }
+            }
+
+            WriteConflicts(Warnings?.ConflictingMacros, x => x.Alias, "Conflicting macros found, they will be overwritten: ");
+            WriteConflicts(Warnings?.ConflictingTemplates, x => x.Alias, "Conflicting templates found, they will be overwritten: ");
+            WriteConflicts(Warnings?.ConflictingStylesheets, x => x.Alias, "Conflicting stylesheets found, they will be overwritten: ");
+            WriteCount("Data types installed: ", DataTypesInstalled);
+            WriteCount("Languages installed: ", LanguagesInstalled);
+            WriteCount("Dictionary items installed: ", DictionaryItemsInstalled);
+            WriteCount("Macros installed: ", MacrosInstalled);
+            WriteCount("Macro partial views installed: ", MacroPartialViewsInstalled);
+            WriteCount("Templates installed: ", TemplatesInstalled);
+            WriteCount("Document types installed: ", DocumentTypesInstalled);
+            WriteCount("Media types installed: ", MediaTypesInstalled);
+            WriteCount("Stylesheets installed: ", StylesheetsInstalled);
+            WriteCount("Scripts installed: ", ScriptsInstalled);
+            WriteCount("Partial views installed: ", PartialViewsInstalled);
+            WriteCount("Content items installed: ", ContentInstalled);
+            WriteCount("Media items installed: ", MediaInstalled, false);
+
             return sb.ToString();
         }
     }
-
 }

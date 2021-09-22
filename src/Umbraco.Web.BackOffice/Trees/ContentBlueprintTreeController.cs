@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -130,7 +131,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
-            var cte = _entityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);
+            var cte = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentType);
             //only refresh & create if it's a content type
             if (cte != null)
             {

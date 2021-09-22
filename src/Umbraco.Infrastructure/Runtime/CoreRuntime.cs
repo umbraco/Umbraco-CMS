@@ -12,8 +12,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 
@@ -95,8 +93,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
                 _logger.LogError(exception, msg);
             };
-
-            AppDomain.CurrentDomain.SetData("DataDirectory", _hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
             AcquireMainDom();

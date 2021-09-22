@@ -57,7 +57,7 @@
         "version": {
             "type": "parameter",
             "datatype": "string",
-            "defaultValue": "9.0.0-rc003",
+            "defaultValue": "9.0.0-rc004",
             "description": "The version of Umbraco to load using NuGet",
             "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
         },
@@ -293,6 +293,12 @@
         "UsingUnattenedInstall":{
             "type": "computed",
             "value": "(FriendlyName != \"\" && Email != \"\" && Password != \"\" && ConnectionString != \"\")"
+        },
+        "UseHttpsRedirect":{
+            "type": "parameter",
+            "datatype":"bool",
+            "defaultValue": "false",
+            "description": "Adds code to Startup.cs to redirect HTTP to HTTPS and enables the UseHttps setting (Default: false)"
         }
     }
 }
