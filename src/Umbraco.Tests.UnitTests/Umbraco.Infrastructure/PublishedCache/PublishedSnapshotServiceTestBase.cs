@@ -39,6 +39,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         protected TestPublishedSnapshotAccessor PublishedSnapshotAccessor { get; private set; }
         protected TestNuCacheContentService NuCacheContentService { get; private set; }
         protected PublishedContentTypeFactory PublishedContentTypeFactory { get; private set; }
+        protected GlobalSettings GlobalSettings { get; } = new GlobalSettings();
         protected virtual PropertyValueConverterCollection PropertyValueConverterCollection
             => new PropertyValueConverterCollection(() => new[]
                 {
@@ -85,7 +86,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             return new[] { dataType };
         }
 
-        private static ServiceContext CreateServiceContext(ContentType[] contentTypes, DataType[] dataTypes)
+        protected virtual ServiceContext CreateServiceContext(ContentType[] contentTypes, DataType[] dataTypes)
         {
             var contentTypeService = new Mock<IContentTypeService>();
             contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
@@ -160,13 +161,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             PublishedContentTypeFactory = new PublishedContentTypeFactory(
                 PublishedModelFactory,
                 PropertyValueConverterCollection,
-                DataTypeService);            
+                DataTypeService);
 
             var typeFinder = TestHelper.GetTypeFinder();
 
-            var globalSettings = new GlobalSettings();
             var nuCacheSettings = new NuCacheSettings();
-            
+
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             SnapshotService = new PublishedSnapshotService(
@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 scopeProvider,
                 NuCacheContentService,
                 new TestDefaultCultureAccessor(),
-                Microsoft.Extensions.Options.Options.Create(globalSettings),
+                Microsoft.Extensions.Options.Options.Create(GlobalSettings),
                 PublishedModelFactory,
                 TestHelper.GetHostingEnvironment(),
                 Microsoft.Extensions.Options.Options.Create(nuCacheSettings),

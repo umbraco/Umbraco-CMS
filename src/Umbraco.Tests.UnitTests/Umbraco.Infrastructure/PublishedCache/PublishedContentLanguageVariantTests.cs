@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -16,13 +20,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
     [TestFixture]
     public class PublishedContentLanguageVariantTests : PublishedSnapshotServiceTestBase
     {
-        // TODO: Now we need to figure out how best to populate our caches
-        // for variants without any XML translations. Ideally we also don't use
-        // any of this 'Solid...' classes and just use the native published cache.
-        // To do that, we just need to built up a list of ContentNodeKit.
-        // And then we'll want to be able to try to automatically build the associated
-        // content types based on that data just like we do with XML so it's all less manual.
-
         [SetUp]
         public override void Setup()
         {
@@ -34,6 +31,73 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Init(cache, contentTypes, dataTypes);
         }
 
+        protected override PropertyValueConverterCollection PropertyValueConverterCollection
+        {
+            get
+            {
+                PropertyValueConverterCollection collection = base.PropertyValueConverterCollection;
+                return new PropertyValueConverterCollection(() => collection.Append(new TestNoValueValueConverter()));
+            }
+        }
+
+        private class TestNoValueValueConverter : SimpleTinyMceValueConverter
+        {
+            public override bool IsConverter(IPublishedPropertyType propertyType)
+                => propertyType.Alias == "noprop";
+
+            // for this test, we return false for IsValue for this property
+            public override bool? IsValue(object value, PropertyValueLevel level) => false;
+        }
+
+        /// <summary>
+        /// Override to mock localization service
+        /// </summary>
+        /// <param name="contentTypes"></param>
+        /// <param name="dataTypes"></param>
+        /// <returns></returns>
+        protected override ServiceContext CreateServiceContext(ContentType[] contentTypes, DataType[] dataTypes)
+        {
+            var serviceContext = base.CreateServiceContext(contentTypes, dataTypes);
+
+            var localizationService = Mock.Get(serviceContext.LocalizationService);
+
+            var languages = new List<Language>
+            {
+                new Language(GlobalSettings, "en-US") { Id = 1, CultureName = "English", IsDefault = true },
+                new Language(GlobalSettings, "fr") { Id = 2, CultureName = "French" },
+                new Language(GlobalSettings, "es") { Id = 3, CultureName = "Spanish", FallbackLanguageId = 1 },
+                new Language(GlobalSettings, "it") { Id = 4, CultureName = "Italian", FallbackLanguageId = 3 },
+                new Language(GlobalSettings, "de") { Id = 5, CultureName = "German" },
+                new Language(GlobalSettings, "da") { Id = 6, CultureName = "Danish", FallbackLanguageId = 8 },
+                new Language(GlobalSettings, "sv") { Id = 7, CultureName = "Swedish", FallbackLanguageId = 6 },
+                new Language(GlobalSettings, "no") { Id = 8, CultureName = "Norweigan", FallbackLanguageId = 7 },
+                new Language(GlobalSettings, "nl") { Id = 9, CultureName = "Dutch", FallbackLanguageId = 1 }
+            };
+
+            localizationService.Setup(x => x.GetAllLanguages()).Returns(languages);
+            localizationService.Setup(x => x.GetLanguageById(It.IsAny<int>()))
+                .Returns((int id) => languages.SingleOrDefault(y => y.Id == id));
+            localizationService.Setup(x => x.GetLanguageByIsoCode(It.IsAny<string>()))
+                .Returns((string c) => languages.SingleOrDefault(y => y.IsoCode == c));
+
+            return serviceContext;
+        }
+
+        /// <summary>
+        /// Creates a content cache
+        /// </summary>
+        /// <param name="dataTypes"></param>
+        /// <param name="contentTypes"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Builds a content hierarchy of 3 nodes, each has a different set of cultural properties.
+        /// The first 2 share the same content type, the last one is a different content type.
+        /// NOTE: The content items themselves are 'Invariant' but their properties are 'Variant' by culture.
+        /// Normally in Umbraco this is prohibited but our APIs and database do actually support that behavior.
+        /// It is simpler to have these tests run this way, else we would need to use WithCultureInfos
+        /// for each item and pass in name values for all cultures we are supporting and then specify the
+        /// default VariationContextAccessor.VariationContext value to be a default culture instead of "".
+        /// </remarks>
         private IEnumerable<ContentNodeKit> CreateCache(IDataType[] dataTypes, out ContentType[] contentTypes)
         {
             var result = new List<ContentNodeKit>();
@@ -46,7 +110,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             ContentData item1Data = new ContentDataBuilder()
                 .WithName("Content 1")
-                .WithCultureInfos(new Dictionary<string, CultureVariation>())
                 .WithProperties(new PropertyDataBuilder()
                     .WithPropertyData("welcomeText", "Welcome")
                     .WithPropertyData("welcomeText", "Welcome", "en-US")
@@ -54,6 +117,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     .WithPropertyData("welcomeText", "Welkom", "nl")
                     .WithPropertyData("welcomeText2", "Welcome")
                     .WithPropertyData("welcomeText2", "Welcome", "en-US")
+                    .WithPropertyData("noprop", "xxx", "en-US")
                     .Build())
                 // build with a dynamically created content type
                 .Build(TestHelper.ShortStringHelper, "ContentType1", propertyDataTypes, out ContentType contentType1);
@@ -68,7 +132,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             ContentData item2Data = new ContentDataBuilder()
                 .WithName("Content 2")
-                .WithCultureInfos(new Dictionary<string, CultureVariation>())
                 .WithProperties(new PropertyDataBuilder()
                     .WithPropertyData("welcomeText", "Welcome")
                     .WithPropertyData("welcomeText", "Welcome", "en-US")
@@ -87,7 +150,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             ContentData item3Data = new ContentDataBuilder()
                 .WithName("Content 3")
-                .WithCultureInfos(new Dictionary<string, CultureVariation>())
                 .WithProperties(new PropertyDataBuilder()
                     .WithPropertyData("prop3", "Oxxo")
                     .WithPropertyData("prop3", "Oxxo", "en-US")
@@ -108,121 +170,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             return result;
         }
-
-        //protected ServiceContext GetServiceContext()
-        //{
-        //    var serviceContext = TestObjects.GetServiceContextMock(Factory);
-        //    MockLocalizationService(serviceContext);
-        //    return serviceContext;
-        //}
-
-        //private static void MockLocalizationService(ServiceContext serviceContext)
-        //{
-        //    // Set up languages.
-        //    // Spanish falls back to English and Italian to Spanish (and then to English).
-        //    // French has no fall back.
-        //    // Danish, Swedish and Norweigan create an invalid loop.
-        //    var globalSettings = new GlobalSettings();
-        //    var languages = new List<Language>
-        //        {
-        //            new Language(globalSettings, "en-US") { Id = 1, CultureName = "English", IsDefault = true },
-        //            new Language(globalSettings, "fr") { Id = 2, CultureName = "French" },
-        //            new Language(globalSettings, "es") { Id = 3, CultureName = "Spanish", FallbackLanguageId = 1 },
-        //            new Language(globalSettings, "it") { Id = 4, CultureName = "Italian", FallbackLanguageId = 3 },
-        //            new Language(globalSettings, "de") { Id = 5, CultureName = "German" },
-        //            new Language(globalSettings, "da") { Id = 6, CultureName = "Danish", FallbackLanguageId = 8 },
-        //            new Language(globalSettings, "sv") { Id = 7, CultureName = "Swedish", FallbackLanguageId = 6 },
-        //            new Language(globalSettings, "no") { Id = 8, CultureName = "Norweigan", FallbackLanguageId = 7 },
-        //            new Language(globalSettings, "nl") { Id = 9, CultureName = "Dutch", FallbackLanguageId = 1 }
-        //        };
-
-        //    var localizationService = Mock.Get(serviceContext.LocalizationService);
-        //    localizationService.Setup(x => x.GetAllLanguages()).Returns(languages);
-        //    localizationService.Setup(x => x.GetLanguageById(It.IsAny<int>()))
-        //        .Returns((int id) => languages.SingleOrDefault(y => y.Id == id));
-        //    localizationService.Setup(x => x.GetLanguageByIsoCode(It.IsAny<string>()))
-        //        .Returns((string c) => languages.SingleOrDefault(y => y.IsoCode == c));
-        //}
-
-        //internal override void PopulateCache(PublishedContentTypeFactory factory, SolidPublishedContentCache cache)
-        //{
-        //    var prop1Type = factory.CreatePropertyType("prop1", 1, variations: ContentVariation.Culture);
-        //    var welcomeType = factory.CreatePropertyType("welcomeText", 1, variations: ContentVariation.Culture);
-        //    var welcome2Type = factory.CreatePropertyType("welcomeText2", 1, variations: ContentVariation.Culture);
-        //    var nopropType = factory.CreatePropertyType("noprop", 1, variations: ContentVariation.Culture);
-
-        //    IEnumerable<IPublishedPropertyType> CreatePropertyTypes1(IPublishedContentType contentType)
-        //    {
-        //        yield return factory.CreatePropertyType(contentType, "prop1", 1, variations: ContentVariation.Culture);
-        //        yield return factory.CreatePropertyType(contentType, "welcomeText", 1, variations: ContentVariation.Culture);
-        //        yield return factory.CreatePropertyType(contentType, "welcomeText2", 1, variations: ContentVariation.Culture);
-        //        yield return factory.CreatePropertyType(contentType, "noprop", 1, variations: ContentVariation.Culture);
-        //    }
-
-        //    var contentType1 = factory.CreateContentType(Guid.NewGuid(), 1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes1);
-
-        //    IEnumerable<IPublishedPropertyType> CreatePropertyTypes2(IPublishedContentType contentType)
-        //    {
-        //        yield return factory.CreatePropertyType(contentType, "prop3", 1, variations: ContentVariation.Culture);
-        //    }
-
-        //    var contentType2 = factory.CreateContentType(Guid.NewGuid(), 2, "contentType2", Enumerable.Empty<string>(), CreatePropertyTypes2);
-
-
-
-
-        //    var prop3 = new SolidPublishedPropertyWithLanguageVariants
-        //    {
-        //        Alias = "welcomeText",
-        //        PropertyType = welcomeType
-        //    };
-        //    prop3.SetSourceValue("en-US", "Welcome", true);
-        //    prop3.SetValue("en-US", "Welcome", true);
-
-        //    var noprop = new SolidPublishedProperty
-        //    {
-        //        Alias = "noprop",
-        //        PropertyType = nopropType
-        //    };
-        //    noprop.SolidHasValue = false; // has no value
-        //    noprop.SolidValue = "xxx"; // but returns something
-
-
-
-        //    var prop4 = new SolidPublishedPropertyWithLanguageVariants
-        //    {
-        //        Alias = "prop3",
-        //        PropertyType = contentType2.GetPropertyType("prop3")
-        //    };
-        //    prop4.SetSourceValue("en-US", "Oxxo", true);
-        //    prop4.SetValue("en-US", "Oxxo", true);
-
-        //    var item3 = new SolidPublishedContent(contentType2)
-        //    {
-        //        Id = 3,
-        //        SortOrder = 0,
-        //        Name = "Content 3",
-        //        UrlSegment = "content-3",
-        //        Path = "/1/2/3",
-        //        Level = 3,
-        //        ParentId = 2,
-        //        ChildIds = new int[] { },
-        //        Properties = new Collection<IPublishedProperty>
-        //        {
-        //            prop4
-        //        }
-        //    };
-
-        //    item1.Children = new List<IPublishedContent> { item2 };
-        //    item2.Parent = item1;
-
-        //    item2.Children = new List<IPublishedContent> { item3 };
-        //    item3.Parent = item2;
-
-        //    cache.Add(item1);
-        //    cache.Add(item2);
-        //    cache.Add(item3);
-        //}
 
         [Test]
         public void Can_Get_Content_For_Populated_Requested_Language()
@@ -278,126 +225,117 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Assert.AreEqual("Welcome", value);
         }
 
-        //[Test]
-        //public void Do_Not_GetContent_For_Unpopulated_Requested_Language_With_Fallback_Over_That_Loops()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First();
-        //    var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "no", fallback: Fallback.ToLanguage);
-        //    Assert.IsNull(value);
-        //}
+        [Test]
+        public void Do_Not_GetContent_For_Unpopulated_Requested_Language_With_Fallback_Over_That_Loops()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First();
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText", "no", fallback: Fallback.ToLanguage);
+            Assert.IsNull(value);
+        }
 
-        //[Test]
-        //public void Do_Not_Get_Content_Recursively_Unless_Requested()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
-        //    var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText2");
-        //    Assert.IsNull(value);
-        //}
+        [Test]
+        public void Do_Not_Get_Content_Recursively_Unless_Requested()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First().Children.First();            
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText2");
+            Assert.IsNull(value);
+        }
 
-        //[Test]
-        //public void Can_Get_Content_Recursively()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
-        //    var value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText2", fallback: Fallback.ToAncestors);
-        //    Assert.AreEqual("Welcome", value);
-        //}
+        [Test]
+        public void Can_Get_Content_Recursively()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First().Children.First();
+            var value = content.Value(PublishedValueFallback, "welcomeText2", fallback: Fallback.ToAncestors);
+            Assert.AreEqual("Welcome", value);
+        }
 
-        //[Test]
-        //public void Do_Not_Get_Content_Recursively_Unless_Requested2()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First().Children.First();
-        //    Assert.IsNull(content.GetProperty("welcomeText2"));
-        //    var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText2");
-        //    Assert.IsNull(value);
-        //}
+        [Test]
+        public void Do_Not_Get_Content_Recursively_Unless_Requested2()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First().Children.First().Children.First();
+            Assert.IsNull(content.GetProperty("welcomeText2"));
+            var value = content.Value(Mock.Of<IPublishedValueFallback>(), "welcomeText2");
+            Assert.IsNull(value);
+        }
 
-        //[Test]
-        //public void Can_Get_Content_Recursively2()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First().Children.First();
-        //    Assert.IsNull(content.GetProperty("welcomeText2"));
-        //    var value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText2", fallback: Fallback.ToAncestors);
-        //    Assert.AreEqual("Welcome", value);
-        //}
+        [Test]
+        public void Can_Get_Content_Recursively2()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First().Children.First().Children.First();
+            Assert.IsNull(content.GetProperty("welcomeText2"));
+            var value = content.Value(PublishedValueFallback, "welcomeText2", fallback: Fallback.ToAncestors);
+            Assert.AreEqual("Welcome", value);
+        }
+        
+        [Test]
+        public void Can_Get_Content_Recursively3()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First().Children.First().Children.First();
+            Assert.IsNull(content.GetProperty("noprop"));
+            var value = content.Value(PublishedValueFallback, "noprop", fallback: Fallback.ToAncestors);
+            // property has no value - based on the converter
+            // but we still get the value (ie, the converter would do something)
+            Assert.AreEqual("xxx", value);
+        }
 
-        //[Test]
-        //public void Can_Get_Content_Recursively3()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First().Children.First();
-        //    Assert.IsNull(content.GetProperty("noprop"));
-        //    var value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "noprop", fallback: Fallback.ToAncestors);
-        //    // property has no value but we still get the value (ie, the converter would do something)
-        //    Assert.AreEqual("xxx", value);
-        //}
+        [Test]
+        public void Can_Get_Content_With_Recursive_Priority()
+        {
+            VariationContextAccessor.VariationContext = new VariationContext("nl");
 
-        //[Test]
-        //public void Can_Get_Content_With_Recursive_Priority()
-        //{
-        //    Current.VariationContextAccessor.VariationContext = new VariationContext("nl");
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First().Children.First();
 
-        //    var value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "nl", fallback: Fallback.To(Fallback.Ancestors, Fallback.Language));
+            var value = content.Value(PublishedValueFallback, "welcomeText", "nl", fallback: Fallback.To(Fallback.Ancestors, Fallback.Language));
 
-        //    // No Dutch value is directly assigned. Check has fallen back to Dutch value from parent.
-        //    Assert.AreEqual("Welkom", value);
-        //}
+            // No Dutch value is directly assigned. Check has fallen back to Dutch value from parent.
+            Assert.AreEqual("Welkom", value);
+        }
 
-        //[Test]
-        //public void Can_Get_Content_With_Fallback_Language_Priority()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
-        //    var value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "nl", fallback: Fallback.ToLanguage);
+        [Test]
+        public void Can_Get_Content_With_Fallback_Language_Priority()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First().Children.First();
 
-        //    // No Dutch value is directly assigned.  Check has fallen back to English value from language variant.
-        //    Assert.AreEqual("Welcome", value);
-        //}
+            var value = content.Value(PublishedValueFallback, "welcomeText", "nl", fallback: Fallback.ToLanguage);
 
-        //[Test]
-        //public void Throws_For_Non_Supported_Fallback()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
-        //    Assert.Throws<NotSupportedException>(() => content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "nl", fallback: Fallback.To(999)));
-        //}
+            // No Dutch value is directly assigned.  Check has fallen back to English value from language variant.
+            Assert.AreEqual("Welcome", value);
+        }
 
-        //[Test]
-        //public void Can_Fallback_To_Default_Value()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
+        [Test]
+        public void Throws_For_Non_Supported_Fallback()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First().Children.First();
 
-        //    // no Dutch value is assigned, so getting null
-        //    var value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "nl");
-        //    Assert.IsNull(value);
+            Assert.Throws<NotSupportedException>(() => content.Value(PublishedValueFallback, "welcomeText", "nl", fallback: Fallback.To(999)));
+        }
 
-        //    // even if we 'just' provide a default value
-        //    value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "nl", defaultValue: "woop");
-        //    Assert.IsNull(value);
+        [Test]
+        public void Can_Fallback_To_Default_Value()
+        {
+            var snapshot = GetPublishedSnapshot();
+            var content = snapshot.Content.GetAtRoot().First().Children.First();
 
-        //    // but it works with proper fallback settings
-        //    value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "nl", fallback: Fallback.ToDefaultValue, defaultValue: "woop");
-        //    Assert.AreEqual("woop", value);
-        //}
+            // no Dutch value is assigned, so getting null
+            var value = content.Value(PublishedValueFallback, "welcomeText", "nl");
+            Assert.IsNull(value);
 
-        //[Test]
-        //public void Can_Have_Custom_Default_Value()
-        //{
-        //    var content = Current.UmbracoContext.Content.GetAtRoot().First().Children.First();
+            // even if we 'just' provide a default value
+            value = content.Value(PublishedValueFallback, "welcomeText", "nl", defaultValue: "woop");
+            Assert.IsNull(value);
 
-        //    // HACK: the value, pretend the converter would return something
-        //    var prop = content.GetProperty("welcomeText") as SolidPublishedPropertyWithLanguageVariants;
-        //    Assert.IsNotNull(prop);
-        //    prop.SetValue("nl", "nope"); // HasValue false but getting value returns this
-
-        //    // there is an EN value
-        //    var value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "en-US");
-        //    Assert.AreEqual("Welcome", value);
-
-        //    // there is no NL value and we get the 'converted' value
-        //    value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "nl");
-        //    Assert.AreEqual("nope", value);
-
-        //    // but it works with proper fallback settings
-        //    value = content.Value(Factory.GetRequiredService<IPublishedValueFallback>(), "welcomeText", "nl", fallback: Fallback.ToDefaultValue, defaultValue: "woop");
-        //    Assert.AreEqual("woop", value);
-        //}
+            // but it works with proper fallback settings
+            value = content.Value(PublishedValueFallback, "welcomeText", "nl", fallback: Fallback.ToDefaultValue, defaultValue: "woop");
+            Assert.AreEqual("woop", value);
+        }
     }
 }

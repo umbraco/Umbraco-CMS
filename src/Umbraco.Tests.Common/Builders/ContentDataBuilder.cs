@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
 
         public ContentDataBuilder WithCultureInfos(Dictionary<string, CultureVariation> cultureInfos)
         {
-            _cultureInfos = cultureInfos;
+            _cultureInfos = cultureInfos;            
             return this;
         }
 
@@ -92,7 +92,8 @@ namespace Umbraco.Cms.Tests.Common.Builders
             IShortStringHelper shortStringHelper,
             Dictionary<string, IDataType> propertyDataTypes,
             ContentType existing,
-            out ContentType contentType) => Build(shortStringHelper, null, propertyDataTypes, existing, out contentType);
+            out ContentType contentType,
+            bool autoCreateCultureNames = false) => Build(shortStringHelper, null, propertyDataTypes, existing, out contentType, autoCreateCultureNames);
 
         /// <summary>
         /// Build and dynamically create a matching content type
@@ -103,16 +104,27 @@ namespace Umbraco.Cms.Tests.Common.Builders
             IShortStringHelper shortStringHelper,
             string alias,
             Dictionary<string, IDataType> propertyDataTypes,
-            out ContentType contentType) => Build(shortStringHelper, alias, propertyDataTypes, null, out contentType);
+            out ContentType contentType,
+            bool autoCreateCultureNames = false) => Build(shortStringHelper, alias, propertyDataTypes, null, out contentType, autoCreateCultureNames);
 
         private ContentData Build(
             IShortStringHelper shortStringHelper,
             string alias,
             Dictionary<string, IDataType> propertyDataTypes,
             ContentType existing,
-            out ContentType contentType)
+            out ContentType contentType,
+            bool autoCreateCultureNames)
         {
-            var result = Build();
+            if (_name.IsNullOrWhiteSpace())
+            {
+                throw new InvalidOperationException("Cannot build without a name");
+            }
+            _segment = (_segment ?? _name).ToLower().ReplaceNonAlphanumericChars('-');
+
+            // create or copy the current culture infos for the content
+            Dictionary<string, CultureVariation> contentCultureInfos = _cultureInfos == null
+                ? new Dictionary<string, CultureVariation>()
+                : new Dictionary<string, CultureVariation>(_cultureInfos);
 
             contentType = existing ?? new ContentType(shortStringHelper, -1)
             {
@@ -122,7 +134,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 Id = alias.GetHashCode()
             };
 
-            foreach(var prop in result.Properties)
+            foreach (KeyValuePair<string, PropertyData[]> prop in _properties)
             {
                 //var dataType = new DataType(new VoidEditor("Label", Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
                 //{
@@ -135,12 +147,49 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 }
 
                 var propertyType = new PropertyType(shortStringHelper, dataType, prop.Key);
+
+                // check each property for culture and set variations accordingly,
+                // this will also ensure that we have the correct culture name on the content
+                // set for each culture too.
+                foreach (PropertyData cultureValue in prop.Value.Where(x => !x.Culture.IsNullOrWhiteSpace()))
+                {
+                    // set the property and content type to vary based on the values
+                    propertyType.Variations |= ContentVariation.Culture;
+
+                    // if there isn't already a culture, then add one with the default name
+                    if (autoCreateCultureNames && !contentCultureInfos.TryGetValue(cultureValue.Culture, out CultureVariation cultureVariation))
+                    {
+                        cultureVariation = new CultureVariation
+                        {
+                            Date = DateTime.Now,
+                            IsDraft = true,
+                            Name = _name,
+                            UrlSegment = _segment
+                        };
+                        contentCultureInfos[cultureValue.Culture] = cultureVariation;
+                    }
+                }
+
+                // set variations for segments if there is any
+                if (prop.Value.Any(x => !x.Segment.IsNullOrWhiteSpace()))
+                {
+                    propertyType.Variations |= ContentVariation.Segment;
+                    contentType.Variations |= ContentVariation.Segment;
+                }
+
                 if (!contentType.PropertyTypeExists(propertyType.Alias))
                 {
                     contentType.AddPropertyType(propertyType);
                 }
             }
 
+            if (contentCultureInfos.Count > 0)
+            {
+                contentType.Variations |= ContentVariation.Culture;
+                WithCultureInfos(contentCultureInfos);
+            }
+
+            var result = Build();
             return result;
         }
 
@@ -154,7 +203,6 @@ namespace Umbraco.Cms.Tests.Common.Builders
             var properties = _properties ?? new Dictionary<string, PropertyData[]>();
             var cultureInfos = _cultureInfos ?? new Dictionary<string, CultureVariation>();
             var segment = (_segment ?? _name).ToLower().ReplaceNonAlphanumericChars('-');
-
 
             var contentData = new ContentData(
                 _name,
