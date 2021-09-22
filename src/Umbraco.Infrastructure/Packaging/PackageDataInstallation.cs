@@ -1558,7 +1558,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var masterElement = templateElement.Element("Master");
 
                 var existingTemplate = _fileService.GetTemplate(alias) as Template;
+
                 var template = existingTemplate ?? new Template(_shortStringHelper, templateName, alias);
+
+                // For new templates, use the serialized key if avaialble.
+                if (existingTemplate == null && templateElement.Element("Key") != null)
+                {
+                    template.Key = Guid.Parse(templateElement.Element("Key").Value);
+                }
+
                 template.Content = design;
 
                 if (masterElement != null && string.IsNullOrEmpty((string)masterElement) == false)
