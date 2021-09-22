@@ -547,7 +547,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     var alias = documentType.Element("Info").Element("Alias").Value;
                     var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
 
-
                     var folderKeysAttribute = documentType.Attribute("FolderKeys");
 
                     var folderKeys = Array.Empty<Guid>();
@@ -555,13 +554,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     {
                         folderKeys = folderKeysAttribute.Value.Split(Constants.CharArrays.ForwardSlash).Select(x=>Guid.Parse(x)).ToArray();
                     }
+
                     var rootFolder = WebUtility.UrlDecode(folders[0]);
 
                     EntityContainer current;
-                    if(folderKeys.Length == folders.Length && folderKeys.Length > 0)
+                    Guid? rootFolderKey = null;
+                    if (folderKeys.Length == folders.Length && folderKeys.Length > 0)
                     {
-                        var rootFolderKey = folderKeys[0];
-                        current = _contentTypeService.GetContainer(rootFolderKey);
+                        rootFolderKey = folderKeys[0];
+                        current = _contentTypeService.GetContainer(rootFolderKey.Value);
                     }
                     else
                     {
@@ -571,7 +572,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                     if (current == null)
                     {
-                        var tryCreateFolder = _contentTypeService.CreateContainer(-1, Guid.NewGuid(), rootFolder);
+                        var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolderKey ?? Guid.NewGuid(), rootFolder);
                         if (tryCreateFolder == false)
                         {
                             _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
