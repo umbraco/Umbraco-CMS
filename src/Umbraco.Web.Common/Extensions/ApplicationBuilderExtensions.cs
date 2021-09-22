@@ -109,7 +109,7 @@ namespace Umbraco.Extensions
         public static IApplicationBuilder UseUmbracoPluginsStaticFiles(this IApplicationBuilder app)
         {
             var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-            var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPluginSettings>>();
+            var umbracoPluginSettings = app.ApplicationServices.GetRequiredService<IOptionsMonitor<UmbracoPluginSettings>>();
 
             var pluginFolder = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
 
