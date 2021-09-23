@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -70,8 +71,10 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
                 }
 
                 userIds = ids
-                    .Select(x => x.Value.ToString())
-                    .Select(x => x.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
+                    .Select(x => int.TryParse(x.Value.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var output) ? Attempt<int>.Succeed(output) : Attempt<int>.Fail())
+                    .Where(x => x.Success)
+                    .Select(x => x.Result)
+                    .ToArray();
             }
 
             if (userIds.Length == 0)

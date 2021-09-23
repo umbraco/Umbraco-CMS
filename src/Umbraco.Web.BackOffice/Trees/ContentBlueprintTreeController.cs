@@ -103,9 +103,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return nodes;
             }
 
-            var intId = id.TryConvertTo<int>();
+            if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+            {
+                return nodes;
+            }
+
             //Get the content type
-            var ct = _contentTypeService.Get(intId.Result);
+            var ct = _contentTypeService.Get(intId);
             if (ct == null) return nodes;
 
             var blueprintsForDocType = entities.Where(x => ct.Alias == ((IContentEntitySlim) x).ContentTypeAlias);

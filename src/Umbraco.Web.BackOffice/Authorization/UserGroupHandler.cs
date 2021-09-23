@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -77,8 +78,8 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             }
 
             var intIds = ids
-                .Select(x => x.Value.ToString())
-                .Select(x => x.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
+                .Select(x => int.TryParse(x.Value.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var output) ? Attempt<int>.Succeed(output) : Attempt<int>.Fail())
+                .Where(x => x.Success).Select(x => x.Result).ToArray();
 
             var authHelper = new UserGroupEditorAuthorizationHelper(
                 _userService,
