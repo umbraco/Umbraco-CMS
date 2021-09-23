@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _userManager = userManager;
             _runtimeState = runtimeState;
             _runtimeMinifier = runtimeMinifier;
-            _globalSettings = globalSettings.CurrentValue;
+            _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _textService = textService;
             _gridConfig = gridConfig ?? throw new ArgumentNullException(nameof(gridConfig));
