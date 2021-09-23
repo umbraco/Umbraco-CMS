@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 out ContentType[] contentTypes,
                 out DataType[] dataTypes).ToList();
 
-            Init(kits, contentTypes, dataTypes);
+            InitializedCache(kits, contentTypes, dataTypes);
         }
 
         [Test]

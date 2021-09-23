@@ -36,41 +36,41 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             var baseType = new ContentType(TestHelper.ShortStringHelper, -1) { Alias = "Base" };
             contentTypes[0].AddContentType(baseType);
 
-            Init(kits, contentTypes, dataTypes);
+            InitializedCache(kits, contentTypes, dataTypes);
         }
 
         [Test]
         public void IsDocumentType_NonRecursive_ActualType_ReturnsTrue()
         {
-            var publishedContent = GetNode(1100);
+            var publishedContent = GetContent(1100);
             Assert.That(publishedContent.IsDocumentType("Inherited", false));
         }
 
         [Test]
         public void IsDocumentType_NonRecursive_BaseType_ReturnsFalse()
         {
-            var publishedContent = GetNode(1100);
+            var publishedContent = GetContent(1100);
             Assert.That(publishedContent.IsDocumentType("Base", false), Is.False);
         }
 
         [Test]
         public void IsDocumentType_Recursive_ActualType_ReturnsTrue()
         {
-            var publishedContent = GetNode(1100);
+            var publishedContent = GetContent(1100);
             Assert.That(publishedContent.IsDocumentType("Inherited", true));
         }
 
         [Test]
         public void IsDocumentType_Recursive_BaseType_ReturnsTrue()
         {
-            var publishedContent = GetNode(1100);
+            var publishedContent = GetContent(1100);
             Assert.That(publishedContent.IsDocumentType("Base", true));
         }
 
         [Test]
         public void IsDocumentType_Recursive_InvalidBaseType_ReturnsFalse()
         {
-            var publishedContent = GetNode(1100);
+            var publishedContent = GetContent(1100);
             Assert.That(publishedContent.IsDocumentType("invalidbase", true), Is.False);
         }
     }

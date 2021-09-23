@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             var dataTypes = GetDefaultDataTypes();
             var cache = CreateCache(dataTypes, out ContentType[] contentTypes);
 
-            Init(cache, contentTypes, dataTypes);
+            InitializedCache(cache, contentTypes, dataTypes: dataTypes);
         }
 
         protected override PropertyValueConverterCollection PropertyValueConverterCollection
@@ -55,9 +55,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         /// <param name="contentTypes"></param>
         /// <param name="dataTypes"></param>
         /// <returns></returns>
-        protected override ServiceContext CreateServiceContext(ContentType[] contentTypes, DataType[] dataTypes)
+        protected override ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes, IDataType[] dataTypes)
         {
-            var serviceContext = base.CreateServiceContext(contentTypes, dataTypes);
+            var serviceContext = base.CreateServiceContext(contentTypes, mediaTypes, dataTypes);
 
             var localizationService = Mock.Get(serviceContext.LocalizationService);
 
@@ -108,6 +108,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 [string.Empty] = dataTypes[0]
             };
 
+            var contentType1 = new ContentType(ShortStringHelper, -1);
+
             ContentData item1Data = new ContentDataBuilder()
                 .WithName("Content 1")
                 .WithProperties(new PropertyDataBuilder()
@@ -120,7 +122,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     .WithPropertyData("noprop", "xxx", "en-US")
                     .Build())
                 // build with a dynamically created content type
-                .Build(TestHelper.ShortStringHelper, "ContentType1", propertyDataTypes, out ContentType contentType1);
+                .Build(ShortStringHelper, propertyDataTypes, contentType1, "ContentType1");
 
             ContentNodeKit item1 = ContentNodeKitBuilder.CreateWithContent(
                 contentType1.Id,
@@ -137,7 +139,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     .WithPropertyData("welcomeText", "Welcome", "en-US")
                     .Build())
                 // build while dynamically updating the same content type
-                .Build(TestHelper.ShortStringHelper, propertyDataTypes, contentType1, out contentType1);
+                .Build(ShortStringHelper, propertyDataTypes, contentType1);
 
             ContentNodeKit item2 = ContentNodeKitBuilder.CreateWithContent(
                 contentType1.Id,
@@ -148,6 +150,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             result.Add(item2);
 
+            var contentType2 = new ContentType(ShortStringHelper, -1);
+
             ContentData item3Data = new ContentDataBuilder()
                 .WithName("Content 3")
                 .WithProperties(new PropertyDataBuilder()
@@ -155,7 +159,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     .WithPropertyData("prop3", "Oxxo", "en-US")
                     .Build())
                 // build with a dynamically created content type
-                .Build(TestHelper.ShortStringHelper, "ContentType2", propertyDataTypes, out ContentType contentType2);
+                .Build(ShortStringHelper, propertyDataTypes, contentType2, "ContentType2");
 
             ContentNodeKit item3 = ContentNodeKitBuilder.CreateWithContent(
                 contentType2.Id,

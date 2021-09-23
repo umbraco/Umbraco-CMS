@@ -222,7 +222,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void EmptyTest()
         {
-            Init(Array.Empty<ContentNodeKit>(), _contentTypes);
+            InitializedCache(Array.Empty<ContentNodeKit>(), _contentTypes);
 
             var snapshot = GetPublishedSnapshot();
 
@@ -233,7 +233,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void ChildrenTest()
         {
-            Init(GetInvariantKits(), _contentTypes);
+            InitializedCache(GetInvariantKits(), _contentTypes);
 
             var snapshot = GetPublishedSnapshot();
 
@@ -259,7 +259,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void ParentTest()
         {
-            Init(GetInvariantKits(), _contentTypes);
+            InitializedCache(GetInvariantKits(), _contentTypes);
 
             var snapshot = GetPublishedSnapshot();
 
@@ -284,14 +284,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void MoveToRootTest()
         {
-            Init(GetInvariantKits(), _contentTypes);
+            InitializedCache(GetInvariantKits(), _contentTypes);
 
             // get snapshot
             var snapshot = GetPublishedSnapshot();
 
             // do some changes
-            var kit = NuCacheContentService.Kits[10];
-            NuCacheContentService.Kits[10] = ContentNodeKitBuilder.CreateWithContent(
+            var kit = NuCacheContentService.ContentKits[10];
+            NuCacheContentService.ContentKits[10] = ContentNodeKitBuilder.CreateWithContent(
                 contentTypeId: _contentTypeInvariant.Id,
                 id: kit.Node.Id, path: "-1,10", sortOrder: 4, level: 1, parentContentId: -1, 
                 draftData: null,
@@ -313,14 +313,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void MoveFromRootTest()
         {
-            Init(GetInvariantKits(), _contentTypes);
+            InitializedCache(GetInvariantKits(), _contentTypes);
 
             // get snapshot
             var snapshot = GetPublishedSnapshot();
 
             // do some changes
-            var kit = NuCacheContentService.Kits[1];
-            NuCacheContentService.Kits[1] = ContentNodeKitBuilder.CreateWithContent(
+            var kit = NuCacheContentService.ContentKits[1];
+            NuCacheContentService.ContentKits[1] = ContentNodeKitBuilder.CreateWithContent(
                 contentTypeId: _contentTypeInvariant.Id,
                 id: kit.Node.Id, path: "-1,3,10,1", sortOrder: 1, level: 1, parentContentId: 10, 
                 draftData: null,
@@ -342,28 +342,28 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void ReOrderTest()
         {
-            Init(GetInvariantKits(), _contentTypes);
+            InitializedCache(GetInvariantKits(), _contentTypes);
 
             // get snapshot
             var snapshot = GetPublishedSnapshot();
 
             // do some changes
-            var kit = NuCacheContentService.Kits[7];
-            NuCacheContentService.Kits[7] = ContentNodeKitBuilder.CreateWithContent(
+            var kit = NuCacheContentService.ContentKits[7];
+            NuCacheContentService.ContentKits[7] = ContentNodeKitBuilder.CreateWithContent(
                 contentTypeId: _contentTypeInvariant.Id,
                 id: kit.Node.Id, path: kit.Node.Path, sortOrder: 1, level: kit.Node.Level, parentContentId: kit.Node.ParentContentId, 
                 draftData: null,
                 publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
-            kit = NuCacheContentService.Kits[8];
-            NuCacheContentService.Kits[8] = ContentNodeKitBuilder.CreateWithContent(
+            kit = NuCacheContentService.ContentKits[8];
+            NuCacheContentService.ContentKits[8] = ContentNodeKitBuilder.CreateWithContent(
                 contentTypeId: _contentTypeInvariant.Id,
                 id: kit.Node.Id, path: kit.Node.Path, sortOrder: 3, level: kit.Node.Level, parentContentId: kit.Node.ParentContentId, 
                 draftData: null,
                 publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
-            kit = NuCacheContentService.Kits[9];
-            NuCacheContentService.Kits[9] = ContentNodeKitBuilder.CreateWithContent(
+            kit = NuCacheContentService.ContentKits[9];
+            NuCacheContentService.ContentKits[9] = ContentNodeKitBuilder.CreateWithContent(
                 contentTypeId: _contentTypeInvariant.Id,
                 id: kit.Node.Id, path: kit.Node.Path, sortOrder: 2, level: kit.Node.Level, parentContentId: kit.Node.ParentContentId, 
                 draftData: null,
@@ -380,36 +380,36 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void MoveTest()
         {
-            Init(GetInvariantKits(), _contentTypes);
+            InitializedCache(GetInvariantKits(), _contentTypes);
 
             // get snapshot
             var snapshot = GetPublishedSnapshot();
 
             // do some changes
-            var kit = NuCacheContentService.Kits[4];
-            NuCacheContentService.Kits[4] = ContentNodeKitBuilder.CreateWithContent(
+            var kit = NuCacheContentService.ContentKits[4];
+            NuCacheContentService.ContentKits[4] = ContentNodeKitBuilder.CreateWithContent(
                 contentTypeId: _contentTypeInvariant.Id,
                 id: kit.Node.Id, path: kit.Node.Path, sortOrder: 2, level: kit.Node.Level, parentContentId: kit.Node.ParentContentId, 
                 draftData: null,
                 publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
-            kit = NuCacheContentService.Kits[5];
-            NuCacheContentService.Kits[5] = ContentNodeKitBuilder.CreateWithContent(
+            kit = NuCacheContentService.ContentKits[5];
+            NuCacheContentService.ContentKits[5] = ContentNodeKitBuilder.CreateWithContent(
                 contentTypeId: _contentTypeInvariant.Id,
                 id: kit.Node.Id, path: kit.Node.Path, sortOrder: 3, level: kit.Node.Level, parentContentId: kit.Node.ParentContentId, 
                 draftData: null,
                 publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
 
-            kit = NuCacheContentService.Kits[6];
-            NuCacheContentService.Kits[6] = ContentNodeKitBuilder.CreateWithContent(
+            kit = NuCacheContentService.ContentKits[6];
+            NuCacheContentService.ContentKits[6] = ContentNodeKitBuilder.CreateWithContent(
                 contentTypeId: _contentTypeInvariant.Id,
                 id: kit.Node.Id, path: kit.Node.Path, sortOrder: 4, level: kit.Node.Level, parentContentId: kit.Node.ParentContentId, 
                 draftData: null,
                 publishedData: ContentDataBuilder.CreateBasic(kit.PublishedData.Name));
             ;
 
-            kit = NuCacheContentService.Kits[7];
-            NuCacheContentService.Kits[7] = ContentNodeKitBuilder.CreateWithContent(
+            kit = NuCacheContentService.ContentKits[7];
+            NuCacheContentService.ContentKits[7] = ContentNodeKitBuilder.CreateWithContent(
                 contentTypeId: _contentTypeInvariant.Id,
                 id: kit.Node.Id, path: "-1,1,7", sortOrder: 1, level: kit.Node.Level, parentContentId: 1, 
                 draftData: null,
@@ -441,7 +441,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             var paths = new Dictionary<int, string> { { -1, "-1" } };
 
-            Init(new List<ContentNodeKit>
+            InitializedCache(new List<ContentNodeKit>
             {
                 CreateInvariantKit(1, -1, 1, paths),    // first level
                 CreateInvariantKit(2, 1, 1, paths),     // second level
@@ -486,7 +486,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void NestedVariationChildrenTest()
         {
-            Init(GetNestedVariantKits(), _contentTypes);
+            InitializedCache(GetNestedVariantKits(), _contentTypes);
 
             // get snapshot
             var snapshot = GetPublishedSnapshot();
@@ -575,7 +575,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void VariantChildrenTest()
         {
-            Init(GetVariantKits(), _contentTypes);
+            InitializedCache(GetVariantKits(), _contentTypes);
 
             // get snapshot
             var snapshot = GetPublishedSnapshot();
@@ -647,7 +647,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void RemoveTest()
         {
-            Init(GetInvariantKits(), _contentTypes);
+            InitializedCache(GetInvariantKits(), _contentTypes);
 
             // get snapshot
             var snapshot = GetPublishedSnapshot();
@@ -696,7 +696,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void UpdateTest()
         {
-            Init(GetInvariantKits(), _contentTypes);
+            InitializedCache(GetInvariantKits(), _contentTypes);
 
             // get snapshot
             var snapshot = GetPublishedSnapshot();
@@ -749,7 +749,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void AtRootTest()
         {
-            Init(GetVariantWithDraftKits(), _contentTypes);
+            InitializedCache(GetVariantWithDraftKits(), _contentTypes);
 
             // get snapshot
             var snapshot = GetPublishedSnapshot();
@@ -778,7 +778,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 yield return CreateInvariantKit(2, 1, 1, paths);
             }
 
-            Init(GetKits(), _contentTypes);
+            InitializedCache(GetKits(), _contentTypes);
 
             var snapshotService = (PublishedSnapshotService)SnapshotService;
             var contentStore = snapshotService.GetContentStore();
@@ -817,7 +817,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 yield return CreateInvariantKit(4, 1, 3, paths);
             }
 
-            Init(GetKits(), _contentTypes);
+            InitializedCache(GetKits(), _contentTypes);
 
             var snapshotService = (PublishedSnapshotService)SnapshotService;
             var contentStore = snapshotService.GetContentStore();
@@ -897,7 +897,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 yield return CreateInvariantKit(40, 1, 3, paths);
             }
 
-            Init(GetKits(), _contentTypes);
+            InitializedCache(GetKits(), _contentTypes);
 
             var snapshotService = (PublishedSnapshotService)SnapshotService;
             var contentStore = snapshotService.GetContentStore();
@@ -969,12 +969,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             }
 
             //init with all published
-            Init(GetKits(), _contentTypes);
+            InitializedCache(GetKits(), _contentTypes);
 
             var snapshotService = (PublishedSnapshotService)SnapshotService;
             var contentStore = snapshotService.GetContentStore();
 
-            var rootKit = NuCacheContentService.Kits[1].Clone(PublishedModelFactory);
+            var rootKit = NuCacheContentService.ContentKits[1].Clone(PublishedModelFactory);
 
             void ChangePublishFlagOfRoot(bool published, int assertGen, TreeChangeTypes changeType)
             {
@@ -988,7 +988,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     PublishedModelFactory,
                     published ? null : rootKit.PublishedData,
                     published ? rootKit.PublishedData : null);
-                NuCacheContentService.Kits[1] = kit;
+                NuCacheContentService.ContentKits[1] = kit;
 
                 SnapshotService.Notify(new[]
                 {
@@ -1040,7 +1040,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 yield return CreateInvariantKit(4, 1, 3, paths);
             }
 
-            Init(GetKits(), _contentTypes);
+            InitializedCache(GetKits(), _contentTypes);
 
             var snapshotService = (PublishedSnapshotService)SnapshotService;
             var contentStore = snapshotService.GetContentStore();
@@ -1100,7 +1100,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         public void MultipleCacheIteration()
         {
             //see https://github.com/umbraco/Umbraco-CMS/issues/7798
-            Init(GetInvariantKits(), _contentTypes);
+            InitializedCache(GetInvariantKits(), _contentTypes);
             var snapshot = GetPublishedSnapshot();
 
             var items = snapshot.Content.GetByXPath("/root/itype");

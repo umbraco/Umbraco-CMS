@@ -83,37 +83,21 @@ namespace Umbraco.Cms.Tests.Common.Builders
         /// <summary>
         /// Build and dynamically update an existing content type
         /// </summary>
+        /// <typeparam name="TContentType"></typeparam>
         /// <param name="shortStringHelper"></param>
         /// <param name="propertyDataTypes"></param>
-        /// <param name="existing"></param>
         /// <param name="contentType"></param>
+        /// <param name="contentTypeAlias">
+        /// Will configure the content type with this alias/name if supplied when it's not already set on the content type.
+        /// </param>
+        /// <param name="autoCreateCultureNames"></param>
         /// <returns></returns>
-        public ContentData Build(
+        public ContentData Build<TContentType>(
             IShortStringHelper shortStringHelper,
             Dictionary<string, IDataType> propertyDataTypes,
-            ContentType existing,
-            out ContentType contentType,
-            bool autoCreateCultureNames = false) => Build(shortStringHelper, null, propertyDataTypes, existing, out contentType, autoCreateCultureNames);
-
-        /// <summary>
-        /// Build and dynamically create a matching content type
-        /// </summary>
-        /// <param name="contentType"></param>
-        /// <returns></returns>
-        public ContentData Build(
-            IShortStringHelper shortStringHelper,
-            string alias,
-            Dictionary<string, IDataType> propertyDataTypes,
-            out ContentType contentType,
-            bool autoCreateCultureNames = false) => Build(shortStringHelper, alias, propertyDataTypes, null, out contentType, autoCreateCultureNames);
-
-        private ContentData Build(
-            IShortStringHelper shortStringHelper,
-            string alias,
-            Dictionary<string, IDataType> propertyDataTypes,
-            ContentType existing,
-            out ContentType contentType,
-            bool autoCreateCultureNames)
+            TContentType contentType,
+            string contentTypeAlias = null,
+            bool autoCreateCultureNames = false) where TContentType : class, IContentTypeComposition
         {
             if (_name.IsNullOrWhiteSpace())
             {
@@ -126,13 +110,10 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 ? new Dictionary<string, CultureVariation>()
                 : new Dictionary<string, CultureVariation>(_cultureInfos);
 
-            contentType = existing ?? new ContentType(shortStringHelper, -1)
-            {
-                Alias = alias,
-                Name = alias,
-                Key = Guid.NewGuid(),
-                Id = alias.GetHashCode()
-            };
+            contentType.Alias ??= contentTypeAlias;
+            contentType.Name ??= contentTypeAlias;
+            contentType.Key = contentType.Key == default ? Guid.NewGuid() : contentType.Key;
+            contentType.Id = contentType.Id == default ? Math.Abs(contentTypeAlias.GetHashCode()) : contentType.Id;
 
             foreach (KeyValuePair<string, PropertyData[]> prop in _properties)
             {

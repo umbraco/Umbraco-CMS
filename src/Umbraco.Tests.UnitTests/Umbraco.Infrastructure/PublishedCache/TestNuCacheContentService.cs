@@ -16,24 +16,29 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             : this((IEnumerable<ContentNodeKit>)kits)
         { }
 
-        public TestNuCacheContentService(IEnumerable<ContentNodeKit> kits) => Kits = kits.ToDictionary(x => x.Node.Id, x => x);
+        public TestNuCacheContentService(IEnumerable<ContentNodeKit> contentKits, IEnumerable<ContentNodeKit> mediaKits = null)
+        {
+            ContentKits = contentKits?.ToDictionary(x => x.Node.Id, x => x) ?? new Dictionary<int, ContentNodeKit>();
+            MediaKits = mediaKits?.ToDictionary(x => x.Node.Id, x => x) ?? new Dictionary<int, ContentNodeKit>();
+        }
 
-        public Dictionary<int, ContentNodeKit> Kits { get; }        
+        public Dictionary<int, ContentNodeKit> ContentKits { get; }
+        public Dictionary<int, ContentNodeKit> MediaKits { get; }
 
         // note: it is important to clone the returned kits, as the inner
         // ContentNode is directly reused and modified by the snapshot service
         public ContentNodeKit GetContentSource(int id)
-            => Kits.TryGetValue(id, out ContentNodeKit kit) ? kit.Clone(PublishedModelFactory) : default;
+            => ContentKits.TryGetValue(id, out ContentNodeKit kit) ? kit.Clone(PublishedModelFactory) : default;
 
         public IEnumerable<ContentNodeKit> GetAllContentSources()
-            => Kits.Values
+            => ContentKits.Values
                 .OrderBy(x => x.Node.Level)
                 .ThenBy(x => x.Node.ParentContentId)
                 .ThenBy(x => x.Node.SortOrder)
                 .Select(x => x.Clone(PublishedModelFactory));
 
         public IEnumerable<ContentNodeKit> GetBranchContentSources(int id)
-            => Kits.Values
+            => ContentKits.Values
                 .Where(x => x.Node.Path.EndsWith("," + id) || x.Node.Path.Contains("," + id + ","))
                 .OrderBy(x => x.Node.Level)
                 .ThenBy(x => x.Node.ParentContentId)
@@ -41,20 +46,38 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 .Select(x => x.Clone(PublishedModelFactory));
 
         public IEnumerable<ContentNodeKit> GetTypeContentSources(IEnumerable<int> ids)
-            => Kits.Values
+            => ContentKits.Values
                 .Where(x => ids.Contains(x.ContentTypeId))
                 .OrderBy(x => x.Node.Level)
                 .ThenBy(x => x.Node.ParentContentId)
                 .ThenBy(x => x.Node.SortOrder)
                 .Select(x => x.Clone(PublishedModelFactory));
 
-        public ContentNodeKit GetMediaSource(int id) => default;
+        public ContentNodeKit GetMediaSource(int id)
+            => MediaKits.TryGetValue(id, out ContentNodeKit kit) ? kit.Clone(PublishedModelFactory) : default;
 
-        public IEnumerable<ContentNodeKit> GetAllMediaSources() => Enumerable.Empty<ContentNodeKit>();
+        public IEnumerable<ContentNodeKit> GetAllMediaSources()
+            => MediaKits.Values
+                .OrderBy(x => x.Node.Level)
+                .ThenBy(x => x.Node.ParentContentId)
+                .ThenBy(x => x.Node.SortOrder)
+                .Select(x => x.Clone(PublishedModelFactory));
 
-        public IEnumerable<ContentNodeKit> GetBranchMediaSources(int id) => Enumerable.Empty<ContentNodeKit>();
+        public IEnumerable<ContentNodeKit> GetBranchMediaSources(int id)
+            => MediaKits.Values
+                .Where(x => x.Node.Path.EndsWith("," + id) || x.Node.Path.Contains("," + id + ","))
+                .OrderBy(x => x.Node.Level)
+                .ThenBy(x => x.Node.ParentContentId)
+                .ThenBy(x => x.Node.SortOrder)
+                .Select(x => x.Clone(PublishedModelFactory));
 
-        public IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids) => Enumerable.Empty<ContentNodeKit>();
+        public IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids)
+            => MediaKits.Values
+                .Where(x => ids.Contains(x.ContentTypeId))
+                .OrderBy(x => x.Node.Level)
+                .ThenBy(x => x.Node.ParentContentId)
+                .ThenBy(x => x.Node.SortOrder)
+                .Select(x => x.Clone(PublishedModelFactory));
 
         public void DeleteContentItem(IContentBase item) => throw new NotImplementedException();
         public void DeleteContentItems(IEnumerable<IContentBase> items) => throw new NotImplementedException();

@@ -24,12 +24,14 @@ using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
+using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
     [TestFixture]
     public class PublishedSnapshotServiceTestBase
     {
+        protected IShortStringHelper ShortStringHelper { get; } = TestHelper.ShortStringHelper;
         protected virtual IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
         protected IContentTypeService ContentTypeService { get; private set; }
         protected IMediaTypeService MediaTypeService { get; private set; }
@@ -47,10 +49,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     new TestSimpleTinyMceValueConverter()
                 });
 
-        protected IPublishedContent GetNode(int id)
+        protected IPublishedContent GetContent(int id)
         {
             var snapshot = GetPublishedSnapshot();
             var doc = snapshot.Content.GetById(id);
+            Assert.IsNotNull(doc);
+            return doc;
+        }
+
+        protected IPublishedContent GetMedia(int id)
+        {
+            var snapshot = GetPublishedSnapshot();
+            var doc = snapshot.Media.GetById(id);
             Assert.IsNotNull(doc);
             return doc;
         }
@@ -87,7 +97,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             return new[] { dataType };
         }
 
-        protected virtual ServiceContext CreateServiceContext(ContentType[] contentTypes, DataType[] dataTypes)
+        protected virtual ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes, IDataType[] dataTypes)
         {
             var contentTypeService = new Mock<IContentTypeService>();
             contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
@@ -96,8 +106,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 .Returns((string alias) => contentTypes.FirstOrDefault(x => x.Alias.InvariantEquals(alias)));
 
             var mediaTypeService = new Mock<IMediaTypeService>();
-            mediaTypeService.Setup(x => x.GetAll()).Returns(Enumerable.Empty<IMediaType>());
-            mediaTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(Enumerable.Empty<IMediaType>());
+            mediaTypeService.Setup(x => x.GetAll()).Returns(mediaTypes);
+            mediaTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(mediaTypes);
+            mediaTypeService.Setup(x => x.Get(It.IsAny<string>()))
+                .Returns((string alias) => mediaTypes.FirstOrDefault(x => x.Alias.InvariantEquals(alias)));
 
             var contentTypeServiceBaseFactory = new Mock<IContentTypeBaseServiceProvider>();
             contentTypeServiceBaseFactory.Setup(x => x.For(It.IsAny<IContentBase>())).Returns(contentTypeService.Object);
@@ -132,16 +144,24 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         /// </summary>
         /// <param name="contentNodeKits"></param>
         /// <param name="contentTypes"></param>
-        protected void Init(IEnumerable<ContentNodeKit> contentNodeKits, ContentType[] contentTypes, DataType[] dataTypes = null)
+        protected void InitializedCache(
+            IEnumerable<ContentNodeKit> contentNodeKits,            
+            IContentType[] contentTypes,            
+            IDataType[] dataTypes = null,
+            IEnumerable<ContentNodeKit> mediaNodeKits = null,
+            IMediaType[] mediaTypes = null)
         {
             // create a data source for NuCache
-            NuCacheContentService = new TestNuCacheContentService(contentNodeKits);
+            NuCacheContentService = new TestNuCacheContentService(contentNodeKits, mediaNodeKits);
 
             var runtime = Mock.Of<IRuntimeState>();
             Mock.Get(runtime).Setup(x => x.Level).Returns(RuntimeLevel.Run);
 
             // create a service context
-            ServiceContext serviceContext = CreateServiceContext(contentTypes, dataTypes ?? GetDefaultDataTypes());
+            ServiceContext serviceContext = CreateServiceContext(
+                contentTypes ?? Array.Empty<IContentType>(),
+                mediaTypes ?? Array.Empty<IMediaType>(),
+                dataTypes ?? GetDefaultDataTypes());
 
             DataTypeService = serviceContext.DataTypeService;
             ContentTypeService = serviceContext.ContentTypeService;

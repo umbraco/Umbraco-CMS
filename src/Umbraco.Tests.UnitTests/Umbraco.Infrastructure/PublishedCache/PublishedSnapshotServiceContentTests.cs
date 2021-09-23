@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 _contentType
             };
 
-            Init(new[] { CreateKit() }, contentTypes);
+            InitializedCache(new[] { CreateKit() }, contentTypes);
         }
 
         private ContentNodeKit CreateKit()

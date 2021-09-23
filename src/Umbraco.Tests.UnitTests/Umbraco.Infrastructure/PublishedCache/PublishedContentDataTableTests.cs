@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         public void To_DataTable()
         {   
             var cache = CreateCache(true, _dataTypes[0], out ContentType[] contentTypes);
-            Init(cache, contentTypes, _dataTypes);
+            InitializedCache(cache, contentTypes, dataTypes: _dataTypes);
 
             var snapshot = GetPublishedSnapshot();
             var root = snapshot.Content.GetAtRoot().First();
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         public void To_DataTable_With_Filter()
         {
             var cache = CreateCache(true, _dataTypes[0], out ContentType[] contentTypes);
-            Init(cache, contentTypes, _dataTypes);
+            InitializedCache(cache, contentTypes, dataTypes: _dataTypes);
 
             var snapshot = GetPublishedSnapshot();
             var root = snapshot.Content.GetAtRoot().First();
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         public void To_DataTable_No_Rows()
         {
             var cache = CreateCache(false, _dataTypes[0], out ContentType[] contentTypes);
-            Init(cache, contentTypes, _dataTypes);
+            InitializedCache(cache, contentTypes, dataTypes: _dataTypes);
 
             var snapshot = GetPublishedSnapshot();
             var root = snapshot.Content.GetAtRoot().First();

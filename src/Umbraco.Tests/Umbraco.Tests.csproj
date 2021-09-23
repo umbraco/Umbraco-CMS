@@ -191,7 +191,6 @@
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
-    <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />

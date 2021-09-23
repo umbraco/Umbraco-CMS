@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             };
             contentTypes.First(x => x.Alias == "Home").AddContentType(compositionType);
 
-            Init(kits, contentTypes, dataTypes);
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
         }
 
         // override to specify our own factory with custom types
@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Is_Last_From_Where_Filter_Dynamic_Linq()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var items = doc.Children(VariationContextAccessor).Where(x => x.IsVisible(Mock.Of<IPublishedValueFallback>())).ToIndexedArray();
 
@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Is_Last_From_Where_Filter()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var items = doc
                 .Children(VariationContextAccessor)
@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Is_Last_From_Where_Filter2()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
             var ct = doc.ContentType;
 
             var items = doc.Children(VariationContextAccessor)
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Is_Last_From_Take()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var items = doc.Children(VariationContextAccessor).Take(4).ToIndexedArray();
 
@@ -214,7 +214,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Is_Last_From_Skip()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             foreach (var d in doc.Children(VariationContextAccessor).Skip(1).ToIndexedArray())
             {
@@ -232,10 +232,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Is_Last_From_Concat()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var items = doc.Children(VariationContextAccessor)
-                .Concat(new[] { GetNode(1175), GetNode(4444) })
+                .Concat(new[] { GetContent(1175), GetContent(4444) })
                 .ToIndexedArray();
 
             foreach (var item in items)
@@ -254,7 +254,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Descendants_Ordered_Properly()
         {
-            var doc = GetNode(1046);
+            var doc = GetContent(1046);
 
             var expected = new[] { 1046, 1173, 1174, 117, 1177, 1178, 1179, 1176, 1175, 4444, 1172 };
             var exindex = 0;
@@ -271,7 +271,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         {
             // TODO: We need to use a different fallback?
 
-            var doc = GetNode(1174);
+            var doc = GetContent(1174);
             var rVal = doc.Value(PublishedValueFallback, "testRecursive", fallback: Fallback.ToAncestors);
             var nullVal = doc.Value(PublishedValueFallback, "DoNotFindThis", fallback: Fallback.ToAncestors);
             Assert.AreEqual("This is the recursive val", rVal);
@@ -281,7 +281,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Get_Property_Value_Uses_Converter()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var propVal = doc.Value(PublishedValueFallback, "content");
             Assert.IsInstanceOf(typeof(IHtmlEncodedString), propVal);
@@ -299,7 +299,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Complex_Linq()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var result = doc.Ancestors().OrderBy(x => x.Level)
                 .Single()
@@ -321,7 +321,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             //};
             //ContentTypesCache.GetPublishedContentTypeByAlias = alias => contentTypes[alias];
 
-            var doc = GetNode(1046);
+            var doc = GetContent(1046);
 
             var found1 = doc.Children(VariationContextAccessor).GroupBy(x => x.ContentType.Alias).ToArray();
 
@@ -342,7 +342,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             //};
             //ContentTypesCache.GetPublishedContentTypeByAlias = alias => contentTypes[alias];
 
-            var doc = GetNode(1046);
+            var doc = GetContent(1046);
 
             var found1 = doc.Children(VariationContextAccessor).Where(x => x.ContentType.Alias == "CustomDocument");
             var found2 = doc.Children(VariationContextAccessor).Where(x => x.ContentType.Alias == "Home");
@@ -354,7 +354,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Children_Order_By_Update_Date()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var ordered = doc.Children(VariationContextAccessor).OrderBy(x => x.UpdateDate);
 
@@ -369,12 +369,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void FirstChild()
         {
-            var doc = GetNode(1173); // has child nodes
+            var doc = GetContent(1173); // has child nodes
             Assert.IsNotNull(doc.FirstChild(Mock.Of<IVariationContextAccessor>()));
             Assert.IsNotNull(doc.FirstChild(Mock.Of<IVariationContextAccessor>(), x => true));
             Assert.IsNotNull(doc.FirstChild<IPublishedContent>(Mock.Of<IVariationContextAccessor>()));
 
-            doc = GetNode(1175); // does not have child nodes
+            doc = GetContent(1175); // does not have child nodes
             Assert.IsNull(doc.FirstChild(Mock.Of<IVariationContextAccessor>()));
             Assert.IsNull(doc.FirstChild(Mock.Of<IVariationContextAccessor>(), x => true));
             Assert.IsNull(doc.FirstChild<IPublishedContent>(Mock.Of<IVariationContextAccessor>()));
@@ -383,7 +383,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void FirstChildAsT()
         {
-            var doc = GetNode(1046); // has child nodes
+            var doc = GetContent(1046); // has child nodes
 
             var model = doc.FirstChild<Home>(Mock.Of<IVariationContextAccessor>(), x => true); // predicate
 
@@ -392,7 +392,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Assert.IsInstanceOf<Home>(model);
             Assert.IsInstanceOf<IPublishedContent>(model);
 
-            doc = GetNode(1175); // does not have child nodes
+            doc = GetContent(1175); // does not have child nodes
             Assert.IsNull(doc.FirstChild<Anything>(Mock.Of<IVariationContextAccessor>()));
             Assert.IsNull(doc.FirstChild<Anything>(Mock.Of<IVariationContextAccessor>(), x => true));
         }
@@ -400,7 +400,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void IsComposedOf()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var isComposedOf = doc.IsComposedOf("MyCompositionAlias");
 
@@ -410,7 +410,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void HasProperty()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var hasProp = doc.HasProperty(Constants.Conventions.Content.UrlAlias);
 
@@ -420,7 +420,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void HasValue()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var hasValue = doc.HasValue(Mock.Of<IPublishedValueFallback>(), Constants.Conventions.Content.UrlAlias);
             var noValue = doc.HasValue(Mock.Of<IPublishedValueFallback>(), "blahblahblah");
@@ -432,7 +432,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Ancestors_Where_Visible()
         {
-            var doc = GetNode(1174);
+            var doc = GetContent(1174);
 
             var whereVisible = doc.Ancestors().Where(x => x.IsVisible(Mock.Of<IPublishedValueFallback>()));
             Assert.AreEqual(1, whereVisible.Count());
@@ -442,8 +442,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Visible()
         {
-            var hidden = GetNode(1046);
-            var visible = GetNode(1173);
+            var hidden = GetContent(1046);
+            var visible = GetContent(1173);
 
             Assert.IsFalse(hidden.IsVisible(Mock.Of<IPublishedValueFallback>()));
             Assert.IsTrue(visible.IsVisible(Mock.Of<IPublishedValueFallback>()));
@@ -452,7 +452,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Ancestor_Or_Self()
         {
-            var doc = GetNode(1173);
+            var doc = GetContent(1173);
 
             var result = doc.AncestorOrSelf();
 
@@ -465,7 +465,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void U4_4559()
         {
-            var doc = GetNode(1174);
+            var doc = GetContent(1174);
             var result = doc.AncestorOrSelf(1);
             Assert.IsNotNull(result);
             Assert.AreEqual(1046, result.Id);
@@ -474,7 +474,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Ancestors_Or_Self()
         {
-            var doc = GetNode(1174);
+            var doc = GetContent(1174);
 
             var result = doc.AncestorsOrSelf().ToArray();
 
@@ -487,7 +487,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Ancestors()
         {
-            var doc = GetNode(1174);
+            var doc = GetContent(1174);
 
             var result = doc.Ancestors().ToArray();
 
@@ -508,12 +508,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             // -- Custom Doc4: 117 (parent 1173)
             // - Custom Doc3: 1172 (no parent)
 
-            var home = GetNode(1173);
-            var root = GetNode(1046);
-            var customDoc = GetNode(1178);
-            var customDoc2 = GetNode(1179);
-            var customDoc3 = GetNode(1172);
-            var customDoc4 = GetNode(117);
+            var home = GetContent(1173);
+            var root = GetContent(1046);
+            var customDoc = GetContent(1178);
+            var customDoc2 = GetContent(1179);
+            var customDoc3 = GetContent(1172);
+            var customDoc4 = GetContent(117);
 
             Assert.IsTrue(root.IsAncestor(customDoc4));
             Assert.IsFalse(root.IsAncestor(customDoc3));
@@ -557,12 +557,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             // -- Custom Doc4: 117 (parent 1173)
             // - Custom Doc3: 1172 (no parent)
 
-            var home = GetNode(1173);
-            var root = GetNode(1046);
-            var customDoc = GetNode(1178);
-            var customDoc2 = GetNode(1179);
-            var customDoc3 = GetNode(1172);
-            var customDoc4 = GetNode(117);
+            var home = GetContent(1173);
+            var root = GetContent(1046);
+            var customDoc = GetContent(1178);
+            var customDoc2 = GetContent(1179);
+            var customDoc3 = GetContent(1172);
+            var customDoc4 = GetContent(117);
 
             Assert.IsTrue(root.IsAncestorOrSelf(customDoc4));
             Assert.IsFalse(root.IsAncestorOrSelf(customDoc3));
@@ -600,7 +600,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Descendants_Or_Self()
         {
-            var doc = GetNode(1046);
+            var doc = GetContent(1046);
 
             var result = doc.DescendantsOrSelf(Mock.Of<IVariationContextAccessor>()).ToArray();
 
@@ -613,7 +613,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Descendants()
         {
-            var doc = GetNode(1046);
+            var doc = GetContent(1046);
 
             var result = doc.Descendants(Mock.Of<IVariationContextAccessor>()).ToArray();
 
@@ -634,12 +634,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             // -- Custom Doc4: 117 (parent 1173)
             // - Custom Doc3: 1172 (no parent)
 
-            var home = GetNode(1173);
-            var root = GetNode(1046);
-            var customDoc = GetNode(1178);
-            var customDoc2 = GetNode(1179);
-            var customDoc3 = GetNode(1172);
-            var customDoc4 = GetNode(117);
+            var home = GetContent(1173);
+            var root = GetContent(1046);
+            var customDoc = GetContent(1178);
+            var customDoc2 = GetContent(1179);
+            var customDoc3 = GetContent(1172);
+            var customDoc4 = GetContent(117);
 
             Assert.IsFalse(root.IsDescendant(root));
             Assert.IsFalse(root.IsDescendant(home));
@@ -683,12 +683,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             // -- Custom Doc4: 117 (parent 1173)
             // - Custom Doc3: 1172 (no parent)
 
-            var home = GetNode(1173);
-            var root = GetNode(1046);
-            var customDoc = GetNode(1178);
-            var customDoc2 = GetNode(1179);
-            var customDoc3 = GetNode(1172);
-            var customDoc4 = GetNode(117);
+            var home = GetContent(1173);
+            var root = GetContent(1046);
+            var customDoc = GetContent(1178);
+            var customDoc2 = GetContent(1179);
+            var customDoc3 = GetContent(1172);
+            var customDoc4 = GetContent(117);
 
             Assert.IsTrue(root.IsDescendantOrSelf(root));
             Assert.IsFalse(root.IsDescendantOrSelf(home));
@@ -737,16 +737,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             // -- Level1.3: 4444 (parent 1046)
             // - Root : 1172 (no parent)
 
-            var root = GetNode(1046);
-            var level1_1 = GetNode(1173);
-            var level1_1_1 = GetNode(1174);
-            var level1_1_2 = GetNode(117);
-            var level1_1_3 = GetNode(1177);
-            var level1_1_4 = GetNode(1178);
-            var level1_1_5 = GetNode(1176);
-            var level1_2 = GetNode(1175);
-            var level1_3 = GetNode(4444);
-            var root2 = GetNode(1172);
+            var root = GetContent(1046);
+            var level1_1 = GetContent(1173);
+            var level1_1_1 = GetContent(1174);
+            var level1_1_2 = GetContent(117);
+            var level1_1_3 = GetContent(1177);
+            var level1_1_4 = GetContent(1178);
+            var level1_1_5 = GetContent(1176);
+            var level1_2 = GetContent(1175);
+            var level1_3 = GetContent(4444);
+            var root2 = GetContent(1172);
 
             var publishedSnapshot = GetPublishedSnapshot();
 
@@ -780,16 +780,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             // -- Level1.3: 4444 (parent 1046)
             // - Root : 1172 (no parent)
 
-            var root = GetNode(1046);
-            var level1_1 = GetNode(1173);
-            var level1_1_1 = GetNode(1174);
-            var level1_1_2 = GetNode(117);
-            var level1_1_3 = GetNode(1177);
-            var level1_1_4 = GetNode(1178);
-            var level1_1_5 = GetNode(1176);
-            var level1_2 = GetNode(1175);
-            var level1_3 = GetNode(4444);
-            var root2 = GetNode(1172);
+            var root = GetContent(1046);
+            var level1_1 = GetContent(1173);
+            var level1_1_1 = GetContent(1174);
+            var level1_1_2 = GetContent(117);
+            var level1_1_3 = GetContent(1177);
+            var level1_1_4 = GetContent(1178);
+            var level1_1_5 = GetContent(1176);
+            var level1_2 = GetContent(1175);
+            var level1_3 = GetContent(4444);
+            var root2 = GetContent(1172);
 
             var publishedSnapshot = GetPublishedSnapshot();
 
@@ -870,7 +870,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Distinct()
         {
-            var items = GetNode(1173)
+            var items = GetContent(1173)
                 .Children(VariationContextAccessor)
                 .Distinct()
                 .Distinct()
@@ -916,7 +916,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void OfType()
         {
-            var content = GetNode(1173)
+            var content = GetContent(1173)
                 .Children(VariationContextAccessor)
                 .OfType<Home>()
                 .First(x => x.UmbracoNaviHide == true);
@@ -926,7 +926,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public void Position()
         {
-            var items = GetNode(1173).Children(VariationContextAccessor)
+            var items = GetContent(1173).Children(VariationContextAccessor)
                 .Where(x => x.Value<int?>(Mock.Of<IPublishedValueFallback>(), "umbracoNaviHide") == 0)
                 .ToIndexedArray();
 
