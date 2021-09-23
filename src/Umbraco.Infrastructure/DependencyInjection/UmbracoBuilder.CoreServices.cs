@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             builder.Services.AddSingleton<IShortStringHelper>(factory
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptions<RequestHandlerSettings>>().Value)));
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptionsMonitor<RequestHandlerSettings>>().CurrentValue)));
 
             builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
             builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));

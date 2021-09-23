@@ -16,19 +16,20 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     {
         private readonly ILogger<ReportSiteTask> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IOptions<GlobalSettings> _globalSettings;
+        private GlobalSettings _globalSettings;
         private static HttpClient s_httpClient;
 
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
             IUmbracoVersion umbracoVersion,
-            IOptions<GlobalSettings> globalSettings)
+            IOptionsMonitor<GlobalSettings> globalSettings)
             : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
         {
             _logger = logger;
             _umbracoVersion = umbracoVersion;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.CurrentValue;
             s_httpClient = new HttpClient();
+            globalSettings.OnChange(x => _globalSettings = x);
         }
 
         /// <summary>
@@ -38,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         public override async Task PerformExecuteAsync(object state)
         {
             // Try & get a value stored in umbracoSettings.config on the backoffice XML element ID attribute
-            var backofficeIdentifierRaw = _globalSettings.Value.Id;
+            var backofficeIdentifierRaw = _globalSettings.Id;
 
             // Parse as a GUID & verify its a GUID and not some random string
             // In case of users may have messed or decided to empty the file contents or put in something random

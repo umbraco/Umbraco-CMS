@@ -11,17 +11,18 @@ namespace Umbraco.Cms.Core.PublishedCache
     {
         private readonly ILocalizationService _localizationService;
         private readonly IRuntimeState _runtimeState;
-        private readonly GlobalSettings _options;
+        private GlobalSettings _options;
 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultCultureAccessor"/> class.
         /// </summary>
-        public DefaultCultureAccessor(ILocalizationService localizationService, IRuntimeState runtimeState, IOptionsSnapshot<GlobalSettings> options)
+        public DefaultCultureAccessor(ILocalizationService localizationService, IRuntimeState runtimeState, IOptionsMonitor<GlobalSettings> options)
         {
             _localizationService = localizationService;
             _runtimeState = runtimeState;
-            _options = options.Value;
+            _options = options.CurrentValue;
+            options.OnChange(x => _options = x);
         }
 
         /// <inheritdoc />
