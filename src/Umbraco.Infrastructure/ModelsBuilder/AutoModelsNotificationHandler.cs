@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
     {
         private static int s_req;
         private readonly ILogger<AutoModelsNotificationHandler> _logger;
-        private readonly ModelsBuilderSettings _config;
+        private ModelsBuilderSettings _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
         private readonly IMainDom _mainDom;
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
         /// </summary>
         public AutoModelsNotificationHandler(
             ILogger<AutoModelsNotificationHandler> logger,
-            IOptions<ModelsBuilderSettings> config,
+            IOptionsSnapshot<ModelsBuilderSettings> config,
             ModelsGenerator modelGenerator,
             ModelsGenerationError mbErrors,
             IMainDom mainDom)

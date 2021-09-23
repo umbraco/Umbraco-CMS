@@ -60,11 +60,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _textService;
         private readonly IUmbracoMapper _umbracoMapper;
-        private GlobalSettings _globalSettings;
-        private SecuritySettings _securitySettings;
+        private readonly GlobalSettings _globalSettings;
+        private readonly SecuritySettings _securitySettings;
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IIpResolver _ipResolver;
-        private UserPasswordConfigurationSettings _passwordConfiguration;
+        private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -81,11 +81,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IUserService userService,
             ILocalizedTextService textService,
             IUmbracoMapper umbracoMapper,
-            IOptionsMonitor<GlobalSettings> globalSettings,
-            IOptionsMonitor<SecuritySettings> securitySettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptionsSnapshot<SecuritySettings> securitySettings,
             ILogger<AuthenticationController> logger,
             IIpResolver ipResolver,
-            IOptionsMonitor<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,
             ISmsSender smsSender,
             IHostingEnvironment hostingEnvironment,
@@ -99,11 +99,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _userService = userService;
             _textService = textService;
             _umbracoMapper = umbracoMapper;
-            _globalSettings = globalSettings.CurrentValue;
-            _securitySettings = securitySettings.CurrentValue;
+            _globalSettings = globalSettings.Value;
+            _securitySettings = securitySettings.Value;
             _logger = logger;
             _ipResolver = ipResolver;
-            _passwordConfiguration = passwordConfiguration.CurrentValue;
+            _passwordConfiguration = passwordConfiguration.Value;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _hostingEnvironment = hostingEnvironment;

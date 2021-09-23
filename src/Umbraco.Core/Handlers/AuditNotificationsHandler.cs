@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Handlers
         private readonly IEntityService _entityService;
         private readonly IIpResolver _ipResolver;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-        private GlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IMemberService _memberService;
 
         public AuditNotificationsHandler(
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Handlers
             IUserService userService,
             IEntityService entityService,
             IIpResolver ipResolver,
-            IOptionsMonitor<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IMemberService memberService)
         {
@@ -48,8 +48,7 @@ namespace Umbraco.Cms.Core.Handlers
             _ipResolver = ipResolver;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _memberService = memberService;
-            _globalSettings = globalSettings.CurrentValue;
-            globalSettings.OnChange(x => _globalSettings = x);
+            _globalSettings = globalSettings.Value;
         }
 
         private IUser CurrentPerformingUser
