@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
 
-        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
         void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Constants.Security.SuperUserId);
-        
+
         /// <summary>
         /// Deletes an <see cref="IDataType"/>
         /// </summary>

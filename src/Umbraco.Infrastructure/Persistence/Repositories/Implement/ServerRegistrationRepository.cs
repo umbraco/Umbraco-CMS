@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             var timeoutDate = DateTime.Now.Subtract(staleTimeout);
 
-            Database.Update<ServerRegistrationDto>("SET isActive=0, isMaster=0 WHERE lastNotifiedDate < @timeoutDate", new { /*timeoutDate =*/ timeoutDate });
+            Database.Update<ServerRegistrationDto>("SET isActive=0, isSchedulingPublisher=0 WHERE lastNotifiedDate < @timeoutDate", new { /*timeoutDate =*/ timeoutDate });
             ClearCache();
         }
     }

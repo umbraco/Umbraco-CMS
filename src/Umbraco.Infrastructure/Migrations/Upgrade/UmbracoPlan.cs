@@ -246,6 +246,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
                 .To<DictionaryTablesIndexes>("{12DCDE7F-9AB7-4617-804F-AB66BF360980}")
             .As("{5AAE6276-80DB-4ACF-B845-199BC6C37538}");
 
+            // TO 9.0.0-rc4
+            To<UmbracoServerColumn>("5E02F241-5253-403D-B5D3-7DB00157E20F");
+
             // TO 9.0.0
 
         }

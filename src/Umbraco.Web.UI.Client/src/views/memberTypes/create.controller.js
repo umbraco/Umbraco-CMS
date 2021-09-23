@@ -29,7 +29,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";
-                navigationService.syncTree({ tree: "membertypes", path: currPath + "," + folderId, forceReload: true, activate: true });
+                navigationService.syncTree({ tree: "memberTypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
                 formHelper.resetForm({ scope: $scope, formCtrl: this.createFolderForm });
 
@@ -42,7 +42,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
 
     $scope.createMemberType = function() {
         $location.search('create', null);
-        $location.path("/" + section + "/membertypes/edit/" + node.id).search("create", "true");
+        $location.path("/" + section + "/memberTypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     }
 }

@@ -33,7 +33,7 @@
                 snippet = selectedSnippet.fileName;
             }
 
-            $location.path("/settings/partialviews/edit/" + node.id).search("create", "true").search("snippet", snippet);
+            $location.path("/settings/partialViews/edit/" + node.id).search("create", "true").search("snippet", snippet);
             navigationService.hideMenu();
 
         }
@@ -67,7 +67,7 @@
                 });
             }
         }
-        
+
         function showCreateFromSnippet() {
             vm.showSnippets = true;
         }
@@ -76,7 +76,7 @@
             const showMenu = true;
             navigationService.hideDialog(showMenu);
         }
-        
+
         onInit();
 
     }

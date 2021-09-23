@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -221,12 +222,40 @@ namespace Umbraco.Extensions
             // We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
             // But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
             IMvcBuilder mvcBuilder = builder.Services
-                .AddControllersWithViews()
-                .AddRazorRuntimeCompilation();
+                .AddControllersWithViews();
+
+            FixForDotnet6Preview1(builder.Services);
+            mvcBuilder.AddRazorRuntimeCompilation();
 
             mvcBuilding?.Invoke(mvcBuilder);
 
             return builder;
+        }
+
+        /// <summary>
+        /// This fixes an issue for .NET6 Preview1, that in AddRazorRuntimeCompilation cannot remove the existing IViewCompilerProvider.
+        /// </summary>
+        /// <remarks>
+        ///  When running .NET6 Preview1 there is an issue with looks to be fixed when running ASP.NET Core 6.
+        ///  This issue is because the default implementation of IViewCompilerProvider has changed, so the
+        ///  AddRazorRuntimeCompilation extension can't remove the default and replace with the runtimeviewcompiler.
+        ///
+        ///  This method basically does the same as the ASP.NET Core 6 version of AddRazorRuntimeCompilation
+        ///  https://github.com/dotnet/aspnetcore/blob/f7dc5e24af7f9692a1db66741954b90b42d84c3a/src/Mvc/Mvc.Razor.RuntimeCompilation/src/DependencyInjection/RazorRuntimeCompilationMvcCoreBuilderExtensions.cs#L71-L80
+        ///
+        ///  While running .NET5 this does nothing as the ImplementationType has another FullName, and this is handled by the .NET5 version of AddRazorRuntimeCompilation
+        /// </remarks>
+        private static void FixForDotnet6Preview1(IServiceCollection services)
+        {
+            var compilerProvider = services.FirstOrDefault(f =>
+                f.ServiceType == typeof(IViewCompilerProvider) &&
+                f.ImplementationType?.Assembly == typeof(IViewCompilerProvider).Assembly &&
+                f.ImplementationType.FullName == "Microsoft.AspNetCore.Mvc.Razor.Compilation.DefaultViewCompiler");
+
+            if (compilerProvider != null)
+            {
+                services.Remove(compilerProvider);
+            }
         }
 
         /// <summary>

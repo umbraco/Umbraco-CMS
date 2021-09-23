@@ -60,17 +60,17 @@
         }
 
         function createFile() {
-            $location.path("/settings/partialviewmacros/edit/" + node.id).search("create", "true");
+            $location.path("/settings/partialViewMacros/edit/" + node.id).search("create", "true");
             navigationService.hideMenu();
         }
 
         function createFileWithoutMacro() {
-            $location.path("/settings/partialviewmacros/edit/" + node.id).search("create", "true").search("nomacro", "true");
+            $location.path("/settings/partialViewMacros/edit/" + node.id).search("create", "true").search("nomacro", "true");
             navigationService.hideMenu();
         }
 
         function createFileFromSnippet(snippet) {
-            $location.path("/settings/partialviewmacros/edit/" + node.id).search("create", "true").search("snippet", snippet.fileName);
+            $location.path("/settings/partialViewMacros/edit/" + node.id).search("create", "true").search("snippet", snippet.fileName);
             navigationService.hideMenu();
         }
 

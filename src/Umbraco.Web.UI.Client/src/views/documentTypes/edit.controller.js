@@ -357,7 +357,7 @@
                 }).then(function (data) {
                     // allow UI to access server validation state
                     vm.contentType.ModelState = data.ModelState;
-                    
+
                     //success
                     // we don't need to sync the tree in infinite mode
                     if (!infiniteMode) {
@@ -367,7 +367,7 @@
                     // emit event
                     var args = { documentType: vm.contentType };
                     eventsService.emit("editors.documentType.saved", args);
-                    
+
                     if (documentTypeIcon !== vm.contentType.icon) {
                         eventsService.emit("editors.tree.icon.changed", args);
                     }
@@ -426,7 +426,7 @@
             editorState.set(contentType);
 
             vm.contentType = contentType;
-            
+
             documentTypeIcon = contentType.icon;
 
             loadButtons();
@@ -466,7 +466,7 @@
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
-            const args = { tree: "documenttypes", path: path.split(","), forceReload: initialLoad !== true };
+            const args = { tree: "documentTypes", path: path.split(","), forceReload: initialLoad !== true };
             navigationService.syncTree(args)
                 .then(function (syncArgs) {
                     vm.currentNode = syncArgs.node;
@@ -513,7 +513,7 @@
             }
         });
 
-        // #3368 - changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty 
+        // #3368 - changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty
         $scope.$watch(
             "vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.allowCultureVariant + vm.contentType.isElement + " +
             "vm.contentType.allowedTemplates.length + vm.contentType.isContainer + vm.contentType.compositeContentTypes.length",

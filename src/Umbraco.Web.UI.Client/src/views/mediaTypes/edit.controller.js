@@ -10,7 +10,7 @@
     "use strict";
 
     function MediaTypesEditController($scope, $routeParams, $q,
-        mediaTypeResource, editorState, contentEditingHelper, 
+        mediaTypeResource, editorState, contentEditingHelper,
         navigationService, iconHelper, contentTypeHelper, notificationsService,
         localizationService, overlayHelper, eventsService, angularHelper) {
 
@@ -85,19 +85,19 @@
                     "name": vm.labels.design,
                     "alias": "design",
                     "icon": "icon-document-dashed-line",
-                    "view": "views/mediatypes/views/design/design.html"
+                    "view": "views/mediaTypes/views/design/design.html"
                 },
                 {
                     "name": vm.labels.listview,
                     "alias": "listView",
                     "icon": "icon-list",
-                    "view": "views/mediatypes/views/listview/listview.html"
+                    "view": "views/mediaTypes/views/listview/listview.html"
                 },
                 {
                     "name": vm.labels.permissions,
                     "alias": "permissions",
                     "icon": "icon-keychain",
-                    "view": "views/mediatypes/views/permissions/permissions.html"
+                    "view": "views/mediaTypes/views/permissions/permissions.html"
                 }
             ];
 
@@ -166,7 +166,7 @@
             var initialViewSetFromRouteParams = false;
             var view = $routeParams.view;
             if (view) {
-                var viewPath = "views/mediatypes/views/" + view + "/" + view + ".html";
+                var viewPath = "views/mediaTypes/views/" + view + "/" + view + ".html";
                 for (var i = 0; i < vm.page.navigation.length; i++) {
                     if (vm.page.navigation[i].view === viewPath) {
                         vm.page.navigation[i].active = true;
@@ -248,7 +248,7 @@
         });
 
         if (create) {
-            
+
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
@@ -350,7 +350,7 @@
                     }
 
                     deferred.resolve(data);
-                    
+
                 }, function (err) {
                     //error
                     if (err) {
@@ -402,7 +402,7 @@
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
-            navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function(syncArgs) {
+            navigationService.syncTree({ tree: "mediaTypes", path: path.split(","), forceReload: initialLoad !== true }).then(function(syncArgs) {
                 vm.currentNode = syncArgs.node;
             });
         }
@@ -428,7 +428,7 @@
             }
         });
 
-        // changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty 
+        // changes on the other "buttons" do not register on the current form, so we manually have to flag the form as dirty
         $scope.$watch("vm.contentType.allowedContentTypes.length + vm.contentType.allowAsRoot + vm.contentType.isContainer + vm.contentType.compositeContentTypes.length", function (newVal, oldVal) {
             if (oldVal === undefined) {
                 // still initializing, ignore

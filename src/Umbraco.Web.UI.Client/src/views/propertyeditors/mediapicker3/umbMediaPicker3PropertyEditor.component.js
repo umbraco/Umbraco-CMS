@@ -298,7 +298,7 @@
                     resetCrop: resetCrop
                 },
                 enableFocalPointSetter: vm.model.config.enableLocalFocalPoint || false,
-                view: "views/common/infiniteeditors/mediaEntryEditor/mediaEntryEditor.html",
+                view: "views/common/infiniteeditors/mediaentryeditor/mediaentryeditor.html",
                 size: "large",
                 submit: function(model) {
                     vm.model.value[vm.model.value.indexOf(mediaEntry)] = mediaEntryClone;

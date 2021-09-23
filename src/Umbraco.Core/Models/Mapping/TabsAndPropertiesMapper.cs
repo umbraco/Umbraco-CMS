@@ -59,7 +59,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 Id = 0,
                 Label = LocalizedTextService.Localize("general", "properties"),
                 Alias = "Generic properties",
-                Properties = genericproperties
+                Properties = genericproperties,
+                Type = PropertyGroupType.Group.ToString()
             });
 
             var genericProps = tabs.Single(x => x.Id == 0);

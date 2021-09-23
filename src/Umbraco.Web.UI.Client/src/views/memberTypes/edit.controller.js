@@ -71,7 +71,7 @@
                 {
                     "name": vm.labels.design,
                     "icon": "icon-document-dashed-line",
-                    "view": "views/membertypes/views/design/design.html",
+                    "view": "views/memberTypes/views/design/design.html",
                     "active": true
                 }
             ];
@@ -134,7 +134,7 @@
 
                             contentTypeHelper.generateModels().then(function (result) {
 
-                                if (!result.lastError) { 
+                                if (!result.lastError) {
 
                                     //re-check model status
                                     contentTypeHelper.checkModelsBuilderStatus().then(function (statusResult) {
@@ -170,7 +170,7 @@
         });
 
         if (create) {
-            
+
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
@@ -203,7 +203,7 @@
         /* ---------- SAVE ---------- */
 
         function save() {
-            
+
             // only save if there is no overlays open
             if(overlayHelper.getNumberOfOverlays() === 0) {
 
@@ -324,11 +324,11 @@
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
-            navigationService.syncTree({ tree: "membertypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
+            navigationService.syncTree({ tree: "memberTypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                 vm.currentNode = syncArgs.node;
             });
         }
-        
+
         function close() {
             if (infiniteMode && $scope.model.close) {
                 $scope.model.close();
