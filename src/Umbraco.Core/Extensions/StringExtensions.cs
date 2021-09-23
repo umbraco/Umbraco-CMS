@@ -42,9 +42,7 @@ namespace Umbraco.Extensions
         public static int[] GetIdsFromPathReversed(this string path)
         {
             var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.TryConvertTo<int>())
-                .Where(x => x.Success)
-                .Select(x => x.Result)
+                .Select(x => int.Parse(x, CultureInfo.InvariantCulture))
                 .Reverse()
                 .ToArray();
             return nodeIds;
