@@ -23,6 +23,9 @@ namespace Umbraco.Cms.Tests.Common.Published
     /// Converts legacy Umbraco XML structures to NuCache <see cref="ContentNodeKit"/> collections
     /// to populate a test implementation of <see cref="INuCacheContentService"/>
     /// </summary>
+    /// <remarks>
+    /// This does not support variant data because the XML structure doesn't support variant data.
+    /// </remarks>
     public static class PublishedContentXmlAdapter
     {
         public static IEnumerable<ContentNodeKit> GetContentNodeKits(

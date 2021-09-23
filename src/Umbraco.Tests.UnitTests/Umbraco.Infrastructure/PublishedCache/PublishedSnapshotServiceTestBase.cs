@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Extensions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -91,6 +92,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             var contentTypeService = new Mock<IContentTypeService>();
             contentTypeService.Setup(x => x.GetAll()).Returns(contentTypes);
             contentTypeService.Setup(x => x.GetAll(It.IsAny<int[]>())).Returns(contentTypes);
+            contentTypeService.Setup(x => x.Get(It.IsAny<string>()))
+                .Returns((string alias) => contentTypes.FirstOrDefault(x => x.Alias.InvariantEquals(alias)));
 
             var mediaTypeService = new Mock<IMediaTypeService>();
             mediaTypeService.Setup(x => x.GetAll()).Returns(Enumerable.Empty<IMediaType>());

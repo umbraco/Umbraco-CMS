@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 
@@ -57,7 +57,9 @@ namespace Umbraco.Cms.Tests.Common.Builders
         /// <param name="level">
         /// Optional. Will get calculated based on the path value if not specified.
         /// </param>
-        /// <param name="parentContentId"></param>
+        /// <param name="parentContentId">
+        /// Optional. Will get calculated based on the path value if not specified.
+        /// </param>
         /// <param name="creatorId"></param>
         /// <param name="uid"></param>
         /// <param name="createDate"></param>
@@ -70,17 +72,25 @@ namespace Umbraco.Cms.Tests.Common.Builders
             string path,
             int? sortOrder = null,
             int? level = null,
-            int parentContentId = -1,
+            int? parentContentId = null,
             int creatorId = -1,
             Guid? uid = null,
             DateTime? createDate = null,
             ContentData draftData = null,
             ContentData publishedData = null)
-            => new ContentNodeKitBuilder()
-            .WithContentTypeId(contentTypeId)
-            .WithContentNode(id, uid ?? Guid.NewGuid(), level ?? path.Split(',').Length - 1, path, sortOrder ?? 0, parentContentId, createDate ?? DateTime.Now, creatorId)
-            .WithDraftData(draftData)
-            .WithPublishedData(publishedData)
-            .Build();
+        {
+            var pathParts = path.Split(',');
+            if (pathParts.Length >= 2)
+            {
+                parentContentId ??= int.Parse(pathParts[^2]);
+            }
+
+            return new ContentNodeKitBuilder()
+                       .WithContentTypeId(contentTypeId)
+                       .WithContentNode(id, uid ?? Guid.NewGuid(), level ?? pathParts.Length - 1, path, sortOrder ?? 0, parentContentId.Value, createDate ?? DateTime.Now, creatorId)
+                       .WithDraftData(draftData)
+                       .WithPublishedData(publishedData)
+                       .Build();
+        }
     }
 }
