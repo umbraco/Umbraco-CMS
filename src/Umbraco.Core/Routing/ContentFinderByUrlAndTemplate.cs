@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IFileService _fileService;
 
         private readonly IContentTypeService _contentTypeService;
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private WebRoutingSettings _webRoutingSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByUrlAndTemplate"/> class.
@@ -33,13 +33,14 @@ namespace Umbraco.Cms.Core.Routing
             IFileService fileService,
             IContentTypeService contentTypeService,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IOptions<WebRoutingSettings> webRoutingSettings)
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
             : base(logger, umbracoContextAccessor)
         {
             _logger = logger;
             _fileService = fileService;
             _contentTypeService = contentTypeService;
-            _webRoutingSettings = webRoutingSettings.Value;
+            _webRoutingSettings = webRoutingSettings.CurrentValue;
+            webRoutingSettings.OnChange(x => _webRoutingSettings = x);
         }
 
         /// <summary>

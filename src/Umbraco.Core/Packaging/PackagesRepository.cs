@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Packaging
             ILocalizationService languageService,
             IHostingEnvironment hostingEnvironment,
             IEntityXmlSerializer serializer,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
             MediaFileManager mediaFileManager,
@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Core.Packaging
 
             _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
             _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
-            _mediaFolderPath = mediaFolderPath ?? globalSettings.Value.UmbracoMediaPath + "/created-packages";
+            _mediaFolderPath = mediaFolderPath ?? globalSettings.CurrentValue.UmbracoMediaPath + "/created-packages";
 
             _parser = new PackageDefinitionXmlParser();
             _mediaService = mediaService;

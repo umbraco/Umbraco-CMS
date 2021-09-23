@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="mediaUrlProviders">The list of media URL providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
         /// <param name="propertyEditorCollection"></param>
-        public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptions<WebRoutingSettings> routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
+        public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptionsSnapshot<WebRoutingSettings> routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _urlProviders = urlProviders;
@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Core.Routing
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-            
+
 
             var url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
                 .FirstOrDefault(u => u != null);
@@ -230,7 +230,7 @@ namespace Umbraco.Cms.Core.Routing
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-                
+
 
             var url = _mediaUrlProviders.Select(provider =>
                     provider.GetMediaUrl(content, propertyAlias, mode, culture, current))

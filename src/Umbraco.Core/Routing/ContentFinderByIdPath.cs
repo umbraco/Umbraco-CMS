@@ -18,21 +18,23 @@ namespace Umbraco.Cms.Core.Routing
         private readonly ILogger<ContentFinderByIdPath> _logger;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private WebRoutingSettings _webRoutingSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentFinderByIdPath"/> class.
         /// </summary>
         public ContentFinderByIdPath(
-            IOptions<WebRoutingSettings> webRoutingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             ILogger<ContentFinderByIdPath> logger,
             IRequestAccessor requestAccessor,
             IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _webRoutingSettings = webRoutingSettings.Value ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.CurrentValue ?? throw new System.ArgumentNullException(nameof(webRoutingSettings));
             _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
             _requestAccessor = requestAccessor ?? throw new System.ArgumentNullException(nameof(requestAccessor));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+
+            webRoutingSettings.OnChange(x => _webRoutingSettings = x);
         }
 
         /// <summary>
