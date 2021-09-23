@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly PreviewRoutes _previewRoutes;
         private readonly IEmailSender _emailSender;
-        private readonly MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
+        private MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IImageUrlGenerator imageUrlGenerator,
             PreviewRoutes previewRoutes,
             IEmailSender emailSender,
-            IOptions<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings)
+            IOptionsMonitor<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -87,12 +87,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator;
             _previewRoutes = previewRoutes;
             _emailSender = emailSender;
-            _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.Value;
+            _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.CurrentValue;
 
             globalSettings.OnChange(x => _globalSettings = x);
             contentSettings.OnChange(x => _contentSettings = x);
             runtimeSettings.OnChange(x => _runtimeSettings = x);
             securitySettings.OnChange(x => _securitySettings = x);
+            memberPasswordConfigurationSettings.OnChange(x => _memberPasswordConfigurationSettings = x);
         }
 
         /// <summary>
