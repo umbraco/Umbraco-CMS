@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.Events
                 INotificationService notificationService,
                 IUserService userService,
                 ILocalizedTextService textService,
-                IOptions<GlobalSettings> globalSettings,
+                IOptionsMonitor<GlobalSettings> globalSettings,
                 ILogger<Notifier> logger)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Core.Events
                 _notificationService = notificationService;
                 _userService = userService;
                 _textService = textService;
-                _globalSettings = globalSettings.Value;
+                _globalSettings = globalSettings.CurrentValue;
                 _logger = logger;
             }
 
