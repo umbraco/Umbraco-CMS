@@ -1786,6 +1786,16 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="deleteUser">Verwijder gebruiker</key>
     <key alias="deleteUserConfirmation">Weet je zeker dat je deze gebruiker wil verwijderen?</key>
     <key alias="stateAll">Alles</key>
+    <key alias="stateActive">Actief</key>
+    <key alias="stateDisabled">Uitgeschakeld</key>
+    <key alias="stateLockedOut">Vergrendeld</key>
+    <key alias="stateInvited">Uitgenodigd</key>
+    <key alias="stateInactive">Inactief</key>
+    <key alias="sortNameAscending">Naam (A-Z)</key>
+    <key alias="sortNameDescending">Naam (Z-A)</key>
+    <key alias="sortCreateDateAscending">Nieuwste</key>
+    <key alias="sortCreateDateDescending">Oudste</key>
+    <key alias="sortLastLoginDateDescending">Laatste login</key>
     <key alias="noUserGroupsAdded">Er zijn geen gebruikersgroepen toegevoegd</key>
   </area>
   <area alias="validation">
@@ -1857,6 +1867,14 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is aanwezig!]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is NIET aanwezig.]]></key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[De header of meta-tag <strong>X-Content-Type-Options</strong> die beveiligt tegen MIME sniffing kwetsbaarheden is gevonden.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[De header of meta-tag <strong>X-Content-Type-Options</strong> die beveiligt tegen MIME sniffing kwetsbaarheden is niet gevonden.]]></key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[De <strong>Strict-Transport-Security</strong> header, ook bekend als de HSTS-header, is gevonden.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[De <strong>Strict-Transport-Security</strong>header is niet gevonden.]]></key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[De header <strong>X-XSS-Protection</strong> is gevonden.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[De header <strong>X-XSS-Protection</strong> is niet gevonden.]]></key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
@@ -2023,12 +2041,18 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="findLogsWithRequestId">Logs met Request ID zoeken</key>
     <key alias="findLogsWithNamespace">Logs met Namespace zoeken</key>
     <key alias="findLogsWithMachineName">Logs met Machine Naam zoeken</key>
+    <key alias="open">Openen</key>
     <key alias="polling">Peilen</key>
     <key alias="every2">Elke 2 seconden</key>
     <key alias="every5">Elke 5 seconden</key>
     <key alias="every10">Elke 10 seconden</key>
     <key alias="every20">Elke 20 seconden</key>
     <key alias="every30">Elke 30 seconden</key>
+    <key alias="pollingEvery2">Elke 2s peilen</key>
+    <key alias="pollingEvery5">Elke 5s peilen</key>
+    <key alias="pollingEvery10">Elke 10s peilen</key>
+    <key alias="pollingEvery20">Elke 20s peilen</key>
+    <key alias="pollingEvery30">Elke 30s peilen</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Kopieer %0%</key>

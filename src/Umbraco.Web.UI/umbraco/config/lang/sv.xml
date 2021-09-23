@@ -978,6 +978,12 @@
     <key alias="sessionExpires">Sessionen går ut</key>
     <key alias="sectionsHelp">Välj sektioner för användaråtkomst</key>
     <key alias="stateAll">Alla</key>
+    <key alias="stateActive">Aktiv</key>
+    <key alias="stateLockedOut">Utlåst</key>
+    <key alias="stateInvited">Inbjuden</key>
+    <key alias="stateInactive">Inaktiv</key>
+    <key alias="sortNameAscending">Namn (A-Z)</key>
+    <key alias="sortNameDescending">Namn (Z-A)</key>
     <key alias="startnode">Startnod för innehåll</key>
     <key alias="startnodehelp">Begränsa sidträdet till en specifik startnod</key>
     <key alias="startnodes">Startnoder för innehåll</key>
@@ -991,6 +997,9 @@
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="yourProfile">Din profil</key>
+    <key alias="sortCreateDateAscending">Nyast</key>
+    <key alias="sortCreateDateDescending">Äldst</key>
+    <key alias="sortLastLoginDateDescending">Senaste login</key>
   </area>
   <area alias="logViewer">
     <key alias="selectAllLogLevelFilters">Välj alla</key>

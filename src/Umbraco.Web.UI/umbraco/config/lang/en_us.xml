@@ -2026,6 +2026,16 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="deleteUser">Delete User</key>
     <key alias="deleteUserConfirmation">Are you sure you wish to delete this user account?</key>
     <key alias="stateAll">All</key>
+    <key alias="stateActive">Active</key>
+    <key alias="stateDisabled">Disabled</key>
+    <key alias="stateLockedOut">Locked out</key>
+    <key alias="stateInvited">Invited</key>
+    <key alias="stateInactive">Inactive</key>
+    <key alias="sortNameAscending">Name (A-Z)</key>
+    <key alias="sortNameDescending">Name (Z-A)</key>
+    <key alias="sortCreateDateAscending">Newest</key>
+    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortLastLoginDateDescending">Last login</key>
     <key alias="noUserGroupsAdded">No user groups have been added</key>
   </area>
   <area alias="validation">
@@ -2106,6 +2116,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was not found.]]></key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Content-Type-Options</strong> used to protect against MIME sniffing vulnerabilities was found.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Content-Type-Options</strong> used to protect against MIME sniffing vulnerabilities was not found.]]></key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[The header <strong>Strict-Transport-Security</strong> was not found.]]></key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
@@ -2282,12 +2300,18 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="findLogsWithRequestId">Find Logs with Request ID</key>
     <key alias="findLogsWithNamespace">Find Logs with Namespace</key>
     <key alias="findLogsWithMachineName">Find Logs with Machine Name</key>
+    <key alias="open">Open</key>
     <key alias="polling">Polling</key>
     <key alias="every2">Every 2 seconds</key>
     <key alias="every5">Every 5 seconds</key>
     <key alias="every10">Every 10 seconds</key>
     <key alias="every20">Every 20 seconds</key>
     <key alias="every30">Every 30 seconds</key>
+    <key alias="pollingEvery2">Polling every 2s</key>
+    <key alias="pollingEvery5">Polling every 5s</key>
+    <key alias="pollingEvery10">Polling every 10s</key>
+    <key alias="pollingEvery20">Polling every 20s</key>
+    <key alias="pollingEvery30">Polling every 30s</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
@@ -2492,6 +2516,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
     <key alias="viewPublishedContentAcceptButton">View published version</key>
     <key alias="viewPublishedContentDeclineButton">Stay in preview mode</key>
+  </area>
+  <area alias="permissions">
+    <key alias="FolderCreation">Folder creation</key>
+    <key alias="FileWritingForPackages">File writing for packages</key>
+    <key alias="FileWriting">File writing</key>
+    <key alias="MediaFolderCreation">Media folder creation</key>
   </area>
   <area alias="treeSearch">
     <key alias="searchResult">item returned</key>

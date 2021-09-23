@@ -1906,6 +1906,16 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="deleteUser">Supprimer l'Utilisateur</key>
     <key alias="deleteUserConfirmation">Etes-vous certain(e) de vouloir supprimer le compte de cet utilisateur?</key>
     <key alias="stateAll">Tous</key>
+    <key alias="stateActive">Actif</key>
+    <key alias="stateDisabled">Désactivé</key>
+    <key alias="stateLockedOut">Bloqué</key>
+    <key alias="stateInvited">Invité</key>
+    <key alias="stateInactive">Inactif</key>
+    <key alias="sortNameAscending">Nom (A-Z)</key>
+    <key alias="sortNameDescending">Nom (Z-A)</key>
+    <key alias="sortCreateDateAscending">Plus récent</key>
+    <key alias="sortCreateDateDescending">Plus ancien</key>
+    <key alias="sortLastLoginDateDescending">Dernière connexion</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validation</key>
@@ -1973,6 +1983,14 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Le header ou meta-tag <strong>X-Frame-Options</strong>, utilisé pour contrôler si un site peut être intégré dans un autre via IFRAME, a été trouvé.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Le header ou meta-tag <strong>X-Frame-Options</strong> , utilisé pour contrôler si un site peut être intégré dans un autre via IFRAME, n'a pas été trouvé.]]></key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[L'en-tête ou le meta-tag <strong>X-Content-Type-Options</strong> utilisé pour la protection contre les vulnérabilités de MIME sniffing a été trouvé.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[L'en-tête ou le meta-tag <strong>X-Content-Type-Options</strong> utilisé pour la protection contre les vulnérabilités de MIME sniffing n'a pas été trouvé.]]></key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, a été trouvé.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, n'a pas été trouvé.]]></key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> a été trouvé.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> n'a pas été trouvé.]]></key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
@@ -2107,6 +2125,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="findLogsWithRequestId">Trouver les Logs avec la Request ID</key>
     <key alias="findLogsWithNamespace">Trouver les Logs avec le Namespace</key>
     <key alias="findLogsWithMachineName">Trouver les logs avec le Nom de Machine</key>
+    <key alias="open">Ouvrir</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copier %0%</key>
