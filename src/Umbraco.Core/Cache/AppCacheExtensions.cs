@@ -77,7 +77,7 @@ namespace Umbraco.Core.Cache
             string[] dependentFiles = null)
         {
             var result = provider.GetCacheItem<T>(cacheKey);
-            if (result == null || result == default(T))
+            if (result == null)
             {
                 result = getCacheItem();
                 provider.InsertCacheItem<T>(cacheKey, () => result, timeout, isSliding, priority, removedCallback, dependentFiles);
