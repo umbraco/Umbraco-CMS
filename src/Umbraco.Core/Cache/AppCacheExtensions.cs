@@ -66,5 +66,23 @@ namespace Umbraco.Core.Cache
             }
             return result.TryConvertTo<T>().Result;
         }
+
+        public static T GetOrInsertCacheItem<T>(this IAppPolicyCache provider,
+            string cacheKey,
+            Func<T> getCacheItem,
+            TimeSpan? timeout = null,
+            bool isSliding = false,
+            CacheItemPriority priority = CacheItemPriority.Normal,
+            CacheItemRemovedCallback removedCallback = null,
+            string[] dependentFiles = null)
+        {
+            var result = provider.GetCacheItem<T>(cacheKey);
+            if (result == null || result == default(T))
+            {
+                result = getCacheItem();
+                provider.InsertCacheItem<T>(cacheKey, () => result, timeout, isSliding, priority, removedCallback, dependentFiles);
+            }
+            return result;
+        }
     }
 }
