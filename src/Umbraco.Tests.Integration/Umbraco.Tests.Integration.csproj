@@ -9,6 +9,11 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.6" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="68.2" />
+  </ItemGroup>
+
   <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <DefineConstants>IS_WINDOWS</DefineConstants>
   </PropertyGroup>
