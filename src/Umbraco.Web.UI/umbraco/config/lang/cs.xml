@@ -2154,23 +2154,6 @@
     </key>
     <key alias="activateByDefault">Ve výchozím stavu aktivovat profiler</key>
     <key alias="reminder">Přátelské připomenutí</key>
-    <key alias="reminderDescription">
-      <![CDATA[
-            <p>
-                Nikdy byste neměli nechat produkční web běžet v režimu ladění. Režim ladění je vypnut nastavením <b> debug="false" </b> na elementu <b>compilation</b> v souboru web.config.
-            </p>
-        ]]>
-    </key>
-    <key alias="profilerEnabledDescription">
-      <![CDATA[
-            <p>
-                Umbraco v současné době neběží v režimu ladění, takže nemůžete použít vestavěný profiler. Takto by to mělo být pro produkční web.
-            </p>
-            <p>
-                Režim ladění je zapnut nastavením <b> debug="true" </b> na elementu <b> compilation </b> v souboru web.config.
-            </p>
-        ]]>
-    </key>
   </area>
   <area alias="settingsDashboardVideos">
     <key alias="trainingHeadline">Hodiny tréninkových videí Umbraco jsou blíž než si myslíte</key>

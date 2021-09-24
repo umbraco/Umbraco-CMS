@@ -2322,7 +2322,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="reminderDescription">
         <![CDATA[
         <p>
-            You should never let a production site run in debug mode. Debug mode is turned off by setting <b>debug="false"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+            You should never let a production site run in debug mode. Debug mode is turned off by setting <b>Umbraco:CMS:Hosting:Debug</b> to <b>false</b> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
         </p>
     ]]>
     </key>
@@ -2332,7 +2332,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
             Umbraco currently does not run in debug mode, so you can't use the built-in profiler. This is how it should be for a production site.
         </p>
         <p>
-            Debug mode is turned on by setting <b>debug="true"</b> on the <b>&lt;compilation /&gt;</b> element in web.config.
+            Debug mode is turned on by setting <b>Umbraco:CMS:Hosting:Debug</b> to <b>true</b> in appsettings.json, appsettings.{Environment}.json or via an environment variable.
         </p>
     ]]>
     </key>

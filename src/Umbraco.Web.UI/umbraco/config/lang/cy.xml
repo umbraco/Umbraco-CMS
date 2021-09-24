@@ -2375,23 +2375,6 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     </key>
     <key alias="activateByDefault">Actifadu y proffiliwr yn ddiofyn</key>
     <key alias="reminder">Nodyn atgoffa cyfeillgar</key>
-    <key alias="reminderDescription">
-      <![CDATA[
-            <p>
-                Ni ddylech chi fyth adael i safle cynhyrchu redeg yn y modd dadfygio. Mae'r modd dadfygio yn gallu cael ei diffodd trwy ychwanegu'r gosodiad <b>debug="false"</b> ar yr elfen <b>&lt;grynhoi /&gt;</b> yn web.config.
-            </p>
-        ]]>
-    </key>
-    <key alias="profilerEnabledDescription">
-      <![CDATA[
-            <p>
-                Mae Umbraco ddim yn rhedeg mewn modd dadfygio ar hyn o bryd, felly nid allwch chi ddefnyddio'r proffiliwer adeiledig. Dyma sut y dylai fod ar gyfer safle cynhyrchu.
-            </p>
-            <p>
-                Mae'r modd dadfygio yn gallu cael ei throi arno gan ychwanegu'r gosodiad <b>debug="true"</b> ar yr elfen <b>&lt;grynhoi /&gt;</b> yn web.config.
-            </p>
-        ]]>
-    </key>
   </area>
   <area alias="settingsDashboardVideos">
     <key alias="trainingHeadline">Oriau o fideos hyfforddiant Umbraco ddim ond un clic i fwrdd</key>

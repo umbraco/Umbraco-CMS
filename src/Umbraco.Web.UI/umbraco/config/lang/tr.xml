@@ -2320,23 +2320,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     </key>
     <key alias="activateByDefault">Profil oluşturucuyu varsayılan olarak etkinleştirin</key>
     <key alias="reminder">Kolay hatırlatma</key>
-    <key alias="reminderDescription">
-      <![CDATA[
-        <p>
-            Bir üretim sitesinin hata ayıklama modunda çalışmasına asla izin vermemelisiniz. Web.config içindeki <b>&lt;compilation /&gt;</b> öğesinde <b> debug="false" </b> ayarlanarak hata ayıklama modu kapatılır.
-        </p>
-    ]]>
-    </key>
-    <key alias="profilerEnabledDescription">
-      <![CDATA[
-        <p>
-            Umbraco şu anda hata ayıklama modunda çalışmadığından yerleşik profil oluşturucuyu kullanamazsınız. Bir üretim sahası için böyle olması gerekir.
-        </p>
-        <p>
-            Hata ayıklama modu, web.config'deki <b>&lt;compilation /&gt;</b> öğesinde <b>debug="true"</b> ayarlanarak etkinleştirilir.
-        </p>
-    ]]>
-    </key>
   </area>
   <area alias="settingsDashboardVideos">
     <key alias="trainingHeadline">Umbraco eğitim videolarının saatleri yalnızca bir tıklama uzaklıkta</key>

@@ -2189,23 +2189,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     </key>
     <key alias="activateByDefault">Activer le profileur par défaut</key>
     <key alias="reminder">Rappel amical</key>
-    <key alias="reminderDescription">
-        <![CDATA[
-            <p>
-                Vous ne devriez jamais laisser un site de production s'exécuer en mode debug. Le mode Debug est désactivé en indiquant <b>debug="false"</b> dans l'élément <b>&lt;compilation /&gt;</b> du fichier web.config.
-            </p>
-        ]]>
-    </key>
-    <key alias="profilerEnabledDescription">
-        <![CDATA[
-            <p>
-                Umbraco n'est pour l'instant pas exécuté en mode debug, vous ne pouvez donc pas utiliser le profileur intégré. Il devrait en être ainsi pour un site de production.
-            </p>
-            <p>
-                Le mode Debug est activé en indiquant <b>debug="true"</b> dans l'élément <b>&lt;compilation /&gt;</b> du fichier web.config.
-            </p>
-        ]]>
-    </key>
   </area>
   <area alias="settingsDashboardVideos">
     <key alias="trainingHeadline">Des heures de vidéos de formation Umbraco ne sont qu'à un clic d'ici</key>

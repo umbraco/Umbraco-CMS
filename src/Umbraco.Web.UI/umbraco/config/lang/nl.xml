@@ -2118,23 +2118,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     </key>
     <key alias="activateByDefault">Activeer de profiler standaard</key>
     <key alias="reminder">Vriendelijke herinnering</key>
-    <key alias="reminderDescription">
-      <![CDATA[
-          <p>
-              Je mag een productiesite nooit in de foutopsporingsmodus laten uitvoeren. Je kan de foutopsporingsmodus uitschakelen door de instelling <b>debug="false"</b> uit het <b>&lt;compilation /&gt;</b> element te verwijderen in het web.config bestand.
-          </p>
-      ]]>
-    </key>
-    <key alias="profilerEnabledDescription">
-      <![CDATA[
-          <p>
-              Umbraco wordt op dit ogenblik niet uitgevoerd in de foutopsporingsmodus, dus je kan de ingebouwde profiler niet gebruiken. Dit is hoe het zou moeten zijn voor een productiewebsite.
-          </p>
-          <p>
-              De foutopsporingsmodus wordt ingeschakeld door <b>debug="true"</b> toe te voegen in het <b>&lt;compilation /&gt;</b> element in web.config.
-          </p>
-      ]]>
-    </key>
   </area>
   <area alias="settingsDashboardVideos">
     <key alias="trainingHeadline">Je bent slechts een klik verwijderd van uren aan Umbraco trainingvideo's.</key>
