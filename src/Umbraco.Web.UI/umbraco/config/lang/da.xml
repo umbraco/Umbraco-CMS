@@ -18,7 +18,7 @@
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyRecycleBin">Tøm papirkurv</key>
+    <key alias="emptyrecyclebin">Tøm papirkurv</key>
     <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>
     <key alias="importDocumentType">Importér dokumenttype</key>

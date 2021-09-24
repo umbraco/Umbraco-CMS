@@ -13,7 +13,7 @@
     <key alias="createPackage">Crea pacchetto</key>
     <key alias="delete">Cancella</key>
     <key alias="disable">Disabilita</key>
-    <key alias="emptyRecycleBin">Svuota il cestino</key>
+    <key alias="emptyrecyclebin">Svuota il cestino</key>
     <key alias="exportDocumentType">Esporta il tipo di documento</key>
     <key alias="importDocumentType">Importa il tipo di documento</key>
     <key alias="importPackage">Importa il pacchetto</key>
