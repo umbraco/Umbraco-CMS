@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -63,7 +64,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             }
             else
             {
-                var ids = _httpContextAccessor.HttpContext.Request.Query.Where(x => x.Key == requirement.QueryStringName).ToList();
+                var ids = queryString.ToString().Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList();
                 if (ids.Count == 0)
                 {
                     // Must succeed this requirement since we cannot process it.
@@ -71,7 +72,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
                 }
 
                 userIds = ids
-                    .Select(x => int.TryParse(x.Value.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var output) ? Attempt<int>.Succeed(output) : Attempt<int>.Fail())
+                    .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var output) ? Attempt<int>.Succeed(output) : Attempt<int>.Fail())
                     .Where(x => x.Success)
                     .Select(x => x.Result)
                     .ToArray();

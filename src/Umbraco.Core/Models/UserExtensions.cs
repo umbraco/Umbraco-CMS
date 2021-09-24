@@ -219,14 +219,14 @@ namespace Umbraco.Cms.Core.Models
 
         private static string GetBinPath(UmbracoObjectTypes objectType)
         {
-            var binPath = Constants.System.Root + ",";
+            var binPath = Constants.System.RootString + ",";
             switch (objectType)
             {
                 case UmbracoObjectTypes.Document:
-                    binPath += Constants.System.RecycleBinContent;
+                    binPath += Constants.System.RecycleBinContentString;
                     break;
                 case UmbracoObjectTypes.Media:
-                    binPath += Constants.System.RecycleBinMedia;
+                    binPath += Constants.System.RecycleBinMediaString;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(objectType));

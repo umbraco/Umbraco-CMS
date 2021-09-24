@@ -568,11 +568,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         private XElement SerializeContentBase(IContentBase contentBase, string urlValue, string nodeName, bool published)
         {
             var xml = new XElement(nodeName,
-                new XAttribute("id", contentBase.Id),
+                new XAttribute("id", contentBase.Id.ToInvariantString()),
                 new XAttribute("key", contentBase.Key),
-                new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
+                new XAttribute("parentID", (contentBase.Level > 1 ? contentBase.ParentId : -1).ToInvariantString()),
                 new XAttribute("level", contentBase.Level),
-                new XAttribute("creatorID", contentBase.CreatorId),
+                new XAttribute("creatorID", contentBase.CreatorId.ToInvariantString()),
                 new XAttribute("sortOrder", contentBase.SortOrder),
                 new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
                 new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),

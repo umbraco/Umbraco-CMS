@@ -49,49 +49,43 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings
 
 
         [Test]
-        [TestCase("en-US")]
-        [TestCase(null)]
-        [TestCase("da-DK")]
-        [TestCase("tr-TR")]
-        public void ConvertToIntegerTest(string culture)
+        [TestCase("en-US", -1, ExpectedResult = -1)]
+        [TestCase("en-US", "-1", ExpectedResult = -1)]
+        [TestCase("en-US", "100", ExpectedResult = 100)]
+        [TestCase("en-US", "100.000", ExpectedResult = 100)]
+        [TestCase("en-US", "100,000", ExpectedResult = 100)]
+        [TestCase("en-US", "100.001", ExpectedResult = 100)]
+        [TestCase("en-US", 100, ExpectedResult = 100)]
+        [TestCase("en-US", 100.000, ExpectedResult = 100)]
+        [TestCase("en-US", 100.001, ExpectedResult = 100)]
+        [TestCase("sv-SE", -1, ExpectedResult = -1)]
+        [TestCase("sv-SE", "−1", ExpectedResult = -1)] // Note '−' vs '-'
+        [TestCase("sv-SE", "100", ExpectedResult = 100)]
+        [TestCase("sv-SE", "100.000", ExpectedResult = 100)]
+        [TestCase("sv-SE", "100,000", ExpectedResult = 100)]
+        [TestCase("sv-SE", "100.001", ExpectedResult = 100)]
+        [TestCase("sv-SE", 100, ExpectedResult = 100)]
+        [TestCase("sv-SE", 100.000, ExpectedResult = 100)]
+        [TestCase("sv-SE", 100.001, ExpectedResult = 100)]
+        [TestCase("da-DK", "-1", ExpectedResult = -1)]
+        [TestCase("da-DK", -1, ExpectedResult = -1)]
+        [TestCase("da-DK", "100", ExpectedResult = 100)]
+        [TestCase("da-DK", "100.000", ExpectedResult = 100)]
+        [TestCase("da-DK", "100,000", ExpectedResult = 100)]
+        [TestCase("da-DK", "100.001", ExpectedResult = 100)]
+        [TestCase("da-DK", 100, ExpectedResult = 100)]
+        [TestCase("da-DK", 100.000, ExpectedResult = 100)]
+        [TestCase("da-DK", 100.001, ExpectedResult = 100)]
+        public int ConvertToIntegerTest(string culture, object input)
         {
             if (culture is not null)
             {
                 CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
             }
-            var conv = "-1".TryConvertTo<int>();
+            var conv = input.TryConvertTo<int>();
             Assert.IsTrue(conv);
-            Assert.AreEqual(-1, conv.Result);
 
-            conv = "100".TryConvertTo<int>();
-            Assert.IsTrue(conv);
-            Assert.AreEqual(100, conv.Result);
-
-            conv = "100.000".TryConvertTo<int>();
-            Assert.IsTrue(conv);
-            Assert.AreEqual(100, conv.Result);
-
-            conv = "100,000".TryConvertTo<int>();
-            Assert.IsTrue(conv);
-            Assert.AreEqual(100, conv.Result);
-
-            // oops
-            conv = "100.001".TryConvertTo<int>();
-            Assert.IsTrue(conv);
-            Assert.AreEqual(100, conv.Result);
-
-            conv = 100m.TryConvertTo<int>();
-            Assert.IsTrue(conv);
-            Assert.AreEqual(100, conv.Result);
-
-            conv = 100.000m.TryConvertTo<int>();
-            Assert.IsTrue(conv);
-            Assert.AreEqual(100, conv.Result);
-
-            // oops
-            conv = 100.001m.TryConvertTo<int>();
-            Assert.IsTrue(conv);
-            Assert.AreEqual(100, conv.Result);
+            return conv.Result;
         }
 
         [Test]
