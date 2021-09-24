@@ -1682,6 +1682,16 @@ Mange hilsner fra Umbraco robotten
     <key alias="deleteUser">Slet bruger</key>
     <key alias="deleteUserConfirmation">Er du sikker på du ønsker at slette denne brugers konto?</key>
     <key alias="stateAll">Alle</key>
+    <key alias="stateActive">Aktiv</key>
+    <key alias="stateDisabled">Deaktiveret</key>
+    <key alias="stateLockedOut">Låst ude</key>
+    <key alias="stateInvited">Inviteret</key>
+    <key alias="stateInactive">Inaktiv</key>
+    <key alias="sortNameAscending">Navn (A-Å)</key>
+    <key alias="sortNameDescending">Navn (Å-A)</key>
+    <key alias="sortCreateDateAscending">Nyeste</key>
+    <key alias="sortCreateDateDescending">Ældste</key>
+    <key alias="sortLastLoginDateDescending">Sidst logget ind</key>
     <key alias="noUserGroupsAdded">Ingen brugere er blevet tilføjet</key>
   </area>
   <area alias="validation">
@@ -1865,12 +1875,18 @@ Mange hilsner fra Umbraco robotten
     <key alias="findLogsWithRequestId">Find logs med request Id</key>
     <key alias="findLogsWithNamespace">Find logs med Namespace</key>
     <key alias="findLogsWithMachineName">Find logs med maskin navn</key>
+    <key alias="open">Åben</key>
     <key alias="polling">Henter</key>
     <key alias="every2">Hver 2 sekunder</key>
     <key alias="every5">Hver 5 sekunder</key>
     <key alias="every10">Hver 10 sekunder</key>
     <key alias="every20">Hver 20 sekunder</key>
     <key alias="every30">Hver 30 sekunder</key>
+    <key alias="pollingEvery2">Henter hver 2s</key>
+    <key alias="pollingEvery5">Henter hver 5s</key>
+    <key alias="pollingEvery10">Henter hver 10s</key>
+    <key alias="pollingEvery20">Henter hver 20s</key>
+    <key alias="pollingEvery30">Henter hver 30s</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Kopier %0%</key>
@@ -1955,6 +1971,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="viewPublishedContentDescription">Du er i forhåndsvisning, vil du afslutte for at se den udgivet version?</key>
     <key alias="viewPublishedContentAcceptButton">Se udgivet version</key>
     <key alias="viewPublishedContentDeclineButton">Forbliv i forhåndsvisning</key>
+  </area>
+  <area alias="permissions">
+    <key alias="FolderCreation">Mappeoprettelse</key>
+    <key alias="FileWritingForPackages">Filskrivning for pakker</key>
+    <key alias="FileWriting">Filskrivning</key>
+    <key alias="MediaFolderCreation">Medie mappeoprettelse</key>
   </area>
   <area alias="treeSearch">
     <key alias="searchResult">resultat</key>

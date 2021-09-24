@@ -1356,6 +1356,8 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <!-- Następujące klucze spowodują, że tokeny zostaną przekazane:
 	    0: Lista uszkodzonych ścieżek folderów oddzielonych przecinkami
   	-->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną został znaleziony.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną nie został znaleziony.]]></key>
     <!-- Następujące klucze spowodują, że tokeny zostaną przekazane:
 	    0: Lista znalezionych nagłówków, oddzielonych przecinkami
   	-->

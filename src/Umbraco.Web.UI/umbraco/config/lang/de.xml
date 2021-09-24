@@ -1957,6 +1957,16 @@
     <key alias="deleteUser">Benutzer entfernen</key>
     <key alias="deleteUserConfirmation">Wollen Sie dieses Benutzerkonto wirklich entfernen?</key>
     <key alias="stateAll">Alle</key>
+    <key alias="stateActive">Aktiv</key>
+    <key alias="stateDisabled">Gesperrt</key>
+    <key alias="stateLockedOut">Ausgeschlossen</key>
+    <key alias="stateInvited">Eingeladen</key>
+    <key alias="stateInactive">Nicht aktiv</key>
+    <key alias="sortNameAscending">Name (A-Z)</key>
+    <key alias="sortNameDescending">Name (Z-A)</key>
+    <key alias="sortCreateDateAscending">Newest</key>
+    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortLastLoginDateDescending">Last login</key>
   </area>
   <area alias="validation">
     <key alias="validation">Validierung</key>
@@ -2001,6 +2011,14 @@
     <!-- The following keys get these tokens passed in:
 	    0: Path to the file not found
   	-->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Der Header oder das Meta-Tag <strong>X-Frame-Options</strong> ist vorhanden. Diese dienen zur Kontrolle, ob eine Site in IFRAMES anderer Sites angezeigt werden kann.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Der Header oder das Meta-Tag <strong>X-Frame-Options</strong> ist <strong>nicht</strong> vorhanden. Es dient zur Kontrolle, ob eine Site in IFRAMES anderer Sites angezeigt werden kann.]]></key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[Der Header oder das Meta-Tag <strong>X-Content-Type-Options</strong> ist vorhanden. Diese dienen zum Schutz gegen MIME-'Schnüffeln'-Schwachstellen. ]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[Der Header oder das Meta-Tag <strong>X-Content-Type-Options</strong> ist <strong>nicht</strong> vorhanden. Diese dienen zum Schutz gegen MIME-'Schnüffeln'-Schwachstellen. ]]></key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[Der Header <strong>Strict-Transport-Security</strong>, auch bekannt als HSTS-Header, ist vorhanden.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[Der Header <strong>Strict-Transport-Security</strong>, auch bekannt als HSTS-Header, ist <strong>nicht</strong> vorhanden.]]></key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Der Header <strong>X-XSS-Protection</strong> ist vorhanden.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Der Header <strong>X-XSS-Protection</strong> ist <strong>nicht</strong> vorhanden]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Folgende Header, die Informationen über die Website-Technologie preisgeben, sind vorhanden: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Es sind keine Header, die Informationen über die Website-Technologie preisgeben, vorhanden.</key>
     <key alias="smtpMailSettingsNotFound">In der 'web.config'-Datei ist der Abschnitt 'system.net/mailsettings' nicht vorhanden.</key>

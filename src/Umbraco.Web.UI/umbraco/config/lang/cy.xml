@@ -2056,6 +2056,16 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="deleteUser">Dileu Defnyddiwr</key>
     <key alias="deleteUserConfirmation">Ydych chi'n sicr eich bod eisiau dileu'r cyfrif defnyddiwr yma?</key>
     <key alias="stateAll">Pob</key>
+    <key alias="stateActive">Gweithredol</key>
+    <key alias="stateDisabled">Wedi analluogi</key>
+    <key alias="stateLockedOut">Wedi cloi allan</key>
+    <key alias="stateInvited">Wedi gwahodd</key>
+    <key alias="stateInactive">Anactif</key>
+    <key alias="sortNameAscending">Enw (A-Y)</key>
+    <key alias="sortNameDescending">Enw (Y-A)</key>
+    <key alias="sortCreateDateAscending">Hynaf</key>
+    <key alias="sortCreateDateDescending">Diweddaraf</key>
+    <key alias="sortLastLoginDateDescending">Mewngofnodi diweddaraf</key>
     <key alias="noUserGroupsAdded">No user groups have been added</key>
   </area>
   <area alias="validation">
@@ -2125,6 +2135,14 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <!-- The following keys get these tokens passed in:
       0: Comma delimitted list of failed folder paths
     -->
+    <key alias="clickJackingCheckHeaderFound"><![CDATA[Mae'r peniad neu meta-tag <strong>X-Frame-Options</strong> sy'n cael ei ddefnyddio i reoli os mae safle'n gallu cael ei osod o fewn IFRAME gan safle arall wedi'i ganfod.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nid yw'r peniad neu meta-tag <strong>X-Frame-Options</strong> sy'n cael ei ddefnyddio i reoli os mae safle'n gallu cael ei osod o fewn IFRAME gan safle arall wedi'i ganfod.]]></key>
+    <key alias="noSniffCheckHeaderFound"><![CDATA[Mae'r peniad neu meta-tag <strong>X-Content-Type-Options</strong> sy'n cael ei ddefnyddio i amddiffyn yn erbyn gwendidau sniffio MIME wedi'i ganfod.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[Nid yw'r peniad neu meta-tag <strong>X-Content-Type-Options</strong> sy'n cael ei ddefnyddio i amddiffyn yn erbyn gwendidau sniffio MIME wedi'i ganfod.]]></key>
+    <key alias="hSTSCheckHeaderFound"><![CDATA[Mae'r peniad <strong>Strict-Transport-Security</strong>, hefyd wedi'i adnabod fel HSTS-header, wedi'i ganfod.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>Strict-Transport-Security</strong> wedi'i ganfod.]]></key>
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Mae'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Nid yw'r peniad <strong>X-XSS-Protection</strong> wedi'i ganfod.]]></key>
     <!-- The following key get these tokens passed in:
       0: Comma delimitted list of headers found
     -->
@@ -2291,6 +2309,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="findLogsWithRequestId">Darganfod logiau efo ID y Cais</key>
     <key alias="findLogsWithNamespace">Darganfod logiau efo Namespace</key>
     <key alias="findLogsWithMachineName">Darganfod logiau efo Enw Peiriant</key>
+    <key alias="open">Agor</key>
   </area>
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copi %0%</key>
