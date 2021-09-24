@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Scoping
         private readonly ILoggerFactory _loggerFactory;
         private readonly IRequestCache _requestCache;
         private readonly FileSystems _fileSystems;
-        private readonly CoreDebugSettings _coreDebugSettings;
+        private CoreDebugSettings _coreDebugSettings;
         private readonly MediaFileManager _mediaFileManager;
         private static readonly AsyncLocal<ConcurrentStack<IScope>> s_scopeStack = new AsyncLocal<ConcurrentStack<IScope>>();
         private static readonly AsyncLocal<ConcurrentStack<IScopeContext>> s_scopeContextStack = new AsyncLocal<ConcurrentStack<IScopeContext>>();
@@ -36,11 +36,11 @@ namespace Umbraco.Cms.Core.Scoping
         private static readonly string s_contextItemKey = typeof(ScopeProvider).FullName;
         private readonly IEventAggregator _eventAggregator;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, IOptions<CoreDebugSettings> coreDebugSettings, MediaFileManager mediaFileManager, ILogger<ScopeProvider> logger, ILoggerFactory loggerFactory, IRequestCache requestCache, IEventAggregator eventAggregator)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, IOptionsMonitor<CoreDebugSettings> coreDebugSettings, MediaFileManager mediaFileManager, ILogger<ScopeProvider> logger, ILoggerFactory loggerFactory, IRequestCache requestCache, IEventAggregator eventAggregator)
         {
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
-            _coreDebugSettings = coreDebugSettings.Value;
+            _coreDebugSettings = coreDebugSettings.CurrentValue;
             _mediaFileManager = mediaFileManager;
             _logger = logger;
             _loggerFactory = loggerFactory;
@@ -48,6 +48,8 @@ namespace Umbraco.Cms.Core.Scoping
             _eventAggregator = eventAggregator;
             // take control of the FileSystems
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
+
+            coreDebugSettings.OnChange(x => _coreDebugSettings = x);
         }
 
         public IUmbracoDatabaseFactory DatabaseFactory { get; }

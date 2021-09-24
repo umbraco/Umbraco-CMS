@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -33,7 +34,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
                     UserService,
                     EntityService,
                     ExternalLoginService,
-                    Options.Create(GlobalSettings),
+                    new TestOptionsMonitor<GlobalSettings>(GlobalSettings),
                     UmbracoMapper,
                     new BackOfficeErrorDescriber(TextService),
                     AppCaches);

@@ -156,7 +156,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IEmailSender, EmailSender>(
                 services => new EmailSender(
                     services.GetRequiredService<ILogger<EmailSender>>(),
-                    services.GetRequiredService<IOptions<GlobalSettings>>(),
+                    services.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
                     services.GetRequiredService<IEventAggregator>(),
                     services.GetService<INotificationHandler<SendEmailNotification>>(),
                     services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));

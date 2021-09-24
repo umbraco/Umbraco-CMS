@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILogger<DictionaryController> logger,
             ILocalizationService localizationService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             ILocalizedTextService localizedTextService,
             IUmbracoMapper umbracoMapper
             )

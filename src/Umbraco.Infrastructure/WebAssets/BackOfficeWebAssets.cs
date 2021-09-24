@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
 
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IManifestParser _parser;
-        private readonly GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly CustomBackOfficeAssetsCollection _customBackOfficeAssetsCollection;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly PropertyEditorCollection _propertyEditorCollection;
@@ -38,15 +38,17 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
             IManifestParser parser,
             PropertyEditorCollection propertyEditorCollection,
             IHostingEnvironment hostingEnvironment,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             CustomBackOfficeAssetsCollection customBackOfficeAssetsCollection)
         {
             _runtimeMinifier = runtimeMinifier;
             _parser = parser;
             _propertyEditorCollection = propertyEditorCollection;
             _hostingEnvironment = hostingEnvironment;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings.CurrentValue;
             _customBackOfficeAssetsCollection = customBackOfficeAssetsCollection;
+
+            globalSettings.OnChange(x => _globalSettings = x);
         }
 
         public void CreateBundles()
@@ -170,7 +172,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
 
                     switch (assetType)
                     {
-                        case AssetType.Javascript:                           
+                        case AssetType.Javascript:
                             _runtimeMinifier.CreateJsBundle(bundleName, BundlingOptions.OptimizedAndComposite, filePaths);
                             break;
                         case AssetType.Css:
@@ -178,7 +180,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                             break;
                         default:
                             throw new IndexOutOfRangeException();
-                    }                    
+                    }
                 }
             }
         }

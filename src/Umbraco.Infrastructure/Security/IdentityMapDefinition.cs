@@ -17,19 +17,21 @@ namespace Umbraco.Cms.Core.Security
     {
         private readonly ILocalizedTextService _textService;
         private readonly IEntityService _entityService;
-        private readonly IOptions<GlobalSettings> _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly AppCaches _appCaches;
 
         public IdentityMapDefinition(
             ILocalizedTextService textService,
             IEntityService entityService,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             AppCaches appCaches)
         {
             _textService = textService;
             _entityService = entityService;
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.CurrentValue;
             _appCaches = appCaches;
+
+            globalSettings.OnChange(x => _globalSettings = x);
         }
 
         public void DefineMaps(IUmbracoMapper mapper)
@@ -37,7 +39,7 @@ namespace Umbraco.Cms.Core.Security
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>
                 {
-                    var target = new BackOfficeIdentityUser(_globalSettings.Value, source.Id, source.Groups);
+                    var target = new BackOfficeIdentityUser(_globalSettings, source.Id, source.Groups);
                     target.DisableChangeTracking();
                     return target;
                 },
@@ -82,7 +84,7 @@ namespace Umbraco.Cms.Core.Security
             target.PasswordConfig = source.PasswordConfiguration;
             target.StartContentIds = source.StartContentIds;
             target.StartMediaIds = source.StartMediaIds;
-            target.Culture = source.GetUserCulture(_textService, _globalSettings.Value).ToString(); // project CultureInfo to string
+            target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;

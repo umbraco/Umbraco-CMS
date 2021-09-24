@@ -78,11 +78,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public UsersController(
             MediaFileManager mediaFileManager,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             ISqlContext sqlContext,
             IImageUrlGenerator imageUrlGenerator,
-            IOptions<SecuritySettings> securitySettings,
+            IOptionsSnapshot<SecuritySettings> securitySettings,
             IEmailSender emailSender,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             AppCaches appCaches,
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IUserService userService,
             ILocalizedTextService localizedTextService,
             IUmbracoMapper umbracoMapper,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IBackOfficeUserManager backOfficeUserManager,
             ILoggerFactory loggerFactory,
             LinkGenerator linkGenerator,
@@ -554,7 +554,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // This needs to be in the correct mailto format including the name, else
             // the name cannot be captured in the email sending notification.
-            // i.e. "Some Person" <hello@example.com>            
+            // i.e. "Some Person" <hello@example.com>
             var toMailBoxAddress = new MailboxAddress(to.Name, to.Email);
 
             var mailMessage = new EmailMessage(fromEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);

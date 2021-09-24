@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
             IRequestCache requestCache,
             IRequestAccessor requestAccessor,
             LastSyncedFileManager lastSyncedFileManager,
-            IOptions<GlobalSettings> globalSettings)
+            IOptionsMonitor<GlobalSettings> globalSettings)
             : base(mainDom, cacheRefreshers, serverRoleAccessor, logger, true, syncBootStateAccessor, hostingEnvironment, cacheInstructionService, jsonSerializer, lastSyncedFileManager, globalSettings)
         {
             _requestCache = requestCache;

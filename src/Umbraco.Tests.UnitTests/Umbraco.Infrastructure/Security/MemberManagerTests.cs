@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Web.Common.Security;
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new IdentityMapDefinition(
                     Mock.Of<ILocalizedTextService>(),
                     Mock.Of<IEntityService>(),
-                    Options.Create(new GlobalSettings()),
+                    new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()),
                     AppCaches.Disabled),
             };
 

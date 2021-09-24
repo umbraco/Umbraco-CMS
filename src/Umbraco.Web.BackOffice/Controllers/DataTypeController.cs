@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public DataTypeController(
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IUmbracoMapper umbracoMapper,
             PropertyEditorCollection propertyEditorCollection,
             IContentTypeService contentTypeService,

@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             private readonly IUserService _userService;
             private readonly IEntityService _entityService;
             private readonly ILocalizedTextService _localizedTextService;
-            private readonly IOptions<GlobalSettings> _globalSettings;
+            private GlobalSettings _globalSettings;
             private readonly IBackOfficeSignInManager _backOfficeSignInManager;
             private readonly IBackOfficeAntiforgery _backOfficeAntiforgery;
             private readonly IScopeProvider _scopeProvider;
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 IUserService userService,
                 IEntityService entityService,
                 ILocalizedTextService localizedTextService,
-                IOptions<GlobalSettings> globalSettings,
+                IOptionsSnapshot<GlobalSettings> globalSettings,
                 IBackOfficeSignInManager backOfficeSignInManager,
                 IBackOfficeAntiforgery backOfficeAntiforgery,
                 IScopeProvider scopeProvider,
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 _userService = userService;
                 _entityService = entityService;
                 _localizedTextService = localizedTextService;
-                _globalSettings = globalSettings;
+                _globalSettings = globalSettings.Value;
                 _backOfficeSignInManager = backOfficeSignInManager;
                 _backOfficeAntiforgery = backOfficeAntiforgery;
                 _scopeProvider = scopeProvider;
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         () => user.Username != identity.GetUsername(),
                         () =>
                         {
-                            CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
+                            CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings);
                             return culture != null && culture.ToString() != identity.GetCultureString();
                         },
                         () => user.AllowedSections.UnsortedSequenceEqual(identity.GetAllowedApplications()) == false,

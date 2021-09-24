@@ -15,15 +15,16 @@ namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
     /// </summary>
     public class ThreadAbortExceptionEnricher : ILogEventEnricher
     {
-        private readonly CoreDebugSettings _coreDebugSettings;
+        private CoreDebugSettings _coreDebugSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMarchal _marchal;
 
-        public ThreadAbortExceptionEnricher(IOptions<CoreDebugSettings> coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal)
+        public ThreadAbortExceptionEnricher(IOptionsMonitor<CoreDebugSettings> coreDebugSettings, IHostingEnvironment hostingEnvironment, IMarchal marchal)
         {
-            _coreDebugSettings = coreDebugSettings.Value;
+            _coreDebugSettings = coreDebugSettings.CurrentValue;
             _hostingEnvironment = hostingEnvironment;
             _marchal = marchal;
+            coreDebugSettings.OnChange(x => _coreDebugSettings = x);
         }
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)

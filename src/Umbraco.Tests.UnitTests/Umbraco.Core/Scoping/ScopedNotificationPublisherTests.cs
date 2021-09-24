@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
 {
@@ -92,7 +93,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
             return new ScopeProvider(
                 Mock.Of<IUmbracoDatabaseFactory>(),
                 fileSystems,
-                Options.Create(new CoreDebugSettings()),
+                new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
                 mediaFileManager,
                 loggerFactory.CreateLogger<ScopeProvider>(),
                 loggerFactory,

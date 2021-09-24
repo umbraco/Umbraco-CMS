@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
     {
         private readonly ILogger<SyncBootStateAccessor> _logger;
         private readonly LastSyncedFileManager _lastSyncedFileManager;
-        private readonly GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly ICacheInstructionService _cacheInstructionService;
 
         private SyncBootState _syncBootState;
@@ -21,13 +21,15 @@ namespace Umbraco.Cms.Infrastructure.Sync
         public SyncBootStateAccessor(
             ILogger<SyncBootStateAccessor> logger,
             LastSyncedFileManager lastSyncedFileManager,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             ICacheInstructionService cacheInstructionService)
         {
             _logger = logger;
             _lastSyncedFileManager = lastSyncedFileManager;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings.CurrentValue;
             _cacheInstructionService = cacheInstructionService;
+
+            globalSettings.OnChange(x => _globalSettings = x);
         }
 
         public SyncBootState GetSyncBootState()

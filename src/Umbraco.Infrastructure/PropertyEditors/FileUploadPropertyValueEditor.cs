@@ -21,20 +21,21 @@ namespace Umbraco.Cms.Core.PropertyEditors
     internal class FileUploadPropertyValueEditor : DataValueEditor
     {
         private readonly MediaFileManager _mediaFileManager;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
 
         public FileUploadPropertyValueEditor(
             DataEditorAttribute attribute,
             MediaFileManager mediaFileManager,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper)
             : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         /// <summary>

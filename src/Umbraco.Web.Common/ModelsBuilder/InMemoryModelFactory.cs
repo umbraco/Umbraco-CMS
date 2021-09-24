@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger profilingLogger,
             ILogger<InMemoryModelFactory> logger,
-            IOptions<ModelsBuilderSettings> config,
+            IOptionsMonitor<ModelsBuilderSettings> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IPublishedValueFallback publishedValueFallback,
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             _umbracoServices = umbracoServices;
             _profilingLogger = profilingLogger;
             _logger = logger;
-            _config = config.Value;
+            _config = config.CurrentValue;
             _hostingEnvironment = hostingEnvironment;
             _hostingLifetime = hostingLifetime;
             _publishedValueFallback = publishedValueFallback;
