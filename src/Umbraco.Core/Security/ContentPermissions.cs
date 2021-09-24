@@ -236,11 +236,11 @@ namespace Umbraco.Cms.Core.Security
 
             // only users with root access have access to the recycle bin,
             // if the above check didn't pass then access is denied
-            if (formattedPath.Contains(string.Concat(",", recycleBinId, ",")))
+            if (formattedPath.Contains(string.Concat(",", recycleBinId.ToString(CultureInfo.InvariantCulture), ",")))
                 return false;
 
             // check for a start node in the path
-            return startNodeIds.Any(x => formattedPath.Contains(string.Concat(",", x, ",")));
+            return startNodeIds.Any(x => formattedPath.Contains(string.Concat(",", x.ToString(CultureInfo.InvariantCulture), ",")));
         }
 
         public static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)

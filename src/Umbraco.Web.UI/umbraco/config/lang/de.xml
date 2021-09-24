@@ -16,10 +16,10 @@
     <key alias="createGroup">Neue Gruppe</key>
     <key alias="delete">Entfernen</key>
     <key alias="disable">Deaktivieren</key>
-    <key alias="emptyRecycleBin">Papierkorb leeren</key>
+    <key alias="emptyrecyclebin">Papierkorb leeren</key>
     <key alias="enable">Aktivieren</key>
     <key alias="exportDocumentType">Dokumenttyp exportieren</key>
-    <key alias="importDocumentType">Dokumenttyp importieren</key>
+    <key alias="importdocumenttype">Dokumenttyp importieren</key>
     <key alias="importPackage">Paket importieren</key>
     <key alias="liveEdit">'Canvas'-Modus starten</key>
     <key alias="logout">Abmelden</key>

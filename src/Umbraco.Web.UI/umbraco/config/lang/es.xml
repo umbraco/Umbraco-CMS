@@ -15,10 +15,10 @@
     <key alias="createGroup">Crear grupo</key>
     <key alias="delete">Borrar</key>
     <key alias="disable">Deshabilitar</key>
-    <key alias="emptyRecycleBin">Vaciar Papelera</key>
+    <key alias="emptyrecyclebin">Vaciar Papelera</key>
     <key alias="enable">Activar</key>
     <key alias="exportDocumentType">Exportar Documento (tipo)</key>
-    <key alias="importDocumentType">Importar Documento (tipo)</key>
+    <key alias="importdocumenttype">Importar Documento (tipo)</key>
     <key alias="importPackage">Importar Paquete</key>
     <key alias="liveEdit">Editar en vivo</key>
     <key alias="logout">Cerrar sesión</key>

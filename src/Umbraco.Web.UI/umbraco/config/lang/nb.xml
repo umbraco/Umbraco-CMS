@@ -14,9 +14,9 @@
     <key alias="createPackage">Opprett pakke</key>
     <key alias="delete">Slett</key>
     <key alias="disable">Deaktiver</key>
-    <key alias="emptyRecycleBin">Tøm papirkurv</key>
+    <key alias="emptyrecyclebin">Tøm papirkurv</key>
     <key alias="exportDocumentType">Eksporter dokumenttype</key>
-    <key alias="importDocumentType">Importer dokumenttype</key>
+    <key alias="importdocumenttype">Importer dokumenttype</key>
     <key alias="importPackage">Importer pakke</key>
     <key alias="liveEdit">Rediger i Canvas</key>
     <key alias="logout">Logg av</key>

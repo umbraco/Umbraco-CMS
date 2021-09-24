@@ -17,11 +17,11 @@
     <key alias="defaultValue">Значение по умолчанию</key>
     <key alias="delete">Удалить</key>
     <key alias="disable">Отключить</key>
-    <key alias="emptyRecycleBin">Очистить корзину</key>
+    <key alias="emptyrecyclebin">Очистить корзину</key>
     <key alias="enable">Включить</key>
     <key alias="export">Экспорт</key>
     <key alias="exportDocumentType">Экспортировать</key>
-    <key alias="importDocumentType">Импортировать</key>
+    <key alias="importdocumenttype">Импортировать</key>
     <key alias="importPackage">Импортировать пакет</key>
     <key alias="liveEdit">Править на месте</key>
     <key alias="logout">Выйти</key>

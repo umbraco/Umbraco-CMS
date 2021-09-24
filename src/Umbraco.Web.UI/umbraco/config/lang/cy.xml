@@ -18,10 +18,10 @@
     <key alias="delete">Dileu</key>
     <key alias="disable">Analluogi</key>
     <key alias="editSettings">Golygu gosodiadau</key>
-    <key alias="emptyRecycleBin">Gwagu bin ailgylchu</key>
+    <key alias="emptyrecyclebin">Gwagu bin ailgylchu</key>
     <key alias="enable">Galluogi</key>
     <key alias="exportDocumentType">Allforio Math o Ddogfen</key>
-    <key alias="importDocumentType">Mewnforio Math o Ddogfen</key>
+    <key alias="importdocumenttype">Mewnforio Math o Ddogfen</key>
     <key alias="importPackage">Mewnforio Pecyn</key>
     <key alias="liveEdit">Golygu mewn Cynfas</key>
     <key alias="logout">Gadael</key>
@@ -102,7 +102,7 @@
     <key alias="domainUpdated">Parth '%0%' wedi diweddaru</key>
     <key alias="orEdit">Golygu Parthau Presennol</key>
     <key alias="domainHelpWithVariants">
-      <![CDATA[Parthau dilys yw: "enghraifft.com", "www.enghraifft.com", "enghraifft.com:8080" neu "https://www.enghraifft.com/". 
+      <![CDATA[Parthau dilys yw: "enghraifft.com", "www.enghraifft.com", "enghraifft.com:8080" neu "https://www.enghraifft.com/".
             Mae llwybrau un-lefel mewn parthau wedi'u cefnogi, e.e. "enghraifft.com/cy" neu "/cy".]]>
     </key>
     <key alias="inherit">Etifeddu</key>
@@ -908,7 +908,7 @@
       <![CDATA[
       <p>
         Mae "Runway" yn wefan syml sy'n darparu mathau o ddogfennau a thempledi syml. Gall y gosodwr osod Runway i chi yn awtomatig,
-        ond gallwch olygu, estyn neu ei ddileu yn hawdd. Nid yw'n angenrheidiol a gallwch ddefnyddio Umbraco yn berffaith heb. Ond, 
+        ond gallwch olygu, estyn neu ei ddileu yn hawdd. Nid yw'n angenrheidiol a gallwch ddefnyddio Umbraco yn berffaith heb. Ond,
         mae Runwayyn cynnig sylfaen hawdd wedi'i seilio ar arferion gorau er mwyn i chi gychwyn yn gyflymach nag erioed.
         Os rydych chi'n dewis gosod Runway, gallwch ddewis blociau adeiliadu syml o'r enw Modylau Runway er mwyn mwyhau eich tudalennau Runway.
         </p>
@@ -1095,15 +1095,15 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="mailBody">
       <![CDATA[
         Helo %0%
-        
+
         Mae hyn yn ebost awtomatig i'ch hysbysu fod y dasg '%1%'
         wedi'i berfformio ar y dudalen '%2%'
         gan y defnyddiwr '%3%'
-        
+
         Ewch at http://%4%/#/content/content/edit/%5% i olygu.
 
         Mwynhewch eich diwrnod!
-        
+
         Hwyl fawr oddi wrth y robot Umbraco
         ]]>
     </key>
@@ -2327,9 +2327,9 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="memoryCache">Cuddstôr Cof</key>
     <key alias="memoryCacheDescription">
       <![CDATA[
-                Mae'r botwm hwn yn caniatáu ichi ail-lwytho'r cuddstôr mewn-cof, gan ail-lwytho fo o'r stôr cronfa ddata 
+                Mae'r botwm hwn yn caniatáu ichi ail-lwytho'r cuddstôr mewn-cof, gan ail-lwytho fo o'r stôr cronfa ddata
                 (ond nid yw'n ailadeiladu stôr cronfa ddata hwnna). Mae hyn yn gymharol o gyflym.
-                Defnyddio fo pan ti'n feddwl nad yw'r stôr gof wedi'i hadnewyddu'n iawn, ar ôl i rai digwyddiad 
+                Defnyddio fo pan ti'n feddwl nad yw'r stôr gof wedi'i hadnewyddu'n iawn, ar ôl i rai digwyddiad
                 digwydd&mdash;a fyddai'n arwydd o broblem fach efo Umbraco.
                 (nodyn: mae hyn yn achosi ail-lwytho ar pob gweinydd mewn amgylchedd LB).
         ]]>
@@ -2340,7 +2340,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
       <![CDATA[
             Mae'r botwm hwn yn caniatáu ichi ailadeiladu'r cuddstôr cronfa ddata, h.y. y cynnwys o'r tabl cmsContentNu.
             <strong>Gall ailadeiladu fod yn ddrud.</strong>
-            Defnyddio fo pan mae ail-lwytho ddim yn ddigon, a ti'n feddwl mai'r stôr cronfa ddata heb gael ei 
+            Defnyddio fo pan mae ail-lwytho ddim yn ddigon, a ti'n feddwl mai'r stôr cronfa ddata heb gael ei
             chynhyrchu'n iawn&mdash;a fyddai'n arwydd o broblem gritigol efo Umbraco.
         ]]>
     </key>

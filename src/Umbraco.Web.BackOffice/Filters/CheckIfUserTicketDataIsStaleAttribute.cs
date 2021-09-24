@@ -118,13 +118,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         return;
                     }
 
-                    Attempt<int> userId = identity.GetId().TryConvertTo<int>();
-                    if (userId == false)
-                    {
-                        return;
-                    }
-
-                    IUser user = _userService.GetUserById(userId.Result);
+                    IUser user = _userService.GetUserById(identity.GetId());
                     if (user == null)
                     {
                         return;

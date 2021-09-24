@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Examine;
 using Umbraco.Cms.Core.Scoping;
@@ -30,7 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             {
                 // we cannot return FAILED here because we need the value set to get into the indexer and then deal with it from there
                 // because we need to remove anything that doesn't pass by parent Id in the cases that umbraco data is moved to an illegal parent.
-                if (!path.Contains(string.Concat(",", ParentId.Value, ",")))
+                if (!path.Contains(string.Concat(",", ParentId.Value.ToString(CultureInfo.InvariantCulture), ",")))
                     return false;
             }
 
@@ -39,7 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         public bool ValidateRecycleBin(string path, string category)
         {
-            var recycleBinId = category == IndexTypes.Content ? Constants.System.RecycleBinContent : Constants.System.RecycleBinMedia;
+            var recycleBinId = category == IndexTypes.Content ? Constants.System.RecycleBinContentString : Constants.System.RecycleBinMediaString;
 
             //check for recycle bin
             if (PublishedValuesOnly)

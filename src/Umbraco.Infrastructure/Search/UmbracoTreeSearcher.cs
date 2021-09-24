@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Examine;
 using Umbraco.Cms.Core.Mapping;
@@ -162,17 +163,16 @@ namespace Umbraco.Cms.Infrastructure.Search
                     }
                 );
 
-                var intId = entity.Id.TryConvertTo<int>();
-                if (intId.Success)
+                if (int.TryParse(entity.Id.ToString(),NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
                 {
                     //if it varies by culture, return the default language URL
                     if (result.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out var varies) && varies == "y")
                     {
-                        entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId.Result, culture: culture ?? defaultLang);
+                        entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId, culture: culture ?? defaultLang);
                     }
                     else
                     {
-                        entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId.Result);
+                        entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId);
                     }
                 }
 

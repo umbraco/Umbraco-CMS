@@ -65,14 +65,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         }
 
         [Test]
-        public async Task User_Matching_One_Of_Requested_Group_Ids_Is_Authorised()
+        public async Task User_Matching_Only_One_Of_Requested_Group_Ids_Is_NOT_Authorised()
         {
             AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
             UserGroupHandler sut = CreateHandler(queryStringValue: $"{Group1Id},{Group2Id}");
 
             await sut.HandleAsync(authHandlerContext);
 
-            Assert.IsTrue(authHandlerContext.HasSucceeded);
+            Assert.IsTrue(authHandlerContext.HasFailed);
         }
 
         [Test]

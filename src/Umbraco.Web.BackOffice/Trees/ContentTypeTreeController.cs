@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                 // root actions
                 menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add(new MenuItem("importDocumentType", LocalizedTextService)
+                menu.Items.Add(new MenuItem("importdocumenttype", LocalizedTextService)
                 {
                     Icon = "page-up",
                     SeparatorBefore = true,

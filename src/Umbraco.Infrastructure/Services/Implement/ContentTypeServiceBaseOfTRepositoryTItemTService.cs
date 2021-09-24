@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
@@ -946,11 +947,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public IEnumerable<EntityContainer> GetContainers(TItem item)
         {
             var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x =>
-                {
-                    var asInt = x.TryConvertTo<int>();
-                    return asInt ? asInt.Result : int.MinValue;
-                })
+                .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt) ? asInt : int.MinValue)
                 .Where(x => x != int.MinValue && x != item.Id)
                 .ToArray();
 

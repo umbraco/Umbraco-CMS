@@ -16,10 +16,10 @@
     <key alias="createGroup">Créer un groupe</key>
     <key alias="delete">Supprimer</key>
     <key alias="disable">Désactiver</key>
-    <key alias="emptyRecycleBin">Vider la corbeille</key>
+    <key alias="emptyrecyclebin">Vider la corbeille</key>
     <key alias="enable">Activer</key>
     <key alias="exportDocumentType">Exporter le type de document</key>
-    <key alias="importDocumentType">Importer un type de document</key>
+    <key alias="importdocumenttype">Importer un type de document</key>
     <key alias="importPackage">Importer un package</key>
     <key alias="liveEdit">Editer dans Canvas</key>
     <key alias="logout">Déconnexion</key>

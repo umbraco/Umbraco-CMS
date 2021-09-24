@@ -425,6 +425,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
         private static int GetIntId(object id)
         {
+            if (id is string strId && int.TryParse(strId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
+            {
+                return asInt;
+            }
             var result = id.TryConvertTo<int>();
             if (result.Success == false)
             {
