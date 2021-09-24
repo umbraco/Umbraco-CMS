@@ -32,12 +32,20 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         {
             if (source == null) return null;
 
-            //Don't attempt to convert to int for UDI
-            if(!(source is string) || source is string strSource && !string.IsNullOrWhiteSpace(strSource) && !strSource.StartsWith("umb"))
+
+            if(source is not string)
             {
-                 var attemptConvertInt = source.TryConvertTo<int>();
-                    if (attemptConvertInt.Success)
-                        return attemptConvertInt.Result;
+                var attemptConvertInt = source.TryConvertTo<int>();
+                if (attemptConvertInt.Success)
+                    return attemptConvertInt.Result;
+            }
+            //Don't attempt to convert to int for UDI
+            if( source is string strSource
+                && !string.IsNullOrWhiteSpace(strSource)
+                && !strSource.StartsWith("umb")
+                && int.TryParse(strSource, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intValue))
+            {
+                return intValue;
             }
 
             var attemptConvertUdi = source.TryConvertTo<Udi>();

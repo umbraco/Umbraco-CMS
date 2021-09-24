@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
@@ -12,9 +13,9 @@ namespace Umbraco.Extensions
         public static EntityPermission GetPermissions(this IUserService userService, IUser user, string path)
         {
             var ids = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.TryConvertTo<int>())
-                .Where(x => x.Success)
-                .Select(x => x.Result)
+                .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? (int?)value : null)
+                .Where(x => x.HasValue)
+                .Select(x => x.Value)
                 .ToArray();
             if (ids.Length == 0) throw new InvalidOperationException("The path: " + path + " could not be parsed into an array of integers or the path was empty");
 
