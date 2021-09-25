@@ -130,17 +130,7 @@ namespace Umbraco.Cms.Web.Website.Routing
 
             IPublishedRequest publishedRequest = await RouteRequestAsync(umbracoContext);
 
-            umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
-
-            if (!umbracoRouteValues?.PublishedRequest?.HasPublishedContent() ?? false)
-            {
-                // No content was found, not by any registered 404 handlers and
-                // not by the IContentLastChanceFinder. In this case we want to return
-                // our default 404 page but we cannot return route values now because
-                // it's possible that a developer is handling dynamic routes too.
-                // Our 404 page will be handled with the NotFoundSelectorPolicy
-                return null;
-            }
+            umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);            
 
             // now we need to do some public access checks
             umbracoRouteValues = await _publicAccessRequestHandler.RewriteForPublishedContentAccessAsync(httpContext, umbracoRouteValues);
@@ -153,6 +143,18 @@ namespace Umbraco.Cms.Web.Website.Routing
             if (postedInfo != null)
             {
                 return HandlePostedValues(postedInfo, httpContext);
+            }
+
+            UmbracoRouteResult? routeResult = umbracoRouteValues?.PublishedRequest?.GetRouteResult();
+
+            if (!routeResult.HasValue || routeResult == UmbracoRouteResult.NotFound)
+            {
+                // No content was found, not by any registered 404 handlers and
+                // not by the IContentLastChanceFinder. In this case we want to return
+                // our default 404 page but we cannot return route values now because
+                // it's possible that a developer is handling dynamic routes too.
+                // Our 404 page will be handled with the NotFoundSelectorPolicy
+                return null;
             }
 
             // See https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.routing.dynamicroutevaluetransformer.transformasync?view=aspnetcore-5.0#Microsoft_AspNetCore_Mvc_Routing_DynamicRouteValueTransformer_TransformAsync_Microsoft_AspNetCore_Http_HttpContext_Microsoft_AspNetCore_Routing_RouteValueDictionary_
