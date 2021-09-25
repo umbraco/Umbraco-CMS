@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -19,8 +20,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly IOptions<GlobalSettings> _globalSettings;
-        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
         private readonly IMapperCollection _mappers;
+        private readonly IConfiguration _configuration;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
         private readonly NPocoMapperCollection _npocoMappers;
@@ -28,16 +29,16 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         public TestUmbracoDatabaseFactoryProvider(
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
             IMapperCollection mappers,
+            IConfiguration configuration,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             NPocoMapperCollection npocoMappers)
         {
             _loggerFactory = loggerFactory;
             _globalSettings = globalSettings;
-            _connectionStrings = connectionStrings;
             _mappers = mappers;
+            _configuration = configuration;
             _dbProviderFactoryCreator = dbProviderFactoryCreator;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
             _npocoMappers = npocoMappers;
@@ -48,7 +49,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 _loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 _loggerFactory,
                 _globalSettings,
-                _connectionStrings,
+                _configuration,
                 _mappers,
                 _dbProviderFactoryCreator,
                 _databaseSchemaCreatorFactory,
