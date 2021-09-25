@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Examine;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -219,7 +220,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IMainDomLock>(factory =>
             {
                 var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
-                var connectionStrings = factory.GetRequiredService<IOptionsMonitor<ConnectionStrings>>();
+                var configuration = factory.GetRequiredService<IConfiguration>();
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
@@ -233,7 +234,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                             loggerFactory.CreateLogger<SqlMainDomLock>(),
                             loggerFactory,
                             globalSettings,
-                            connectionStrings,
+                            configuration,
                             dbCreator,
                             hostingEnvironment,
                             databaseSchemaCreatorFactory,
