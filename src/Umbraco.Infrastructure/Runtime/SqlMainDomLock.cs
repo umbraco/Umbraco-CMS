@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
@@ -41,12 +42,12 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly object _locker = new object();
         private bool _hasTable = false;
         private bool _acquireWhenTablesNotAvailable = false;
-        
+
         public SqlMainDomLock(
             ILogger<SqlMainDomLock> logger,
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IConfiguration configuration,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             IHostingEnvironment hostingEnvironment,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
@@ -62,7 +63,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                 _globalSettings,
-               connectionStrings,
+                configuration,
                new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
                dbProviderFactoryCreator,
                databaseSchemaCreatorFactory,

@@ -1,6 +1,7 @@
 using System;
 using System.Data.Common;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
@@ -80,7 +81,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             ILogger<UmbracoDatabaseFactory> logger,
             ILoggerFactory loggerFactory,
             IOptions<GlobalSettings> globalSettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IConfiguration configuration,
             IMapperCollection mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
@@ -95,22 +96,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory;
 
-            var settings = connectionStrings.CurrentValue.UmbracoConnectionString;
-            if (settings == null)
-            {
-                logger.LogDebug("Missing connection string, defer configuration.");
-                return; // not configured
-            }
 
             // could as well be <add name="umbracoDbDSN" connectionString="" providerName="" />
             // so need to test the values too
-            if (settings.IsConnectionStringConfigured() == false)
+            if (configuration.IsConnectionStringConfigured() == false)
             {
                 logger.LogDebug("Empty connection string or provider name, defer configuration.");
                 return; // not configured
             }
 
-            Configure(settings.ConnectionString, settings.ProviderName);
+            Configure(configuration.GetConnectionString(Constants.System.UmbracoConnectionName), configuration.GetConnectionString(Constants.System.UmbracoConnectionProviderName));
         }
 
         #endregion

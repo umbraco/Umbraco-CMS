@@ -47,7 +47,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Register configuration sections.
             builder
                 .AddUmbracoOptions<ModelsBuilderSettings>()
-                .AddUmbracoOptions<ConnectionStrings>()
                 .AddUmbracoOptions<ActiveDirectorySettings>()
                 .AddUmbracoOptions<ContentSettings>()
                 .AddUmbracoOptions<CoreDebugSettings>()

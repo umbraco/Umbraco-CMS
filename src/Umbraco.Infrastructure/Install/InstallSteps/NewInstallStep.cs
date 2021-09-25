@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -31,9 +32,9 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
         private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly SecuritySettings _securitySettings;
-        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
         private readonly ICookieManager _cookieManager;
         private readonly IBackOfficeUserManager _userManager;
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
@@ -44,7 +45,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             IHttpClientFactory httpClientFactory,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IOptions<SecuritySettings> securitySettings,
-            IOptionsMonitor<ConnectionStrings> connectionStrings,
+            IConfiguration configuration,
             ICookieManager cookieManager,
             IBackOfficeUserManager userManager,
             IDbProviderFactoryCreator dbProviderFactoryCreator)
@@ -52,9 +53,9 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
             _passwordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
             _securitySettings = securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
-            _connectionStrings = connectionStrings;
             _cookieManager = cookieManager;
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
@@ -141,7 +142,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             // TODO: we need to do a null check here since this could be entirely missing and we end up with a null ref
             // exception in the installer.
 
-            var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
+            var databaseSettings = _configuration.GetConnectionString(Constants.System.UmbracoConnectionName);
 
             var hasConnString = databaseSettings != null && _databaseBuilder.IsDatabaseConfigured;
             if (hasConnString)
@@ -149,15 +150,15 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 installState = (installState | InstallState.HasConnectionString) & ~InstallState.Unknown;
             }
 
-            var connStringConfigured = databaseSettings.IsConnectionStringConfigured();
+            var connStringConfigured = _configuration.IsConnectionStringConfigured();
             if (connStringConfigured)
             {
                 installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
             }
 
 
-            var factory = _dbProviderFactoryCreator.CreateFactory(databaseSettings?.ProviderName);
-            var canConnect = connStringConfigured && DbConnectionExtensions.IsConnectionAvailable(databaseSettings.ConnectionString, factory);
+            var factory = _dbProviderFactoryCreator.CreateFactory(_configuration.GetConnectionString(Constants.System.UmbracoConnectionProviderName));
+            var canConnect = connStringConfigured && DbConnectionExtensions.IsConnectionAvailable(databaseSettings, factory);
             if (canConnect)
             {
                 installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -24,20 +25,20 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private readonly IRuntimeState _runtime;
         private readonly ILogger<DatabaseUpgradeStep> _logger;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
+        private readonly IConfiguration _configuration;
 
         public DatabaseUpgradeStep(
             DatabaseBuilder databaseBuilder,
             IRuntimeState runtime,
             ILogger<DatabaseUpgradeStep> logger,
             IUmbracoVersion umbracoVersion,
-            IOptionsMonitor<ConnectionStrings> connectionStrings)
+            IConfiguration configuration)
         {
             _databaseBuilder = databaseBuilder;
             _runtime = runtime;
             _logger = logger;
             _umbracoVersion = umbracoVersion;
-            _connectionStrings = connectionStrings;
+            _configuration = configuration;
         }
 
         public override Task<InstallSetupResult> ExecuteAsync(object model)
@@ -77,9 +78,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 return false;
             }
 
-            var databaseSettings = _connectionStrings.CurrentValue.UmbracoConnectionString;
 
-            if (databaseSettings.IsConnectionStringConfigured())
+            if (_configuration.IsConnectionStringConfigured())
             {
                 // a connection string was present, determine whether this is an install/upgrade
                 // return true (upgrade) if there is an installed version, else false (install)
