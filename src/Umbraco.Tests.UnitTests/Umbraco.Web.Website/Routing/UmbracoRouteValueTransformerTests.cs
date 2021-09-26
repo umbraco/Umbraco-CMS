@@ -163,7 +163,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
         public async Task Null_When_No_Content_On_PublishedRequest()
         {
             IUmbracoContext umbracoContext = GetUmbracoContext(true);
-            IPublishedRequest request = Mock.Of<IPublishedRequest>();
+            IPublishedRequest request = Mock.Of<IPublishedRequest>(x => x.PublishedContent == null);
 
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
                 Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
@@ -172,9 +172,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
 
             var httpContext = new DefaultHttpContext();
             RouteValueDictionary result = await transformer.TransformAsync(httpContext, new RouteValueDictionary());
+            Assert.IsNull(result);
 
             UmbracoRouteValues routeVals = httpContext.Features.Get<UmbracoRouteValues>();
-            Assert.IsNull(routeVals);
+            Assert.AreEqual(routeVals.PublishedRequest.GetRouteResult(), UmbracoRouteResult.NotFound);
         }
 
         [Test]

@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -64,6 +66,19 @@ namespace Umbraco.Cms.Web.Website.Routing
                 if (publicAccessAttempt)
                 {
                     _logger.LogDebug("EnsurePublishedContentAccess: Page is protected, check for access");
+
+                    // manually authenticate the request
+                    AuthenticateResult authResult = await httpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+                    if (authResult.Succeeded)
+                    {
+                        // set the user to the auth result. we need to do this here because this occurs
+                        // before the authentication middleware.
+                        // NOTE: It would be possible to just pass the authResult to the HasMemberAccessToContentAsync method
+                        // instead of relying directly on the user assigned to the http context, and then the auth middleware
+                        // will run anyways and assign the user. Perhaps that is a little cleaner, but would require more code
+                        // changes right now, and really it's not any different in the end result.
+                        httpContext.SetPrincipalForRequest(authResult.Principal);
+                    }
 
                     publicAccessStatus = await _publicAccessChecker.HasMemberAccessToContentAsync(publishedContent.Id);
                     switch (publicAccessStatus)
