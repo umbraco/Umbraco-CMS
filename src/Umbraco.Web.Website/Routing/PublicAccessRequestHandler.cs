@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                         // instead of relying directly on the user assigned to the http context, and then the auth middleware
                         // will run anyways and assign the user. Perhaps that is a little cleaner, but would require more code
                         // changes right now, and really it's not any different in the end result.
-                        httpContext.User = authResult.Principal;
+                        httpContext.SetPrincipalForRequest(authResult.Principal);
                     }
 
                     publicAccessStatus = await _publicAccessChecker.HasMemberAccessToContentAsync(publishedContent.Id);
