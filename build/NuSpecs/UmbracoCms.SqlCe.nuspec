@@ -25,6 +25,7 @@
                 -->
                 <dependency id="Umbraco.Cms.Core" version="[$version$]" />
                 <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.999999)" /> <!-- Hack it is only available in framework, but we need it on netstandard -->
+                <dependency id="Microsoft.Windows.Compatability" version="[5.0.2,5.999999]" />
             </group>
 
         </dependencies>
