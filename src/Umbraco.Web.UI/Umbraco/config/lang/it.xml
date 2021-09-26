@@ -97,10 +97,10 @@
         <key alias="duplicateDomain"><![CDATA[Il dominio è già stato assegnato.]]></key>
         <key alias="language">Lingua</key>
         <key alias="domain">Dominio</key>
-        <key alias="domainCreated">Il dominio '%0%' è stato creato</key>
-        <key alias="domainDeleted">Il dominio '%0%' è stato cancellato</key>
-        <key alias="domainExists">Il dominio '%0%' è già stato assegnato</key>
-        <key alias="domainUpdated">Il dominio '%0%' è stato aggiornato</key>
+        <key alias="domainCreated"><![CDATA[Il dominio '%0%' è stato creato]]></key>
+        <key alias="domainDeleted"><![CDATA[Il dominio '%0%' è stato cancellato]]></key>
+        <key alias="domainExists"><![CDATA[Il dominio '%0%' è già stato assegnato]]></key>
+        <key alias="domainUpdated"><![CDATA[Il dominio '%0%' è stato aggiornato]]></key>
         <key alias="orEdit">Modifica il dominio corrente</key>
         <key alias="domainHelpWithVariants">
             <![CDATA[Nomi di dominio validi sono: "example.com", "www.example.com", "example.com:8080", oppure "https://www.example.com/".
@@ -147,7 +147,7 @@
         <key alias="schedulePublish">Pianifica</key>
         <key alias="showPage">Anteprima</key>
         <key alias="saveAndPreview">Salva e visualizza anteprima</key>
-        <key alias="showPageDisabled"><![CDATA[L'anteprima è disabilitata perchè non ci sono template assegnati]]></key>
+        <key alias="showPageDisabled"><![CDATA[L'anteprima è disabilitata perché non ci sono template assegnati]]></key>
         <key alias="styleChoose">Scegli stile</key>
         <key alias="styleShow">Vedi stili</key>
         <key alias="tableInsert">Inserisci tabella</key>
@@ -234,8 +234,8 @@
         <key alias="noMediaLink">Questo media non ha link</key>
         <key alias="noProperties"><![CDATA[Nessun contenuto può essere aggiunto per questo elemento]]></key>
         <key alias="otherElements"><![CDATA[Proprietà]]></key>
-        <key alias="parentNotPublished"><![CDATA[Questo documento è pubblicato, ma non è visibile perchè il padre '%0%' non è pubblicato]]></key>
-        <key alias="parentCultureNotPublished"><![CDATA[Questa lingua è pubblicata, ma non è visibile perchè non è pubblicata al padre '%0%']]></key>
+        <key alias="parentNotPublished"><![CDATA[Questo documento è pubblicato, ma non è visibile perché il padre '%0%' non è pubblicato]]></key>
+        <key alias="parentCultureNotPublished"><![CDATA[Questa lingua è pubblicata, ma non è visibile perché non è pubblicata al padre '%0%']]></key>
         <key alias="parentNotPublishedAnomaly"><![CDATA[Questo documento è pubblicato, ma non è nella cache]]></key>
         <key alias="getUrlException">Impossibile ottenere l'URL</key>
         <key alias="routeError"><![CDATA[Questo documento è pubblicato ma il suo URL entrerebbe in conflitto con il contenuto %0%]]></key>
@@ -314,7 +314,7 @@
         <key alias="schedulePublishHelp">Seleziona da data e l'ora in cui pubblicare/non pubblicare il contenuto.</key>
 		<key alias="createEmpty">Crea nuovo/a</key>
         <key alias="createFromClipboard">Incolla dagli appunti</key>
-        <key alias="nodeIsInTrash">Questo articolo è nel cestino</key>
+        <key alias="nodeIsInTrash"><![CDATA[Questo articolo è nel cestino]]></key>
 	</area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Crea un nuovo modello di contenuto da '%0%'</key>
@@ -460,7 +460,7 @@
         <key alias="insertlink">Inserisci link</key>
         <key alias="insertMacro">Inserisci macro</key>
         <key alias="inserttable">Inserisci tabella</key>
-        <key alias="languagedeletewarning">Questo eliminerà la lingua</key>
+        <key alias="languagedeletewarning"><![CDATA[Questo eliminerà la lingua]]></key>
         <key alias="languageChangeWarning"><![CDATA[La modifica della cultura di una lingua può essere un'operazione costosa e comporterà la ricostruzione della cache dei contenuti e degli indici]]></key>
         <key alias="lastEdited">Ultima modifica</key>
         <key alias="link">Link</key>
@@ -491,7 +491,7 @@
         <key alias="viewCacheItem">Visualizza gli elementi in cache</key>
         <key alias="relateToOriginalLabel">Relaziona con l'originale</key>
         <key alias="includeDescendants">Includi discendenti</key>
-        <key alias="theFriendliestCommunity">La comunità più amichevole</key>
+        <key alias="theFriendliestCommunity"><![CDATA[La comunità più amichevole]]></key>
         <key alias="linkToPage">Link alla pagina</key>
         <key alias="openInNewWindow">Apre il documento linkato in una nuova finestra o tab</key>
         <key alias="linkToMedia">Link al media</key>
@@ -651,7 +651,7 @@
         <key alias="stylesNoStylesOnPage"><![CDATA[Nessuno stile attivo disponibile]]></key>
         <key alias="tableColMergeLeft"><![CDATA[Per favore posiziona il cursore a sinistra delle due celle che desideri unire ]]></key>
         <key alias="tableSplitNotSplittable"><![CDATA[Non puoi dividere una cella che non è stata unita.]]></key>
-        <key alias="propertyHasErrors">Questa proprietà non è valida</key>
+        <key alias="propertyHasErrors"><![CDATA[Questa proprietà non è valida]]></key>
     </area>
     <area alias="general">
         <key alias="options">Opzioni</key>
@@ -934,7 +934,7 @@
         	]]>
         </key>
         <key alias="runwayHeader"><![CDATA[Hai configurato una versione pulita della piattaforma Umbraco. Cosa vuoi fare adesso?]]></key>
-        <key alias="runwayInstalled">Runway è installato</key>
+        <key alias="runwayInstalled"><![CDATA[Runway è installato]]></key>
         <key alias="runwayInstalledText">
             <![CDATA[
       			Hai le basi. Seleziona quali moduli vorresti installare.<br />
@@ -1356,22 +1356,22 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="invalidPublishBranchPermissions">Permessi insufficienti per pubblicare tutti i discendenti</key>
         <key alias="contentPublishedFailedIsTrashed">
             <![CDATA[
-      %0% non può essere pubblicato perchè l'elemento è nel cestino.
+      %0% non può essere pubblicato perché l'elemento è nel cestino.
     ]]>
         </key>
         <key alias="contentPublishedFailedAwaitingRelease">
             <![CDATA[
-      %0% non può essere pubblicato perchè l'elemento ha in corso una pubblicazione programmata.
+      %0% non può essere pubblicato perché l'elemento ha in corso una pubblicazione programmata.
     ]]>
         </key>
         <key alias="contentPublishedFailedExpired">
             <![CDATA[
-      %0% non può essere pubblicato perchè l'elemento è scaduto.
+      %0% non può essere pubblicato perché l'elemento è scaduto.
     ]]>
         </key>
         <key alias="contentPublishedFailedInvalid">
             <![CDATA[
-      %0% non può essere pubblicato perchè alcune proprietà non hanno passato la validazione.
+      %0% non può essere pubblicato perché alcune proprietà non hanno passato la validazione.
     ]]>
         </key>
         <key alias="contentPublishedFailedByEvent">
@@ -1381,14 +1381,14 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         </key>
         <key alias="contentPublishedFailedByParent">
             <![CDATA[
-      %0% non può essere pubblicato perchè la pagina padre non è pubblicata.
+      %0% non può essere pubblicato perché la pagina padre non è pubblicata.
     ]]>
         </key>
-        <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% non può essere pubblicato perchè manca un nome.]]></key>
-        <key alias="contentPublishedFailedReqCultureValidationError">Validazione fallita per la lingua obbligatoria '%0%'. Questa lingua è stata salvata ma non pubblicata.</key>
+        <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% non può essere pubblicato perché manca un nome.]]></key>
+        <key alias="contentPublishedFailedReqCultureValidationError"><![CDATA[Validazione fallita per la lingua obbligatoria '%0%'. Questa lingua è stata salvata ma non pubblicata.]]></key>
         <key alias="inProgress">Pubblicazione in corso, aspetta...</key>
         <key alias="inProgressCounter">%0% di %1% pagine sono state pubblicate...</key>
-        <key alias="nodePublish">%0% è stato pubblicato</key>
+        <key alias="nodePublish"><![CDATA[%0% è stato pubblicato]]></key>
         <key alias="nodePublishAll">%0% e le relative sottopagine sono state pubblicate</key>
         <key alias="publishAll">Pubblica %0% e tutte le sue sottopagine</key>
         <key alias="publishHelp">
@@ -1581,7 +1581,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="documentTypeExportedSuccess"><![CDATA[Il Tipo di Documento è stato esportato in un file]]></key>
         <key alias="documentTypeExportedError"><![CDATA[C'è stato un errore durante l'esportazione del Tipo di Documento]]></key>
         <key alias="scheduleErrReleaseDate1"><![CDATA[La data di rilascio non può essere passata]]></key>
-        <key alias="scheduleErrReleaseDate2"><![CDATA[Non è possibile pianificare il documento per la pubblicazione poichè è richiesto '%0%', che non è pubblicato]]></key>
+        <key alias="scheduleErrReleaseDate2"><![CDATA[Non è possibile pianificare il documento per la pubblicazione poiché è richiesto '%0%', che non è pubblicato]]></key>
         <key alias="scheduleErrReleaseDate3"><![CDATA[Non è possibile pianificare il documento per la pubblicazione poiche '%0%' ha una data di pubblicazione posteriore di una lingua non obbligatoria]]></key>
         <key alias="scheduleErrExpireDate1"><![CDATA[La data di scadenza non può essere passata]]></key>
         <key alias="scheduleErrExpireDate2"><![CDATA[La data di scadenza non può essere prima della data di rilascio]]></key>
@@ -1754,7 +1754,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="childNodesHeading">Tipi di nodi figlio consentiti</key>
         <key alias="childNodesDescription">Consenti la creazione di contenuti con i tipi specificati sotto il contenuto di questo tipo.</key>
         <key alias="chooseChildNode">Scegli nodo figlio</key>
-        <key alias="compositionsDescription">Eredita schede e proprietà da un tipo di documento esistente. Le nuove schede verranno aggiunte al tipo di documento corrente o unite se esiste una scheda con un nome identico.</key>
+        <key alias="compositionsDescription"><![CDATA[Eredita schede e proprietà da un tipo di documento esistente. Le nuove schede verranno aggiunte al tipo di documento corrente o unite se esiste una scheda con un nome identico.]]></key>
         <key alias="compositionInUse"><![CDATA[Questo tipo di contenuto è utlizzato in una composizione, e quindi non può essere composto da se stesso.]]></key>
         <key alias="noAvailableCompositions">Non ci sono tipi di contenuto utilizzabili come composizione.</key>
         <key alias="compositionRemoveWarning"><![CDATA[Rimuovendo una composizione si elimineranno tutti i dati associati ad essa. Una volta salvato il tipo di documento non ci sarà nessun modo di recuperare i dati.]]></key>
@@ -1812,11 +1812,11 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="mandatoryLanguage">Lingua obbligatoria</key>
         <key alias="mandatoryLanguageHelp"><![CDATA[Le proprietà in questa lingua devono essere compliate prima che il nodo possa essere pubblicato.]]></key>
         <key alias="defaultLanguage">Lingua di default</key>
-        <key alias="defaultLanguageHelp">Un sito web Umbraco può avere solo una lingua di default.</key>
+        <key alias="defaultLanguageHelp"><![CDATA[Un sito web Umbraco può avere solo una lingua di default.]]></key>
         <key alias="changingDefaultLanguageWarning">Il cambio della lingua predefinita potrebbe comportare la mancanza di contenuti predefiniti.</key>
         <key alias="fallsbackToLabel">Ripiega a</key>
         <key alias="noFallbackLanguageOption">Nessuna lingua alternativa</key>
-        <key alias="fallbackLanguageDescription">Per consentire ad un contenuto multi-lingua di ripiegare su un altra lingua se il contenuto non è presente nella lingua richiesta, selezionalo qui.</key>
+        <key alias="fallbackLanguageDescription"><![CDATA[Per consentire ad un contenuto multi-lingua di ripiegare su un altra lingua se il contenuto non è presente nella lingua richiesta, selezionalo qui.]]></key>
         <key alias="fallbackLanguage">Lingua alternativa</key>
         <key alias="none">nessuna</key>
     </area>
@@ -2200,7 +2200,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		   1: Recommended value
 	  -->
         <key alias="customErrorsCheckSuccessMessage">Gli errori personalizzati sono impostati a '%0%'.</key>
-        <key alias="customErrorsCheckErrorMessage">Gli errori personalizzati al momento sono impostati a '%0%'. È raccomandato impostarli a '%1%' prima di andare live.</key>
+        <key alias="customErrorsCheckErrorMessage"><![CDATA[Gli errori personalizzati al momento sono impostati a '%0%'. È raccomandato impostarli a '%1%' prima di andare live.]]></key>
         <key alias="customErrorsCheckRectifySuccessMessage">Errori personalizzati impostati correttamente a '%0%'.</key>
         <key alias="macroErrorModeCheckSuccessMessage">I MacroErrors sono impostati a '%0%'.</key>
         <key alias="macroErrorModeCheckErrorMessage"><![CDATA[I MacroErrors sono impostati a '%0%' che impediranno il caricamento di qualche pagina nel sito se c'è anche solo un errore nella macro. Rettificando questa impostazione verrà impostato il valore '%1%'.]]></key>
@@ -2263,7 +2263,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="setHeaderInConfigError">Non posso aggiornare il file web.config. Errore: %0%</key>
         <key alias="noSniffCheckHeaderFound"><![CDATA[L'header o meta-tag <strong>X-Content-Type-Options</strong> usato per proteggere dalle vulnerabilità per MIME sniffing è stato trovato.]]></key>
         <key alias="noSniffCheckHeaderNotFound"><![CDATA[L'header o meta-tag <strong>X-Content-Type-Options</strong> usato per proteggere dalle vulnerabilità per MIME sniffing è stato trovato.]]></key>
-        <key alias="noSniffSetHeaderInConfigDescription">Aggiunge un valore alla sezione httpProtocol/customHeaders del file web.config per proteggere dalle vulnerabilità per MIME sniffing.</key>
+        <key alias="noSniffSetHeaderInConfigDescription"><![CDATA[Aggiunge un valore alla sezione httpProtocol/customHeaders del file web.config per proteggere dalle vulnerabilità per MIME sniffing.]]></key>
         <key alias="noSniffSetHeaderInConfigSuccess"><![CDATA[L'impostazione per creare un header per proteggere dalle vulnerabilità per MIME sniffing è stata aggiunta al file web.config.]]></key>
         <key alias="hSTSCheckHeaderFound"><![CDATA[L'header <strong>Strict-Transport-Security</strong>, conosciuto anche come l'header HSTS, è stato trovato.]]></key>
         <key alias="hSTSCheckHeaderNotFound"><![CDATA[L'header <strong>Strict-Transport-Security</strong> non è stato trovato.]]></key>
@@ -2561,7 +2561,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     </area>
     <area alias="settingsDashboard">
         <key alias="start">Inizia da qui!</key>
-        <key alias="startDescription">Questa sezione contiene gli elementi costitutivi del tuo sito Umbraco. Segui i collegamenti sottostanti per saperne di più su come lavorare con gli elementi nella sezione Impostazioni</key>
+        <key alias="startDescription"><![CDATA[Questa sezione contiene gli elementi costitutivi del tuo sito Umbraco. Segui i collegamenti sottostanti per saperne di più su come lavorare con gli elementi nella sezione Impostazioni]]></key>
         <key alias="more"><![CDATA[Scopri di più]]></key>
         <key alias="bulletPointOne">
             <![CDATA[
