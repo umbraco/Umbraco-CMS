@@ -450,7 +450,7 @@
         <key alias="confirmlogout"><![CDATA[Sei sicuro?]]></key>
         <key alias="confirmSure"><![CDATA[Sei sicuro?]]></key>
         <key alias="cut">Taglia</key>
-        <key alias="editdictionary">Modifica elemento Dictionary</key>
+        <key alias="editdictionary">Modifica elemento del Dizionario</key>
         <key alias="editlanguage">Modifica la lingua</key>
         <key alias="editSelectedMedia">Modifica il media selezionato</key>
         <key alias="insertAnchor">Inserisci il link locale</key>
@@ -531,13 +531,13 @@
         <key alias="yesRemove">Si, rimuovi</key>
     </area>
     <area alias="dictionary">
-        <key alias="noItems">Non ci sono oggetti nel Dictionary.</key>
+        <key alias="noItems">Non ci sono oggetti nel Dizionario.</key>
     </area>
     <area alias="dictionaryItem">
         <key alias="description"><![CDATA[Modifica le lingue per l'elemento '<em>%0%</em>' qui sotto.]]></key>
         <key alias="displayName">Nome della cultura</key>
         <key alias="changeKeyError"><![CDATA[La chiave '%0%' esiste già.]]></key>
-        <key alias="overviewTitle">Panoramica del Dictionary</key>
+        <key alias="overviewTitle">Panoramica del Dizionario</key>
     </area>
     <area alias="examineManagement">
         <key alias="configuredSearchers">Searchers configurati</key>
@@ -689,7 +689,7 @@
         <key alias="deleted">Eliminato</key>
         <key alias="deleting">Eliminazione...</key>
         <key alias="design">Design</key>
-        <key alias="dictionary">Dictionary</key>
+        <key alias="dictionary">Dizionario</key>
         <key alias="dimensions">Dimensioni</key>
         <key alias="discard">Scarta</key>
         <key alias="down"><![CDATA[Giù]]></key>
@@ -767,7 +767,7 @@
         <key alias="scheduledPublishing">Pubblicazione programmata</key>
         <key alias="search">Cerca</key>
         <key alias="searchNoResult">Spiacenti, non riusciamo a trovare quello che stai cercando.</key>
-        <key alias="noItemsInList"><![CDATA[Non è stato aggiunto nessun elemento]]</key>
+        <key alias="noItemsInList"><![CDATA[Non è stato aggiunto nessun elemento]]></key>
         <key alias="server">Server</key>
         <key alias="settings">Impostazioni</key>
         <key alias="show">Mostra</key>
@@ -799,7 +799,7 @@
         <key alias="preview">Anteprima</key>
         <key alias="changePassword">Cambia password</key>
         <key alias="to">a</key>
-        <key alias="listView">Vista elenco</key>
+        <key alias="listView">Vista lista</key>
         <key alias="saving">Salvataggio...</key>
         <key alias="current">corrente</key>
         <key alias="embed">Incorpora</key>
@@ -815,7 +815,7 @@
     </area>
     <area alias="shortcuts">
         <key alias="addGroup">Aggiungi gruppo</key>
-        <key alias="addProperty"><![CDATA[Aggiungi proprietà]]</key>
+        <key alias="addProperty"><![CDATA[Aggiungi proprietà]]></key>
         <key alias="addEditor">Aggiungi editor</key>
         <key alias="addTemplate">Aggiungi template</key>
         <key alias="addChildNode">Aggiungi nodo figlio</key>
@@ -824,14 +824,14 @@
         <key alias="navigateSections">Naviga tra le sezioni</key>
         <key alias="shortcut">Scorciatoie</key>
         <key alias="showShortcuts">vedi scorciatoie</key>
-        <key alias="toggleListView">Attiva/disattiva vista elenco</key>
+        <key alias="toggleListView">Attiva/disattiva vista lista</key>
         <key alias="toggleAllowAsRoot">Attiva/disattiva consenti come root</key>
         <key alias="commentLine">Commenta/Non commentare righe</key>
         <key alias="removeLine">Rimuovi riga</key>
         <key alias="copyLineUp">Copia linee sopra</key>
         <key alias="copyLineDown">Copia linee sotto</key>
         <key alias="moveLineUp">Sposta linee in su</key>
-        <key alias="moveLineDown"><![CDATA[Sposta linee in giù]]</key>
+        <key alias="moveLineDown"><![CDATA[Sposta linee in giù]]></key>
         <key alias="generalHeader">Generale</key>
         <key alias="editorHeader">Editor</key>
         <key alias="toggleAllowCultureVariants">Attiva/disattiva consenti varianti lingua</key>
@@ -957,12 +957,12 @@
         </small>
       ]]>
         </key>
-        <key alias="runwayWhatIsRunway">Cosa è Runway</key>
+        <key alias="runwayWhatIsRunway"><![CDATA[Cos'è Runway]]></key>
         <key alias="step1">Passo 1/5 Accettazione licenza</key>
         <key alias="step2">Passo 2/5: Configurazione database</key>
         <key alias="step3">Passo 3/5: Controllo permessi dei file</key>
         <key alias="step4">Passo 4/5: Controllo impostazioni sicurezza</key>
-        <key alias="step5">Passo 5/5: Umbraco è pronto per iniziare</key>
+        <key alias="step5"><![CDATA[Passo 5/5: Umbraco è pronto per iniziare]]></key>
         <key alias="thankYou">Grazie per aver scelto Umbraco</key>
         <key alias="theEndBrowseSite">
             <![CDATA[<h3>Naviga per il tuo nuovo sito</h3>
@@ -1004,26 +1004,26 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="renewSession">Riconnetti adesso per salvare il tuo lavoro</key>
     </area>
     <area alias="login">
-        <key alias="greeting0">Buona domenica</key>
-        <key alias="greeting1">Buon lunedì</key>
-        <key alias="greeting2">Buon martedì</key>
-        <key alias="greeting3">Buon mercoledì</key>
-        <key alias="greeting4">Buon giovedì</key>
-        <key alias="greeting5">Buon venerdì</key>
-        <key alias="greeting6">Buon sabato</key>
+        <key alias="greeting0"><![CDATA[Buona Domenica!]]></key>
+        <key alias="greeting1"><![CDATA[Buon Lunedì!]]></key>
+        <key alias="greeting2"><![CDATA[Buon Martedì!]]></key>
+        <key alias="greeting3"><![CDATA[Buon Mercoledì!]]></key>
+        <key alias="greeting4"><![CDATA[Buon Giovedì!]]></key>
+        <key alias="greeting5"><![CDATA[Buon Venerdì!]]></key>
+        <key alias="greeting6"><![CDATA[Buon Sabato!]]></key>
         <key alias="instruction">Fai il login qui sotto</key>
         <key alias="signInWith">Fai il login con</key>
         <key alias="timeout">Sessione scaduta</key>
         <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
         <key alias="forgottenPassword">Password dimenticata?</key>
-        <key alias="forgottenPasswordInstruction">Una email verrà inviata all'indirizzo specificato con un link per il reset della password</key>
-        <key alias="requestPasswordResetConfirmation">Un'e-mail con le istruzioni per il reset della password verrà inviata all'indirizzo specificato se registrato.</key>
+        <key alias="forgottenPasswordInstruction"><![CDATA[Una email verrà inviata all'indirizzo specificato con un link per il reset della password]]></key>
+        <key alias="requestPasswordResetConfirmation"><![CDATA[Un'e-mail con le istruzioni per il reset della password verrà inviata all'indirizzo specificato se registrato.]]></key>
         <key alias="showPassword">Mostra password</key>
         <key alias="hidePassword">Nascondi password</key>
         <key alias="returnToLogin">Ritorna alla finestra di login</key>
         <key alias="setPasswordInstruction">Inserisci una nuova password</key>
-        <key alias="setPasswordConfirmation">La tua password è stata modificata</key>
-        <key alias="resetCodeExpired">Il link su cui hai cliccato non è valido o è scaduto</key>
+        <key alias="setPasswordConfirmation"><![CDATA[La tua password è stata modificata]]></key>
+        <key alias="resetCodeExpired"><![CDATA[Il link su cui hai cliccato non è valido o è scaduto]]></key>
         <key alias="resetPasswordEmailCopySubject">Umbraco: Reset Password</key>
         <key alias="resetPasswordEmailCopyFormat">
             <![CDATA[
@@ -1245,7 +1245,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
       ]]>
         </key>
         <key alias="deletewarning"><![CDATA[Questo eliminerà il pacchetto]]></key>
-        <key alias="dropHere">Rilascia per caricare</key>
+        <key alias="dropHere">Trascina qui caricare</key>
         <key alias="includeAllChildNodes">Includi tutti i figli</key>
         <key alias="orClickHereToUpload">o clicca qui per scegliere il file del pacchetto</key>
         <key alias="uploadPackage">Carica pacchetto</key>
@@ -1256,7 +1256,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="termsOfUse">termini di servizio</key>
         <key alias="pathToFile">Percorso del file</key>
         <key alias="pathToFileDescription">Percorso assoluto del file (es: /bin/umbraco.bin)</key>
-        <key alias="installed">Installato</key>
+        <key alias="installed">Installati</key>
         <key alias="installedPackages">Pacchetti installati</key>
         <key alias="installLocal">Installa localmente</key>
         <key alias="installFinish">Termina</key>
@@ -1273,10 +1273,10 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="packageLicense">Licenza</key>
         <key alias="packageLicenseUrl">URL della licenza</key>
         <key alias="packageProperties"><![CDATA[Proprietà del pacchetto]]></key>
-        <key alias="packageSearch">Cerca dei pacchetti</key>
+        <key alias="packageSearch">Cerca un pacchetto...</key>
         <key alias="packageSearchResults">Risultati per</key>
         <key alias="packageNoResults">Non abbiamo trovato niente per</key>
-        <key alias="packageNoResultsDescription">Perfavore prova a cercare un altro pacchetto oppure cerca tra le categorie</key>
+        <key alias="packageNoResultsDescription">Per favore prova a cercare un altro pacchetto oppure cerca tra le categorie</key>
         <key alias="packagesPopular">Popolari</key>
         <key alias="packagesNew">Nuove uscite</key>
         <key alias="packageHas">ha</key>
@@ -1612,7 +1612,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="insert">Inserisci</key>
         <key alias="insertDesc">Scegli cosa inserire nel tuo template</key>
         <key alias="insertDictionaryItem">Elementi del dizionario</key>
-        <key alias="insertDictionaryItemDesc">Un elemento del dizionario è un segnaposto per un pezzo di testo traducibile, che facilita il design di siti web multi lingua.</key>
+        <key alias="insertDictionaryItemDesc"><![CDATA[Un elemento del dizionario è un segnaposto per un pezzo di testo traducibile, che facilita il design di siti web multi lingua.]]></key>
         <key alias="insertMacro">Macro</key>
         <key alias="insertMacroDesc"><![CDATA[
             Una macro è un componente configurabile, ottimo per
@@ -1910,7 +1910,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     </area>
     <area alias="treeHeaders">
 		<key alias="content">Contenuti</key>
-        <key alias="contentBlueprints">Templates del contenuto</key>
+        <key alias="contentBlueprints">Modelli di contenuto</key>
         <key alias="media">Media</key>
         <key alias="cacheBrowser">Cache Browser</key>
         <key alias="contentRecycleBin">Cestino</key>
@@ -1927,13 +1927,13 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="member">Membri</key>
         <key alias="memberGroups">Gruppi di Membri</key>
         <key alias="memberRoles">Ruoli</key>
-        <key alias="memberTypes">Tipi di Membro</key>
+        <key alias="memberTypes">Tipi di membro</key>
         <key alias="documentTypes">Tipi di documento</key>
         <key alias="relationTypes">Tipi di relazione</key>
         <key alias="packager">Pacchetti</key>
         <key alias="packages">Pacchetti</key>
         <key alias="partialViews">Partial Views</key>
-        <key alias="partialViewMacros">File Partial View della macro</key>
+        <key alias="partialViewMacros">Macro Partial Views</key>
         <key alias="repositories">Installa dal repository</key>
         <key alias="runway">Installa Runway</key>
         <key alias="runwayModules">Moduli Runway</key>
@@ -1941,7 +1941,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="scripts">Scripts</key>
         <key alias="stylesheets">Fogli di stile</key>
         <key alias="templates">Templates</key>
-        <key alias="logViewer">Visualizzatore log</key>
+        <key alias="logViewer">Logs</key>
         <key alias="users">Utenti</key>
         <key alias="settingsGroup">Impostazioni</key>
         <key alias="templatingGroup">Templating</key>
@@ -2039,7 +2039,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="writer">Autore</key>
         <key alias="change">Modifica</key>
         <key alias="yourProfile" version="7.0">Il tuo profilo</key>
-        <key alias="yourHistory" version="7.0">La tua storia recente</key>
+        <key alias="yourHistory" version="7.0"><![CDATA[La tua attività recente]]></key>
         <key alias="sessionExpires" version="7.0">La sessione scade in</key>
         <key alias="inviteUser">Invita utente</key>
         <key alias="createUser">Crea utente</key>
@@ -2560,7 +2560,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="getStarted">Per iniziare</key>
     </area>
     <area alias="settingsDashboard">
-        <key alias="start">Inizia qui</key>
+        <key alias="start">Inizia da qui!</key>
         <key alias="startDescription">Questa sezione contiene gli elementi costitutivi del tuo sito Umbraco. Segui i collegamenti sottostanti per saperne di più su come lavorare con gli elementi nella sezione Impostazioni</key>
         <key alias="more"><![CDATA[Scopri di più]]></key>
         <key alias="bulletPointOne">
@@ -2647,7 +2647,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="createHeadline">Come creo un modello di contenuto?</key>
         <key alias="createDescription">
             <![CDATA[
-            <p>Ci sono due modi per creare un tipo di contenuto:</p>
+            <p>Ci sono due modi per creare un modello di contenuto:</p>
             <ul>
                 <li>Fare clic con il pulsante destro del mouse su un nodo di contenuto e selezionare "Crea modello di contenuto" per creare un nuovo modello di contenuto.</li>
                 <li>Fare clic con il pulsante destro del mouse sull'albero dei modelli di contenuto nella sezione Impostazioni e selezionare il tipo di documento per il quale si desidera creare un modello di contenuto.</li>
@@ -2655,7 +2655,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
             <p>Una volta specificato un nome, gli editors potranno cominciare a usare il tipo di contenuto come base per la nuova pagina.</p>
         ]]>
         </key>
-        <key alias="manageHeadline">Come gestisco i tipi di contenuto?</key>
+        <key alias="manageHeadline">Come gestisco i modelli di contenuto?</key>
         <key alias="manageDescription">Puoi modificare ed eliminare i modelli di contenuto dall'albero "Modelli di contenuto" nella sezione Impostazioni. Espandere il tipo di documento su cui si basa il modello di contenuto e fare clic su di esso per modificarlo o eliminarlo.</key>
     </area>
     <area alias="preview">
