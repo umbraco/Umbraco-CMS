@@ -396,6 +396,27 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
+        /// A boolean value defining if TinyMCE security patches should be applied or not
+        /// </summary>
+        /// <remarks>
+        /// The default value is false
+        /// </remarks>
+        public bool ApplyMcePatches
+        {
+            get
+            {
+                try
+                {
+                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.MceSecurityPatches]);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// An int value representing the time in milliseconds to lock the database for a write operation
         /// </summary>
         /// <remarks>

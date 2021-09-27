@@ -361,6 +361,7 @@ namespace Umbraco.Web.Editors
                         {"showAllowSegmentationForDocumentTypes", false},
                         {"minimumPasswordLength", userMembershipProvider.MinRequiredPasswordLength},
                         {"minimumPasswordNonAlphaNum", userMembershipProvider.MinRequiredNonAlphanumericCharacters},
+                        {"applyMceSecurityPatches", Current.Configs.Global().ApplyMcePatches}
                     }
                 },
                 {

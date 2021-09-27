@@ -77,5 +77,10 @@
         /// Gets the write lock timeout.
         /// </summary>
         int SqlWriteLockTimeOut { get; }
+
+        /// <summary>
+        /// Returns true if TinyMCE security patches should be applied
+        /// </summary>
+        bool ApplyMcePatches { get; }
     }
 }
