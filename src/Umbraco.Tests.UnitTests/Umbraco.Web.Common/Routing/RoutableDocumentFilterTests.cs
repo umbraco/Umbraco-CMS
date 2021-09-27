@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Common.Routing;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
@@ -91,7 +92,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
             var endpointDataSource = new DefaultEndpointDataSource(endpoint1, endpoint2);
 
             var routableDocFilter = new RoutableDocumentFilter(
-                Options.Create(globalSettings),
+                new TestOptionsSnapshot<GlobalSettings>(globalSettings),
                 Options.Create(routingSettings),
                 GetHostingEnvironment(),
                 endpointDataSource);
@@ -120,7 +121,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
             var endpointDataSource = new DefaultEndpointDataSource(endpoint1);
 
             var routableDocFilter = new RoutableDocumentFilter(
-                Options.Create(globalSettings),
+                new TestOptionsSnapshot<GlobalSettings>(globalSettings),
                 Options.Create(routingSettings),
                 GetHostingEnvironment(),
                 endpointDataSource);

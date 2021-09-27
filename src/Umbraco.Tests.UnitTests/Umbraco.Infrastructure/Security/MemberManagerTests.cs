@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         private Mock<IPasswordHasher<MemberIdentityUser>> _mockPasswordHasher;
         private Mock<IMemberService> _mockMemberService;
         private Mock<IServiceProvider> _mockServiceProviders;
-        private Mock<IOptions<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
+        private Mock<IOptionsMonitor<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
 
         public MemberManager CreateSut()
         {
@@ -65,8 +65,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             userValidators.Add(validator.Object);
 
             _mockServiceProviders = new Mock<IServiceProvider>();
-            _mockPasswordConfiguration = new Mock<IOptions<MemberPasswordConfigurationSettings>>();
-            _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
+            _mockPasswordConfiguration = new Mock<IOptionsMonitor<MemberPasswordConfigurationSettings>>();
+            _mockPasswordConfiguration.Setup(x => x.CurrentValue).Returns(() =>
                 new MemberPasswordConfigurationSettings()
                 {
 

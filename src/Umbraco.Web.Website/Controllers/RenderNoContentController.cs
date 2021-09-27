@@ -13,13 +13,13 @@ namespace Umbraco.Cms.Web.Website.Controllers
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IIOHelper _ioHelper;
-        private readonly IOptions<GlobalSettings> _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
-        public RenderNoContentController(IUmbracoContextAccessor umbracoContextAccessor, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
+        public RenderNoContentController(IUmbracoContextAccessor umbracoContextAccessor, IIOHelper ioHelper, IOptionsSnapshot<GlobalSettings> globalSettings)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
+            _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
         }
 
         public ActionResult Index()
@@ -34,10 +34,10 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
             var model = new NoNodesViewModel
             {
-                UmbracoPath = _ioHelper.ResolveUrl(_globalSettings.Value.UmbracoPath),
+                UmbracoPath = _ioHelper.ResolveUrl(_globalSettings.UmbracoPath),
             };
 
-            return View(_globalSettings.Value.NoNodesViewPath, model);
+            return View(_globalSettings.NoNodesViewPath, model);
         }
     }
 }

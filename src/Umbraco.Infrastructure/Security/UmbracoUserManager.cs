@@ -35,11 +35,12 @@ namespace Umbraco.Cms.Core.Security
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<TUser>> logger,
-            IOptions<TPasswordConfig> passwordConfiguration)
+            IOptionsMonitor<TPasswordConfig> passwordConfiguration)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoopLookupNormalizer(), errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
-            PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            PasswordConfiguration = passwordConfiguration.CurrentValue ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+            passwordConfiguration.OnChange(x => PasswordConfiguration = x);
         }
 
         /// <inheritdoc />
@@ -60,7 +61,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets the password configuration
         /// </summary>
-        public IPasswordConfiguration PasswordConfiguration { get; }
+        public IPasswordConfiguration PasswordConfiguration { get; private set; }
 
         /// <summary>
         /// Gets the IP resolver
@@ -96,7 +97,7 @@ namespace Umbraco.Cms.Core.Security
             string password = _passwordGenerator.GeneratePassword();
             return password;
         }
-        
+
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code

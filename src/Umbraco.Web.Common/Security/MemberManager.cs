@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.Common.Security
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<MemberIdentityUser>> logger,
-            IOptions<MemberPasswordConfigurationSettings> passwordConfiguration,
+            IOptionsMonitor<MemberPasswordConfigurationSettings> passwordConfiguration,
             IPublicAccessService publicAccessService,
             IHttpContextAccessor httpContextAccessor)
             : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors,
