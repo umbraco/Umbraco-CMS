@@ -159,7 +159,7 @@ namespace Umbraco.Core
             /// <summary>
             /// A boolean value representing if the Tiny MCE security patches should be applied
             /// </summary>
-            public const string MceSecurityPatches = "Umbraco.Web.MCE.SecurityPatches";
+            public const string ApplyMceSecurityPatches = "Umbraco.Web.MCE.ApplyMceSecurityPatches";
         }
     }
 }

@@ -81,6 +81,6 @@
         /// <summary>
         /// Returns true if TinyMCE security patches should be applied
         /// </summary>
-        bool ApplyMcePatches { get; }
+        bool ApplyMceSecurityPatches { get; }
     }
 }

@@ -401,13 +401,13 @@ namespace Umbraco.Core.Configuration
         /// <remarks>
         /// The default value is false
         /// </remarks>
-        public bool ApplyMcePatches
+        public bool ApplyMceSecurityPatches
         {
             get
             {
                 try
                 {
-                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.MceSecurityPatches]);
+                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.ApplyMceSecurityPatches]);
                 }
                 catch
                 {
