@@ -149,6 +149,47 @@
                 </a>
             </div>
 
+          <!-- System info -->
+          <div class="umb-help-section">
+
+            <h5 class="umb-help-section__title">System Information</h5>
+              <div class="umb-help-list">
+                <div class="umb-help-list-item__title-wrapper">
+                <button
+                  type="button"
+                  class="umb-help-list-item umb-help-list-item__content"
+                  ng-click="vm.systemInfoDisplay = !vm.systemInfoDisplay"
+                  aria-expanded="{{vm.systemInfoDisplay ===  true}}">
+                  <umb-icon class="mr1" icon="{{vm.systemInfoDisplay ? 'icon-navigation-down' : 'icon-navigation-right'}}"></umb-icon>
+                  <span class="flex-column items-start flex">
+                    <span class="umb-help-list-item__group-title bold">System Information</span>
+                    <span class="umb-help-list-item__description mt0">View your system information</span>
+                  </span>
+                </button>
+                <button
+                  ng-click="vm.copyInformation()"
+                  class="btn-reset"
+                  type="button"
+                  size="30">
+                    <span class="">
+                      <umb-icon icon="icon-documents" class="umb-help-list-item__icon"></umb-icon>
+                    </span>
+                </button>
+                </div>
+                <div ng-if="vm.systemInfoDisplay === true">
+                  <table class="table table-striped">
+                    <tr>
+                      <th>Category</th>
+                      <th>Data</th>
+                    </tr>
+                    <tr ng-repeat="info in vm.systemInfo">
+                      <td>{{info.name}}</td>
+                      <td>{{info.data}}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+          </div>
         </umb-drawer-content>
 
         <umb-drawer-footer>
