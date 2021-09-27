@@ -1492,15 +1492,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 }
 
-                /** prevent injecting arbitrary JavaScript execution in on-attributes. */
-                var allNodes =  Array.prototype.slice.call(args.editor.dom.doc.getElementsByTagName("*"));
-                allNodes.forEach(node => {
-                    for (var i = 0; i < node.attributes.length; i++) {
-                        if(node.attributes[i].name.indexOf("on") === 0) {
-                            node.removeAttribute(node.attributes[i].name)
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.applyMceSecurityPatches === true){
+                    /** prevent injecting arbitrary JavaScript execution in on-attributes. */
+                    var allNodes =  Array.prototype.slice.call(args.editor.dom.doc.getElementsByTagName("*"));
+                    allNodes.forEach(node => {
+                        for (var i = 0; i < node.attributes.length; i++) {
+                            if(node.attributes[i].name.indexOf("on") === 0) {
+                                node.removeAttribute(node.attributes[i].name)
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
             });
 
@@ -1551,16 +1553,19 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         return uri;
                     }
                 }();
-                args.editor.serializer.addAttributeFilter(uriAttributesToSanitize, function (nodes) {
-                    nodes.forEach(function(node) {
-                        node.attributes.forEach(function(attr) {
-                            const attrName = attr.name.toLowerCase();
-                            if(uriAttributesToSanitize.indexOf(attrName) !== -1) {
-                                attr.value = parseUri(attr.value, node.name);
-                            }
+
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.applyMceSecurityPatches === true){
+                    args.editor.serializer.addAttributeFilter(uriAttributesToSanitize, function (nodes) {
+                        nodes.forEach(function(node) {
+                            node.attributes.forEach(function(attr) {
+                                const attrName = attr.name.toLowerCase();
+                                if(uriAttributesToSanitize.indexOf(attrName) !== -1) {
+                                    attr.value = parseUri(attr.value, node.name);
+                                }
+                            });
                         });
                     });
-                });
+                }
 
                 //start watching the value
                 startWatch();
