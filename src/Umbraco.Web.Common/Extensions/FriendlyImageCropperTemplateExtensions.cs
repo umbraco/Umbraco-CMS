@@ -126,6 +126,39 @@ namespace Umbraco.Extensions
                 urlMode
             );
 
+        public static string GetCropUrl(
+            this MediaWithCrops mediaWithCrops,
+            int? width = null,
+            int? height = null,
+            string propertyAlias = Cms.Core.Constants.Conventions.Media.File,
+            string cropAlias = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = false,
+            bool cacheBuster = true,
+            string furtherOptions = null,
+            UrlMode urlMode = UrlMode.Default)
+            => ImageCropperTemplateCoreExtensions.GetCropUrl(
+                mediaWithCrops,
+                ImageUrlGenerator,
+                PublishedValueFallback,
+                PublishedUrlProvider,
+                width,
+                height,
+                propertyAlias,
+                cropAlias,
+                quality,
+                imageCropMode,
+                imageCropAnchor,
+                preferFocalPoint,
+                useCropDimensions,
+                cacheBuster,
+                furtherOptions,
+                urlMode
+            );
+
         /// <summary>
         /// Gets the underlying image processing service URL from the image path.
         /// </summary>
