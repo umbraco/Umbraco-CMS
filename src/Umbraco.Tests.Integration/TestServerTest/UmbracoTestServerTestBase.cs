@@ -40,7 +40,18 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             InMemoryConfiguration["ConnectionStrings:" + Constants.System.UmbracoConnectionName] = null;
             InMemoryConfiguration["Umbraco:CMS:Hosting:Debug"] = "true";
 
-            // create new WebApplicationFactory specifying 'this' as the IStartup instance
+            /*
+             * It's worth noting that our usage of WebApplicationFactory is non-standard,
+             * the intent is that your Startup.ConfigureServices is called just like
+             * when the app starts up, then replacements are registered in this class with
+             * builder.ConfigureServices (builder.ConfigureTestServices has hung around from before the
+             * generic host switchover).
+             *
+             * This is currently a pain to refactor towards due to UmbracoBuilder+TypeFinder+TypeLoader setup but
+             * we should get there one day.
+             *
+             * See https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests
+             */
             var factory = new UmbracoWebApplicationFactory<Startup>(CreateHostBuilder, BeforeHostStart);
 
             // additional host configuration for web server integration tests
