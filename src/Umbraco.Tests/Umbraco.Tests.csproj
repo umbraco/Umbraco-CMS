@@ -186,9 +186,7 @@
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
-    <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Models\MediaXmlTest.cs" />
-    <Compile Include="Cache\PublishedCache\PublishedContentCacheTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />

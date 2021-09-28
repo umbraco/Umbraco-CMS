@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             {
                 throw new InvalidOperationException("Cannot build without a name");
             }
-            _segment = (_segment ?? _name).ToLower().ReplaceNonAlphanumericChars('-');
+            _segment ??= _name.ToLower().ReplaceNonAlphanumericChars('-');
 
             // create or copy the current culture infos for the content
             Dictionary<string, CultureVariation> contentCultureInfos = _cultureInfos == null
@@ -183,7 +183,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             var published = _published ?? true;
             var properties = _properties ?? new Dictionary<string, PropertyData[]>();
             var cultureInfos = _cultureInfos ?? new Dictionary<string, CultureVariation>();
-            var segment = (_segment ?? _name).ToLower().ReplaceNonAlphanumericChars('-');
+            var segment = _segment ?? _name.ToLower().ReplaceNonAlphanumericChars('-');
 
             var contentData = new ContentData(
                 _name,
