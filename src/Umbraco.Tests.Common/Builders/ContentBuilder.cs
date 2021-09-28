@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
         public ContentBuilder WithContentType(IContentType contentType)
         {
             _contentTypeBuilder = null;
-            _contentType = contentType;
+            _contentType = contentType;            
             return this;
         }
 
@@ -152,6 +152,11 @@ namespace Umbraco.Cms.Tests.Common.Builders
             content.Path = path;
             content.SortOrder = sortOrder;
             content.Trashed = trashed;
+
+            if (contentType.DefaultTemplate?.Id > 0)
+            {
+                content.TemplateId = contentType.DefaultTemplate.Id;
+            }
 
             foreach (KeyValuePair<string, string> cultureName in _cultureNames)
             {

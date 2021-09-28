@@ -38,8 +38,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IMediaService MediaService => GetRequiredService<IMediaService>();
         private IUserService UserService => GetRequiredService<IUserService>();
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+        private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
         private IDataValueEditorFactory DataValueEditorFactory => GetRequiredService<IDataValueEditorFactory>();
         private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
+        private IFileService FileService => GetRequiredService<IFileService>();
 
         [Test]
         public void Can_Export_Macro()
@@ -105,6 +107,51 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             // Assert
             Assert.That(xml.ToString(), Is.EqualTo(languageItemsElement.ToString()));
+        }
+
+        [Test]
+        public void Can_Generate_Xml_Representation_Of_Content()
+        {
+            // Arrange
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template); // else, FK violation on contentType!
+            var contentType = ContentTypeBuilder.CreateTextPageContentType(
+                defaultTemplateId: template.Id);
+            ContentTypeService.Save(contentType);
+
+            var content = ContentBuilder.CreateTextpageContent(contentType, "Root Home", -1);
+            ContentService.Save(content, Constants.Security.SuperUserId);
+
+            var nodeName = content.ContentType.Alias.ToSafeAlias(ShortStringHelper);
+            var urlName = content.GetUrlSegment(ShortStringHelper, new[] { new DefaultUrlSegmentProvider(ShortStringHelper) });
+
+            // Act
+            XElement element = content.ToXml(Serializer);
+
+            // Assert
+            Assert.That(element, Is.Not.Null);
+            Assert.That(element.Name.LocalName, Is.EqualTo(nodeName));
+            Assert.AreEqual(content.Id.ToString(), (string)element.Attribute("id"));
+            Assert.AreEqual(content.ParentId.ToString(), (string)element.Attribute("parentID"));
+            Assert.AreEqual(content.Level.ToString(), (string)element.Attribute("level"));
+            Assert.AreEqual(content.CreatorId.ToString(), (string)element.Attribute("creatorID"));
+            Assert.AreEqual(content.SortOrder.ToString(), (string)element.Attribute("sortOrder"));
+            Assert.AreEqual(content.CreateDate.ToString("s"), (string)element.Attribute("createDate"));
+            Assert.AreEqual(content.UpdateDate.ToString("s"), (string)element.Attribute("updateDate"));
+            Assert.AreEqual(content.Name, (string)element.Attribute("nodeName"));
+            Assert.AreEqual(urlName, (string)element.Attribute("urlName"));
+            Assert.AreEqual(content.Path, (string)element.Attribute("path"));
+            Assert.AreEqual("", (string)element.Attribute("isDoc"));
+            Assert.AreEqual(content.ContentType.Id.ToString(), (string)element.Attribute("nodeType"));
+            Assert.AreEqual(content.GetCreatorProfile(UserService).Name, (string)element.Attribute("creatorName"));
+            Assert.AreEqual(content.GetWriterProfile(UserService).Name, (string)element.Attribute("writerName"));
+            Assert.AreEqual(content.WriterId.ToString(), (string)element.Attribute("writerID"));
+            Assert.AreEqual(content.TemplateId.ToString(), (string)element.Attribute("template"));
+
+            Assert.AreEqual(content.Properties["title"].GetValue().ToString(), element.Elements("title").Single().Value);
+            Assert.AreEqual(content.Properties["bodyText"].GetValue().ToString(), element.Elements("bodyText").Single().Value);
+            Assert.AreEqual(content.Properties["keywords"].GetValue().ToString(), element.Elements("keywords").Single().Value);
+            Assert.AreEqual(content.Properties["description"].GetValue().ToString(), element.Elements("description").Single().Value);
         }
 
         [Test]
