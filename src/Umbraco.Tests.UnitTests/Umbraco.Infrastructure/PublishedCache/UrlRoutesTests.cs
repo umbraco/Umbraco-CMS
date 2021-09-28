@@ -1,25 +1,23 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Tests.LegacyXmlPublishedCache;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Tests.Common.Published;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Tests.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
     // purpose: test the values returned by PublishedContentCache.GetRouteById
     // and .GetByRoute (no caching at all, just routing nice URLs) including all
     // the quirks due to hideTopLevelFromPath and backward compatibility.
 
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class UrlRoutesTests : TestWithDatabaseBase
+    public class UrlRoutesTests : PublishedSnapshotServiceTestBase
     {
-        #region Test Setup
-
-        protected override string GetXmlContent(int templateId)
-        {
-            return @"<?xml version=""1.0"" encoding=""utf-8""?>
+        private static string GetXmlContent(int templateId)
+            => @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
@@ -48,17 +46,6 @@ namespace Umbraco.Tests.Routing
         </Doc>
     </Doc>
 </root>";
-        }
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-
-            if (FirstTestInFixture)
-                ServiceContext.ContentTypeService.Save(new ContentType(ShortStringHelper, -1) { Alias = "Doc", Name = "name" });
-        }
-
-        #endregion
 
         /*
          * Just so it's documented somewhere, as of jan. 2017, routes obey the following pseudo-code:
@@ -193,11 +180,19 @@ DetermineRouteById(id):
         [TestCase(2006, false, "/x/b/e")]
         public void GetRouteByIdNoHide(int id, bool hide, string expected)
         {
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hide };
+            GlobalSettings.HideTopLevelNodeFromPath = hide;
 
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings);
-            var cache = umbracoContext.Content as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+            string xml = GetXmlContent(1234);
+
+            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
+                xml,
+                TestHelper.ShortStringHelper,
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
+
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
+
+            var cache = GetPublishedSnapshot().Content;
 
             var route = cache.GetRouteById(false, id);
             Assert.AreEqual(expected, route);
@@ -216,12 +211,19 @@ DetermineRouteById(id):
         [TestCase(2006, true, "/b/e")] // risky!
         public void GetRouteByIdHide(int id, bool hide, string expected)
         {
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hide };
+            GlobalSettings.HideTopLevelNodeFromPath = hide;
 
-            var snapshotService = CreatePublishedSnapshotService(globalSettings);
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings: globalSettings, snapshotService: snapshotService);
-            var cache = umbracoContext.Content as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+            string xml = GetXmlContent(1234);
+
+            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
+                xml,
+                TestHelper.ShortStringHelper,
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
+
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
+
+            var cache = GetPublishedSnapshot().Content;
 
             var route = cache.GetRouteById(false, id);
             Assert.AreEqual(expected, route);
@@ -230,27 +232,23 @@ DetermineRouteById(id):
         [Test]
         public void GetRouteByIdCache()
         {
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
+            GlobalSettings.HideTopLevelNodeFromPath = false;
 
-            var snapshotService = CreatePublishedSnapshotService(globalSettings);
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings, snapshotService: snapshotService);
-            var cache = umbracoContext.Content as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+            string xml = GetXmlContent(1234);
+
+            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
+                xml,
+                TestHelper.ShortStringHelper,
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
+
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
+
+            var cache = GetPublishedSnapshot().Content;
+
 
             var route = cache.GetRouteById(false, 1000);
             Assert.AreEqual("/a", route);
-
-            // GetRouteById registers a non-trusted route, which is cached for
-            // id -> route queries (fast GetUrl) but *not* for route -> id
-            // queries (safe inbound routing)
-
-            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
-            Assert.AreEqual(1, cachedRoutes.Count);
-            Assert.IsTrue(cachedRoutes.ContainsKey(1000));
-            Assert.AreEqual("/a", cachedRoutes[1000]);
-
-            var cachedIds = cache.RoutesCache.GetCachedIds();
-            Assert.AreEqual(0, cachedIds.Count);
         }
 
         [TestCase("/", false, 1000)]
@@ -261,12 +259,19 @@ DetermineRouteById(id):
         [TestCase("/x", false, 2000)]
         public void GetByRouteNoHide(string route, bool hide, int expected)
         {
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hide };
+            GlobalSettings.HideTopLevelNodeFromPath = hide;
 
-            var snapshotService = CreatePublishedSnapshotService(globalSettings);
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings, snapshotService: snapshotService);
-            var cache = umbracoContext.Content as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+            string xml = GetXmlContent(1234);
+
+            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
+                xml,
+                TestHelper.ShortStringHelper,
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
+
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
+
+            var cache = GetPublishedSnapshot().Content;
 
             const bool preview = false; // make sure we don't cache - but HOW? should be some sort of switch?!
             var content = cache.GetByRoute(preview, route);
@@ -292,12 +297,19 @@ DetermineRouteById(id):
         [TestCase("/b/c", true, 1002)] // (hence the 2005 collision)
         public void GetByRouteHide(string route, bool hide, int expected)
         {
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hide };
+            GlobalSettings.HideTopLevelNodeFromPath = hide;
 
-            var snapshotService = CreatePublishedSnapshotService(globalSettings);
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings, snapshotService: snapshotService);
-            var cache = umbracoContext.Content as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+            string xml = GetXmlContent(1234);
+
+            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
+                xml,
+                TestHelper.ShortStringHelper,
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
+
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
+
+            var cache = GetPublishedSnapshot().Content;
 
             const bool preview = false; // make sure we don't cache - but HOW? should be some sort of switch?!
             var content = cache.GetByRoute(preview, route);
@@ -315,30 +327,23 @@ DetermineRouteById(id):
         [Test]
         public void GetByRouteCache()
         {
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
+            GlobalSettings.HideTopLevelNodeFromPath = false;
 
-            var snapshotService = CreatePublishedSnapshotService(globalSettings);
-            var umbracoContext = GetUmbracoContext("/test", 0, globalSettings:globalSettings, snapshotService:snapshotService);
-            var cache = umbracoContext.Content as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+            string xml = GetXmlContent(1234);
+
+            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
+                xml,
+                TestHelper.ShortStringHelper,
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
+
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
+
+            var cache = GetPublishedSnapshot().Content;
 
             var content = cache.GetByRoute(false, "/a/b/c");
             Assert.IsNotNull(content);
             Assert.AreEqual(1002, content.Id);
-
-            // GetByRoute registers a trusted route, which is cached both for
-            // id -> route queries (fast GetUrl) and for route -> id queries
-            // (fast inbound routing)
-
-            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
-            Assert.AreEqual(1, cachedRoutes.Count);
-            Assert.IsTrue(cachedRoutes.ContainsKey(1002));
-            Assert.AreEqual("/a/b/c", cachedRoutes[1002]);
-
-            var cachedIds = cache.RoutesCache.GetCachedIds();
-            Assert.AreEqual(1, cachedIds.Count);
-            Assert.IsTrue(cachedIds.ContainsKey("/a/b/c"));
-            Assert.AreEqual(1002, cachedIds["/a/b/c"]);
         }
     }
 }
