@@ -51,11 +51,6 @@ namespace Umbraco.Cms.Tests.Common
         public TypeLoader GetMockedTypeLoader() =>
             new TypeLoader(Mock.Of<ITypeFinder>(), new VaryingRuntimeHash(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfiler>());
 
-        //// public Configs GetConfigs() => GetConfigsFactory().Create();
-
-        public abstract IBackOfficeInfo GetBackOfficeInfo();
-
-        //// public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
         /// <summary>
         /// Gets the working directory of the test project.
         /// </summary>

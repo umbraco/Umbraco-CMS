@@ -104,18 +104,6 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
 
         public override IMarchal Marchal { get; } = new AspNetCoreMarchal();
 
-        public override IBackOfficeInfo GetBackOfficeInfo()
-        {
-            if (_backOfficeInfo == null)
-            {
-                var globalSettings = new GlobalSettings();
-                IOptionsMonitor<GlobalSettings> mockedOptionsMonitorOfGlobalSettings = Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
-                _backOfficeInfo = new AspNetCoreBackOfficeInfo(mockedOptionsMonitorOfGlobalSettings, GetHostingEnvironment());
-            }
-
-            return _backOfficeInfo;
-        }
-
         public override IHostingEnvironment GetHostingEnvironment()
             => _hostingEnvironment ??= new TestHostingEnvironment(
                 GetIOptionsMonitorOfHostingSettings(),
