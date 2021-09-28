@@ -24,6 +24,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.UI;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 
@@ -40,7 +41,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             InMemoryConfiguration["Umbraco:CMS:Hosting:Debug"] = "true";
 
             // create new WebApplicationFactory specifying 'this' as the IStartup instance
-            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder, BeforeHostStart);
+            var factory = new UmbracoWebApplicationFactory<Startup>(CreateHostBuilder, BeforeHostStart);
 
             // additional host configuration for web server integration tests
             Factory = factory.WithWebHostBuilder(builder =>
@@ -129,7 +130,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected LinkGenerator LinkGenerator { get; private set; }
 
-        protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
+        protected WebApplicationFactory<Startup> Factory { get; private set; }
 
         public override void ConfigureServices(IServiceCollection services)
         {

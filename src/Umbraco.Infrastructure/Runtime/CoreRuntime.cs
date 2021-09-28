@@ -27,8 +27,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IMainDom _mainDom;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IEventAggregator _eventAggregator;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoVersion _umbracoVersion;
         private CancellationToken _cancellationToken;
 
         /// <summary>
@@ -42,9 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IProfilingLogger profilingLogger,
             IMainDom mainDom,
             IUmbracoDatabaseFactory databaseFactory,
-            IEventAggregator eventAggregator,
-            IHostingEnvironment hostingEnvironment,
-            IUmbracoVersion umbracoVersion)
+            IEventAggregator eventAggregator)
         {
             State = state;
             _loggerFactory = loggerFactory;
@@ -54,8 +50,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _mainDom = mainDom;
             _databaseFactory = databaseFactory;
             _eventAggregator = eventAggregator;
-            _hostingEnvironment = hostingEnvironment;
-            _umbracoVersion = umbracoVersion;
             _logger = _loggerFactory.CreateLogger<CoreRuntime>();
         }
 

@@ -26,7 +26,6 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.TestHelpers;
-using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Common
@@ -57,11 +56,10 @@ namespace Umbraco.Cms.Tests.Common
         public abstract IBackOfficeInfo GetBackOfficeInfo();
 
         //// public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
-
         /// <summary>
         /// Gets the working directory of the test project.
         /// </summary>
-        public virtual string WorkingDirectory
+        public string WorkingDirectory
         {
             get
             {
@@ -70,11 +68,11 @@ namespace Umbraco.Cms.Tests.Common
                     return _workingDir;
                 }
 
-                var dir = Path.Combine(Assembly.GetExecutingAssembly().GetRootDirectorySafe(), "TEMP");
+                var dir = Path.Combine(Path.GetTempPath(), "UmbracoIntegrationTests", "Temp");
 
                 if (!Directory.Exists(dir))
                 {
-                    Directory.CreateDirectory(dir);
+                    _ = Directory.CreateDirectory(dir);
                 }
 
                 _workingDir = dir;

@@ -79,32 +79,6 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
             ProfilingLogger = new ProfilingLogger(ConsoleLoggerFactory.CreateLogger<ProfilingLogger>(), Profiler);
         }
 
-        public override string WorkingDirectory
-        {
-            get
-            {
-                // For Azure Devops we can only store a database in certain locations so we will need to detect if we are running
-                // on a build server and if so we'll use the %temp% path.
-                if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("System_DefaultWorkingDirectory")))
-                {
-                    // We are using Azure Devops!
-                    if (_tempWorkingDir != null)
-                    {
-                        return _tempWorkingDir;
-                    }
-
-                    string temp = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoTemp");
-                    Directory.CreateDirectory(temp);
-                    _tempWorkingDir = temp;
-                    return _tempWorkingDir;
-                }
-                else
-                {
-                    return base.WorkingDirectory;
-                }
-            }
-        }
-
         public IUmbracoBootPermissionChecker UmbracoBootPermissionChecker { get; } =
             new TestUmbracoBootPermissionChecker();
 
