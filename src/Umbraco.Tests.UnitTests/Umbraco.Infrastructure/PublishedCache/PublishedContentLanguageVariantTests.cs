@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                     .WithPropertyData("welcomeText", "Welkom", "nl")
                     .WithPropertyData("welcomeText2", "Welcome")
                     .WithPropertyData("welcomeText2", "Welcome", "en-US")
-                    .WithPropertyData("noprop", "xxx", "en-US")
+                    .WithPropertyData("noprop", "xxx")
                     .Build())
                 // build with a dynamically created content type
                 .Build(ShortStringHelper, propertyDataTypes, contentType1, "ContentType1");
@@ -137,6 +137,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 .WithProperties(new PropertyDataBuilder()
                     .WithPropertyData("welcomeText", "Welcome")
                     .WithPropertyData("welcomeText", "Welcome", "en-US")
+                    .WithPropertyData("noprop", "xxx")
                     .Build())
                 // build while dynamically updating the same content type
                 .Build(ShortStringHelper, propertyDataTypes, contentType1);
@@ -285,7 +286,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             var value = content.Value(PublishedValueFallback, "noprop", fallback: Fallback.ToAncestors);
             // property has no value - based on the converter
             // but we still get the value (ie, the converter would do something)
-            Assert.AreEqual("xxx", value);
+            Assert.AreEqual("xxx", value.ToString());
         }
 
         [Test]
