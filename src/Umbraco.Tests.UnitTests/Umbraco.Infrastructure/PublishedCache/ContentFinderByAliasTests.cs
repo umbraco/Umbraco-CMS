@@ -1,42 +1,75 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.Published;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
     // TODO: We should be able to decouple this from the base db tests since we're just mocking the services now
 
     [TestFixture]
-    public class ContentFinderByAliasTests : UrlRoutingTestBase
+    public class ContentFinderByAliasTests : PublishedSnapshotServiceTestBase
     {
-        private PublishedContentType _publishedContentType;
+        private static PublishedRouter CreatePublishedRouter(IUmbracoContextAccessor umbracoContextAccessor)
+            => new PublishedRouter(
+                    Options.Create(new WebRoutingSettings()),
+                    new ContentFinderCollection(() => Enumerable.Empty<IContentFinder>()),
+                    new TestLastChanceFinder(),
+                    new TestVariationContextAccessor(),
+                    Mock.Of<IProfilingLogger>(),
+                    Mock.Of<ILogger<PublishedRouter>>(),
+                    Mock.Of<IPublishedUrlProvider>(),
+                    Mock.Of<IRequestAccessor>(),
+                    Mock.Of<IPublishedValueFallback>(),
+                    Mock.Of<IFileService>(),
+                    Mock.Of<IContentTypeService>(),
+                    umbracoContextAccessor,
+                    Mock.Of<IEventAggregator>());
 
-        protected override void Initialize()
+        private IUmbracoContextAccessor GetUmbracoContextAccessor(string urlAsString)
         {
-            base.Initialize();
-
-            var properties = new[]
-            {
-                new PublishedPropertyType("umbracoUrlAlias", Constants.DataTypes.Textbox, false, ContentVariation.Nothing,
-                    new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
-                    Mock.Of<IPublishedModelFactory>(),
-                    Mock.Of<IPublishedContentTypeFactory>()),
-            };
-            _publishedContentType = new PublishedContentType(Guid.NewGuid(), 0, "Doc", PublishedItemType.Content, Enumerable.Empty<string>(), properties, ContentVariation.Nothing);
+            var snapshot = GetPublishedSnapshot();
+            var uri = new Uri($"http://example.com{urlAsString}");
+            var umbracoContext = Mock.Of<IUmbracoContext>(
+                x => x.CleanedUmbracoUrl == uri && x.Content == snapshot.Content);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            return umbracoContextAccessor;
         }
 
-        protected override PublishedContentType GetPublishedContentTypeByAlias(string alias)
+        [SetUp]
+        public override void Setup()
         {
-            if (alias == "Doc") return _publishedContentType;
-            return null;
+            base.Setup();
+
+            string xml = GetXmlContent(1234);
+
+            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
+                xml,
+                TestHelper.ShortStringHelper,
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
+
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
+
         }
 
         [TestCase("/this/is/my/alias", 1001)]
@@ -48,11 +81,13 @@ namespace Umbraco.Tests.Routing
         [TestCase("/alias43", 100121)]
         public async Task Lookup_By_Url_Alias(string urlAsString, int nodeMatch)
         {
-            var umbracoContext = GetUmbracoContext(urlAsString);
-            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
+            var umbracoContextAccessor = GetUmbracoContextAccessor(urlAsString);
+            var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+
+            var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             var lookup =
-                new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, GetUmbracoContextAccessor(umbracoContext));
+                new ContentFinderByUrlAlias(Mock.Of<ILogger<ContentFinderByUrlAlias>>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, umbracoContextAccessor);
 
             var result = lookup.TryFindContent(frequest);
 
@@ -60,9 +95,8 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(frequest.PublishedContent.Id, nodeMatch);
         }
 
-        protected override string GetXmlContent(int templateId)
-        {
-            return @"<?xml version=""1.0"" encoding=""utf-8""?>
+        private static string GetXmlContent(int templateId)
+            => @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
@@ -147,7 +181,6 @@ namespace Umbraco.Tests.Routing
         </Doc>
     </Doc>
 </root>";
-        }
 
     }
 }

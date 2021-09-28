@@ -187,7 +187,6 @@
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
-    <Compile Include="Routing\ContentFinderByAliasTests.cs" />
     <Compile Include="Routing\ContentFinderByIdTests.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
