@@ -181,9 +181,7 @@
     <Compile Include="TestHelpers\TestObjects.cs" />
     <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
-    <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
-    <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />

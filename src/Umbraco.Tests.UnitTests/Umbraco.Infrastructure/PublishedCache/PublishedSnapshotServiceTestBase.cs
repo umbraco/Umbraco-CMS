@@ -25,6 +25,10 @@ using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
@@ -63,6 +67,38 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             var doc = snapshot.Media.GetById(id);
             Assert.IsNotNull(doc);
             return doc;
+        }
+
+        protected static PublishedRouter CreatePublishedRouter(IUmbracoContextAccessor umbracoContextAccessor)
+            => new PublishedRouter(
+                    Options.Create(new WebRoutingSettings()),
+                    new ContentFinderCollection(() => Enumerable.Empty<IContentFinder>()),
+                    new TestLastChanceFinder(),
+                    new TestVariationContextAccessor(),
+                    Mock.Of<IProfilingLogger>(),
+                    Mock.Of<ILogger<PublishedRouter>>(),
+                    Mock.Of<IPublishedUrlProvider>(),
+                    Mock.Of<IRequestAccessor>(),
+                    Mock.Of<IPublishedValueFallback>(),
+                    Mock.Of<IFileService>(),
+                    Mock.Of<IContentTypeService>(),
+                    umbracoContextAccessor,
+                    Mock.Of<IEventAggregator>());
+
+        protected IUmbracoContextAccessor GetUmbracoContextAccessor(string urlAsString)
+        {
+            var snapshot = GetPublishedSnapshot();
+
+            var uri = new Uri(urlAsString.Contains(Uri.SchemeDelimiter)
+                ? urlAsString
+                : $"http://example.com{urlAsString}");
+
+            var umbracoContext = Mock.Of<IUmbracoContext>(
+                x => x.CleanedUmbracoUrl == uri
+                    && x.Content == snapshot.Content
+                    && x.PublishedSnapshot == snapshot);
+            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
+            return umbracoContextAccessor;
         }
 
         [SetUp]

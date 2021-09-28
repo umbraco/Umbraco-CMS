@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -8,39 +9,32 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Tests.Common.Published;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
     [TestFixture]
-    public class ContentFinderByAliasWithDomainsTests : ContentFinderByAliasTests
+    public class ContentFinderByAliasWithDomainsTests : UrlRoutingTestBase
     {
-        private PublishedContentType _publishedContentType;
-
-        protected override void Initialize()
+        [SetUp]
+        public override void Setup()
         {
-            base.Initialize();
+            base.Setup();
 
-            var properties = new[]
-            {
-                new PublishedPropertyType(
-                    propertyTypeAlias:"umbracoUrlAlias",
-                    dataTypeId: Constants.DataTypes.Textbox,
-                    isUserProperty:false,
-                    variations: ContentVariation.Nothing,
-                    propertyValueConverters:new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
-                    contentType:Mock.Of<IPublishedContentType>(),
-                    publishedModelFactory:Mock.Of<IPublishedModelFactory>(),
-                    factory:Mock.Of<IPublishedContentTypeFactory>()
-                    )
-            };
-            _publishedContentType = new PublishedContentType(Guid.NewGuid(), 0, "Doc", PublishedItemType.Content, Enumerable.Empty<string>(), properties, ContentVariation.Nothing);
-        }
+            string xml = GetXmlContent(1234);
 
-        protected override PublishedContentType GetPublishedContentTypeByAlias(string alias)
-        {
-            if (alias == "Doc") return _publishedContentType;
-            return null;
+            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
+                xml,
+                TestHelper.ShortStringHelper,
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
+
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
+
         }
 
         [TestCase("http://domain1.com/this/is/my/alias", "de-DE", -1001)] // alias to domain's page fails - no alias on domain's home
@@ -56,10 +50,11 @@ namespace Umbraco.Tests.Routing
         public async Task Lookup_By_Url_Alias_And_Domain(string inputUrl, string expectedCulture, int expectedNode)
         {
             //SetDomains1();
+            var umbracoContextAccessor = GetUmbracoContextAccessor(inputUrl);
+            var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
-            var umbracoContext = GetUmbracoContext(inputUrl);
-            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext));
-            var request = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
+            var request = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
             // must lookup domain
             publishedRouter.FindDomain(request);
 
@@ -68,7 +63,7 @@ namespace Umbraco.Tests.Routing
                 Assert.AreEqual(expectedCulture, request.Culture);
             }
 
-            var finder = new ContentFinderByUrlAlias(LoggerFactory.CreateLogger<ContentFinderByUrlAlias>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, GetUmbracoContextAccessor(umbracoContext));
+            var finder = new ContentFinderByUrlAlias(Mock.Of<ILogger<ContentFinderByUrlAlias>>(), Mock.Of<IPublishedValueFallback>(), VariationContextAccessor, umbracoContextAccessor);
             var result = finder.TryFindContent(request);
 
             if (expectedNode > 0)
