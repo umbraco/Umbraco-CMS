@@ -5,69 +5,88 @@ namespace Umbraco.Cms.Core.Configuration
 {
     public class ConfigConnectionString
     {
+        public string Name { get; }
+
+        public string ConnectionString { get; }
+
+        public string ProviderName { get; }
+
         public ConfigConnectionString(string name, string connectionString, string providerName = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            ConnectionString = connectionString;
-
-            ProviderName = string.IsNullOrEmpty(providerName) ? ParseProvider(connectionString) : providerName;
+            ConnectionString = ParseConnectionString(connectionString, ref providerName);
+            ProviderName = providerName;
         }
 
-        public string ConnectionString { get; }
-        public string ProviderName { get; }
-        public string Name { get; }
-
-        private static bool IsSqlCe(DbConnectionStringBuilder builder) => (builder.TryGetValue("Data Source", out var ds)
-                                                                           || builder.TryGetValue("DataSource", out ds)) &&
-                                                                          ds is string dataSource &&
-                                                                          dataSource.EndsWith(".sdf");
-
-        private static bool IsSqlServer(DbConnectionStringBuilder builder) =>
-            !string.IsNullOrEmpty(GetServer(builder)) &&
-            ((builder.TryGetValue("Database", out var db) && db is string database &&
-              !string.IsNullOrEmpty(database)) ||
-             (builder.TryGetValue("AttachDbFileName", out var a) && a is string attachDbFileName &&
-              !string.IsNullOrEmpty(attachDbFileName)) ||
-             (builder.TryGetValue("Initial Catalog", out var i) && i is string initialCatalog &&
-              !string.IsNullOrEmpty(initialCatalog)));
-
-        private static string GetServer(DbConnectionStringBuilder builder)
+        private static string ParseConnectionString(string connectionString, ref string providerName)
         {
-            if(builder.TryGetValue("Server", out var s) && s is string server)
+            if (string.IsNullOrEmpty(connectionString))
             {
-                return server;
+                return connectionString;
             }
 
-            if ((builder.TryGetValue("Data Source", out var ds)
-                 || builder.TryGetValue("DataSource", out ds)) && ds is string dataSource)
+            var builder = new DbConnectionStringBuilder
             {
-                return dataSource;
+                ConnectionString = connectionString
+            };
+
+            // Replace data directory placeholder
+            const string attachDbFileNameKey = "AttachDbFileName";
+            const string dataDirectoryPlaceholder = "|DataDirectory|";
+            if (builder.TryGetValue(attachDbFileNameKey, out var attachDbFileNameValue) &&
+                attachDbFileNameValue is string attachDbFileName &&
+                attachDbFileName.Contains(dataDirectoryPlaceholder))
+            {
+                var dataDirectory = AppDomain.CurrentDomain.GetData("DataDirectory")?.ToString();
+                if (!string.IsNullOrEmpty(dataDirectory))
+                {
+                    builder[attachDbFileNameKey] = attachDbFileName.Replace(dataDirectoryPlaceholder, dataDirectory);
+
+                    // Mutate the existing connection string (note: the builder also lowercases the properties)
+                    connectionString = builder.ToString();
+                }
             }
 
-            return "";
+            // Also parse provider name now we already have a builder
+            if (string.IsNullOrEmpty(providerName))
+            {
+                providerName = ParseProviderName(builder);
+            }
+
+            return connectionString;
         }
 
-        private static string ParseProvider(string connectionString)
+        /// <summary>
+        /// Parses the connection string to get the provider name.
+        /// </summary>
+        /// <param name="connectionString">The connection string.</param>
+        /// <returns>
+        /// The provider name or <c>null</c> is the connection string is empty.
+        /// </returns>
+        public static string ParseProviderName(string connectionString)
         {
             if (string.IsNullOrEmpty(connectionString))
             {
                 return null;
             }
 
-            var builder = new DbConnectionStringBuilder {ConnectionString = connectionString};
-            if (IsSqlCe(builder))
+            var builder = new DbConnectionStringBuilder
+            {
+                ConnectionString = connectionString
+            };
+
+            return ParseProviderName(builder);
+        }
+
+        private static string ParseProviderName(DbConnectionStringBuilder builder)
+        {
+            if ((builder.TryGetValue("Data Source", out var dataSource) || builder.TryGetValue("DataSource", out dataSource)) &&
+                dataSource?.ToString().EndsWith(".sdf", StringComparison.OrdinalIgnoreCase) == true)
             {
                 return Constants.DbProviderNames.SqlCe;
             }
 
-
-            if (IsSqlServer(builder))
-            {
-                return Constants.DbProviderNames.SqlServer;
-            }
-
-            throw new ArgumentException("Cannot determine provider name from connection string",
-                nameof(connectionString));
+            return Constants.DbProviderNames.SqlServer;
         }
     }
 }

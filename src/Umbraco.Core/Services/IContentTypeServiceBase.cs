@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         bool HasContainerInPath(params int[] ids);
 
-        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentContainerId, string name, int userId = Constants.Security.SuperUserId);
+        Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentContainerId, Guid key, string name, int userId = Constants.Security.SuperUserId);
         Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);

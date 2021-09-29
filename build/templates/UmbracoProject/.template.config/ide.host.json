@@ -55,6 +55,20 @@
                 "text": "Optional: Database connection string when using Unattended install"
             },
             "isVisible": "true"
+        },
+        {
+            "id": "NoNodesViewPath",
+            "name": {
+                "text": "Optional: Path to a custom view presented with the Umbraco installation contains no published content"
+            },
+            "isVisible": "true"
+        },
+        {
+            "id": "UseHttpsRedirect",
+            "name": {
+                "text": "Optional: Adds code to Startup.cs to redirect HTTP to HTTPS and enables the UseHttps setting."
+            },
+            "isVisible": "true"
         }
     ]
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.ContentApps
                         Alias = "permissions",
                         Name = "Permissions",
                         Icon = "icon-keychain",
-                        View = "views/documenttypes/views/permissions/permissions.html",
+                        View = "views/documentTypes/views/permissions/permissions.html",
                         Weight = Weight
                     });
                 default:

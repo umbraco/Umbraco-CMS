@@ -34,7 +34,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                 var currPath = node.path ? node.path : "-1";
 
                 navigationService.syncTree({
-                    tree: "documenttypes",
+                    tree: "documentTypes",
                     path: currPath + "," + folderId,
                     forceReload: true,
                     activate: true
@@ -51,14 +51,14 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
             });
         }
-    };   
+    };
 
     // Disabling logic for creating document type with template if disableTemplates is set to true
     if (!disableTemplates) {
         $scope.createDocType = function () {
             $location.search('create', null);
             $location.search('notemplate', null);
-            $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
+            $location.path("/settings/documentTypes/edit/" + node.id).search("create", "true");
             navigationService.hideMenu();
         };
     }
@@ -66,7 +66,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     $scope.createComponent = function () {
         $location.search('create', null);
         $location.search('notemplate', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
+        $location.path("/settings/documentTypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
         navigationService.hideMenu();
     };
 
@@ -74,7 +74,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         $location.search('create', null);
         $location.search('notemplate', null);
         $location.search('iscomposition', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true").search("iscomposition", "true");
+        $location.path("/settings/documentTypes/edit/" + node.id).search("create", "true").search("notemplate", "true").search("iscomposition", "true");
         navigationService.hideMenu();
     };
 
@@ -82,7 +82,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         $location.search('create', null);
         $location.search('notemplate', null);
         $location.search('iselement', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true").search("iselement", "true");
+        $location.path("/settings/documentTypes/edit/" + node.id).search("create", "true").search("notemplate", "true").search("iselement", "true");
         navigationService.hideMenu();
     };
 

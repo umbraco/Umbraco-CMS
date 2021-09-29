@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
@@ -830,7 +831,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         protected Guid ContainerObjectType => EntityContainer.GetContainerObjectType(ContainedObjectType);
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, Guid key, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             EventMessages eventMessages = EventMessagesFactory.Get();
             using (IScope scope = ScopeProvider.CreateScope())
@@ -843,7 +844,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     {
                         Name = name,
                         ParentId = parentId,
-                        CreatorId = userId
+                        CreatorId = userId,
+                        Key = key
                     };
 
                     var savingNotification = new EntityContainerSavingNotification(container, eventMessages);
@@ -945,11 +947,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public IEnumerable<EntityContainer> GetContainers(TItem item)
         {
             var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x =>
-                {
-                    var asInt = x.TryConvertTo<int>();
-                    return asInt ? asInt.Result : int.MinValue;
-                })
+                .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt) ? asInt : int.MinValue)
                 .Where(x => x != int.MinValue && x != item.Id)
                 .ToArray();
 

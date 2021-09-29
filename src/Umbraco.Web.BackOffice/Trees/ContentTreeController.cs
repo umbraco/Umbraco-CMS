@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -187,7 +188,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             //return a normal node menu:
             int iid;
-            if (int.TryParse(id, out iid) == false)
+            if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out iid) == false)
             {
                 return NotFound();
             }

@@ -14,9 +14,9 @@
     <key alias="createPackage">パッケージの作成</key>
     <key alias="delete">削除</key>
     <key alias="disable">無効</key>
-    <key alias="emptyRecycleBin">ごみ箱を空にする</key>
+    <key alias="emptyrecyclebin">ごみ箱を空にする</key>
     <key alias="exportDocumentType">ドキュメントタイプの書出</key>
-    <key alias="importDocumentType">ドキュメントタイプの読込</key>
+    <key alias="importdocumenttype">ドキュメントタイプの読込</key>
     <key alias="importPackage">パッケージの読み込み</key>
     <key alias="liveEdit">ライブ編集</key>
     <key alias="logout">ログアウト</key>
@@ -33,7 +33,6 @@
     <key alias="sendtopublish">公開に送る</key>
     <key alias="sendToTranslate">翻訳に送る</key>
     <key alias="sort">並べ替え</key>
-    <key alias="toPublish">公開する</key>
     <key alias="translate">翻訳</key>
     <key alias="update">更新</key>
     <key alias="defaultValue">初期値</key>
@@ -877,7 +876,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="contentAllowed">このコンテンツはここに使用できます</key>
     <key alias="clickToEmbed">クリックして埋め込む</key>
     <key alias="clickToInsertImage">クリックして画像を挿入する</key>
-    <key alias="placeholderImageCaption">キャプション...</key>
     <key alias="placeholderWriteHere">ここに記入する...</key>
     <key alias="gridLayouts">レイアウト</key>
     <key alias="gridLayoutsDetail">レイアウトは通常1つまたは2つの異なるレイアウトを必要とする、グリッドエディタの全体的な作業エリアです</key>

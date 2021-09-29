@@ -16,10 +16,10 @@
     <key alias="createGroup">Neue Gruppe</key>
     <key alias="delete">Entfernen</key>
     <key alias="disable">Deaktivieren</key>
-    <key alias="emptyRecycleBin">Papierkorb leeren</key>
+    <key alias="emptyrecyclebin">Papierkorb leeren</key>
     <key alias="enable">Aktivieren</key>
     <key alias="exportDocumentType">Dokumenttyp exportieren</key>
-    <key alias="importDocumentType">Dokumenttyp importieren</key>
+    <key alias="importdocumenttype">Dokumenttyp importieren</key>
     <key alias="importPackage">Paket importieren</key>
     <key alias="liveEdit">'Canvas'-Modus starten</key>
     <key alias="logout">Abmelden</key>
@@ -32,7 +32,6 @@
     <key alias="republish">Erneut veröffentlichen</key>
     <key alias="rename" version="7.3.0">Umbenennen</key>
     <key alias="restore" version="7.3.0">Wiederherstellen</key>
-    <key alias="SetPermissionsForThePage">Berechtigungen setzen für Seite %0%</key>
     <key alias="chooseWhereToCopy">Wähle worunter kopiert werden soll</key>
     <key alias="chooseWhereToMove">Wähle worunter verschoben werden soll</key>
     <key alias="toInTheTreeStructureBelow">in der Baumstrukture</key>
@@ -99,7 +98,6 @@
     <key alias="domainHelpWithVariants">
     	<![CDATA[Gültige Domain-Namen sind: "example.com", "www.example.com", "example.com:8080", oder "https://www.example.com/".
      Außerdem werden Pfade mit erstem URL-Segment unterstützt z. B.: "example.com/en" or "/en".]]></key>
-
     <key alias="inherit">Vererben</key>
     <key alias="setLanguage">Kultur</key>
     <key alias="setLanguageHelp">Definiert die Kultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>
@@ -132,7 +130,6 @@
     <key alias="save">Speichern</key>
     <key alias="saveAndClose">Sichern und schliessen</key>
     <key alias="saveAndPublish">Speichern und veröffentlichen</key>
-    <key alias="saveAndSchedule">Speichern und planen</key>
     <key alias="saveToPublish">Speichern und zur Abnahme übergeben</key>
     <key alias="saveListView">Listenansicht sichern</key>
     <key alias="schedulePublish">Veröffentlichung planen</key>
@@ -145,7 +142,6 @@
     <key alias="saveAndGenerateModels">Sichern und Daten-Model erzeugen</key>
     <key alias="undo">Zurücknehmen</key>
     <key alias="redo">Erneut anwenden</key>
-    <key alias="rollback">Vorgängerversion herstellen</key>
     <key alias="deleteTag">TAG entfernen</key>
     <key alias="confirmActionCancel">Abbrechen</key>
     <key alias="confirmActionConfirm">Bestätigen</key>
@@ -182,8 +178,6 @@
     <key alias="historyIncludingVariants">Verlauf (alle Variationen)</key>
   </area>
   <area alias="codefile">
-    <key alias="createFolderFailedById">Es konnte kein Verzeichnis unter dem Knoten mit der ID %0% angelegt werden.</key>
-    <key alias="createFolderFailedByName">Es konnte kein Verzeichnis unter dem Knoten mit dem Namen %0% angelegt werden.</key>
     <key alias="createFolderIllegalChars">Der Verzeichnisname darf keine ungültigen Zeichen enthalten.</key>
     <key alias="deleteItemFailed">Folgendes Element konnte nicht entfernt werden: %0%</key>
   </area>
@@ -276,17 +270,10 @@
     <key alias="includeUnpublished">Inklusive Entwürfen: veröffentliche auch unveröffentlichte Elemente.</key>
     <key alias="isSensitiveValue">Dieser Wert ist verborgen. Wenn Sie diesen Wert einsehen müssen, wenden Sie sich bitte an einen Administrator.</key>
     <key alias="isSensitiveValue_short">Dieser Wert ist verborgen.</key>
-    <key alias="languagesToPublishForFirstTime">Welche Sprache möchten Sie veröffentlichen? Alle Sprachinhalte wurden gesichert!</key>
     <key alias="languagesToPublish">Welche Sprache möchten Sie veröffentlichen?</key>
-    <key alias="languagesToSave">Welche Sprache möchten Sie sichern?</key>
-    <key alias="languagesToSaveForFirstTime">Alle Sprachinhalte wurden beim Anlegen gesichert!</key>
     <key alias="languagesToSendForApproval">Welche Sprachen möchten Sie zur Freigabe schicken?</key>
     <key alias="languagesToSchedule">Welche Sprachen möchten Sie zu einer bestimmten Zeit veröffentlichen?</key>
     <key alias="languagesToUnpublish">Wählen Sie die Sprachen, deren Veröffentlichung zurück genommen werden soll. Das Zurücknehmen der Veröffentlichung einer Pflichtsprache betrifft alle Sprachen.</key>
-    <key alias="publishedLanguages">Veröffentlichte Sprachen</key>
-    <key alias="unpublishedLanguages">Unveröffentlichte Sprachen</key>
-    <key alias="unmodifiedLanguages">Unveränderte Sprachen</key>
-    <key alias="untouchedLanguagesForFirstTime">Diese Sprachen wurden nicht angelegt</key>
     <key alias="readyToPublish">Bereit zu Veröffentlichen?</key>
     <key alias="readyToSave">Bereit zu Sichern?</key>
     <key alias="sendForApproval">Freigabe anfordern</key>
@@ -306,13 +293,10 @@
   <area alias="media">
     <key alias="clickToUpload">Für Upload klicken</key>
     <key alias="orClickHereToUpload">oder klicken Sie hier um eine Datei zu wählen</key>
-    <key alias="dragFilesHereToUpload">Sie können Dateien hierher ziehen, um sie hochzuladen.</key>
     <key alias="disallowedFileType">Dieser Dateityp darf nicht hochgeladen werden</key>
     <key alias="maxFileSize">Max. Dateigröße ist</key>
     <key alias="mediaRoot">Media-Basis</key>
-    <key alias="moveFailed">Media-Element konnte nicht verschoben werden</key>
     <key alias="moveToSameFolderFailed">Eltern- und Ziel-Verzeichnis dürfen nicht übereinstimmen</key>
-    <key alias="copyFailed">Media-Element konnte nicht kopiert werden</key>
     <key alias="createFolderFailed">Unter Element Id %0% konnte kein Verzeichnis angelegt werden</key>
     <key alias="renameFolderFailed">Das Verzeichnis mit Id %0% konnte nicht umbenannt werden</key>
   </area>
@@ -415,7 +399,6 @@
     <key alias="linkinternal">Anker:</key>
     <key alias="linklocaltip">Wenn lokale Links verwendet werden, füge ein "#" vor den Link ein</key>
     <key alias="linknewwindow">In einem neuen Fenster öffnen?</key>
-    <key alias="macroContainerSettings">Macro Einstellungen</key>
     <key alias="macroDoesNotHaveProperties">Dieses Makro enthält keine einstellbaren Eigenschaften.</key>
     <key alias="paste">Einfügen</key>
     <key alias="permissionsEdit">Berechtigungen bearbeiten für</key>
@@ -564,13 +547,6 @@
     <key alias="rteRelatedStylesheets">Verknüpfte Stylesheets</key>
     <key alias="rteShowLabel">Beschriftung anzeigen</key>
     <key alias="rteWidthAndHeight">Breite und Höhe</key>
-    <key alias="allPropTypes">Alle Eigenschaftstypen und -daten</key>
-    <key alias="willBeDeleted">
-      die auf diesem Datentyp basierenden werden endgültig entfernt,
-      bitte bestätigen Sie, dass Sie diese ebenfalls entfernen wollen
-    </key>
-    <key alias="yesDelete">Ja, entferne</key>
-    <key alias="andAllRelated">und alle Eigenschaftstypen und -daten die auf diesem Datentyp basierenden!</key>
     <key alias="selectFolder">Wählen Sie das Verzeichnis aus der untenstehenden Baumstruktur, in das</key>
     <key alias="inTheTree">verschoben werden soll.</key>
     <key alias="wasMoved">wurde verschoben in</key>
@@ -660,7 +636,6 @@
     <key alias="icon">Bildzeichen</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
-    <key alias="includeFromsubFolders">Unterverzeichnisse ebenfalls durchsuchen</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Innerer Abstand</key>
     <key alias="insert">Einfügen</key>
@@ -1133,15 +1108,9 @@
       ]]>
     </key>
     <key alias="deletewarning">Diese Aktion entfernt das Paket</key>
-    <key alias="dropHere">Hierher ziehen zum Hochladen</key>
     <key alias="includeAllChildNodes">Alle Unterknoten einschließen</key>
-    <key alias="accept">Ich akzeptiere</key>
-    <key alias="termsOfUse">Benutzungsbedingungen</key>
-    <key alias="pathToFile">Dateipfad</key>
-    <key alias="pathToFileDescription">Absoluter Dateipfad (z. B.: /bin/umbraco.bin)</key>
     <key alias="installed">Installiert</key>
     <key alias="installedPackages">Installierte Pakete</key>
-    <key alias="installFinish">Abschließen</key>
     <key alias="noConfigurationView">Diese Paket hat keine Einstellungen</key>
     <key alias="noPackagesCreated">Es wurden noche keine Pakete angelegt</key>
     <key alias="noPackages">Sie haben keine Pakete installiert</key>
@@ -1152,14 +1121,8 @@
     <strong>'Pakete'</strong> rechts, oben), um es zu installieren
     ]]>
     </key>
-    <key alias="packageAuthorUrl">Autor URL</key>
     <key alias="packageContent">Paketinhalt</key>
-    <key alias="packageFiles">Paketdateien</key>
-    <key alias="packageIconUrl">Bildsymbol URL</key>
-    <key alias="packageInstall">Paket installieren</key>
     <key alias="packageLicense">Lizenz</key>
-    <key alias="packageLicenseUrl">Lizenz URL</key>
-    <key alias="packageProperties">Paketeigenschaften</key>
     <key alias="packageSearch">Paket suchen</key>
     <key alias="packageSearchResults">Ergebnis(se) für</key>
     <key alias="packageNoResults">Keine Ergebnisse für</key>
@@ -1206,16 +1169,6 @@
     Bitte deinstallieren Sie also mit Vorsicht. Falls Sie unsicher sind, kontaktieren Sie den Autor des Pakets.]]>
     </key>
     <key alias="packageVersion">Paketversion</key>
-    <key alias="packageVersionUpgrade">"Upgrading" von Version</key>
-    <key alias="packageAlreadyInstalled">Packet bereits installiert</key>
-    <key alias="targetVersionMismatch">Diese Paket kann nicht installiert werden. Es benötigt mindestens die Umbracoversion</key>
-    <key alias="installStateUninstalling">Es wird deinstalliert...</key>
-    <key alias="installStateDownloading">Es wird heruntergeladen...</key>
-    <key alias="installStateImporting">Es wird importiert...</key>
-    <key alias="installStateInstalling">Es wird installiert...</key>
-    <key alias="installStateRestarting">Es wird neu gestartet, bitte warten...</key>
-    <key alias="installStateComplete">Fertig, Ihr Browser aktualisiert jetzt, bitte warten...</key>
-    <key alias="installStateCompleted">Bitte klicken Sie 'Beenden', um die Installation abzuschließen und die Seite neu zu laden.</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Einfügen mit Formatierung (Nicht empfohlen)</key>
@@ -1248,7 +1201,6 @@
     <key alias="paMembers">Mitglieder basierte Zugriffsberechtigung</key>
     <key alias="paMembersHelp">Falls Sie Mitglieder basierte Zugriffsberechtigung gewähren wollen</key>
   </area>
-
   <area alias="publish">
     <key alias="invalidPublishBranchPermissions">Die Zugriffsrechte des Benutzers sind ungenügend, um alle Unterknoten zu veröffentlichen</key>
     <key alias="contentPublishedFailedIsTrashed">
@@ -1313,8 +1265,6 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Zurücksetzen</key>
-    <key alias="saveCrop">Ausschnitt sichern</key>
-    <key alias="addCrop">Neuer Ausschnitt</key>
     <key alias="updateEditCrop">Fertig</key>
     <key alias="undoEditCrop">Rückgängig machen</key>
   </area>
@@ -1405,7 +1355,6 @@
     <key alias="editMediaSaved">Medium gespeichert</key>
     <key alias="editMediaSavedText">Medium fehlerfrei gespeichert</key>
     <key alias="editMemberSaved">Mitglied gespeichert</key>
-    <key alias="editMemberGroupSaved">Mitgliedsgruppe gespeichert</key>
     <key alias="editStylesheetPropertySaved">Stylesheet-Regel gespeichert</key>
     <key alias="editStylesheetSaved">Stylesheet gespeichert</key>
     <key alias="editTemplateSaved">Vorlage gespeichert</key>
@@ -1560,7 +1509,6 @@
     <key alias="orderBy">sortiert nach</key>
     <key alias="ascending">aufsteigend</key>
     <key alias="descending">absteigend</key>
-
     <key alias="template">Vorlage</key>
   </area>
   <area alias="grid">
@@ -1576,7 +1524,6 @@
     <key alias="contentAllowed">Dieser Inhalt ist hier zugelassen</key>
     <key alias="clickToEmbed">Klicken, um Inhalt einzubetten</key>
     <key alias="clickToInsertImage">Klicken, um Abbildung einzufügen</key>
-    <key alias="placeholderImageCaption">Beschriftung ...</key>
     <key alias="placeholderWriteHere">Hier schreiben ...</key>
     <key alias="gridLayouts">Layouts</key>
     <key alias="gridLayoutsDetail">Layouts sind die grundlegenden Arbeitsflächen für das Gestaltungsraster. Üblicherweise sind nicht mehr als ein oder zwei Layouts nötig.</key>
@@ -1706,8 +1653,6 @@
     <key alias="modelsExceptionInUlog">Erzeugung des Datenmodels fehlgeschlagen, siehe Ausnahmen in den Log-Daten</key>
   </area>
   <area alias="templateEditor">
-    <key alias="addFallbackField">Ersatzfeld hinzufügen</key>
-    <key alias="fallbackField">Ersatzfeld</key>
     <key alias="addDefaultValue">Standardwert hinzufügen</key>
     <key alias="defaultValue">Standardwert</key>
     <key alias="alternativeField">Alternatives Feld</key>
@@ -1716,26 +1661,21 @@
     <key alias="encoding">Kodierung</key>
     <key alias="chooseField">Feld auswählen</key>
     <key alias="convertLineBreaks">Zeilenumbrüche ersetzen</key>
-    <key alias="convertLineBreaksDescription">Ja, Zeilenumbrüche konvertieren</key>
     <key alias="convertLineBreaksHelp">Ersetzt Zeilenumbrüche durch das HTML-Tag &lt;br /&gt;</key>
     <key alias="customFields">Benutzerdefinierte Felder</key>
     <key alias="dateOnly">nur Datum</key>
-    <key alias="formatAndEncoding">Format und Kodierung</key>
     <key alias="formatAsDate">Als Datum formatieren</key>
-    <key alias="formatAsDateDescr">Formatire den Wert als Datum mit oder ohne Zeit entsprechend der aktiven Kultur</key>
     <key alias="htmlEncode">HTML kodieren</key>
     <key alias="htmlEncodeHelp">Wandelt Sonderzeichen in HTML-Zeichencodes um</key>
     <key alias="insertedAfter">Wird nach dem Feldinhalt eingefügt</key>
     <key alias="insertedBefore">Wird vor dem Feldinhalt eingefügt</key>
     <key alias="lowercase">Kleinbuchstaben</key>
-    <key alias="modifyOutput">Modifiziere Ausgabe</key>
     <key alias="none">Keine</key>
     <key alias="outputSample">Beispiel-Ausgabe</key>
     <key alias="postContent">An den Feldinhalt anhängen</key>
     <key alias="preContent">Dem Feldinhalt voranstellen</key>
     <key alias="recursive">Rekursiv</key>
     <key alias="recursiveDescr">Ja, verwende es rekursiv</key>
-    <key alias="separator">Trenner</key>
     <key alias="standardFields">Standardfelder</key>
     <key alias="uppercase">Großbuchstaben</key>
     <key alias="urlEncode">URL kodieren</key>
@@ -2013,7 +1953,6 @@
 </html>
 ]]>
     </key>
-    <key alias="invite">Einladen</key>
     <key alias="defaultInvitationMessage">Einladung erneut verschicken...</key>
     <key alias="deleteUser">Benutzer entfernen</key>
     <key alias="deleteUserConfirmation">Wollen Sie dieses Benutzerkonto wirklich entfernen?</key>
@@ -2052,27 +1991,13 @@
   <area alias="healthcheck">
     <!--!!!-->
     <key alias="checkSuccessMessage">Wert wurde auf den empfohlenen Wert gesetzt: '%0%'.</key>
-    <key alias="rectifySuccessMessage">Wert wurde für XPath '%2%' auf '%1%' in der Konfigurationsdatei '%3%' gesetzt.</key>
     <key alias="checkErrorMessageDifferentExpectedValue">Erwartete Wert '%1%' für '%2%' in der Konfigurationsdatei '%3%', '%0%' wurde jedoch gefunden.</key>
     <key alias="checkErrorMessageUnexpectedValue">Unerwarteten Wert '%0%' für '%2%' in der Konfigurationsdatei '%3%' gefunden.</key>
-    <key alias="customErrorsCheckSuccessMessage">"customErrors" auf '%0%' gesetzt.</key>
-    <key alias="customErrorsCheckErrorMessage">"customErrors" aktuell auf '%0%' gesetzt. Es wird empfohlen, diese vor dem Live-Gang auf '%1%' zu setzen.</key>
-    <key alias="customErrorsCheckRectifySuccessMessage">"customErrors" erfolgreich auf '%0%' gesetzt.</key>
     <key alias="macroErrorModeCheckSuccessMessage">"MacroErrors" auf '%0%' gesetzt.</key>
     <key alias="macroErrorModeCheckErrorMessage">
       "MacroErrors" sind auf '%0%' gesetzt,
       was verhindert, dass einige oder alle Seiten Ihrer Website vollständig geladen werden, falls Fehler in Makros auftreten. Schaltfläche "Beheben" setzt den Wert auf '%1%'.
     </key>
-    <key alias="macroErrorModeCheckRectifySuccessMessage">"MacroErrors" sind jetzt auf '%0%' gesetzt.</key>
-    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">"trySkipIisCustomErrors" ist auf '%0%' gestellt und Sie verwenden IIS-Version '%1%'.</key>
-    <key alias="trySkipIisCustomErrorsCheckErrorMessage">"trySkipIisCustomErrors" ist aktuell auf '%0%' gestellt. Für Ihre IIS-Version (%2%) wird empfohlen, diese auf '%1%' zu stellen.</key>
-    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">"trySkipIisCustomErrors" wurde erfolgreich auf '%0%' gestellt.</key>
-    <key alias="configurationServiceFileNotFound">Folgende Datei ist nicht vorhanden: '%0%'.</key>
-    <key alias="configurationServiceNodeNotFound"><![CDATA[<strong>'%0%'</strong> wurde nicht in der Konfigurationsdatei <strong>'%1%'</strong> gefunden.]]></key>
-    <key alias="configurationServiceError">Es trat ein Fehler auf, für eine vollständige Fehlermeldung suchen Sie in den Logs nach: %0%</key>
-    <key alias="databaseSchemaValidationCheckDatabaseOk">Datenbank - Das Datenbank-Schema ist korrekt für diese Umbraco-Version</key>
-    <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% Probleme wurden in Ihrem Datenbank-Schema entdeckt (Weitere Details finden Sie in den Logs)</key>
-    <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Es wurden einige Fehler während der Abgleichs des Datenbank-Schemas mit der vorliegenden Umbraco-Version.</key>
     <key alias="httpsCheckValidCertificate">Ihr Website-Zertifikat (SSL) ist gültig.</key>
     <key alias="httpsCheckInvalidCertificate">(SSL-)Zertifikat-Validierungsfehler: '%0%'</key>
     <key alias="httpsCheckExpiredCertificate">Ihr Website-Zertifikat (SSL) ist abgelaufen.</key>
@@ -2081,50 +2006,19 @@
     <key alias="httpsCheckIsCurrentSchemeHttps">Sie betrachten diese Website %0% unter Verwendung des HTTPS-Schemas.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">Der Schlüssel 'Umbraco.Core.UseHttps' im Abschnitt 'appSettings' der 'web.config'-Datei ist auf 'false' gesetzt. Sobald Sie diese Site über HTTPS nutzen, sollte dieser auf 'true' gestellt werden.</key>
     <key alias="httpsCheckConfigurationCheckResult">Der Schlüssel 'Umbraco.Core.UseHttps' im Abschnitt 'appSettings' der 'web.config'-Datei ist auf '%0%' gesetzt, Cookies sind %1% als sicher markiert.</key>
-    <key alias="httpsCheckEnableHttpsError">Der Schlüssel 'Umbraco.Core.UseHttps' im Abschnitt 'appSettings' der 'web.config'-Datei konnte nicht geändert werden. Fehler: %0%</key>
-    <key alias="httpsCheckEnableHttpsButton">HTTPS aktivieren</key>
-    <key alias="httpsCheckEnableHttpsDescription">Setzt Schlüssel 'umbracoSSL' im Abschnitt 'appSettings' der 'web.config'-Datei auf 'true'.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">Der Schlüssel 'Umbraco.Core.UseHttps' im Abschnitt 'appSettings' der 'web.config'-Datei steht jetzt auf 'true', Cookies werden als sicher markiert.</key>
-    <key alias="rectifyButton">Beheben</key>
-    <key alias="cannotRectifyShouldNotEqual">Überprüfungen mit Wertvergleichen vom Typ 'ShouldNotEqual' können nicht behoben werden.</key>
-    <key alias="cannotRectifyShouldEqualWithValue">Überprüfungen mit Wertvergleichen vom Typ 'ShouldEqual' mit einem gelieferten Wert können nicht behoben werden.</key>
-    <key alias="valueToRectifyNotProvided">Es wurde kein Wert geliefert, um den Fehler bei der Überprüfungen zu beheben.</key>
     <key alias="compilationDebugCheckSuccessMessage">'Debug' Kompilierungsmodus ist abgeschaltet.</key>
     <key alias="compilationDebugCheckErrorMessage">'Debug' Kompilierungsmodus ist gegenwertig eingeschaltet. Es ist empfehlenswert diesen vor Live-Gang abzuschalten.</key>
-    <key alias="compilationDebugCheckRectifySuccessMessage">'Debug' Kompilierungsmodus wurde erfolgreich abgeschaltet.</key>
-    <key alias="traceModeCheckSuccessMessage">Trace-Modus ist abgeschaltet.</key>
-    <key alias="traceModeCheckErrorMessage">Trace-Modus ist gegenwertig eingeschaltet. Es ist empfehlenswert diesen vor Live-Gang abzuschalten.</key>
-    <key alias="traceModeCheckRectifySuccessMessage">Trace-Modus wurde erfolgreich abgeschaltet.</key>
-    <key alias="folderPermissionsCheckMessage">Alle Ordner haben die korrekten Zugriffsrechte.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Path to the file not found
   	-->
-    <key alias="fileNotFound">Folgende Datei ist nicht vorhanden: '%0%'.</key>
-    <key alias="requiredFolderPermissionFailed"><![CDATA[Für folgende Ordner werden 'Ändern'-Berechtigungen benötigen, es konnte jedoch nicht auf sie zugegriffen werden: <strong>%0%</strong>.]]></key>
-    <key alias="optionalFolderPermissionFailed"><![CDATA[Für folgende Ordner werden 'Ändern'-Berechtigungen benötigen, damit bestimmte Umbraco-Operationen funktionieren, es konnte jedoch nicht auf sie zugegriffen werden: <strong>%0%</strong>. Falls nicht in diese geschrieben wird, brauchen Sie nichts zu unternehmen.]]></key>
-    <key alias="filePermissionsCheckMessage">Alle Dateien haben die korrekten Zugriffsrechte.</key>
-    <key alias="requiredFilePermissionFailed"><![CDATA[Für folgende Dateien werden 'Ändern'-Berechtigungen benötigen, es konnte jedoch nicht auf sie zugegriffen werden: <strong>%0%</strong>.]]></key>
-    <key alias="optionalFilePermissionFailed"><![CDATA[Für folgende Dateien werden 'Ändern'-Berechtigungen benötigen, damit bestimmte Umbraco-Operationen funktionieren, es konnte jedoch nicht auf sie zugegriffen werden: <strong>%0%</strong>. Falls nicht in diese geschrieben wird, brauchen Sie nichts zu unternehmen.]]></key>
     <key alias="clickJackingCheckHeaderFound"><![CDATA[Der Header oder das Meta-Tag <strong>X-Frame-Options</strong> ist vorhanden. Diese dienen zur Kontrolle, ob eine Site in IFRAMES anderer Sites angezeigt werden kann.]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Der Header oder das Meta-Tag <strong>X-Frame-Options</strong> ist <strong>nicht</strong> vorhanden. Es dient zur Kontrolle, ob eine Site in IFRAMES anderer Sites angezeigt werden kann.]]></key>
-    <key alias="setHeaderInConfig">Header konfigurieren</key>
-    <key alias="clickJackingSetHeaderInConfigDescription">Fügt einen Wert im Abschnitt 'httpProtocol/customHeaders' der 'web.config'-Datei hinzu um zu verhindern, dass diese Website in IFRAMES anderer Websites verwendet werden kann.</key>
-    <key alias="clickJackingSetHeaderInConfigSuccess">Der 'web.config'-Datei wurde eine Einstellung zum Erzeugen eines Headers, der andere Websites daran hindert, diese Site im IFRAME zu verwenden, hinzugefügt.</key>
-    <key alias="setHeaderInConfigError">Die 'web.config'-Datei konnte nicht geändert werden. Fehler: %0%</key>
     <key alias="noSniffCheckHeaderFound"><![CDATA[Der Header oder das Meta-Tag <strong>X-Content-Type-Options</strong> ist vorhanden. Diese dienen zum Schutz gegen MIME-'Schnüffeln'-Schwachstellen. ]]></key>
     <key alias="noSniffCheckHeaderNotFound"><![CDATA[Der Header oder das Meta-Tag <strong>X-Content-Type-Options</strong> ist <strong>nicht</strong> vorhanden. Diese dienen zum Schutz gegen MIME-'Schnüffeln'-Schwachstellen. ]]></key>
-    <key alias="noSniffSetHeaderInConfigDescription">Fügt einen Wert im Abschnitt 'httpProtocol/customHeaders' der 'web.config'-Datei zum Schutz gegen MIME-'Schnüffeln'-Schwachstellen hinzu.</key>
-    <key alias="noSniffSetHeaderInConfigSuccess">Der 'web.config'-Datei wurde eine Einstellung zum Schutz gegen MIME-'Schnüffeln'-Schwachstellen hinzugefügt.</key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[Der Header <strong>Strict-Transport-Security</strong>, auch bekannt als HSTS-Header, ist vorhanden.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[Der Header <strong>Strict-Transport-Security</strong>, auch bekannt als HSTS-Header, ist <strong>nicht</strong> vorhanden.]]></key>
-    <key alias="hSTSSetHeaderInConfigDescription">
-      Fügt den Header 'Strict-Transport-Security' mit dem Wert 'max-age=10886400; preload' im Abschnitt 'httpProtocol/customHeaders' der 'web.config'-Datei hinzu. Benutzen Sie dies nur, wenn Sie Ihre <em>Domain</em>en für mindestens 18 Wochen unter HTTPS laufen lassen.
-    </key>
-    <key alias="hSTSSetHeaderInConfigSuccess">Die HSTS-Header-Einstellung wurde der 'web.config'-Datei hinzugefügt.</key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[Der Header <strong>X-XSS-Protection</strong> ist vorhanden.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Der Header <strong>X-XSS-Protection</strong> ist <strong>nicht</strong> vorhanden]]></key>
-    <key alias="xssProtectionSetHeaderInConfigDescription">Fügt den Header 'X-XSS-Protection' mit dem Wert '1; mode=block' im Abschnitt 'httpProtocol/customHeaders' der 'web.config'-Datei hinzu.</key>
-    <key alias="xssProtectionSetHeaderInConfigSuccess">Die X-XSS-Protection-Header-Einstellung wurde der 'web.config'-Datei hinzugefügt.</key>
     <key alias="excessiveHeadersFound"><![CDATA[Folgende Header, die Informationen über die Website-Technologie preisgeben, sind vorhanden: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Es sind keine Header, die Informationen über die Website-Technologie preisgeben, vorhanden.</key>
     <key alias="smtpMailSettingsNotFound">In der 'web.config'-Datei ist der Abschnitt 'system.net/mailsettings' nicht vorhanden.</key>
@@ -2155,7 +2049,6 @@
       Wenn eine veröffentlichte Seite umbenannt oder verschoben wird,
       erzeugt dieses CMS automatisch eine entsprechende Weiterleitung.
     </key>
-    <key alias="confirmRemove">Wollen Sie wirklich die Weiterleitung von '%0%' nach '%1%' entfernen?</key>
     <key alias="redirectRemoved">URL-Weiterleitung wurde entfernt.</key>
     <key alias="redirectRemoveError">Beim Entfernen der URL-Weiterleitung ist ein Fehler aufgetreten.</key>
     <key alias="redirectRemoveWarning">Dies entfernt die Weiterleitung</key>

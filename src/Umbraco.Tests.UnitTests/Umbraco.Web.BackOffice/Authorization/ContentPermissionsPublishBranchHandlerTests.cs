@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -90,10 +91,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
             var mockUserService = new Mock<IUserService>();
 
             mockUserService
-                .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(), It.Is<string>(y => y == $"{Constants.System.Root},{parentNodeId},{DescendentNodeId1}")))
+                .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(), It.Is<string>(y => y == $"{Constants.System.RootString},{parentNodeId.ToString(CultureInfo.InvariantCulture)},{DescendentNodeId1}")))
                 .Returns(new EntityPermissionSet(parentNodeId, new EntityPermissionCollection(new List<EntityPermission> { new EntityPermission(1, parentNodeId, descendendNodePermissionsForPath[DescendentNodeId1]) })));
             mockUserService
-                .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(), It.Is<string>(y => y == $"{Constants.System.Root},{parentNodeId},{DescendentNodeId1},{DescendentNodeId2}")))
+                .Setup(x => x.GetPermissionsForPath(It.IsAny<IUser>(), It.Is<string>(y => y == $"{Constants.System.RootString},{parentNodeId.ToString(CultureInfo.InvariantCulture)},{DescendentNodeId1},{DescendentNodeId2}")))
                 .Returns(new EntityPermissionSet(parentNodeId, new EntityPermissionCollection(new List<EntityPermission> { new EntityPermission(1, parentNodeId, descendendNodePermissionsForPath[DescendentNodeId2]) })));
 
             return mockUserService;

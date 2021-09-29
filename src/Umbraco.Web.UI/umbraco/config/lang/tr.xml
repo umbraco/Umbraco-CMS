@@ -17,10 +17,10 @@
     <key alias="delete">Sil</key>
     <key alias="disable">Devre Dışı Bırak</key>
     <key alias="editSettings">Ayarları düzenle</key>
-    <key alias="emptyRecycleBin">Geri dönüşüm kutusunu boşalt</key>
+    <key alias="emptyrecyclebin">Geri dönüşüm kutusunu boşalt</key>
     <key alias="enable">Etkinleştir</key>
     <key alias="exportDocumentType">Belge Türünü Dışa Aktar</key>
-    <key alias="importDocumentType">Belge Türünü İçe Aktar</key>
+    <key alias="importdocumenttype">Belge Türünü İçe Aktar</key>
     <key alias="importPackage">Paketi İçe Aktar</key>
     <key alias="liveEdit">Kanvas'ta Düzenle</key>
     <key alias="logout">Çıkış</key>
@@ -34,7 +34,6 @@
     <key alias="remove">Kaldır</key>
     <key alias="rename" version="7.3.0">Yeniden adlandır</key>
     <key alias="restore" version="7.3.0">Geri Yükle</key>
-    <key alias="SetPermissionsForThePage">%0% sayfası için izinleri ayarlayın</key>
     <key alias="chooseWhereToCopy">Nereye kopyalayacağınızı seçin</key>
     <key alias="chooseWhereToMove">Taşınacağınız yeri seçin</key>
     <key alias="toInTheTreeStructureBelow">aşağıdaki ağaç yapısına</key>
@@ -140,11 +139,9 @@
     <key alias="save">Kaydet</key>
     <key alias="saveAndClose">Kaydet ve kapat</key>
     <key alias="saveAndPublish">Kaydet ve yayınla</key>
-    <key alias="saveAndSchedule">Kaydet ve planla</key>
     <key alias="saveToPublish">Kaydet ve onaya gönder</key>
     <key alias="saveListView">Liste görünümünü kaydet</key>
-    <key alias="schedPublish">Planla</key>
-    <key alias="showPage">Önizleme</key>
+    <key alias="schedulePublish">Planla</key>
     <key alias="saveAndPreview">Kaydet ve önizle</key>
     <key alias="showPageDisabled">Atanmış şablon olmadığından önizleme devre dışı bırakıldı</key>
     <key alias="styleChoose">Stil seçin</key>
@@ -158,7 +155,6 @@
     <key alias="confirmActionConfirm">Onayla</key>
     <key alias="morePublishingOptions">Daha fazla yayınlama seçeneği</key>
     <key alias="submitChanges">Gönder</key>
-    <key alias="submitChangesAndClose">Gönder ve kapat</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Görüntüleniyor</key>
@@ -191,8 +187,6 @@
     <key alias="historyIncludingVariants">Geçmiş (tüm varyantlar)</key>
   </area>
   <area alias="codefile">
-    <key alias="createFolderFailedById">%0% kimliğine sahip ebeveyn altında klasör oluşturulamadı</key>
-    <key alias="createFolderFailedByName">%0% adıyla ebeveyn altında klasör oluşturulamadı</key>
     <key alias="createFolderIllegalChars">Klasör adı geçersiz karakterler içeremez.</key>
     <key alias="deleteItemFailed">Öğe silinemedi: %0%</key>
   </area>
@@ -279,26 +273,14 @@
     <key alias="includeUnpublished">Yayınlanmamış içerik öğelerini dahil edin.</key>
     <key alias="isSensitiveValue">Bu değer gizlidir. Bu değeri görüntülemek için erişime ihtiyacınız varsa, lütfen web sitesi yöneticinizle iletişime geçin.</key>
     <key alias="isSensitiveValue_short">Bu değer gizlidir.</key>
-    <key alias="languagesToPublishForFirstTime">Hangi dilleri yayınlamak istersiniz? İçeriği olan tüm diller kaydedilir!</key>
     <key alias="languagesToPublish">Hangi dilleri yayınlamak istersiniz?</key>
-    <key alias="languagesToSave">Hangi dilleri kaydetmek istersiniz?</key>
-    <key alias="languagesToSaveForFirstTime">İçeriği olan tüm diller oluşturma sırasında kaydedilir!</key>
     <key alias="languagesToSendForApproval">Onay için hangi dilleri göndermek istersiniz?</key>
     <key alias="languagesToSchedule">Hangi dilleri planlamak istersiniz?</key>
     <key alias="languagesToUnpublish">Yayından kaldırılacak dilleri seçin. Zorunlu bir dilin yayından kaldırılması tüm dilleri yayından kaldırır.</key>
-    <key alias="publishedLanguages">Yayınlanan Diller</key>
-    <key alias="unpublishedLanguages">Yayınlanmamış Diller</key>
-    <key alias="unmodifiedLanguages">Değiştirilmemiş Diller</key>
-    <key alias="untouchedLanguagesForFirstTime">Bu diller oluşturulmadı</key>
-
     <key alias="variantsWillBeSaved">Tüm yeni varyantlar kaydedilecektir.</key>
     <key alias="variantsToPublish">Hangi çeşitleri yayınlamak istersiniz?</key>
     <key alias="variantsToSave">Hangi değişkenlerin kaydedileceğini seçin.</key>
-    <key alias="variantsToSendForApproval">Onaya gönderilecek çeşitleri seçin.</key>
-    <key alias="variantsToSchedule">Planlanmış yayınlamayı ayarlayın...</key>
-    <key alias="variantsToUnpublish">Yayından kaldırılacak varyantları seçin. Zorunlu bir dilin yayından kaldırılması tüm değişkenleri yayından kaldıracaktır.</key>
     <key alias="publishRequiresVariants">Yayınlamanın gerçekleşmesi için aşağıdaki varyantlar gereklidir:</key>
-
     <key alias="notReadyToPublish">Yayınlamaya hazır değiliz</key>
     <key alias="readyToPublish">Yayınlamaya hazır mısınız?</key>
     <key alias="readyToSave">Kaydetmeye Hazır mısınız?</key>
@@ -320,12 +302,9 @@
   <area alias="media">
     <key alias="clickToUpload">Yüklemek için tıklayın</key>
     <key alias="orClickHereToUpload">veya dosyaları seçmek için burayı tıklayın</key>
-    <key alias="dragFilesHereToUpload">Dosyaları yüklemek için buraya sürükleyebilirsiniz</key>
     <key alias="disallowedFileType">Bu dosya yüklenemiyor, onaylanmış bir dosya türüne sahip değil</key>
     <key alias="maxFileSize">Maksimum dosya boyutu</key>
     <key alias="mediaRoot">Medya kökü</key>
-    <key alias="moveFailed">Medya taşınamadı</key>
-    <key alias="copyFailed">Medya kopyalanamadı</key>
     <key alias="createFolderFailed">%0% üst kimliği altında klasör oluşturulamadı</key>
     <key alias="renameFolderFailed">%0% kimliğine sahip klasör yeniden adlandırılamadı</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Dosyalarınızı alana sürükleyip bırakın</key>
@@ -412,11 +391,9 @@
     <key alias="assignDomain">Ana bilgisayar adlarını yönet</key>
     <key alias="closeThisWindow">Bu pencereyi kapat</key>
     <key alias="confirmdelete">Silmek istediğinizden emin misiniz</key>
-    <key alias="confirmdeleteXofX">%1% temelinde %0% 'ı silmek istediğinizden emin misiniz</key>
     <key alias="confirmdisable">Devre dışı bırakmak istediğinizden emin misiniz</key>
     <key alias="confirmremove">Kaldırmak istediğinizden emin misiniz</key>
     <key alias="confirmremoveusageof"><![CDATA[<b>%0%</b> kullanımını kaldırmak istediğinizden emin misiniz?]]></key>
-    <key alias="confirmremovereferenceto"><![CDATA[<b>%0%</b> başvurusunu kaldırmak istediğinizden emin misiniz?]]></key>
     <key alias="confirmlogout">Emin misiniz?</key>
     <key alias="confirmSure">Emin misiniz?</key>
     <key alias="cut">Kes</key>
@@ -437,7 +414,6 @@
     <key alias="linkinternal">Dahili bağlantı:</key>
     <key alias="linklocaltip">Yerel bağlantıları kullanırken, bağlantının önüne "#" ekleyin</key>
     <key alias="linknewwindow">Yeni pencerede açılsın mı?</key>
-    <key alias="macroContainerSettings">Makro Ayarları</key>
     <key alias="macroDoesNotHaveProperties">Bu makro düzenleyebileceğiniz herhangi bir özellik içermiyor</key>
     <key alias="paste">Yapıştır</key>
     <key alias="permissionsEdit">için izinleri düzenle</key>
@@ -591,10 +567,6 @@
     <key alias="rteRelatedStylesheets">İlgili stil sayfaları</key>
     <key alias="rteShowLabel">Etiketi göster</key>
     <key alias="rteWidthAndHeight">Genişlik ve yükseklik</key>
-    <key alias="allPropTypes">Tüm mülk türleri &amp; emlak verileri</key>
-    Bu veri türünü kullanan <key alias="willBeDeleted">kalıcı olarak silinecek, lütfen bunları da silmek istediğinizi onaylayın</key>
-    <key alias="yesDelete">Evet, sil</key>
-    <key alias="andAllRelated">ve tüm mülk türleri &amp; bu veri türünü kullanan mülk verileri</key>
     <key alias="selectFolder">Taşınacak klasörü seçin</key>
     <key alias="inTheTree">aşağıdaki ağaç yapısına</key>
     <key alias="wasMoved">altına taşındı</key>
@@ -640,7 +612,6 @@
     <key alias="back">Geri</key>
     <key alias="backToOverview">Genel bakışa dön</key>
     <key alias="border">Kenarlık</key>
-    <key alias="border">yazan</key>
     <key alias="cancel">İptal</key>
     <key alias="cellMargin">Hücre kenar boşluğu</key>
     <key alias="choose">Seçin</key>
@@ -686,7 +657,6 @@
     <key alias="icon">Simge</key>
     <key alias="id">Kimlik</key>
     <key alias="import">İçe Aktar</key>
-    <key alias="includeFromsubFolders">Alt klasörleri aramaya dahil et</key>
     <key alias="excludeFromSubFolders">Yalnızca bu klasörü ara</key>
     <key alias="info">Bilgi</key>
     <key alias="innerMargin">İç kenar boşluğu</key>
@@ -781,8 +751,6 @@
     <key alias="other">Diğer</key>
     <key alias="articles">Makaleler</key>
     <key alias="videos">Videolar</key>
-    <key alias="clear">Temizle</key>
-    <key alias="installing">Kuruluyor</key>
   </area>
   <area alias="colors">
     <key alias="blue">Mavi</key>
@@ -809,7 +777,6 @@
     <key alias="generalHeader">Genel</key>
     <key alias="editorHeader">Düzenleyici</key>
     <key alias="toggleAllowCultureVariants">Kültür varyantlarına izin ver </key>
-    <key alias="toggleAllowSegmentVariants">Bölümlemeye izin vermeyi aç/kapat</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Arka plan rengi</key>
@@ -942,7 +909,7 @@
       <![CDATA[<h3> Yeni sitenize göz atın </h3>
 Runway'i kurdunuz, öyleyse neden yeni web sitenizin nasıl göründüğüne bakmıyorsunuz.]]>
     </key>
-    <key alias="theEndFowseHelp">
+    <key alias="theEndFurtherHelp">
       <![CDATA[<h3> Daha fazla yardım ve bilgi </h3>
 Ödüllü topluluğumuzdan yardım alın, belgelere göz atın veya basit bir sitenin nasıl oluşturulacağı, paketlerin nasıl kullanılacağı ve Umbraco terminolojisine yönelik hızlı bir kılavuzla ilgili bazı ücretsiz videolar izleyin]]>
     </key>
@@ -1104,7 +1071,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   </area>
   <area alias="notifications">
     <key alias="editNotifications"><![CDATA[<strong>%0%</strong>]]> için bildiriminizi seçin</key>
-    <key alias="notificationSavedFor">için bildirim ayarları kaydedildi</key>
+    <key alias="notificationsSavedFor">için bildirim ayarları kaydedildi</key>
     <key alias="mailBody">
       <![CDATA[
       Merhaba %0%
@@ -1220,28 +1187,15 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
       ]]>
     </key>
     <key alias="deletewarning">Bu, paketi silecek</key>
-    <key alias="dropHere">Yüklemek için bırakın</key>
     <key alias="includeAllChildNodes">Tüm alt düğümleri dahil et</key>
-    <key alias="accept">Kabul ediyorum</key>
-    <key alias="termsOfUse">kullanım şartları</key>
-
-    <key alias="pathToFile">Dosyaya giden yol</key>
-    <key alias="pathToFileDescription">Dosyaya giden mutlak yol (yani: /bin/umbraco.bin)</key>
     <key alias="installed">Yüklendi</key>
     <key alias="installedPackages">Yüklü paketler</key>
-    <key alias="installFinish">Bitir</key>
     <key alias="noConfigurationView">Bu pakette yapılandırma görünümü yok</key>
     <key alias="noPackagesCreated">Henüz paket oluşturulmadı</key>
     <key alias="noPackages">Kurulu paketiniz yok</key>
     <key alias="noPackagesDescription"><![CDATA[Kurulu paketiniz yok. Makinenizden seçerek yerel bir paket kurun veya ekranınızın sağ üst kısmındaki <strong>'Paketler'</strong> simgesini kullanarak mevcut paketlere göz atın]]></key>
-    <key alias="packageAuthorUrl">Yazar URL'si</key>
     <key alias="packageContent">Paket İçeriği</key>
-    <key alias="packageFiles">Paket Dosyaları</key>
-    <key alias="packageIconUrl">Simge URL'si</key>
-    <key alias="packageInstall">Paketi yükle</key>
     <key alias="packageLicense">Lisans</key>
-    <key alias="packageLicenseUrl">Lisans URL'si</key>
-    <key alias="packageProperties">Paket Özellikleri</key>
     <key alias="packageSearch">Paket arayın</key>
     <key alias="packageSearchResults">Sonuçlar</key>
     <key alias="packageNoResults">için hiçbir şey bulamadık</key>
@@ -1283,8 +1237,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
       bu yüzden dikkatli bir şekilde kaldırın. Şüpheniz varsa, paket yazarıyla iletişime geçin.]]>
     </key>
     <key alias="packageVersion">Paket versiyonu</key>
-    <key alias="packageAlreadyInstalled">Paket zaten yüklü</key>
-    <key alias="targetVersionMismatch">Bu paket kurulamaz, minimum Umbraco sürümü gerektirir</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Tam biçimlendirmeyle yapıştırın (Önerilmez)</key>
@@ -1304,7 +1256,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="paLoginPage">Giriş Sayfası</key>
     <key alias="paLoginPageHelp">Giriş formunu içeren sayfayı seçin</key>
     <key alias="paRemoveProtection">Korumayı kaldır ...</key>
-    <key alias="paRemoveProtectionConfirm"><![CDATA[Korumayı <strong>%0%</strong> sayfasından kaldırmak istediğinizden emin misiniz?]]> </key>
+    <key alias="paRemoveProtectionConfirm"><![CDATA[Korumayı <strong>%0%</strong> sayfasından kaldırmak istediğinizden emin misiniz?]]></key>
     <key alias="paSelectPages">Giriş formu ve hata mesajları içeren sayfaları seçin</key>
     <key alias="paSelectGroups"><![CDATA[<strong>%0%</strong> sayfasına erişimi olan grupları seçin]]></key>
     <key alias="paSelectMembers"><![CDATA[<strong>%0%</strong> sayfasına erişimi olan üyeleri seçin]]></key>
@@ -1375,8 +1327,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   </area>
   <area alias="imagecropper">
     <key alias="reset">Kırpmayı sıfırla</key>
-    <key alias="saveCrop">Kırpmayı kaydet</key>
-    <key alias="addCrop">Yeni kırpma ekle</key>
     <key alias="updateEditCrop">Bitti</key>
     <key alias="undoEditCrop">Düzenlemeleri geri alın</key>
     <key alias="customCrop">Kullanıcı tanımlı</key>
@@ -1424,19 +1374,19 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="importDocumentTypeHelp">
       Bir belge türünü içe aktarmak için, "Gözat" düğmesini tıklayarak bilgisayarınızda ".udt" dosyasını bulun ve "İçe Aktar" ı tıklayın (sonraki ekranda onay vermeniz istenir) </key>
     <key alias="newtabname">Yeni Sekme Başlığı</key>
-      <key alias="nodetype">Düğüm türü</key>
-      <key alias="objecttype">Tür</key>
-      <key alias="stylesheet">Stil Sayfası</key>
-      <key alias="script">Komut Dosyası</key>
-      <key alias="tab">Sekme</key>
-      <key alias="tabname">Sekme Başlığı</key>
-      <key alias="tabs">Sekmeler</key>
-      <key alias="contentTypeEnabled">Ana İçerik Türü etkinleştirildi</key>
-      <key alias="contentTypeUses">Bu İçerik Türü kullanır</key>
-      <key alias="noPropertiesDefinedOnTab">Bu sekmede tanımlanmış özellik yok. Yeni bir mülk oluşturmak için üstteki "yeni mülk ekle" bağlantısını tıklayın.</key>
-      <key alias="createMatchingTemplate">Eşleşen şablon oluştur</key>
-      <key alias="addIcon">Simge ekle</key>
-    </area>
+    <key alias="nodetype">Düğüm türü</key>
+    <key alias="objecttype">Tür</key>
+    <key alias="stylesheet">Stil Sayfası</key>
+    <key alias="script">Komut Dosyası</key>
+    <key alias="tab">Sekme</key>
+    <key alias="tabname">Sekme Başlığı</key>
+    <key alias="tabs">Sekmeler</key>
+    <key alias="contentTypeEnabled">Ana İçerik Türü etkinleştirildi</key>
+    <key alias="contentTypeUses">Bu İçerik Türü kullanır</key>
+    <key alias="noPropertiesDefinedOnTab">Bu sekmede tanımlanmış özellik yok. Yeni bir mülk oluşturmak için üstteki "yeni mülk ekle" bağlantısını tıklayın.</key>
+    <key alias="createMatchingTemplate">Eşleşen şablon oluştur</key>
+    <key alias="addIcon">Simge ekle</key>
+  </area>
   <area alias="sort">
     <key alias="sortOrder">Sıralama düzeni</key>
     <key alias="sortCreationDate">Oluşturma tarihi</key>
@@ -1474,7 +1424,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="editContentSendToPublish">Onay İçin Gönderildi</key>
     <key alias="editContentSendToPublishText">Değişiklikler onay için gönderildi</key>
     <key alias="editMediaSaved">Medya kaydedildi</key>
-    <key alias="editMemberGroupSaved">Üye grubu kaydedildi</key>
     <key alias="editMediaSavedText">Medya hatasız kaydedildi</key>
     <key alias="editMemberSaved">Üye kaydedildi</key>
     <key alias="editStylesheetPropertySaved">Stil Sayfası Özelliği Kaydedildi</key>
@@ -1501,7 +1450,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="contentUnpublished">Yayınlanmamış içerik</key>
     <key alias="partialViewSavedHeader">Kısmi görünüm kaydedildi</key>
     <key alias="partialViewSavedText">Kısmi görünüm, herhangi bir hata olmadan kaydedildi!</key>
-    <key alias="smallerViewErrorHeader">Kısmi görünüm kaydedilmedi</key>
+    <key alias="partialViewErrorHeader">Kısmi görünüm kaydedilmedi</key>
     <key alias="partialViewErrorText">Dosyayı kaydederken bir hata oluştu.</key>
     <key alias="permissionsSavedFor">için kaydedilen izinler</key>
     <key alias="deleteUserGroupsSuccess">%0% kullanıcı grubu silindi</key>
@@ -1592,7 +1541,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     ]]></key>
     <key alias="queryBuilder">Sorgu oluşturucu</key>
     <key alias="itemsReturned">öğe iade edildi,</key>
-    <key alias="copyToClipboard">panoya kopyala</key>
     <key alias="iWant">istiyorum</key>
     <key alias="allContent">tüm içerik</key>
     <key alias="contentOfType">"%0%" türünde içerik</key>
@@ -1611,7 +1559,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="contains">içerir</key>
     <key alias="doesNotContain">içermez</key>
     <key alias="greaterThan">büyüktür</key>
-    <key alias="greatThanEqual">büyük veya eşittir</key>
+    <key alias="greaterThanEqual">büyük veya eşittir</key>
     <key alias="lessThan">küçüktür</key>
     <key alias="lessThanEqual">küçüktür veya eşittir</key>
     <key alias="id">kimlik</key>
@@ -1636,7 +1584,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="contentAllowed">Bu içeriğe burada izin verilir</key>
     <key alias="clickToEmbed">Yerleştirmek için tıklayın</key>
     <key alias="clickToInsertImage">Resim eklemek için tıklayın</key>
-    <key alias="placeholderImageCaption">Resim yazısı ...</key>
     <key alias="placeholderWriteHere">Buraya yazın ...</key>
     <key alias="gridLayouts">Izgara Düzenleri</key>
     <key alias="gridLayoutsDetail">Düzenler, ızgara düzenleyicinin genel çalışma alanıdır, genellikle yalnızca bir veya iki farklı düzene ihtiyacınız vardır</key>
@@ -1662,7 +1609,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="chooseExtra">Fazladan birini seçin</key>
     <key alias="chooseDefault">Varsayılanı seçin</key>
     <key alias="areAdded">eklendi</key>
-    <key alias="warning">Uyarı</key>
     <key alias="youAreDeleting">Satır yapılandırmasını siliyorsunuz</key>
     <key alias="deletingARow">
       Bir satır yapılandırma adının silinmesi, bu yapılandırmaya dayalı mevcut herhangi bir içerik için veri kaybına neden olur.
@@ -1670,7 +1616,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Kompozisyonlar</key>
-    <key alias="grup">Grup</key>
+    <key alias="group">Grup</key>
     <key alias="noGroups">Hiçbir grup eklemediniz</key>
     <key alias="addGroup">Grup ekle</key>
     <key alias="inheritedFrom">devralındı ​​</key>
@@ -1678,23 +1624,23 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="requiredLabel">Gerekli etiket</key>
     <key alias="enableListViewHeading">Liste görünümünü etkinleştir</key>
     <key alias="enableListViewDescription">İçerik öğesini, alt öğelerinin sıralanabilir ve aranabilir bir listesini gösterecek şekilde yapılandırır, alt öğeler ağaçta gösterilmez</key>
-    <key alias="allowTemplatesHeading">İzin Verilen Şablonlar</key>
-    <key alias="allowTemplatesDescription">Bu tür içerik üzerinde hangi şablon düzenleyicilerinin kullanmasına izin verileceğini seçin</key>
+    <key alias="allowedTemplatesHeading">İzin Verilen Şablonlar</key>
+    <key alias="allowedTemplatesDescription">Bu tür içerik üzerinde hangi şablon düzenleyicilerinin kullanmasına izin verileceğini seçin</key>
     <key alias="allowAsRootHeading">Kök olarak izin ver</key>
     <key alias="allowAsRootDescription">Düzenleyicilerin, içerik ağacının kök dizininde bu türden içerik oluşturmasına izin verin.</key>
     <key alias="childNodesHeading">İzin verilen alt düğüm türleri</key>
     <key alias="childNodesDescription">Belirtilen türlerdeki içeriğin, bu tür içeriğin altında oluşturulmasına izin verin.</key>
     <key alias="chooseChildNode">Alt düğümü seçin</key>
-    <key alias="CompositionDescription">Mevcut bir belge türünden sekmeleri ve özellikleri devralın. Mevcut belge türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.</key>
-    <key alias="CompositionInUse">Bu içerik türü bir bestede kullanıldığından kendi başına oluşturulamaz.</key>
+    <key alias="compositionsDescription">Mevcut bir belge türünden sekmeleri ve özellikleri devralın. Mevcut belge türüne yeni sekmeler eklenecek veya aynı ada sahip bir sekme varsa birleştirilecektir.</key>
+    <key alias="compositionInUse">Bu içerik türü bir bestede kullanıldığından kendi başına oluşturulamaz.</key>
     <key alias="noAvailableCompositions">Beste olarak kullanılabilecek içerik türü yok.</key>
-    <key alias="CompositionRemoveWarning">Bir kompozisyonun kaldırılması, ilişkili tüm özellik verilerini silecektir. Belge türünü kaydettikten sonra geri dönüş yoktur.</key>
+    <key alias="compositionRemoveWarning">Bir kompozisyonun kaldırılması, ilişkili tüm özellik verilerini silecektir. Belge türünü kaydettikten sonra geri dönüş yoktur.</key>
     <key alias="availableEditors">Yeni oluştur</key>
     <key alias="reuse">Mevcut olanı kullan</key>
     <key alias="editorSettings">Düzenleyici ayarları</key>
     <key alias="configuration">Yapılandırma</key>
     <key alias="yesDelete">Evet, sil</key>
-    <key alias="moveUnderneath">altına taşındı</key>
+    <key alias="movedUnderneath">altına taşındı</key>
     <key alias="copiedUnderneath">altına kopyalandı</key>
     <key alias="folderToMove">Taşınacak klasörü seçin</key>
     <key alias="folderToCopy">Kopyalanacak klasörü seçin</key>
@@ -1715,14 +1661,12 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="showOnMemberProfile">Üye profilinde göster</key>
     <key alias="showOnMemberProfileDescription">Bu özellik değerinin üye profil sayfasında görüntülenmesine izin ver</key>
     <key alias="tabHasNoSortOrder">sekmesinde sıralama düzeni yok</key>
-    <key alias="CompositionUsageHeading">Bu beste nerede kullanılıyor?</key>
-    <key alias="CompositionUsageSpecification">Bu beste şu anda aşağıdaki içerik türlerinin oluşturulmasında kullanılmaktadır:</key>
-    <key alias="değişkenHeading">Varyasyonlara izin ver</key>
+    <key alias="compositionUsageHeading">Bu beste nerede kullanılıyor?</key>
+    <key alias="compositionUsageSpecification">Bu beste şu anda aşağıdaki içerik türlerinin oluşturulmasında kullanılmaktadır:</key>
     <key alias="cultureVariantHeading">Kültüre göre değişikliklere izin ver</key>
     <key alias="segmentVariantHeading">Segmentasyona izin ver</key>
     <key alias="cultureVariantLabel">Kültüre göre değişiklik yapın</key>
     <key alias="segmentVariantLabel">Segmentlere göre değişiklik yapın</key>
-    <key alias="değişkenDescription">Düzenleyenlerin bu türden içeriği farklı dillerde oluşturmasına izin verin.</key>
     <key alias="cultureVariantDescription">Düzenleyenlerin farklı dillerde içerik oluşturmasına izin ver.</key>
     <key alias="segmentVariantDescription">Editörlerin bu içeriğin segmentlerini oluşturmasına izin ver.</key>
     <key alias="allowVaryByCulture">Kültüre göre değişiklik yapmaya izin ver</key>
@@ -1747,7 +1691,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="fallbackLanguage">Geri dönüş dili</key>
     <key alias="none">yok</key>
   </area>
-
   <area alias="macro">
     <key alias="addParameter">Parametre ekle</key>
     <key alias="editParameter">Parametreyi düzenle</key>
@@ -1764,8 +1707,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="modelsExceptionInUlog">Model oluşturma başarısız oldu, U günlüğünde istisnaya bakın</key>
   </area>
   <area alias="templateEditor">
-    <key alias="addFallbackField">Yedek alanı ekle</key>
-    <key alias="fallbackField">Yedek alanı</key>
     <key alias="addDefaultValue">Varsayılan değer ekle</key>
     <key alias="defaultValue">Varsayılan değer</key>
     <key alias="alternativeField">Yedek alanı</key>
@@ -1774,26 +1715,21 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="encoding">Kodlama</key>
     <key alias="chooseField">Alan seçin</key>
     <key alias="convertLineBreaks">Satır sonlarını dönüştür</key>
-    <key alias="convertLineBreaksDescription">Evet, satır sonlarını dönüştür</key>
     <key alias="convertLineBreaksHelp">Satır sonlarını 'br' html etiketiyle değiştirir</key>
     <key alias="customFields">Özel Alanlar</key>
     <key alias="dateOnly">Yalnızca tarih</key>
-    <key alias="formatAndEncoding">Biçim ve kodlama</key>
     <key alias="formatAsDate">Tarih olarak biçimlendir</key>
-    <key alias="formatAsDateDescr">Değeri, aktif kültüre göre tarih veya saatli tarih olarak biçimlendirin</key>
     <key alias="htmlEncode">HTML kodlama</key>
     <key alias="htmlEncodeHelp">Özel karakterleri HTML eşdeğerleriyle değiştirir.</key>
     <key alias="insertedAfter">Alan değerinden sonra eklenecek</key>
     <key alias="insertedBefore">Alan değerinden önce eklenecek</key>
     <key alias="lowercase">Küçük harf</key>
-    <key alias="modifyOutput">Çıktıyı değiştir</key>
     <key alias="none">Yok</key>
     <key alias="outputSample">Çıktı örneği</key>
     <key alias="postContent">Alanın sonrasına ekle</key>
     <key alias="preContent">Alanın önüne ekle</key>
     <key alias="recursive">Özyinelemeli</key>
     <key alias="recursiveDescr">Evet, yinelemeli yap</key>
-    <key alias="separator">Ayırıcı</key>
     <key alias="standardFields">Standart Alanlar</key>
     <key alias="uppercase">Büyük harf</key>
     <key alias="urlEncode">URL kodlama</key>
@@ -2065,7 +2001,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     </body>
 </html>]]>
     </key>
-    <key alias="invite">Davet Et</key>
     <key alias="defaultInvitationMessage">Davetiye yeniden gönderiliyor ...</key>
     <key alias="deleteUser">Kullanıcıyı Sil</key>
     <key alias="deleteUserConfirmation">Bu kullanıcı hesabını silmek istediğinizden emin misiniz?</key>
@@ -2096,7 +2031,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="minCount">En az eklemeniz gerekiyor</key>
     <key alias="maxCount">Yalnızca sahip olabilirsiniz</key>
     <key alias="addUpTo">En fazla ekle</key>
-
     <key alias="items">öğeler</key>
     <key alias="urls">url(ler)</key>
     <key alias="urlsSelected">url(ler) seçildi</key>
@@ -2116,34 +2050,20 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 		   3: Configuration file path
 	  -->
     <key alias="checkSuccessMessage">Değer, önerilen değere ayarlandı: '%0%'.</key>
-    <key alias="rectifySuccessMessage">Değer, '%3%' yapılandırma dosyasındaki XPath '%2%' için '%1%' olarak ayarlandı.</key>
     <key alias="checkErrorMessageDifferentExpectedValue">'%3%' yapılandırma dosyasında '%2%' için '%1%' değeri bekleniyordu, ancak '%0%' bulundu.</key>
     <key alias="checkErrorMessageUnexpectedValue">'%3%' yapılandırma dosyasında '%2%' için beklenmeyen '%0%' değeri bulundu.</key>
     <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 	  -->
-    <key alias="customErrorsCheckSuccessMessage">Özel hatalar '%0%' olarak ayarlandı.</key>
-    <key alias="customErrorsCheckErrorMessage">Özel hatalar şu anda '%0%' olarak ayarlı. Yayınlanmadan önce bunun '%1%' olarak ayarlanması önerilir.</key>
-    <key alias="customErrorsCheckRectifySuccessMessage">Özel hatalar başarıyla '%0%' olarak ayarlandı.</key>
     <key alias="macroErrorModeCheckSuccessMessage">Makro Hatalar '%0%' olarak ayarlandı.</key>
     <key alias="macroErrorModeCheckErrorMessage">MacroErrors, makrolarda herhangi bir hata olması durumunda sitenizdeki bazı veya tüm sayfaların tamamen yüklenmesini önleyecek olan '%0%' olarak ayarlanmıştır. Bunu düzeltmek, değeri "%1%" olarak ayarlayacaktır.</key>
-    <key alias="macroErrorModeCheckRectifySuccessMessage">Makro Hatalar artık '%0%' olarak ayarlandı.</key>
     <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 		   2: Server version
 	  -->
-    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Deneyin IIS Özel Hatalarını Atla '%0%' olarak ayarlandı ve '%1%' IIS sürümünü kullanıyorsunuz.</key>
-    <key alias="trySkipIisCustomErrorsCheckErrorMessage">IIS'yi Atlamayı Deneyin Özel Hataları şu anda '%0%'. IIS sürümünüz (%2%) için bunu '%1%' olarak ayarlamanız önerilir.</key>
-    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">IIS Özel Hatalarını Atlamayı deneyin başarıyla '%0%' olarak ayarlandı.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="configurationServiceFileNotFound">​​Dosya mevcut değil: '%0%'.</key>
-    <key alias="configurationServiceNodeNotFound">​​<![CDATA[<strong> '%1%' </strong> yapılandırma dosyasında <strong> '%0%' </strong> bulunamadı.]]> </key>
-    <key alias="configurationServiceError">Bir hata oluştu, tam hata için günlüğü kontrol edin: %0%.</key>
-    <key alias="databaseSchemaValidationCheckDatabaseOk">Veritabanı - Veritabanı şeması, Umbraco'nun bu sürümü için doğru</key>
-    <key alias="databaseSchemaValidationCheckDatabaseErrors">Veritabanı şemanızda %0% sorun algılandı (Ayrıntılar için günlüğe bakın)</key>
-    <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Umbraco'nun mevcut sürümüne göre veritabanı şeması doğrulanırken bazı hatalar tespit edildi.</key>
     <key alias="httpsCheckValidCertificate">Web sitenizin sertifikası geçerlidir.</key>
     <key alias="httpsCheckInvalidCertificate">Sertifika doğrulama hatası: '%0%'</key>
     <key alias="httpsCheckExpiredCertificate">Web sitenizin SSL sertifikasının süresi doldu.</key>
@@ -2152,77 +2072,44 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="httpsCheckIsCurrentSchemeHttps">Şu anda HTTPS şemasını kullanarak siteyi %0% görüntülüyorsunuz.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'Umbraco.Core.Https' web.config dosyanızda 'false' olarak ayarlandı. Bu siteye HTTPS şemasını kullanarak eriştiğinizde, bu 'doğru' olarak ayarlanmalıdır.</key>
     <key alias="httpsCheckConfigurationCheckResult">appSetting 'Umbraco.Core.Https' web.config dosyanızda '%0%' olarak ayarlandı, çerezleriniz%1% güvenli olarak işaretlendi.</key>
-    <key alias="httpsCheckEnableHttpsError">Web.config dosyanızdaki 'Umbraco.Core.Https' ayarı güncellenemedi. Hata: %0%</key>
-
     <!-- The following keys don't get tokens passed in -->
-    <key alias="httpsCheckEnableHttpsButton">HTTPS'yi etkinleştir</key>
-    <key alias="httpsCheckEnableHttpsDescription">web.config dosyasının appSettings öğesinde umbracoSSL ayarını true olarak ayarlar.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">appSetting 'Umbraco.Core.Https' artık web.config dosyanızda 'true' olarak ayarlandı, çerezleriniz güvenli olarak işaretlenecek.</key>
-    <key alias="rectifyButton">Düzelt</key>
-    <key alias="cannotRectifyShouldNotEqual">Değer karşılaştırma türü 'ShouldNotEqual' olan bir kontrol düzeltilemez.</key>
-    <key alias="cannotRectifyShouldEqualWithValue">Sağlanan bir değere sahip 'ShouldEqual' değer karşılaştırma türüne sahip bir kontrol düzeltilemez.</key>
-    <key alias="valueToRectifyNotProvided">Düzeltilecek değer kontrolü sağlanmadı.</key>
     <key alias="compilationDebugCheckSuccessMessage">Hata ayıklama derleme modu devre dışı.</key>
     <key alias="compilationDebugCheckErrorMessage">Hata ayıklama derleme modu şu anda etkin. Yayınlanmadan önce bu ayarı devre dışı bırakmanız önerilir.</key>
-    <key alias="compilationDebugCheckRectifySuccessMessage">Hata ayıklama derleme modu başarıyla devre dışı bırakıldı.</key>
-    <key alias="traceModeCheckSuccessMessage">İzleme modu devre dışı.</key>
-    <key alias="traceModeCheckErrorMessage">İzleme modu şu anda etkin. Yayınlanmadan önce bu ayarı devre dışı bırakmanız önerilir.</key>
-    <key alias="traceModeCheckRectifySuccessMessage">İzleme modu başarıyla devre dışı bırakıldı.</key>
-    <key alias="folderPermissionsCheckMessage">Tüm klasörler doğru izinlere sahip.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-    <key alias="requiredFolderPermissionFailed"><![CDATA[Aşağıdaki klasörler, değiştirme izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0%</strong>]]></key>
-    <key alias="optionalFolderPermissionFailed"><![CDATA[Aşağıdaki klasörler, belirli Umbraco işlemlerinin çalışması için değiştirme izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0% </strong>. Yazılmıyorsa herhangi bir işlem yapılmasına gerek yoktur.]]></key>
-    <key alias="filePermissionsCheckMessage">Tüm dosyalar doğru izinlere sahip.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-    <key alias="requiredFilePermissionFailed"><![CDATA[Aşağıdaki dosyalar yazma izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0%</strong>]]></key>
-    <key alias="optionalFilePermissionFailed"><![CDATA[Aşağıdaki dosyalar, belirli Umbraco işlemlerinin çalışması için yazma izinleriyle ayarlanmalıdır, ancak erişilemez: <strong>%0% </strong>. Yazılmıyorsa herhangi bir işlem yapılmasına gerek yoktur.]]></key>
-    <key alias="clickJackingCheckHeaderFound">
-      ​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong>.]]> </key>
-      <key alias="clickJackingCheckHeaderNotFound">
-        ​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong> bulunamadı.]]> </key>
-    <key alias="setHeaderInConfig">Yapılandırmada Üstbilgiyi Ayarla</key>
-        <key alias="clickJackingSetHeaderInConfigDescription">Sitenin diğer web siteleri tarafından IFRAMEd olmasını önlemek için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
-        <key alias="clickJackingSetHeaderInConfigSuccess">Web.config dosyanıza, sitenin diğer web siteleri tarafından IFRAMEing yapılmasını engelleyen bir başlık oluşturma ayarı eklendi.</key>
-        <key alias="setHeaderInConfigError">web.config dosyası güncellenemedi. Hata: %0%</key>
-        <key alias="noSniffCheckHeaderFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulundu.]]></key>
-        <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]> </key>
-
-        <key alias="noSniffSetHeaderInConfigDescription">MIME koklama güvenlik açıklarına karşı koruma sağlamak için web.config’in httpProtocol / customHeaders bölümüne bir değer ekler.</key>
-        <key alias="noSniffSetHeaderInConfigSuccess">Web.config dosyanıza MIME koklama güvenlik açıklarına karşı koruma sağlayan bir üstbilgi oluşturma ayarı eklendi.</key>
-        <key alias="hSTSCheckHeaderFound">​​<![CDATA[HSTS başlığı olarak da bilinen <strong> Strict-Transport-Security </strong> başlığı bulundu.]]></key>
-        <key alias="hSTSCheckHeaderNotFound">​​<![CDATA[<strong> Strict-Transport-Security </strong> başlığı bulunamadı.]]></key>
-        <key alias="hSTSSetHeaderInConfigDescription">Web.config'in httpProtocol / customHeaders bölümüne 'max-age=10886400' değerine sahip 'Strict-Transport-Security' başlığını ekler. Bu düzeltmeyi yalnızca alanlarınız önümüzdeki 18 hafta boyunca (minimum) https ile çalışacaksa kullanın.</key>
-        <key alias="hSTSSetHeaderInConfigSuccess">HSTS başlığı web.config dosyanıza eklendi.</key>
-        <key alias="xssProtectionCheckHeaderFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulundu.]]></key>
-        <key alias="xssProtectionCheckHeaderNotFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulunamadı.]]></key>
-        <key alias="xssProtectionSetHeaderInConfigDescription">'X-XSS-Protection' başlığını '1; mode=block 'web.config'in httpProtocol / customHeaders bölümüne.</key>
-        <key alias="xssProtectionSetHeaderInConfigSuccess">X-XSS-Protection başlığı web.config dosyanıza eklendi.</key>
-        <!-- The following key get these tokens passed in:
+    <key alias="clickJackingCheckHeaderFound">​​<![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong>.]]></key>
+    <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Bir sitenin başka bir site tarafından IFRAMEd olup olmadığını kontrol etmek için kullanılan başlık veya meta etiketi <strong> X-Frame-Options </strong> bulunamadı.]]></key>
+    <key alias="noSniffCheckHeaderFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulundu.]]></key>
+    <key alias="noSniffCheckHeaderNotFound">​​<![CDATA[MIME koklama güvenlik açıklarına karşı koruma sağlamak için kullanılan başlık veya meta etiketi <strong> X-Content-Type-Options </strong> bulunamadı.]]></key>
+    <key alias="hSTSCheckHeaderFound">​​<![CDATA[HSTS başlığı olarak da bilinen <strong> Strict-Transport-Security </strong> başlığı bulundu.]]></key>
+    <key alias="hSTSCheckHeaderNotFound">​​<![CDATA[<strong> Strict-Transport-Security </strong> başlığı bulunamadı.]]></key>
+    <key alias="xssProtectionCheckHeaderFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulundu.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound">​​<![CDATA[<strong> X-XSS-Protection </strong> başlığı bulunamadı.]]></key>
+    <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
-        <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</strong>.]]></key>
-        <key alias="excessiveHeadersNotFound">​​Web sitesi teknolojisi hakkında bilgi veren hiçbir başlık bulunamadı.</key>
-        <key alias="smtpMailSettingsNotFound">​​Web.config dosyasında system.net/mailsettings bulunamadı.</key>
-        <key alias="smtpMailSettingsHostNotConfigured">Web.config dosyası system.net/mailsettings bölümünde, ana bilgisayar yapılandırılmamış.</key>
-        <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
-        <key alias="smtpMailSettingsConnectionFail">'%0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
-        <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> olarak ayarlandı]]></key>
-        <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
-        <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
-        <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
-        <key alias="checkAllGroups">Tüm Grupları Kontrol Edin</key>
-        <key alias="checkGroup">Grubu kontrol et</key>
-        <key alias="helpText">
-          <![CDATA[
+    <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</strong>.]]></key>
+    <key alias="excessiveHeadersNotFound">​​Web sitesi teknolojisi hakkında bilgi veren hiçbir başlık bulunamadı.</key>
+    <key alias="smtpMailSettingsNotFound">​​Web.config dosyasında system.net/mailsettings bulunamadı.</key>
+    <key alias="smtpMailSettingsHostNotConfigured">Web.config dosyası system.net/mailsettings bölümünde, ana bilgisayar yapılandırılmamış.</key>
+    <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
+    <key alias="smtpMailSettingsConnectionFail">'%0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
+    <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> olarak ayarlandı]]></key>
+    <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
+    <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
+    <key alias="scheduledHealthCheckEmailSubject">Umbraco Sağlık Kontrolü Durumu: %0%</key>
+    <key alias="checkGroup">Grubu kontrol et</key>
+    <key alias="helpText">
+      <![CDATA[
         <p> Durum denetleyicisi, sitenizin çeşitli alanlarını en iyi uygulama ayarları, yapılandırma, olası sorunlar vb. için değerlendirir. Sorunları bir düğmeye basarak kolayca düzeltebilirsiniz.
         Kendi sağlık kontrollerinizi ekleyebilir, <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">özel durum kontrolleri hakkında daha fazla bilgi için belgeler </a>. </p>
         ]]>
-        </key>
-      </area>
+    </key>
+  </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">URL izleyiciyi devre dışı bırakın</key>
     <key alias="enableUrlTracker">URL izleyiciyi etkinleştir</key>
@@ -2232,7 +2119,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="panelInformation">Aşağıdaki URL'ler bu içerik öğesine yönlendiriyor:</key>
     <key alias="noRedirects">Yönlendirme yapılmadı</key>
     <key alias="noRedirectsDescription">Yayınlanan bir sayfa yeniden adlandırıldığında veya taşındığında, yeni sayfaya otomatik olarak bir yönlendirme yapılır.</key>
-    <key alias="confirmRemove">'%0%' dan '%1%' e yönlendirmeyi kaldırmak istediğinizden emin misiniz?</key>
     <key alias="redirectRemoved">Yönlendirme URL'si kaldırıldı.</key>
     <key alias="redirectRemoveError">Yönlendirme URL'sini kaldırma hatası.</key>
     <key alias="redirectRemoveWarning">Bu, yönlendirmeyi kaldırır</key>
@@ -2329,11 +2215,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="tabName">Referanslar</key>
     <key alias="DataTypeNoReferences">Bu Veri Türünde referans yok.</key>
     <key alias="labelUsedByDocumentTypes">Belge Türlerinde Kullanılır</key>
-    <key alias="noDocumentTypes">Belge Türlerine referans yok.</key>
     <key alias="labelUsedByMediaTypes">Medya Türlerinde Kullanılır</key>
-    <key alias="noMediaTypes">Medya Türlerine referans yok.</key>
     <key alias="labelUsedByMemberTypes">Üye Türlerinde Kullanılır</key>
-    <key alias="noMemberTypes">Üye Türlerine referans yok.</key>
     <key alias="usedByProperties">Kullanan</key>
     <key alias="labelUsedByDocuments">Belgelerde Kullanıldı</key>
     <key alias="labelUsedByMembers">Üyelerde Kullanıldı</key>
@@ -2437,23 +2320,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     </key>
     <key alias="activateByDefault">Profil oluşturucuyu varsayılan olarak etkinleştirin</key>
     <key alias="reminder">Kolay hatırlatma</key>
-    <key alias="reminderDescription">
-      <![CDATA[
-        <p>
-            Bir üretim sitesinin hata ayıklama modunda çalışmasına asla izin vermemelisiniz. Web.config içindeki <b>&lt;compilation /&gt;</b> öğesinde <b> debug="false" </b> ayarlanarak hata ayıklama modu kapatılır.
-        </p>
-    ]]>
-    </key>
-    <key alias="profilerEnabledDescription">
-      <![CDATA[
-        <p>
-            Umbraco şu anda hata ayıklama modunda çalışmadığından yerleşik profil oluşturucuyu kullanamazsınız. Bir üretim sahası için böyle olması gerekir.
-        </p>
-        <p>
-            Hata ayıklama modu, web.config'deki <b>&lt;compilation /&gt;</b> öğesinde <b>debug="true"</b> ayarlanarak etkinleştirilir.
-        </p>
-    ]]>
-    </key>
   </area>
   <area alias="settingsDashboardVideos">
     <key alias="trainingHeadline">Umbraco eğitim videolarının saatleri yalnızca bir tıklama uzaklıkta</key>
@@ -2523,7 +2389,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="labelEditorSize">Yer paylaşımı düzenleyici boyutu</key>
     <key alias="addCustomView">Özel görünüm ekle</key>
     <key alias="addSettingsElementType">Ayarları ekle</key>
-    <key alias="labelTemplatePlaceholder">Etiket şablonunun üzerine yaz</key>
     <key alias="confirmDeleteBlockMessage"><![CDATA[<strong>%0%</strong> içeriğini silmek istediğinizden emin misiniz?]]></key>
     <key alias="confirmDeleteBlockTypeMessage"><![CDATA[<strong>%0%</strong> blok yapılandırmasını silmek istediğinizden emin misiniz?]]></key>
     <key alias="confirmDeleteBlockTypeNotice">Bu bloğun içeriği hala mevcut olacak, bu içeriğin düzenlenmesi artık kullanılamayacak ve desteklenmeyen içerik olarak gösterilecek.</key>

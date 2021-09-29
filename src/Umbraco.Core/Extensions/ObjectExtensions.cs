@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -94,8 +95,8 @@ namespace Umbraco.Extensions
                 {
                     // sure, null can be any object
                     return Attempt<T>.Succeed((T)input);
-                } 
-            } 
+                }
+            }
 
             // just try to cast
             try
@@ -293,7 +294,7 @@ namespace Umbraco.Extensions
             {
                 if (target == typeof(int))
                 {
-                    if (int.TryParse(input, out var value))
+                    if (int.TryParse(input,  out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
@@ -301,7 +302,7 @@ namespace Umbraco.Extensions
                     // Because decimal 100.01m will happily convert to integer 100, it
                     // makes sense that string "100.01" *also* converts to integer 100.
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Attempt<object>.If(decimal.TryParse(input2, out var value2), Convert.ToInt32(value2));
+                    return Attempt<object>.If(decimal.TryParse(input2,  out var value2), Convert.ToInt32(value2));
                 }
 
                 if (target == typeof(long))
@@ -320,7 +321,7 @@ namespace Umbraco.Extensions
 
                 if (target == typeof(bool))
                 {
-                    if (bool.TryParse(input, out var value))
+                    if (bool.TryParse(input,  out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
@@ -337,11 +338,11 @@ namespace Umbraco.Extensions
 
                     case TypeCode.Double:
                         var input2 = NormalizeNumberDecimalSeparator(input);
-                        return Attempt<object>.If(double.TryParse(input2, out var valueD), valueD);
+                        return Attempt<object>.If(double.TryParse(input2,  out var valueD), valueD);
 
                     case TypeCode.Single:
                         var input3 = NormalizeNumberDecimalSeparator(input);
-                        return Attempt<object>.If(float.TryParse(input3, out var valueF), valueF);
+                        return Attempt<object>.If(float.TryParse(input3,  out var valueF), valueF);
 
                     case TypeCode.Char:
                         return Attempt<object>.If(char.TryParse(input, out var valueC), valueC);
@@ -353,13 +354,13 @@ namespace Umbraco.Extensions
                         return Attempt<object>.If(sbyte.TryParse(input, out var valueSb), valueSb);
 
                     case TypeCode.UInt32:
-                        return Attempt<object>.If(uint.TryParse(input, out var valueU), valueU);
+                        return Attempt<object>.If(uint.TryParse(input,  out var valueU), valueU);
 
                     case TypeCode.UInt16:
-                        return Attempt<object>.If(ushort.TryParse(input, out var valueUs), valueUs);
+                        return Attempt<object>.If(ushort.TryParse(input,  out var valueUs), valueUs);
 
                     case TypeCode.UInt64:
-                        return Attempt<object>.If(ulong.TryParse(input, out var valueUl), valueUl);
+                        return Attempt<object>.If(ulong.TryParse(input,  out var valueUl), valueUl);
                 }
             }
             else if (target == typeof(Guid))

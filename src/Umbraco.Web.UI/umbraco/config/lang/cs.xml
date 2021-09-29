@@ -16,10 +16,10 @@
     <key alias="createGroup">Vytvořit skupinu</key>
     <key alias="delete">Odstranit</key>
     <key alias="disable">Deaktivovat</key>
-    <key alias="emptyRecycleBin">Vyprázdnit koš</key>
+    <key alias="emptyrecyclebin">Vyprázdnit koš</key>
     <key alias="enable">Aktivovat</key>
     <key alias="exportDocumentType">Exportovat typ dokumentu</key>
-    <key alias="importDocumentType">Importovat typ dokumentu</key>
+    <key alias="importdocumenttype">Importovat typ dokumentu</key>
     <key alias="importPackage">Importovat balíček</key>
     <key alias="liveEdit">Editovat na stránce</key>
     <key alias="logout">Odhlásit</key>
@@ -33,7 +33,6 @@
     <key alias="rights">Práva</key>
     <key alias="rename" version="7.3.0">Přejmenovat</key>
     <key alias="restore" version="7.3.0">Obnovit</key>
-    <key alias="SetPermissionsForThePage">Nastavit oprávnění pro stránku %0%</key>
     <key alias="chooseWhereToCopy">Kam zkopírovat</key>
     <key alias="chooseWhereToMove">Kam přesunout</key>
     <key alias="toInTheTreeStructureBelow">do struktury stromu pod</key>
@@ -135,12 +134,10 @@
     <key alias="save">Uložit</key>
     <key alias="saveAndClose">Uložit a zavřít</key>
     <key alias="saveAndPublish">Uložit a publikovat</key>
-    <key alias="saveAndSchedule">Uložit a naplánovat</key>
     <key alias="saveToPublish">Uložit a odeslat ke schválení</key>
     <key alias="saveAndPreview">Náhled</key>
     <key alias="saveListView">Uložit zobrazení seznamu</key>
     <key alias="schedulePublish">Naplánovat</key>
-    <key alias="showPage">Náhled</key>
     <key alias="showPageDisabled">Náhled je deaktivován, protože není přiřazena žádná šablona</key>
     <key alias="styleChoose">Vybrat styl</key>
     <key alias="styleShow">Zobrazit styly</key>
@@ -149,7 +146,6 @@
     <key alias="saveAndGenerateModels">Uložit a generovat modely</key>
     <key alias="undo">Zpět</key>
     <key alias="redo">Znovu</key>
-    <key alias="rollback">Obnovit</key>
     <key alias="deleteTag">Smazat štítek</key>
     <key alias="confirmActionCancel">Zrušit</key>
     <key alias="confirmActionConfirm">Potvrdit</key>
@@ -186,8 +182,6 @@
     <key alias="historyIncludingVariants">Historie (všechny jazyky)</key>
   </area>
   <area alias="codefile">
-    <key alias="createFolderFailedById">Nepodařilo se vytvořit složku pod rodičem s ID %0%</key>
-    <key alias="createFolderFailedByName">Nepodařilo se vytvořit složku pod rodičem s názvem %0%</key>
     <key alias="createFolderIllegalChars">Název složky nesmí obsahovat nepovolené znaky.</key>
     <key alias="deleteItemFailed">Odstranění položky se nezdařilo: %0%</key>
   </area>
@@ -276,17 +270,10 @@
     <key alias="includeUnpublished">Include drafts: also publish unpublished content items.</key>
     <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
     <key alias="isSensitiveValue_short">This value is hidden.</key>
-    <key alias="languagesToPublishForFirstTime">What languages would you like to publish? All languages with content are saved!</key>
     <key alias="languagesToPublish">What languages would you like to publish?</key>
-    <key alias="languagesToSave">What languages would you like to save?</key>
-    <key alias="languagesToSaveForFirstTime">All languages with content are saved on creation!</key>
     <key alias="languagesToSendForApproval">What languages would you like to send for approval?</key>
     <key alias="languagesToSchedule">What languages would you like to schedule?</key>
     <key alias="languagesToUnpublish">Select the languages to unpublish. Unpublishing a mandatory language will unpublish all languages.</key>
-    <key alias="publishedLanguages">Published Languages</key>
-    <key alias="unpublishedLanguages">Unpublished Languages</key>
-    <key alias="unmodifiedLanguages">Unmodified Languages</key>
-    <key alias="untouchedLanguagesForFirstTime">These languages haven't been created</key>
     <key alias="readyToPublish">Ready to Publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
     <key alias="sendForApproval">Send for approval</key>
@@ -307,13 +294,10 @@
   <area alias="media">
     <key alias="clickToUpload">Klikněte pro nahrání</key>
     <key alias="orClickHereToUpload">nebo kliknutím sem vyberte soubory</key>
-    <key alias="dragFilesHereToUpload">Sem můžete přetáhnout a nahrát soubory.</key>
     <key alias="disallowedFileType">Tento soubor nelze nahrát, nemá povolený typ souboru</key>
     <key alias="maxFileSize">Maximální velikost souboru je</key>
     <key alias="mediaRoot">Nejvyšší složka médií</key>
-    <key alias="moveFailed">Nepodařilo se přesunout média</key>
     <key alias="moveToSameFolderFailed">Nadřazené a cílové složky nemohou být stejné</key>
-    <key alias="copyFailed">Médium se nepodařilo zkopírovat</key>
     <key alias="createFolderFailed">Nepodařilo se vytvořit složku pod nadřazeným id %0%</key>
     <key alias="renameFolderFailed">Nepodařilo se přejmenovat složku s id %0%</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Přetáhněte své soubory do oblasti</key>
@@ -421,7 +405,6 @@
     <key alias="linkinternal">Místní odkaz:</key>
     <key alias="linklocaltip">Při používání místních odkazů vložte znak "#" před odkaz</key>
     <key alias="linknewwindow">Otevřít v novém okně?</key>
-    <key alias="macroContainerSettings">Nastavení makra</key>
     <key alias="macroDoesNotHaveProperties">Toto makro nemá žádné vlastnosti, které by bylo možno editovat</key>
     <key alias="paste">Vložit</key>
     <key alias="permissionsEdit">Editovat oprávnění pro</key>
@@ -559,10 +542,6 @@
     <key alias="rteRelatedStylesheets">Související stylopisy</key>
     <key alias="rteShowLabel">Zobrazit jmenovku</key>
     <key alias="rteWidthAndHeight">Šířka a výška</key>
-    <key alias="allPropTypes">Všechny typy vlastností a údaje o nich</key>
-    <key alias="willBeDeleted">použití tohoto datového typu bude trvale smazáno, potvrďte, že je chcete  odstranit</key>
-    <key alias="yesDelete">Ano, smazat</key>
-    <key alias="andAllRelated">a všechny typy vlastností a data vlastností používající tento typ dat</key>
     <key alias="selectFolder">Vyberte složku, kterou chcete přesunout</key>
     <key alias="inTheTree">do stromové struktury níže</key>
     <key alias="wasMoved">byla přesunuta pod</key>
@@ -656,7 +635,6 @@
     <key alias="icon">Ikona</key>
     <key alias="id">Id</key>
     <key alias="import">Import</key>
-    <key alias="includeFromsubFolders">Zahrnout podsložky do vyhledávání</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Vnitřní okraj</key>
     <key alias="insert">Vložit</key>
@@ -748,7 +726,6 @@
     <key alias="other">Další</key>
     <key alias="articles">Články</key>
     <key alias="videos">Videa</key>
-    <key alias="installing">Instalování</key>
   </area>
   <area alias="colors">
     <key alias="blue">Modrá</key>
@@ -1080,27 +1057,15 @@
          a výběrem balíčku. Balíčky Umbraco mají obvykle přípony ".umb" nebo ".zip".
       ]]></key>
     <key alias="deletewarning">Tím se balíček odstraní</key>
-    <key alias="dropHere">Přetáhněte sem pro nahrání</key>
     <key alias="includeAllChildNodes">Zahrnout všechny podřízené uzly</key>
-    <key alias="accept">Přijímám</key>
-    <key alias="termsOfUse">podmínky použití</key>
-    <key alias="pathToFile">Cesta k souboru</key>
-    <key alias="pathToFileDescription">Absolutní cesta k souboru (ie: /bin/umbraco.bin)</key>
     <key alias="installed">Nainstalováno</key>
     <key alias="installedPackages">Nainstalované balíčky</key>
-    <key alias="installFinish">Dokončit</key>
     <key alias="noConfigurationView">Tento balíček nemá žádné zobrazení konfigurace</key>
     <key alias="noPackagesCreated">Zatím nebyly vytvořeny žádné balíčky</key>
     <key alias="noPackages">Nemáte nainstalované žádné balíčky</key>
     <key alias="noPackagesDescription"><![CDATA[Nemáte nainstalované žádné balíčky. Nainstalujte místní balíček tak, že jej vyberete ze svého počítače, nebo procházejte dostupné balíčky pomocí ikony <strong>Balíčky</strong> v pravém horním rohu obrazovky.]]></key>
-    <key alias="packageAuthorUrl">Web autora</key>
     <key alias="packageContent">Obsah balíčku</key>
-    <key alias="packageFiles">Soubory balíčku</key>
-    <key alias="packageIconUrl">URL ikony</key>
-    <key alias="packageInstall">Nainstalovat balíček</key>
     <key alias="packageLicense">Licence</key>
-    <key alias="packageLicenseUrl">URL licence</key>
-    <key alias="packageProperties">Vlastnosti balíčku</key>
     <key alias="packageSearch">Hledat balíčky</key>
     <key alias="packageSearchResults">Výsledky pro</key>
     <key alias="packageNoResults">Nemohli jsme nic najít</key>
@@ -1138,14 +1103,6 @@
       <span style="color: Red; font-weight: bold;">Upozornění:</span> všechny dokumenty, media atd. závislé na položkách, které odstraníte, přestanou pracovat a mohou vést k nestabilitě systému,
       takže odinstalovávejte opatrně. Jste-li na pochybách, kontaktujte autora balíčku.]]></key>
     <key alias="packageVersion">Verze balíčku</key>
-    <key alias="packageVersionUpgrade">Upgradování z verze</key>
-    <key alias="packageAlreadyInstalled">Balíček je již nainstalován</key>
-    <key alias="targetVersionMismatch">Tento balíček nelze nainstalovat, vyžaduje minimální verzi Umbraco</key>
-    <key alias="installStateUninstalling">Odinstalovávám...</key>
-    <key alias="installStateDownloading">Stahuji...</key>
-    <key alias="installStateImporting">Importuji...</key>
-    <key alias="installStateInstalling">Instaluji...</key>
-    <key alias="installStateRestarting">Restartuji, prosím čekejte...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Vložit s úplným formatováním (nedoporučeno)</key>
@@ -1243,8 +1200,6 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Zrušit oříznutí</key>
-    <key alias="saveCrop">Uložit oříznutí</key>
-    <key alias="addCrop">Přidat nové oříznutí</key>
     <key alias="updateEditCrop">Hotovo</key>
     <key alias="undoEditCrop">Vrátit změny</key>
   </area>
@@ -1346,7 +1301,6 @@
     <key alias="editMediaSaved">Médium bylo uloženo</key>
     <key alias="editMediaSavedText">Médium bylo uloženo bez chyb</key>
     <key alias="editMemberSaved">Člen byl uložen</key>
-    <key alias="editMemberGroupSaved">Skupina členů byla uložena</key>
     <key alias="editStylesheetPropertySaved">Vlastnost stylopisu byla uložena</key>
     <key alias="editStylesheetSaved">Stylopis byl uložen</key>
     <key alias="editTemplateSaved">Šablona byla uložena</key>
@@ -1463,7 +1417,6 @@
             ]]></key>
     <key alias="queryBuilder">Tvůrce dotazů</key>
     <key alias="itemsReturned">položky vráceny, do</key>
-    <key alias="copyToClipboard">zkopírovat do schránky</key>
     <key alias="iWant">Chci</key>
     <key alias="allContent">veškerý obsah</key>
     <key alias="contentOfType">obsah typu "%0%"</key>
@@ -1509,7 +1462,6 @@
     <key alias="contentAllowed">Tento obsah je zde povolen</key>
     <key alias="clickToEmbed">Klepněte pro vložení</key>
     <key alias="clickToInsertImage">Klepnutím vložíte obrázek</key>
-    <key alias="placeholderImageCaption">Titulek obrázku...</key>
     <key alias="placeholderWriteHere">Zde pište...</key>
     <key alias="gridLayouts">Rozvržení mřížky</key>
     <key alias="gridLayoutsDetail">Rozvržení je celková pracovní oblast pro editor mřížky, obvykle potřebujete pouze jedno nebo dvě různá rozvržení</key>
@@ -1533,7 +1485,6 @@
     <key alias="chooseExtra">Vyberat navíc</key>
     <key alias="chooseDefault">Zvolit výchozí</key>
     <key alias="areAdded">jsou přidány</key>
-    <key alias="warning">Varování</key>
     <key alias="youAreDeleting">Odstraňujete konfiguraci řádku</key>
     <key alias="deletingARow">
       Odstranění názvu konfigurace řádku povede ke ztrátě dat pro veškerý existující obsah založený na této konfiguraci.
@@ -1627,8 +1578,6 @@
     <key alias="modelsExceptionInUlog">Generování modelů selhalo, viz výjimka v logu Umbraca</key>
   </area>
   <area alias="templateEditor">
-    <key alias="addFallbackField">Přidat záložní pole</key>
-    <key alias="fallbackField">Náhradní pole</key>
     <key alias="addDefaultValue">Přidat výchozí hodnotu</key>
     <key alias="defaultValue">Výchozí hodnota</key>
     <key alias="alternativeField">Alternativní pole</key>
@@ -1637,26 +1586,21 @@
     <key alias="encoding">Kódování</key>
     <key alias="chooseField">Vybrat pole</key>
     <key alias="convertLineBreaks">Konvertovat</key>
-    <key alias="convertLineBreaksDescription">Ano, převést konce řádků</key>
     <key alias="convertLineBreaksHelp">Nahrazuje nové řádky html tagem &amp;lt;br&amp;gt;</key>
     <key alias="customFields">Vlastní pole</key>
     <key alias="dateOnly">Ano, pouze datum</key>
-    <key alias="formatAndEncoding">Formát a kódování</key>
     <key alias="formatAsDate">Formátovat jako datum</key>
-    <key alias="formatAsDateDescr">Naformátuje hodnotu jako datum nebo datum s časem podle aktivního jazyka</key>
     <key alias="htmlEncode">HTML kódování</key>
     <key alias="htmlEncodeHelp">Nahradí speciální znaky jejich HTML ekvivalentem.</key>
     <key alias="insertedAfter">Bude vloženo za hodnotou pole</key>
     <key alias="insertedBefore">Bude vloženo před hodnotou pole</key>
     <key alias="lowercase">Malá písmena</key>
-    <key alias="modifyOutput">Upravit výstup</key>
     <key alias="none">Nic</key>
     <key alias="outputSample">Ukázka výstupu</key>
     <key alias="postContent">Vložit za polem</key>
     <key alias="preContent">Vložit před polem</key>
     <key alias="recursive">Rekurzivní</key>
     <key alias="recursiveDescr">Ano, udělej to rekurzivní</key>
-    <key alias="separator">Oddělovač</key>
     <key alias="standardFields">Standardní pole</key>
     <key alias="uppercase">Velká písmena</key>
     <key alias="urlEncode">Kódování URL</key>
@@ -1926,7 +1870,6 @@
                 </table>
             </body>
     </html>]]></key>
-    <key alias="invite">Pozvat</key>
     <key alias="defaultInvitationMessage">Zasílám pozvání...</key>
     <key alias="deleteUser">Smazat uživatele</key>
     <key alias="deleteUserConfirmation">Opravdu chcete smazat tento uživatelský účet?</key>
@@ -1975,34 +1918,20 @@
            3: Configuration file path
       -->
     <key alias="checkSuccessMessage">Hodnota je nastavena na doporučenou hodnotu: '%0%'.</key>
-    <key alias="rectifySuccessMessage">Hodnota byla nastavena na '%1%' pro XPath '%2%' v konfiguračním souboru '%3%'.</key>
     <key alias="checkErrorMessageDifferentExpectedValue">Očekávaná hodnota '%1%' pro '%2%' v konfiguračním souboru '%3%', ale nalezeno '%0%'.</key>
     <key alias="checkErrorMessageUnexpectedValue">Nalezena neočekávaná hodnota '%0%' pro '%2%' v konfiguračním souboru '%3%'.</key>
     <!-- The following keys get these tokens passed in:
          0: Current value
            1: Recommended value
       -->
-    <key alias="customErrorsCheckSuccessMessage">Vlastní chyby jsou nastaveny na '%0%'.</key>
-    <key alias="customErrorsCheckErrorMessage">Vlastní chyby jsou aktuálně nastaveny na '%0%'. Před nasazením se doporučuje nastavit na '%1%'.</key>
-    <key alias="customErrorsCheckRectifySuccessMessage">Vlastní chyby byly úspěšně nastaveny na '%0%'.</key>
     <key alias="macroErrorModeCheckSuccessMessage">MacroErrors jsou nastaveny na '%0%'.</key>
     <key alias="macroErrorModeCheckErrorMessage">MakroErrors jsou nastaveny na '%0%', což zabrání úplnému načtení některých nebo všech stránek na vašem webu, pokud dojde k chybám v makrech. Náprava nastaví hodnotu na '%1%'.</key>
-    <key alias="macroErrorModeCheckRectifySuccessMessage">MakroErrors jsou nyní nastaveny na '%0%'.</key>
     <!-- The following keys get these tokens passed in:
          0: Current value
            1: Recommended value
            2: Server version
       -->
-    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors je nastaveno na '%0%' a používáte verzi IIS '%1%'.</key>
-    <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors je aktuálně nastaveno na '%0%'. Doporučuje se nastavit %1% pro vaši verzi služby IIS (%2%).</key>
-    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors úspěšně nastaveno na '%0%'.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="configurationServiceFileNotFound">Soubor neexistuje: '%0%'.</key>
-    <key alias="configurationServiceNodeNotFound"><![CDATA[Nelze najít <strong>'% 0%'</strong> v konfiguračním souboru <strong>'% 1%'</strong>.]]></key>
-    <key alias="configurationServiceError">Došlo k chybě, zkontrolujte ji v logu: %0%.</key>
-    <key alias="databaseSchemaValidationCheckDatabaseOk">Databáze - Databázové schéma je pro tuto verzi Umbraco správné</key>
-    <key alias="databaseSchemaValidationCheckDatabaseErrors">Bylo zjištěno %0% problémů se schématem vaší databáze (podrobnosti najdete v logu)</key>
-    <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Při ověřování databázového schématu vůči aktuální verzi Umbraco byly zjištěny některé chyby.</key>
     <key alias="httpsCheckValidCertificate">Certifikát vašeho webu je platný.</key>
     <key alias="httpsCheckInvalidCertificate">Chyba ověření certifikátu: '%0%'</key>
     <key alias="httpsCheckExpiredCertificate">Platnost SSL certifikátu vašeho webu vypršela.</key>
@@ -2011,51 +1940,23 @@
     <key alias="httpsCheckIsCurrentSchemeHttps">Aktuálně prohlížíte web pomocí schématu HTTPS.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">AppSetting 'Umbraco.Core.UseHttps' je v souboru web.config nastaven na 'false'. Jakmile vstoupíte na tento web pomocí schématu HTTPS, mělo by být nastaveno na 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">AppSetting 'Umbraco.Core.UseHttps' je v souboru web.config nastaven na '%0%', vaše cookies %1% jsou označeny jako zabezpečené.</key>
-    <key alias="httpsCheckEnableHttpsError">V souboru web.config se nepodařilo aktualizovat nastavení 'Umbraco.Core.UseHttps'. Chyba: %0%</key>
     <!-- The following keys don't get tokens passed in -->
-    <key alias="httpsCheckEnableHttpsButton">Povolit HTTPS</key>
-    <key alias="httpsCheckEnableHttpsDescription">Nastaví nastavení umbracoSSL na true v appSettings v souboru web.config.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">AppSetting 'Umbraco.Core.UseHttps' je nyní nastaveno na 'true' v souboru web.config, vaše cookies budou označeny jako zabezpečené.</key>
-    <key alias="rectifyButton">Fix</key>
-    <key alias="cannotRectifyShouldNotEqual">Nelze opravit kontrolu pro porovnání hodnot pomocí 'ShouldNotEqual'.</key>
-    <key alias="cannotRectifyShouldEqualWithValue">Nelze opravit kontrolu pro porovnání hodnot pomocí  'ShouldEqual' s poskytnutou hodnotou.</key>
-    <key alias="valueToRectifyNotProvided">Hodnota k opravě nebyla poskytnuta.</key>
     <key alias="compilationDebugCheckSuccessMessage">Režim kompilace ladění je zakázán.</key>
     <key alias="compilationDebugCheckErrorMessage">Režim ladění je aktuálně povolen. Před spuštěním webu se doporučuje toto nastavení deaktivovat.</key>
-    <key alias="compilationDebugCheckRectifySuccessMessage">Režim ladění byl úspěšně deaktivován.</key>
-    <key alias="traceModeCheckSuccessMessage">Režim sledování je deaktivován.</key>
-    <key alias="traceModeCheckErrorMessage">Režim sledování je aktuálně povolen. Před spuštěním se doporučuje toto nastavení deaktivovat.</key>
-    <key alias="traceModeCheckRectifySuccessMessage">Režim sledování byl úspěšně deaktivován.</key>
-    <key alias="folderPermissionsCheckMessage">Všechny složky mají nastavena správná oprávnění.</key>
     <!-- The following keys get these tokens passed in:
         0: Comma delimitted list of failed folder paths
     -->
-    <key alias="requiredFolderPermissionFailed"><![CDATA[Následující složky musí být nastaveny s oprávněním k úpravám, ale nelze k nim přistupovat: <strong>%0%</strong>.]]></key>
-    <key alias="optionalFolderPermissionFailed"><![CDATA[Následující složky musí být nastaveny s oprávněními k úpravám, aby některé operace Umbraco fungovaly, ale nemohly být přístupné: <strong>%0%</strong>. Pokud nejsou psány, není třeba podniknout žádné kroky.]]></key>
-    <key alias="filePermissionsCheckMessage">Všechny soubory mají nastavena správná oprávnění.</key>
     <!-- The following keys get these tokens passed in:
         0: Comma delimitted list of failed folder paths
     -->
-    <key alias="requiredFilePermissionFailed"><![CDATA[Následující soubory musí být nastaveny s právy pro zápis, ale nelze k nim získat přístup: <strong>%0%</strong>.]]></key>
-    <key alias="optionalFilePermissionFailed"><![CDATA[Následující soubory musí být nastaveny s oprávněními pro zápis, aby určité operace Umbraco fungovaly, ale nemohly být přístupné: <strong>%0%</strong>. Pokud nejsou psány, není třeba podniknout žádné kroky.]]></key>
     <key alias="clickJackingCheckHeaderFound"><![CDATA[Bylo nalezeno záhlaví nebo metaznačka <strong>X-Frame-Options</strong>, které určuje, zda může být obsah webu zobrazen na jiném webu pomocí IFRAME.]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nebylo nalezeno záhlaví nebo metaznačka <strong>X-Frame-Options</strong>, které určuje, zda může být obsah webu zobrazen na jiném webu pomocí IFRAME.]]></key>
-    <key alias="setHeaderInConfig">Nastavit záhlaví v Konfiguraci</key>
-    <key alias="clickJackingSetHeaderInConfigDescription">Přidá hodnotu do sekce httpProtocol/customHeaders do web.config, aby se zabránilo tomu, že web může být zobrazen na jiném webu pomocí IFRAME.</key>
-    <key alias="clickJackingSetHeaderInConfigSuccess">Do souboru web.config bylo přidáno nastavení pro vytvoření záhlaví, které zabrání jinému webu, zobrazit tento web pomocí IFRAME.</key>
-    <key alias="setHeaderInConfigError">Nelze aktualizovat soubor web.config. Chyba: %0%</key>
     <key alias="noSniffCheckHeaderFound"><![CDATA[Bylo nalezeno záhlaví nebo metaznačka <strong>X-Content-Type-Options</strong> použitá k ochraně před zranitelnostmi čichání MIME.]]></key>
     <key alias="noSniffCheckHeaderNotFound"><![CDATA[Záhlaví nebo metaznačky <strong>X-Content-Type-Options</strong> použité k ochraně před zranitelnostmi čichání MIME nebyly nalezeny.]]></key>
-    <key alias="noSniffSetHeaderInConfigDescription">Přidá hodnotu do sekce httpProtocol/customHeaders v souboru web.config, která chrání před zranitelnostmi MIME.</key>
-    <key alias="noSniffSetHeaderInConfigSuccess">Do souboru web.config bylo přidáno nastavení pro vytvoření záhlaví, které chrání před zranitelnostmi MIME.</key>
     <key alias="hSTSCheckHeaderFound"><![CDATA[Záhlaví <strong>Strict-Transport-Security</strong>, také známo jako HSTS-header, bylo nalezeno.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[záhlaví <strong>Strict-Transport-Security</strong> nebylo nalezeno.]]></key>
-    <key alias="hSTSSetHeaderInConfigDescription">Do sekce httpProtocol/customHeaders v souboru web.config přidá záhlaví 'Strict-Transport-Security' s hodnotou 'max-age = 10886400'. Tuto opravu použijte pouze v případě, že vaše domény budou spuštěny s https po dobu příštích 18 týdnů (minimálně).</key>
-    <key alias="hSTSSetHeaderInConfigSuccess">Do vašeho souboru web.config bylo přidáno záhlaví HSTS.</key>
     <key alias="xssProtectionCheckHeaderFound"><![CDATA[Záhlaví <strong>X-XSS-Protection</strong> bylo nalezeno.]]></key>
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Záhlaví <strong>X-XSS-Protection</strong> bylo nalezeno.]]></key>
-    <key alias="xssProtectionSetHeaderInConfigDescription">Přidá záhlaví 'X-XSS-Protection' s hodnotou '1; mode=block' do sekce httpProtocol/customHeaders v souboru web.config. </key>
-    <key alias="xssProtectionSetHeaderInConfigSuccess">Záhlaví X-XSS-Protection bylo přidáno do vašeho souboru web.config.</key>
     <!-- The following key get these tokens passed in:
         0: Comma delimitted list of headers found
     -->
@@ -2069,7 +1970,6 @@
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[E-mail s oznámením je stále nastaven na výchozí hodnotu <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Výsledky plánovaných kontrol Umbraco Health Checks provedených na %0% v %1% jsou následující:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Stav Umbraco Health Check: %0%</key>
-    <key alias="checkAllGroups">Zkontrolovat všechny skupiny</key>
     <key alias="checkGroup">Zkontrolovat skupinu</key>
     <key alias="helpText">
       <![CDATA[
@@ -2087,7 +1987,6 @@
     <key alias="panelInformation">Na tuto položku obsahu přesměrovávají následující adresy URL:</key>
     <key alias="noRedirects">Nebyla provedena žádná přesměrování</key>
     <key alias="noRedirectsDescription">Jakmile bude publikovaná stránka přejmenována nebo přesunuta, bude automaticky provedeno přesměrování na novou stránku.</key>
-    <key alias="confirmRemove">Opravdu chcete odstranit přesměrování z '%0%' na '%1%'?</key>
     <key alias="redirectRemoved">Přesměrování bylo odstraněno.</key>
     <key alias="redirectRemoveError">Chyba při odebírání URL přesměrování.</key>
     <key alias="redirectRemoveWarning">Toto odstraní přesměrování</key>
@@ -2173,11 +2072,8 @@
     <key alias="tabName">Závislosti</key>
     <key alias="DataTypeNoReferences">Tento datový typ nemá žádné závislosti.</key>
     <key alias="labelUsedByDocumentTypes">Použito v dokumentových typech</key>
-    <key alias="noDocumentTypes">Žádné vazby na typy dokumentů.</key>
     <key alias="labelUsedByMediaTypes">Použito v typech médií</key>
-    <key alias="noMediaTypes">Žádné vazby na typy médií.</key>
     <key alias="labelUsedByMemberTypes">Použito v typech členů</key>
-    <key alias="noMemberTypes">Žádné vazby na typy členů.</key>
     <key alias="usedByProperties">Použito v </key>
     <key alias="labelUsedByDocuments">Použito v dokumentech</key>
     <key alias="labelUsedByMembers">Použito ve členech</key>
@@ -2258,23 +2154,6 @@
     </key>
     <key alias="activateByDefault">Ve výchozím stavu aktivovat profiler</key>
     <key alias="reminder">Přátelské připomenutí</key>
-    <key alias="reminderDescription">
-      <![CDATA[
-            <p>
-                Nikdy byste neměli nechat produkční web běžet v režimu ladění. Režim ladění je vypnut nastavením <b> debug="false" </b> na elementu <b>compilation</b> v souboru web.config.
-            </p>
-        ]]>
-    </key>
-    <key alias="profilerEnabledDescription">
-      <![CDATA[
-            <p>
-                Umbraco v současné době neběží v režimu ladění, takže nemůžete použít vestavěný profiler. Takto by to mělo být pro produkční web.
-            </p>
-            <p>
-                Režim ladění je zapnut nastavením <b> debug="true" </b> na elementu <b> compilation </b> v souboru web.config.
-            </p>
-        ]]>
-    </key>
   </area>
   <area alias="settingsDashboardVideos">
     <key alias="trainingHeadline">Hodiny tréninkových videí Umbraco jsou blíž než si myslíte</key>

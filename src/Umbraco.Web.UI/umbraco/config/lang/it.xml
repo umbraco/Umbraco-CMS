@@ -13,9 +13,9 @@
     <key alias="createPackage">Crea pacchetto</key>
     <key alias="delete">Cancella</key>
     <key alias="disable">Disabilita</key>
-    <key alias="emptyRecycleBin">Svuota il cestino</key>
+    <key alias="emptyrecyclebin">Svuota il cestino</key>
     <key alias="exportDocumentType">Esporta il tipo di documento</key>
-    <key alias="importDocumentType">Importa il tipo di documento</key>
+    <key alias="importdocumenttype">Importa il tipo di documento</key>
     <key alias="importPackage">Importa il pacchetto</key>
     <key alias="liveEdit">Modifica in Area di Lavoro</key>
     <key alias="logout">Uscita</key>
@@ -30,7 +30,6 @@
     <key alias="sendtopublish">Invia per la pubblicazione</key>
     <key alias="sendToTranslate">Invia per la traduzione</key>
     <key alias="sort">Ordina</key>
-    <key alias="toPublish">Invia la pubblicazione</key>
     <key alias="translate">Traduci</key>
     <key alias="unpublish">Annulla pubblicazione</key>
     <key alias="update">Aggiorna</key>
@@ -220,8 +219,6 @@
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[Modifica le traduzioni per l'elemento '%0%'. Puoi aggiungere una lingua sotto "Lingue" nel menù a sinistra]]></key>
     <key alias="displayName"><![CDATA[Identificativo Cultura]]></key>
-  </area>
-  <area alias="editcontenttype">
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue"><![CDATA[Aggiungi valore predefinito]]></key>
@@ -766,7 +763,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="contentAllowed">Questo contenuto è consentito qui</key>
     <key alias="clickToEmbed">Clicca per incorporare</key>
     <key alias="clickToInsertImage">Clicca per inserire l'immagine</key>
-    <key alias="placeholderImageCaption">Didascalia dell'immagine...</key>
     <key alias="placeholderWriteHere">Scrivi qui...</key>
     <key alias="gridLayouts">I Grid Layout</key>
     <key alias="gridLayoutsDetail">I layout sono l'area globale di lavoro per il grid editor, di solito ti serve solo uno o due layout differenti</key>
@@ -949,7 +945,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
   <area alias="apps">
     <key alias="umbContent">Contenuti</key>
     <key alias="umbInfo">Info</key>
-    <key alias="umbListView">Elementi</key>
   </area>
   <area alias="logViewer">
     <key alias="selectAllLogLevelFilters">Seleziona tutto</key>

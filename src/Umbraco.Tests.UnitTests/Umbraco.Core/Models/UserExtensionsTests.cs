@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -101,10 +102,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
 
             var comma = new[] { ',' };
 
-            var groupSnA = groupSn.Split(comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
-            var userSnA = userSn.Split(comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            var groupSnA = groupSn.Split(comma, StringSplitOptions.RemoveEmptyEntries).Select(x=>int.Parse(x, CultureInfo.InvariantCulture)).ToArray();
+            var userSnA = userSn.Split(comma, StringSplitOptions.RemoveEmptyEntries).Select(x=>int.Parse(x, CultureInfo.InvariantCulture)).ToArray();
             var combinedA = UserExtensions.CombineStartNodes(UmbracoObjectTypes.Document, groupSnA, userSnA, esmock.Object).OrderBy(x => x).ToArray();
-            var expectedA = expected.Split(comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).OrderBy(x => x).ToArray();
+            var expectedA = expected.Split(comma, StringSplitOptions.RemoveEmptyEntries).Select(x=>int.Parse(x, CultureInfo.InvariantCulture)).OrderBy(x => x).ToArray();
 
             var ok = combinedA.Length == expectedA.Length;
             if (ok)

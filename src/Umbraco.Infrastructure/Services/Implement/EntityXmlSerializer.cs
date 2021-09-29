@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Xml.Linq;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -193,18 +191,23 @@ namespace Umbraco.Cms.Core.Services.Implement
             xml.Add(new XAttribute("Configuration", _configurationEditorJsonSerializer.Serialize(dataType.Configuration)));
 
             var folderNames = string.Empty;
+            var folderKeys = string.Empty;
             if (dataType.Level != 1)
             {
                 //get URL encoded folder names
                 var folders = _dataTypeService.GetContainers(dataType)
-                    .OrderBy(x => x.Level)
-                    .Select(x => WebUtility.UrlEncode(x.Name));
+                    .OrderBy(x => x.Level);
 
-                folderNames = string.Join("/", folders.ToArray());
+                folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
+                folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
+            {
                 xml.Add(new XAttribute("Folders", folderNames));
+                xml.Add(new XAttribute("FolderKeys", folderKeys));
+            }
+
 
             return xml;
         }
@@ -319,6 +322,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var xml = new XElement("Template");
             xml.Add(new XElement("Name", template.Name));
+            xml.Add(new XElement("Key", template.Key));
             xml.Add(new XElement("Alias", template.Alias));
             xml.Add(new XElement("Design", new XCData(template.Content)));
 
@@ -491,19 +495,24 @@ namespace Umbraco.Cms.Core.Services.Implement
                 tabs);
 
             var folderNames = string.Empty;
+            var folderKeys = string.Empty;
             //don't add folders if this is a child doc type
             if (contentType.Level != 1 && masterContentType == null)
             {
                 //get URL encoded folder names
                 var folders = _contentTypeService.GetContainers(contentType)
-                    .OrderBy(x => x.Level)
-                    .Select(x => WebUtility.UrlEncode(x.Name));
+                    .OrderBy(x => x.Level);
 
-                folderNames = string.Join("/", folders.ToArray());
+                folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
+                folderKeys = string.Join("/", folders.Select(x => x.Key).ToArray());
             }
 
             if (string.IsNullOrWhiteSpace(folderNames) == false)
+            {
                 xml.Add(new XAttribute("Folders", folderNames));
+                xml.Add(new XAttribute("FolderKeys", folderKeys));
+            }
+
 
             return xml;
         }
@@ -559,11 +568,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         private XElement SerializeContentBase(IContentBase contentBase, string urlValue, string nodeName, bool published)
         {
             var xml = new XElement(nodeName,
-                new XAttribute("id", contentBase.Id),
+                new XAttribute("id", contentBase.Id.ToInvariantString()),
                 new XAttribute("key", contentBase.Key),
-                new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
+                new XAttribute("parentID", (contentBase.Level > 1 ? contentBase.ParentId : -1).ToInvariantString()),
                 new XAttribute("level", contentBase.Level),
-                new XAttribute("creatorID", contentBase.CreatorId),
+                new XAttribute("creatorID", contentBase.CreatorId.ToInvariantString()),
                 new XAttribute("sortOrder", contentBase.SortOrder),
                 new XAttribute("createDate", contentBase.CreateDate.ToString("s")),
                 new XAttribute("updateDate", contentBase.UpdateDate.ToString("s")),

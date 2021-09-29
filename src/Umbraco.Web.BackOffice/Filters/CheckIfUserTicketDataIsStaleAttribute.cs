@@ -118,13 +118,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         return;
                     }
 
-                    Attempt<int> userId = identity.GetId().TryConvertTo<int>();
-                    if (userId == false)
-                    {
-                        return;
-                    }
-
-                    IUser user = _userService.GetUserById(userId.Result);
+                    IUser user = _userService.GetUserById(identity.GetId());
                     if (user == null)
                     {
                         return;
@@ -167,9 +161,6 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             {
                 BackOfficeIdentityUser backOfficeIdentityUser = _umbracoMapper.Map<BackOfficeIdentityUser>(user);
                 await _backOfficeSignInManager.SignInAsync(backOfficeIdentityUser, isPersistent: true);
-
-                // ensure the remainder of the request has the correct principal set
-                actionContext.HttpContext.SetPrincipalForRequest(ClaimsPrincipal.Current);
 
                 // flag that we've made changes
                 _requestCache.Set(nameof(CheckIfUserTicketDataIsStaleFilter), true);

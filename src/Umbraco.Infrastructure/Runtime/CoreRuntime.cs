@@ -12,8 +12,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 
@@ -29,8 +27,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IMainDom _mainDom;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IEventAggregator _eventAggregator;
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IUmbracoVersion _umbracoVersion;
         private CancellationToken _cancellationToken;
 
         /// <summary>
@@ -44,9 +40,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IProfilingLogger profilingLogger,
             IMainDom mainDom,
             IUmbracoDatabaseFactory databaseFactory,
-            IEventAggregator eventAggregator,
-            IHostingEnvironment hostingEnvironment,
-            IUmbracoVersion umbracoVersion)
+            IEventAggregator eventAggregator)
         {
             State = state;
             _loggerFactory = loggerFactory;
@@ -56,8 +50,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _mainDom = mainDom;
             _databaseFactory = databaseFactory;
             _eventAggregator = eventAggregator;
-            _hostingEnvironment = hostingEnvironment;
-            _umbracoVersion = umbracoVersion;
             _logger = _loggerFactory.CreateLogger<CoreRuntime>();
         }
 
@@ -95,8 +87,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
                 _logger.LogError(exception, msg);
             };
-
-            AppDomain.CurrentDomain.SetData("DataDirectory", _hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
             AcquireMainDom();

@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
     {
         private IDbProviderFactoryCreator DbProviderFactoryCreator => GetRequiredService<IDbProviderFactoryCreator>();
         private IUmbracoDatabaseFactory UmbracoDatabaseFactory => GetRequiredService<IUmbracoDatabaseFactory>();
-        private IEmbeddedDatabaseCreator EmbeddedDatabaseCreator => GetRequiredService<IEmbeddedDatabaseCreator>();
+        private IDatabaseCreator EmbeddedDatabaseCreator => GetRequiredService<IDatabaseCreator>();
 
         public DatabaseBuilderTests()
         {
@@ -42,10 +42,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             if (File.Exists(filePath))
                 File.Delete(filePath);
 
-            EmbeddedDatabaseCreator.ConnectionString = $"Datasource=|DataDirectory|{dbFile};Flush Interval=1";
+            var connectionString = $"Datasource=|DataDirectory|{dbFile};Flush Interval=1";
 
-            UmbracoDatabaseFactory.Configure(EmbeddedDatabaseCreator.ConnectionString, Constants.DbProviderNames.SqlCe);
-            DbProviderFactoryCreator.CreateDatabase(Constants.DbProviderNames.SqlCe);
+            UmbracoDatabaseFactory.Configure(connectionString, Constants.DbProviderNames.SqlCe);
+            DbProviderFactoryCreator.CreateDatabase(Constants.DbProviderNames.SqlCe, connectionString);
             UmbracoDatabaseFactory.CreateDatabase();
 
             // test get database type (requires an actual database)

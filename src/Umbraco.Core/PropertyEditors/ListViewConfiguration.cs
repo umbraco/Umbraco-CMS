@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             Description = "The default sort order for the list")]
         public string OrderBy { get; set; }
 
-        [ConfigurationField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
+        [ConfigurationField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderDirection.prevalues.html")]
         public string OrderDirection { get; set; }
 
         [ConfigurationField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html",
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         [ConfigurationField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
         public Layout[] Layouts { get; set; }
 
-        [ConfigurationField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
+        [ConfigurationField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkActionPermissions.prevalues.html",
             Description = "The bulk actions that are allowed from the list view")]
         public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // TODO: managing defaults?
 

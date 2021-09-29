@@ -84,6 +84,7 @@
                 width: 4px;
             }
         }
+
         &.--is-defined {
 
         }
@@ -109,14 +110,16 @@
 }
 
 .umb-media-entry-editor__imageholder {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     height: calc(100% - 50px);
 }
+
 .umb-media-entry-editor__imageholder-actions {
-    background-color: white;
+    background-color: @white;
     height: 50px;
     display: flex;
     justify-content: center;
 }
-

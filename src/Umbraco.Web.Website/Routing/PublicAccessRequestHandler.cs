@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -10,22 +12,21 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Routing;
-using Umbraco.Cms.Web.Website.Routing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Website.Middleware
+namespace Umbraco.Cms.Web.Website.Routing
 {
-    public class PublicAccessMiddleware : IMiddleware
+    public class PublicAccessRequestHandler : IPublicAccessRequestHandler
     {
-        private readonly ILogger<PublicAccessMiddleware> _logger;
+        private readonly ILogger<PublicAccessRequestHandler> _logger;
         private readonly IPublicAccessService _publicAccessService;
         private readonly IPublicAccessChecker _publicAccessChecker;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IUmbracoRouteValuesFactory _umbracoRouteValuesFactory;
         private readonly IPublishedRouter _publishedRouter;
 
-        public PublicAccessMiddleware(
-            ILogger<PublicAccessMiddleware> logger,
+        public PublicAccessRequestHandler(
+            ILogger<PublicAccessRequestHandler> logger,
             IPublicAccessService publicAccessService,
             IPublicAccessChecker publicAccessChecker,
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -40,23 +41,8 @@ namespace Umbraco.Cms.Web.Website.Middleware
             _publishedRouter = publishedRouter;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
-        {
-            UmbracoRouteValues umbracoRouteValues = context.Features.Get<UmbracoRouteValues>();
-
-            if (umbracoRouteValues != null)
-            {
-                await EnsurePublishedContentAccess(context, umbracoRouteValues);
-            }
-
-            await next(context);
-        }
-
-        /// <summary>
-        /// Ensures that access to current node is permitted.
-        /// </summary>
-        /// <remarks>Redirecting to a different site root and/or culture will not pick the new site root nor the new culture.</remarks>
-        private async Task EnsurePublishedContentAccess(HttpContext httpContext, UmbracoRouteValues routeValues)
+        /// <inheritdoc />
+        public async Task<UmbracoRouteValues> RewriteForPublishedContentAccessAsync(HttpContext httpContext, UmbracoRouteValues routeValues)
         {
             // because these might loop, we have to have some sort of infinite loop detection
             int i = 0;
@@ -64,13 +50,13 @@ namespace Umbraco.Cms.Web.Website.Middleware
             PublicAccessStatus publicAccessStatus = PublicAccessStatus.AccessAccepted;
             do
             {
-                _logger.LogDebug(nameof(EnsurePublishedContentAccess) + ": Loop {LoopCounter}", i);
+                _logger.LogDebug(nameof(RewriteForPublishedContentAccessAsync) + ": Loop {LoopCounter}", i);
 
 
                 IPublishedContent publishedContent = routeValues.PublishedRequest?.PublishedContent;
                 if (publishedContent == null)
                 {
-                    return;
+                    return routeValues;
                 }
 
                 var path = publishedContent.Path;
@@ -80,6 +66,19 @@ namespace Umbraco.Cms.Web.Website.Middleware
                 if (publicAccessAttempt)
                 {
                     _logger.LogDebug("EnsurePublishedContentAccess: Page is protected, check for access");
+
+                    // manually authenticate the request
+                    AuthenticateResult authResult = await httpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
+                    if (authResult.Succeeded)
+                    {
+                        // set the user to the auth result. we need to do this here because this occurs
+                        // before the authentication middleware.
+                        // NOTE: It would be possible to just pass the authResult to the HasMemberAccessToContentAsync method
+                        // instead of relying directly on the user assigned to the http context, and then the auth middleware
+                        // will run anyways and assign the user. Perhaps that is a little cleaner, but would require more code
+                        // changes right now, and really it's not any different in the end result.
+                        httpContext.SetPrincipalForRequest(authResult.Principal);
+                    }
 
                     publicAccessStatus = await _publicAccessChecker.HasMemberAccessToContentAsync(publishedContent.Id);
                     switch (publicAccessStatus)
@@ -117,8 +116,10 @@ namespace Umbraco.Cms.Web.Website.Middleware
 
             if (i == maxLoop)
             {
-                _logger.LogDebug(nameof(EnsurePublishedContentAccess) + ": Looks like we are running into an infinite loop, abort");                
+                _logger.LogDebug(nameof(RewriteForPublishedContentAccessAsync) + ": Looks like we are running into an infinite loop, abort");
             }
+
+            return routeValues;
         }
 
 
@@ -139,17 +140,11 @@ namespace Umbraco.Cms.Web.Website.Middleware
                 // we need to change the content item that is getting rendered so we have to re-create UmbracoRouteValues.
                 UmbracoRouteValues updatedRouteValues = await _umbracoRouteValuesFactory.CreateAsync(httpContext, reRouted);
 
-                // Update the feature
-                httpContext.Features.Set(updatedRouteValues);
-
                 return updatedRouteValues;
             }
             else
             {
-                _logger.LogWarning("Public Access rule has a redirect node set to itself, nothing can be routed.");
-                // Update the feature to nothing - cannot continue
-                httpContext.Features.Set<UmbracoRouteValues>(null);
-                return null;
+                throw new InvalidOperationException("Public Access rule has a redirect node set to itself, nothing can be routed.");
             }
         }
     }

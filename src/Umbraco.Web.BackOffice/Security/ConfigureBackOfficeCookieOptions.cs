@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -189,7 +190,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     // occurs when sign in is successful and after the ticket is written to the outbound cookie
 
                     // When we are signed in with the cookie, assign the principal to the current HttpContext
-                    ctx.HttpContext.User = ctx.Principal;
+                    ctx.HttpContext.SetPrincipalForRequest(ctx.Principal);
 
                     return Task.CompletedTask;
                 },

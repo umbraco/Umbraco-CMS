@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
                     if (File.Exists(distCacheFilePath))
                     {
                         var content = File.ReadAllText(distCacheFilePath);
-                        if (int.TryParse(content, out var last))
+                        if (int.TryParse(content, NumberStyles.Integer, CultureInfo.InvariantCulture, out var last))
                         {
                             return last;
                         }

@@ -14,9 +14,9 @@
     <key alias="createPackage">創建擴展包</key>
     <key alias="delete">刪除</key>
     <key alias="disable">禁用</key>
-    <key alias="emptyRecycleBin">清空回收站</key>
+    <key alias="emptyrecyclebin">清空回收站</key>
     <key alias="exportDocumentType">匯出文檔類型</key>
-    <key alias="importDocumentType">導入文檔類型</key>
+    <key alias="importdocumenttype">導入文檔類型</key>
     <key alias="importPackage">導入擴展包</key>
     <key alias="liveEdit">即時編輯模式</key>
     <key alias="logout">退出</key>
@@ -33,7 +33,6 @@
     <key alias="sendtopublish">提交至發佈者</key>
     <key alias="sendToTranslate">發送給翻譯</key>
     <key alias="sort">排序</key>
-    <key alias="toPublish">提交至發佈者</key>
     <key alias="translate">翻譯</key>
     <key alias="update">更新</key>
     <key alias="defaultValue">預設值</key>
@@ -696,14 +695,6 @@
       <span style="color: Red; font-weight: bold;">注意：</span> 任何文檔，媒體或需要這些項目才能運作的物件將會停止運作，並可能使得系統不穩定，
       請小心移除。若有疑慮，請聯絡擴展包作者。]]></key>
     <key alias="packageVersion">版本</key>
-    <key alias="packageAlreadyInstalled">擴展包已安裝</key>
-    <key alias="targetVersionMismatch">這個擴展包無法安裝，它需要Umbraco至少是版本 %0%</key>
-    <key alias="installStateUninstalling">移除中...</key>
-    <key alias="installStateDownloading">下載中...</key>
-    <key alias="installStateImporting">匯入中...</key>
-    <key alias="installStateInstalling">安裝中...</key>
-    <key alias="installStateRestarting">重新啟動中，請稍後...</key>
-    <key alias="installStateComplete">都好了，您的瀏覽器將重新整理，請稍待...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">帶格式粘貼（不推薦）</key>
@@ -910,7 +901,6 @@
     <key alias="contentAllowed">此處允許有內容</key>
     <key alias="clickToEmbed">點選來內嵌</key>
     <key alias="clickToInsertImage">點選來插入圖片</key>
-    <key alias="placeholderImageCaption">圖片標題...</key>
     <key alias="placeholderWriteHere">在此填寫...</key>
     <key alias="gridLayouts">網格排列方式</key>
     <key alias="gridLayoutsDetail">排列是指網格編輯器的整體工作區域，通常您只需要一種或兩種排列方式</key>
@@ -1127,72 +1117,39 @@
 		   3: Configuration file path
 	  -->
     <key alias="checkSuccessMessage">數值已設為推薦值：%0%</key>
-    <key alias="rectifySuccessMessage">在設定檔 %3% 中XPath %2% 的數值設為 %1% 。</key>
     <key alias="checkErrorMessageDifferentExpectedValue">在設定檔 %3% 中XPath %2% 的預期值設為 %1% ，但卻是 %0%。</key>
     <key alias="checkErrorMessageUnexpectedValue">在設定檔 %3% 中XPath %2% 的值為非預期值 %0%。</key>
     <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 	  -->
-    <key alias="customErrorsCheckSuccessMessage">自訂錯誤設定為 %0%</key>
-    <key alias="customErrorsCheckErrorMessage">自訂錯誤設定為 %0。建議在上線前改為 %1%。</key>
-    <key alias="customErrorsCheckRectifySuccessMessage">自訂錯誤成功設定為 %0%</key>
     <key alias="macroErrorModeCheckSuccessMessage">巨集錯誤設為 %0%</key>
     <key alias="macroErrorModeCheckErrorMessage">巨集錯誤設為 %0%，如此一來，當巨集有任何錯誤時會阻止某些或全部頁面正常載入。改正會將此設定 %1%。</key>
-    <key alias="macroErrorModeCheckRectifySuccessMessage">巨集錯誤已設為 %0%</key>
     <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 		   2: Server version
 	  -->
-    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">嘗試略過IIS自訂錯誤目前設為 %0%，而且您使用的IIS版本為 %1%。</key>
-    <key alias="trySkipIisCustomErrorsCheckErrorMessage">嘗試略過IIS自訂錯誤目前設為 %0%，然而在您使用的IIS版本為 %2% 時，建議設定是 %1%。</key>
-    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">嘗試略過IIS自訂錯誤已成功設為 %0%。</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="configurationServiceNodeNotFound"><![CDATA[於設定檔<strong>'%1%'</strong>中無法找到<strong>'%0%'</strong>。]]></key>
-    <key alias="configurationServiceError">有錯誤產生，請參閱下列錯誤的紀錄：%0%。</key>
     <key alias="httpsCheckInvalidCertificate">憑證驗證錯誤：%0%</key>
     <key alias="healthCheckInvalidUrl">網址探查錯誤：%0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">您目前使用HTTPS瀏覽本站：%0%</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">在您的web.config檔案中，appSetting的Umbraco.Core.UseHttps是設為false。當您開始使用HTTPS時，應將其改為 true。</key>
     <key alias="httpsCheckConfigurationCheckResult">在您的web.config檔案中，appSetting的Umbraco.Core.UseHttps是設為 %0%，您的cookies %0% 標成安全。</key>
-    <key alias="httpsCheckEnableHttpsError">無法在您的web.config檔案中，更新appSetting的Umbraco.Core.UseHttps設定，錯誤訊息：%0%</key>
     <!-- The following keys don't get tokens passed in -->
-    <key alias="httpsCheckEnableHttpsButton">開啟HTTPS</key>
-    <key alias="httpsCheckEnableHttpsDescription">在web.config檔案中，將appSetting的Umbraco.Core.UseHttps設true。</key>
-    <key alias="httpsCheckEnableHttpsSuccess">在您的web.config檔案中，appSetting的Umbraco.Core.UseHttps已設為 true，您的cookies 將被標成安全。</key>
-    <key alias="rectifyButton">修正</key>
-    <key alias="cannotRectifyShouldNotEqual">無法修正比較種類檢查為'ShouldNotEqual'。</key>
-    <key alias="cannotRectifyShouldEqualWithValue">用提供的數值無法修正比較種類檢查為'ShouldEqual'。</key>
-    <key alias="valueToRectifyNotProvided">沒有提供要修正檢查的數值。</key>
     <key alias="compilationDebugCheckSuccessMessage">偵錯編輯模式關閉。</key>
     <key alias="compilationDebugCheckErrorMessage">偵錯編輯模式目前已開啟。上線前建議將其關閉。</key>
-    <key alias="compilationDebugCheckRectifySuccessMessage">偵錯編輯模式已成功關閉。</key>
-    <key alias="traceModeCheckSuccessMessage">詳細記錄模式已關閉。</key>
-    <key alias="traceModeCheckErrorMessage">詳細記錄模式目前已開啟。上線前建議將其關閉。</key>
-    <key alias="traceModeCheckRectifySuccessMessage">詳細記錄模式已成功關閉。</key>
-    <key alias="folderPermissionsCheckMessage">所有資料夾已有正確權限設定。</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-    <key alias="requiredFolderPermissionFailed"><![CDATA[以下資料夾必須擁有修改權限，但無法連接：<strong>%0%</strong>。]]></key>
-    <key alias="optionalFolderPermissionFailed"><![CDATA[以下資料夾必須擁有修改權限好讓系統可以正常運作，但無法連接：<strong>%0%</strong>。如果無須寫入，不需採取行動。]]></key>
-    <key alias="filePermissionsCheckMessage">所有檔案已有正確權限設定。</key>
     <!-- The following keys get these tokens passed in:
 	    0: Path to the file not found
   	-->
-    <key alias="fileNotFound">檔案不存在：%0%。</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-    <key alias="requiredFilePermissionFailed"><![CDATA[以下檔案必須擁有寫入權限，但無法連接：<strong>%0%</strong>。]]></key>
-    <key alias="optionalFilePermissionFailed"><![CDATA[以下檔案必須擁有寫入權限好讓系統可以正常運作，但無法連接：<strong>%0%</strong>。如果無須寫入，不需採取行動。]]></key>
     <key alias="clickJackingCheckHeaderFound"><![CDATA[標頭或meta-tag的 <strong>X-Frame-Options</strong> 設定能控制網站是否可以被其他人IFRAMEd已找到。]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[標頭或meta-tag的 <strong>X-Frame-Options</strong> 設定能控制網站是否可以被其他人IFRAMEd沒有找到。]]></key>
-    <key alias="setHeaderInConfig">調整設定的標頭</key>
-    <key alias="clickJackingSetHeaderInConfigDescription">在 web.config 的 httpProtocol/customHeaders 區域增加設定來防止本站被別的網站IFRAMEd。</key>
-    <key alias="clickJackingSetHeaderInConfigSuccess">在 web.config 的 httpProtocol/customHeaders 區域已經增加設定來防止本站被別的網站IFRAMEd。</key>
-    <key alias="setHeaderInConfigError">無法更新web.config檔案，錯誤：%0%</key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
@@ -1212,7 +1169,6 @@
     <key alias="redirectedTo">轉址成</key>
     <key alias="noRedirects">沒有任何轉址</key>
     <key alias="noRedirectsDescription">當發佈後的頁面改名或移動時，會自動轉址至新網頁。</key>
-    <key alias="confirmRemove">您確定要移除從 %0% 到 %1% 的轉址嗎？</key>
     <key alias="redirectRemoved">轉址已移除。</key>
     <key alias="redirectRemoveError">移除轉址錯誤。
 </key>

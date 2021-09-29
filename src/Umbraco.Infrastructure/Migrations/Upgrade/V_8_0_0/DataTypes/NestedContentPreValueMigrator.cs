@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Globalization;
+using Newtonsoft.Json;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
@@ -25,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
 
             if (preValue.Alias == "minItems" ||
                 preValue.Alias == "maxItems")
-                return int.TryParse(preValue.Value, out var i) ? (int?)i : null;
+                return int.TryParse(preValue.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i) ? (int?)i : null;
 
             return preValue.Value.DetectIsJson() ? JsonConvert.DeserializeObject(preValue.Value) : preValue.Value;
         }

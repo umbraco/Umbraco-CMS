@@ -1,12 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -55,13 +58,13 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             }
 
             int[] userIds;
-            if (int.TryParse(queryString, out var userId))
+            if (int.TryParse(queryString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var userId))
             {
                 userIds = new[] { userId };
             }
             else
             {
-                var ids = _httpContextAccessor.HttpContext.Request.Query.Where(x => x.Key == requirement.QueryStringName).ToList();
+                var ids = queryString.ToString().Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList();
                 if (ids.Count == 0)
                 {
                     // Must succeed this requirement since we cannot process it.
@@ -69,8 +72,10 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
                 }
 
                 userIds = ids
-                    .Select(x => x.Value.ToString())
-                    .Select(x => x.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
+                    .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var output) ? Attempt<int>.Succeed(output) : Attempt<int>.Fail())
+                    .Where(x => x.Success)
+                    .Select(x => x.Result)
+                    .ToArray();
             }
 
             if (userIds.Length == 0)

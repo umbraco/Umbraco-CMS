@@ -4,7 +4,6 @@ const config = require('../config');
 const {watch, series, parallel, dest, src} = require('gulp');
 
 var _ = require('lodash');
-var rename = require('gulp-rename');
 var MergeStream = require('merge-stream');
 
 var processJs = require('../util/processJs');
@@ -37,12 +36,7 @@ function watchTask(cb) {
             viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval },
                 parallel(
                     function MoveViewsAndRegenerateJS() {
-                        var task = src(group.files)
-                                 .pipe(rename(function(path) {
-                                        path.dirname = path.dirname.toLowerCase();
-                                        path.basename = path.basename.toLowerCase();
-                                        path.extname = path.extname.toLowerCase();
-                                     }));
+                        var task = src(group.files);
 
                         _.forEach(config.roots, function(root){
                             var destPath = root + config.targets.views + group.folder;

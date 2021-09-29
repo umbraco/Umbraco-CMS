@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -114,7 +115,7 @@ namespace Umbraco.Cms.Core.Templates
                             yield return (null, guidUdi, tag.Value);
                     }
 
-                    if (int.TryParse(id, out var intId))
+                    if (int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
                     {
                         yield return (intId, null, tag.Value);
                     }

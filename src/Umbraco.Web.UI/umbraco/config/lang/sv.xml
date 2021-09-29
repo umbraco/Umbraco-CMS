@@ -20,9 +20,9 @@
     <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
-    <key alias="emptyRecycleBin">Töm papperskorgen</key>
+    <key alias="emptyrecyclebin">Töm papperskorgen</key>
     <key alias="exportDocumentType">Exportera dokumenttyp</key>
-    <key alias="importDocumentType">Importera dokumenttyp</key>
+    <key alias="importdocumenttype">Importera dokumenttyp</key>
     <key alias="importPackage">Importera paket</key>
     <key alias="liveEdit">Redigera i Canvas</key>
     <key alias="logout">Logga ut</key>
@@ -37,16 +37,15 @@
     <key alias="sendtopublish">Skicka för publicering</key>
     <key alias="sendToTranslate">Skicka för översättning</key>
     <key alias="sort">Sortera</key>
-    <key alias="toPublish">Skicka för publicering</key>
     <key alias="translate">Översätt</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
   </area>
   <area alias="actionCategories">
-      <key alias="content">Innehåll</key>
-      <key alias="administration">Administration</key>
-      <key alias="structure">Struktur</key>
-      <key alias="other">Övrigt</key>
+    <key alias="administration">Administration</key>
+    <key alias="structure">Struktur</key>
+    <key alias="other">Övrigt</key>
+    <key alias="content">Innehåll</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">Lägg till nytt domännamn</key>
@@ -130,7 +129,6 @@
     <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
     <key alias="saveAndPublish">Spara och publicera</key>
-    <key alias="saveAndSchedule">Spara och schemalägg</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
     <key alias="schedulePublish">Schemaläggning</key>
     <key alias="select">Välj</key>
@@ -294,7 +292,6 @@
     <key alias="selectIcon">Välj ikon</key>
     <key alias="selectLink">Välj länk</key>
     <key alias="selectMediaStartNode">Välj startnod för media</key>
-    <key alias="selectUserGroups">Välj användargrupper</key>
     <key alias="selectSections">Välj sektioner</key>
     <key alias="selectUsers">Välj användare</key>
     <key alias="tableColumns">Antal kolumner</key>
@@ -574,12 +571,12 @@
   <area alias="media">
     <key alias="clickToUpload">Klicka för att ladda upp</key>
     <key alias="orClickHereToUpload">eller klicka här för att välja filer</key>
-      <key alias="dragAndDropYourFilesIntoTheArea">Drag och släpp dina filer i denna yta</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Drag och släpp dina filer i denna yta</key>
   </area>
   <area alias="member">
-        <key alias="createNewMember">Skapa en ny medlem</key>
-        <key alias="allMembers">Alla medlemmar</key>
-        <key alias="memberGroupNoProperties">Medlemsgrupper har inga extra egenskaper för redigering.</key>
+    <key alias="createNewMember">Skapa en ny medlem</key>
+    <key alias="allMembers">Alla medlemmar</key>
+    <key alias="memberGroupNoProperties">Medlemsgrupper har inga extra egenskaper för redigering.</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
@@ -679,8 +676,6 @@
   </area>
   <area alias="imagecropper">
     <key alias="reset">Återställ</key>
-    <key alias="saveCrop">spara beskärning</key>
-    <key alias="addCrop">Lägg till ny beskärning</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Nuvarande version</key>
@@ -811,7 +806,6 @@
     <key alias="contentAllowed">Indholdet er tilladt her</key>
     <key alias="clickToEmbed">Klicka för att lägga in</key>
     <key alias="clickToInsertImage">Klicka för att lägga till bild</key>
-    <key alias="placeholderImageCaption">Bildtext...</key>
     <key alias="placeholderWriteHere">Skriv här...</key>
     <key alias="gridLayouts">Rutnätslayouter</key>
     <key alias="gridLayoutsDetail">Layouter är arbetsytan för rutnätet, oftast så behöver du bara en eller två layouter</key>
@@ -941,7 +935,6 @@
     <key alias="failedPasswordAttempts">Misslyckade inloggningsförsök</key>
     <key alias="goToProfile">Gå till användarens profil</key>
     <key alias="groupsHelp">Lägg till grupper för att tilldela åtkomst och rättigheter</key>
-    <key alias="invite">Bjud in</key>
     <key alias="inviteAnotherUser">Bjud in en till användare</key>
     <key alias="inviteUserHelp">Bjud in nya användare för att ge dom åtkomst till Umbraco. Ett e-postmeddelande kommer skikcas till användaren med information om hur man loggar in i Umbraco. Inbjudningar är giltiga i 72 timmar.</key>
     <key alias="language">Språk</key>

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -94,6 +95,9 @@ namespace Umbraco.Extensions
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
+            // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
+            AppDomain.CurrentDomain.SetData("DataDirectory", tempHostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
+
             // Manually create and register the HttpContextAccessor. In theory this should not be registered
             // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
             // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
@@ -102,6 +106,10 @@ namespace Umbraco.Extensions
 
             var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
             var appCaches = AppCaches.Create(requestCache);
+
+            services.ConfigureOptions<ConfigureKestrelServerOptions>();
+            services.ConfigureOptions<ConfigureIISServerOptions>();
+            services.ConfigureOptions<ConfigureFormOptions>();
 
             IProfiler profiler = GetWebProfiler(config);
 
@@ -150,7 +158,7 @@ namespace Umbraco.Extensions
                 DbProviderFactories.GetFactory,
                 factory.GetServices<ISqlSyntaxProvider>(),
                 factory.GetServices<IBulkSqlInsertProvider>(),
-                factory.GetServices<IEmbeddedDatabaseCreator>(),
+                factory.GetServices<IDatabaseCreator>(),
                 factory.GetServices<IProviderSpecificMapperFactory>()
             ));
 
@@ -214,12 +222,40 @@ namespace Umbraco.Extensions
             // We need to have runtime compilation of views when using umbraco. We could consider having only this when a specific config is set.
             // But as far as I can see, there are still precompiled views, even when this is activated, so maybe it is okay.
             IMvcBuilder mvcBuilder = builder.Services
-                .AddControllersWithViews()
-                .AddRazorRuntimeCompilation();
+                .AddControllersWithViews();
+
+            FixForDotnet6Preview1(builder.Services);
+            mvcBuilder.AddRazorRuntimeCompilation();
 
             mvcBuilding?.Invoke(mvcBuilder);
 
             return builder;
+        }
+
+        /// <summary>
+        /// This fixes an issue for .NET6 Preview1, that in AddRazorRuntimeCompilation cannot remove the existing IViewCompilerProvider.
+        /// </summary>
+        /// <remarks>
+        ///  When running .NET6 Preview1 there is an issue with looks to be fixed when running ASP.NET Core 6.
+        ///  This issue is because the default implementation of IViewCompilerProvider has changed, so the
+        ///  AddRazorRuntimeCompilation extension can't remove the default and replace with the runtimeviewcompiler.
+        ///
+        ///  This method basically does the same as the ASP.NET Core 6 version of AddRazorRuntimeCompilation
+        ///  https://github.com/dotnet/aspnetcore/blob/f7dc5e24af7f9692a1db66741954b90b42d84c3a/src/Mvc/Mvc.Razor.RuntimeCompilation/src/DependencyInjection/RazorRuntimeCompilationMvcCoreBuilderExtensions.cs#L71-L80
+        ///
+        ///  While running .NET5 this does nothing as the ImplementationType has another FullName, and this is handled by the .NET5 version of AddRazorRuntimeCompilation
+        /// </remarks>
+        private static void FixForDotnet6Preview1(IServiceCollection services)
+        {
+            var compilerProvider = services.FirstOrDefault(f =>
+                f.ServiceType == typeof(IViewCompilerProvider) &&
+                f.ImplementationType?.Assembly == typeof(IViewCompilerProvider).Assembly &&
+                f.ImplementationType.FullName == "Microsoft.AspNetCore.Mvc.Razor.Compilation.DefaultViewCompiler");
+
+            if (compilerProvider != null)
+            {
+                services.Remove(compilerProvider);
+            }
         }
 
         /// <summary>
@@ -357,17 +393,17 @@ namespace Umbraco.Extensions
 
                     Type sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider");
                     Type sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeBulkSqlInsertProvider");
-                    Type sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeEmbeddedDatabaseCreator");
+                    Type sqlCeDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeDatabaseCreator");
                     Type sqlCeSpecificMapperFactory = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSpecificMapperFactory");
 
                     if (!(sqlCeSyntaxProviderType is null
                           || sqlCeBulkSqlInsertProviderType is null
-                          || sqlCeEmbeddedDatabaseCreatorType is null
+                          || sqlCeDatabaseCreatorType is null
                           || sqlCeSpecificMapperFactory is null))
                     {
                         builder.Services.AddSingleton(typeof(ISqlSyntaxProvider), sqlCeSyntaxProviderType);
                         builder.Services.AddSingleton(typeof(IBulkSqlInsertProvider), sqlCeBulkSqlInsertProviderType);
-                        builder.Services.AddSingleton(typeof(IEmbeddedDatabaseCreator), sqlCeEmbeddedDatabaseCreatorType);
+                        builder.Services.AddSingleton(typeof(IDatabaseCreator), sqlCeDatabaseCreatorType);
                         builder.Services.AddSingleton(typeof(IProviderSpecificMapperFactory), sqlCeSpecificMapperFactory);
                     }
 
@@ -397,7 +433,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
             builder.Services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
-            builder.Services.AddSingleton<IEmbeddedDatabaseCreator, NoopEmbeddedDatabaseCreator>();
+            builder.Services.AddSingleton<IDatabaseCreator, SqlServerDatabaseCreator>();
 
             return builder;
         }

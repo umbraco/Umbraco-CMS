@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
@@ -524,15 +525,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return ValidationProblem(validatePassword.Errors.ToErrorMessage());
                 }
 
-                Attempt<int> intId = identityMember.Id.TryConvertTo<int>();
-                if (intId.Success == false)
+                if (!int.TryParse(identityMember.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
                 {
                     return ValidationProblem("Member ID was not valid");
                 }
 
                 var changingPasswordModel = new ChangingPasswordModel
                 {
-                    Id = intId.Result,
+                    Id = intId,
                     OldPassword = contentItem.Password.OldPassword,
                     NewPassword = contentItem.Password.NewPassword,
                 };

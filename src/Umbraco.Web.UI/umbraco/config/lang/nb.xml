@@ -14,9 +14,9 @@
     <key alias="createPackage">Opprett pakke</key>
     <key alias="delete">Slett</key>
     <key alias="disable">Deaktiver</key>
-    <key alias="emptyRecycleBin">Tøm papirkurv</key>
+    <key alias="emptyrecyclebin">Tøm papirkurv</key>
     <key alias="exportDocumentType">Eksporter dokumenttype</key>
-    <key alias="importDocumentType">Importer dokumenttype</key>
+    <key alias="importdocumenttype">Importer dokumenttype</key>
     <key alias="importPackage">Importer pakke</key>
     <key alias="liveEdit">Rediger i Canvas</key>
     <key alias="logout">Logg av</key>
@@ -50,7 +50,7 @@
     <key alias="domainExists">Domenet '%0%' er allerede tilknyttet</key>
     <key alias="domainUpdated">Domenet '%0%' er nå oppdatert</key>
     <key alias="orEdit">eller rediger eksisterende domener</key>
-   <key alias="inherit">Arv</key>
+    <key alias="inherit">Arv</key>
     <key alias="setLanguage">Språk</key>
     <key alias="setLanguageHelp"><![CDATA[Sett språk for underordnede noder eller arv språk fra overordnet.<br/>Vil også gjelde denne noden, med mindre et underordnet domene også gjelder.]]></key>
     <key alias="setDomains">Domener</key>
@@ -81,7 +81,6 @@
     <key alias="returnToList">Tilbake til listen</key>
     <key alias="save">Lagre</key>
     <key alias="saveAndPublish">Lagre og publiser</key>
-    <key alias="saveAndSchedule">Lagre og planlegge</key>
     <key alias="saveToPublish">Lagre og send til publisering</key>
     <key alias="saveAndPreview">Forhåndsvis</key>
     <key alias="showPageDisabled">Forhåndsvisning er deaktivert siden det ikke er angitt noen mal</key>
@@ -760,7 +759,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="contentAllowed">Innholdstypen er tillatt her</key>
     <key alias="clickToEmbed">Klikk for å bygge inn</key>
     <key alias="clickToInsertImage">Klikk for å sette inn et bilde</key>
-    <key alias="placeholderImageCaption">Bildetekst...</key>
     <key alias="placeholderWriteHere">Skriv her...</key>
     <key alias="gridLayouts">Rutenettoppsett</key>
     <key alias="gridLayoutsDetail">Et oppsett er det overordnede arbeidsområdet til ditt rutenett - du vil typisk kun behøve ett eller to</key>

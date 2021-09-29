@@ -554,7 +554,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // This needs to be in the correct mailto format including the name, else
             // the name cannot be captured in the email sending notification.
-            // i.e. "Some Person" <hello@example.com>            
+            // i.e. "Some Person" <hello@example.com>
             var toMailBoxAddress = new MailboxAddress(to.Name, to.Email);
 
             var mailMessage = new EmailMessage(fromEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
@@ -577,12 +577,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            var intId = userSave.Id.TryConvertTo<int>();
-            if (intId.Success == false)
-                return NotFound();
-
-
-            var found = _userService.GetUserById(intId.Result);
+            var found = _userService.GetUserById(userSave.Id);
             if (found == null)
                 return NotFound();
 
@@ -673,13 +668,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return ValidationProblem(ModelState);
             }
 
-            Attempt<int> intId = changingPasswordModel.Id.TryConvertTo<int>();
-            if (intId.Success == false)
-            {
-                return NotFound();
-            }
-
-            IUser found = _userService.GetUserById(intId.Result);
+            IUser found = _userService.GetUserById(changingPasswordModel.Id);
             if (found == null)
             {
                 return NotFound();

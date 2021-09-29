@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -102,9 +103,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return nodes;
             }
 
-            var intId = id.TryConvertTo<int>();
+            if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+            {
+                return nodes;
+            }
+
             //Get the content type
-            var ct = _contentTypeService.Get(intId.Result);
+            var ct = _contentTypeService.Get(intId);
             if (ct == null) return nodes;
 
             var blueprintsForDocType = entities.Where(x => ct.Alias == ((IContentEntitySlim) x).ContentTypeAlias);
@@ -130,7 +135,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
-            var cte = _entityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentType);
+            var cte = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentType);
             //only refresh & create if it's a content type
             if (cte != null)
             {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -116,16 +117,14 @@ namespace Umbraco.Cms.Core.Security
                     throw new ArgumentNullException(nameof(user));
                 }
 
-                Attempt<int> asInt = user.Id.TryConvertTo<int>();
-                if (asInt == false)
+                if (!int.TryParse(user.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
                 {
                     //TODO: should this be thrown, or an identity result?
-                    throw new InvalidOperationException("The user id must be an integer to work with Umbraco");
+                    throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
                 }
-
                 using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
 
-                IMember found = _memberService.GetById(asInt.Result);
+                IMember found = _memberService.GetById(asInt);
                 if (found != null)
                 {
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.

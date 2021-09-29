@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -59,7 +60,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         public async Task Editing_Single_Admin_User_By_Admin_User_Is_Authorized()
         {
             AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
-            AdminUsersHandler sut = CreateHandler(queryStringValue: Admin2UserId.ToString(), editingWithAdmin: true);
+            AdminUsersHandler sut = CreateHandler(queryStringValue: Admin2UserId.ToString(CultureInfo.InvariantCulture), editingWithAdmin: true);
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -70,7 +71,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         public async Task Editing_Single_Admin_User_By_Non_Admin_User_Is_Not_Authorized()
         {
             AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
-            AdminUsersHandler sut = CreateHandler(queryStringValue: Admin2UserId.ToString());
+            AdminUsersHandler sut = CreateHandler(queryStringValue: Admin2UserId.ToString(CultureInfo.InvariantCulture));
 
             await sut.HandleAsync(authHandlerContext);
 
@@ -81,7 +82,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
         public async Task Editing_Single_Non_Admin_User_By_Non_Admin_User_Is_Authorized()
         {
             AuthorizationHandlerContext authHandlerContext = CreateAuthorizationHandlerContext();
-            AdminUsersHandler sut = CreateHandler(queryStringValue: NonAdmin2UserId.ToString());
+            AdminUsersHandler sut = CreateHandler(queryStringValue: NonAdmin2UserId.ToString(CultureInfo.InvariantCulture));
 
             await sut.HandleAsync(authHandlerContext);
 

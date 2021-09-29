@@ -14,9 +14,9 @@
     <key alias="createPackage">创建扩展包</key>
     <key alias="delete">删除</key>
     <key alias="disable">禁用</key>
-    <key alias="emptyRecycleBin">清空回收站</key>
+    <key alias="emptyrecyclebin">清空回收站</key>
     <key alias="exportDocumentType">导出文档类型</key>
-    <key alias="importDocumentType">导入文档类型</key>
+    <key alias="importdocumenttype">导入文档类型</key>
     <key alias="importPackage">导入扩展包</key>
     <key alias="liveEdit">实时编辑模式</key>
     <key alias="logout">退出</key>
@@ -28,7 +28,6 @@
     <key alias="refreshNode">重新加载节点</key>
     <key alias="republish">重新发布整站</key>
     <key alias="restore" version="7.3.0">恢复</key>
-    <key alias="SetPermissionsForThePage">为 %0%设置权限</key>
     <key alias="chooseWhereToMove">选择移动目的地</key>
     <key alias="toInTheTreeStructureBelow">到下列的树结构中</key>
     <key alias="rights">权限</key>
@@ -36,7 +35,6 @@
     <key alias="sendtopublish">提交至发布者</key>
     <key alias="sendToTranslate">发送给翻译</key>
     <key alias="sort">排序</key>
-    <key alias="toPublish">提交至发布者</key>
     <key alias="translate">翻译</key>
     <key alias="update">更新</key>
     <key alias="defaultValue">默认值</key>
@@ -708,15 +706,6 @@
       <span style="color: Red; font-weight: bold;">注意：</span>
       卸载包将导致所有依赖该包的东西失效，请确认。    ]]></key>
     <key alias="packageVersion">版本</key>
-    <key alias="packageAlreadyInstalled">已安装软件包</key>
-    <key alias="targetVersionMismatch">此软件包无法安装, 它需要一个最小的 Umbraco 版本的%0%</key>
-    <key alias="installStateUninstalling">卸载中...</key>
-    <key alias="installStateDownloading">下载中...</key>
-    <key alias="installStateImporting">导入中...</key>
-    <key alias="installStateInstalling">安装中...</key>
-    <key alias="installStateRestarting">重启中, 请稍候...</key>
-    <key alias="installStateComplete">所有完成后, 您的浏览器将立即刷新, 请稍候...</key>
-    <key alias="installStateCompleted">请单击 "完成" 以完成安装和重新加载页面。</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">带格式粘贴（不推荐）</key>
@@ -923,7 +912,6 @@
     <key alias="contentAllowed">此处允许有该内容</key>
     <key alias="clickToEmbed">点击嵌入</key>
     <key alias="clickToInsertImage">点击添加图片</key>
-    <key alias="placeholderImageCaption">图片说明...</key>
     <key alias="placeholderWriteHere">在这里输入...</key>
     <key alias="gridLayouts">网格布局</key>
     <key alias="gridLayoutsDetail">布局是网格编辑器的整体工作区域, 通常只需要一个或两个不同的布局</key>
@@ -1147,73 +1135,40 @@
 		   3: Configuration file path
 	  -->
     <key alias="checkSuccessMessage">Value is set to the recommended value: '%0%'.</key>
-    <key alias="rectifySuccessMessage">Value was set to '%1%' for XPath '%2%' in configuration file '%3%'.</key>
     <key alias="checkErrorMessageDifferentExpectedValue">Expected value '%1%' for '%2%' in configuration file '%3%', but found '%0%'.</key>
     <key alias="checkErrorMessageUnexpectedValue">Found unexpected value '%0%' for '%2%' in configuration file '%3%'.</key>
     <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 	  -->
-    <key alias="customErrorsCheckSuccessMessage">Custom errors are set to '%0%'.</key>
-    <key alias="customErrorsCheckErrorMessage">Custom errors are currently set to '%0%'. It is recommended to set this to '%1%' before go live.</key>
-    <key alias="customErrorsCheckRectifySuccessMessage">Custom errors successfully set to '%0%'.</key>
     <key alias="macroErrorModeCheckSuccessMessage">MacroErrors are set to '%0%'.</key>
     <key alias="macroErrorModeCheckErrorMessage">MacroErrors are set to '%0%' which will prevent some or all pages in your site from loading completely if there are any errors in macros. Rectifying this will set the value to '%1%'.</key>
-    <key alias="macroErrorModeCheckRectifySuccessMessage">MacroErrors are now set to '%0%'.</key>
     <!-- The following keys get these tokens passed in:
 	     0: Current value
 		   1: Recommended value
 		   2: Server version
 	  -->
-    <key alias="trySkipIisCustomErrorsCheckSuccessMessage">Try Skip IIS Custom Errors is set to '%0%' and you're using IIS version '%1%'.</key>
-    <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
-    <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
-    <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
-    <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
     <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
     <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
     <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco.Core.UseHttps' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco.Core.UseHttps' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
-    <key alias="httpsCheckEnableHttpsError">Could not update the 'Umbraco.Core.UseHttps' setting in your web.config file. Error: %0%</key>
     <!-- The following keys don't get tokens passed in -->
-    <key alias="httpsCheckEnableHttpsButton">Enable HTTPS</key>
-    <key alias="httpsCheckEnableHttpsDescription">Sets umbracoSSL setting to true in the appSettings of the web.config file.</key>
-    <key alias="httpsCheckEnableHttpsSuccess">The appSetting 'Umbraco.Core.UseHttps' is now set to 'true' in your web.config file, your cookies will be marked as secure.</key>
-    <key alias="rectifyButton">Fix</key>
-    <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
-    <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
-    <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
     <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
     <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
-    <key alias="compilationDebugCheckRectifySuccessMessage">Debug compilation mode successfully disabled.</key>
-    <key alias="traceModeCheckSuccessMessage">Trace mode is disabled.</key>
-    <key alias="traceModeCheckErrorMessage">Trace mode is currently enabled. It is recommended to disable this setting before go live.</key>
-    <key alias="traceModeCheckRectifySuccessMessage">Trace mode successfully disabled.</key>
-    <key alias="folderPermissionsCheckMessage">All folders have the correct permissions set.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-    <key alias="requiredFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
-    <key alias="optionalFolderPermissionFailed"><![CDATA[The following folders must be set up with modify permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
-    <key alias="filePermissionsCheckMessage">All files have the correct permissions set.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Path to the file not found
   	-->
-    <key alias="fileNotFound">File does not exist: '%0%'.</key>
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-    <key alias="requiredFilePermissionFailed"><![CDATA[The following files must be set up with write permissions but could not be acccessed: <strong>%0%</strong>.]]></key>
-    <key alias="optionalFilePermissionFailed"><![CDATA[The following files must be set up with write permissions for certain Umbraco operations to function but could not be acccessed: <strong>%0%</strong>. If they aren't being written to no action need be taken.]]></key>
     <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was not found.]]></key>
-    <key alias="setHeaderInConfig">Set Header in Config</key>
-    <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMEd by other websites.</key>
-    <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMEing of the site by other websites has been added to your web.config file.</key>
-    <key alias="setHeaderInConfigError">Could not update web.config file. Error: %0%</key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
@@ -1233,7 +1188,6 @@
     <key alias="redirectedTo">已重定向至</key>
     <key alias="noRedirects">未进行重定向</key>
     <key alias="noRedirectsDescription">当已发布的页重命名或移动时, 将自动对新页进行重定向。</key>
-    <key alias="confirmRemove">确实要删除 "%0%" 到 "%1%" 的重定向吗？</key>
     <key alias="redirectRemoved">重定向URL已删除。</key>
     <key alias="redirectRemoveError">删除重定向 URL 时出错.</key>
     <key alias="confirmDisable">是否确实要禁用 URL 跟踪程序?</key>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -54,13 +55,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
-            var intId = id.TryConvertTo<int>();
-            if (intId == false) throw new InvalidOperationException("Id must be an integer");
+            if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+            {
+                throw new InvalidOperationException("Id must be an integer");
+            }
 
             var nodes = new TreeNodeCollection();
 
             nodes.AddRange(
-                _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentTypeContainer)
+                _entityService.GetChildren(intId, UmbracoObjectTypes.DocumentTypeContainer)
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
@@ -75,7 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             //if the request is for folders only then just return
             if (queryStrings["foldersonly"].ToString().IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
-            var children = _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentType).ToArray();
+            var children = _entityService.GetChildren(intId, UmbracoObjectTypes.DocumentType).ToArray();
             var contentTypes = _contentTypeService.GetAll(children.Select(c => c.Id).ToArray()).ToDictionary(c => c.Id);
             nodes.AddRange(
                 children
@@ -114,7 +117,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                 // root actions
                 menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add(new MenuItem("importDocumentType", LocalizedTextService)
+                menu.Items.Add(new MenuItem("importdocumenttype", LocalizedTextService)
                 {
                     Icon = "page-up",
                     SeparatorBefore = true,
@@ -125,7 +128,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return menu;
             }
 
-            var container = _entityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentTypeContainer);
+            var container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentTypeContainer);
             if (container != null)
             {
                 //set the default to create
@@ -147,7 +150,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
             else
             {
-                var ct = _contentTypeService.Get(int.Parse(id));
+                var ct = _contentTypeService.Get(int.Parse(id, CultureInfo.InvariantCulture));
                 var parent = ct == null ? null : _contentTypeService.Get(ct.ParentId);
 
                 menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);

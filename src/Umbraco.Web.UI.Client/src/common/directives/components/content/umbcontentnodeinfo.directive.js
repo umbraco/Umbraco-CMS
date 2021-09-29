@@ -54,8 +54,8 @@
 
                 localizationService.localizeMany(keys)
                     .then(function (data) {
-                        [labels.deleted, 
-                        labels.unpublished, 
+                        [labels.deleted,
+                        labels.unpublished,
                         labels.published,
                         labels.publishedPendingChanges,
                         labels.notCreated,
@@ -97,7 +97,7 @@
 
                 // Declare a fallback URL for the <umb-node-preview/> directive
                 if (scope.documentType !== null) {
-                    scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+                    scope.previewOpenUrl = '#/settings/documentTypes/edit/' + scope.documentType.id;
                 }
 
                 var activeApp = _.find(scope.node.apps, (a) => a.active);

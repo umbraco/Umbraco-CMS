@@ -233,6 +233,34 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             Assert.That(templates, Is.Not.Null);
             Assert.That(templates.Any(), Is.True);
             Assert.That(templates.Count(), Is.EqualTo(1));
+
+            var template = templates.First();
+            Assert.AreEqual(template.Name, "Articles");
+        }
+
+        [Test]
+        public void Can_Import_Single_Template_With_Key()
+        {
+            // Arrange
+            string strXml = ImportResources.StandardMvc_Package;
+            var xml = XElement.Parse(strXml);
+            XElement element = xml.Descendants("Templates").First();
+
+            var firstTemplateElement = element.Elements("Template").First();
+            var key = Guid.NewGuid();
+            firstTemplateElement.Add(new XElement("Key", key));
+
+            // Act
+            IEnumerable<ITemplate> templates = PackageDataInstallation.ImportTemplate(firstTemplateElement, 0);
+
+            // Assert
+            Assert.That(templates, Is.Not.Null);
+            Assert.That(templates.Any(), Is.True);
+            Assert.That(templates.Count(), Is.EqualTo(1));
+
+            var template = templates.First();
+            Assert.AreEqual(template.Name, "Articles");
+            Assert.AreEqual(template.Key, key);
         }
 
         [Test]
@@ -650,7 +678,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             // Act
             var macros = PackageDataInstallation.ImportMacros(
                 macrosElement.Elements("macro"),
-                Enumerable.Empty<XElement>(),
                 0).ToList();
 
             // Assert
@@ -674,7 +701,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             // Act
             var macros = PackageDataInstallation.ImportMacros(
                 macrosElement.Elements("macro"),
-                Enumerable.Empty<XElement>(),
                 0).ToList();
 
             // Assert

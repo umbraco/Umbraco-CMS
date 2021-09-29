@@ -62,7 +62,14 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
                 using HttpResponseMessage response = await HttpClient.SendAsync(request);
 
                 IEnumerable<string> allHeaders = response.Headers.Select(x => x.Key);
-                var headersToCheckFor = new[] { "Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version" };
+                var headersToCheckFor = new List<string> {"Server", "X-Powered-By", "X-AspNet-Version", "X-AspNetMvc-Version" };
+
+                // Ignore if server header is present and it's set to cloudflare
+                if (allHeaders.InvariantContains("Server") && response.Headers.TryGetValues("Server", out var serverHeaders) && serverHeaders.ToString().InvariantEquals("cloudflare"))
+                {
+                    headersToCheckFor.Remove("Server");
+                }
+
                 var headersFound = allHeaders
                     .Intersect(headersToCheckFor)
                     .ToArray();

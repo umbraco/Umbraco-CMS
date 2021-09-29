@@ -115,12 +115,12 @@ function contentCreateController($scope,
     };
 
     $scope.createContentType = function () {
-        $location.path("/settings/documenttypes/edit/-1").search("create", "true");
+        $location.path("/settings/documentTypes/edit/-1").search("create", "true");
         close();
     };
 
     $scope.editContentType = function () {
-        $location.path("/settings/documenttypes/edit/" + $scope.contentTypeId).search("view", "permissions");
+        $location.path("/settings/documentTypes/edit/" + $scope.contentTypeId).search("view", "permissions");
         close();
     };
 

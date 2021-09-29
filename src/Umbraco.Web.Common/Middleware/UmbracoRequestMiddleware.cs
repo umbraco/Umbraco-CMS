@@ -13,10 +13,11 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
@@ -50,6 +51,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
         private readonly BackOfficeWebAssets _backOfficeWebAssets;
         private readonly IRuntimeState _runtimeState;
+        private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly SmidgeOptions _smidgeOptions;
         private readonly WebProfiler _profiler;
 
@@ -77,7 +80,9 @@ namespace Umbraco.Cms.Web.Common.Middleware
             UmbracoRequestPaths umbracoRequestPaths,
             BackOfficeWebAssets backOfficeWebAssets,
             IOptions<SmidgeOptions> smidgeOptions,
-            IRuntimeState runtimeState)
+            IRuntimeState runtimeState,
+            IVariationContextAccessor variationContextAccessor,
+            IDefaultCultureAccessor defaultCultureAccessor)
         {
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
@@ -88,6 +93,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _umbracoRequestPaths = umbracoRequestPaths;
             _backOfficeWebAssets = backOfficeWebAssets;
             _runtimeState = runtimeState;
+            _variationContextAccessor = variationContextAccessor;
+            _defaultCultureAccessor = defaultCultureAccessor;
             _smidgeOptions = smidgeOptions.Value;
             _profiler = profiler as WebProfiler; // Ignore if not a WebProfiler
         }
@@ -110,6 +117,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
             EnsureContentCacheInitialized();
 
+            _variationContextAccessor.VariationContext ??= new VariationContext(_defaultCultureAccessor.DefaultCulture);
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
             Uri currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);

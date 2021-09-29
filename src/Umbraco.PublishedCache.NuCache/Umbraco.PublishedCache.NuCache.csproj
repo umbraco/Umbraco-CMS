@@ -22,7 +22,7 @@
     <PackageReference Include="MessagePack" Version="2.3.75" />
     <PackageReference Include="K4os.Compression.LZ4" Version="1.2.12" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Umbraco.Code" Version="1.1.1">
+    <PackageReference Include="Umbraco.Code" Version="1.2.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -42,14 +43,16 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
         {
-            var intId = id.TryConvertTo<int>();
-            if (intId == false) throw new InvalidOperationException("Id must be an integer");
+            if (!int.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intId))
+            {
+                throw new InvalidOperationException("Id must be an integer");
+            }
 
             var nodes = new TreeNodeCollection();
 
             //Folders first
             nodes.AddRange(
-               _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DataTypeContainer)
+               _entityService.GetChildren(intId, UmbracoObjectTypes.DataTypeContainer)
                    .OrderBy(entity => entity.Name)
                    .Select(dt =>
                    {
@@ -67,7 +70,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             //System ListView nodes
             var systemListViewDataTypeIds = GetNonDeletableSystemListViewDataTypeIds();
 
-            var children = _entityService.GetChildren(intId.Result, UmbracoObjectTypes.DataType).ToArray();
+            var children = _entityService.GetChildren(intId, UmbracoObjectTypes.DataType).ToArray();
             var dataTypes = Enumerable.ToDictionary(_dataTypeService.GetAll(children.Select(c => c.Id).ToArray()), dt => dt.Id);
 
             nodes.AddRange(
@@ -134,7 +137,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 return menu;
             }
 
-            var container = _entityService.Get(int.Parse(id), UmbracoObjectTypes.DataTypeContainer);
+            var container = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DataTypeContainer);
             if (container != null)
             {
                 //set the default to create
@@ -158,7 +161,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             {
                 var nonDeletableSystemDataTypeIds = GetNonDeletableSystemDataTypeIds();
 
-                if (nonDeletableSystemDataTypeIds.Contains(int.Parse(id)) == false)
+                if (nonDeletableSystemDataTypeIds.Contains(int.Parse(id, CultureInfo.InvariantCulture)) == false)
                     menu.Items.Add<ActionDelete>(LocalizedTextService, opensDialog: true);
 
                 menu.Items.Add<ActionMove>(LocalizedTextService, hasSeparator: true, opensDialog: true);

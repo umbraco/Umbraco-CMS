@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         #region Containers
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, Guid key, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -70,7 +70,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     {
                         Name = name,
                         ParentId = parentId,
-                        CreatorId = userId
+                        CreatorId = userId,
+                        Key = key
                     };
 
                     var savingEntityContainerNotification = new EntityContainerSavingNotification(container, evtMsgs);

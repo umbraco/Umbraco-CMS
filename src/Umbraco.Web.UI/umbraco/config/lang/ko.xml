@@ -13,9 +13,9 @@
     <key alias="createPackage">패키지 새로 만들기</key>
     <key alias="delete">삭제</key>
     <key alias="disable">비활성</key>
-    <key alias="emptyRecycleBin">휴지통 비우기</key>
+    <key alias="emptyrecyclebin">휴지통 비우기</key>
     <key alias="exportDocumentType">추출 문서 유형</key>
-    <key alias="importDocumentType">등록 문서 유형</key>
+    <key alias="importdocumenttype">등록 문서 유형</key>
     <key alias="importPackage">패키지 등록</key>
     <key alias="liveEdit">캔버스 내용 편집</key>
     <key alias="logout">종료</key>
@@ -30,7 +30,6 @@
     <key alias="sendtopublish">발행 항목으로 전달</key>
     <key alias="sendToTranslate">번역 항목으로 전달</key>
     <key alias="sort">정렬</key>
-    <key alias="toPublish">발행 항목으로 전달</key>
     <key alias="translate">번역</key>
     <key alias="update">업데이트</key>
   </area>
@@ -198,8 +197,6 @@
     '<em>%0%</em>'사전 항목 아래에 다른 언어버전들을 편집하세요<br/>왼쪽 '언어'메뉴를 사용하여 추가 언어들을 설정할 수 있습니다.
  ]]></key>
     <key alias="displayName">국가명</key>
-  </area>
-  <area alias="editcontenttype">
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">이전값 더하기</key>
@@ -699,7 +696,6 @@
     <key alias="contentAllowed">This content is allowed here</key>
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
-    <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>

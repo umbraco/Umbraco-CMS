@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -62,23 +63,22 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         {
             IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
-            IQueryCollection queryString = _httpContextAccessor.HttpContext?.Request.Query;
-            if (queryString == null)
+            var querystring = _httpContextAccessor.HttpContext?.Request.Query[requirement.QueryStringName];
+            if (querystring is null)
             {
                 // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
             }
 
-            KeyValuePair<string, StringValues>[] ids = queryString.Where(x => x.Key == requirement.QueryStringName).ToArray();
-            if (ids.Length == 0)
+            if (querystring.Value.Count == 0)
             {
                 // Must succeed this requirement since we cannot process it.
                 return Task.FromResult(true);
             }
 
-            var intIds = ids
-                .Select(x => x.Value.ToString())
-                .Select(x => x.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
+            var intIds = querystring.Value.ToString().Split(Constants.CharArrays.Comma)
+                .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var output) ? Attempt<int>.Succeed(output) : Attempt<int>.Fail())
+                .Where(x => x.Success).Select(x => x.Result).ToArray();
 
             var authHelper = new UserGroupEditorAuthorizationHelper(
                 _userService,

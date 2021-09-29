@@ -13,9 +13,9 @@
     <key alias="createPackage">Criar Pacote</key>
     <key alias="delete">Remover</key>
     <key alias="disable">Desabilitar</key>
-    <key alias="emptyRecycleBin">Esvaziar Lixeira</key>
+    <key alias="emptyrecyclebin">Esvaziar Lixeira</key>
     <key alias="exportDocumentType">Exportar Tipo de Documento</key>
-    <key alias="importDocumentType">Importar Tipo de Documento</key>
+    <key alias="importdocumenttype">Importar Tipo de Documento</key>
     <key alias="importPackage">Importar Pacote</key>
     <key alias="liveEdit">Editar na Tela</key>
     <key alias="logout">Sair</key>
@@ -30,7 +30,6 @@
     <key alias="sendtopublish">Enviar para Publicação</key>
     <key alias="sendToTranslate">Enviar para Tradução</key>
     <key alias="sort">Classificar</key>
-    <key alias="toPublish">Enviar para publicação</key>
     <key alias="translate">Traduzir</key>
     <key alias="update">Atualizar</key>
   </area>
@@ -196,8 +195,6 @@
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[Editar as diferente versões de linguagem para o item de dicionário '<em>%0%</em>' abaixo <br /> Você pode adicionar mais linguagens sob 'linguagens' no menu à esquerda]]></key>
     <key alias="displayName">Nome da Cultura</key>
-  </area>
-  <area alias="editcontenttype">
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Adicionar valor prévio</key>
@@ -688,7 +685,6 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="contentAllowed">This content is allowed here</key>
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
-    <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>

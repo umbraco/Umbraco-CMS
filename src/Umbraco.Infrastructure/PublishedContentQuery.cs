@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.XPath;
 using Examine;
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Infrastructure
             switch (id)
             {
                 case string s:
-                    return int.TryParse(s, out intId);
+                    return int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out intId);
 
                 case int i:
                     intId = i;
@@ -232,11 +233,6 @@ namespace Umbraco.Cms.Infrastructure
         public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*",
             string indexName = Constants.UmbracoIndexes.ExternalIndexName) =>
             Search(term, 0, 0, out _, culture, indexName);
-
-        /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords,
-            string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
-            => Search(term, skip, take, out totalRecords, culture, indexName, null);
 
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null)

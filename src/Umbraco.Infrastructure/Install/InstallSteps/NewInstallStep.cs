@@ -73,11 +73,11 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 
             _userService.Save(admin);
 
-            var membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserId.ToString());
+            var membershipUser = await _userManager.FindByIdAsync(Constants.Security.SuperUserIdAsString);
             if (membershipUser == null)
             {
                 throw new InvalidOperationException(
-                    $"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
+                    $"No user found in membership provider with id of {Constants.Security.SuperUserIdAsString}.");
             }
 
             //To change the password here we actually need to reset it since we don't have an old one to use to change

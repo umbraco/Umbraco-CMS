@@ -13,9 +13,9 @@
     <key alias="createPackage">צור חבילה</key>
     <key alias="delete">מחק</key>
     <key alias="disable">נטרל</key>
-    <key alias="emptyRecycleBin">רוקן סל מיחזור</key>
+    <key alias="emptyrecyclebin">רוקן סל מיחזור</key>
     <key alias="exportDocumentType">ייצא סוג קובץ</key>
-    <key alias="importDocumentType">ייבא סוג מסמך</key>
+    <key alias="importdocumenttype">ייבא סוג מסמך</key>
     <key alias="importPackage">ייבא חבילה</key>
     <key alias="liveEdit">ערוך במצב "קנבס"</key>
     <key alias="logout">יציאה</key>
@@ -30,10 +30,8 @@
     <key alias="sendtopublish">שלח לפירסום</key>
     <key alias="sendToTranslate">שלח לתירגום</key>
     <key alias="sort">מיין</key>
-    <key alias="toPublish">שלח לפירסום</key>
     <key alias="translate">תרגם</key>
     <key alias="update">עדכן</key>
-    <key alias="LastRunInfoAction">יומן משימות מתוזמנות</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">הוסף דומיין חדש</key>
@@ -199,8 +197,6 @@
       ערוך את גרסאות השפות השונות לפריט המילון '<em>%0%</em>' למטה<br/>ניתן להוסיף שפות נוספות תחת "שפות" בתפריט בצד שמאל
    ]]></key>
     <key alias="displayName">שם התצוגה לשפה</key>
-  </area>
-  <area alias="editcontenttype">
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">הוסף ערך מקדים</key>
@@ -716,7 +712,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contentAllowed">This content is allowed here</key>
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
-    <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>

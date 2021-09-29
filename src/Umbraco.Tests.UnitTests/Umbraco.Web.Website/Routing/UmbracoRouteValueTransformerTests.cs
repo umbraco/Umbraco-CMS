@@ -14,6 +14,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -47,6 +48,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
             IPublishedRouter router = null,
             IUmbracoRouteValuesFactory routeValuesFactory = null)
         {
+            var publicAccessRequestHandler = new Mock<IPublicAccessRequestHandler>();
+            publicAccessRequestHandler.Setup(x => x.RewriteForPublishedContentAccessAsync(It.IsAny<HttpContext>(), It.IsAny<UmbracoRouteValues>()))
+                .Returns((HttpContext ctx, UmbracoRouteValues routeVals) => Task.FromResult(routeVals));
+
             var transformer = new UmbracoRouteValueTransformer(
                 new NullLogger<UmbracoRouteValueTransformer>(),
                 ctx,
@@ -58,7 +63,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
                 filter ?? Mock.Of<IRoutableDocumentFilter>(x => x.IsDocumentRequest(It.IsAny<string>()) == true),
                 Mock.Of<IDataProtectionProvider>(),
                 Mock.Of<IControllerActionSearcher>(),
-                Mock.Of<IEventAggregator>());
+                Mock.Of<IEventAggregator>(),
+                publicAccessRequestHandler.Object);
 
             return transformer;
         }
@@ -92,28 +98,28 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
             => Mock.Of<IPublishedRouter>(x => x.RouteRequestAsync(It.IsAny<IPublishedRequestBuilder>(), It.IsAny<RouteRequestOptions>()) == Task.FromResult(request));
 
         [Test]
-        public async Task Noop_When_Runtime_Level_Not_Run()
+        public async Task Null_When_Runtime_Level_Not_Run()
         {
             UmbracoRouteValueTransformer transformer = GetTransformer(
                 Mock.Of<IUmbracoContextAccessor>(),
                 Mock.Of<IRuntimeState>());
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
-            Assert.AreEqual(0, result.Count);
+            Assert.IsNull(result);
         }
 
         [Test]
-        public async Task Noop_When_No_Umbraco_Context()
+        public async Task Null_When_No_Umbraco_Context()
         {
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
                 Mock.Of<IUmbracoContextAccessor>());
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
-            Assert.AreEqual(0, result.Count);
+            Assert.IsNull(result);
         }
 
         [Test]
-        public async Task Noop_When_Not_Document_Request()
+        public async Task Null_When_Not_Document_Request()
         {
             var umbracoContext = Mock.Of<IUmbracoContext>();
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
@@ -121,7 +127,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
                 Mock.Of<IRoutableDocumentFilter>(x => x.IsDocumentRequest(It.IsAny<string>()) == false));
 
             RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
-            Assert.AreEqual(0, result.Count);
+            Assert.IsNull(result);
         }
 
         [Test]
@@ -154,10 +160,29 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
         }
 
         [Test]
+        public async Task Null_When_No_Content_On_PublishedRequest()
+        {
+            IUmbracoContext umbracoContext = GetUmbracoContext(true);
+            IPublishedRequest request = Mock.Of<IPublishedRequest>(x => x.PublishedContent == null);
+
+            UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
+                Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
+                router: GetRouter(request),
+                routeValuesFactory: GetRouteValuesFactory(request));
+
+            var httpContext = new DefaultHttpContext();
+            RouteValueDictionary result = await transformer.TransformAsync(httpContext, new RouteValueDictionary());
+            Assert.IsNull(result);
+
+            UmbracoRouteValues routeVals = httpContext.Features.Get<UmbracoRouteValues>();
+            Assert.AreEqual(routeVals.PublishedRequest.GetRouteResult(), UmbracoRouteResult.NotFound);
+        }
+
+        [Test]
         public async Task Assigns_UmbracoRouteValues_To_HttpContext_Feature()
         {
             IUmbracoContext umbracoContext = GetUmbracoContext(true);
-            IPublishedRequest request = Mock.Of<IPublishedRequest>();
+            IPublishedRequest request = Mock.Of<IPublishedRequest>(x => x.PublishedContent == Mock.Of<IPublishedContent>());
 
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
                 Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
@@ -173,10 +198,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
         }
 
         [Test]
-        public async Task Assigns_Values_To_RouteValueDictionary()
+        public async Task Assigns_Values_To_RouteValueDictionary_When_Content()
         {
             IUmbracoContext umbracoContext = GetUmbracoContext(true);
-            IPublishedRequest request = Mock.Of<IPublishedRequest>();
+            IPublishedRequest request = Mock.Of<IPublishedRequest>(x => x.PublishedContent == Mock.Of<IPublishedContent>());
             UmbracoRouteValues routeValues = GetRouteValues(request);
 
             UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
@@ -188,6 +213,23 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
 
             Assert.AreEqual(routeValues.ControllerName, result[ControllerToken]);
             Assert.AreEqual(routeValues.ActionName, result[ActionToken]);
+        }
+
+        [Test]
+        public async Task Returns_Null_RouteValueDictionary_When_No_Content()
+        {
+            IUmbracoContext umbracoContext = GetUmbracoContext(true);
+            IPublishedRequest request = Mock.Of<IPublishedRequest>(x => x.PublishedContent == null);
+            UmbracoRouteValues routeValues = GetRouteValues(request);
+
+            UmbracoRouteValueTransformer transformer = GetTransformerWithRunState(
+                Mock.Of<IUmbracoContextAccessor>(x => x.TryGetUmbracoContext(out umbracoContext)),
+                router: GetRouter(request),
+                routeValuesFactory: GetRouteValuesFactory(request));
+
+            RouteValueDictionary result = await transformer.TransformAsync(new DefaultHttpContext(), new RouteValueDictionary());
+
+            Assert.IsNull(result);
         }
 
         private class TestController : RenderController

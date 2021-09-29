@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -157,6 +158,6 @@ namespace Umbraco.Cms.Core.Security
             Roles = roles;
         }
 
-        private static string UserIdToString(int userId) => string.Intern(userId.ToString());
+        private static string UserIdToString(int userId) => string.Intern(userId.ToString(CultureInfo.InvariantCulture));
     }
 }

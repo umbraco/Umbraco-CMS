@@ -3,12 +3,12 @@ using System.Data.Common;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using NPoco;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
 {
+    [Obsolete("This is only used for integration tests and should be moved into a test project.")]
     public class SqlServerDbProviderFactoryCreator : IDbProviderFactoryCreator
     {
         private readonly Func<string, DbProviderFactory> _getFactory;
@@ -23,35 +23,29 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public DbProviderFactory CreateFactory(string providerName)
         {
             if (string.IsNullOrEmpty(providerName)) return null;
+
             return _getFactory(providerName);
         }
 
         // gets the sql syntax provider that corresponds, from attribute
         public ISqlSyntaxProvider GetSqlSyntaxProvider(string providerName)
-        {
-            return providerName switch
+            => providerName switch
             {
                 Cms.Core.Constants.DbProviderNames.SqlCe => throw new NotSupportedException("SqlCe is not supported"),
                 Cms.Core.Constants.DbProviderNames.SqlServer => new SqlServerSyntaxProvider(_globalSettings),
                 _ => throw new InvalidOperationException($"Unknown provider name \"{providerName}\""),
             };
-        }
 
         public IBulkSqlInsertProvider CreateBulkSqlInsertProvider(string providerName)
-        {
-            switch (providerName)
+            => providerName switch
             {
-                case Cms.Core.Constants.DbProviderNames.SqlCe:
-                    throw new NotSupportedException("SqlCe is not supported");
-                case Cms.Core.Constants.DbProviderNames.SqlServer:
-                    return new SqlServerBulkSqlInsertProvider();
-                default:
-                    return new BasicBulkSqlInsertProvider();
-            }
-        }
+                Cms.Core.Constants.DbProviderNames.SqlCe => throw new NotSupportedException("SqlCe is not supported"),
+                Cms.Core.Constants.DbProviderNames.SqlServer => new SqlServerBulkSqlInsertProvider(),
+                _ => new BasicBulkSqlInsertProvider(),
+            };
 
-        public void CreateDatabase(string providerName)
-            => throw new NotSupportedException("Embedded databases are not supported");
+        public void CreateDatabase(string providerName, string connectionString)
+            => throw new NotSupportedException("Embedded databases are not supported"); // TODO But LocalDB is?
 
         public NPocoMapperCollection ProviderSpecificMappers(string providerName)
             => new NPocoMapperCollection(() => Enumerable.Empty<IMapper>());
