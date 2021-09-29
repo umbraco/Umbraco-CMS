@@ -1,42 +1,47 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
 
     [TestFixture]
     public class ContentFinderByUrlWithDomainsTests : UrlRoutingTestBase
     {
-        void SetDomains3()
+        private void SetDomains3()
         {
-            SetupDomainServiceMock(new[]
-            {
-                new UmbracoDomain("domain1.com/") {Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"}
-            });
+            var domainService = Mock.Get(DomainService);
 
+            domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
+                .Returns((bool incWildcards) => new[]
+                {
+                    new UmbracoDomain("domain1.com/") {Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"}
+                });
         }
 
-        void SetDomains4()
+        private void SetDomains4()
         {
-            SetupDomainServiceMock(new[]
-            {
-                new UmbracoDomain("domain1.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("domain1.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("domain1.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId =  10012, LanguageIsoCode = "fr-FR"},
-                new UmbracoDomain("http://domain3.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1003, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain3.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10031, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain3.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId = 10032, LanguageIsoCode = "fr-FR"}
-            });
+            var domainService = Mock.Get(DomainService);
 
+            domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
+                .Returns((bool incWildcards) => new[]
+                {
+                    new UmbracoDomain("domain1.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("domain1.com/en") {Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("domain1.com/fr") {Id = 3, LanguageId = LangFrId, RootContentId =  10012, LanguageIsoCode = "fr-FR"},
+                    new UmbracoDomain("http://domain3.com/") {Id = 4, LanguageId = LangEngId, RootContentId = 1003, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain3.com/en") {Id = 5, LanguageId = LangEngId, RootContentId = 10031, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain3.com/fr") {Id = 6, LanguageId = LangFrId, RootContentId = 10032, LanguageIsoCode = "fr-FR"}
+                });
         }
 
         protected override string GetXmlContent(int templateId)
-        {
-            return @"<?xml version=""1.0"" encoding=""utf-8""?>
+            => @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
@@ -115,7 +120,6 @@ namespace Umbraco.Tests.Routing
         </Doc>
     </Doc>
 </root>";
-        }
 
         [TestCase("http://domain1.com/", 1001)]
         [TestCase("http://domain1.com/1001-1", 10011)]
@@ -125,16 +129,17 @@ namespace Umbraco.Tests.Routing
         {
             SetDomains3();
 
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = true };
+            GlobalSettings.HideTopLevelNodeFromPath = true;
 
-            var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
+            var umbracoContextAccessor = GetUmbracoContextAccessor(url);
+            var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
             var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
 
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
+            var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
@@ -164,19 +169,20 @@ namespace Umbraco.Tests.Routing
             SetDomains4();
 
             // defaults depend on test environment
-            expectedCulture = expectedCulture ?? System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+            expectedCulture ??= System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
 
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = true };
+            GlobalSettings.HideTopLevelNodeFromPath = true;
 
-            var umbracoContext = GetUmbracoContext(url, globalSettings:globalSettings);
-            var publishedRouter = CreatePublishedRouter(GetUmbracoContextAccessor(umbracoContext), Factory);
-            var frequest = await publishedRouter .CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
+            var umbracoContextAccessor = GetUmbracoContextAccessor(url);
+            var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+            var frequest = await publishedRouter.CreateRequestAsync(umbracoContext.CleanedUmbracoUrl);
 
             // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
             Assert.AreEqual(expectedCulture, frequest.Culture);
 
-            var lookup = new ContentFinderByUrl(LoggerFactory.CreateLogger<ContentFinderByUrl>(), GetUmbracoContextAccessor(umbracoContext));
+            var lookup = new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor);
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(expectedId, frequest.PublishedContent.Id);

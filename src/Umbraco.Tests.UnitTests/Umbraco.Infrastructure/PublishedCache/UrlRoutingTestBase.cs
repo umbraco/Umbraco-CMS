@@ -27,6 +27,23 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
     [TestFixture]
     public abstract class UrlRoutingTestBase : PublishedSnapshotServiceTestBase
     {
+        [SetUp]
+        public override void Setup()
+        {
+            base.Setup();
+
+            string xml = GetXmlContent(1234);
+
+            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
+                xml,
+                TestHelper.ShortStringHelper,
+                out ContentType[] contentTypes,
+                out DataType[] dataTypes).ToList();
+
+            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
+
+        }
+
         // Sets up the mock domain service
         protected override ServiceContext CreateServiceContext(IContentType[] contentTypes, IMediaType[] mediaTypes, IDataType[] dataTypes)
         {
@@ -52,7 +69,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             return serviceContext;
         }
         
-        protected static string GetXmlContent(int templateId)
+        protected virtual string GetXmlContent(int templateId)
             => @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT Doc ANY>

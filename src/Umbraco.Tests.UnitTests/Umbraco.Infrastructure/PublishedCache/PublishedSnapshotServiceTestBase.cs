@@ -40,6 +40,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         protected IContentTypeService ContentTypeService { get; private set; }
         protected IMediaTypeService MediaTypeService { get; private set; }
         protected IDataTypeService DataTypeService { get; private set; }
+        protected IDomainService DomainService { get; private set; }
         protected IPublishedValueFallback PublishedValueFallback { get; private set; }
         protected IPublishedSnapshotService SnapshotService { get; private set; }
         protected IVariationContextAccessor VariationContextAccessor { get; private set; }
@@ -202,6 +203,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             DataTypeService = serviceContext.DataTypeService;
             ContentTypeService = serviceContext.ContentTypeService;
             MediaTypeService = serviceContext.MediaTypeService;
+            DomainService = serviceContext.DomainService;
 
             // create a scope provider
             var scopeProvider = Mock.Of<IScopeProvider>();

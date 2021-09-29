@@ -20,22 +20,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
     [TestFixture]
     public class ContentFinderByAliasWithDomainsTests : UrlRoutingTestBase
     {
-        [SetUp]
-        public override void Setup()
-        {
-            base.Setup();
-
-            string xml = GetXmlContent(1234);
-
-            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
-                xml,
-                TestHelper.ShortStringHelper,
-                out ContentType[] contentTypes,
-                out DataType[] dataTypes).ToList();
-
-            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
-
-        }
+        
 
         [TestCase("http://domain1.com/this/is/my/alias", "de-DE", -1001)] // alias to domain's page fails - no alias on domain's home
         [TestCase("http://domain1.com/page2/alias", "de-DE", 10011)] // alias to sub-page works

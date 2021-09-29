@@ -162,7 +162,6 @@
     <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
-    <Compile Include="Routing\ContentFinderByUrlWithDomainsTests.cs" />
     <Compile Include="Routing\UrlProviderWithoutHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />
     <Compile Include="Scoping\ScopedXmlTests.cs" />
@@ -184,7 +183,6 @@
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
-    <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />

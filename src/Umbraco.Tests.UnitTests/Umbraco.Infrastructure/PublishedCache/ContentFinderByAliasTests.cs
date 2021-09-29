@@ -29,22 +29,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
     [TestFixture]
     public class ContentFinderByAliasTests : UrlRoutingTestBase
     {
-        [SetUp]
-        public override void Setup()
-        {
-            base.Setup();
-
-            string xml = GetXmlContent(1234);
-
-            IEnumerable<ContentNodeKit> kits = PublishedContentXmlAdapter.GetContentNodeKits(
-                xml,
-                TestHelper.ShortStringHelper,
-                out ContentType[] contentTypes,
-                out DataType[] dataTypes).ToList();
-
-            InitializedCache(kits, contentTypes, dataTypes: dataTypes);
-
-        }
 
         [TestCase("/this/is/my/alias", 1001)]
         [TestCase("/anotheralias", 1001)]
