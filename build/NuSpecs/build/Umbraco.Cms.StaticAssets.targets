@@ -6,9 +6,8 @@
         <UmbracoWwwrootName Condition="'$(UmbracoWwwrootName)' == ''">umbraco</UmbracoWwwrootName>
     </PropertyGroup>
 
-    <Target Name="CopyUmbracoAssets" BeforeTargets="Build">
+    <Target Name="CopyUmbracoAssets" BeforeTargets="BeforeBuild">
         <ItemGroup>
-
             <ContentFiles Include="$(ContentFilesPath)" />
             <ContentWwwrootFiles Include="$(ContentWwwrootFilesPath)" />
         </ItemGroup>
