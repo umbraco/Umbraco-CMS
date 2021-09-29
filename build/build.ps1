@@ -390,7 +390,7 @@
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
 	$params = "-Source", $nugetsourceUmbraco
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\umbraco-netcore-only.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\umbraco-netcore-only.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 
@@ -401,7 +401,7 @@
 
     Write-Host "Create NuGet packages"
 
-    &dotnet pack "$($this.SolutionRoot)\src\umbraco-netcore-only.sln" `
+    &dotnet pack "$($this.SolutionRoot)\umbraco-netcore-only.sln" `
         --output "$($this.BuildOutput)" `
         --verbosity detailed `
         -c Release `
