@@ -26,6 +26,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.TestHelpers;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Common
@@ -63,7 +64,11 @@ namespace Umbraco.Cms.Tests.Common
                     return _workingDir;
                 }
 
-                var dir = Path.Combine(Path.GetTempPath(), "UmbracoIntegrationTests", "Temp");
+                // Azure DevOps can only store a database in certain locations so we will need to detect if we are running
+                // on a build server and if so we'll use the temp path.
+                var dir = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("System_DefaultWorkingDirectory"))
+                    ? Path.Combine(Assembly.GetExecutingAssembly().GetRootDirectorySafe(), "TEMP")
+                    : Path.Combine(Path.GetTempPath(), "UmbracoTests", "TEMP");
 
                 if (!Directory.Exists(dir))
                 {
