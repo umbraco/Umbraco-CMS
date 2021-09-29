@@ -161,7 +161,6 @@
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
-    <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
     <Compile Include="Routing\UrlProviderWithoutHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />
     <Compile Include="Scoping\ScopedXmlTests.cs" />

@@ -161,7 +161,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 contentTypeService: contentTypeService.Object,
                 mediaTypeService: mediaTypeService.Object,
                 localizationService: Mock.Of<ILocalizationService>(),
-                domainService: Mock.Of<IDomainService>()
+                domainService: Mock.Of<IDomainService>(),
+                fileService: Mock.Of<IFileService>()
                 );
         }
 
