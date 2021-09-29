@@ -180,7 +180,6 @@
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
-    <Compile Include="Routing\UrlsWithNestedDomains.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />

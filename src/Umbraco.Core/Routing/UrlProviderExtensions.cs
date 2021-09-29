@@ -247,13 +247,6 @@ namespace Umbraco.Extensions
                 return Attempt.Succeed(urlInfo);
             }
 
-            // collisions with a different culture of the same content can never be routed.
-            if (!culture.InvariantEquals(pcr.Culture))
-            {
-                var urlInfo = UrlInfo.Message(textService.Localize("content", "routeErrorCannotRoute"), culture);
-                return Attempt.Succeed(urlInfo);
-            }
-
             // no collision
             return Attempt<UrlInfo>.Fail();
         }
