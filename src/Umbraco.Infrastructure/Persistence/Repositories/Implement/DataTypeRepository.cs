@@ -299,7 +299,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             var sql = Sql()
                 .Select<ContentTypeDto>(ct => ct.Select(node => node.NodeDto))
-                .AndSelect<PropertyTypeDto>(pt => Alias(pt.Alias, "PropertyTypes__Alias"), pt => Alias(pt.Name, "PropertyTypes__Name"))
+                .AndSelect<PropertyTypeDto>(pt => Alias(pt.Alias, "ptAlias"), pt => Alias(pt.Name, "ptName"))
                 .From<PropertyTypeDto>()
                 .InnerJoin<ContentTypeDto>().On<ContentTypeDto, PropertyTypeDto>(ct => ct.NodeId, pt => pt.ContentTypeId)
                 .InnerJoin<NodeDto>().On<NodeDto, ContentTypeDto>(n => n.NodeId, ct => ct.NodeId)
@@ -339,10 +339,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         [TableName(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType)]
         private class PropertyTypeReferenceDto
         {
-            [Column("Alias")]
+            [Column("ptAlias")]
             public string Alias { get; set; }
 
-            [Column("Name")]
+            [Column("ptName")]
             public string Name { get; set; }
         }
     }
