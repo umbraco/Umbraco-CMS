@@ -1094,163 +1094,169 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private bool SaveScheduleInvariant(ContentItemSave contentItem, SimpleNotificationModel globalNotifications)
         {
-            var variant = contentItem.Variants.First();
+            // TODO: ContentScheduling - fix
+            throw new NotImplementedException("ContentScheduling");
 
-            var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Release).ToList();
-            var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Expire).ToList();
+            //var variant = contentItem.Variants.First();
 
-            //Do all validation of data first
+            //var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Release).ToList();
+            //var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Expire).ToList();
 
-            //1) release date cannot be less than now
-            if (variant.ReleaseDate.HasValue && variant.ReleaseDate < DateTime.Now)
-            {
-                globalNotifications.AddErrorNotification(
-                        _localizedTextService.Localize("speechBubbles", "validationFailedHeader"),
-                        _localizedTextService.Localize("speechBubbles", "scheduleErrReleaseDate1"));
-                return false;
-            }
+            ////Do all validation of data first
 
-            //2) expire date cannot be less than now
-            if (variant.ExpireDate.HasValue && variant.ExpireDate < DateTime.Now)
-            {
-                globalNotifications.AddErrorNotification(
-                        _localizedTextService.Localize("speechBubbles", "validationFailedHeader"),
-                        _localizedTextService.Localize("speechBubbles", "scheduleErrExpireDate1"));
-                return false;
-            }
+            ////1) release date cannot be less than now
+            //if (variant.ReleaseDate.HasValue && variant.ReleaseDate < DateTime.Now)
+            //{
+            //    globalNotifications.AddErrorNotification(
+            //            _localizedTextService.Localize("speechBubbles", "validationFailedHeader"),
+            //            _localizedTextService.Localize("speechBubbles", "scheduleErrReleaseDate1"));
+            //    return false;
+            //}
 
-            //3) expire date cannot be less than release date
-            if (variant.ExpireDate.HasValue && variant.ReleaseDate.HasValue && variant.ExpireDate <= variant.ReleaseDate)
-            {
-                globalNotifications.AddErrorNotification(
-                    _localizedTextService.Localize("speechBubbles", "validationFailedHeader"),
-                    _localizedTextService.Localize("speechBubbles", "scheduleErrExpireDate2"));
-                return false;
-            }
+            ////2) expire date cannot be less than now
+            //if (variant.ExpireDate.HasValue && variant.ExpireDate < DateTime.Now)
+            //{
+            //    globalNotifications.AddErrorNotification(
+            //            _localizedTextService.Localize("speechBubbles", "validationFailedHeader"),
+            //            _localizedTextService.Localize("speechBubbles", "scheduleErrExpireDate1"));
+            //    return false;
+            //}
+
+            ////3) expire date cannot be less than release date
+            //if (variant.ExpireDate.HasValue && variant.ReleaseDate.HasValue && variant.ExpireDate <= variant.ReleaseDate)
+            //{
+            //    globalNotifications.AddErrorNotification(
+            //        _localizedTextService.Localize("speechBubbles", "validationFailedHeader"),
+            //        _localizedTextService.Localize("speechBubbles", "scheduleErrExpireDate2"));
+            //    return false;
+            //}
 
 
-            //Now we can do the data updates
+            ////Now we can do the data updates
 
-            //remove any existing release dates so we can replace it
-            //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
-            if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Release);
+            ////remove any existing release dates so we can replace it
+            ////if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
+            //if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
+            //    contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Release);
 
-            //remove any existing expire dates so we can replace it
-            //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
-            if (variant.ExpireDate.HasValue || currExpire.Count > 0)
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Expire);
+            ////remove any existing expire dates so we can replace it
+            ////if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
+            //if (variant.ExpireDate.HasValue || currExpire.Count > 0)
+            //    contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Expire);
 
-            //add the new schedule
-            contentItem.PersistedContent.ContentSchedule.Add(variant.ReleaseDate, variant.ExpireDate);
-            return true;
+            ////add the new schedule
+            //contentItem.PersistedContent.ContentSchedule.Add(variant.ReleaseDate, variant.ExpireDate);
+            //return true;
         }
 
         private bool SaveScheduleVariant(ContentItemSave contentItem)
         {
-            //All variants in this collection should have a culture if we get here but we'll double check and filter here)
-            var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
-            var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
+            // TODO: ContentScheduling - fix
+            throw new NotImplementedException("ContentScheduling");
 
-            //Make a copy of the current schedule and apply updates to it
+            ////All variants in this collection should have a culture if we get here but we'll double check and filter here)
+            //var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
+            //var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
-            var schedCopy = (ContentScheduleCollection)contentItem.PersistedContent.ContentSchedule.DeepClone();
+            ////Make a copy of the current schedule and apply updates to it
 
-            foreach (var variant in cultureVariants.Where(x => x.Save))
-            {
-                var currRelease = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Release).ToList();
-                var currExpire = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Expire).ToList();
+            //var schedCopy = (ContentScheduleCollection)contentItem.PersistedContent.ContentSchedule.DeepClone();
 
-                //remove any existing release dates so we can replace it
-                //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
-                if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
-                    schedCopy.Clear(variant.Culture, ContentScheduleAction.Release);
+            //foreach (var variant in cultureVariants.Where(x => x.Save))
+            //{
+            //    var currRelease = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Release).ToList();
+            //    var currExpire = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Expire).ToList();
 
-                //remove any existing expire dates so we can replace it
-                //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
-                if (variant.ExpireDate.HasValue || currExpire.Count > 0)
-                    schedCopy.Clear(variant.Culture, ContentScheduleAction.Expire);
+            //    //remove any existing release dates so we can replace it
+            //    //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
+            //    if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
+            //        schedCopy.Clear(variant.Culture, ContentScheduleAction.Release);
 
-                //add the new schedule
-                schedCopy.Add(variant.Culture, variant.ReleaseDate, variant.ExpireDate);
-            }
+            //    //remove any existing expire dates so we can replace it
+            //    //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
+            //    if (variant.ExpireDate.HasValue || currExpire.Count > 0)
+            //        schedCopy.Clear(variant.Culture, ContentScheduleAction.Expire);
 
-            //now validate the new schedule to make sure it passes all of the rules
+            //    //add the new schedule
+            //    schedCopy.Add(variant.Culture, variant.ReleaseDate, variant.ExpireDate);
+            //}
 
-            var isValid = true;
+            ////now validate the new schedule to make sure it passes all of the rules
 
-            //create lists of mandatory/non-mandatory states
-            var mandatoryVariants = new List<(string culture, bool isPublished, List<DateTime> releaseDates)>();
-            var nonMandatoryVariants = new List<(string culture, bool isPublished, List<DateTime> releaseDates)>();
-            foreach (var groupedSched in schedCopy.FullSchedule.GroupBy(x => x.Culture))
-            {
-                var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(groupedSched.Key);
-                var releaseDates = groupedSched.Where(x => x.Action == ContentScheduleAction.Release).Select(x => x.Date).ToList();
-                if (mandatoryCultures.Contains(groupedSched.Key, StringComparer.InvariantCultureIgnoreCase))
-                    mandatoryVariants.Add((groupedSched.Key, isPublished, releaseDates));
-                else
-                    nonMandatoryVariants.Add((groupedSched.Key, isPublished, releaseDates));
-            }
+            //var isValid = true;
 
-            var nonMandatoryVariantReleaseDates = nonMandatoryVariants.SelectMany(x => x.releaseDates).ToList();
+            ////create lists of mandatory/non-mandatory states
+            //var mandatoryVariants = new List<(string culture, bool isPublished, List<DateTime> releaseDates)>();
+            //var nonMandatoryVariants = new List<(string culture, bool isPublished, List<DateTime> releaseDates)>();
+            //foreach (var groupedSched in schedCopy.FullSchedule.GroupBy(x => x.Culture))
+            //{
+            //    var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(groupedSched.Key);
+            //    var releaseDates = groupedSched.Where(x => x.Action == ContentScheduleAction.Release).Select(x => x.Date).ToList();
+            //    if (mandatoryCultures.Contains(groupedSched.Key, StringComparer.InvariantCultureIgnoreCase))
+            //        mandatoryVariants.Add((groupedSched.Key, isPublished, releaseDates));
+            //    else
+            //        nonMandatoryVariants.Add((groupedSched.Key, isPublished, releaseDates));
+            //}
 
-            //validate that the mandatory languages have the right data
-            foreach (var (culture, isPublished, releaseDates) in mandatoryVariants)
-            {
-                if (!isPublished && releaseDates.Count == 0)
-                {
-                    //can't continue, a mandatory variant is not published and not scheduled for publishing
-                    // TODO: Add segment
-                    AddVariantValidationError(culture, null, "speechBubbles", "scheduleErrReleaseDate2");
-                    isValid = false;
-                    continue;
-                }
-                if (!isPublished && releaseDates.Any(x => nonMandatoryVariantReleaseDates.Any(r => x.Date > r.Date)))
-                {
-                    //can't continue, a mandatory variant is not published and it's scheduled for publishing after a non-mandatory
-                    // TODO: Add segment
-                    AddVariantValidationError(culture, null, "speechBubbles", "scheduleErrReleaseDate3");
-                    isValid = false;
-                    continue;
-                }
-            }
+            //var nonMandatoryVariantReleaseDates = nonMandatoryVariants.SelectMany(x => x.releaseDates).ToList();
 
-            if (!isValid) return false;
+            ////validate that the mandatory languages have the right data
+            //foreach (var (culture, isPublished, releaseDates) in mandatoryVariants)
+            //{
+            //    if (!isPublished && releaseDates.Count == 0)
+            //    {
+            //        //can't continue, a mandatory variant is not published and not scheduled for publishing
+            //        // TODO: Add segment
+            //        AddVariantValidationError(culture, null, "speechBubbles", "scheduleErrReleaseDate2");
+            //        isValid = false;
+            //        continue;
+            //    }
+            //    if (!isPublished && releaseDates.Any(x => nonMandatoryVariantReleaseDates.Any(r => x.Date > r.Date)))
+            //    {
+            //        //can't continue, a mandatory variant is not published and it's scheduled for publishing after a non-mandatory
+            //        // TODO: Add segment
+            //        AddVariantValidationError(culture, null, "speechBubbles", "scheduleErrReleaseDate3");
+            //        isValid = false;
+            //        continue;
+            //    }
+            //}
 
-            //now we can validate the more basic rules for individual variants
-            foreach (var variant in cultureVariants.Where(x => x.ReleaseDate.HasValue || x.ExpireDate.HasValue))
-            {
-                //1) release date cannot be less than now
-                if (variant.ReleaseDate.HasValue && variant.ReleaseDate < DateTime.Now)
-                {
-                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "scheduleErrReleaseDate1");
-                    isValid = false;
-                    continue;
-                }
+            //if (!isValid) return false;
 
-                //2) expire date cannot be less than now
-                if (variant.ExpireDate.HasValue && variant.ExpireDate < DateTime.Now)
-                {
-                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "scheduleErrExpireDate1");
-                    isValid = false;
-                    continue;
-                }
+            ////now we can validate the more basic rules for individual variants
+            //foreach (var variant in cultureVariants.Where(x => x.ReleaseDate.HasValue || x.ExpireDate.HasValue))
+            //{
+            //    //1) release date cannot be less than now
+            //    if (variant.ReleaseDate.HasValue && variant.ReleaseDate < DateTime.Now)
+            //    {
+            //        AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "scheduleErrReleaseDate1");
+            //        isValid = false;
+            //        continue;
+            //    }
 
-                //3) expire date cannot be less than release date
-                if (variant.ExpireDate.HasValue && variant.ReleaseDate.HasValue && variant.ExpireDate <= variant.ReleaseDate)
-                {
-                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "scheduleErrExpireDate2");
-                    isValid = false;
-                    continue;
-                }
-            }
+            //    //2) expire date cannot be less than now
+            //    if (variant.ExpireDate.HasValue && variant.ExpireDate < DateTime.Now)
+            //    {
+            //        AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "scheduleErrExpireDate1");
+            //        isValid = false;
+            //        continue;
+            //    }
 
-            if (!isValid) return false;
+            //    //3) expire date cannot be less than release date
+            //    if (variant.ExpireDate.HasValue && variant.ReleaseDate.HasValue && variant.ExpireDate <= variant.ReleaseDate)
+            //    {
+            //        AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "scheduleErrExpireDate2");
+            //        isValid = false;
+            //        continue;
+            //    }
+            //}
+
+            //if (!isValid) return false;
 
 
-            //now that we are validated, we can assign the copied schedule back to the model
-            contentItem.PersistedContent.ContentSchedule = schedCopy;
-            return true;
+            ////now that we are validated, we can assign the copied schedule back to the model
+            //contentItem.PersistedContent.ContentSchedule = schedCopy;
+            //return true;
         }
 
         /// <summary>

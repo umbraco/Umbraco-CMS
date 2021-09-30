@@ -143,26 +143,29 @@ namespace Umbraco.Extensions
         /// </summary>
         public static ContentStatus GetStatus(this IContent content, string culture = null)
         {
-            if (content.Trashed)
-                return ContentStatus.Trashed;
+            // TODO: ContentScheduling - fix
+            throw new NotImplementedException("ContentScheduling");
 
-            if (!content.ContentType.VariesByCulture())
-                culture = string.Empty;
-            else if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
+            //if (content.Trashed)
+            //    return ContentStatus.Trashed;
 
-            var expires = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
-            if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
-                return ContentStatus.Expired;
+            //if (!content.ContentType.VariesByCulture())
+            //    culture = string.Empty;
+            //else if (culture.IsNullOrWhiteSpace())
+            //    throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
 
-            var release = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
-            if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
-                return ContentStatus.AwaitingRelease;
+            //var expires = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
+            //if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
+            //    return ContentStatus.Expired;
 
-            if (content.Published)
-                return ContentStatus.Published;
+            //var release = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
+            //if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
+            //    return ContentStatus.AwaitingRelease;
 
-            return ContentStatus.Unpublished;
+            //if (content.Published)
+            //    return ContentStatus.Published;
+
+            //return ContentStatus.Unpublished;
         }
 
 

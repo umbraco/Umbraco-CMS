@@ -354,9 +354,12 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
         private DateTime? GetScheduledDate(IContent source, ContentScheduleAction action, MapperContext context)
         {
-            var culture = context.GetCulture() ?? string.Empty;
-            var schedule = source.ContentSchedule.GetSchedule(culture, action);
-            return schedule.FirstOrDefault()?.Date; // take the first, it's ordered by date
+            // TODO: ContentScheduling - fix
+            throw new NotImplementedException("ContentScheduling");
+
+            //var culture = context.GetCulture() ?? string.Empty;
+            //var schedule = source.ContentSchedule.GetSchedule(culture, action);
+            //return schedule.FirstOrDefault()?.Date; // take the first, it's ordered by date
         }
 
         private IDictionary<string, string> GetAllowedTemplates(IContent source)
