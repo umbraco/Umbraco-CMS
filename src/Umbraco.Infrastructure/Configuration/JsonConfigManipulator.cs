@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Configuration
             _logger = logger;
         }
 
-        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{ Cms.Core.Constants.System.UmbracoConnectionName}";
+        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{Cms.Core.Constants.System.UmbracoConnectionName}";
         public void RemoveConnectionString()
         {
             var provider = GetJsonConfigurationProvider(UmbracoConnectionPath);
