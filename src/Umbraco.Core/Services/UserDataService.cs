@@ -21,11 +21,10 @@ namespace Umbraco.Cms.Core.Services
 
         public IEnumerable<UserData> GetUserData()
         {
-
             var userDataList = new List<UserData>
             {
-
-                new UserData("Server OS", Environment.OSVersion.VersionString),
+                new UserData("Server OS", RuntimeInformation.OSDescription),
+                new UserData("Server Framework", RuntimeInformation.FrameworkDescription),
                 new UserData("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
                 new UserData("Current Culture", Thread.CurrentThread.CurrentCulture.ToString()),
                 new UserData("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
