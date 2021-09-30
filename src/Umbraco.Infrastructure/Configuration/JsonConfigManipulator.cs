@@ -186,19 +186,24 @@ namespace Umbraco.Cms.Core.Configuration
         {
             lock (_locker)
             {
-                if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
+                if (provider.Source.FileProvider is not PhysicalFileProvider physicalFileProvider)
                 {
-                    var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
-
-                    var serializer = new JsonSerializer();
-                    using (var sr = new StreamReader(jsonFilePath))
-                    using (var jsonTextReader = new JsonTextReader(sr))
-                    {
-                        return serializer.Deserialize<JObject>(jsonTextReader);
-                    }
+                    return null;
                 }
 
-                return null; 
+                var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
+
+                try
+                {
+                    var serializer = new JsonSerializer();
+                    using var sr = new StreamReader(jsonFilePath);
+                    using var jsonTextReader = new JsonTextReader(sr);
+                    return serializer.Deserialize<JObject>(jsonTextReader);
+                }
+                catch (FileNotFoundException)
+                {
+                    return null;
+                }
             }
         }
 
