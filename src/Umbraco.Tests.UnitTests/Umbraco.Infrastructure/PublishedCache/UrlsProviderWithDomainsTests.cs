@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -13,77 +14,83 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Extensions;
-using Umbraco.Tests.LegacyXmlPublishedCache;
 
-namespace Umbraco.Tests.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
     [TestFixture]
     public class UrlsProviderWithDomainsTests : UrlRoutingTestBase
     {
-        private IUmbracoContextAccessor UmbracoContextAccessor { get; } = new TestUmbracoContextAccessor();
-        protected override void Compose()
-        {
-            base.Compose();
+        private const string CacheKeyPrefix = "NuCache.ContentCache.RouteByContent";
 
-            Builder.Services.AddUnique(Mock.Of<IDomainService>());
-            Builder.Services.AddTransient<ISiteDomainMapper, SiteDomainMapper>();
+        private void SetDomains1()
+        {
+            var domainService = Mock.Get(DomainService);
+
+            domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
+                .Returns((bool incWildcards) => new[]
+                {
+                    new UmbracoDomain("domain1.com") {Id = 1, LanguageId = LangFrId, RootContentId = 1001, LanguageIsoCode = "fr-FR"}
+                });
         }
 
-        void SetDomains1()
+        private void SetDomains2()
         {
-            SetupDomainServiceMock(new[]
-            {
-                new UmbracoDomain("domain1.com") {Id = 1, LanguageId = LangFrId, RootContentId = 1001, LanguageIsoCode = "fr-FR"}
-            });
+            var domainService = Mock.Get(DomainService);
+
+            domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
+                .Returns((bool incWildcards) => new[]
+                {
+                    new UmbracoDomain("http://domain1.com/foo") {Id = 1, LanguageId = LangFrId, RootContentId = 1001, LanguageIsoCode = "fr-FR"}
+                });
         }
 
-        void SetDomains2()
+        private void SetDomains3()
         {
-            SetupDomainServiceMock(new[]
-            {
-                new UmbracoDomain("http://domain1.com/foo") {Id = 1, LanguageId = LangFrId, RootContentId = 1001, LanguageIsoCode = "fr-FR"}
-            });
+            var domainService = Mock.Get(DomainService);
+
+            domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
+                .Returns((bool incWildcards) => new[]
+                {
+                    new UmbracoDomain("http://domain1.com/") {Id = 1, LanguageId = LangFrId, RootContentId = 10011, LanguageIsoCode = "fr-FR"}
+                });
         }
 
-        void SetDomains3()
+        private void SetDomains4()
         {
-            SetupDomainServiceMock(new[]
-            {
-                new UmbracoDomain("http://domain1.com/") {Id = 1, LanguageId = LangFrId, RootContentId = 10011, LanguageIsoCode = "fr-FR"}
-            });
+            var domainService = Mock.Get(DomainService);
+
+            domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
+                .Returns((bool incWildcards) => new[]
+                {
+                    new UmbracoDomain("http://domain1.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain1.com/en") {Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain1.com/fr") {Id = 3, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"},
+                    new UmbracoDomain("http://domain3.com/") {Id = 4, LanguageId = LangEngId, RootContentId = 1003, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain3.com/en") {Id = 5, LanguageId = LangEngId, RootContentId = 10031, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain3.com/fr") {Id = 6, LanguageId = LangFrId, RootContentId = 10032, LanguageIsoCode = "fr-FR"}
+                });
         }
 
-        void SetDomains4()
+        private void SetDomains5()
         {
-            SetupDomainServiceMock(new[]
-            {
-                new UmbracoDomain("http://domain1.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain1.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain1.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"},
-                new UmbracoDomain("http://domain3.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1003, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain3.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10031, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain3.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId = 10032, LanguageIsoCode = "fr-FR"}
-            });
-        }
+            var domainService = Mock.Get(DomainService);
 
-        void SetDomains5()
-        {
-            SetupDomainServiceMock(new[]
-            {
-                new UmbracoDomain("http://domain1.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain1a.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain1b.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain1.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"},
-                new UmbracoDomain("http://domain1a.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"},
-                new UmbracoDomain("http://domain1b.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"},
-                new UmbracoDomain("http://domain3.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10031, LanguageIsoCode = "en-US"},
-                new UmbracoDomain("http://domain3.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId = 10032, LanguageIsoCode = "fr-FR"}
-            });
+            domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
+                .Returns((bool incWildcards) => new[]
+                {
+                    new UmbracoDomain("http://domain1.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain1a.com/en") {Id = 2, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain1b.com/en") {Id = 3, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain1.com/fr") {Id = 4, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"},
+                    new UmbracoDomain("http://domain1a.com/fr") {Id = 5, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"},
+                    new UmbracoDomain("http://domain1b.com/fr") {Id = 6, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"},
+                    new UmbracoDomain("http://domain3.com/en") {Id = 7, LanguageId = LangEngId, RootContentId = 10031, LanguageIsoCode = "en-US"},
+                    new UmbracoDomain("http://domain3.com/fr") {Id = 8, LanguageId = LangFrId, RootContentId = 10032, LanguageIsoCode = "fr-FR"}
+                });
         }
 
         protected override string GetXmlContent(int templateId)
-        {
-            return @"<?xml version=""1.0"" encoding=""utf-8""?>
+            => @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT Doc ANY>
 <!ATTLIST Doc id ID #REQUIRED>
@@ -162,7 +169,6 @@ namespace Umbraco.Tests.Routing
         </Doc>
     </Doc>
 </root>";
-        }
 
         // with one simple domain "domain1.com"
         // basic tests
@@ -179,21 +185,18 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "https://domain1.com", false, "/1001-1/")]
         public void Get_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
-
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
-            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
-            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
-
             SetDomains1();
+
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            GlobalSettings.HideTopLevelNodeFromPath = false;
+
+            var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
+
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out UriUtility uriUtility);
 
             var currentUri = new Uri(currentUrl);
             var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
-            var result = publishedUrlProvider.GetUrl(nodeId, mode, current: currentUri);
+            var result = urlProvider.GetUrl(nodeId, mode, current: currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -212,21 +215,18 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
         public void Get_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
-
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
-            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
-            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
-
             SetDomains2();
+
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            GlobalSettings.HideTopLevelNodeFromPath = false;
+
+            var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
+
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out UriUtility uriUtility);
 
             var currentUri = new Uri(currentUrl);
             var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
-            var result = publishedUrlProvider.GetUrl(nodeId, mode, current : currentUri);
+            var result = urlProvider.GetUrl(nodeId, mode, current: currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -237,21 +237,18 @@ namespace Umbraco.Tests.Routing
         [TestCase(1002, "http://domain1.com", false, "/1002/")]
         public void Get_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
-
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
-            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
-            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
-
             SetDomains3();
+
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            GlobalSettings.HideTopLevelNodeFromPath = false;
+
+            var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
+
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out UriUtility uriUtility);            
 
             var currentUri = new Uri(currentUrl);
             var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
-            var result = publishedUrlProvider.GetUrl(nodeId, mode, current : currentUri);
+            var result = urlProvider.GetUrl(nodeId, mode, current: currentUri);
             Assert.AreEqual(expected, result);
         }
 
@@ -268,152 +265,130 @@ namespace Umbraco.Tests.Routing
         [TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1/")]
         public void Get_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
         {
-            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
-
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
-            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var urlProvider = new DefaultUrlProvider(
-                Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
-            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
-
             SetDomains4();
+
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            GlobalSettings.HideTopLevelNodeFromPath = false;
+
+            var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
+
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out UriUtility uriUtility);
+
 
             var currentUri = new Uri(currentUrl);
             var mode = absolute ? UrlMode.Absolute : UrlMode.Auto;
-            var result = publishedUrlProvider.GetUrl(nodeId, mode, current : currentUri);
+            var result = urlProvider.GetUrl(nodeId, mode, current: currentUri);
             Assert.AreEqual(expected, result);
         }
 
         [Test]
         public void Get_Url_DomainsAndCache()
         {
-            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
-
-            var umbracoContext = GetUmbracoContext("/test", 1111, globalSettings: globalSettings);
-            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var urlProvider = new DefaultUrlProvider(
-                Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
-            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
-
             SetDomains4();
 
-            string ignore;
-            ignore = publishedUrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = publishedUrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = publishedUrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = publishedUrlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = publishedUrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = publishedUrlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = publishedUrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com"));
-            ignore = publishedUrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain2.com"));
-            ignore = publishedUrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain2.com"));
-            ignore = publishedUrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain2.com"));
-            ignore = publishedUrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            GlobalSettings.HideTopLevelNodeFromPath = false;
 
-            var cache = umbracoContext.Content as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-            var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
+            var umbracoContextAccessor = GetUmbracoContextAccessor("/test");
+            var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out UriUtility uriUtility);
+
+
+
+            string ignore;
+            ignore = urlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = urlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = urlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = urlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = urlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = urlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = urlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com"));
+            ignore = urlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = urlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = urlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain2.com"));
+            ignore = urlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain2.com"));
+
+            
+            var cache = (FastDictionaryAppCache)umbracoContext.PublishedSnapshot.ElementsCache;
+            var cachedRoutes = cache.Keys.Where(x => x.StartsWith(CacheKeyPrefix)).ToList();
             Assert.AreEqual(7, cachedRoutes.Count);
 
-            var cachedIds = cache.RoutesCache.GetCachedIds();
-            Assert.AreEqual(0, cachedIds.Count);
+            //var cachedIds = cache.RoutesCache.GetCachedIds();
+            //Assert.AreEqual(0, cachedIds.Count);
 
-            CheckRoute(cachedRoutes, cachedIds, 1001, "1001/");
-            CheckRoute(cachedRoutes, cachedIds, 10011, "10011/");
-            CheckRoute(cachedRoutes, cachedIds, 100111, "10011/1001-1-1");
-            CheckRoute(cachedRoutes, cachedIds, 10012, "10012/");
-            CheckRoute(cachedRoutes, cachedIds, 100121, "10012/1001-2-1");
-            CheckRoute(cachedRoutes, cachedIds, 10013, "1001/1001-3");
-            CheckRoute(cachedRoutes, cachedIds, 1002, "/1002");
+            CheckRoute(cache, 1001, "1001/");
+            CheckRoute(cache, 10011, "10011/");
+            CheckRoute(cache, 100111, "10011/1001-1-1");
+            CheckRoute(cache, 10012, "10012/");
+            CheckRoute(cache, 100121, "10012/1001-2-1");
+            CheckRoute(cache, 10013, "1001/1001-3");
+            CheckRoute(cache, 1002, "/1002");
 
             // use the cache
-            Assert.AreEqual("/", publishedUrlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/en/", publishedUrlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/en/1001-1-1/", publishedUrlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/fr/", publishedUrlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/fr/1001-2-1/", publishedUrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/1001-3/", publishedUrlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com")));
-            Assert.AreEqual("/1002/", publishedUrlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/", urlProvider.GetUrl(1001, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/en/", urlProvider.GetUrl(10011, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/en/1001-1-1/", urlProvider.GetUrl(100111, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/fr/", urlProvider.GetUrl(10012, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/fr/1001-2-1/", urlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/1001-3/", urlProvider.GetUrl(10013, UrlMode.Auto, current: new Uri("http://domain1.com")));
+            Assert.AreEqual("/1002/", urlProvider.GetUrl(1002, UrlMode.Auto, current: new Uri("http://domain1.com")));
 
-            Assert.AreEqual("http://domain1.com/fr/1001-2-1/", publishedUrlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain2.com")));
+            Assert.AreEqual("http://domain1.com/fr/1001-2-1/", urlProvider.GetUrl(100121, UrlMode.Auto, current: new Uri("http://domain2.com")));
         }
 
-        private static void CheckRoute(IDictionary<int, string> routes, IDictionary<string, int> ids, int id, string route)
+        private static void CheckRoute(FastDictionaryAppCache routes, int id, string route)
         {
-            Assert.IsTrue(routes.ContainsKey(id));
-            Assert.AreEqual(route, routes[id]);
-            Assert.IsFalse(ids.ContainsKey(route));
+            var cacheKey = $"{CacheKeyPrefix}[P:{id}]";
+            var found = (string)routes.Get(cacheKey);
+            Assert.IsNotNull(found);
+            Assert.AreEqual(route, found);
         }
 
         [Test]
         public void Get_Url_Relative_Or_Absolute()
         {
-            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
-
-            var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, globalSettings: globalSettings);
-            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var urlProvider = new DefaultUrlProvider(
-                Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
-            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
-
             SetDomains4();
 
-            Assert.AreEqual("/en/1001-1-1/", publishedUrlProvider.GetUrl(100111));
-            Assert.AreEqual("http://domain3.com/en/1003-1-1/", publishedUrlProvider.GetUrl(100311));
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            GlobalSettings.HideTopLevelNodeFromPath = false;
 
-            publishedUrlProvider.Mode = UrlMode.Absolute;
+            var umbracoContextAccessor = GetUmbracoContextAccessor("http://domain1.com/test");
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out UriUtility uriUtility);
 
-            Assert.AreEqual("http://domain1.com/en/1001-1-1/", publishedUrlProvider.GetUrl(100111));
-            Assert.AreEqual("http://domain3.com/en/1003-1-1/", publishedUrlProvider.GetUrl(100311));
+
+            Assert.AreEqual("/en/1001-1-1/", urlProvider.GetUrl(100111));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", urlProvider.GetUrl(100311));
+
+            urlProvider.Mode = UrlMode.Absolute;
+
+            Assert.AreEqual("http://domain1.com/en/1001-1-1/", urlProvider.GetUrl(100111));
+            Assert.AreEqual("http://domain3.com/en/1003-1-1/", urlProvider.GetUrl(100311));
         }
 
         [Test]
         public void Get_Url_Alternate()
         {
-            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
-            var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = false };
-
-            var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, globalSettings: globalSettings);
-            var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var urlProvider = new DefaultUrlProvider(
-                Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
-                LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
-            var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
-
             SetDomains5();
 
-            var url = publishedUrlProvider.GetUrl(100111, UrlMode.Absolute);
+            var requestHandlerSettings = new RequestHandlerSettings { AddTrailingSlash = true };
+            GlobalSettings.HideTopLevelNodeFromPath = false;
+
+            var umbracoContextAccessor = GetUmbracoContextAccessor("http://domain1.com/en/test");
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, requestHandlerSettings, new WebRoutingSettings(), out UriUtility uriUtility);
+
+
+            var url = urlProvider.GetUrl(100111, UrlMode.Absolute);
             Assert.AreEqual("http://domain1.com/en/1001-1-1/", url);
 
-            var result = publishedUrlProvider.GetOtherUrls(100111).ToArray();
+            var result = urlProvider.GetOtherUrls(100111).ToArray();
 
-            foreach (var x in result) Console.WriteLine(x);
+            foreach (var x in result)
+                Console.WriteLine(x);
 
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(result[0].Text, "http://domain1b.com/en/1001-1-1/");
             Assert.AreEqual(result[1].Text, "http://domain1a.com/en/1001-1-1/");
         }
 
-        private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, DefaultUrlProvider urlProvider)
-        {
-            var webRoutingSettings = new WebRoutingSettings();
-            return new UrlProvider(
-                new TestUmbracoContextAccessor(umbracoContext),
-                Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
-                new UrlProviderCollection(new []{urlProvider}),
-                new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                Mock.Of<IVariationContextAccessor>()
-            );
-        }
     }
 }

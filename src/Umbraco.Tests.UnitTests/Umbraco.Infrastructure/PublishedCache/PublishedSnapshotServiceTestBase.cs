@@ -29,6 +29,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 {
@@ -68,6 +69,30 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             var doc = snapshot.Media.GetById(id);
             Assert.IsNotNull(doc);
             return doc;
+        }
+
+        protected UrlProvider GetUrlProvider(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            RequestHandlerSettings requestHandlerSettings,
+            WebRoutingSettings webRoutingSettings,
+            out UriUtility uriUtility)
+        {
+            uriUtility = new UriUtility(Mock.Of<IHostingEnvironment>());
+            var urlProvider = new DefaultUrlProvider(
+                                   Options.Create(requestHandlerSettings),
+                                   Mock.Of<ILogger<DefaultUrlProvider>>(),
+                                   new SiteDomainMapper(),
+                                   umbracoContextAccessor,
+                                   uriUtility);
+
+            var publishedUrlProvider = new UrlProvider(
+                umbracoContextAccessor,
+                Options.Create(webRoutingSettings),
+                new UrlProviderCollection(() => new[] { urlProvider }),
+                new MediaUrlProviderCollection(() => Enumerable.Empty<IMediaUrlProvider>()),
+                Mock.Of<IVariationContextAccessor>());
+
+            return publishedUrlProvider;
         }
 
         protected static PublishedRouter CreatePublishedRouter(

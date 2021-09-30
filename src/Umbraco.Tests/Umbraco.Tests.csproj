@@ -177,7 +177,6 @@
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Routing\UrlProviderWithoutHideTopLevelNodeFromPathTests.cs" />
-    <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />
     <Compile Include="Scoping\ScopedXmlTests.cs" />
     <Compile Include="Scoping\ScopedNuCacheTests.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />

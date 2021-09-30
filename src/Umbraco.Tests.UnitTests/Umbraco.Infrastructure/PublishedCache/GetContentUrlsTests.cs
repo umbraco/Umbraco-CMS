@@ -77,28 +77,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             return langService;
         }
 
-        private UrlProvider GetUrlProvider(
-            IUmbracoContextAccessor umbracoContextAccessor,
-            out UriUtility uriUtility)
-        {
-            uriUtility = new UriUtility(Mock.Of<IHostingEnvironment>());
-            var urlProvider = new DefaultUrlProvider(
-                                   Microsoft.Extensions.Options.Options.Create(_requestHandlerSettings),
-                                   Mock.Of<ILogger<DefaultUrlProvider>>(),
-                                   new SiteDomainMapper(),
-                                   umbracoContextAccessor,
-                                   uriUtility);
-
-            var publishedUrlProvider = new UrlProvider(
-                umbracoContextAccessor,
-                Microsoft.Extensions.Options.Options.Create(_webRoutingSettings),
-                new UrlProviderCollection(() => new[] { urlProvider }),
-                new MediaUrlProviderCollection(() => Enumerable.Empty<IMediaUrlProvider>()),
-                Mock.Of<IVariationContextAccessor>());
-
-            return publishedUrlProvider;
-        }
-
         [Test]
         public async Task Content_Not_Published()
         {
@@ -113,7 +91,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
             var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
-            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, out UriUtility uriUtility);
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings, out UriUtility uriUtility);
 
             var urls = (await content.GetContentUrlsAsync(
                 publishedRouter,
@@ -146,7 +124,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
                 new[] { new ContentFinderByUrl(Mock.Of<ILogger<ContentFinderByUrl>>(), umbracoContextAccessor) });
             var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
-            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, out UriUtility uriUtility);
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings, out UriUtility uriUtility);
 
             var urls = (await content.GetContentUrlsAsync(
                 publishedRouter,
@@ -188,7 +166,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             var umbracoContext = umbracoContextAccessor.GetRequiredUmbracoContext();
 
 
-            var urlProvider = GetUrlProvider(umbracoContextAccessor, out UriUtility uriUtility);
+            UrlProvider urlProvider = GetUrlProvider(umbracoContextAccessor, _requestHandlerSettings, _webRoutingSettings, out UriUtility uriUtility);
 
             var urls = (await child.GetContentUrlsAsync(
                 publishedRouter,
