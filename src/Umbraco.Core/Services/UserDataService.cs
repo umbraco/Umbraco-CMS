@@ -14,9 +14,11 @@ namespace Umbraco.Cms.Core.Services
     public class UserDataService : IUserDataService
     {
         private IUmbracoVersion _version;
-        public UserDataService(IUmbracoVersion version)
+        private readonly ILocalizationService _localizationService;
+        public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
         {
             _version = version;
+            _localizationService = localizationService;
         }
 
         public IEnumerable<UserData> GetUserData()
@@ -25,6 +27,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 new UserData("Server OS", RuntimeInformation.OSDescription),
                 new UserData("Server Framework", RuntimeInformation.FrameworkDescription),
+                new UserData("Default Language", _localizationService.GetDefaultLanguageIsoCode()),
                 new UserData("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
                 new UserData("Current Culture", Thread.CurrentThread.CurrentCulture.ToString()),
                 new UserData("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),

@@ -42,7 +42,7 @@
               if(browserInfo != null){
                 vm.systemInfo.push({name :"Browser", data: browserInfo.name + " " + browserInfo.version});
               }
-              vm.systemInfo.push({name :"User OS", data: getPlatform()});
+              vm.systemInfo.push({name :"Browser OS", data: getPlatform()});
             });
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
@@ -224,29 +224,6 @@
         function getPlatform() {
           const allPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE', 'Android', 'iPhone', 'iPad', 'iPod'];
           return allPlatforms.find(item => item === window.navigator.platform);
-        }
-        function getCurrentBrowser(){
-          let sBrowser, sUsrAg = window.navigator.userAgent;
-          if (sUsrAg.indexOf("Firefox") > -1) {
-            sBrowser = "Mozilla Firefox";
-          } else if (sUsrAg.indexOf("SamsungBrowser") > -1) {
-            sBrowser = "Samsung Internet";
-          } else if (sUsrAg.indexOf("Opera") > -1 || sUsrAg.indexOf("OPR") > -1) {
-            sBrowser = "Opera";
-          } else if (sUsrAg.indexOf("Trident") > -1) {
-            sBrowser = "Microsoft Internet Explorer";
-          } else if (sUsrAg.indexOf("Edge") > -1) {
-            sBrowser = "Microsoft Edge (Legacy)";
-          } else if (sUsrAg.indexOf("Edg") > -1) {
-            sBrowser = "Microsoft Edge (Chromium)";
-          } else if (sUsrAg.indexOf("Chrome") > -1) {
-            sBrowser = "Google Chrome or Chromium";
-          } else if (sUsrAg.indexOf("Safari") > -1) {
-            sBrowser = "Apple Safari";
-          } else {
-            sBrowser = "unknown";
-          }
-          return sBrowser;
         }
         evts.push(eventsService.on("appState.tour.complete", function (event, tour) {
             tourService.getGroupedTours().then(function(groupedTours) {
