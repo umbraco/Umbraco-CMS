@@ -175,7 +175,6 @@
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
-    <Compile Include="Routing\GetContentUrlsTests.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Routing\UrlProviderWithoutHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />

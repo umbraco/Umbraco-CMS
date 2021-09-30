@@ -70,15 +70,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             return doc;
         }
 
-        protected static PublishedRouter CreatePublishedRouter(IUmbracoContextAccessor umbracoContextAccessor)
+        protected static PublishedRouter CreatePublishedRouter(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IEnumerable<IContentFinder> contentFinders = null,
+            IPublishedUrlProvider publishedUrlProvider = null)
             => new PublishedRouter(
                     Options.Create(new WebRoutingSettings()),
-                    new ContentFinderCollection(() => Enumerable.Empty<IContentFinder>()),
+                    new ContentFinderCollection(() => contentFinders ?? Enumerable.Empty<IContentFinder>()),
                     new TestLastChanceFinder(),
                     new TestVariationContextAccessor(),
                     Mock.Of<IProfilingLogger>(),
                     Mock.Of<ILogger<PublishedRouter>>(),
-                    Mock.Of<IPublishedUrlProvider>(),
+                    publishedUrlProvider?? Mock.Of<IPublishedUrlProvider>(),
                     Mock.Of<IRequestAccessor>(),
                     Mock.Of<IPublishedValueFallback>(),
                     Mock.Of<IFileService>(),
