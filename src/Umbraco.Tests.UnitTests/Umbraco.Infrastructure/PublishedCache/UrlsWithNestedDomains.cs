@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
@@ -51,13 +52,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             string absUrl = publishedUrlProvider.GetUrl(100111, UrlMode.Absolute);
             Assert.AreEqual("http://domain2.com/1001-1-1/", absUrl);
 
-            // check that the proper route has been cached
-            var cache = umbracoContext.PublishedSnapshot.ElementsCache;
+            const string cacheKeyPrefix = "NuCache.ContentCache.RouteByContent";
 
-            // ***************
-            //var cachedRoutes = cache.GetCachedRoutes();
-            //Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
-            // ***************
+            // check that the proper route has been cached
+            var cache = (FastDictionaryAppCache)umbracoContext.PublishedSnapshot.ElementsCache;
+
+            var cachedRoutes = cache.Keys.Where(x => x.StartsWith(cacheKeyPrefix)).ToList();
+            var cacheKey = $"{cacheKeyPrefix}[P:100111]";
+            Assert.AreEqual("10011/1001-1-1", cache.Get(cacheKey));
 
             // route a rogue URL
             var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
@@ -72,17 +74,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
             Assert.IsTrue(result);
             Assert.AreEqual(100111, frequest.PublishedContent.Id);
 
-            // ***************
             // has the cache been polluted?
-            //cachedRoutes = cache.RoutesCache.GetCachedRoutes();
-            //Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]); // no
-            // ***************
-
-            //Assert.AreEqual("1001/1001-1/1001-1-1", cachedRoutes[100111]); // yes
+            cachedRoutes = cache.Keys.Where(x => x.StartsWith(cacheKeyPrefix)).ToList();
+            Assert.AreEqual("10011/1001-1-1", cache.Get(cacheKey)); // no
 
             // what's the nice URL now?
             Assert.AreEqual("http://domain2.com/1001-1-1/", publishedUrlProvider.GetUrl(100111)); // good
-            //Assert.AreEqual("http://domain1.com/1001-1/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, true)); // bad
         }
 
         private IPublishedUrlProvider GetPublishedUrlProvider(IUmbracoContext umbracoContext, object urlProvider)
