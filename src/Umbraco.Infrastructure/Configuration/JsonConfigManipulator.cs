@@ -22,6 +22,10 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider(UmbracoConnectionPath);
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                return;
+            }
 
             RemoveJsonKey(json, UmbracoConnectionPath);
 
@@ -33,6 +37,10 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                return;
+            }
 
             var item = GetConnectionItem(connectionString, providerName);
 
@@ -47,6 +55,10 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                return;
+            }
 
             JToken token = json;
             foreach (var propertyName in key.Split(new[] { ':' }))
@@ -73,6 +85,10 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                return;
+            }
 
             var item = GetDisableRedirectUrlItem(disable);
 
@@ -86,6 +102,10 @@ namespace Umbraco.Cms.Core.Configuration
             var provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
+            if (json is null)
+            {
+                return;
+            }
 
             var item = GetGlobalIdItem(id);
 
