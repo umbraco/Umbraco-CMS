@@ -5,9 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
@@ -167,9 +165,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
         public IEnumerable<UserData> GetUserData()
         {
-            var variablesFeature = HttpContext.Features.Get<IServerVariablesFeature>();
             return _userDataService.GetUserData();
-
         }
 
         /// <summary>
