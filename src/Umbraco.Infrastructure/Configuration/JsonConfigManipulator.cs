@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration;
@@ -12,9 +13,16 @@ namespace Umbraco.Cms.Core.Configuration
     public class JsonConfigManipulator : IConfigManipulator
     {
         private readonly IConfiguration _configuration;
+        private readonly ILogger<JsonConfigManipulator> _logger;
         private readonly object _locker = new object();
 
-        public JsonConfigManipulator(IConfiguration configuration) => _configuration = configuration;
+        public JsonConfigManipulator(
+            IConfiguration configuration,
+            ILogger<JsonConfigManipulator> logger)
+        {
+            _configuration = configuration;
+            _logger = logger;
+        }
 
         public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{ Cms.Core.Constants.System.UmbracoConnectionName}";
         public void RemoveConnectionString()
@@ -24,6 +32,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
+                _logger.LogWarning("Failed to remove connection string from JSON configuration");
                 return;
             }
 
@@ -39,6 +48,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
+                _logger.LogWarning("Failed to save connection string in JSON configuration");
                 return;
             }
 
@@ -57,6 +67,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
+                _logger.LogWarning("Failed to save configuration key \"{key}\" in JSON configuration", key);
                 return;
             }
 
@@ -87,6 +98,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
+                _logger.LogWarning("Failed to save \"DisableRedirectUrlTracking\" in JSON configuration");
                 return;
             }
 
@@ -104,6 +116,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
+                _logger.LogWarning("Failed to save global identifier in JSON configuration");
                 return;
             }
 
@@ -222,6 +235,7 @@ namespace Umbraco.Cms.Core.Configuration
                 }
                 catch (FileNotFoundException)
                 {
+                    _logger.LogWarning("JSON configuration file does not exist: {path}", jsonFilePath);
                     return null;
                 }
             }
