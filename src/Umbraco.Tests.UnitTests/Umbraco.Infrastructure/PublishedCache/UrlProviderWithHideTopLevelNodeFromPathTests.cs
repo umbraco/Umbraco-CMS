@@ -31,6 +31,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
 
             InitializedCache(kits, contentTypes, dataTypes: dataTypes);
 
+            GlobalSettings.HideTopLevelNodeFromPath = true;
         }
         
         [TestCase(1046, "/")]

@@ -115,6 +115,11 @@ namespace Umbraco.Cms.Tests.Common.Builders
             contentType.Key = contentType.Key == default ? Guid.NewGuid() : contentType.Key;
             contentType.Id = contentType.Id == default ? Math.Abs(contentTypeAlias.GetHashCode()) : contentType.Id;
 
+            if (_properties == null)
+            {
+                _properties = new Dictionary<string, PropertyData[]>();
+            }
+
             foreach (KeyValuePair<string, PropertyData[]> prop in _properties)
             {
                 //var dataType = new DataType(new VoidEditor("Label", Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
@@ -134,7 +139,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 // set for each culture too.
                 foreach (PropertyData cultureValue in prop.Value.Where(x => !x.Culture.IsNullOrWhiteSpace()))
                 {
-                    // set the property and content type to vary based on the values
+                    // set the property type to vary based on the values
                     propertyType.Variations |= ContentVariation.Culture;
 
                     // if there isn't already a culture, then add one with the default name
