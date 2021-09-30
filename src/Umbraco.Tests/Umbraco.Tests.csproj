@@ -164,7 +164,6 @@
     <Compile Include="LegacyXmlPublishedCache\PublishedMember.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Routing\BaseUrlProviderTest.cs" />
-    <Compile Include="Routing\UrlProviderWithHideTopLevelNodeFromPathTests.cs" />
     <Compile Include="Services\TestWithSomeContentBase.cs" />
     <Compile Include="TestHelpers\Entities\MockedContent.cs" />
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
