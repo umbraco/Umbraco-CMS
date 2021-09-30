@@ -237,6 +237,8 @@ namespace Umbraco.Web.Composing
 
         public static IVariationContextAccessor VariationContextAccessor => CoreCurrent.VariationContextAccessor;
 
+        public static IEmailSender EmailSender => CoreCurrent.EmailSender;
+
         #endregion
     }
 }

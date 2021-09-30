@@ -222,6 +222,9 @@ namespace Umbraco.Core.Composing
 
         public static IImageUrlGenerator ImageUrlGenerator
             => Factory.GetInstance<IImageUrlGenerator>();
+
+        public static IEmailSender EmailSender
+            => Factory.GetInstance<IEmailSender>();
         #endregion
     }
 }
