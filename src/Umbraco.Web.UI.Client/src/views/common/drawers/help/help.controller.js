@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter, editorState, notificationsService) {
+    function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter, editorState, notificationsService, currentUserResource, platformService) {
 
         var vm = this;
         var evts = [];
@@ -22,8 +22,7 @@
 
         vm.showDocTypeTour = false;
         vm.docTypeTours = [];
-        vm.systemInfo = [{name : "Umbraco Version", data : "9.0.0-rc004"}, {name : "Operating System", data : "Windows"}, {name : "Current Culture", data : "en-US"}, {name : "Current UI Culture", data : "dn-DK"},
-          {name : "Webserver", data : "Kestrel"}, {name : "Packages", data : "Umbraco.TheStarterKit, uSync"}, {name : "Browser", data : "Electron"}]
+        vm.systemInfo = [];
         vm.nodeName = '';
 
         function startTour(tour) {
@@ -37,7 +36,14 @@
             localizationService.localize("general_help").then(function(data){
                 vm.title = data;
             });
-
+            currentUserResource.getUserData().then(function(systemInfo){
+              vm.systemInfo = systemInfo;
+              let browserInfo = platformService.getBrowserInfo();
+              if(browserInfo != null){
+                vm.systemInfo.push({name :"Browser", data: browserInfo.name + " " + browserInfo.version});
+              }
+              vm.systemInfo.push({name :"User OS", data: getPlatform()});
+            });
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
                 getTourGroupCompletedPercentage();
@@ -208,12 +214,39 @@
           });
           copyText += "\n<!--EndFragment-->\n</body>\n</html>"
           navigator.clipboard.writeText(copyText);
-          if(copyText != null || copyText != ""){
+          if(copyText != null){
             notificationsService.success("Copied!", "Your system information is now in your clipboard");
           }
           else{
             notificationsService.error("Sadge", "something failed");
           }
+        }
+        function getPlatform() {
+          const allPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE', 'Android', 'iPhone', 'iPad', 'iPod'];
+          return allPlatforms.find(item => item === window.navigator.platform);
+        }
+        function getCurrentBrowser(){
+          let sBrowser, sUsrAg = window.navigator.userAgent;
+          if (sUsrAg.indexOf("Firefox") > -1) {
+            sBrowser = "Mozilla Firefox";
+          } else if (sUsrAg.indexOf("SamsungBrowser") > -1) {
+            sBrowser = "Samsung Internet";
+          } else if (sUsrAg.indexOf("Opera") > -1 || sUsrAg.indexOf("OPR") > -1) {
+            sBrowser = "Opera";
+          } else if (sUsrAg.indexOf("Trident") > -1) {
+            sBrowser = "Microsoft Internet Explorer";
+          } else if (sUsrAg.indexOf("Edge") > -1) {
+            sBrowser = "Microsoft Edge (Legacy)";
+          } else if (sUsrAg.indexOf("Edg") > -1) {
+            sBrowser = "Microsoft Edge (Chromium)";
+          } else if (sUsrAg.indexOf("Chrome") > -1) {
+            sBrowser = "Google Chrome or Chromium";
+          } else if (sUsrAg.indexOf("Safari") > -1) {
+            sBrowser = "Apple Safari";
+          } else {
+            sBrowser = "unknown";
+          }
+          return sBrowser;
         }
         evts.push(eventsService.on("appState.tour.complete", function (event, tour) {
             tourService.getGroupedTours().then(function(groupedTours) {

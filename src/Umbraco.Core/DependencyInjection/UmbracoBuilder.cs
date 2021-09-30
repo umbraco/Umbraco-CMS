@@ -26,6 +26,8 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -179,6 +181,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<UriUtility>();
 
             Services.AddUnique<IDashboardService, DashboardService>();
+            Services.AddUnique<IUserDataService, UserDataService>();
 
             // will be injected in controllers when needed to invoke rest endpoints on Our
             Services.AddUnique<IInstallationService, InstallationService>();
