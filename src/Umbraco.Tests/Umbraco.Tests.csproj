@@ -195,7 +195,6 @@
     <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
-    <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
