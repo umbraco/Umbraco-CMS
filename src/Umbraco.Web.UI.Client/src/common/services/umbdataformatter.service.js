@@ -72,10 +72,10 @@
                     return g.tabState === "init";
                 });
                 saveModel.groups = _.map(realGroups, function (g) {
-                    var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name', 'key', 'alias', 'type');
+                    var saveGroup = _.pick(g, 'id', 'sortOrder', 'name', 'key', 'alias', 'type');
 
                     var realProperties = _.reject(g.properties, function (p) {
-                        // Do not include properties with init state or inherited from compositions
+                        // Do not include properties with init state or inherited from a composition
                         return p.propertyState === "init" || p.inherited === true;
                     });
 
@@ -86,7 +86,7 @@
 
                     saveGroup.properties = saveProperties;
 
-                    if (saveGroup.inherited === true) {
+                    if (g.inherited === true) {
                         if (saveProperties.length === 0) {
                             // All properties are inherited from the compositions, no need to save this group
                             return null;
