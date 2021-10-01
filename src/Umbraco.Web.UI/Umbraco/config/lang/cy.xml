@@ -318,7 +318,7 @@
         <key alias="nodeIsInTrash">Mae'r eitem yma yn y Bin Ailgylchu</key>
     </area>
     <area alias="blueprints">
-        <key alias="createBlueprintFrom">Creu Templed Cynnwys newydd o '%0%'</key>
+        <key alias="createBlueprintFrom"><![CDATA[Creu Templed Cynnwys newydd o <em>%0%</em>]]></key>
         <key alias="blankBlueprint">Gwag</key>
         <key alias="selectBlueprint">Dewis Templed Cynnwys</key>
         <key alias="createdBlueprintHeading">Templed Cynnwys wedi'i greu</key>

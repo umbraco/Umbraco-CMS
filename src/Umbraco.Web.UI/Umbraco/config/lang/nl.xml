@@ -314,7 +314,7 @@
     <key alias="nodeIsInTrash">Dit item is in de prullenbak</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Nieuw Inhoudssjabloon aanmaken voor '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Nieuw Inhoudssjabloon aanmaken voor <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Leeg</key>
     <key alias="selectBlueprint">Selecteer een Inhoudssjabloon</key>
     <key alias="createdBlueprintHeading">Inhoudssjabloon aangemaakt</key>
@@ -2342,6 +2342,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       <key alias="confirmCancelBlockCreationMessage"><![CDATA[Ben je zeker dat je deze wijzigingen wil verwerpen?]]></key>
       <key alias="elementTypeDoesNotExistHeadline">Fout!</key>
       <key alias="elementTypeDoesNotExistDescription">Het Elementtype van dit blok bestaat niet meer</key>
+      <key alias="addBlock">Inhoud toevoegen</key>
       <key alias="propertyEditorNotSupported">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in blokken.</key>
     </area>
   <area alias="contentTemplatesDashboard">

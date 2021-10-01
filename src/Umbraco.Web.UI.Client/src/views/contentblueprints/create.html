@@ -12,7 +12,7 @@
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
             <ul class="umb-actions umb-actions-child">
-                <li class="umb-action" ng-repeat="documentType in vm.documentTypes |orderBy:'name':false">
+                <li class="umb-action" ng-repeat="documentType in vm.documentTypes | orderBy:'name':false">
                     <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.createBlueprint(documentType)">
                         <umb-icon icon="{{documentType.icon}}" class="icon large"></umb-icon>
                         <span class="menu-label">
