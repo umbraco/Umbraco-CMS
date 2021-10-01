@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.Events
             private readonly INotificationService _notificationService;
             private readonly IUserService _userService;
             private readonly ILocalizedTextService _textService;
-            private readonly GlobalSettings _globalSettings;
+            private GlobalSettings _globalSettings;
             private readonly ILogger<Notifier> _logger;
 
             /// <summary>
@@ -146,6 +146,8 @@ namespace Umbraco.Cms.Core.Events
                 _textService = textService;
                 _globalSettings = globalSettings.CurrentValue;
                 _logger = logger;
+
+                globalSettings.OnChange(x => _globalSettings = x);
             }
 
             public void Notify(IAction action, params IContent[] entities)
