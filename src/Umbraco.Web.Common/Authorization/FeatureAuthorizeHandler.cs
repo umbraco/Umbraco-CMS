@@ -47,6 +47,13 @@ namespace Umbraco.Cms.Web.Common.Authorization
                     break;
                 }
 
+                case Microsoft.AspNetCore.Mvc.Filters.AuthorizationFilterContext authorizationFilterContext:
+                {
+                    IEndpointFeature endpointFeature = authorizationFilterContext.HttpContext.Features.Get<IEndpointFeature>();
+                    endpoint = endpointFeature.Endpoint;
+                    break;
+                }
+
                 case Endpoint resourceEndpoint:
                 {
                     endpoint = resourceEndpoint;
