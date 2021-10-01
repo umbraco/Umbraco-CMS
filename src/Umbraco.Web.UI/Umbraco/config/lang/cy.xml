@@ -2846,11 +2846,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     </area>
     <area alias="preview">
         <key alias="endLabel">Diweddu</key>
-        <key alias="endTitle">
-            End preview mode
-            Diwedd modd rhagolwg
-            Diweddu modd rhagolwg
-        </key>
+        <key alias="endTitle">Diwedd modd rhagolwg</key>
         <key alias="openWebsiteLabel">Rhagolwg y wefan</key>
         <key alias="openWebsiteTitle">Agor y wefan mewn modd rhagolwg</key>
         <key alias="returnToPreviewHeadline">Rhagolwg y wefan?</key>
