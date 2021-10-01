@@ -218,7 +218,7 @@
             notificationsService.success("Copied!", "Your system information is now in your clipboard");
           }
           else{
-            notificationsService.error("Sadge", "something failed");
+            notificationsService.error("Error", "Could not copy system information");
           }
         }
         function getPlatform() {
