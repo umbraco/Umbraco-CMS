@@ -318,7 +318,7 @@
         <key alias="nodeIsInTrash">Mae'r eitem yma yn y Bin Ailgylchu</key>
     </area>
     <area alias="blueprints">
-        <key alias="createBlueprintFrom"><![CDATA[Creu Templed Cynnwys newydd o <em>%0%</em>]]></key>
+        <key alias="createBlueprintFrom">Creu Templed Cynnwys newydd o '%0%'</key>
         <key alias="blankBlueprint">Gwag</key>
         <key alias="selectBlueprint">Dewis Templed Cynnwys</key>
         <key alias="createdBlueprintHeading">Templed Cynnwys wedi'i greu</key>
@@ -2582,7 +2582,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="tabExpand">Gweld mwy o opsiynau</key>
         <key alias="searchOverlayTitle">Chwilio'r swyddfa gefn Umbraco</key>
         <key alias="searchOverlayDescription">Chwilio am nodau gynnwys, nodau cyfryngau ayyb. ar draws y swyddfa gefn.</key>
-        <key alias="searchInputDescription">Pryd mae canlyniadau awtocyflawni ar gael, gwasgwch y saethau lan a lawr, neu ddefnyddio'r fysell tab ac y fysell mewn i ddewis.</key>
+        <key alias="searchInputDescription">Pryd mae canlyniadau awtocyflawni ar gael, gwasgwch y saethau lan a lawr, neu ddefnyddio'r fysell tab ac y fysell enter i ddewis.</key>
         <key alias="path">Llwybr:</key>
         <key alias="foundIn">Wedi'i ddarganfod yn</key>
         <key alias="hasTranslation">Wedi cyfieithu</key>
