@@ -28,6 +28,14 @@ namespace Umbraco.Cms.Tests.Common.Published
     /// </remarks>
     public static class PublishedContentXmlAdapter
     {
+        /// <summary>
+        /// Generate a collection of <see cref="ContentNodeKit"/> based on legacy umbraco XML
+        /// </summary>
+        /// <param name="xml">The legacy umbraco XML</param>
+        /// <param name="shortStringHelper"></param>
+        /// <param name="contentTypes">Dynamically generates a list of <see cref="ContentType"/>s based on the XML data</param>
+        /// <param name="dataTypes">Dynamically generates a list of <see cref="DataType"/> for tests</param>
+        /// <returns></returns>
         public static IEnumerable<ContentNodeKit> GetContentNodeKits(
             string xml,
             IShortStringHelper shortStringHelper,

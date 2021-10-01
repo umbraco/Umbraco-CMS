@@ -16,7 +16,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 {
     [TestFixture]
     public class PublishedRouterTests
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PublishedCache
         [Test]
         public async Task ConfigureRequest_Returns_False_When_IsRedirect()
         {
-            var umbracoContextAccessor = GetUmbracoContextAccessor();           
+            var umbracoContextAccessor = GetUmbracoContextAccessor();
             var publishedRouter = CreatePublishedRouter(umbracoContextAccessor);
             var request = await publishedRouter.CreateRequestAsync(umbracoContextAccessor.GetRequiredUmbracoContext().CleanedUmbracoUrl);
             var content = GetPublishedContentMock();
