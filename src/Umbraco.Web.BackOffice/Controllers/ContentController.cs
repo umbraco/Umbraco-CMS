@@ -321,15 +321,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay> GetById(int id)
+        public ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>> GetById(int id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
                 return HandleContentNotFound(id);
             }
-            var content = MapToDisplay(foundContent);
-            return content;
+
+            return MapToDisplayWithSchedule(foundContent);
         }
 
         /// <summary>
@@ -339,16 +339,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay> GetById(Guid id)
+        public ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>> GetById(Guid id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
                 return HandleContentNotFound(id);
             }
-
-            var content = MapToDisplay(foundContent);
-            return content;
+            return MapToDisplayWithSchedule(foundContent);
         }
 
         /// <summary>
@@ -358,7 +356,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay> GetById(Udi id)
+        public ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
@@ -2368,6 +2366,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 context.Items["CurrentUser"] = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             });
 
+        private ContentItemDisplayWithSchedule MapToDisplayWithSchedule(IContent content)
+        {
+            ContentItemDisplayWithSchedule display = _umbracoMapper.Map<ContentItemDisplayWithSchedule>(content, context =>
+            {
+                context.Items["CurrentUser"] = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                context.Items["Schedule"] = _contentService.GetContentScheduleByContentId(content.Id);
+            });
+            display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
+            return display;
+        }
+        
         /// <summary>
         /// Used to map an <see cref="IContent"/> instance to a <see cref="ContentItemDisplay"/> and ensuring AllowPreview is set correctly.
         /// Also allows you to pass in an action for the mapper context where you can pass additional information on to the mapper.
@@ -2377,7 +2386,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content, Action<MapperContext> contextOptions)
         {
-            var display = _umbracoMapper.Map<ContentItemDisplay>(content, contextOptions);
+            ContentItemDisplay display = _umbracoMapper.Map<ContentItemDisplay>(content, contextOptions);
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }

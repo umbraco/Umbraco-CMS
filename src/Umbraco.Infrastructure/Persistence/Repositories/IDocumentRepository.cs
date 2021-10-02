@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -78,5 +78,12 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// Returns true if there is any content in the recycle bin
         /// </summary>
         bool RecycleBinSmells();
+
+        /// <summary>
+        /// Loads schedule for content
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        ContentScheduleCollection GetContentSchedule(int contentId);
     }
 }

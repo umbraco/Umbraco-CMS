@@ -294,7 +294,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
                 // load bare minimum, need variants though since this is used to rollback with variants
-                false, false, false, true).Skip(skip).Take(take);
+                false, false, true).Skip(skip).Take(take);
         }
 
         public override IContent GetVersion(int versionId)
@@ -1197,205 +1197,180 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool withCache = false,
             bool loadProperties = true,
             bool loadTemplates = true,
-            bool loadSchedule = true,
             bool loadVariants = true)
         {
-            // TODO: ContentScheduling - fix
-            throw new NotImplementedException("ContentScheduling");
+            var temps = new List<TempContent<Content>>();
+            var contentTypes = new Dictionary<int, IContentType>();
+            var templateIds = new List<int>();
 
-            //var temps = new List<TempContent<Content>>();
-            //var contentTypes = new Dictionary<int, IContentType>();
-            //var templateIds = new List<int>();
+            var content = new Content[dtos.Count];
 
-            //var content = new Content[dtos.Count];
+            for (var i = 0; i < dtos.Count; i++)
+            {
+                var dto = dtos[i];
 
-            //for (var i = 0; i < dtos.Count; i++)
-            //{
-            //    var dto = dtos[i];
+                if (withCache)
+                {
+                    // if the cache contains the (proper version of the) item, use it
+                    var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
+                    if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
+                    {
+                        content[i] = (Content)cached;
+                        continue;
+                    }
+                }
 
-            //    if (withCache)
-            //    {
-            //        // if the cache contains the (proper version of the) item, use it
-            //        var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
-            //        if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
-            //        {
-            //            content[i] = (Content)cached;
-            //            continue;
-            //        }
-            //    }
+                // else, need to build it
 
-            //    // else, need to build it
+                // get the content type - the repository is full cache *but* still deep-clones
+                // whatever comes out of it, so use our own local index here to avoid this
+                var contentTypeId = dto.ContentDto.ContentTypeId;
+                if (contentTypes.TryGetValue(contentTypeId, out var contentType) == false)
+                    contentTypes[contentTypeId] = contentType = _contentTypeRepository.Get(contentTypeId);
 
-            //    // get the content type - the repository is full cache *but* still deep-clones
-            //    // whatever comes out of it, so use our own local index here to avoid this
-            //    var contentTypeId = dto.ContentDto.ContentTypeId;
-            //    if (contentTypes.TryGetValue(contentTypeId, out var contentType) == false)
-            //        contentTypes[contentTypeId] = contentType = _contentTypeRepository.Get(contentTypeId);
+                var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
-            //    var c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
+                if (loadTemplates)
+                {
+                    // need templates
+                    var templateId = dto.DocumentVersionDto.TemplateId;
+                    if (templateId.HasValue && templateId.Value > 0)
+                        templateIds.Add(templateId.Value);
+                    if (dto.Published)
+                    {
+                        templateId = dto.PublishedVersionDto.TemplateId;
+                        if (templateId.HasValue && templateId.Value > 0)
+                            templateIds.Add(templateId.Value);
+                    }
+                }
 
-            //    if (loadTemplates)
-            //    {
-            //        // need templates
-            //        var templateId = dto.DocumentVersionDto.TemplateId;
-            //        if (templateId.HasValue && templateId.Value > 0)
-            //            templateIds.Add(templateId.Value);
-            //        if (dto.Published)
-            //        {
-            //            templateId = dto.PublishedVersionDto.TemplateId;
-            //            if (templateId.HasValue && templateId.Value > 0)
-            //                templateIds.Add(templateId.Value);
-            //        }
-            //    }
+                // need temps, for properties, templates and variations
+                var versionId = dto.DocumentVersionDto.Id;
+                var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
+                var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
+                {
+                    Template1Id = dto.DocumentVersionDto.TemplateId
+                };
+                if (dto.Published)
+                    temp.Template2Id = dto.PublishedVersionDto.TemplateId;
+                temps.Add(temp);
+            }
 
-            //    // need temps, for properties, templates and variations
-            //    var versionId = dto.DocumentVersionDto.Id;
-            //    var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-            //    var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
-            //    {
-            //        Template1Id = dto.DocumentVersionDto.TemplateId
-            //    };
-            //    if (dto.Published)
-            //        temp.Template2Id = dto.PublishedVersionDto.TemplateId;
-            //    temps.Add(temp);
-            //}
+            Dictionary<int, ITemplate> templates = null;
+            if (loadTemplates)
+            {
+                // load all required templates in 1 query, and index
+                templates = _templateRepository.GetMany(templateIds.ToArray())
+                    .ToDictionary(x => x.Id, x => x);
+            }
 
-            //Dictionary<int, ITemplate> templates = null;
-            //if (loadTemplates)
-            //{
-            //    // load all required templates in 1 query, and index
-            //    templates = _templateRepository.GetMany(templateIds.ToArray())
-            //        .ToDictionary(x => x.Id, x => x);
-            //}
+            IDictionary<int, PropertyCollection> properties = null;
+            if (loadProperties)
+            {
+                // load all properties for all documents from database in 1 query - indexed by version id
+                properties = GetPropertyCollections(temps);
+            }
 
-            //IDictionary<int, PropertyCollection> properties = null;
-            //if (loadProperties)
-            //{
-            //    // load all properties for all documents from database in 1 query - indexed by version id
-            //    properties = GetPropertyCollections(temps);
-            //}
-
-            //var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
-
-            //// assign templates and properties
-            //foreach (var temp in temps)
-            //{
-            //    if (loadTemplates)
-            //    {
-            //        // set the template ID if it matches an existing template
-            //        if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
-            //            temp.Content.TemplateId = temp.Template1Id;
-            //        if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
-            //            temp.Content.PublishTemplateId = temp.Template2Id;
-            //    }
+            // assign templates and properties
+            foreach (var temp in temps)
+            {
+                if (loadTemplates)
+                {
+                    // set the template ID if it matches an existing template
+                    if (temp.Template1Id.HasValue && templates.ContainsKey(temp.Template1Id.Value))
+                        temp.Content.TemplateId = temp.Template1Id;
+                    if (temp.Template2Id.HasValue && templates.ContainsKey(temp.Template2Id.Value))
+                        temp.Content.PublishTemplateId = temp.Template2Id;
+                }
 
 
-            //    // set properties
-            //    if (loadProperties)
-            //    {
-            //        if (properties.ContainsKey(temp.VersionId))
-            //            temp.Content.Properties = properties[temp.VersionId];
-            //        else
-            //            throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
-            //    }
+                // set properties
+                if (loadProperties)
+                {
+                    if (properties.ContainsKey(temp.VersionId))
+                        temp.Content.Properties = properties[temp.VersionId];
+                    else
+                        throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
+                }
+            }
 
-            //    if (loadSchedule)
-            //    {
-            //        // load in the schedule
-            //        if (schedule.TryGetValue(temp.Content.Id, out var s))
-            //            temp.Content.ContentSchedule = s;
-            //    }
-
-            //}
-
-            //if (loadVariants)
-            //{
-            //    // set variations, if varying
-            //    temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
-            //    if (temps.Count > 0)
-            //    {
-            //        // load all variations for all documents from database, in one query
-            //        var contentVariations = GetContentVariations(temps);
-            //        var documentVariations = GetDocumentVariations(temps);
-            //        foreach (var temp in temps)
-            //            SetVariations(temp.Content, contentVariations, documentVariations);
-            //    }
-            //}
+            if (loadVariants)
+            {
+                // set variations, if varying
+                temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
+                if (temps.Count > 0)
+                {
+                    // load all variations for all documents from database, in one query
+                    var contentVariations = GetContentVariations(temps);
+                    var documentVariations = GetDocumentVariations(temps);
+                    foreach (var temp in temps)
+                        SetVariations(temp.Content, contentVariations, documentVariations);
+                }
+            }
 
 
 
-            //foreach (var c in content)
-            //    c.ResetDirtyProperties(false); // reset dirty initial properties (U4-1946)
+            foreach (var c in content)
+                c.ResetDirtyProperties(false); // reset dirty initial properties (U4-1946)
 
-            //return content;
+            return content;
         }
 
         private IContent MapDtoToContent(DocumentDto dto)
         {
-            // TODO: ContentScheduling - fix
-            throw new NotImplementedException("ContentScheduling");
+            var contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
+            var content = ContentBaseFactory.BuildEntity(dto, contentType);
 
-            //var contentType = _contentTypeRepository.Get(dto.ContentDto.ContentTypeId);
-            //var content = ContentBaseFactory.BuildEntity(dto, contentType);
+            try
+            {
+                content.DisableChangeTracking();
 
-            //try
-            //{
-            //    content.DisableChangeTracking();
+                // get template
+                if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
+                    content.TemplateId = dto.DocumentVersionDto.TemplateId;
 
-            //    // get template
-            //    if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
-            //        content.TemplateId = dto.DocumentVersionDto.TemplateId;
+                // get properties - indexed by version id
+                var versionId = dto.DocumentVersionDto.Id;
 
-            //    // get properties - indexed by version id
-            //    var versionId = dto.DocumentVersionDto.Id;
+                // TODO: shall we get published properties or not?
+                //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
+                var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
 
-            //    // TODO: shall we get published properties or not?
-            //    //var publishedVersionId = dto.Published ? dto.PublishedVersionDto.Id : 0;
-            //    var publishedVersionId = dto.PublishedVersionDto?.Id ?? 0;
+                var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
+                var ltemp = new List<TempContent<Content>> { temp };
+                var properties = GetPropertyCollections(ltemp);
+                content.Properties = properties[dto.DocumentVersionDto.Id];
 
-            //    var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType);
-            //    var ltemp = new List<TempContent<Content>> { temp };
-            //    var properties = GetPropertyCollections(ltemp);
-            //    content.Properties = properties[dto.DocumentVersionDto.Id];
+                // set variations, if varying
+                if (contentType.VariesByCulture())
+                {
+                    var contentVariations = GetContentVariations(ltemp);
+                    var documentVariations = GetDocumentVariations(ltemp);
+                    SetVariations(content, contentVariations, documentVariations);
+                }
 
-            //    // set variations, if varying
-            //    if (contentType.VariesByCulture())
-            //    {
-            //        var contentVariations = GetContentVariations(ltemp);
-            //        var documentVariations = GetDocumentVariations(ltemp);
-            //        SetVariations(content, contentVariations, documentVariations);
-            //    }
-
-            //    //load in the schedule
-            //    var schedule = GetContentSchedule(dto.NodeId);
-            //    if (schedule.TryGetValue(dto.NodeId, out var s))
-            //        content.ContentSchedule = s;
-
-            //    // reset dirty initial properties (U4-1946)
-            //    content.ResetDirtyProperties(false);
-            //    return content;
-            //}
-            //finally
-            //{
-            //    content.EnableChangeTracking();
-            //}
+                // reset dirty initial properties (U4-1946)
+                content.ResetDirtyProperties(false);
+                return content;
+            }
+            finally
+            {
+                content.EnableChangeTracking();
+            }
         }
 
-        private IDictionary<int, ContentScheduleCollection> GetContentSchedule(params int[] contentIds)
+        public ContentScheduleCollection GetContentSchedule(int contentId)
         {
-            var result = new Dictionary<int, ContentScheduleCollection>();
+            var result = new ContentScheduleCollection();
 
-            var scheduleDtos = Database.FetchByGroups<ContentScheduleDto, int>(contentIds, 2000, batch => Sql()
+            var scheduleDtos = Database.Fetch<ContentScheduleDto>(Sql()
                 .Select<ContentScheduleDto>()
                 .From<ContentScheduleDto>()
-                .WhereIn<ContentScheduleDto>(x => x.NodeId, batch));
+                .Where<ContentScheduleDto>(x => x.NodeId == contentId ));
 
             foreach (var scheduleDto in scheduleDtos)
             {
-                if (!result.TryGetValue(scheduleDto.NodeId, out var col))
-                    col = result[scheduleDto.NodeId] = new ContentScheduleCollection();
-
-                col.Add(new ContentSchedule(scheduleDto.Id,
+                result.Add(new ContentSchedule(scheduleDto.Id,
                     LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
                     scheduleDto.Date,
                     scheduleDto.Action == ContentScheduleAction.Release.ToString()

@@ -99,10 +99,14 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
         public void DefineMaps(IUmbracoMapper mapper)
         {
-            mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
-            mapper.Define<IContent, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);
-            mapper.Define<IContent, ContentVariantDisplay>((source, context) => new ContentVariantDisplay(), Map);
             mapper.Define<IContent, ContentItemBasic<ContentPropertyBasic>>((source, context) => new ContentItemBasic<ContentPropertyBasic>(), Map);
+            mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
+
+            mapper.Define<IContent, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);
+            mapper.Define<IContent, ContentItemDisplayWithSchedule>((source, context) => new ContentItemDisplayWithSchedule(), Map);
+
+            mapper.Define<IContent, ContentVariantDisplay>((source, context) => new ContentVariantDisplay(), Map);
+            mapper.Define<IContent, ContentVariantScheduleDisplay>((source, context) => new ContentVariantScheduleDisplay(), Map);
         }
 
         // Umbraco.Code.MapAll
@@ -112,7 +116,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         }
 
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
-        private void Map(IContent source, ContentItemDisplay target, MapperContext context)
+        private void Map<TVariant>(IContent source, ContentItemDisplay<TVariant> target, MapperContext context) where TVariant : ContentVariantDisplay
         {
             // Both GetActions and DetermineIsChildOfListView use parent, so get it once here
             // Parent might already be in context, so check there before using content service
@@ -154,7 +158,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.UpdateDate = source.UpdateDate;
             target.Updater = _commonMapper.GetCreator(source, context);
             target.Urls = GetUrls(source);
-            target.Variants = _contentVariantMapper.Map(source, context);
+            target.Variants = _contentVariantMapper.Map<TVariant>(source, context);
 
             target.ContentDto = new ContentPropertyCollectionDto();
             target.ContentDto.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
@@ -164,13 +168,18 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         private void Map(IContent source, ContentVariantDisplay target, MapperContext context)
         {
             target.CreateDate = source.CreateDate;
-            target.ExpireDate = GetScheduledDate(source, ContentScheduleAction.Expire, context);
             target.Name = source.Name;
             target.PublishDate = source.PublishDate;
-            target.ReleaseDate = GetScheduledDate(source, ContentScheduleAction.Release, context);
             target.State = _stateMapper.Map(source, context);
             target.Tabs = _tabsAndPropertiesMapper.Map(source, context);
             target.UpdateDate = source.UpdateDate;
+        }
+
+        private void Map(IContent source, ContentVariantScheduleDisplay target, MapperContext context)
+        {
+            Map(source, (ContentVariantDisplay)target, context);
+            target.ReleaseDate = GetScheduledDate(source, ContentScheduleAction.Release, context);
+            target.ExpireDate = GetScheduledDate(source, ContentScheduleAction.Expire, context);
         }
 
         // Umbraco.Code.MapAll -Alias
@@ -354,12 +363,16 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
 
         private DateTime? GetScheduledDate(IContent source, ContentScheduleAction action, MapperContext context)
         {
-            // TODO: ContentScheduling - fix
-            throw new NotImplementedException("ContentScheduling");
+            _ = context.Items.TryGetValue("Schedule", out var untypedSchedule);
+       
+            if (untypedSchedule is not ContentScheduleCollection scheduleCollection)
+            {
+                throw new ApplicationException("GetScheduledDate requires a ContentScheduleCollection in the MapperContext for Key: Schedule");
+            }
 
-            //var culture = context.GetCulture() ?? string.Empty;
-            //var schedule = source.ContentSchedule.GetSchedule(culture, action);
-            //return schedule.FirstOrDefault()?.Date; // take the first, it's ordered by date
+            var culture = context.GetCulture() ?? string.Empty;
+            IEnumerable<ContentSchedule> schedule = scheduleCollection.GetSchedule(culture, action);
+            return schedule.FirstOrDefault()?.Date; // take the first, it's ordered by date
         }
 
         private IDictionary<string, string> GetAllowedTemplates(IContent source)

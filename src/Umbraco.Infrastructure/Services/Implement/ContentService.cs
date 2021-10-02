@@ -374,6 +374,16 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
+        /// <inheritdoc />
+        public ContentScheduleCollection GetContentScheduleByContentId(int contentId)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Cms.Core.Constants.Locks.ContentTree);
+                return _documentRepository.GetContentSchedule(contentId);
+            }
+        }
+
         /// <summary>
         ///
         /// </summary>

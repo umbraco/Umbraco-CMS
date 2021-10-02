@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -60,12 +60,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
 
-        [DataMember(Name = "releaseDate")]
-        public DateTime? ReleaseDate { get; set; }
-
-        [DataMember(Name = "expireDate")]
-        public DateTime? ExpireDate { get; set; }
-
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
@@ -75,5 +69,14 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [DataMember(Name = "notifications")]
         [ReadOnly(true)]
         public List<BackOfficeNotification> Notifications { get; private set; }
+    }
+
+    public class ContentVariantScheduleDisplay : ContentVariantDisplay
+    {
+        [DataMember(Name = "releaseDate")]
+        public DateTime? ReleaseDate { get; set; }
+
+        [DataMember(Name = "expireDate")]
+        public DateTime? ExpireDate { get; set; }
     }
 }

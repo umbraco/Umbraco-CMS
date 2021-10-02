@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -7,18 +7,22 @@ using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing
 {
+    public class ContentItemDisplay : ContentItemDisplay<ContentVariantDisplay> { }
+
+    public class ContentItemDisplayWithSchedule : ContentItemDisplay<ContentVariantScheduleDisplay> { }
+
     /// <summary>
     /// A model representing a content item to be displayed in the back office
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentItemDisplay : INotificationModel, IErrorModel //ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
+    public class ContentItemDisplay<TVariant> : INotificationModel, IErrorModel //ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
     {
         public ContentItemDisplay()
         {
             AllowPreview = true;
             Notifications = new List<BackOfficeNotification>();
             Errors = new Dictionary<string, object>();
-            Variants = new List<ContentVariantDisplay>();
+            Variants = new List<TVariant>();
             ContentApps = new List<ContentApp>();
         }
 
@@ -60,7 +64,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// If a content item is invariant, this collection will only contain one item, else it will contain all culture variants
         /// </remarks>
         [DataMember(Name = "variants")]
-        public IEnumerable<ContentVariantDisplay> Variants { get; set; }
+        public IEnumerable<TVariant> Variants { get; set; }
 
         [DataMember(Name = "owner")]
         public UserProfile Owner { get; set; }
