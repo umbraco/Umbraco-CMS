@@ -1,10 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
+using System.IO;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MimeKit;
+using MimeKit.IO;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mail;
@@ -70,10 +75,52 @@ namespace Umbraco.Cms.Infrastructure.Mail
                 }
             }
 
-            if (_globalSettings.IsSmtpServerConfigured == false)
+            var isPickupDirectoryConfigured = !string.IsNullOrWhiteSpace(_globalSettings.Smtp?.PickupDirectoryLocation);
+
+            if (_globalSettings.IsSmtpServerConfigured == false && !isPickupDirectoryConfigured)
             {
                 _logger.LogDebug("Could not send email for {Subject}. It was not handled by a notification handler and there is no SMTP configured.", message.Subject);
                 return;
+            }
+
+            if (isPickupDirectoryConfigured && !string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From))
+            {
+                do {
+                    var path = Path.Combine(_globalSettings.Smtp?.PickupDirectoryLocation, Guid.NewGuid () + ".eml");
+                    Stream stream;
+
+                    try
+                    {
+                        stream = File.Open(path, FileMode.CreateNew);
+                    }
+                    catch (IOException)
+                    {
+                        if (File.Exists(path))
+                        {
+                            continue;
+                        }
+                        throw;
+                    }
+
+                    try {
+                        using (stream)
+                        {
+                            using var filtered = new FilteredStream(stream);
+                            filtered.Add(new SmtpDataFilter());
+
+                            FormatOptions options = FormatOptions.Default.Clone();
+                            options.NewLineFormat = NewLineFormat.Dos;
+
+                            await message.ToMimeMessage(_globalSettings.Smtp?.From).WriteToAsync(options, filtered);
+                            filtered.Flush();
+                            return;
+
+                        }
+                    } catch {
+                        File.Delete(path);
+                        throw;
+                    }
+                } while (true);
             }
 
             using var client = new SmtpClient();
