@@ -99,7 +99,7 @@ context('DataTypes', () => {
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         cy.get('.property-error').should('be.visible');
 
-        // //Clean
+        // Clean
         cy.umbracoEnsureDataTypeNameNotExists(name);
         cy.umbracoEnsureDocumentTypeNameNotExists(name);
     })
