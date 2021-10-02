@@ -969,6 +969,14 @@ When building a custom infinite editor view you can use the same components as a
             editor.view = "views/common/infiniteeditors/itempicker/itempicker.html";
             if (!editor.size) editor.size = "small";
             open(editor);
+      }
+
+        function templatePicker(editor) {
+          editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+          if (!editor.size) editor.size = "small";
+          editor.section = "settings";
+          editor.treeAlias = "templates";
+          open(editor);
         }
 
         /**
@@ -1133,6 +1141,7 @@ When building a custom infinite editor view you can use the same components as a
             templateSections: templateSections,
             userPicker: userPicker,
             itemPicker: itemPicker,
+            templatePicker: templatePicker,
             macroPicker: macroPicker,
             memberGroupPicker: memberGroupPicker,
             memberPicker: memberPicker,
