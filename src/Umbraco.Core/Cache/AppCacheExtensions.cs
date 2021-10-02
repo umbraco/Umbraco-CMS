@@ -78,8 +78,7 @@ namespace Umbraco.Core.Cache
         {
             var result = provider.GetCacheItem<T>(cacheKey);
             if (result == null
-                || (cacheValue is int // Handle case where the non nullable integer type can't handle null as empty value, but returns "0" instead.
-                    && cacheValue.ToString() is "0"))
+                || (result is int && result.ToString() is "0")) // Handle case where the non nullable integer type can't handle null as empty value, but returns "0" instead.
             {
                 result = getCacheItem();
                 provider.InsertCacheItem<T>(cacheKey, () => result, timeout, isSliding, priority, removedCallback, dependentFiles);
