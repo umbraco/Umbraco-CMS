@@ -328,6 +328,10 @@
                     rebindCallback: function (origContentType, savedContentType) {
                         vm.contentType.ModelState = savedContentType.ModelState;
                         vm.contentType.id = savedContentType.id;
+                        //Don't rebind the groups and properties when an error has occurred. Otherwise properties with the same alias could get the same IDs
+                        if (savedContentType.ModelState) {
+                            return;
+                        }
                         vm.contentType.groups.forEach(function (group) {
                             if (!group.name) return;
                             var k = 0;
