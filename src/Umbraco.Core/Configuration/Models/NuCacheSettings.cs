@@ -32,5 +32,18 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public int SqlPageSize { get; set; } = StaticSqlPageSize;
 
         public bool UnPublishedContentCompression { get; set; } = false;
+
+        /// <summary>
+        /// <para>
+        /// When set to true NuCache.*.db files are not written to disk.
+        /// </para>
+        /// <para>
+        /// For larger sites this may result in a slower boot, however this may be a desirable trade off if you are experiencing locking issues with the NuCache files.
+        /// </para>
+        /// <para>
+        /// Defaults to false.
+        /// </para>
+        /// </summary>
+        public bool InMemoryOnly { get; set; } = false;
     }
 }

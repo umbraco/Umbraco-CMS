@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             var valueSerializer = new ContentNodeKitSerializer(contentDataSerializer);
             var options = new BPlusTree<int, ContentNodeKit>.OptionsV2(keySerializer, valueSerializer)
             {
-                CreateFile = exists ? CreatePolicy.IfNeeded : CreatePolicy.Always,
+                CreateFile = GetCreatePolicy(settings, exists),
                 FileName = filepath,
 
                 // read or write but do *not* keep in memory
@@ -25,8 +25,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
                 //HACK: Forces FileOptions to be WriteThrough here: https://github.com/mamift/CSharpTest.Net.Collections/blob/9f93733b3af7ee0e2de353e822ff54d908209b0b/src/CSharpTest.Net.Collections/IO/TransactedCompoundFile.cs#L316-L327,
                 // as the reflection uses otherwise will failed in .NET Core as the "_handle" field in FileStream is renamed to "_fileHandle".
                 StoragePerformance = StoragePerformance.CommitToDisk,
-
-
+                StorageType = settings.InMemoryOnly ? StorageType.Memory : StorageType.Disk
 
                 // other options?
             };
@@ -37,7 +36,16 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             //btree.
 
             return tree;
+        }
 
+        private static CreatePolicy GetCreatePolicy(NuCacheSettings settings, bool fileExistsOnDisk)
+        {
+            if (settings.InMemoryOnly)
+            {
+                return CreatePolicy.Never;
+            }
+
+            return fileExistsOnDisk ? CreatePolicy.IfNeeded : CreatePolicy.Always;
         }
 
         private static int GetBlockSize(NuCacheSettings settings)
