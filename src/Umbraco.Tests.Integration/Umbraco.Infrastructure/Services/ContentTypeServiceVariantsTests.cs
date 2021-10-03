@@ -52,9 +52,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
-            InMemoryConfiguration[Constants.Configuration.ConfigNuCache + ":" + nameof(NuCacheSettings.NuCacheSerializerType)] = NuCacheSerializerType.JSON.ToString();
             builder.AddNuCache();
             builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
+            builder.Services.PostConfigure<NuCacheSettings>(options =>
+            {
+                options.NuCacheSerializerType = NuCacheSerializerType.JSON;
+            });
+
+
         }
 
         private void AssertJsonStartsWith(int id, string expected)

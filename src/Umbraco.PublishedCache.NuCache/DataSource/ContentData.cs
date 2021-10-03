@@ -11,14 +11,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         public ContentData(string name, string urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, IDictionary<string, PropertyData[]> properties, IReadOnlyDictionary<string, CultureVariation> cultureInfos)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            UrlSegment = urlSegment ?? throw new ArgumentNullException(nameof(urlSegment));
+            UrlSegment = urlSegment;
             VersionId = versionId;
             VersionDate = versionDate;
             WriterId = writerId;
             TemplateId = templateId;
             Published = published;
             Properties = properties ?? throw new ArgumentNullException(nameof(properties));
-            CultureInfos = cultureInfos ?? throw new ArgumentNullException(nameof(cultureInfos));
+            CultureInfos = cultureInfos;
         }
 
         public string Name { get; }

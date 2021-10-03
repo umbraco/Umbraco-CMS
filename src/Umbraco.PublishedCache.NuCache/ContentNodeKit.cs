@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     {
         public ContentNodeKit(ContentNode node, int contentTypeId, ContentData draftData, ContentData publishedData)
         {
-            Node = node ?? throw new ArgumentNullException(nameof(node));
+            Node = node;
             ContentTypeId = contentTypeId;
             DraftData = draftData;
             PublishedData = publishedData;
