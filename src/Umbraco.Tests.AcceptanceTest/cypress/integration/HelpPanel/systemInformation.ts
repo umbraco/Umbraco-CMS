@@ -27,7 +27,7 @@ context('System Information', () => {
         cy.get('.umb-button__content').click();
         cy.get('[data-element="global-user"]').click();
         cy.get('[alias="editUser"]').click();
-        cy.get('[name="culture"]').select('Danish (Denmark)', {timeout: 10000});
+        cy.get('[name="culture"]').select('Danish (Denmark)', {timeout: 10000, force: true});
         cy.umbracoButtonByLabelKey('buttons_save').click();
         //Refresh site to display new language
         cy.reload();
@@ -39,7 +39,7 @@ context('System Information', () => {
         //Clean
         cy.get('[data-element="global-user"]').click();
         cy.get('[alias="editUser"]').click();
-        cy.get('.input-block-level', {timeout: 10000}).last().select('English (United States)');
+        cy.get('.input-block-level', {timeout: 10000}).last().select('English (United States)', {timeout: 10000, force: true});
         cy.umbracoButtonByLabelKey('buttons_save').click();
         cy.reload();
     });
