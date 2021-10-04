@@ -22,15 +22,22 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
         public ContentData ReadFrom(Stream stream)
         {
+            var published = PrimitiveSerializer.Boolean.ReadFrom(stream);
+            var name = PrimitiveSerializer.String.ReadFrom(stream);
+            var urlSegment = PrimitiveSerializer.String.ReadFrom(stream);
+            var versionId = PrimitiveSerializer.Int32.ReadFrom(stream);
+            var versionDate = PrimitiveSerializer.DateTime.ReadFrom(stream);
+            var writerId = PrimitiveSerializer.Int32.ReadFrom(stream);
+            var templateId = PrimitiveSerializer.Int32.ReadFrom(stream);
             return new ContentData
             {
-                Published = PrimitiveSerializer.Boolean.ReadFrom(stream),
-                Name = PrimitiveSerializer.String.ReadFrom(stream),
-                UrlSegment = PrimitiveSerializer.String.ReadFrom(stream),
-                VersionId = PrimitiveSerializer.Int32.ReadFrom(stream),
-                VersionDate = PrimitiveSerializer.DateTime.ReadFrom(stream),
-                WriterId = PrimitiveSerializer.Int32.ReadFrom(stream),
-                TemplateId = PrimitiveSerializer.Int32.ReadFrom(stream),
+                Published = published,
+                Name = name,
+                UrlSegment = urlSegment,
+                VersionId = versionId,
+                VersionDate = versionDate,
+                WriterId = writerId,
+                TemplateId = templateId == 0 ? (int?)null : templateId,
                 Properties = _dictionaryOfPropertyDataSerializer.ReadFrom(stream), // TODO: We don't want to allocate empty arrays
                 CultureInfos = DefaultCultureVariationsSerializer.ReadFrom(stream) // TODO: We don't want to allocate empty arrays
             };
@@ -44,10 +51,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
             PrimitiveSerializer.Int32.WriteTo(value.VersionId, stream);
             PrimitiveSerializer.DateTime.WriteTo(value.VersionDate, stream);
             PrimitiveSerializer.Int32.WriteTo(value.WriterId, stream);
-            if (value.TemplateId.HasValue)
-            {
-                PrimitiveSerializer.Int32.WriteTo(value.TemplateId.Value, stream);
-            }
+            PrimitiveSerializer.Int32.WriteTo(value.TemplateId ?? 0, stream);
             _dictionaryOfPropertyDataSerializer.WriteTo(value.Properties, stream);
             DefaultCultureVariationsSerializer.WriteTo(value.CultureInfos, stream);
         }
