@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
                     new MembersErrorDescriber(Mock.Of<ILocalizedTextService>()),
                     Mock.Of<IServiceProvider>(),
                     Mock.Of<ILogger<UserManager<MemberIdentityUser>>>(),
-                    new TestOptionsMonitor<MemberPasswordConfigurationSettings>(new MemberPasswordConfigurationSettings()),
+                    new TestOptionsSnapshot<MemberPasswordConfigurationSettings>(new MemberPasswordConfigurationSettings()),
                     Mock.Of<IPublicAccessService>(),
                     Mock.Of<IHttpContextAccessor>());
 
