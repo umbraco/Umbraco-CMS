@@ -35,12 +35,11 @@ namespace Umbraco.Cms.Core.Security
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<TUser>> logger,
-            IOptionsMonitor<TPasswordConfig> passwordConfiguration)
+            IOptionsSnapshot<TPasswordConfig> passwordConfiguration)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoopLookupNormalizer(), errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
-            PasswordConfiguration = passwordConfiguration.CurrentValue ?? throw new ArgumentNullException(nameof(passwordConfiguration));
-            passwordConfiguration.OnChange(x => PasswordConfiguration = x);
+            PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
         }
 
         /// <inheritdoc />

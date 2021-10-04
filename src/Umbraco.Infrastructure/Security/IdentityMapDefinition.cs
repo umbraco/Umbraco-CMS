@@ -23,15 +23,13 @@ namespace Umbraco.Cms.Core.Security
         public IdentityMapDefinition(
             ILocalizedTextService textService,
             IEntityService entityService,
-            IOptionsMonitor<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             AppCaches appCaches)
         {
             _textService = textService;
             _entityService = entityService;
-            _globalSettings = globalSettings.CurrentValue;
+            _globalSettings = globalSettings.Value;
             _appCaches = appCaches;
-
-            globalSettings.OnChange(x => _globalSettings = x);
         }
 
         public void DefineMaps(IUmbracoMapper mapper)

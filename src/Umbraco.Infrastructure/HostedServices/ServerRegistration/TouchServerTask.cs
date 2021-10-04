@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
         private readonly IServerRegistrationService _serverRegistrationService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger<TouchServerTask> _logger;
-        private GlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TouchServerTask"/> class.
@@ -37,15 +37,14 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
             IServerRegistrationService serverRegistrationService,
             IHostingEnvironment hostingEnvironment,
             ILogger<TouchServerTask> logger,
-            IOptionsMonitor<GlobalSettings> globalSettings)
-            : base(globalSettings.CurrentValue.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15))
+            IOptionsSnapshot<GlobalSettings> globalSettings)
+            : base(globalSettings.Value.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15))
         {
             _runtimeState = runtimeState;
             _serverRegistrationService = serverRegistrationService ?? throw new ArgumentNullException(nameof(serverRegistrationService));
             _hostingEnvironment = hostingEnvironment;
             _logger = logger;
-            _globalSettings = globalSettings.CurrentValue;
-            globalSettings.OnChange(x => _globalSettings = x);
+            _globalSettings = globalSettings.Value;
         }
 
         public override Task PerformExecuteAsync(object state)

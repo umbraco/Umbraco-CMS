@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Security
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
-        private GlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly IUmbracoMapper _mapper;
         private readonly AppCaches _appCaches;
 
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Security
             IUserService userService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
-            IOptionsMonitor<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IUmbracoMapper mapper,
             BackOfficeErrorDescriber describer,
             AppCaches appCaches)
@@ -52,13 +52,11 @@ namespace Umbraco.Cms.Core.Security
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService;
             _externalLoginService = externalLoginService ?? throw new ArgumentNullException(nameof(externalLoginService));
-            _globalSettings = globalSettings.CurrentValue;
+            _globalSettings = globalSettings.Value;
             _mapper = mapper;
             _appCaches = appCaches;
             _userService = userService;
             _externalLoginService = externalLoginService;
-
-            globalSettings.OnChange(x => _globalSettings = x);
         }
 
         /// <inheritdoc />

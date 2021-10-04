@@ -13,11 +13,11 @@ namespace Umbraco.Cms.Core.Runtime
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly GlobalSettings _globalSettings;
 
-        public EssentialDirectoryCreator(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IOptionsMonitor<GlobalSettings> globalSettings)
+        public EssentialDirectoryCreator(IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IOptions<GlobalSettings> globalSettings)
         {
             _ioHelper = ioHelper;
             _hostingEnvironment = hostingEnvironment;
-            _globalSettings = globalSettings.CurrentValue;
+            _globalSettings = globalSettings.Value;
         }
 
         public void Handle(UmbracoApplicationStartingNotification notification)

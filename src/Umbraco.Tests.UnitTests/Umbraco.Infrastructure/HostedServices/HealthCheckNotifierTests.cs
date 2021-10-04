@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockProfilingLogger = new Mock<IProfilingLogger>();
 
             return new HealthCheckNotifier(
-                new TestOptionsMonitor<HealthChecksSettings>(settings),
+                Options.Create(settings),
                 checks,
                 notifications,
                 mockRunTimeState.Object,

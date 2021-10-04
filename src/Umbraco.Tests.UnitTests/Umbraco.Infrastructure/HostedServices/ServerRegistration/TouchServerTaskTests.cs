@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.Serv
                 _mockServerRegistrationService.Object,
                 mockRequestAccessor.Object,
                 mockLogger.Object,
-                new TestOptionsMonitor<GlobalSettings>(settings));
+                new TestOptionsSnapshot<GlobalSettings>(settings));
         }
 
         private void VerifyServerNotTouched() => VerifyServerTouchedTimes(Times.Never());

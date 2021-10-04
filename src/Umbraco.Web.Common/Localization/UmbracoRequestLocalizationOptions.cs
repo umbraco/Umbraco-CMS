@@ -16,10 +16,9 @@ namespace Umbraco.Cms.Web.Common.Localization
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRequestLocalizationOptions"/> class.
         /// </summary>
-        public UmbracoRequestLocalizationOptions(IOptionsMonitor<GlobalSettings> globalSettings)
+        public UmbracoRequestLocalizationOptions(IOptionsSnapshot<GlobalSettings> globalSettings)
         {
-            _globalSettings = globalSettings.CurrentValue;
-            globalSettings.OnChange(x => _globalSettings = x);
+            _globalSettings = globalSettings.Value;
         }
 
         /// <inheritdoc/>

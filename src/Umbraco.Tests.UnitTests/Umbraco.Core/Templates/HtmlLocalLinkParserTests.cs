@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
             var webRoutingSettings = new WebRoutingSettings();
             var publishedUrlProvider = new UrlProvider(
                 umbracoContextAccessor,
-                new TestOptionsMonitor<WebRoutingSettings>(webRoutingSettings),
+                Options.Create(webRoutingSettings),
                 new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
                 new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
                 Mock.Of<IVariationContextAccessor>());

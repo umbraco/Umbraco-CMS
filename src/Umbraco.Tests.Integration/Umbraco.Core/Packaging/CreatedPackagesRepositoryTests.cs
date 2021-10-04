@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             LocalizationService,
             HostingEnvironment,
             EntityXmlSerializer,
-            new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()),
+            Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             MediaService,
             MediaTypeService,
             MediaFileManager,

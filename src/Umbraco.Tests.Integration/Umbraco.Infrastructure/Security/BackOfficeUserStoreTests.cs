@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
                     UserService,
                     EntityService,
                     ExternalLoginService,
-                    new TestOptionsMonitor<GlobalSettings>(GlobalSettings),
+                    new TestOptionsSnapshot<GlobalSettings>(GlobalSettings),
                     UmbracoMapper,
                     new BackOfficeErrorDescriber(TextService),
                     AppCaches);

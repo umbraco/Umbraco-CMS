@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         private Mock<IPasswordHasher<MemberIdentityUser>> _mockPasswordHasher;
         private Mock<IMemberService> _mockMemberService;
         private Mock<IServiceProvider> _mockServiceProviders;
-        private Mock<IOptionsMonitor<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
+        private Mock<IOptionsSnapshot<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
 
         public MemberManager CreateSut()
         {
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new IdentityMapDefinition(
                     Mock.Of<ILocalizedTextService>(),
                     Mock.Of<IEntityService>(),
-                    new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()),
+                    new TestOptionsSnapshot<GlobalSettings>(new GlobalSettings()),
                     AppCaches.Disabled),
             };
 
@@ -65,8 +65,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             userValidators.Add(validator.Object);
 
             _mockServiceProviders = new Mock<IServiceProvider>();
-            _mockPasswordConfiguration = new Mock<IOptionsMonitor<MemberPasswordConfigurationSettings>>();
-            _mockPasswordConfiguration.Setup(x => x.CurrentValue).Returns(() =>
+            _mockPasswordConfiguration = new Mock<IOptionsSnapshot<MemberPasswordConfigurationSettings>>();
+            _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
                 new MemberPasswordConfigurationSettings()
                 {
 

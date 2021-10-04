@@ -24,11 +24,10 @@ namespace Umbraco.Cms.Web.Common.Filters
             private readonly ArrayPool<char> _arrayPool;
             private MvcOptions _options;
 
-            public AngularJsonOnlyConfigurationFilter(ArrayPool<char> arrayPool, IOptionsMonitor<MvcOptions> options)
+            public AngularJsonOnlyConfigurationFilter(ArrayPool<char> arrayPool, IOptionsSnapshot<MvcOptions> options)
             {
                 _arrayPool = arrayPool;
-                _options = options.CurrentValue;
-                options.OnChange(x => _options = x);
+                _options = options.Value;
             }
 
             public void OnResultExecuted(ResultExecutedContext context)

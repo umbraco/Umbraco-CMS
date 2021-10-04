@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 factory.GetRequiredService<ILocalizationService>(),
                 factory.GetRequiredService<IHostingEnvironment>(),
                 factory.GetRequiredService<IEntityXmlSerializer>(),
-                factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
+                factory.GetRequiredService<IOptions<GlobalSettings>>(),
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>(),
                 factory.GetRequiredService<MediaFileManager>(),

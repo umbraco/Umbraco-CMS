@@ -25,13 +25,14 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="mediaUrlProviders">The list of media URL providers.</param>
         /// <param name="variationContextAccessor">The current variation accessor.</param>
         /// <param name="propertyEditorCollection"></param>
-        public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptionsMonitor<WebRoutingSettings> routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
+        public UrlProvider(IUmbracoContextAccessor umbracoContextAccessor, IOptions<WebRoutingSettings> routingSettings, UrlProviderCollection urlProviders, MediaUrlProviderCollection mediaUrlProviders, IVariationContextAccessor variationContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _urlProviders = urlProviders;
             _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
-            Mode = routingSettings.CurrentValue.UrlProviderMode;
+            Mode = routingSettings.Value.UrlProviderMode;
+
         }
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
