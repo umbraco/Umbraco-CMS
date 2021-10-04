@@ -62,11 +62,11 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
                 _globalSettings,
-                connectionStrings,
                 new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
                 dbProviderFactoryCreator,
                 databaseSchemaCreatorFactory,
-                npocoMappers);
+                npocoMappers,
+                connectionStringName);
             MainDomKey = MainDomKeyPrefix + "-" + (Environment.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
         }
 
@@ -88,18 +88,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             hostingEnvironment,
             databaseSchemaCreatorFactory,
             npocoMappers,
-            Constants.System.UmbracoConnectionName
+            connectionStrings.CurrentValue.UmbracoConnectionString.ConnectionString
             )
         {
 
-                loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
-                loggerFactory,
-                _globalSettings,
-               connectionStrings,
-               new MapperCollection(() => Enumerable.Empty<BaseMapper>()),
-               dbProviderFactoryCreator,
-               databaseSchemaCreatorFactory,
-               npocoMappers);
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
