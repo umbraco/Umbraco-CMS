@@ -85,6 +85,8 @@ namespace Umbraco.Cms.Infrastructure.Mail
 
             if (isPickupDirectoryConfigured && !string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From))
             {
+            // The following code snippet is the recommended way to handle PickupDirectoryLocation. 
+            // See more https://github.com/jstedfast/MailKit/blob/master/FAQ.md#q-how-can-i-send-email-to-a-specifiedpickupdirectory
                 do {
                     var path = Path.Combine(_globalSettings.Smtp?.PickupDirectoryLocation, Guid.NewGuid () + ".eml");
                     Stream stream;
