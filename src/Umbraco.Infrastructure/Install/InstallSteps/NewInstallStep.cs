@@ -117,7 +117,8 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 {
                     minCharLength = _passwordConfiguration.RequiredLength,
                     minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
-                    quickInstallAvailable = DatabaseConfigureStep.IsSqlCeAvailable()
+                    quickInstallAvailable = DatabaseConfigureStep.IsSqlCeAvailable(),
+                    customInstallAvailable = !GetInstallState().HasFlag(InstallState.ConnectionStringConfigured)
                 };
             }
         }
