@@ -163,6 +163,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData);
             return userTours;
         }
+
         public IEnumerable<UserData> GetUserData()
         {
             return _userDataService.GetUserData();

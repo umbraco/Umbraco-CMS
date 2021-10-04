@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Services
 {
     public class UserDataService : IUserDataService
     {
-        private IUmbracoVersion _version;
+        private readonly IUmbracoVersion _version;
         private readonly ILocalizationService _localizationService;
         public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
         {

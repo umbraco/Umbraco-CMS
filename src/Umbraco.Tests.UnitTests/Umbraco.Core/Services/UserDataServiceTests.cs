@@ -17,11 +17,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
         private IUmbracoVersion _umbracoVersion;
         private ILocalizationService _localizationService;
 
-        [SetUp]
-        public void CreateMocks()
-        {
-            CreateUmbracoVersion(9, 0, 0);
-        }
+        [OneTimeSetUp]
+        public void CreateMocks() => CreateUmbracoVersion(9, 0, 0);
 
         [Test]
         [TestCase("en-US")]
