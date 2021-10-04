@@ -26,6 +26,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
                 Id = 1,
                 Alias = "type1",
                 ClrName = "Type1",
+                Name = "type1Name",
                 ParentId = 0,
                 BaseType = null,
                 ItemType = TypeModel.ItemTypes.Content,
@@ -34,6 +35,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
             {
                 Alias = "prop1",
                 ClrName = "Prop1",
+                Name = "prop1Name",
                 ModelClrType = typeof(string),
             });
 
@@ -67,6 +69,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.PublishedModels
 {
+	/// <summary>type1Name</summary>
 	[PublishedModel(""type1"")]
 	public partial class Type1 : PublishedContentModel
 	{
@@ -97,6 +100,9 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		// properties
 
+		///<summary>
+		/// prop1Name
+		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType(""prop1"")]
