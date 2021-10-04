@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private readonly Lazy<UmbracoServices> _umbracoServices; // fixme: this is because of circular refs :(
         private static readonly Regex s_assemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private static readonly string[] s_ourFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err", "Compiled" };
-        private readonly ModelsBuilderSettings _config;
+        private ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IApplicationShutdownRegistry _hostingLifetime;
         private readonly ModelsGenerationError _errors;
@@ -81,6 +81,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 return;
             }
 
+            config.OnChange(x => _config = x);
             _pureLiveDirectory = new Lazy<string>(PureLiveDirectoryAbsolute);
 
             if (!Directory.Exists(_pureLiveDirectory.Value))
