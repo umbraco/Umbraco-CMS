@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Security
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<TUser>> logger,
-            IOptionsSnapshot<TPasswordConfig> passwordConfiguration)
+            IOptions<TPasswordConfig> passwordConfiguration)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoopLookupNormalizer(), errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));

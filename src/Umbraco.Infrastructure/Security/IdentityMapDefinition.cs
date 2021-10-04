@@ -17,13 +17,13 @@ namespace Umbraco.Cms.Core.Security
     {
         private readonly ILocalizedTextService _textService;
         private readonly IEntityService _entityService;
-        private GlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
         private readonly AppCaches _appCaches;
 
         public IdentityMapDefinition(
             ILocalizedTextService textService,
             IEntityService entityService,
-            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptions<GlobalSettings> globalSettings,
             AppCaches appCaches)
         {
             _textService = textService;

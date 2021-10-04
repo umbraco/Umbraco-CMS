@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.Common.Security
             IServiceProvider services,
             IHttpContextAccessor httpContextAccessor,
             ILogger<UserManager<BackOfficeIdentityUser>> logger,
-            IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IEventAggregator eventAggregator,
             IBackOfficeUserPasswordChecker backOfficeUserPasswordChecker)
             : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors, services, logger, passwordConfiguration)
