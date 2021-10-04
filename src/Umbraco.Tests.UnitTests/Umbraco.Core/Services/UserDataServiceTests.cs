@@ -15,7 +15,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
     public class UserDataServiceTests
     {
         private IUmbracoVersion _umbracoVersion;
-        private ILocalizationService _localizationService;
 
         [OneTimeSetUp]
         public void CreateMocks() => CreateUmbracoVersion(9, 0, 0);
@@ -27,8 +26,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
         [TestCase("sv-SE")]
         public void GetCorrectDefaultLanguageTest(string culture)
         {
-            CreateLocalizationVersion(culture);
-            var userDataService = new UserDataService(_umbracoVersion, _localizationService);
+            var userDataService = CreateUserDataService(culture);
             var defaultLanguage = userDataService.GetUserData().FirstOrDefault(x => x.Name == "Default Language");
             Assert.Multiple(() =>
             {
@@ -45,8 +43,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
         public void GetCorrectCultureTest(string culture)
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo(culture);
-            CreateLocalizationVersion(culture);
-            var userDataService = new UserDataService(_umbracoVersion, _localizationService);
+            var userDataService = CreateUserDataService(culture);
             var currentCulture = userDataService.GetUserData().FirstOrDefault(x => x.Name == "Current Culture");
             Assert.Multiple(() =>
             {
@@ -63,8 +60,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
         public void GetCorrectUICultureTest(string culture)
         {
             Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
-            CreateLocalizationVersion(culture);
-            var userDataService = new UserDataService(_umbracoVersion, _localizationService);
+            var userDataService = CreateUserDataService(culture);
             var currentCulture = userDataService.GetUserData().FirstOrDefault(x => x.Name == "Current UI Culture");
             Assert.Multiple(() =>
             {
@@ -80,22 +76,27 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
         [TestCase("sv-SE")]
         public void RunTimeInformationNotNullTest(string culture)
         {
-            CreateLocalizationVersion(culture);
-            var userDataService = new UserDataService(_umbracoVersion, _localizationService);
-            IEnumerable<UserData> userData = userDataService.GetUserData();
+            var userDataService = CreateUserDataService(culture);
+            IEnumerable<UserData> userData = userDataService.GetUserData().ToList();
             Assert.Multiple(() =>
             {
-                Assert.IsNotNull(userData.FirstOrDefault(x => x.Name == "Server OS"));
-                Assert.IsNotNull(userData.FirstOrDefault(x => x.Name == "Server Framework"));
-                Assert.IsNotNull(userData.FirstOrDefault(x => x.Name == "Current Webserver"));
+                Assert.IsNotNull(userData.Select(x => x.Name == "Server OS"));
+                Assert.IsNotNull(userData.Select(x => x.Name == "Server Framework"));
+                Assert.IsNotNull(userData.Select(x => x.Name == "Current Webserver"));
             });
         }
 
-        private void CreateLocalizationVersion(string culture)
+        private UserDataService CreateUserDataService(string culture)
+        {
+            var localizationService = CreateILocalizationService(culture);
+            return new UserDataService(_umbracoVersion, localizationService);
+        }
+
+        private ILocalizationService CreateILocalizationService(string culture)
         {
             var localizationService = new Mock<ILocalizationService>();
             localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns(culture);
-            _localizationService = localizationService.Object;
+            return localizationService.Object;
         }
 
         private void CreateUmbracoVersion(int major, int minor, int patch)

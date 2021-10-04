@@ -13,6 +13,7 @@ namespace Umbraco.Cms.Core.Services
     {
         private readonly IUmbracoVersion _version;
         private readonly ILocalizationService _localizationService;
+
         public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
         {
             _version = version;
@@ -23,26 +24,19 @@ namespace Umbraco.Cms.Core.Services
         {
             var userDataList = new List<UserData>
             {
-                new UserData("Server OS", RuntimeInformation.OSDescription),
-                new UserData("Server Framework", RuntimeInformation.FrameworkDescription),
-                new UserData("Default Language", _localizationService.GetDefaultLanguageIsoCode()),
-                new UserData("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
-                new UserData("Current Culture", Thread.CurrentThread.CurrentCulture.ToString()),
-                new UserData("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
-                new UserData("Current Webserver", GetCurrentWebServer())
+                new("Server OS", RuntimeInformation.OSDescription),
+                new("Server Framework", RuntimeInformation.FrameworkDescription),
+                new("Default Language", _localizationService.GetDefaultLanguageIsoCode()),
+                new("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
+                new("Current Culture", Thread.CurrentThread.CurrentCulture.ToString()),
+                new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
+                new("Current Webserver", GetCurrentWebServer())
             };
             return userDataList;
         }
 
-        public string GetCurrentWebServer()
-        {
-            if (IsRunningInProcessIIS())
-            {
-                return "IIS";
-            }
+        private string GetCurrentWebServer() => IsRunningInProcessIIS() ? "IIS" : "Kestrel";
 
-            return "Kestrel";
-        }
         public bool IsRunningInProcessIIS()
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
