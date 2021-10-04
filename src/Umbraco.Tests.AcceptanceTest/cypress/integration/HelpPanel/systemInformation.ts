@@ -27,7 +27,7 @@ context('System Information', () => {
         cy.get('.umb-button__content').click();
         cy.get('[data-element="global-user"]').click();
         cy.get('[alias="editUser"]').click();
-        cy.get('.input-block-level').last().select('Danish (Denmark)');
+        cy.get('[name="culture"]').select('Danish (Denmark)', {timeout: 10000});
         cy.umbracoButtonByLabelKey('buttons_save').click();
         //Refresh site to display new language
         cy.reload();
