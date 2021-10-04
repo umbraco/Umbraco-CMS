@@ -222,8 +222,7 @@
           }
         }
         function getPlatform() {
-          const allPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE', 'Android', 'iPhone', 'iPad', 'iPod'];
-          return allPlatforms.find(item => item === window.navigator.platform);
+          return window.navigator.platform;
         }
         evts.push(eventsService.on("appState.tour.complete", function (event, tour) {
             tourService.getGroupedTours().then(function(groupedTours) {
