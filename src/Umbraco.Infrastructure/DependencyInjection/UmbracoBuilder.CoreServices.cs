@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             builder.Services.AddSingleton<IShortStringHelper>(factory
-                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptions<RequestHandlerSettings>>().Value)));
+                => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptionsMonitor<RequestHandlerSettings>>().CurrentValue)));
 
             builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
             builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
@@ -156,7 +156,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IEmailSender, EmailSender>(
                 services => new EmailSender(
                     services.GetRequiredService<ILogger<EmailSender>>(),
-                    services.GetRequiredService<IOptions<GlobalSettings>>(),
+                    services.GetRequiredService<IOptionsMonitor<GlobalSettings>>(),
                     services.GetRequiredService<IEventAggregator>(),
                     services.GetService<INotificationHandler<SendEmailNotification>>(),
                     services.GetService<INotificationAsyncHandler<SendEmailNotification>>()));

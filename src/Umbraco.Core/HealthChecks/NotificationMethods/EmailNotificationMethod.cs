@@ -17,15 +17,14 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IEmailSender _emailSender;
         private readonly IMarkdownToHtmlConverter _markdownToHtmlConverter;
-
-        private readonly ContentSettings _contentSettings;
+        private  ContentSettings _contentSettings;
 
         public EmailNotificationMethod(
             ILocalizedTextService textService,
             IHostingEnvironment hostingEnvironment,
             IEmailSender emailSender,
-            IOptions<HealthChecksSettings> healthChecksSettings,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IMarkdownToHtmlConverter markdownToHtmlConverter)
             : base(healthChecksSettings)
         {
@@ -42,7 +41,9 @@ namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
             _hostingEnvironment = hostingEnvironment;
             _emailSender = emailSender;
             _markdownToHtmlConverter = markdownToHtmlConverter;
-            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         public string RecipientEmail { get; }

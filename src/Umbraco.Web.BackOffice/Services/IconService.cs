@@ -15,18 +15,20 @@ namespace Umbraco.Cms.Web.BackOffice.Services
 {
     public class IconService : IIconService
     {
-        private readonly IOptions<GlobalSettings> _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IAppPolicyCache _cache;
 
         public IconService(
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             AppCaches appCaches)
         {
-            _globalSettings = globalSettings;
+            _globalSettings = globalSettings.CurrentValue;
             _hostingEnvironment = hostingEnvironment;
             _cache = appCaches.RuntimeCache;
+
+            globalSettings.OnChange(x => _globalSettings = x);
         }
 
         /// <inheritdoc />
@@ -114,7 +116,7 @@ namespace Umbraco.Cms.Web.BackOffice.Services
             }
 
             // add icons from IconsPath if not already added from plugins
-            var coreIconsDirectory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.Value.IconsPath}/"));
+            var coreIconsDirectory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.IconsPath}/"));
             var coreIcons = coreIconsDirectory.GetFiles("*.svg");
 
             icons.UnionWith(coreIcons);

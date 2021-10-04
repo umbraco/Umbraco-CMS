@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
-        private readonly TimeSpan _period;
+        private TimeSpan _period;
         private readonly TimeSpan _delay;
         private Timer _timer;
 
@@ -35,6 +35,12 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _period = period;
             _delay = delay;
         }
+
+        /// <summary>
+        /// Change the period between operations.
+        /// </summary>
+        /// <param name="newPeriod">The new period between tasks</param>
+        protected void ChangePeriod(TimeSpan newPeriod) => _period = newPeriod;
 
         /// <inheritdoc/>
         public Task StartAsync(CancellationToken cancellationToken)

@@ -32,6 +32,7 @@ namespace Umbraco.Cms.Core.Routing
             _mediaUrlProviders = mediaUrlProviders;
             _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             Mode = routingSettings.Value.UrlProviderMode;
+
         }
 
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -122,7 +123,7 @@ namespace Umbraco.Cms.Core.Routing
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-            
+
 
             var url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
                 .FirstOrDefault(u => u != null);
@@ -230,7 +231,7 @@ namespace Umbraco.Cms.Core.Routing
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
                 current = umbracoContext.CleanedUmbracoUrl;
             }
-                
+
 
             var url = _mediaUrlProviders.Select(provider =>
                     provider.GetMediaUrl(content, propertyAlias, mode, culture, current))

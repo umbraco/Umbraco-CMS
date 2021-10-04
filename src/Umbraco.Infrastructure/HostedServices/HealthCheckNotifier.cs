@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     /// </summary>
     public class HealthCheckNotifier : RecurringHostedServiceBase
     {
-        private readonly HealthChecksSettings _healthChecksSettings;
+        private HealthChecksSettings _healthChecksSettings;
         private readonly HealthCheckCollection _healthChecks;
         private readonly HealthCheckNotificationMethodCollection _notifications;
         private readonly IRuntimeState _runtimeState;
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <param name="profilingLogger">The profiling logger.</param>
         /// <param name="cronTabParser">Parser of crontab expressions.</param>
         public HealthCheckNotifier(
-            IOptions<HealthChecksSettings> healthChecksSettings,
+            IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
             HealthCheckCollection healthChecks,
             HealthCheckNotificationMethodCollection notifications,
             IRuntimeState runtimeState,
@@ -61,10 +61,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IProfilingLogger profilingLogger,
             ICronTabParser cronTabParser)
             : base(
-                healthChecksSettings.Value.Notification.Period,
-                healthChecksSettings.Value.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay))
+                healthChecksSettings.CurrentValue.Notification.Period,
+                healthChecksSettings.CurrentValue.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay))
         {
-            _healthChecksSettings = healthChecksSettings.Value;
+            _healthChecksSettings = healthChecksSettings.CurrentValue;
             _healthChecks = healthChecks;
             _notifications = notifications;
             _runtimeState = runtimeState;
@@ -73,6 +73,12 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _scopeProvider = scopeProvider;
             _logger = logger;
             _profilingLogger = profilingLogger;
+
+            healthChecksSettings.OnChange(x =>
+            {
+                _healthChecksSettings = x;
+                ChangePeriod(x.Notification.Period);
+            });
         }
 
         public override async Task PerformExecuteAsync(object state)

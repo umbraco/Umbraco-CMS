@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Routing
     {
         private readonly ILogger<ContentFinderByConfigured404> _logger;
         private readonly IEntityService _entityService;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly IExamineManager _examineManager;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -31,17 +31,19 @@ namespace Umbraco.Cms.Core.Routing
         public ContentFinderByConfigured404(
             ILogger<ContentFinderByConfigured404> logger,
             IEntityService entityService,
-            IOptions<ContentSettings> contentConfigSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IExamineManager examineManager,
             IVariationContextAccessor variationContextAccessor,
             IUmbracoContextAccessor umbracoContextAccessor)
         {
             _logger = logger;
             _entityService = entityService;
-            _contentSettings = contentConfigSettings.Value;
+            _contentSettings = contentSettings.CurrentValue;
             _examineManager = examineManager;
             _variationContextAccessor = variationContextAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         /// <summary>

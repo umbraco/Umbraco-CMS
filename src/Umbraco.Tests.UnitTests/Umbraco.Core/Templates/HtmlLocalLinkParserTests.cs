@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -78,7 +79,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
             var webRoutingSettings = new WebRoutingSettings();
             var publishedUrlProvider = new UrlProvider(
                 umbracoContextAccessor,
-                Microsoft.Extensions.Options.Options.Create(webRoutingSettings),
+                Options.Create(webRoutingSettings),
                 new UrlProviderCollection(() => new[] { contentUrlProvider.Object }),
                 new MediaUrlProviderCollection(() => new[] { mediaUrlProvider.Object }),
                 Mock.Of<IVariationContextAccessor>());

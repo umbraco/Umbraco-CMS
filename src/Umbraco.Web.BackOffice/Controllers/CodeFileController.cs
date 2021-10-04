@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             IUmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
-            IOptions<GlobalSettings> globalSettings)
+            IOptionsSnapshot<GlobalSettings> globalSettings)
         {
             _hostingEnvironment = hostingEnvironment;
             _fileSystems = fileSystems;

@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private readonly IRuntimeState _runtimeState;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
-        private readonly SmidgeOptions _smidgeOptions;
+        private SmidgeOptions _smidgeOptions;
         private readonly WebProfiler _profiler;
 
         private static bool s_cacheInitialized;
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             IHostingEnvironment hostingEnvironment,
             UmbracoRequestPaths umbracoRequestPaths,
             BackOfficeWebAssets backOfficeWebAssets,
-            IOptions<SmidgeOptions> smidgeOptions,
+            IOptionsMonitor<SmidgeOptions> smidgeOptions,
             IRuntimeState runtimeState,
             IVariationContextAccessor variationContextAccessor,
             IDefaultCultureAccessor defaultCultureAccessor)
@@ -95,8 +95,10 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _runtimeState = runtimeState;
             _variationContextAccessor = variationContextAccessor;
             _defaultCultureAccessor = defaultCultureAccessor;
-            _smidgeOptions = smidgeOptions.Value;
+            _smidgeOptions = smidgeOptions.CurrentValue;
             _profiler = profiler as WebProfiler; // Ignore if not a WebProfiler
+
+            smidgeOptions.OnChange(x => _smidgeOptions = x);
         }
 
         /// <inheritdoc/>

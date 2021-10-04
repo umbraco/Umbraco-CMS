@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public CurrentUserController(
             MediaFileManager mediaFileManager,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,

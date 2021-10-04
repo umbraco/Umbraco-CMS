@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
@@ -87,7 +88,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 mockMainDom.Object,
                 mockServerRegistrar.Object,
                 _mockAuditService.Object,
-                Options.Create(settings),
+                new TestOptionsMonitor<LoggingSettings>(settings),
                 mockScopeProvider.Object,
                 mockLogger.Object,
                 mockProfilingLogger.Object);

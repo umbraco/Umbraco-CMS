@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRegistration
 {
@@ -76,7 +77,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.Serv
                 _mockServerRegistrationService.Object,
                 mockRequestAccessor.Object,
                 mockLogger.Object,
-                Options.Create(settings));
+                new TestOptionsMonitor<GlobalSettings>(settings));
         }
 
         private void VerifyServerNotTouched() => VerifyServerTouchedTimes(Times.Never());

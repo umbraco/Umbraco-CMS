@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
         private readonly MediaFileManager _mediaFileManager;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly IDataTypeService _dataTypeService;
 
         public ImageCropperPropertyValueEditor(
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             MediaFileManager mediaFileSystem,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
             IDataTypeService dataTypeService)
@@ -44,8 +44,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _contentSettings = contentSettings.Value;
+            _contentSettings = contentSettings.CurrentValue;
             _dataTypeService = dataTypeService;
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         /// <summary>

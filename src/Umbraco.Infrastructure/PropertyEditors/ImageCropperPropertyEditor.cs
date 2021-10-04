@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         INotificationHandler<MemberDeletedNotification>
     {
         private readonly MediaFileManager _mediaFileManager;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly IDataTypeService _dataTypeService;
         private readonly IIOHelper _ioHelper;
         private readonly UploadAutoFillProperties _autoFillProperties;
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IDataValueEditorFactory dataValueEditorFactory,
             ILoggerFactory loggerFactory,
             MediaFileManager mediaFileManager,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
             IIOHelper ioHelper,
             UploadAutoFillProperties uploadAutoFillProperties,
@@ -58,12 +58,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
             : base(dataValueEditorFactory)
         {
             _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
-            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _autoFillProperties = uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
             _contentService = contentService;
             _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         public bool TryGetMediaPath(string propertyEditorAlias, object value, out string mediaPath)

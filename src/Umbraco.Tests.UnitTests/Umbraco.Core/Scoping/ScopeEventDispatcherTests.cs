@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
@@ -91,7 +92,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
             return new ScopeProvider(
                 Mock.Of<IUmbracoDatabaseFactory>(),
                 fileSystems,
-                Options.Create(new CoreDebugSettings()),
+                new TestOptionsMonitor<CoreDebugSettings>(new CoreDebugSettings()),
                 mediaFileManager,
                 Mock.Of<ILogger<ScopeProvider>>(),
                 instance,

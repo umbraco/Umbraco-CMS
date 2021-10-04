@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IMediaTypeService mediaTypeService,
             IMediaService mediaService,
             IEntityService entityService,

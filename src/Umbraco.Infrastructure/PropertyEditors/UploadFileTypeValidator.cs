@@ -16,12 +16,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
     internal class UploadFileTypeValidator : IValueValidator
     {
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
 
-        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IOptions<ContentSettings> contentSettings)
+        public UploadFileTypeValidator(ILocalizedTextService localizedTextService, IOptionsMonitor<ContentSettings> contentSettings)
         {
             _localizedTextService = localizedTextService;
-            _contentSettings = contentSettings.Value;
+            _contentSettings = contentSettings.CurrentValue;
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)

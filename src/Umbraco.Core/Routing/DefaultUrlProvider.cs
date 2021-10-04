@@ -15,19 +15,20 @@ namespace Umbraco.Cms.Core.Routing
     /// </summary>
     public class DefaultUrlProvider : IUrlProvider
     {
-        private readonly RequestHandlerSettings _requestSettings;
+        private RequestHandlerSettings _requestSettings;
         private readonly ILogger<DefaultUrlProvider> _logger;
         private readonly ISiteDomainMapper _siteDomainMapper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
 
-        public DefaultUrlProvider(IOptions<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger, ISiteDomainMapper siteDomainMapper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
+        public DefaultUrlProvider(IOptionsMonitor<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger, ISiteDomainMapper siteDomainMapper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
         {
-            _requestSettings = requestSettings.Value;
+            _requestSettings = requestSettings.CurrentValue;
             _logger = logger;
             _siteDomainMapper = siteDomainMapper;
             _uriUtility = uriUtility;
             _umbracoContextAccessor = umbracoContextAccessor;
+            requestSettings.OnChange(x => _requestSettings = x);
         }
 
         #region GetUrl

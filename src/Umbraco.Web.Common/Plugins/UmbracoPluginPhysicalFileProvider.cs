@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Options;
@@ -18,7 +19,7 @@ namespace Umbraco.Cms.Web.Common.Plugins
     /// </remarks>
     public class UmbracoPluginPhysicalFileProvider : PhysicalFileProvider, IFileProvider
     {
-        private readonly IOptions<UmbracoPluginSettings> _options;
+        private UmbracoPluginSettings _options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoPluginPhysicalFileProvider"/> class, at the given root directory.
@@ -26,8 +27,14 @@ namespace Umbraco.Cms.Web.Common.Plugins
         /// <param name="root">The root directory. This should be an absolute path.</param>
         /// <param name="options">The configuration options.</param>
         /// <param name="filters">Specifies which files or directories are excluded.</param>
-        public UmbracoPluginPhysicalFileProvider(string root, IOptions<UmbracoPluginSettings> options, ExclusionFilters filters = ExclusionFilters.Sensitive)
-            : base(root, filters) => _options = options;
+        public UmbracoPluginPhysicalFileProvider(string root, IOptionsMonitor<UmbracoPluginSettings> options, ExclusionFilters filters = ExclusionFilters.Sensitive)
+            : base(root, filters)
+        {
+            _options = options.CurrentValue;
+            options.OnChange(x => {
+                _options = x;
+            } );
+        }
 
         /// <summary>
         /// Locate a file at the given path by directly mapping path segments to physical directories.
@@ -41,7 +48,7 @@ namespace Umbraco.Cms.Web.Common.Plugins
         {
             var extension = Path.GetExtension(subpath);
             var subPathInclAppPluginsFolder = Path.Combine(Cms.Core.Constants.SystemDirectories.AppPlugins, subpath);
-            if (!_options.Value.BrowsableFileExtensions.Contains(extension))
+            if (!_options.BrowsableFileExtensions.Contains(extension))
             {
                 return new NotFoundFileInfo(subPathInclAppPluginsFolder);
             }

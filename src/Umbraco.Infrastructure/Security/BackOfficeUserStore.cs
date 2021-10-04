@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Security
             IUserService userService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IUmbracoMapper mapper,
             BackOfficeErrorDescriber describer,
             AppCaches appCaches)

@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeUserManager _userManager;
         private readonly IRuntimeState _runtimeState;
         private readonly IRuntimeMinifier _runtimeMinifier;
-        private readonly GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILocalizedTextService _textService;
         private readonly IGridConfig _gridConfig;
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeUserManager userManager,
             IRuntimeState runtimeState,
             IRuntimeMinifier runtimeMinifier,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
             ILocalizedTextService textService,
             IGridConfig gridConfig,

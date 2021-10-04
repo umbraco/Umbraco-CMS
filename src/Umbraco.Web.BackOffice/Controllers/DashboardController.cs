@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IDashboardService _dashboardService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IOptions<ContentDashboardSettings> _dashboardSettings;
+        private readonly ContentDashboardSettings _dashboardSettings;
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IDashboardService dashboardService,
             IUmbracoVersion umbracoVersion,
             IShortStringHelper shortStringHelper,
-            IOptions<ContentDashboardSettings> dashboardSettings)
+            IOptionsSnapshot<ContentDashboardSettings> dashboardSettings)
 
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _dashboardService = dashboardService;
             _umbracoVersion = umbracoVersion;
             _shortStringHelper = shortStringHelper;
-            _dashboardSettings = dashboardSettings;
+            _dashboardSettings = dashboardSettings.Value;
         }
 
         //we have just one instance of HttpClient shared for the entire application
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}",
                 baseUrl,
-                _dashboardSettings.Value.ContentDashboardPath,
+                _dashboardSettings.ContentDashboardPath,
                 section,
                 allowedSections,
                 language,

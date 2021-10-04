@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeSessionIdValidator"/> class.
         /// </summary>
-        public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptions<GlobalSettings> globalSettings, IBackOfficeUserManager userManager)
+        public BackOfficeSessionIdValidator(ISystemClock systemClock, IOptionsSnapshot<GlobalSettings> globalSettings, IBackOfficeUserManager userManager)
         {
             _systemClock = systemClock;
             _globalSettings = globalSettings.Value;

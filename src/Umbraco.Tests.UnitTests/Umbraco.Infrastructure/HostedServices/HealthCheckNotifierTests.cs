@@ -20,6 +20,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Tests.Common;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
@@ -149,7 +150,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockProfilingLogger = new Mock<IProfilingLogger>();
 
             return new HealthCheckNotifier(
-                Options.Create(settings),
+                new TestOptionsMonitor<HealthChecksSettings>(settings),
                 checks,
                 notifications,
                 mockRunTimeState.Object,

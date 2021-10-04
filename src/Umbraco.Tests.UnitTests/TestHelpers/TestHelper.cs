@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 
         public static UriUtility UriUtility => s_testHelperInternal.UriUtility;
 
-        public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), Options.Create(new GlobalSettings()), Mock.Of<IEventAggregator>());
+        public static IEmailSender EmailSender { get; } = new EmailSender(new NullLogger<EmailSender>(), new TestOptionsMonitor<GlobalSettings>(new GlobalSettings()), Mock.Of<IEventAggregator>());
 
         /// <summary>
         /// Some test files are copied to the /bin (/bin/debug) on build, this is a utility to return their physical path based on a virtual path name

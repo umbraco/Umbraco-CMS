@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Web.Common.Templates
         private readonly IPublishedRouter _publishedRouter;
         private readonly IFileService _fileService;
         private readonly ILocalizationService _languageService;
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private WebRoutingSettings _webRoutingSettings;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICompositeViewEngine _viewEngine;
         private readonly IModelMetadataProvider _modelMetadataProvider;
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Web.Common.Templates
             IPublishedRouter publishedRouter,
             IFileService fileService,
             ILocalizationService textService,
-            IOptions<WebRoutingSettings> webRoutingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IHttpContextAccessor httpContextAccessor,
             ICompositeViewEngine viewEngine,
             IModelMetadataProvider modelMetadataProvider,
@@ -56,11 +56,13 @@ namespace Umbraco.Cms.Web.Common.Templates
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
-            _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.CurrentValue ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
             _modelMetadataProvider = modelMetadataProvider;
             _tempDataDictionaryFactory = tempDataDictionaryFactory;
+
+            webRoutingSettings.OnChange(x => _webRoutingSettings = x);
         }
 
         public async Task RenderAsync(int pageId, int? altTemplateId, StringWriter writer)

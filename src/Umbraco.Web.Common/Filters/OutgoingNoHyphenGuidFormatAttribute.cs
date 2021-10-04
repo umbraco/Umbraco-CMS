@@ -18,14 +18,13 @@ namespace Umbraco.Cms.Web.Common.Filters
 
         private class OutgoingNoHyphenGuidFormatFilter : IResultFilter
         {
-            private readonly IOptions<MvcNewtonsoftJsonOptions> _mvcNewtonsoftJsonOptions;
             private readonly ArrayPool<char> _arrayPool;
-            private readonly IOptions<MvcOptions> _options;
+            private readonly MvcOptions _options;
 
-            public OutgoingNoHyphenGuidFormatFilter(ArrayPool<char> arrayPool, IOptions<MvcOptions> options)
+            public OutgoingNoHyphenGuidFormatFilter(ArrayPool<char> arrayPool, IOptionsSnapshot<MvcOptions> options)
             {
                 _arrayPool = arrayPool;
-                _options = options;
+                _options = options.Value;
             }
             public void OnResultExecuted(ResultExecutedContext context)
             {
@@ -39,7 +38,7 @@ namespace Umbraco.Cms.Web.Common.Filters
                     serializerSettings.Converters.Add(new GuidNoHyphenConverter());
 
                     objectResult.Formatters.Clear();
-                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options.Value));
+                    objectResult.Formatters.Add(new AngularJsonMediaTypeFormatter(serializerSettings, _arrayPool, _options));
                 }
             }
 
