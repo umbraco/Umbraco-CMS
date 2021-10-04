@@ -35,12 +35,11 @@ context('System Information', () => {
         //Assert
         cy.contains('Current Culture').parent().should('contain', 'da-DK');
         cy.contains('Current UI Culture').parent().should('contain', 'da-DK');
-
+        cy.reload();
         //Clean
-        cy.get('.umb-button__content').click();
         cy.get('[data-element="global-user"]').click();
         cy.get('[alias="editUser"]').click();
-        cy.get('.input-block-level').last().select('English (United States)');
+        cy.get('.input-block-level', {timeout: 10000}).last().select('English (United States)');
         cy.umbracoButtonByLabelKey('buttons_save').click();
         cy.reload();
     });
