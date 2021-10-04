@@ -45,7 +45,11 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
             _hostingEnvironment = hostingEnvironment;
             _logger = logger;
             _globalSettings = globalSettings.CurrentValue;
-            globalSettings.OnChange(x => _globalSettings = x);
+            globalSettings.OnChange(x =>
+            {
+                _globalSettings = x;
+                ChangePeriod(x.DatabaseServerRegistrar.WaitTimeBetweenCalls);
+            });
         }
 
         public override Task PerformExecuteAsync(object state)
