@@ -35,6 +35,7 @@ context('System Information', () => {
         //Assert
         cy.contains('Current Culture').parent().should('contain', 'da-DK');
         cy.contains('Current UI Culture').parent().should('contain', 'da-DK');
+        cy.get('.umb-button__content').last().click();
         cy.reload();
         //Clean
         cy.get('[data-element="global-user"]').click();
