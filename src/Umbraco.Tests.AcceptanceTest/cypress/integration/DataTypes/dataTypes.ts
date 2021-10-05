@@ -2,6 +2,7 @@
 import {
     AliasHelper,
     ApprovedColorPickerDataTypeBuilder,
+    TextBoxDataTypeBuilder,
 } from 'umbraco-cypress-testhelpers';
 
 context('DataTypes', () => {
@@ -61,6 +62,48 @@ context('DataTypes', () => {
         cy.umbracoEnsureDocumentTypeNameNotExists(name);
         cy.umbracoEnsureTemplateNameNotExists(name);
     });
+
+    it('Tests Textbox Maxlength', () => {
+        cy.deleteAllContent();
+        const name = 'Textbox Maxlength Test';
+        const alias = AliasHelper.toAlias(name);
+
+        cy.umbracoEnsureDocumentTypeNameNotExists(name);
+        cy.umbracoEnsureDataTypeNameNotExists(name);
+
+        const textBoxDataType = new TextBoxDataTypeBuilder()
+            .withName(name)
+            .withMaxChars(10)
+            .build()
+
+        cy.umbracoCreateDocTypeWithContent(name, alias, textBoxDataType);
+
+        // Act
+        // Enter content
+        // Assert no helptext with (max-2) chars & can save
+        cy.umbracoRefreshContentTree();
+        cy.umbracoTreeItem("content", [name]).click();
+        cy.get('input[name="textbox"]').type('12345678');
+        cy.get('localize[key="textbox_characters_left"]').should('not.exist');
+        cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
+        cy.umbracoSuccessNotification().should('be.visible');
+        cy.get('.property-error').should('not.be.visible');
+
+        // Add char and assert helptext appears - no publish to save time & has been asserted above & below
+        cy.get('input[name="textbox"]').type('9');
+        cy.get('localize[key="textbox_characters_left"]').contains('characters left').should('exist');
+        cy.get('.property-error').should('not.be.visible');
+
+        // Add char and assert errortext appears and can't save
+        cy.get('input[name="textbox"]').type('10'); // 1 char over max
+        cy.get('localize[key="textbox_characters_exceed"]').contains('too many').should('exist');
+        cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
+        cy.get('.property-error').should('be.visible');
+
+        // Clean
+        cy.umbracoEnsureDataTypeNameNotExists(name);
+        cy.umbracoEnsureDocumentTypeNameNotExists(name);
+    })
 
     //   it('Tests Checkbox List', () => {
     //     const name = 'CheckBox List';
