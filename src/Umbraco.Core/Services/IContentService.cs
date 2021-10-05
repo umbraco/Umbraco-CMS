@@ -243,7 +243,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId);
+        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, ContentScheduleCollection contentSchedule = null);
 
         /// <summary>
         /// Saves documents.

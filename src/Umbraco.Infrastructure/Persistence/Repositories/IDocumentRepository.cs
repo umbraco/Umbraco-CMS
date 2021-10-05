@@ -14,6 +14,8 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 
         void ClearSchedule(DateTime date, ContentScheduleAction action);
 
+        void PersistContentSchedule(IContent content, ContentScheduleCollection schedule);
+
         bool HasContentForExpiration(DateTime date);
         bool HasContentForRelease(DateTime date);
 

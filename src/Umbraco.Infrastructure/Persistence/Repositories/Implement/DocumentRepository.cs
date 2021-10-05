@@ -477,9 +477,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Insert(dto);
 
-            //insert the schedule
-            PersistContentSchedule(entity, false);
-
             // persist the variations
             if (entity.ContentType.VariesByCulture())
             {
@@ -552,253 +549,251 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IContent entity)
         {
-            // TODO: ContentScheduling - fix
-            throw new NotImplementedException("ContentScheduling");
+            var isEntityDirty = entity.IsDirty();
 
-            //var isEntityDirty = entity.IsDirty();
+            // check if we need to make any database changes at all
+            if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
+                    && !isEntityDirty && !entity.IsAnyUserPropertyDirty())
+            {
+                return; // no change to save, do nothing, don't even update dates
+            }
 
-            //// check if we need to make any database changes at all
-            //if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
-            //        && !isEntityDirty && !entity.IsAnyUserPropertyDirty())
+            // whatever we do, we must check that we are saving the current version
+            var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId)).FirstOrDefault();
+            if (version == null || !version.Current)
+                throw new InvalidOperationException("Cannot save a non-current version.");
+
+            // update
+            entity.UpdatingEntity();
+
+            // Check if this entity is being moved as a descendant as part of a bulk moving operations.
+            // In this case we can bypass a lot of the below operations which will make this whole operation go much faster.
+            // When moving we don't need to create new versions, etc... because we cannot roll this operation back anyways.
+            var isMoving = entity.IsMoving();
+            // TODO: I'm sure we can also detect a "Copy" (of a descendant) operation and probably perform similar checks below.
+            // There is probably more stuff that would be required for copying but I'm sure not all of this logic would be, we could more than likely boost
+            // copy performance by 95% just like we did for Move
+
+
+            var publishing = entity.PublishedState == PublishedState.Publishing;
+
+            if (!isMoving)
+            {
+                // check if we need to create a new version
+                if (publishing && entity.PublishedVersionId > 0)
+                {
+                    // published version is not published anymore
+                    Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == entity.PublishedVersionId));
+                }
+
+                // sanitize names
+                SanitizeNames(entity, publishing);
+
+                // ensure that strings don't contain characters that are invalid in xml
+                // TODO: do we really want to keep doing this here?
+                entity.SanitizeEntityPropertiesForXmlStorage();
+
+                // if parent has changed, get path, level and sort order
+                if (entity.IsPropertyDirty("ParentId"))
+                {
+                    var parent = GetParentNodeDto(entity.ParentId);
+                    entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                    entity.Level = parent.Level + 1;
+                    entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+                }
+            }
+
+            // create the dto
+            var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId);
+
+            // update the node dto
+            var nodeDto = dto.ContentDto.NodeDto;
+            nodeDto.ValidatePathWithException();
+            Database.Update(nodeDto);
+
+            if (!isMoving)
+            {
+                // update the content dto
+                Database.Update(dto.ContentDto);
+
+                // update the content & document version dtos
+                var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
+                var documentVersionDto = dto.DocumentVersionDto;
+                if (publishing)
+                {
+                    documentVersionDto.Published = true; // now published
+                    contentVersionDto.Current = false; // no more current
+                }
+                Database.Update(contentVersionDto);
+                Database.Update(documentVersionDto);
+
+                // and, if publishing, insert new content & document version dtos
+                if (publishing)
+                {
+                    entity.PublishedVersionId = entity.VersionId;
+
+                    contentVersionDto.Id = 0; // want a new id
+                    contentVersionDto.Current = true; // current version
+                    contentVersionDto.Text = entity.Name;
+                    Database.Insert(contentVersionDto);
+                    entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
+
+                    documentVersionDto.Published = false; // non-published version
+                    Database.Insert(documentVersionDto);
+                }
+
+                // replace the property data (rather than updating)
+                // only need to delete for the version that existed, the new version (if any) has no property data yet
+                var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
+
+                // insert property data
+                ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out HashSet<string> editedCultures);
+
+                // if !publishing, we may have a new name != current publish name,
+                // also impacts 'edited'
+                if (!publishing && entity.PublishName != entity.Name)
+                {
+                    edited = true;
+                }
+
+                if (entity.ContentType.VariesByCulture())
+                {
+                    // names also impact 'edited'
+                    // ReSharper disable once UseDeconstruction
+                    foreach (var cultureInfo in entity.CultureInfos)
+                    {
+                        if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
+                        {
+                            edited = true;
+                            (editedCultures ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase)).Add(cultureInfo.Culture);
+
+                            // TODO: change tracking
+                            // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
+                            // culture has just been edited or not, so we don't update its update date - that date only changes
+                            // when the name is set, and it all works because the controller does it - but, if someone uses a
+                            // service to change a property value and save (without setting name), the update date does not change.
+                        }
+                    }
+
+                    // refresh content
+                    entity.SetCultureEdited(editedCultures);
+
+                    // bump dates to align cultures to version
+                    entity.AdjustDates(contentVersionDto.VersionDate, publishing);
+
+                    // replace the content version variations (rather than updating)
+                    // only need to delete for the version that existed, the new version (if any) has no property data yet
+                    var deleteContentVariations = Sql().Delete<ContentVersionCultureVariationDto>().Where<ContentVersionCultureVariationDto>(x => x.VersionId == versionToDelete);
+                    Database.Execute(deleteContentVariations);
+
+                    // replace the document version variations (rather than updating)
+                    var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == entity.Id);
+                    Database.Execute(deleteDocumentVariations);
+
+                    // TODO: NPoco InsertBulk issue?
+                    // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
+                    // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
+                    // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
+                    // (same in PersistNewItem above)
+
+                    // insert content variations
+                    Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
+
+                    // insert document variations
+                    Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
+                }
+
+                // update the document dto
+                // at that point, when un/publishing, the entity still has its old Published value
+                // so we need to explicitly update the dto to persist the correct value
+                if (entity.PublishedState == PublishedState.Publishing)
+                {
+                    dto.Published = true;
+                }
+                else if (entity.PublishedState == PublishedState.Unpublishing)
+                {
+                    dto.Published = false;
+                }
+
+                entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
+                Database.Update(dto);
+
+                // if entity is publishing, update tags, else leave tags there
+                // means that implicitly unpublished, or trashed, entities *still* have tags in db
+                if (entity.PublishedState == PublishedState.Publishing)
+                {
+                    SetEntityTags(entity, _tagRepository, _serializer);
+                }
+            }
+
+            // trigger here, before we reset Published etc
+            OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
+
+            if (!isMoving)
+            {
+                // flip the entity's published property
+                // this also flips its published state
+                if (entity.PublishedState == PublishedState.Publishing)
+                {
+                    entity.Published = true;
+                    entity.PublishTemplateId = entity.TemplateId;
+                    entity.PublisherId = entity.WriterId;
+                    entity.PublishName = entity.Name;
+                    entity.PublishDate = entity.UpdateDate;
+
+                    SetEntityTags(entity, _tagRepository, _serializer);
+                }
+                else if (entity.PublishedState == PublishedState.Unpublishing)
+                {
+                    entity.Published = false;
+                    entity.PublishTemplateId = null;
+                    entity.PublisherId = null;
+                    entity.PublishName = null;
+                    entity.PublishDate = null;
+
+                    ClearEntityTags(entity, _tagRepository);
+                }
+
+                PersistRelations(entity);
+
+                // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
+            }
+
+            entity.ResetDirtyProperties();
+
+            // troubleshooting
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
             //{
-            //    return; // no change to save, do nothing, don't even update dates
+            //    Debugger.Break();
+            //    throw new Exception("oops");
             //}
-
-            //// whatever we do, we must check that we are saving the current version
-            //var version = Database.Fetch<ContentVersionDto>(SqlContext.Sql().Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == entity.VersionId)).FirstOrDefault();
-            //if (version == null || !version.Current)
-            //    throw new InvalidOperationException("Cannot save a non-current version.");
-
-            //// update
-            //entity.UpdatingEntity();
-
-            //// Check if this entity is being moved as a descendant as part of a bulk moving operations.
-            //// In this case we can bypass a lot of the below operations which will make this whole operation go much faster.
-            //// When moving we don't need to create new versions, etc... because we cannot roll this operation back anyways.
-            //var isMoving = entity.IsMoving();
-            //// TODO: I'm sure we can also detect a "Copy" (of a descendant) operation and probably perform similar checks below.
-            //// There is probably more stuff that would be required for copying but I'm sure not all of this logic would be, we could more than likely boost
-            //// copy performance by 95% just like we did for Move
-
-
-            //var publishing = entity.PublishedState == PublishedState.Publishing;
-
-            //if (!isMoving)
+            //if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
             //{
-            //    // check if we need to create a new version
-            //    if (publishing && entity.PublishedVersionId > 0)
-            //    {
-            //        // published version is not published anymore
-            //        Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == entity.PublishedVersionId));
-            //    }
-
-            //    // sanitize names
-            //    SanitizeNames(entity, publishing);
-
-            //    // ensure that strings don't contain characters that are invalid in xml
-            //    // TODO: do we really want to keep doing this here?
-            //    entity.SanitizeEntityPropertiesForXmlStorage();
-
-            //    // if parent has changed, get path, level and sort order
-            //    if (entity.IsPropertyDirty("ParentId"))
-            //    {
-            //        var parent = GetParentNodeDto(entity.ParentId);
-            //        entity.Path = string.Concat(parent.Path, ",", entity.Id);
-            //        entity.Level = parent.Level + 1;
-            //        entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
-            //    }
+            //    Debugger.Break();
+            //    throw new Exception("oops");
             //}
-
-            //// create the dto
-            //var dto = ContentBaseFactory.BuildDto(entity, NodeObjectTypeId);
-
-            //// update the node dto
-            //var nodeDto = dto.ContentDto.NodeDto;
-            //nodeDto.ValidatePathWithException();
-            //Database.Update(nodeDto);
-
-            //if (!isMoving)
-            //{
-            //    // update the content dto
-            //    Database.Update(dto.ContentDto);
-
-            //    // update the content & document version dtos
-            //    var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
-            //    var documentVersionDto = dto.DocumentVersionDto;
-            //    if (publishing)
-            //    {
-            //        documentVersionDto.Published = true; // now published
-            //        contentVersionDto.Current = false; // no more current
-            //    }
-            //    Database.Update(contentVersionDto);
-            //    Database.Update(documentVersionDto);
-
-            //    // and, if publishing, insert new content & document version dtos
-            //    if (publishing)
-            //    {
-            //        entity.PublishedVersionId = entity.VersionId;
-
-            //        contentVersionDto.Id = 0; // want a new id
-            //        contentVersionDto.Current = true; // current version
-            //        contentVersionDto.Text = entity.Name;
-            //        Database.Insert(contentVersionDto);
-            //        entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
-
-            //        documentVersionDto.Published = false; // non-published version
-            //        Database.Insert(documentVersionDto);
-            //    }
-
-            //    // replace the property data (rather than updating)
-            //    // only need to delete for the version that existed, the new version (if any) has no property data yet
-            //    var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
-
-            //    // insert property data
-            //    ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out HashSet<string> editedCultures);
-
-            //    // if !publishing, we may have a new name != current publish name,
-            //    // also impacts 'edited'
-            //    if (!publishing && entity.PublishName != entity.Name)
-            //    {
-            //        edited = true;
-            //    }
-
-            //    if (entity.ContentType.VariesByCulture())
-            //    {
-            //        // names also impact 'edited'
-            //        // ReSharper disable once UseDeconstruction
-            //        foreach (var cultureInfo in entity.CultureInfos)
-            //        {
-            //            if (cultureInfo.Name != entity.GetPublishName(cultureInfo.Culture))
-            //            {
-            //                edited = true;
-            //                (editedCultures ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase)).Add(cultureInfo.Culture);
-
-            //                // TODO: change tracking
-            //                // at the moment, we don't do any dirty tracking on property values, so we don't know whether the
-            //                // culture has just been edited or not, so we don't update its update date - that date only changes
-            //                // when the name is set, and it all works because the controller does it - but, if someone uses a
-            //                // service to change a property value and save (without setting name), the update date does not change.
-            //            }
-            //        }
-
-            //        // refresh content
-            //        entity.SetCultureEdited(editedCultures);
-
-            //        // bump dates to align cultures to version
-            //        entity.AdjustDates(contentVersionDto.VersionDate, publishing);
-
-            //        // replace the content version variations (rather than updating)
-            //        // only need to delete for the version that existed, the new version (if any) has no property data yet
-            //        var deleteContentVariations = Sql().Delete<ContentVersionCultureVariationDto>().Where<ContentVersionCultureVariationDto>(x => x.VersionId == versionToDelete);
-            //        Database.Execute(deleteContentVariations);
-
-            //        // replace the document version variations (rather than updating)
-            //        var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == entity.Id);
-            //        Database.Execute(deleteDocumentVariations);
-
-            //        // TODO: NPoco InsertBulk issue?
-            //        // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
-            //        // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
-            //        // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
-            //        // (same in PersistNewItem above)
-
-            //        // insert content variations
-            //        Database.BulkInsertRecords(GetContentVariationDtos(entity, publishing));
-
-            //        // insert document variations
-            //        Database.BulkInsertRecords(GetDocumentVariationDtos(entity, editedCultures));
-            //    }
-
-            //    // update the document dto
-            //    // at that point, when un/publishing, the entity still has its old Published value
-            //    // so we need to explicitly update the dto to persist the correct value
-            //    if (entity.PublishedState == PublishedState.Publishing)
-            //    {
-            //        dto.Published = true;
-            //    }
-            //    else if (entity.PublishedState == PublishedState.Unpublishing)
-            //    {
-            //        dto.Published = false;
-            //    }
-
-            //    entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
-            //    Database.Update(dto);
-
-            //    //update the schedule
-            //    if (entity.IsPropertyDirty(nameof(entity.ContentSchedule)))
-            //    {
-            //        PersistContentSchedule(entity, true);
-            //    }
-
-            //    // if entity is publishing, update tags, else leave tags there
-            //    // means that implicitly unpublished, or trashed, entities *still* have tags in db
-            //    if (entity.PublishedState == PublishedState.Publishing)
-            //    {
-            //        SetEntityTags(entity, _tagRepository, _serializer);
-            //    }
-            //}
-
-            //// trigger here, before we reset Published etc
-            //OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
-
-            //if (!isMoving)
-            //{
-            //    // flip the entity's published property
-            //    // this also flips its published state
-            //    if (entity.PublishedState == PublishedState.Publishing)
-            //    {
-            //        entity.Published = true;
-            //        entity.PublishTemplateId = entity.TemplateId;
-            //        entity.PublisherId = entity.WriterId;
-            //        entity.PublishName = entity.Name;
-            //        entity.PublishDate = entity.UpdateDate;
-
-            //        SetEntityTags(entity, _tagRepository, _serializer);
-            //    }
-            //    else if (entity.PublishedState == PublishedState.Unpublishing)
-            //    {
-            //        entity.Published = false;
-            //        entity.PublishTemplateId = null;
-            //        entity.PublisherId = null;
-            //        entity.PublishName = null;
-            //        entity.PublishDate = null;
-
-            //        ClearEntityTags(entity, _tagRepository);
-            //    }
-
-            //    PersistRelations(entity);
-
-            //    // TODO: note re. tags: explicitly unpublished entities have cleared tags, but masked or trashed entities *still* have tags in the db - so what?
-            //}
-
-            //entity.ResetDirtyProperties();
-
-            //// troubleshooting
-            ////if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE published=1 AND nodeId=" + content.Id) > 1)
-            ////{
-            ////    Debugger.Break();
-            ////    throw new Exception("oops");
-            ////}
-            ////if (Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Constants.DatabaseSchema.Tables.DocumentVersion} JOIN {Constants.DatabaseSchema.Tables.ContentVersion} ON {Constants.DatabaseSchema.Tables.DocumentVersion}.id={Constants.DatabaseSchema.Tables.ContentVersion}.id WHERE [current]=1 AND nodeId=" + content.Id) > 1)
-            ////{
-            ////    Debugger.Break();
-            ////    throw new Exception("oops");
-            ////}
         }
 
-        private void PersistContentSchedule(IContent content, bool update)
+        public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
         {
-            var schedules = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository).ToList();
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            if (contentSchedule == null)
+            {
+                throw new ArgumentNullException(nameof(contentSchedule));
+            }
+
+            var schedules = ContentBaseFactory.BuildScheduleDto(content, contentSchedule, LanguageRepository).ToList();
 
             //remove any that no longer exist
-            if (update)
-            {
-                var ids = schedules.Where(x => x.Model.Id != Guid.Empty).Select(x => x.Model.Id).Distinct();
-                Database.Execute(Sql()
-                    .Delete<ContentScheduleDto>()
-                    .Where<ContentScheduleDto>(x => x.NodeId == content.Id)
-                    .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
-            }
+            var ids = schedules.Where(x => x.Model.Id != Guid.Empty).Select(x => x.Model.Id).Distinct();
+            Database.Execute(Sql()
+                .Delete<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x => x.NodeId == content.Id)
+                .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
 
             //add/update the rest
             foreach (var schedule in schedules)

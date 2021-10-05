@@ -141,31 +141,28 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the current status of the Content
         /// </summary>
-        public static ContentStatus GetStatus(this IContent content, string culture = null)
+        public static ContentStatus GetStatus(this IContent content, ContentScheduleCollection contentSchedule, string culture = null)
         {
-            // TODO: ContentScheduling - fix
-            throw new NotImplementedException("ContentScheduling");
+            if (content.Trashed)
+                return ContentStatus.Trashed;
 
-            //if (content.Trashed)
-            //    return ContentStatus.Trashed;
+            if (!content.ContentType.VariesByCulture())
+                culture = string.Empty;
+            else if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
 
-            //if (!content.ContentType.VariesByCulture())
-            //    culture = string.Empty;
-            //else if (culture.IsNullOrWhiteSpace())
-            //    throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
+            var expires = contentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
+            if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
+                return ContentStatus.Expired;
 
-            //var expires = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
-            //if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
-            //    return ContentStatus.Expired;
+            var release = contentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
+            if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
+                return ContentStatus.AwaitingRelease;
 
-            //var release = content.ContentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
-            //if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
-            //    return ContentStatus.AwaitingRelease;
+            if (content.Published)
+                return ContentStatus.Published;
 
-            //if (content.Published)
-            //    return ContentStatus.Published;
-
-            //return ContentStatus.Unpublished;
+            return ContentStatus.Unpublished;
         }
 
 

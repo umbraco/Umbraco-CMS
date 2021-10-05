@@ -765,7 +765,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         #region Save, Publish, Unpublish
 
         /// <inheritdoc />
-        public OperationResult Save(IContent content, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public OperationResult Save(IContent content, int userId = Cms.Core.Constants.Security.SuperUserId, ContentScheduleCollection contentSchedule = null)
         {
             PublishedState publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -808,6 +808,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // have always changed if it's been saved in the back office but that's not really fail safe.
 
                 _documentRepository.Save(content);
+
+                // Ignore scheduling if none provided (e.g. Save & Preview)
+                if (contentSchedule != null)
+                {
+                    _documentRepository.PersistContentSchedule(content, contentSchedule);
+                }
 
                 scope.Notifications.Publish(new ContentSavedNotification(content, eventMessages).WithStateFrom(savingNotification));
 
@@ -2652,12 +2658,13 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
             }
 
+            ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
             //loop over each culture publishing - or string.Empty for invariant
             foreach (var culture in culturesPublishing ?? (new[] { string.Empty }))
             {
                 // ensure that the document status is correct
                 // note: culture will be string.Empty for invariant
-                switch (content.GetStatus(culture))
+                switch (content.GetStatus(contentSchedule, culture))
                 {
                     case ContentStatus.Expired:
                         if (!variesByCulture)
