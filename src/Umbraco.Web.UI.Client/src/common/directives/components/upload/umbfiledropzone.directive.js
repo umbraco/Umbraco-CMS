@@ -138,17 +138,24 @@ angular.module("umbraco.directives")
                                   file.uploadStatus = "uploading";
                                 }
                             })
-                            .success(function(data, status, headers, config) {
-                                if (data.notifications && data.notifications.length > 0) {
-                                    // set error status on file
-                                    file.uploadStatus = "error";
-                                    // Throw message back to user with the cause of the error
-                                    file.serverErrorMessage = data.notifications[0].message;
-                                    // Put the file in the rejected pool
-                                    scope.rejected.push(file);
-                                } else {
+                          .success(function (data, status, headers, config) {
+                              // If any of the messages are an error, mark the file as such
+                              if (data.notifications && data.notifications.length > 0 &&
+                                  data.notifications.filter(e => e.type === "Error").length > 0) {
+ 
+                                  // set error status on file
+                                  file.uploadStatus = "error";
+                                  // Throw message back to user with the cause of the error
+                                  file.serverErrorMessage = data.notifications[0].message;
+                                  // Put the file in the rejected pool
+                                  scope.rejected.push(file);
+
+                              } else {
+                                    // Set server messages
+                                    file.serverMessages = data.notifications;
                                     // set done status on file
-                                    file.uploadStatus = "done";
+                                file.uploadStatus = "done";
+                                file.hasMessage = true;
                                     file.uploadProgress = 100;
                                     // set date/time for when done - used for sorting
                                     file.doneDate = new Date();
@@ -156,7 +163,7 @@ angular.module("umbraco.directives")
                                     scope.done.push(file);
                                 }
                                 scope.currentFile = undefined;
-                                //after processing, test if everthing is done
+                                //after processing, test if everything is done
                                 _processQueueItem();
                             })
                             .error(function(evt, status, headers, config) {
@@ -172,7 +179,7 @@ angular.module("umbraco.directives")
                                     }
                                 } else if (evt.Message) {
                                     file.serverErrorMessage = evt.Message;
-                                } else if (evt && typeof evt === 'string') {
+                                } else if (evt && typeof evt === "string") {
                                     file.serverErrorMessage = evt;
                                 }
                                 // If file not found, server will return a 404 and display this message

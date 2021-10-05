@@ -48,6 +48,10 @@
                 <!-- file name -->
                 <div class="file-description">{{ file.name }}</div>
 
+                <span class="file-error" ng-if="file.serverMessages">
+                    <span class="errorMessage color-red" ng-repeat="message in file.serverMessages" >{{message}}</span>
+                </span>
+
                 <!-- upload success -->
                 <div class="file-icon" ng-if="file.uploadStatus == 'done'">
                     <umb-icon icon="icon-check" class="icon color-green"></umb-icon>
