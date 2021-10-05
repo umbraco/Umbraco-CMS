@@ -127,7 +127,7 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve url for id:' + id);
         },
 
-        getUrlsByUdis: function(ids, culture) {
+        getUrlsByUdis: function(udis, culture) {
           var query = "culture=" + (culture || "");
 
           return umbRequestHelper.resourcePromise(
@@ -137,9 +137,9 @@ function entityResource($q, $http, umbRequestHelper) {
                      "GetUrlsByUdis",
                      query),
                  {
-                     ids: ids
+                     udis: udis
                  }),
-             'Failed to retrieve url map for ids ' + ids);
+             'Failed to retrieve url map for udis ' + udis);
         },
 
         getUrlByUdi: function (udi, culture) {

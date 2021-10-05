@@ -238,7 +238,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Get entity URLs by UDIs
         /// </summary>
-        /// <param name="ids">
+        /// <param name="udis">
         /// A list of UDIs to lookup items by
         /// </param>
         /// <param name="culture">The culture to fetch the URL for</param>
@@ -248,14 +248,9 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public IDictionary<Udi, string> GetUrlsByUdis([FromJsonPath] Udi[] ids, string culture = null)
+        public IDictionary<Udi, string> GetUrlsByUdis([FromJsonPath] Udi[] udis, string culture = null)
         {
-            if (ids == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            if (ids.Length == 0)
+            if (udis == null || udis.Length == 0)
             {
                 return new Dictionary<Udi, string>();
             }
@@ -277,7 +272,7 @@ namespace Umbraco.Web.Editors
                 };
             }
 
-            return ids
+            return udis
                 .Select(udi => new {
                     Udi = udi,
                     Url = MediaOrDocumentUrl(udi)
