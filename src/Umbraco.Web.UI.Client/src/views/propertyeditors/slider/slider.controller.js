@@ -47,10 +47,10 @@
         }
 
         // convert to array - exiting value can be a number if switching from numeric/decimal property editor
-        $scope.sliderValue = $scope.model.value ?
-                (Utilities.isString($scope.model.value) || Utilities.isNumber($scope.model.value)
-                ? $scope.model.value.toString().split(',')
-                : null)
+        $scope.sliderValue = $scope.model.value
+            ? Utilities.isString($scope.model.value) || Utilities.isNumber($scope.model.value)
+                    ? $scope.model.value.toString().split(',')
+                    : null
             : null;
         
         // don't render values with decimal places if the step increment in a whole number
