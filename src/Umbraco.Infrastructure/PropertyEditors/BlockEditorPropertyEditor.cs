@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -264,7 +263,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         _textService.Localize("validation", "entriesShort", new[]
                         {
                             validationLimit.Min.ToString(),
-                            (validationLimit.Min - blockEditorData.Layout.Count()).ToString()
+                            (validationLimit.Min - (blockEditorData?.Layout.Count() ?? 0)).ToString()
                         }),
                         new[] { "minCount" });
                 }
