@@ -455,7 +455,8 @@ namespace Umbraco.Web.Models.Mapping
 
                 // if the group has no local properties and is not used as parent, skip it, ie sort-of garbage-collect
                 // local groups which would not have local properties anymore
-                if (destProperties.Length == 0 && !sourceGroupParentAliases.Contains(sourceGroup.Alias))
+                // only applies to groups; not tabs
+                if (sourceGroup.Type == PropertyGroupType.Group && destProperties.Length == 0 && !sourceGroupParentAliases.Contains(sourceGroup.Alias))
                     continue;
 
                 // ensure no duplicate alias, then assign the group properties collection
