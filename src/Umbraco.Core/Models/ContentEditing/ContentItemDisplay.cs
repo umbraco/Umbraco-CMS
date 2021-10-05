@@ -16,6 +16,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
     public class ContentItemDisplay<TVariant> : INotificationModel, IErrorModel //ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
+        where TVariant : ContentVariantDisplay
     {
         public ContentItemDisplay()
         {

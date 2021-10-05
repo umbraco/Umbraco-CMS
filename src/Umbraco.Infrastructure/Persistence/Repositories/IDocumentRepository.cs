@@ -8,14 +8,14 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
     {
         /// <summary>
-        /// Loads schedule for content
+        /// Gets publish/unpublish schedule for a content node.
         /// </summary>
         /// <param name="contentId"></param>
-        /// <returns></returns>
+        /// <returns><see cref="ContentScheduleCollection"/></returns>
         ContentScheduleCollection GetContentSchedule(int contentId);
 
         /// <summary>
-        /// Persists publish/unpublish schedule for a piece of content
+        /// Persists publish/unpublish schedule for a content node.
         /// </summary>
         /// <param name="content"></param>
         /// <param name="schedule"></param>

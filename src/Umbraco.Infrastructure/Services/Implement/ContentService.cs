@@ -384,6 +384,16 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
+        /// <inheritdoc />
+        public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
+                _documentRepository.PersistContentSchedule(content, contentSchedule);
+            }
+        }
+
         /// <summary>
         ///
         /// </summary>
@@ -809,7 +819,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _documentRepository.Save(content);
 
-                // Ignore scheduling if none provided (e.g. Save & Preview)
                 if (contentSchedule != null)
                 {
                     _documentRepository.PersistContentSchedule(content, contentSchedule);
@@ -1466,10 +1475,13 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                         foreach (var c in pendingCultures)
                         {
+                            //Clear this schedule for this culture
+                            contentSchedule.Clear(c, ContentScheduleAction.Expire, date);
                             //set the culture to be published
                             d.UnpublishCulture(c);
                         }
 
+                        _documentRepository.PersistContentSchedule(d, contentSchedule);
                         var result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1478,6 +1490,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                     }
                     else
                     {
+                        //Clear this schedule for this culture
+                        contentSchedule.Clear(ContentScheduleAction.Expire, date);
+                        _documentRepository.PersistContentSchedule(d, contentSchedule);
                         var result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1525,6 +1540,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                         var publishing = true;
                         foreach (var culture in pendingCultures)
                         {
+                            //Clear this schedule for this culture
+                            contentSchedule.Clear(culture, ContentScheduleAction.Release, date);
+
                             if (d.Trashed)
                                 continue; // won't publish
 
@@ -1548,7 +1566,11 @@ namespace Umbraco.Cms.Core.Services.Implement
                         else if (!publishing)
                             result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
                         else
+                        {
+                            _documentRepository.PersistContentSchedule(d, contentSchedule);
                             result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        }
+                           
 
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1557,9 +1579,20 @@ namespace Umbraco.Cms.Core.Services.Implement
                     }
                     else
                     {
-                        var result = d.Trashed
-                            ? new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d)
-                            : SaveAndPublish(d, userId: d.WriterId);
+                        //Clear this schedule
+                        contentSchedule.Clear(ContentScheduleAction.Release, date);
+
+                        PublishResult result = null;
+
+                        if (d.Trashed)
+                        {
+                            result = new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d);
+                        }
+                        else
+                        {
+                            _documentRepository.PersistContentSchedule(d, contentSchedule);
+                            result = SaveAndPublish(d, userId: d.WriterId);
+                        }
 
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
