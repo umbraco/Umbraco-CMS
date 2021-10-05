@@ -8,13 +8,25 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
     public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
     {
         /// <summary>
+        /// Loads schedule for content
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        ContentScheduleCollection GetContentSchedule(int contentId);
+
+        /// <summary>
+        /// Persists publish/unpublish schedule for a piece of content
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="schedule"></param>
+        void PersistContentSchedule(IContent content, ContentScheduleCollection schedule);
+
+        /// <summary>
         /// Clears the publishing schedule for all entries having an a date before (lower than, or equal to) a specified date.
         /// </summary>
         void ClearSchedule(DateTime date);
 
         void ClearSchedule(DateTime date, ContentScheduleAction action);
-
-        void PersistContentSchedule(IContent content, ContentScheduleCollection schedule);
 
         bool HasContentForExpiration(DateTime date);
         bool HasContentForRelease(DateTime date);
@@ -80,12 +92,5 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// Returns true if there is any content in the recycle bin
         /// </summary>
         bool RecycleBinSmells();
-
-        /// <summary>
-        /// Loads schedule for content
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <returns></returns>
-        ContentScheduleCollection GetContentSchedule(int contentId);
     }
 }

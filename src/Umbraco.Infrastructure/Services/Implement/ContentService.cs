@@ -1435,156 +1435,144 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private void PerformScheduledPublishingExpiration(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<List<ILanguage>> allLangs)
         {
-            // TODO: ContentScheduling - fix
-            throw new NotImplementedException("ContentScheduling");
+            using var scope = ScopeProvider.CreateScope();
 
-            //using var scope = ScopeProvider.CreateScope();
+            // do a fast read without any locks since this executes often to see if we even need to proceed
+            if (_documentRepository.HasContentForExpiration(date))
+            {
+                // now take a write lock since we'll be updating
+                scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
 
-            //// do a fast read without any locks since this executes often to see if we even need to proceed
-            //if (_documentRepository.HasContentForExpiration(date))
-            //{
-            //    // now take a write lock since we'll be updating
-            //    scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
+                foreach (var d in _documentRepository.GetContentForExpiration(date))
+                {
+                    ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(d.Id);
+                    if (d.ContentType.VariesByCulture())
+                    {
+                        //find which cultures have pending schedules
+                        var pendingCultures = contentSchedule.GetPending(ContentScheduleAction.Expire, date)
+                            .Select(x => x.Culture)
+                            .Distinct()
+                            .ToList();
 
-            //    foreach (var d in _documentRepository.GetContentForExpiration(date))
-            //    {
-            //        if (d.ContentType.VariesByCulture())
-            //        {
-            //            //find which cultures have pending schedules
-            //            var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleAction.Expire, date)
-            //                .Select(x => x.Culture)
-            //                .Distinct()
-            //                .ToList();
+                        if (pendingCultures.Count == 0)
+                            continue; //shouldn't happen but no point in processing this document if there's nothing there
 
-            //            if (pendingCultures.Count == 0)
-            //                continue; //shouldn't happen but no point in processing this document if there's nothing there
+                        var savingNotification = new ContentSavingNotification(d, evtMsgs);
+                        if (scope.Notifications.PublishCancelable(savingNotification))
+                        {
+                            results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
+                            continue;
+                        }
 
-            //            var savingNotification = new ContentSavingNotification(d, evtMsgs);
-            //            if (scope.Notifications.PublishCancelable(savingNotification))
-            //            {
-            //                results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
-            //                continue;
-            //            }
+                        foreach (var c in pendingCultures)
+                        {
+                            //set the culture to be published
+                            d.UnpublishCulture(c);
+                        }
 
-            //            foreach (var c in pendingCultures)
-            //            {
-            //                //Clear this schedule for this culture
-            //                d.ContentSchedule.Clear(c, ContentScheduleAction.Expire, date);
-            //                //set the culture to be published
-            //                d.UnpublishCulture(c);
-            //            }
+                        var result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        if (result.Success == false)
+                            _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        results.Add(result);
 
-            //            var result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
-            //            if (result.Success == false)
-            //                _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
-            //            results.Add(result);
+                    }
+                    else
+                    {
+                        var result = Unpublish(d, userId: d.WriterId);
+                        if (result.Success == false)
+                            _logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        results.Add(result);
+                    }
+                }
 
-            //        }
-            //        else
-            //        {
-            //            //Clear this schedule
-            //            d.ContentSchedule.Clear(ContentScheduleAction.Expire, date);
-            //            var result = Unpublish(d, userId: d.WriterId);
-            //            if (result.Success == false)
-            //                _logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
-            //            results.Add(result);
-            //        }
-            //    }
+                _documentRepository.ClearSchedule(date, ContentScheduleAction.Expire);
+            }
 
-            //    _documentRepository.ClearSchedule(date, ContentScheduleAction.Expire);
-            //}
-
-            //scope.Complete();
+            scope.Complete();
         }
 
         private void PerformScheduledPublishingRelease(DateTime date, List<PublishResult> results, EventMessages evtMsgs, Lazy<List<ILanguage>> allLangs)
         {
-            // TODO: ContentScheduling - fix
-            throw new NotImplementedException("ContentScheduling");
+            using var scope = ScopeProvider.CreateScope();
 
-            //using var scope = ScopeProvider.CreateScope();
+            // do a fast read without any locks since this executes often to see if we even need to proceed
+            if (_documentRepository.HasContentForRelease(date))
+            {
+                // now take a write lock since we'll be updating
+                scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
 
-            //// do a fast read without any locks since this executes often to see if we even need to proceed
-            //if (_documentRepository.HasContentForRelease(date))
-            //{
-            //    // now take a write lock since we'll be updating
-            //    scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
+                foreach (var d in _documentRepository.GetContentForRelease(date))
+                {
+                    ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(d.Id);
+                    if (d.ContentType.VariesByCulture())
+                    {
+                        //find which cultures have pending schedules
+                        var pendingCultures = contentSchedule.GetPending(ContentScheduleAction.Release, date)
+                            .Select(x => x.Culture)
+                            .Distinct()
+                            .ToList();
 
-            //    foreach (var d in _documentRepository.GetContentForRelease(date))
-            //    {
-            //        if (d.ContentType.VariesByCulture())
-            //        {
-            //            //find which cultures have pending schedules
-            //            var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleAction.Release, date)
-            //                .Select(x => x.Culture)
-            //                .Distinct()
-            //                .ToList();
+                        if (pendingCultures.Count == 0)
+                            continue; //shouldn't happen but no point in processing this document if there's nothing there
 
-            //            if (pendingCultures.Count == 0)
-            //                continue; //shouldn't happen but no point in processing this document if there's nothing there
+                        var savingNotification = new ContentSavingNotification(d, evtMsgs);
+                        if (scope.Notifications.PublishCancelable(savingNotification))
+                        {
+                            results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
+                            continue;
+                        }
 
-            //            var savingNotification = new ContentSavingNotification(d, evtMsgs);
-            //            if (scope.Notifications.PublishCancelable(savingNotification))
-            //            {
-            //                results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
-            //                continue;
-            //            }
+                        var publishing = true;
+                        foreach (var culture in pendingCultures)
+                        {
+                            if (d.Trashed)
+                                continue; // won't publish
 
-            //            var publishing = true;
-            //            foreach (var culture in pendingCultures)
-            //            {
-            //                //Clear this schedule for this culture
-            //                d.ContentSchedule.Clear(culture, ContentScheduleAction.Release, date);
+                            //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
+                            IProperty[] invalidProperties = null;
+                            var impact = CultureImpact.Explicit(culture, IsDefaultCulture(allLangs.Value, culture));
+                            var tryPublish = d.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
+                            if (invalidProperties != null && invalidProperties.Length > 0)
+                                _logger.LogWarning("Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
+                                    d.Id, culture, string.Join(",", invalidProperties.Select(x => x.Alias)));
 
-            //                if (d.Trashed) continue; // won't publish
+                            publishing &= tryPublish; //set the culture to be published
+                            if (!publishing)
+                                continue; // move to next document
+                        }
 
-            //                //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
-            //                IProperty[] invalidProperties = null;
-            //                var impact = CultureImpact.Explicit(culture, IsDefaultCulture(allLangs.Value, culture));
-            //                var tryPublish = d.PublishCulture(impact) && _propertyValidationService.Value.IsPropertyDataValid(d, out invalidProperties, impact);
-            //                if (invalidProperties != null && invalidProperties.Length > 0)
-            //                    _logger.LogWarning("Scheduled publishing will fail for document {DocumentId} and culture {Culture} because of invalid properties {InvalidProperties}",
-            //                        d.Id, culture, string.Join(",", invalidProperties.Select(x => x.Alias)));
+                        PublishResult result;
 
-            //                publishing &= tryPublish; //set the culture to be published
-            //                if (!publishing) continue; // move to next document
-            //            }
+                        if (d.Trashed)
+                            result = new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d);
+                        else if (!publishing)
+                            result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
+                        else
+                            result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
 
-            //            PublishResult result;
+                        if (result.Success == false)
+                            _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
 
-            //            if (d.Trashed)
-            //                result = new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d);
-            //            else if (!publishing)
-            //                result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
-            //            else
-            //                result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        results.Add(result);
+                    }
+                    else
+                    {
+                        var result = d.Trashed
+                            ? new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d)
+                            : SaveAndPublish(d, userId: d.WriterId);
 
-            //            if (result.Success == false)
-            //                _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                        if (result.Success == false)
+                            _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
 
-            //            results.Add(result);
-            //        }
-            //        else
-            //        {
-            //            //Clear this schedule
-            //            d.ContentSchedule.Clear(ContentScheduleAction.Release, date);
+                        results.Add(result);
+                    }
+                }
 
-            //            var result = d.Trashed
-            //                ? new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d)
-            //                : SaveAndPublish(d, userId: d.WriterId);
+                _documentRepository.ClearSchedule(date, ContentScheduleAction.Release);
 
-            //            if (result.Success == false)
-            //                _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+            }
 
-            //            results.Add(result);
-            //        }
-            //    }
-
-            //    _documentRepository.ClearSchedule(date, ContentScheduleAction.Release);
-
-            //}
-
-            //scope.Complete();
+            scope.Complete();
         }
 
         // utility 'PublishCultures' func used by SaveAndPublishBranch
@@ -2781,30 +2769,25 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </remarks>
         private PublishResult StrategyUnpublish(IContent content, EventMessages evtMsgs)
         {
-            // TODO: ContentScheduling - fix
-            throw new NotImplementedException("ContentScheduling");
+            var attempt = new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
 
-            //var attempt = new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
+            // if the document has any release dates set to before now,
+            // they should be removed so they don't interrupt an unpublish
+            // otherwise it would remain released == published
 
-            ////TODO: What is this check?? we just created this attempt and of course it is Success?!
-            //if (attempt.Success == false)
-            //    return attempt;
+            var contentSchedule = _documentRepository.GetContentSchedule(content.Id);
+            var pastReleases = contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.Now);
+            foreach (var p in pastReleases)
+                contentSchedule.Remove(p);
+            if (pastReleases.Count > 0)
+                _logger.LogInformation("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
 
-            //// if the document has any release dates set to before now,
-            //// they should be removed so they don't interrupt an unpublish
-            //// otherwise it would remain released == published
+            _documentRepository.PersistContentSchedule(content, contentSchedule);
+            // change state to unpublishing
+            content.PublishedState = PublishedState.Unpublishing;
 
-            //var pastReleases = content.ContentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.Now);
-            //foreach (var p in pastReleases)
-            //    content.ContentSchedule.Remove(p);
-            //if (pastReleases.Count > 0)
-            //    _logger.LogInformation("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
-
-            //// change state to unpublishing
-            //content.PublishedState = PublishedState.Unpublishing;
-
-            //_logger.LogInformation("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
-            //return attempt;
+            _logger.LogInformation("Document {ContentName} (id={ContentId}) has been unpublished.", content.Name, content.Id);
+            return attempt;
         }
 
         #endregion

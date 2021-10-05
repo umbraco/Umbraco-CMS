@@ -774,6 +774,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //}
         }
 
+        /// <inheritdoc />
         public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
         {
             if (content == null)
@@ -1354,6 +1355,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
+        /// <inheritdoc />
         public ContentScheduleCollection GetContentSchedule(int contentId)
         {
             var result = new ContentScheduleCollection();
