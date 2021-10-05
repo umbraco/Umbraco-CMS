@@ -21,17 +21,17 @@ context('System Information', () => {
     });
 
     context('Language switching', () => {
-        
+
         afterEach(() => {
-            cy.get('[data-element="global-user"]').click();
-            cy.get('[alias="editUser"]').click({timeout: 10000});
+            cy.get('[data-element="global-user"]', {timeout: 10000}).click();
+            cy.get('[alias="editUser"]').click();
             cy.get('.input-block-level', {timeout: 10000}).last().select('string:en-US', {timeout: 10000, force: true});
             cy.umbracoButtonByLabelKey('buttons_save').click({force: true});
             cy.reload();
         });
-    
+
         it('Checks language displays correctly after switching', () => {
-            
+
             //Navigate to edit user and change language
             openSystemInformation();
             cy.contains('Current Culture').parent().should('contain', 'en-US');
