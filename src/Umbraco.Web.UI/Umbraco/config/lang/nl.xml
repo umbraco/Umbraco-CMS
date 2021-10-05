@@ -2184,7 +2184,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="tooltipForPropertyActionsMenuClose">Eigenschapsacties sluiten</key>
   </area>
   <area alias="nuCache">
-      <key alias="wait">Wachten</key>
       <key alias="refreshStatus">Status vernieuwen</key>
       <key alias="memoryCache">Geheugencache</key>
       <key alias="memoryCacheDescription">
