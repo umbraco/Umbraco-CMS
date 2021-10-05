@@ -138,7 +138,7 @@
     <key alias="saveListView">Sauver la mise en page de la liste</key>
     <key alias="schedulePublish">Planifier</key>
     <key alias="saveAndPreview">Prévisualiser</key>
-    <key alias="showPage">Prévisualiser</key>    
+    <key alias="showPage">Prévisualiser</key>
     <key alias="showPageDisabled">La prévisualisation est désactivée car aucun modèle n'a été assigné.</key>
     <key alias="styleChoose">Choisir un style</key>
     <key alias="styleShow">Afficher les styles</key>
@@ -2245,7 +2245,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="tooltipForPropertyActionsMenu">Ouvrir les Property Actions</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Attendez</key>
     <key alias="refreshStatus">Rafraîchir le Statut</key>
     <key alias="memoryCache">Cache Mémoire</key>
     <key alias="memoryCacheDescription">
