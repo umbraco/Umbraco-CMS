@@ -34,11 +34,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Returns all member types
         /// </summary>
-        public IEnumerable<ContentTypeBasic> GetAllTypes()
-        {
-            return _memberTypeService.GetAll()
-                               .Select(_umbracoMapper.Map<IMemberType, ContentTypeBasic>);
-        }
+        public IEnumerable<ContentTypeBasic> GetAllTypes() =>
+            _memberTypeService.GetAll()
+                .Select(_umbracoMapper.Map<IMemberType, ContentTypeBasic>);
 
     }
 }
