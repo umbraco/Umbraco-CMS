@@ -28,7 +28,7 @@ context('System Information', () => {
         cy.get('[data-element="global-user"]').click();
         cy.get('[alias="editUser"]').click();
         cy.get('[name="culture"]').select('string:da-DK', {timeout: 10000, force: true});
-        cy.umbracoButtonByLabelKey('buttons_save').click();
+        cy.umbracoButtonByLabelKey('buttons_save').click({force: true});
         //Refresh site to display new language
         cy.reload();
         openSystemInformation();
@@ -40,7 +40,7 @@ context('System Information', () => {
         cy.get('[data-element="global-user"]').click();
         cy.get('[alias="editUser"]').click();
         cy.get('.input-block-level', {timeout: 10000}).last().select('string:en-US', {timeout: 10000, force: true});
-        cy.umbracoButtonByLabelKey('buttons_save').click();
+        cy.umbracoButtonByLabelKey('buttons_save').click({force: true});
         cy.reload();
     });
 });
