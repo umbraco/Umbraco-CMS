@@ -17,13 +17,15 @@ context('System Information', () => {
     it('Check System Info Displays', () => {
         openSystemInformation();
         cy.get('.table').find('tr').should('have.length', 10);
-
+        cy.contains('Current Culture').parent().should('contain', 'en-US');
+        cy.contains('Current UI Culture').parent().should('contain', 'en-US');
     });
 
     context('Language switching', () => {
 
         afterEach(() => {
-            cy.get('[data-element="global-user"]', {timeout: 10000}).click();
+            cy.reload()
+            cy.get('[data-element="global-user"]', {timeout: 10000}).should('be.visible', {timeout: 10000}).click();
             cy.get('[alias="editUser"]').click();
             cy.get('.input-block-level', {timeout: 10000}).last().select('string:en-US', {timeout: 10000, force: true});
             cy.umbracoButtonByLabelKey('buttons_save').click({force: true});
@@ -33,10 +35,6 @@ context('System Information', () => {
         it('Checks language displays correctly after switching', () => {
 
             //Navigate to edit user and change language
-            openSystemInformation();
-            cy.contains('Current Culture').parent().should('contain', 'en-US');
-            cy.contains('Current UI Culture').parent().should('contain', 'en-US');
-            cy.get('.umb-button__content').click();
             cy.get('[data-element="global-user"]').click();
             cy.get('[alias="editUser"]').click();
             cy.get('[name="culture"]').select('string:da-DK', {timeout: 10000, force: true});
