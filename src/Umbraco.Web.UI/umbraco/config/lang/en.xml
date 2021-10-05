@@ -500,6 +500,7 @@
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
+    <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
