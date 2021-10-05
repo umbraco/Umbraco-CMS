@@ -5,7 +5,9 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
@@ -26,6 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IPackagingService _packagingService;
         private readonly IShortStringHelper _shortStringHelper;
         private bool _executed;
+        private readonly IOptions<PackageMigrationsSettings> _options;
 
         public ImportPackageBuilderExpression(
             IPackagingService packagingService,
@@ -34,7 +37,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             MediaUrlGeneratorCollection mediaUrlGenerators,
             IShortStringHelper shortStringHelper,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IMigrationContext context) : base(context)
+            IMigrationContext context,
+            IOptions<PackageMigrationsSettings> options) : base(context)
         {
             _packagingService = packagingService;
             _mediaService = mediaService;
@@ -42,6 +46,27 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _mediaUrlGenerators = mediaUrlGenerators;
             _shortStringHelper = shortStringHelper;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _options = options;
+        }
+
+        [Obsolete("Use ctor with more params")]
+        public ImportPackageBuilderExpression(
+            IPackagingService packagingService,
+            IMediaService mediaService,
+            MediaFileManager mediaFileManager,
+            MediaUrlGeneratorCollection mediaUrlGenerators,
+            IShortStringHelper shortStringHelper,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            IMigrationContext context) : this(
+            packagingService,
+            mediaService,
+            mediaFileManager,
+            mediaUrlGenerators,
+            shortStringHelper,
+            contentTypeBaseServiceProvider,
+            context, Options.Create(new PackageMigrationsSettings()))
+        {
+
         }
 
         /// <summary>
@@ -53,6 +78,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         public override void Execute()
         {
+            if (_options.Value.DisableImportFromEmbeddedSchema)
+            {
+                Logger.LogInformation("Skipping import of embedded schema file, due to configuration");
+                return;
+            }
             if (_executed)
             {
                 throw new InvalidOperationException("This expression has already been executed.");
