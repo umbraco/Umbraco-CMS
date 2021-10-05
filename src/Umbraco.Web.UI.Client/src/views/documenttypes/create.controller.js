@@ -94,11 +94,11 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     };
 
     $scope.createComposition = function (icon) {
-        createDocType({ iscomposition: true, iselement: true, icon });
+        createDocType({ notemplate: true, iscomposition: true, iselement: true, icon });
     };
 
     $scope.createElement = function (icon) {
-        createDocType({ iselement: true, icon });
+        createDocType({ notemplate: true, iselement: true, icon });
     };
 
     $scope.close = function() {
