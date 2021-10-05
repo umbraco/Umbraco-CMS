@@ -1,7 +1,8 @@
 /// <reference types="Cypress" />
 
 function openSystemInformation(){
-    cy.get('[data-element="global-help"]').click();
+    //We have to wait for page to load, if the site is slow
+    cy.get('[data-element="global-help"]').should('be.visible', {timeout:10000}).click();
     cy.get('.umb-help-list-item').last().should('be.visible').click();
     cy.get('.umb-drawer-content').scrollTo('bottom', {ensureScrollable : false});
 }
@@ -18,7 +19,7 @@ context('System Information', () => {
         cy.get('.table').find('tr').should('have.length', 10);
 
     });
-    
+
     context('Language switching', () => {
         
         afterEach(() => {
