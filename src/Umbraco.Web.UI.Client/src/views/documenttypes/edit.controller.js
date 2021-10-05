@@ -419,7 +419,7 @@
             }
 
             // set icon if one is provided
-            if (icon !== null) {
+            if (icon !== null && icon !== undefined) {
                 contentType.icon = icon;
             }
 
