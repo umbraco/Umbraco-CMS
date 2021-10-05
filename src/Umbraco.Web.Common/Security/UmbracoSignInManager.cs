@@ -362,7 +362,7 @@ namespace Umbraco.Cms.Web.Common.Security
                 {
                     // Store the userId for use after two factor check
                     var userId = await UserManager.GetUserIdAsync(user);
-                    await Context.SignInAsync(TwoFactorRememberMeAuthenticationType, StoreTwoFactorInfo(userId, loginProvider));
+                    await Context.SignInAsync(TwoFactorAuthenticationType, StoreTwoFactorInfo(userId, loginProvider));
                     return SignInResult.TwoFactorRequired;
                 }
             }
