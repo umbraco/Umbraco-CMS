@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     /// <para>So far, this is very manual. We don't try to be clever and figure out whether the
     /// columns exist already. We just ignore it.</para>
     /// <para>Beware, the application MUST restart when this class behavior changes.</para>
+    /// <para>You can override the GetColmunnInfo method to control which columns this includes</para>
     /// </remarks>
     internal class UmbracoPocoDataBuilder : PocoDataBuilder
     {
@@ -27,20 +28,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             : base(type, mapper)
         {
             _upgrading = upgrading;
-        }
-
-        protected override ColumnInfo GetColumnInfo(MemberInfo mi, Type type)
-        {
-            var columnInfo = base.GetColumnInfo(mi, type);
-
-            // TODO: Is this upgrade flag still relevant? It's a lot of hacking to just set this value
-            // including the interface method ConfigureForUpgrade for this one circumstance.
-            if (_upgrading)
-            {
-                if (type == typeof(UserDto) && mi.Name == "TourData") columnInfo.IgnoreColumn = true;
-            }
-
-            return columnInfo;
         }
     }
 }
