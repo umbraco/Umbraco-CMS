@@ -427,6 +427,7 @@
             if (allowVaryByCulture) {
                 contentType.allowCultureVariant = true;
             }
+
             // convert icons for content type
             convertLegacyIcons(contentType);
 
