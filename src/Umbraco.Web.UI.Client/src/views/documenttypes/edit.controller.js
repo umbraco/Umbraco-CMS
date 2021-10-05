@@ -413,6 +413,7 @@
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
+
             // set isElement checkbox by default
             if (isElement) {
                 contentType.isElement = true;
