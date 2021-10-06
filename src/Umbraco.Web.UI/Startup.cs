@@ -44,7 +44,6 @@ namespace Umbraco.Cms.Web.UI
                 .AddBackOffice()
                 .AddWebsite()
                 .AddComposers()
-                .AddNotificationHandler<MediaSavingNotification, ImageComponent>()
                 .Build();
 #pragma warning restore IDE0022 // Use expression body for methods
 
