@@ -118,6 +118,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 return installationSummary;
             }
         }
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="docTypeElements">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <returns>An enumerable list of generated ContentTypes</returns>
+        public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId)
+            => ImportMediaTypes(docTypeElements, userId, new List<EntityContainer>());
+
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
         /// </summary>
@@ -418,10 +428,30 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// </summary>
         /// <param name="docTypeElements">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <returns>An enumerable list of generated ContentTypes</returns>
+        public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
+            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, new List<EntityContainer>(), _contentTypeService);
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="docTypeElements">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="entityContainersInstalled">List of entity containers installed by the package to be populated with those created in installing data types.</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId, List<EntityContainer> entityContainersInstalled)
             => ImportDocumentTypes(docTypeElements.ToList(), true, userId, entityContainersInstalled, _contentTypeService);
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="unsortedDocumentTypes">Xml to import</param>
+        /// <param name="importStructure">Boolean indicating whether or not to import the </param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <returns>An enumerable list of generated ContentTypes</returns>
+        public IReadOnlyList<T> ImportDocumentTypes<T>(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId, IContentTypeBaseService<T> service)
+            where T : class, IContentTypeComposition
+            => ImportDocumentTypes(unsortedDocumentTypes, importStructure, userId, new List<EntityContainer>(), service);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -596,6 +626,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         var folderName = WebUtility.UrlDecode(folders[i]);
                         Guid? folderKey = (folderKeys.Length == folders.Length) ? folderKeys[i] : null;
                         current = CreateContentTypeChildFolder(folderName, folderKey ?? Guid.NewGuid(), current);
+                        entityContainersInstalled.Add(current);
                         importedFolders[alias] = current.Id;
                     }
                 }
@@ -1011,6 +1042,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         #endregion
 
         #region DataTypes
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IDataType"/>
+        /// </summary>
+        /// <param name="dataTypeElements">Xml to import</param>
+        /// <param name="userId">Optional id of the user</param>
+        /// <returns>An enumerable list of generated DataTypeDefinitions</returns>
+        public IReadOnlyList<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId)
+             => ImportDataTypes(dataTypeElements, userId, new List<EntityContainer>());
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IDataType"/>
