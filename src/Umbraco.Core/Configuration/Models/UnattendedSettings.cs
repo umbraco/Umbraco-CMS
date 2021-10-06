@@ -1,17 +1,19 @@
-﻿using System.ComponentModel;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
-
     /// <summary>
     /// Typed configuration options for unattended settings.
     /// </summary>
     [UmbracoOptions(Constants.Configuration.ConfigUnattended)]
     public class UnattendedSettings
     {
-        internal const bool StaticInstallUnattended = false;
-        internal const bool StaticUpgradeUnattended = false;
+        private const bool StaticInstallUnattended = false;
+        private const bool StaticUpgradeUnattended = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether unattended installs are enabled.
