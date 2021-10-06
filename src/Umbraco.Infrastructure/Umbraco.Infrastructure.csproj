@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -45,7 +45,7 @@
       <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
-      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
       <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
       <PackageReference Include="System.Text.Encodings.Web" Version="5.0.1" /> <!-- Explicit updated this nested dependency due to this https://github.com/dotnet/announcements/issues/178-->
