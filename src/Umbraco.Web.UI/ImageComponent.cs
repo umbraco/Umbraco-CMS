@@ -10,13 +10,19 @@ namespace Umbraco.Cms.Web.UI
 
             foreach (var entity in notification.SavedEntities)
             {
+                if (entity.Name == "Bible")
+                {
+                    notification.Messages.Add(new EventMessage("Error", "Error Message", EventMessageType.Error));
+                }
 
-                notification.Messages.Add(new EventMessage("Category", "Error Message", EventMessageType.Error));
+                if (entity.Name == "Countryside")
+                {
+                    notification.Messages.Add(new EventMessage("Info", "Info Message", EventMessageType.Info));
+                    notification.Messages.Add(new EventMessage("Default", "Default Message"));
+                    notification.Messages.Add(new EventMessage("Success", "Success Message", EventMessageType.Success));
+                    notification.Messages.Add(new EventMessage("Warning", "Warning Message", EventMessageType.Warning));
+                }
 
-                //notification.Messages.Add(new EventMessage("Category", "Info Message", EventMessageType.Info));
-                //notification.Messages.Add(new EventMessage("Category", "Default Message"));
-                //notification.Messages.Add(new EventMessage("Category", "Success Message", EventMessageType.Success));
-                //notification.Messages.Add(new EventMessage("Category", "Warning Message", EventMessageType.Warning));
 
             }
         }
