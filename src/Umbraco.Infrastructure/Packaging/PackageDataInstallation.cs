@@ -469,7 +469,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             where T : class, IContentTypeComposition
         {
             var importedContentTypes = new Dictionary<string, T>();
-            entityContainersInstalled = new List<EntityContainer>();
 
             //When you are importing a single doc type we have to assume that the dependencies are already there.
             //Otherwise something like uSync won't work.
