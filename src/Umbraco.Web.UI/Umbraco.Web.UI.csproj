@@ -74,7 +74,6 @@
     <PackageReference Include="Umbraco.Code" Version="1.2.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Umbraco.TheStarterKit" Version="9.0.0" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -59,14 +59,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         public override void Execute()
         {
-
             if (_executed)
             {
                 throw new InvalidOperationException("This expression has already been executed.");
             }
 
             _executed = true;
-
 
             Context.BuildingExpression = false;
 
