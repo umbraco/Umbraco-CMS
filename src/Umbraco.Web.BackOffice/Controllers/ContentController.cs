@@ -1413,10 +1413,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = culturesToPublish;
 
-                // Verify that there's appropriate cultures configured for the root nude
+                // Verify that there's appropriate cultures configured for the root node
                 if (publishStatus.Success && contentItem.ParentId == -1)
                 {
-                    VerifyRootNodeDomainsForCultures(contentItem, publishStatus);
+                    VerifyDomainsForCultures(contentItem.PersistedContent, publishStatus);
                 }
                 return publishStatus;
             }
@@ -1431,18 +1431,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        private void VerifyRootNodeDomainsForCultures(ContentItemSave contentItemSave, PublishResult publishResult)
+        private void VerifyDomainsForCultures(IContent publishedContent, PublishResult publishResult)
         {
-            IContent persistedContent = contentItemSave.PersistedContent;
-            var publishedCultures = persistedContent.PublishedCultures.ToList();
+            var publishedCultures = publishedContent.PublishedCultures.ToList();
             // If only a single culture is published we shouldn't have any routing issues
-            if (publishedCultures.Count() < 2)
+            if (publishedCultures.Count < 2)
             {
                 return;
             }
 
             // If more than a single culture is published we need to verify that there's a domain registered for each published culture
-            IEnumerable<IDomain> assignedDomains = _domainService.GetAssignedDomains(persistedContent.Id, true);
+            var assignedDomains = _domainService.GetAssignedDomains(publishedContent.Id, true).ToList();
 
             // No domains at all, add a warning, and making it scary, to add domains.
             if (assignedDomains.Any() is false)
@@ -1452,9 +1451,25 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     "Domains are not configured for multilingual site, please contact an administrator, see log for more information",
                     EventMessageType.Error));
 
-                _logger.LogWarning("The root node {RootNodeName} is published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
-                    persistedContent.Name, string.Join(", ", publishedCultures));
+                _logger.LogWarning("The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
+                    publishedContent.Name, string.Join(", ", publishedCultures));
                 return;
+            }
+
+            // If there is some domains, verify that there's a domain for each of the published cultures
+            foreach (var culture in publishedCultures)
+            {
+                if (assignedDomains.Any(x => x.LanguageIsoCode.Equals(culture, StringComparison.OrdinalIgnoreCase)) is false)
+                {
+                    publishResult.EventMessages.Add(new EventMessage(
+                        "Multilingual site",
+                        $"There is no domain configured for {culture}, please contact an administrator, see log for more information",
+                        EventMessageType.Error
+                        ));
+
+                    _logger.LogWarning("The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",
+                        publishedContent.Name, culture);
+                }
             }
         }
 
