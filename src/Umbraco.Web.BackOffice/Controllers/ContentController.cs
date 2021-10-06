@@ -1447,8 +1447,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (assignedDomains.Any() is false)
             {
                 publishResult.EventMessages.Add(new EventMessage(
-                    "Multilingual site",
-                    "Domains are not configured for multilingual site, please contact an administrator, see log for more information",
+                    _localizedTextService.Localize("auditTrails", "publish"),
+                    _localizedTextService.Localize("speechBubbles", "publishWithNoDomains"),
                     EventMessageType.Error));
 
                 _logger.LogWarning("The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
@@ -1457,19 +1457,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             // If there is some domains, verify that there's a domain for each of the published cultures
-            foreach (var culture in publishedCultures)
+            foreach (var culture in publishedCultures
+                .Where(culture => assignedDomains.Any(x => x.LanguageIsoCode.Equals(culture, StringComparison.OrdinalIgnoreCase)) is false))
             {
-                if (assignedDomains.Any(x => x.LanguageIsoCode.Equals(culture, StringComparison.OrdinalIgnoreCase)) is false)
-                {
-                    publishResult.EventMessages.Add(new EventMessage(
-                        "Multilingual site",
-                        $"There is no domain configured for {culture}, please contact an administrator, see log for more information",
-                        EventMessageType.Error
-                        ));
+                publishResult.EventMessages.Add(new EventMessage(
+                    _localizedTextService.Localize("auditTrails", "publish"),
+                    _localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{culture}),
+                    EventMessageType.Error
+                ));
 
-                    _logger.LogWarning("The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",
-                        publishedContent.Name, culture);
-                }
+                _logger.LogWarning("The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",
+                    publishedContent.Name, culture);
             }
         }
 
