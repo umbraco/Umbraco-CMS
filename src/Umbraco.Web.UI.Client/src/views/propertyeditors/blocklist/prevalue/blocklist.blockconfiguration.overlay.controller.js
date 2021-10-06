@@ -211,9 +211,6 @@
             const filePicker = {
               title: localizedTitle,
               isDialog: true,
-              section: "settings",
-              treeAlias: "staticFiles",
-              entityType: "file",
               filter: i => {
                 return !(i.name.indexOf(".css") !== -1);
               },
@@ -226,7 +223,7 @@
               close: () => editorService.close()
             };
 
-            editorService.treePicker(filePicker);
+            editorService.staticFilePicker(filePicker);
 
           });
         };
