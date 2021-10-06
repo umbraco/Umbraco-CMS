@@ -49,4 +49,8 @@
         </AssemblyAttribute>
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="DependencyInjection\UmbracoApplicationServicesCapture.cs" />
+    </ItemGroup>
+
 </Project>

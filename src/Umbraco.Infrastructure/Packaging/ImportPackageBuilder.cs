@@ -1,5 +1,7 @@
 using System;
 using System.Xml.Linq;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -20,7 +22,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             MediaUrlGeneratorCollection mediaUrlGenerators,
             IShortStringHelper shortStringHelper,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IMigrationContext context)
+            IMigrationContext context,
+            IOptions<PackageMigrationSettings> options)
             : base(new ImportPackageBuilderExpression(
                 packagingService,
                 mediaService,
@@ -28,7 +31,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 mediaUrlGenerators,
                 shortStringHelper,
                 contentTypeBaseServiceProvider,
-                context))
+                context,
+                options
+                ))
         {
         }
 

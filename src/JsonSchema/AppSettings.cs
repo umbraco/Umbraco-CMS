@@ -47,7 +47,7 @@ namespace JsonSchema
                 public RichTextEditorSettings RichTextEditor { get; set; }
                 public RuntimeMinificationSettings RuntimeMinification { get; set; }
                 public BasicAuthSettings BasicAuth { get; set; }
-                public PackageMigrationsSettings PackageMigrations { get; set; }
+                public PackageMigrationSettings PackageMigration { get; set; }
             }
 
             /// <summary>

@@ -52,7 +52,7 @@
             public const string ConfigWebRouting = ConfigPrefix + "WebRouting";
             public const string ConfigUserPassword = ConfigPrefix + "Security:UserPassword";
             public const string ConfigRichTextEditor = ConfigPrefix + "RichTextEditor";
-            public const string ConfigPackageMigrations = ConfigPrefix + "PackageMigrations";
+            public const string ConfigPackageMigration = ConfigPrefix + "PackageMigration";
         }
     }
 }
