@@ -1416,7 +1416,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // Verify that there's appropriate cultures configured.
                 if (publishStatus.Success)
                 {
-                    VerifyDomainsForCultures(contentItem.PersistedContent, publishStatus);
+                    VerifyDomainsForCultures(contentItem.PersistedContent, culturesToPublish, publishStatus);
                 }
                 return publishStatus;
             }
@@ -1439,8 +1439,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// and there's no domain added for the published cultures
         /// </remarks>
         /// <param name="persistedContent"></param>
+        /// <param name="culturesPublished"></param>
         /// <param name="publishResult"></param>
-        private void VerifyDomainsForCultures(IContent persistedContent, PublishResult publishResult)
+        private void VerifyDomainsForCultures(IContent persistedContent, IEnumerable<string> culturesPublished, PublishResult publishResult)
         {
             var publishedCultures = persistedContent.PublishedCultures.ToList();
             // If only a single culture is published we shouldn't have any routing issues
@@ -1457,8 +1458,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 assignedDomains.AddRange(_domainService.GetAssignedDomains(ancestorID, true));
             }
 
-
-            // No domains at all, add a warning, and making it scary, to add domains.
+            // No domains at all, add a warning, to add domains.
             if (assignedDomains.Count == 0)
             {
                 publishResult.EventMessages.Add(new EventMessage(
@@ -1472,7 +1472,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             // If there is some domains, verify that there's a domain for each of the published cultures
-            foreach (var culture in publishedCultures
+            foreach (var culture in culturesPublished
                 .Where(culture => assignedDomains.Any(x => x.LanguageIsoCode.Equals(culture, StringComparison.OrdinalIgnoreCase)) is false))
             {
                 publishResult.EventMessages.Add(new EventMessage(
