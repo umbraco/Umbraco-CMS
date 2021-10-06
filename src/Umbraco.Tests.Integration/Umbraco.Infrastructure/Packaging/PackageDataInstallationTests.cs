@@ -94,9 +94,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            IReadOnlyList<IDataType> dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IDataType> dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0, entityContainersInstalled);
             IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled);
 
             int numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
             int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
@@ -141,9 +142,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            IReadOnlyList<IDataType> dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IDataType> dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0, entityContainersInstalled);
             IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled);
 
             // Assert
             IContentType mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
@@ -166,9 +168,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            IReadOnlyList<IDataType> dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IDataType> dataTypes = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0, entityContainersInstalled);
             IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled);
 
             int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
@@ -274,9 +277,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0, entityContainersInstalled);
             IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled);
             int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
@@ -309,13 +313,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0, entityContainersInstalled);
             IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled);
             int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert - Re-Import contenttypes doesn't throw
-            Assert.DoesNotThrow(() => PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0));
+            Assert.DoesNotThrow(() => PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled));
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
@@ -333,13 +338,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0, entityContainersInstalled);
             IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled);
             int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert - Re-Import contenttypes doesn't throw
-            Assert.DoesNotThrow(() => PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0));
+            Assert.DoesNotThrow(() => PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled));
             Assert.That(contentTypes.Count(), Is.EqualTo(numberOfDocTypes));
             Assert.That(dataTypeDefinitions, Is.Not.Null);
             Assert.That(dataTypeDefinitions.Any(), Is.True);
@@ -358,8 +364,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             var packageDocument = CompiledPackageContentBase.Create(element);
 
             // Act
-            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0, entityContainersInstalled);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0, entityContainersInstalled);
             var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
             IReadOnlyList<IContent> contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, 0, ContentTypeService, ContentService);
             int numberOfDocs = (from doc in element.Descendants()
@@ -385,7 +392,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             var packageMedia = CompiledPackageContentBase.Create(element);
 
             // Act
-            IReadOnlyList<IMediaType> mediaTypes = PackageDataInstallation.ImportMediaTypes(mediaTypesElement.Elements("MediaType"), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IMediaType> mediaTypes = PackageDataInstallation.ImportMediaTypes(mediaTypesElement.Elements("MediaType"), 0, entityContainersInstalled);
             var importedMediaTypes = mediaTypes.ToDictionary(x => x.Alias, x => x);
             IReadOnlyList<IMedia> medias = PackageDataInstallation.ImportContentBase(packageMedia.Yield(), importedMediaTypes, 0, MediaTypeService, MediaService);
             int numberOfDocs = (from doc in element.Descendants()
@@ -413,8 +421,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             var packageDocument = CompiledPackageContentBase.Create(element);
 
             // Act
-            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0, entityContainersInstalled);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0, entityContainersInstalled);
             var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
             IReadOnlyList<IContent> contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, 0, ContentTypeService, ContentService);
             int numberOfDocs = (from doc in element.Descendants()
@@ -724,8 +733,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
+            var entityContainersInstalled = new List<EntityContainer>();
             IReadOnlyList<ITemplate> templates = PackageDataInstallation.ImportTemplates(templateElement.Elements("Template").ToList(), 0);
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled);
             int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
@@ -751,7 +761,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             XElement docTypeElement = xml.Descendants("DocumentTypes").First();
 
             // Act
-            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0);
+            var entityContainersInstalled = new List<EntityContainer>();
+            IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypeElement.Elements("DocumentType"), 0, entityContainersInstalled);
             int numberOfDocTypes = (from doc in docTypeElement.Elements("DocumentType") select doc).Count();
 
             // Assert
