@@ -36,5 +36,7 @@ context('System Information', () => {
         cy.contains('Current Culture').parent().should('contain', 'da-DK');
         cy.contains('Current UI Culture').parent().should('contain', 'da-DK');
         cy.get('.umb-button__content').last().click();
+        //Clean
+        cy.umbracoSetCurrentUserLanguage('en-US');
     });
 });
