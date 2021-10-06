@@ -12,7 +12,6 @@ using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
 {
-
     public abstract class PackageMigrationBase : MigrationBase
     {
         private readonly IPackagingService _packagingService;
@@ -34,7 +33,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IOptions<PackageMigrationSettings> packageMigrationsSettings)
             : base(context)
         {
-
             _packagingService = packagingService;
             _mediaService = mediaService;
             _mediaFileManager = mediaFileManager;
@@ -62,10 +60,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 shortStringHelper,
                 contentTypeBaseServiceProvider,
                 context,
-                StaticServiceProvider.Instance.GetRequiredService<IOptions<PackageMigrationSettings>>()
-                )
+                StaticServiceProvider.Instance.GetRequiredService<IOptions<PackageMigrationSettings>>())
         {
-
         }
 
         public IImportPackageBuilder ImportPackage => BeginBuild(
@@ -77,8 +73,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 _shortStringHelper,
                 _contentTypeBaseServiceProvider,
                 Context,
-                _packageMigrationsSettings
-                ));
+                _packageMigrationsSettings));
 
     }
 }

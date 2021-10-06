@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations;
@@ -32,8 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 shortStringHelper,
                 contentTypeBaseServiceProvider,
                 context,
-                options
-                ))
+                options))
         {
         }
 

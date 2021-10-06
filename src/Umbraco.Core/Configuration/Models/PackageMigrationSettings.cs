@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -12,6 +13,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     {
         private const bool StaticRunSchemaAndContentMigrations = true;
         private const bool StaticAllowComponentOverrideOfRunSchemaAndContentMigrations = true;
+
         /// <summary>
         /// Gets or sets a value indicating whether package migration steps that install schema and content should run.
         /// </summary>
@@ -23,6 +25,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </remarks>
         [DefaultValue(StaticRunSchemaAndContentMigrations)]
         public bool RunSchemaAndContentMigrations { get; set; } = StaticRunSchemaAndContentMigrations;
+
         /// <summary>
         /// Gets or sets a value indicating whether components can override the configured value for <see cref="RunSchemaAndContentMigrations"/>.
         /// </summary>

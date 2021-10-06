@@ -4,7 +4,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -16,7 +15,6 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Migrations;
-using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
@@ -29,8 +27,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly IPackagingService _packagingService;
         private readonly IShortStringHelper _shortStringHelper;
-        private bool _executed;
-        private readonly IOptions<PackageMigrationSettings> _options;
+        private readonly PackageMigrationSettings _packageMigrationSettings;
+
+        private bool _executed;        
 
         public ImportPackageBuilderExpression(
             IPackagingService packagingService,
@@ -40,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IShortStringHelper shortStringHelper,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IMigrationContext context,
-            IOptions<PackageMigrationSettings> options) : base(context)
+            IOptions<PackageMigrationSettings> packageMigrationSettings) : base(context)
         {
             _packagingService = packagingService;
             _mediaService = mediaService;
@@ -48,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _mediaUrlGenerators = mediaUrlGenerators;
             _shortStringHelper = shortStringHelper;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
-            _options = options;
+            _packageMigrationSettings = packageMigrationSettings.Value;
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     $"Nothing to execute, neither {nameof(EmbeddedResourceMigrationType)} or {nameof(PackageDataManifest)} has been set.");
             }
 
-            if (!_options.Value.RunSchemaAndContentMigrations)
+            if (!_packageMigrationSettings.RunSchemaAndContentMigrations)
             {
                 Logger.LogInformation("Skipping import of embedded schema file, due to configuration");
                 return;

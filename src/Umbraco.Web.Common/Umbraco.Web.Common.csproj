@@ -48,9 +48,4 @@
             <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="DependencyInjection\UmbracoApplicationServicesCapture.cs" />
-    </ItemGroup>
-
 </Project>
