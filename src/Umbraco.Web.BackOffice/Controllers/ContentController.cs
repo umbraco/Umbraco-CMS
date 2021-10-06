@@ -398,7 +398,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public ActionResult<IDictionary<string, ContentItemDisplay>> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
         {
-            // It's important to do this operation within a scope to reduce the amount of readlock queries. 
+            // It's important to do this operation within a scope to reduce the amount of readlock queries.
             using var scope = _scopeProvider.CreateScope(autoComplete: true);
             var contentTypes = contentTypesByAliases.ContentTypeAliases.Select(alias => _contentTypeService.Get(alias));
             return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
@@ -1412,6 +1412,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = culturesToPublish;
+
+                // Verify that there's appropriate cultures configured for the root nude
+                if (publishStatus.Success && contentItem.ParentId == -1)
+                {
+                    VerifyRootNodeDomainsForCultures(contentItem, publishStatus);
+                }
                 return publishStatus;
             }
             else
@@ -1422,6 +1428,33 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                 successfulCultures = Array.Empty<string>();
                 return publishStatus;
+            }
+        }
+
+        private void VerifyRootNodeDomainsForCultures(ContentItemSave contentItemSave, PublishResult publishResult)
+        {
+            IContent persistedContent = contentItemSave.PersistedContent;
+            var publishedCultures = persistedContent.PublishedCultures.ToList();
+            // If only a single culture is published we shouldn't have any routing issues
+            if (publishedCultures.Count() < 2)
+            {
+                return;
+            }
+
+            // If more than a single culture is published we need to verify that there's a domain registered for each published culture
+            IEnumerable<IDomain> assignedDomains = _domainService.GetAssignedDomains(persistedContent.Id, true);
+
+            // No domains at all, add a warning, and making it scary, to add domains.
+            if (assignedDomains.Any() is false)
+            {
+                publishResult.EventMessages.Add(new EventMessage(
+                    "Multilingual site",
+                    "Domains are not configured for multilingual site, please contact an administrator, see log for more information",
+                    EventMessageType.Error));
+
+                _logger.LogWarning("The root node {RootNodeName} is published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
+                    persistedContent.Name, string.Join(", ", publishedCultures));
+                return;
             }
         }
 
