@@ -1,9 +1,30 @@
 /// <reference types="Cypress" />
+
 context('Languages', () => {
 
     beforeEach(() => {
         cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'), false);
       });
+
+    it('Creates language', () => {
+      // Setup
+      const language = 'Danish';
+      const culture = 'da';
+      cy.umbracoEnsureLanguageNotExists(culture);
+      cy.umbracoSection('settings');
+
+      // Enter language tree and create new language
+      cy.umbracoTreeItem('settings', ['Languages']).click();
+      cy.umbracoButtonByLabelKey('languages_addLanguage').click();
+      cy.get('select[name="newLang"]').select(language);
+
+      // Save and assert success
+      cy.umbracoButtonByLabelKey('buttons_save').click();
+      cy.umbracoSuccessNotification().should('be.visible');
+
+      // Cleanup
+      cy.umbracoEnsureLanguageNotExists(culture);
+    });
 
     it('Deletes language', () => {
         // Setup
