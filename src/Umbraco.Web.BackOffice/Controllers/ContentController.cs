@@ -1413,8 +1413,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = culturesToPublish;
 
-                // Verify that there's appropriate cultures configured for the root node
-                if (publishStatus.Success && contentItem.ParentId == -1)
+                // Verify that there's appropriate cultures configured.
+                if (publishStatus.Success)
                 {
                     VerifyDomainsForCultures(contentItem.PersistedContent, publishStatus);
                 }
@@ -1431,9 +1431,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        private void VerifyDomainsForCultures(IContent publishedContent, PublishResult publishResult)
+        /// <summary>
+        /// Verifies that there's an appropriate domain setup for the published cultures
+        /// </summary>
+        /// <remarks>
+        /// Adds a warning and logs a message if, a node varies but culture, there's at least 1 culture already published,
+        /// and there's no domain added for the published cultures
+        /// </remarks>
+        /// <param name="persistedContent"></param>
+        /// <param name="publishResult"></param>
+        private void VerifyDomainsForCultures(IContent persistedContent, PublishResult publishResult)
         {
-            var publishedCultures = publishedContent.PublishedCultures.ToList();
+            var publishedCultures = persistedContent.PublishedCultures.ToList();
             // If only a single culture is published we shouldn't have any routing issues
             if (publishedCultures.Count < 2)
             {
@@ -1441,18 +1450,24 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             // If more than a single culture is published we need to verify that there's a domain registered for each published culture
-            var assignedDomains = _domainService.GetAssignedDomains(publishedContent.Id, true).ToList();
+            var assignedDomains = _domainService.GetAssignedDomains(persistedContent.Id, true).ToList();
+            // We also have to check all of the ancestors, if any of those has the appropriate culture assigned we don't need to warn
+            foreach (var ancestorID in persistedContent.GetAncestorIds())
+            {
+                assignedDomains.AddRange(_domainService.GetAssignedDomains(ancestorID, true));
+            }
+
 
             // No domains at all, add a warning, and making it scary, to add domains.
-            if (assignedDomains.Any() is false)
+            if (assignedDomains.Count == 0)
             {
                 publishResult.EventMessages.Add(new EventMessage(
                     _localizedTextService.Localize("auditTrails", "publish"),
                     _localizedTextService.Localize("speechBubbles", "publishWithNoDomains"),
-                    EventMessageType.Error));
+                    EventMessageType.Warning));
 
                 _logger.LogWarning("The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
-                    publishedContent.Name, string.Join(", ", publishedCultures));
+                    persistedContent.Name, string.Join(", ", publishedCultures));
                 return;
             }
 
@@ -1463,11 +1478,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 publishResult.EventMessages.Add(new EventMessage(
                     _localizedTextService.Localize("auditTrails", "publish"),
                     _localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{culture}),
-                    EventMessageType.Error
+                    EventMessageType.Warning
                 ));
 
                 _logger.LogWarning("The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",
-                    publishedContent.Name, culture);
+                    persistedContent.Name, culture);
             }
         }
 
