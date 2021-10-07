@@ -180,6 +180,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<UriUtility>();
 
             Services.AddUnique<IDashboardService, DashboardService>();
+            Services.AddUnique<IUserDataService, UserDataService>();
 
             // will be injected in controllers when needed to invoke rest endpoints on Our
             Services.AddUnique<IInstallationService, InstallationService>();
