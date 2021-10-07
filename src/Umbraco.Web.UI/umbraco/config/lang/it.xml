@@ -13,9 +13,9 @@
     <key alias="createPackage">Crea pacchetto</key>
     <key alias="delete">Cancella</key>
     <key alias="disable">Disabilita</key>
-    <key alias="emptyrecyclebin">Svuota il cestino</key>
+    <key alias="emptyRecycleBin">Svuota il cestino</key>
     <key alias="exportDocumentType">Esporta il tipo di documento</key>
-    <key alias="importdocumenttype">Importa il tipo di documento</key>
+    <key alias="importDocumentType">Importa il tipo di documento</key>
     <key alias="importPackage">Importa il pacchetto</key>
     <key alias="liveEdit">Modifica in Area di Lavoro</key>
     <key alias="logout">Uscita</key>
