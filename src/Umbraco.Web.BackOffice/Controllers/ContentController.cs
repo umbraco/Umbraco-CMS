@@ -321,7 +321,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>> GetById(int id)
+        public ActionResult<ContentItemDisplayWithSchedule> GetById(int id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
@@ -339,7 +339,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>> GetById(Guid id)
+        public ActionResult<ContentItemDisplayWithSchedule> GetById(Guid id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
@@ -356,7 +356,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>> GetById(Udi id)
+        public ActionResult<ContentItemDisplayWithSchedule> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
@@ -1757,7 +1757,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public async Task<ActionResult<ContentItemDisplay>> PostUnpublish(UnpublishContent model)
+        public async Task<ActionResult<ContentItemDisplayWithSchedule>> PostUnpublish(UnpublishContent model)
         {
             var foundContent = _contentService.GetById(model.Id);
 
@@ -1780,7 +1780,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 //this means that the entire content item will be unpublished
                 var unpublishResult = _contentService.Unpublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
-                var content = MapToDisplay(foundContent);
+                var content = MapToDisplayWithSchedule(foundContent);
 
                 if (!unpublishResult.Success)
                 {
@@ -1810,7 +1810,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
 
-                var content = MapToDisplay(foundContent);
+                var content = MapToDisplayWithSchedule(foundContent);
 
                 //check for this status and return the correct message
                 if (results.Any(x => x.Value.Result == PublishResultType.SuccessUnpublishMandatoryCulture))
