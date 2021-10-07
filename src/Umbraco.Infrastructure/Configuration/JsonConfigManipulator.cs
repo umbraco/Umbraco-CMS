@@ -15,6 +15,11 @@ namespace Umbraco.Cms.Core.Configuration
         private readonly ILogger<JsonConfigManipulator> _logger;
         private readonly object _locker = new object();
 
+        [Obsolete]
+        public JsonConfigManipulator(IConfiguration configuration)
+            : this(configuration, null)
+        { }
+
         public JsonConfigManipulator(
             IConfiguration configuration,
             ILogger<JsonConfigManipulator> logger)
