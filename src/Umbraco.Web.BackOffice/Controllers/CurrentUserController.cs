@@ -52,6 +52,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IPasswordChanger<BackOfficeIdentityUser> _passwordChanger;
         private readonly IUserDataService _userDataService;
 
+        [ActivatorUtilitiesConstructor]
         public CurrentUserController(
             MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
@@ -95,8 +96,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILocalizedTextService localizedTextService,
             AppCaches appCaches,
             IShortStringHelper shortStringHelper,
-            IPasswordChanger<BackOfficeIdentityUser> passwordChanger) :
-            this(mediaFileManager,
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger) : this(
+                mediaFileManager,
                 contentSettings,
                 hostingEnvironment,
                 imageUrlGenerator,
@@ -197,10 +198,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return userTours;
         }
 
-        public IEnumerable<UserData> GetUserData()
-        {
-            return _userDataService.GetUserData();
-        }
+        public IEnumerable<UserData> GetUserData() => _userDataService.GetUserData();
 
         /// <summary>
         /// When a user is invited and they click on the invitation link, they will be partially logged in
