@@ -90,7 +90,7 @@
                                         class="umb-breadcrumbs__add-ancestor"
                                         ng-show="model.showFolderInput"
                                         ng-model="model.newFolderName"
-                                        ng-keydown="enterSubmitFolder($event)"
+                                        ng-keydown="vm.enterSubmitFolder($event)"
                                         ng-blur="vm.submitFolder()"
                                         focus-when="{{model.showFolderInput}}" />
                             </li>
