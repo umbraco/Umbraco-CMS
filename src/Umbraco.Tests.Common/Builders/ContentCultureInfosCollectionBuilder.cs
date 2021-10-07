@@ -7,31 +7,30 @@ namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class ContentCultureInfosCollectionBuilder : ChildBuilderBase<ContentBuilder, ContentCultureInfosCollection>, IBuildContentCultureInfosCollection
     {
-        private List<ContentCultureInfos> _cultureInfos;
-        public ContentCultureInfosCollectionBuilder(ContentBuilder parentBuilder) : base(parentBuilder) => _cultureInfos = new List<ContentCultureInfos>();
+        private List<ContentCultureInfosBuilder> _cultureInfosBuilders;
+        public ContentCultureInfosCollectionBuilder(ContentBuilder parentBuilder) : base(parentBuilder) => _cultureInfosBuilders = new List<ContentCultureInfosBuilder>();
 
-        // TODO: Should this again wrap *another* child builder "ContentCultureInfosBuilder"?
-        public ContentCultureInfosCollectionBuilder WithCultureInfo(string culture, string name, DateTime? date = null)
+        public ContentCultureInfosBuilder AddCultureInfos()
         {
-            if (date is null)
-            {
-                date = DateTime.Now;
-            }
-
-            _cultureInfos.Add(new ContentCultureInfos(culture) { Name = name, Date = date.Value });
-            return this;
+            var builder = new ContentCultureInfosBuilder(this);
+            _cultureInfosBuilders.Add(builder);
+            return builder;
         }
 
         public override ContentCultureInfosCollection Build()
         {
-            var cultureInfos = new ContentCultureInfosCollection();
-
-            foreach (ContentCultureInfos cultureInfo in _cultureInfos)
+            if (_cultureInfosBuilders.Count < 1)
             {
-                cultureInfos.AddOrUpdate(cultureInfo.Culture, cultureInfo.Name, cultureInfo.Date);
+                throw new InvalidOperationException("You must add at least one culture infos to the collection builder");
+            }
+            var cultureInfosCollection = new ContentCultureInfosCollection();
+
+            foreach (ContentCultureInfosBuilder cultureInfosBuilder in _cultureInfosBuilders)
+            {
+                cultureInfosCollection.Add(cultureInfosBuilder.Build());
             }
 
-            return cultureInfos;
+            return cultureInfosCollection;
         }
     }
 }
