@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _userDataService = userDataService;
         }
 
-        [Obsolete("This constructor is obsolete, use constructor with all values")]
+        [Obsolete("This constructor is obsolete and will be removed in v11, use constructor with all values")]
         public CurrentUserController(
             MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
