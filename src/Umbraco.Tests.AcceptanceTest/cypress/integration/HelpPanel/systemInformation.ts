@@ -2,7 +2,7 @@
 
 function openSystemInformation(){
     //We have to wait for page to load, if the site is slow
-    cy.get('[data-element="global-help"]').should('be.visible', {timeout:10000}).click();
+    cy.umbracoGlobalUser().should('be.visible', {timeout:10000}).click();
     cy.get('.umb-help-list-item').last().should('be.visible').click();
     cy.get('.umb-drawer-content').scrollTo('bottom', {ensureScrollable : false});
 }
@@ -12,6 +12,9 @@ context('System Information', () => {
     beforeEach(() => {
         //arrange
         cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'));
+        cy.umbracoSetCurrentUserLanguage('en-US');
+    });
+    afterEach(() => {
         cy.umbracoSetCurrentUserLanguage('en-US');
     });
 
@@ -25,7 +28,7 @@ context('System Information', () => {
     it('Checks language displays correctly after switching', () => {
 
         //Navigate to edit user and change language
-        cy.get('[data-element="global-user"]').click();
+        cy.umbracoGlobalUser().click();
         cy.get('[alias="editUser"]').click();
         cy.get('[name="culture"]').select('string:da-DK', {timeout: 10000, force: true});
         cy.umbracoButtonByLabelKey('buttons_save').click({force: true});
