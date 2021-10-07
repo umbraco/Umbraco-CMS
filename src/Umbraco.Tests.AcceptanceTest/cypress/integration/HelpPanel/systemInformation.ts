@@ -2,7 +2,7 @@
 
 function openSystemInformation(){
     //We have to wait for page to load, if the site is slow
-    cy.umbracoGlobalUser().should('be.visible', {timeout:10000}).click();
+    cy.get('[data-element="global-help"]').should('be.visible').click();
     cy.get('.umb-help-list-item').last().should('be.visible').click();
     cy.get('.umb-drawer-content').scrollTo('bottom', {ensureScrollable : false});
 }
@@ -30,10 +30,12 @@ context('System Information', () => {
         //Navigate to edit user and change language
         cy.umbracoGlobalUser().click();
         cy.get('[alias="editUser"]').click();
-        cy.get('[name="culture"]').select('string:da-DK', {timeout: 10000, force: true});
+        cy.get('[name="culture"]').select('string:da-DK', { force: true});
         cy.umbracoButtonByLabelKey('buttons_save').click({force: true});
         //Refresh site to display new language
         cy.reload();
+        cy.get('.umb-tour-step', { timeout: 60000 }).should('be.visible'); // We now due to the api calls this will be shown, but slow computers can take a while
+        cy.get('.umb-tour-step__close').click();
         openSystemInformation();
         //Assert
         cy.contains('Current Culture').parent().should('contain', 'da-DK');
