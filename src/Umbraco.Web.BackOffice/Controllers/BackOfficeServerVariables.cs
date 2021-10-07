@@ -280,6 +280,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.GetAllTypes())
                         },
                         {
+                            "memberTypeQueryApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTypeQueryController>(
+                                controller => controller.GetAllTypes())
+                        },
+                        {
                             "memberGroupApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
                                 controller => controller.GetAllGroups())
                         },
