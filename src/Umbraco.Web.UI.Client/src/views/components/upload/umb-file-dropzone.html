@@ -40,18 +40,7 @@
         <!-- List of uploading/uploaded files  -->
         <ul class="file-list" ng-show="queue.length > 0 || processed.length > 0 || filesHolder.length > 0">
 
-            <li class="file" ng-repeat="file in queue track by file.key">
-                <div class="file-description">{{ file.name }}</div>
-            </li>
-
-            <li class="file" ng-if="currentFile">
-                <div class="file-name">{{currentFile.name}} {{currentFile.uploadProgress + '%'}}</div>
-                <div class="file-progress">
-                    <span class="file-progress-indicator" ng-style="{'width': currentFile.uploadProgress + '%'}"></span>
-                </div>
-            </li>
-
-            <li class="file" ng-repeat="file in processed track by file.key | orderBy:processedDate:reverse">
+            <li class="file" ng-repeat="file in processed track by file.key">
 
               <div class="file-description">
                 <div>
@@ -75,6 +64,18 @@
               </div>              
 
             </li>
+
+            <li class="file" ng-if="currentFile">
+                <div class="file-name">{{currentFile.name}} {{currentFile.uploadProgress + '%'}}</div>
+                <div class="file-progress">
+                    <span class="file-progress-indicator" ng-style="{'width': currentFile.uploadProgress + '%'}"></span>
+                </div>
+            </li>
+
+            <li class="file" ng-repeat="file in queue track by file.key">
+                <div class="file-description">{{ file.name }}</div>
+            </li>
+                       
         </ul>
     </ng-form>
 

@@ -138,7 +138,6 @@ angular.module("umbraco.directives")
                             .success(function (data, status, headers, config) {
                                 // Set server messages
                                 file.messages = data.notifications;
-                                file.processedDate = new Date();
                                 scope.processed.push(file);
                                 scope.currentFile = undefined;
                                 //after processing, test if everything is done
@@ -146,7 +145,6 @@ angular.module("umbraco.directives")
                             })
                             .error(function(evt, status, headers, config) {
                                 //if the service returns a detailed error
-                                file.processedDate = new Date();
                                 if (evt.InnerException) {
                                     file.serverErrorMessage = evt.InnerException.ExceptionMessage;
                                     //Check if its the common "too large file" exception
