@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
-                _logger.LogWarning("Failed to remove connection string from JSON configuration");
+                _logger.LogWarning("Failed to remove connection string from JSON configuration.");
                 return;
             }
 
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
-                _logger.LogWarning("Failed to save connection string in JSON configuration");
+                _logger.LogWarning("Failed to save connection string in JSON configuration.");
                 return;
             }
 
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
-                _logger.LogWarning("Failed to save configuration key \"{key}\" in JSON configuration", key);
+                _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration.", key);
                 return;
             }
 
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
-                _logger.LogWarning("Failed to save \"DisableRedirectUrlTracking\" in JSON configuration");
+                _logger.LogWarning("Failed to save enabled/disabled state for redirect URL tracking in JSON configuration.");
                 return;
             }
 
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Core.Configuration
             var json = GetJson(provider);
             if (json is null)
             {
-                _logger.LogWarning("Failed to save global identifier in JSON configuration");
+                _logger.LogWarning("Failed to save global identifier in JSON configuration.");
                 return;
             }
 
