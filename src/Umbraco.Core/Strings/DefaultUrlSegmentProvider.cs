@@ -26,7 +26,8 @@ namespace Umbraco.Core.Strings
             if (string.IsNullOrWhiteSpace(source))
             {
                 // If the name of a node has been updated, but it has not been published, the url should use the published name, not the current node name
-                source = (content is IContent document) && document.Edited
+                // If this node has never been published (GetPublishName is null), use the unpublished name
+                source = (content is IContent document) && document.Edited && document.GetPublishName(culture) != null
                     ? document.GetPublishName(culture)
                     : content.GetCultureName(culture);
             }
