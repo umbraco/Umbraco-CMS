@@ -142,7 +142,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var content = _defaultViewContentProvider.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
             var scaffold = _umbracoMapper.Map<ITemplate, TemplateDisplay>(dt);
 
-            scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
+            scaffold.Content =  content;
             return scaffold;
         }
 
