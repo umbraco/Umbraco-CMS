@@ -406,5 +406,41 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 CollectionAssert.Contains(display.Errors.Keys, "_content_variant_en-US_null_");
             });
         }
+
+        [Test]
+        public async Task PostSave_Validates_Domains()
+        {
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo("da-DK")
+                .WithIsDefault(false)
+                .Build());
+
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+            var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
+            contentTypeService.Save(contentType);
+
+            var content = new ContentBuilder()
+                .WithId(1)
+                .WithContentType(contentType)
+                .WithCultureName("en-US", "Root")
+                .WithCultureName("da-DK", "Rod")
+                .Build();
+
+            var model = new ContentItemSaveBuilder()
+                .WithContent(content)
+                .WithAction(ContentSaveAction.PublishNew)
+                .Build();
+
+            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+
+            HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
+            {
+                { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
+            });
+            string body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+        }
     }
 }
