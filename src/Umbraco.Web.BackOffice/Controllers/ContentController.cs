@@ -1441,7 +1441,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="persistedContent"></param>
         /// <param name="culturesPublished"></param>
         /// <param name="publishResult"></param>
-        private void VerifyDomainsForCultures(IContent persistedContent, IEnumerable<string> culturesPublished, PublishResult publishResult)
+        internal void VerifyDomainsForCultures(IContent persistedContent, IEnumerable<string> culturesPublished, PublishResult publishResult)
         {
             var publishedCultures = persistedContent.PublishedCultures.ToList();
             // If only a single culture is published we shouldn't have any routing issues
