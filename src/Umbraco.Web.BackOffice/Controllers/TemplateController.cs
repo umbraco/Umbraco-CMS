@@ -24,15 +24,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IFileService _fileService;
         private readonly IUmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
         public TemplateController(
             IFileService fileService,
             IUmbracoMapper umbracoMapper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IDefaultViewContentProvider defaultViewContentProvider)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
         }
 
         /// <summary>
@@ -136,7 +139,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            var content = ViewHelper.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
+            var content = _defaultViewContentProvider.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
             var scaffold = _umbracoMapper.Map<ITemplate, TemplateDisplay>(dt);
 
             scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
