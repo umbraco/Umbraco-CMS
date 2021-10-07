@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
@@ -24,6 +25,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -78,6 +80,37 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _shortStringHelper = shortStringHelper;
             _passwordChanger = passwordChanger;
             _userDataService = userDataService;
+        }
+
+        [Obsolete("This constructor is obsolete, use constructor with all values")]
+        public CurrentUserController(
+            MediaFileManager mediaFileManager,
+            IOptions<ContentSettings> contentSettings,
+            IHostingEnvironment hostingEnvironment,
+            IImageUrlGenerator imageUrlGenerator,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IUserService userService,
+            IUmbracoMapper umbracoMapper,
+            IBackOfficeUserManager backOfficeUserManager,
+            ILocalizedTextService localizedTextService,
+            AppCaches appCaches,
+            IShortStringHelper shortStringHelper,
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger) :
+            this(mediaFileManager,
+                contentSettings,
+                hostingEnvironment,
+                imageUrlGenerator,
+                backofficeSecurityAccessor,
+                userService,
+                umbracoMapper,
+                backOfficeUserManager,
+                localizedTextService,
+                appCaches,
+                shortStringHelper,
+                passwordChanger,
+                StaticServiceProvider.Instance.GetRequiredService<IUserDataService>())
+        {
+
         }
 
 

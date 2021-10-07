@@ -20,9 +20,8 @@ namespace Umbraco.Cms.Core.Services
             _localizationService = localizationService;
         }
 
-        public IEnumerable<UserData> GetUserData()
-        {
-            var userDataList = new List<UserData>
+        public IEnumerable<UserData> GetUserData() =>
+            new List<UserData>
             {
                 new("Server OS", RuntimeInformation.OSDescription),
                 new("Server Framework", RuntimeInformation.FrameworkDescription),
@@ -32,8 +31,6 @@ namespace Umbraco.Cms.Core.Services
                 new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
                 new("Current Webserver", GetCurrentWebServer())
             };
-            return userDataList;
-        }
 
         private string GetCurrentWebServer() => IsRunningInProcessIIS() ? "IIS" : "Kestrel";
 
