@@ -91,18 +91,24 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var installationSummary = new InstallationSummary(compiledPackage.Name)
                 {
                     Warnings = compiledPackage.Warnings,
-                    DataTypesInstalled = ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
+                    DataTypesInstalled = ImportDataTypes(compiledPackage.DataTypes.ToList(), userId, out IEnumerable<EntityContainer> dataTypeEntityContainersInstalled),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
                     MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
                     MacroPartialViewsInstalled = ImportMacroPartialViews(compiledPackage.MacroPartialViews, userId),
                     TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
-                    DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId),
-                    MediaTypesInstalled = ImportMediaTypes(compiledPackage.MediaTypes, userId),
+                    DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId, out IEnumerable<EntityContainer> documentTypeEntityContainersInstalled),
+                    MediaTypesInstalled = ImportMediaTypes(compiledPackage.MediaTypes, userId, out IEnumerable<EntityContainer> mediaTypeEntityContainersInstalled),
                     StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId),
                     ScriptsInstalled = ImportScripts(compiledPackage.Scripts, userId),
                     PartialViewsInstalled = ImportPartialViews(compiledPackage.PartialViews, userId)
                 };
+
+                var entityContainersInstalled = new List<EntityContainer>();
+                entityContainersInstalled.AddRange(dataTypeEntityContainersInstalled);
+                entityContainersInstalled.AddRange(documentTypeEntityContainersInstalled);
+                entityContainersInstalled.AddRange(mediaTypeEntityContainersInstalled);
+                installationSummary.EntityContainersInstalled = entityContainersInstalled;
 
                 // We need a reference to the imported doc types to continue
                 var importedDocTypes = installationSummary.DocumentTypesInstalled.ToDictionary(x => x.Alias, x => x);
@@ -116,6 +122,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 return installationSummary;
             }
         }
+
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
         /// </summary>
@@ -123,7 +130,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId)
-            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService);
+            => ImportMediaTypes(docTypeElements, userId, out _);
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="docTypeElements">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <param name="entityContainersInstalled">Collection of entity containers installed by the package to be populated with those created in installing data types.</param>
+        /// <returns>An enumerable list of generated ContentTypes</returns>
+        public IReadOnlyList<IMediaType> ImportMediaTypes(IEnumerable<XElement> docTypeElements, int userId, out IEnumerable<EntityContainer> entityContainersInstalled)
+            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _mediaTypeService, out entityContainersInstalled);
 
         #endregion
 
@@ -408,7 +425,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         #region DocumentTypes
 
         public IReadOnlyList<IContentType> ImportDocumentType(XElement docTypeElement, int userId)
-            => ImportDocumentTypes(new[] { docTypeElement }, userId);
+            => ImportDocumentTypes(new[] { docTypeElement }, userId, out _);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -417,7 +434,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
-            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _contentTypeService);
+            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _contentTypeService, out _);
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="docTypeElements">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <param name="entityContainersInstalled">Collection of entity containers installed by the package to be populated with those created in installing data types.</param>
+        /// <returns>An enumerable list of generated ContentTypes</returns>
+        public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId, out IEnumerable<EntityContainer> entityContainersInstalled)
+            => ImportDocumentTypes(docTypeElements.ToList(), true, userId, _contentTypeService, out entityContainersInstalled);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -428,6 +455,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<T> ImportDocumentTypes<T>(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId, IContentTypeBaseService<T> service)
             where T : class, IContentTypeComposition
+            => ImportDocumentTypes(unsortedDocumentTypes, importStructure, userId, service);
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IContentType"/>
+        /// </summary>
+        /// <param name="unsortedDocumentTypes">Xml to import</param>
+        /// <param name="importStructure">Boolean indicating whether or not to import the </param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <param name="entityContainersInstalled">Collection of entity containers installed by the package to be populated with those created in installing data types.</param>
+        /// <returns>An enumerable list of generated ContentTypes</returns>
+        public IReadOnlyList<T> ImportDocumentTypes<T>(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId, IContentTypeBaseService<T> service, out IEnumerable<EntityContainer> entityContainersInstalled)
+            where T : class, IContentTypeComposition
         {
             var importedContentTypes = new Dictionary<string, T>();
 
@@ -436,7 +475,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var graph = new TopoGraph<string, TopoGraph.Node<string, XElement>>(x => x.Key, x => x.Dependencies);
             var isSingleDocTypeImport = unsortedDocumentTypes.Count == 1;
 
-            var importedFolders = CreateContentTypeFolderStructure(unsortedDocumentTypes);
+            var importedFolders = CreateContentTypeFolderStructure(unsortedDocumentTypes, out entityContainersInstalled);
 
             if (isSingleDocTypeImport == false)
             {
@@ -532,9 +571,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return list;
         }
 
-        private Dictionary<string, int> CreateContentTypeFolderStructure(IEnumerable<XElement> unsortedDocumentTypes)
+        private Dictionary<string, int> CreateContentTypeFolderStructure(IEnumerable<XElement> unsortedDocumentTypes, out IEnumerable<EntityContainer> entityContainersInstalled)
         {
             var importedFolders = new Dictionary<string, int>();
+            var trackEntityContainersInstalled = new List<EntityContainer>();
             foreach (var documentType in unsortedDocumentTypes)
             {
                 var foldersAttribute = documentType.Attribute("Folders");
@@ -578,8 +618,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                             _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
+
                         var rootFolderId = tryCreateFolder.Result.Entity.Id;
                         current = _contentTypeService.GetContainer(rootFolderId);
+                        trackEntityContainersInstalled.Add(current);
                     }
 
                     importedFolders.Add(alias, current.Id);
@@ -589,11 +631,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         var folderName = WebUtility.UrlDecode(folders[i]);
                         Guid? folderKey = (folderKeys.Length == folders.Length) ? folderKeys[i] : null;
                         current = CreateContentTypeChildFolder(folderName, folderKey ?? Guid.NewGuid(), current);
+                        trackEntityContainersInstalled.Add(current);
                         importedFolders[alias] = current.Id;
                     }
                 }
             }
 
+            entityContainersInstalled = trackEntityContainersInstalled;
             return importedFolders;
         }
 
@@ -1012,10 +1056,20 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="userId">Optional id of the user</param>
         /// <returns>An enumerable list of generated DataTypeDefinitions</returns>
         public IReadOnlyList<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId)
+             => ImportDataTypes(dataTypeElements, userId, out _);
+
+        /// <summary>
+        /// Imports and saves package xml as <see cref="IDataType"/>
+        /// </summary>
+        /// <param name="dataTypeElements">Xml to import</param>
+        /// <param name="userId">Optional id of the user</param>
+        /// <param name="entityContainersInstalled">Collection of entity containers installed by the package to be populated with those created in installing data types.</param>
+        /// <returns>An enumerable list of generated DataTypeDefinitions</returns>
+        public IReadOnlyList<IDataType> ImportDataTypes(IReadOnlyCollection<XElement> dataTypeElements, int userId, out IEnumerable<EntityContainer> entityContainersInstalled)
         {
             var dataTypes = new List<IDataType>();
 
-            var importedFolders = CreateDataTypeFolderStructure(dataTypeElements);
+            var importedFolders = CreateDataTypeFolderStructure(dataTypeElements, out entityContainersInstalled);
 
             foreach (var dataTypeElement in dataTypeElements)
             {
@@ -1072,9 +1126,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return dataTypes;
         }
 
-        private Dictionary<string, int> CreateDataTypeFolderStructure(IEnumerable<XElement> datatypeElements)
+        private Dictionary<string, int> CreateDataTypeFolderStructure(IEnumerable<XElement> datatypeElements, out IEnumerable<EntityContainer> entityContainersInstalled)
         {
             var importedFolders = new Dictionary<string, int>();
+            var trackEntityContainersInstalled = new List<EntityContainer>();
             foreach (var datatypeElement in datatypeElements)
             {
                 var foldersAttribute = datatypeElement.Attribute("Folders");
@@ -1103,7 +1158,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                             _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
+
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
+                        trackEntityContainersInstalled.Add(current);
                     }
 
                     importedFolders.Add(name, current.Id);
@@ -1113,11 +1170,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         var folderName = WebUtility.UrlDecode(folders[i]);
                         Guid? folderKey = (folderKeys.Length == folders.Length) ? folderKeys[i] : null;
                         current = CreateDataTypeChildFolder(folderName, folderKey ?? Guid.NewGuid(), current);
+                        trackEntityContainersInstalled.Add(current);
                         importedFolders[name] = current.Id;
                     }
                 }
             }
-
+            entityContainersInstalled = trackEntityContainersInstalled;
             return importedFolders;
         }
 
