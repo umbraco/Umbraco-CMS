@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -26,19 +27,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
     public class ContentControllerTests
     {
         [Test]
-        public void Root_Node_With_Domains_Causes_No_Error()
+        public void Root_Node_With_Domains_Causes_No_Warning()
         {
             // Setup domain service
             var domainServiceMock = new Mock<IDomainService>();
             domainServiceMock.Setup(x => x.GetAssignedDomains(1060, It.IsAny<bool>()))
-                .Returns(new List<IDomain>{new UmbracoDomain("/", "da-dk"), new UmbracoDomain("/en", "en-us")});
+                .Returns(new []{new UmbracoDomain("/", "da-dk"), new UmbracoDomain("/en", "en-us")});
 
-            // Create content type and content
-            IContentType contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
-
-            // Create content, we need to specify and ID configure domain service
+            // Create content, we need to specify and ID in order to be able to configure domain service
             Content rootNode = new ContentBuilder()
-                .WithContentType(contentType)
+                .WithContentType(CreateContentType())
                 .WithId(1060)
                 .AddContentCultureInfosCollection()
                     .AddCultureInfos()
@@ -58,6 +56,175 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
             IEnumerable<EventMessage> eventMessages = publishResult.EventMessages.GetAll();
             Assert.IsEmpty(eventMessages);
+        }
+
+        [Test]
+        public void Node_With_Single_Published_Culture_Causes_No_Warning()
+        {
+            var domainServiceMock = new Mock<IDomainService>();
+            domainServiceMock.Setup(x => x.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
+                .Returns(Enumerable.Empty<IDomain>());
+
+            Content rootNode = new ContentBuilder()
+                .WithContentType(CreateContentType())
+                .WithId(1060)
+                .AddContentCultureInfosCollection()
+                    .AddCultureInfos()
+                        .WithCultureIso("da-dk")
+                        .Done()
+                .Done()
+                .Build();
+
+            var culturesPublished = new List<string> {"da-dk" };
+            var publishResult = new PublishResult(new EventMessages(), rootNode);
+
+            ContentController contentController = CreateContentController(domainServiceMock.Object);
+            contentController.VerifyDomainsForCultures(rootNode, culturesPublished, publishResult);
+
+            Assert.IsEmpty(publishResult.EventMessages.GetAll());
+        }
+
+        [Test]
+        public void Root_Node_Without_Domains_Causes_SingleWarning()
+        {
+            var domainServiceMock = new Mock<IDomainService>();
+            domainServiceMock.Setup(x => x.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
+                .Returns(Enumerable.Empty<IDomain>());
+
+            Content rootNode = new ContentBuilder()
+                .WithContentType(CreateContentType())
+                .WithId(1060)
+                .AddContentCultureInfosCollection()
+                    .AddCultureInfos()
+                        .WithCultureIso("da-dk")
+                        .Done()
+                    .AddCultureInfos()
+                        .WithCultureIso("en-us")
+                        .Done()
+                .Done()
+                .Build();
+
+            var culturesPublished = new List<string> { "en-us", "da-dk" };
+            var publishResult = new PublishResult(new EventMessages(), rootNode);
+
+            ContentController contentController = CreateContentController(domainServiceMock.Object);
+            contentController.VerifyDomainsForCultures(rootNode, culturesPublished, publishResult);
+            Assert.AreEqual(1, publishResult.EventMessages.Count);
+        }
+
+        [Test]
+        public void One_Warning_Per_Culture_Being_Published()
+        {
+            var domainServiceMock = new Mock<IDomainService>();
+            domainServiceMock.Setup(x => x.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
+                .Returns(new []{new UmbracoDomain("/", "da-dk")});
+
+
+            Content rootNode = new ContentBuilder()
+                .WithContentType(CreateContentType())
+                .WithId(1060)
+                .AddContentCultureInfosCollection()
+                    .AddCultureInfos()
+                        .WithCultureIso("da-dk")
+                        .Done()
+                    .AddCultureInfos()
+                        .WithCultureIso("en-us")
+                        .Done()
+                .Done()
+                .Build();
+
+            var culturesPublished = new List<string> { "en-us", "da-dk", "nl-bk", "se-sv" };
+            var publishResult = new PublishResult(new EventMessages(), rootNode);
+
+            ContentController contentController = CreateContentController(domainServiceMock.Object);
+            contentController.VerifyDomainsForCultures(rootNode, culturesPublished, publishResult);
+            Assert.AreEqual(3, publishResult.EventMessages.Count);
+        }
+
+        [Test]
+        public void Ancestor_Domains_Counts()
+        {
+            var rootId = 1060;
+            var level1Id = 1061;
+            var level2Id = 1062;
+            var level3Id = 1063;
+
+            var domainServiceMock = new Mock<IDomainService>();
+            domainServiceMock.Setup(x => x.GetAssignedDomains(rootId, It.IsAny<bool>()))
+                .Returns(new[] { new UmbracoDomain("/", "da-dk") });
+
+            domainServiceMock.Setup(x => x.GetAssignedDomains(level1Id, It.IsAny<bool>()))
+                .Returns(new[] { new UmbracoDomain("/en", "en-us") });
+
+            domainServiceMock.Setup(x => x.GetAssignedDomains(level2Id, It.IsAny<bool>()))
+                .Returns(new[] { new UmbracoDomain("/se", "se-sv"), new UmbracoDomain("/nl", "nl-bk") });
+
+            Content level3Node = new ContentBuilder()
+                .WithContentType(CreateContentType())
+                .WithId(level3Id)
+                .WithPath($"-1,{rootId},{level1Id},{level2Id},{level3Id}")
+                .AddContentCultureInfosCollection()
+                    .AddCultureInfos()
+                        .WithCultureIso("da-dk")
+                        .Done()
+                    .AddCultureInfos()
+                        .WithCultureIso("en-us")
+                        .Done()
+                    .AddCultureInfos()
+                        .WithCultureIso("se-sv")
+                    .Done()
+                    .AddCultureInfos()
+                        .WithCultureIso("nl-bk")
+                        .Done()
+                    .AddCultureInfos()
+                        .WithCultureIso("de-de")
+                        .Done()
+                .Done()
+                .Build();
+
+            var culturesPublished = new List<string> { "en-us", "da-dk", "nl-bk", "se-sv", "de-de" };
+            var publishResult = new PublishResult(new EventMessages(), level3Node);
+
+            ContentController contentController = CreateContentController(domainServiceMock.Object);
+            contentController.VerifyDomainsForCultures(level3Node, culturesPublished, publishResult);
+            // We expect one error because all domains except "de-de" is registered somewhere in the ancestor path
+            Assert.AreEqual(1, publishResult.EventMessages.Count);
+        }
+
+        [Test]
+        public void Only_Warns_About_Cultures_Being_Published()
+        {
+            var domainServiceMock = new Mock<IDomainService>();
+            domainServiceMock.Setup(x => x.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
+                .Returns(new []{new UmbracoDomain("/", "da-dk")});
+
+            Content rootNode = new ContentBuilder()
+                .WithContentType(CreateContentType())
+                .WithId(1060)
+                .AddContentCultureInfosCollection()
+                    .AddCultureInfos()
+                        .WithCultureIso("da-dk")
+                        .Done()
+                    .AddCultureInfos()
+                        .WithCultureIso("en-us")
+                        .Done()
+                    .AddCultureInfos()
+                        .WithCultureIso("se-sv")
+                        .Done()
+                    .AddCultureInfos()
+                        .WithCultureIso("de-de")
+                        .Done()
+                .Done()
+                .Build();
+
+            var culturesPublished = new List<string> { "en-us", "se-sv" };
+            var publishResult = new PublishResult(new EventMessages(), rootNode);
+
+            ContentController contentController = CreateContentController(domainServiceMock.Object);
+            contentController.VerifyDomainsForCultures(rootNode, culturesPublished, publishResult);
+
+            // We only get two errors, one for each culture being published, so no errors from previously published cultures.
+            Assert.AreEqual(2, publishResult.EventMessages.Count);
         }
 
         private ContentController CreateContentController(IDomainService domainService)
@@ -89,5 +256,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
             return controller;
         }
+
+        private IContentType CreateContentType() =>
+            new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
     }
 }
