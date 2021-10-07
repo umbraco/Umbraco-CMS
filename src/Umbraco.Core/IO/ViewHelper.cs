@@ -13,7 +13,11 @@ namespace Umbraco.Cms.Core.IO
 
         public ViewHelper(IFileSystem viewFileSystem)
         {
-            if (viewFileSystem == null) throw new ArgumentNullException(nameof(viewFileSystem));
+            if (viewFileSystem == null)
+            {
+                throw new ArgumentNullException(nameof(viewFileSystem));
+            }
+
             _viewFileSystem = viewFileSystem;
         }
 
@@ -65,13 +69,15 @@ namespace Umbraco.Cms.Core.IO
             var content = new StringBuilder();
 
             if (string.IsNullOrWhiteSpace(modelNamespaceAlias))
+            {
                 modelNamespaceAlias = "ContentModels";
+            }
 
             // either
-            // @inherits Umbraco.Web.Mvc.UmbracoViewPage
-            // @inherits Umbraco.Web.Mvc.UmbracoViewPage<ModelClass>
-            content.AppendLine("@using Umbraco.Cms.Web.Common.PublishedModels;");
-            content.Append("@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage");
+            // @inherits UmbracoViewPage
+            // @inherits UmbracoViewPage<ModelClass>
+            content.Append("@inherits UmbracoViewPage");
+
             if (modelClassName.IsNullOrWhiteSpace() == false)
             {
                 content.Append("<");
@@ -100,6 +106,7 @@ namespace Umbraco.Cms.Core.IO
             // Layout = null;
             // Layout = "layoutPage.cshtml";
             content.Append("@{\r\n\tLayout = ");
+
             if (layoutPageAlias.IsNullOrWhiteSpace())
             {
                 content.Append("null");
@@ -111,6 +118,7 @@ namespace Umbraco.Cms.Core.IO
                 content.Append(".cshtml\"");
             }
             content.Append(";\r\n}");
+
             return content.ToString();
         }
 
@@ -138,8 +146,11 @@ namespace Umbraco.Cms.Core.IO
             {
                 //then kill the old file..
                 var oldFile = ViewPath(currentAlias);
+
                 if (_viewFileSystem.FileExists(oldFile))
+                {
                     _viewFileSystem.DeleteFile(oldFile);
+                }
             }
 
             var data = Encoding.UTF8.GetBytes(t.Content);
@@ -162,7 +173,9 @@ namespace Umbraco.Cms.Core.IO
             var design = template.Content;
 
             if (string.IsNullOrEmpty(design))
+            {
                 design = GetDefaultFileContent(template.MasterTemplateAlias);
+            }
 
             return design;
         }

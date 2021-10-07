@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
                 Assert.AreEqual(
-                    @"@usingUmbraco.Cms.Web.Common.PublishedModels;@inheritsUmbraco.Cms.Web.Common.Views.UmbracoViewPage@{Layout=null;}".StripWhitespace(),
+                    @"@inherits UmbracoViewPage @{ Layout = null; }".StripWhitespace(),
                     template.Content.StripWhitespace());
             }
         }
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.That(repository.Get("test2"), Is.Not.Null);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test2.cshtml"), Is.True);
                 Assert.AreEqual(
-                    "@usingUmbraco.Cms.Web.Common.PublishedModels;@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage @{ Layout = \"test.cshtml\";}".StripWhitespace(),
+                    "@inherits UmbracoViewPage @{ Layout = \"test.cshtml\";}".StripWhitespace(),
                     template2.Content.StripWhitespace());
             }
         }
