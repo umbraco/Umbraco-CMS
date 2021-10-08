@@ -879,7 +879,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
                     {
-                        var publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
+                        PublishResult publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
+                        // Add warnings if domains are not set up correctly
+                        AddDomainWarnings(publishStatus.Content, successfulCultures, globalNotifications);
                         AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
                     }
                     break;
@@ -1413,11 +1415,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = culturesToPublish;
 
-                // Verify that there's appropriate cultures configured.
-                if (publishStatus.Success)
-                {
-                    VerifyDomainsForCultures(contentItem.PersistedContent, culturesToPublish, publishStatus);
-                }
                 return publishStatus;
             }
             else
@@ -1435,14 +1432,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Verifies that there's an appropriate domain setup for the published cultures
         /// </summary>
         /// <remarks>
-        /// Adds a warning and logs a message if, a node varies but culture, there's at least 1 culture already published,
+        /// Adds a warning and logs a message if a node varies by culture, there's at least 1 culture already published,
         /// and there's no domain added for the published cultures
         /// </remarks>
         /// <param name="persistedContent"></param>
         /// <param name="culturesPublished"></param>
-        /// <param name="publishResult"></param>
-        internal void VerifyDomainsForCultures(IContent persistedContent, IEnumerable<string> culturesPublished, PublishResult publishResult)
+        /// <param name="globalNotifications"></param>
+        internal void AddDomainWarnings(IContent persistedContent, IEnumerable<string> culturesPublished, SimpleNotificationModel globalNotifications)
         {
+            // Don't try to verify if no cultures were published
+            if (culturesPublished is null)
+            {
+                return;
+            }
+
             var publishedCultures = persistedContent.PublishedCultures.ToList();
             // If only a single culture is published we shouldn't have any routing issues
             if (publishedCultures.Count < 2)
@@ -1461,10 +1464,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // No domains at all, add a warning, to add domains.
             if (assignedDomains.Count == 0)
             {
-                publishResult.EventMessages.Add(new EventMessage(
+                globalNotifications.AddWarningNotification(
                     _localizedTextService.Localize("auditTrails", "publish"),
-                    _localizedTextService.Localize("speechBubbles", "publishWithNoDomains"),
-                    EventMessageType.Warning));
+                    _localizedTextService.Localize("speechBubbles", "publishWithNoDomains"));
 
                 _logger.LogWarning("The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
                     persistedContent.Name, string.Join(", ", publishedCultures));
@@ -1475,11 +1477,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             foreach (var culture in culturesPublished
                 .Where(culture => assignedDomains.Any(x => x.LanguageIsoCode.Equals(culture, StringComparison.OrdinalIgnoreCase)) is false))
             {
-                publishResult.EventMessages.Add(new EventMessage(
+                globalNotifications.AddWarningNotification(
                     _localizedTextService.Localize("auditTrails", "publish"),
-                    _localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{culture}),
-                    EventMessageType.Warning
-                ));
+                    _localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{culture}));
 
                 _logger.LogWarning("The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",
                     persistedContent.Name, culture);

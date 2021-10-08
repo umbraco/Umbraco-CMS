@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -9,6 +11,7 @@ using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
@@ -49,13 +52,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Build();
 
             var culturesPublished = new List<string> { "en-us", "da-dk" };
-            var publishResult = new PublishResult(new EventMessages(), rootNode);
+            var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
-            contentController.VerifyDomainsForCultures(rootNode, culturesPublished, publishResult);
+            contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
 
-            IEnumerable<EventMessage> eventMessages = publishResult.EventMessages.GetAll();
-            Assert.IsEmpty(eventMessages);
+            Assert.IsEmpty(notifications.Notifications);
         }
 
         [Test]
@@ -76,12 +78,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Build();
 
             var culturesPublished = new List<string> {"da-dk" };
-            var publishResult = new PublishResult(new EventMessages(), rootNode);
+            var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
-            contentController.VerifyDomainsForCultures(rootNode, culturesPublished, publishResult);
+            contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
 
-            Assert.IsEmpty(publishResult.EventMessages.GetAll());
+            Assert.IsEmpty(notifications.Notifications);
         }
 
         [Test]
@@ -105,11 +107,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Build();
 
             var culturesPublished = new List<string> { "en-us", "da-dk" };
-            var publishResult = new PublishResult(new EventMessages(), rootNode);
+            var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
-            contentController.VerifyDomainsForCultures(rootNode, culturesPublished, publishResult);
-            Assert.AreEqual(1, publishResult.EventMessages.Count);
+            contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
+            Assert.AreEqual(1, notifications.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
         }
 
         [Test]
@@ -134,11 +136,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Build();
 
             var culturesPublished = new List<string> { "en-us", "da-dk", "nl-bk", "se-sv" };
-            var publishResult = new PublishResult(new EventMessages(), rootNode);
+            var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
-            contentController.VerifyDomainsForCultures(rootNode, culturesPublished, publishResult);
-            Assert.AreEqual(3, publishResult.EventMessages.Count);
+            contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
+            Assert.AreEqual(3, notifications.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
         }
 
         [Test]
@@ -183,12 +185,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Build();
 
             var culturesPublished = new List<string> { "en-us", "da-dk", "nl-bk", "se-sv", "de-de" };
-            var publishResult = new PublishResult(new EventMessages(), level3Node);
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
-            contentController.VerifyDomainsForCultures(level3Node, culturesPublished, publishResult);
+            var notifications = new SimpleNotificationModel();
+
+            contentController.AddDomainWarnings(level3Node, culturesPublished, notifications);
             // We expect one error because all domains except "de-de" is registered somewhere in the ancestor path
-            Assert.AreEqual(1, publishResult.EventMessages.Count);
+            Assert.AreEqual(1, notifications.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
         }
 
         [Test]
@@ -218,23 +221,30 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Build();
 
             var culturesPublished = new List<string> { "en-us", "se-sv" };
-            var publishResult = new PublishResult(new EventMessages(), rootNode);
+            var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
-            contentController.VerifyDomainsForCultures(rootNode, culturesPublished, publishResult);
+            contentController.AddDomainWarnings(rootNode, culturesPublished, notifications);
 
             // We only get two errors, one for each culture being published, so no errors from previously published cultures.
-            Assert.AreEqual(2, publishResult.EventMessages.Count);
+            Assert.AreEqual(2, notifications.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
         }
 
         private ContentController CreateContentController(IDomainService domainService)
         {
+            // We have to configure ILocalizedTextService to return a new string every time Localize is called
+            // Otherwise it won't add the notification because it skips dupes
+            var localizedTextServiceMock = new Mock<ILocalizedTextService>();
+            localizedTextServiceMock.Setup(x => x.Localize(It.IsAny<string>(),
+                It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>()))
+                .Returns(() => Guid.NewGuid().ToString());
+
             var controller = new ContentController(
                 Mock.Of<ICultureDictionary>(),
                 NullLoggerFactory.Instance,
                 Mock.Of<IShortStringHelper>(),
                 Mock.Of<IEventMessagesFactory>(),
-                Mock.Of<ILocalizedTextService>(),
+                localizedTextServiceMock.Object,
                 new PropertyEditorCollection(new DataEditorCollection(() => null)),
                 Mock.Of<IContentService>(),
                 Mock.Of<IUserService>(),

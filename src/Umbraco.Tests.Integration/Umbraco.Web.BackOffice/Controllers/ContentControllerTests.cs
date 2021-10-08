@@ -441,6 +441,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             string body = await response.Content.ReadAsStringAsync();
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+            Assert.IsNotNull(display);
+            Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
         }
     }
 }
