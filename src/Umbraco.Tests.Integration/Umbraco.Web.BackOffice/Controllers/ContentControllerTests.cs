@@ -408,7 +408,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         }
 
         [Test]
-        public async Task PostSave_Validates_Domains()
+        public async Task PostSave_Validates_Domains_Exist()
         {
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             localizationService.Save(new LanguageBuilder()
@@ -417,32 +417,101 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .Build());
 
             IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
-            var contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
+            IContentType contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
             contentTypeService.Save(contentType);
 
-            var content = new ContentBuilder()
+            Content content = new ContentBuilder()
                 .WithId(1)
                 .WithContentType(contentType)
                 .WithCultureName("en-US", "Root")
                 .WithCultureName("da-DK", "Rod")
                 .Build();
 
-            var model = new ContentItemSaveBuilder()
+            ContentItemSave model = new ContentItemSaveBuilder()
                 .WithContent(content)
                 .WithAction(ContentSaveAction.PublishNew)
                 .Build();
 
-            string url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
 
             HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
             {
                 { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
             });
-            string body = await response.Content.ReadAsStringAsync();
+            var body = await response.Content.ReadAsStringAsync();
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
-            Assert.IsNotNull(display);
-            Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+
+            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithNoDomains");
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsNotNull(display);
+                Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+                Assert.AreEqual(expectedMessage, display.Notifications.First().Message);
+            });
+        }
+
+        [Test]
+        public async Task PostSave_Validates_All_Cultures_Has_Domains()
+        {
+            var enString = "en-US";
+            var dkString = "da-DK";
+
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo(dkString)
+                .WithIsDefault(false)
+                .Build());
+
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+            IContentType contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
+            contentTypeService.Save(contentType);
+
+            Content content = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithCultureName(enString, "Root")
+                .WithCultureName(dkString, "Rod")
+                .Build();
+
+            IContentService contentService = GetRequiredService<IContentService>();
+            contentService.Save(content);
+
+            ContentItemSave model = new ContentItemSaveBuilder()
+                .WithContent(content)
+                .WithAction(ContentSaveAction.Publish)
+                .Build();
+
+            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(dkString);
+            IDomainService domainService = GetRequiredService<IDomainService>();
+            var dkDomain = new UmbracoDomain("/")
+            {
+                RootContentId = content.Id,
+                LanguageId = dkLanguage.Id
+            };
+            domainService.Save(dkDomain);
+
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+
+            HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
+            {
+                { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
+            });
+
+            var body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+
+            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{enString});
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(display);
+                Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+                Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
+            });
         }
     }
 }
