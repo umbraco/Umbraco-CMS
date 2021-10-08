@@ -513,5 +513,94 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
             });
         }
+
+        [Test]
+        public async Task PostSave_Checks_Ancestors_For_Domains()
+        {
+            var enString = "en-US";
+            var dkString = "da-DK";
+
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo(dkString)
+                .WithIsDefault(false)
+                .Build());
+
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+            IContentType contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
+            contentTypeService.Save(contentType);
+
+            Content rootNode = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithCultureName(enString, "Root")
+                .WithCultureName(dkString, "Rod")
+                .Build();
+
+            IContentService contentService = GetRequiredService<IContentService>();
+            contentService.SaveAndPublish(rootNode);
+
+            Content childNode = new ContentBuilder()
+                .WithoutIdentity()
+                .WithParent(rootNode)
+                .WithContentType(contentType)
+                .WithCultureName(dkString, "Barn")
+                .WithCultureName(enString, "Child")
+                .Build();
+
+            contentService.SaveAndPublish(childNode);
+
+            Content grandChild = new ContentBuilder()
+                .WithoutIdentity()
+                .WithParent(childNode)
+                .WithContentType(contentType)
+                .WithCultureName(dkString, "BarneBarn")
+                .WithCultureName(enString, "GrandChild")
+                .Build();
+
+            contentService.Save(grandChild);
+
+            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(dkString);
+            ILanguage usLanguage = localizationService.GetLanguageByIsoCode(enString);
+            IDomainService domainService = GetRequiredService<IDomainService>();
+            var dkDomain = new UmbracoDomain("/")
+            {
+                RootContentId = rootNode.Id,
+                LanguageId = dkLanguage.Id
+            };
+
+            var usDomain = new UmbracoDomain("/en")
+            {
+                RootContentId = childNode.Id,
+                LanguageId = usLanguage.Id
+            };
+
+            domainService.Save(dkDomain);
+            domainService.Save(usDomain);
+
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+
+            ContentItemSave model = new ContentItemSaveBuilder()
+                .WithContent(grandChild)
+                .WithAction(ContentSaveAction.Publish)
+                .Build();
+
+            HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
+            {
+                { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
+            });
+
+            var body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(display);
+                // Assert all is good, a success notification for each culture published and no warnings.
+                Assert.AreEqual(2, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Success));
+                Assert.AreEqual(0, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+            });
+        }
     }
 }
