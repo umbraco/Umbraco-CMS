@@ -557,7 +557,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // i.e. "Some Person" <hello@example.com>
             var toMailBoxAddress = new MailboxAddress(to.Name, to.Email);
 
-            var mailMessage = new EmailMessage(fromEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
+            var mailMessage = new EmailMessage(null /*use info from smtp settings*/, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
 
             await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.UserInvite, true);
         }

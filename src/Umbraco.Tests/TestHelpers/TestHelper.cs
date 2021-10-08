@@ -69,11 +69,6 @@ namespace Umbraco.Tests.TestHelpers
 
             public override IMarchal Marchal { get; } = new FrameworkMarchal();
 
-            public override IBackOfficeInfo GetBackOfficeInfo()
-                => new AspNetBackOfficeInfo(
-                    new GlobalSettings(),
-                    TestHelper.IOHelper, Mock.Of<ILogger<AspNetBackOfficeInfo>>(), Options.Create(new WebRoutingSettings()));
-
             public override IHostingEnvironment GetHostingEnvironment()
                 => new AspNetHostingEnvironment(Options.Create(new HostingSettings()));
 
@@ -87,12 +82,6 @@ namespace Umbraco.Tests.TestHelpers
         public static ITypeFinder GetTypeFinder() => _testHelperInternal.GetTypeFinder();
 
         public static TypeLoader GetMockedTypeLoader() => _testHelperInternal.GetMockedTypeLoader();
-
-        //public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
-
-        public static IBackOfficeInfo GetBackOfficeInfo() => _testHelperInternal.GetBackOfficeInfo();
-
-      //  public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
 
         /// <summary>
         /// Gets the working directory of the test project.

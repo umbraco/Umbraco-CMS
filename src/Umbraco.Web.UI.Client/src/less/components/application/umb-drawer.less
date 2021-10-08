@@ -101,9 +101,9 @@
 }
 
 /* Make sure typography looks good */
-.umb-help-article h1, 
-.umb-help-article h2, 
-.umb-help-article h3, 
+.umb-help-article h1,
+.umb-help-article h2,
+.umb-help-article h3,
 .umb-help-article h4 {
     line-height: 1.3em;
     font-weight: bold;
@@ -138,7 +138,7 @@
 }
 
 .umb-help-section__title {
-    margin:0 0 10px;    
+    margin:0 0 10px;
 }
 
 /* Help list */
@@ -147,10 +147,10 @@
     list-style: none;
     margin-left: 0;
     margin-bottom: 0;
-    background: @white; 
+    background: @white;
     border-radius: 3px;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
-    
+
     [data-element*="help-tours"] & {
         margin-bottom:5px;
     }
@@ -166,8 +166,19 @@
     border: 0 none;
 }
 
+
 .umb-help-list-item:last-child {
     border-bottom: none;
+}
+.umb-help-list-item__title-wrapper {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .umb-help-list-item {
+    flex: 1 0 auto;
+    width: auto;
+  }
 }
 
 .umb-help-list-item__group-title i {
@@ -185,7 +196,7 @@
 .umb-help-list-item:hover,
 .umb-help-list-item:focus,
 .umb-help-list-item:active,
-.umb-help-list-item > a:hover, 
+.umb-help-list-item > a:hover,
 .umb-help-list-item > a:focus,
 .umb-help-list-item > a:active {
     text-decoration: none;

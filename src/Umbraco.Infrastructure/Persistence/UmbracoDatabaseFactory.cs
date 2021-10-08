@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using NPoco;
 using NPoco.FluentMappings;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
@@ -72,6 +73,47 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
         #region Constructors
 
+
+          /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
+        /// </summary>
+        /// <remarks>Used by the other ctor and in tests.</remarks>
+          internal UmbracoDatabaseFactory(
+            ILogger<UmbracoDatabaseFactory> logger,
+            ILoggerFactory loggerFactory,
+            IOptions<GlobalSettings> globalSettings,
+            IMapperCollection mappers,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            NPocoMapperCollection npocoMappers,
+            string connectionString)
+        {
+            _globalSettings = globalSettings;
+            _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
+            _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
+            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ?? throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
+            _npocoMappers = npocoMappers;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _loggerFactory = loggerFactory;
+
+            if (connectionString is null)
+            {
+                logger.LogDebug("Missing connection string, defer configuration.");
+                return; // not configured
+            }
+
+            var configConnectionString = new ConfigConnectionString("Custom", connectionString);
+            // could as well be <add name="umbracoDbDSN" connectionString="" providerName="" />
+            // so need to test the values too
+            if (configConnectionString.IsConnectionStringConfigured() == false)
+            {
+                logger.LogDebug("Empty connection string or provider name, defer configuration.");
+                return; // not configured
+            }
+
+            Configure(configConnectionString.ConnectionString, configConnectionString.ProviderName);
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
@@ -84,33 +126,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             IMapperCollection mappers,
             IDbProviderFactoryCreator dbProviderFactoryCreator,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            NPocoMapperCollection npocoMappers)
+            NPocoMapperCollection npocoMappers):
+            this(logger, loggerFactory, globalSettings, mappers, dbProviderFactoryCreator, databaseSchemaCreatorFactory, npocoMappers, connectionStrings?.CurrentValue?.UmbracoConnectionString?.ConnectionString)
         {
 
-            _globalSettings = globalSettings;
-            _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
-            _dbProviderFactoryCreator = dbProviderFactoryCreator  ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
-            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ?? throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
-            _npocoMappers = npocoMappers;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _loggerFactory = loggerFactory;
-
-            var settings = connectionStrings.CurrentValue.UmbracoConnectionString;
-            if (settings == null)
-            {
-                logger.LogDebug("Missing connection string, defer configuration.");
-                return; // not configured
-            }
-
-            // could as well be <add name="umbracoDbDSN" connectionString="" providerName="" />
-            // so need to test the values too
-            if (settings.IsConnectionStringConfigured() == false)
-            {
-                logger.LogDebug("Empty connection string or provider name, defer configuration.");
-                return; // not configured
-            }
-
-            Configure(settings.ConnectionString, settings.ProviderName);
         }
 
         #endregion

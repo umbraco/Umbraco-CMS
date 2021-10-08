@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
@@ -22,11 +22,10 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -47,12 +46,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IUserService _userService;
         private readonly IUmbracoMapper _umbracoMapper;
         private readonly IBackOfficeUserManager _backOfficeUserManager;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly AppCaches _appCaches;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IPasswordChanger<BackOfficeIdentityUser> _passwordChanger;
+        private readonly IUserDataService _userDataService;
 
+        [ActivatorUtilitiesConstructor]
         public CurrentUserController(
             MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
@@ -62,11 +62,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IUserService userService,
             IUmbracoMapper umbracoMapper,
             IBackOfficeUserManager backOfficeUserManager,
-            ILoggerFactory loggerFactory,
             ILocalizedTextService localizedTextService,
             AppCaches appCaches,
             IShortStringHelper shortStringHelper,
-            IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger,
+            IUserDataService userDataService)
         {
             _mediaFileManager = mediaFileManager;
             _contentSettings = contentSettings.Value;
@@ -76,11 +76,42 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _userService = userService;
             _umbracoMapper = umbracoMapper;
             _backOfficeUserManager = backOfficeUserManager;
-            _loggerFactory = loggerFactory;
             _localizedTextService = localizedTextService;
             _appCaches = appCaches;
             _shortStringHelper = shortStringHelper;
             _passwordChanger = passwordChanger;
+            _userDataService = userDataService;
+        }
+
+        [Obsolete("This constructor is obsolete and will be removed in v11, use constructor with all values")]
+        public CurrentUserController(
+            MediaFileManager mediaFileManager,
+            IOptions<ContentSettings> contentSettings,
+            IHostingEnvironment hostingEnvironment,
+            IImageUrlGenerator imageUrlGenerator,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IUserService userService,
+            IUmbracoMapper umbracoMapper,
+            IBackOfficeUserManager backOfficeUserManager,
+            ILocalizedTextService localizedTextService,
+            AppCaches appCaches,
+            IShortStringHelper shortStringHelper,
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger) : this(
+                mediaFileManager,
+                contentSettings,
+                hostingEnvironment,
+                imageUrlGenerator,
+                backofficeSecurityAccessor,
+                userService,
+                umbracoMapper,
+                backOfficeUserManager,
+                localizedTextService,
+                appCaches,
+                shortStringHelper,
+                passwordChanger,
+                StaticServiceProvider.Instance.GetRequiredService<IUserDataService>())
+        {
+
         }
 
 
@@ -166,6 +197,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData);
             return userTours;
         }
+
+        public IEnumerable<UserData> GetUserData() => _userDataService.GetUserData();
 
         /// <summary>
         /// When a user is invited and they click on the invitation link, they will be partially logged in
