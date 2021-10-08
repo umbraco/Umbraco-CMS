@@ -44,7 +44,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     function validate() {
         if ($scope.contentPickerForm) {
             //Validate!
-            if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
+            if (($scope.renderModel.length !== 0 || ($scope.model.validation && $scope.model.validation.mandatory)) && $scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", false);
             }
             else {
