@@ -12,6 +12,9 @@ namespace Umbraco.Cms.Core.IO
         private readonly IFileSystem _viewFileSystem;
         private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
+        [Obsolete("Inject IViewHelper instead")]
+        public ViewHelper(IFileSystem viewFileSystem) => _viewFileSystem = viewFileSystem ?? throw new ArgumentNullException(nameof(viewFileSystem));
+
         public ViewHelper(FileSystems fileSystems, IDefaultViewContentProvider defaultViewContentProvider)
         {
             _viewFileSystem = fileSystems.MvcViewsFileSystem ?? throw new ArgumentNullException(nameof(fileSystems));
