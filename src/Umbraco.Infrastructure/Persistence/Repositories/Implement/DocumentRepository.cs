@@ -1232,12 +1232,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 {
                     // need templates
                     var templateId = dto.DocumentVersionDto.TemplateId;
-                    if (templateId.HasValue && templateId.Value > 0)
+                    if (templateId.HasValue)
                         templateIds.Add(templateId.Value);
                     if (dto.Published)
                     {
                         templateId = dto.PublishedVersionDto.TemplateId;
-                        if (templateId.HasValue && templateId.Value > 0)
+                        if (templateId.HasValue)
                             templateIds.Add(templateId.Value);
                     }
                 }
@@ -1334,7 +1334,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 content.DisableChangeTracking();
 
                 // get template
-                if (dto.DocumentVersionDto.TemplateId.HasValue && dto.DocumentVersionDto.TemplateId.Value > 0)
+                if (dto.DocumentVersionDto.TemplateId.HasValue)
                     content.TemplateId = dto.DocumentVersionDto.TemplateId;
 
                 // get properties - indexed by version id
