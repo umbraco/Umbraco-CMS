@@ -1464,11 +1464,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             // If more than a single culture is published we need to verify that there's a domain registered for each published culture
-            var assignedDomains = _domainService.GetAssignedDomains(persistedContent.Id, true).ToList();
+            var assignedDomains = _domainService.GetAssignedDomains(persistedContent.Id, true).ToHashSet();
             // We also have to check all of the ancestors, if any of those has the appropriate culture assigned we don't need to warn
             foreach (var ancestorID in persistedContent.GetAncestorIds())
             {
-                assignedDomains.AddRange(_domainService.GetAssignedDomains(ancestorID, true));
+                assignedDomains.UnionWith(_domainService.GetAssignedDomains(ancestorID, true));
             }
 
             // No domains at all, add a warning, to add domains.
