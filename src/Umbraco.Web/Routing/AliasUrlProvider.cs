@@ -119,7 +119,7 @@ namespace Umbraco.Web.Routing
                     foreach(var alias in aliases.Distinct())
                     {
                         var path = "/" + alias;
-                        var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                        var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Authority), path));
                         yield return UrlInfo.Url(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString(), domainUri.Culture.Name);
                     }
                 }
