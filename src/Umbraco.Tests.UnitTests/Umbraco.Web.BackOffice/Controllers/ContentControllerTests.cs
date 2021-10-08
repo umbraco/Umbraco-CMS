@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Done()
                 .Build();
 
-            var culturesPublished = new List<string> { "en-us", "da-dk" };
+            var culturesPublished = new []{ "en-us", "da-dk" };
             var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Done()
                 .Build();
 
-            var culturesPublished = new List<string> {"da-dk" };
+            var culturesPublished = new []{"da-dk" };
             var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Done()
                 .Build();
 
-            var culturesPublished = new List<string> { "en-us", "da-dk" };
+            var culturesPublished = new []{ "en-us", "da-dk" };
             var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
@@ -135,7 +135,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Done()
                 .Build();
 
-            var culturesPublished = new List<string> { "en-us", "da-dk", "nl-bk", "se-sv" };
+            var culturesPublished = new []{ "en-us", "da-dk", "nl-bk", "se-sv" };
             var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
@@ -184,7 +184,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Done()
                 .Build();
 
-            var culturesPublished = new List<string> { "en-us", "da-dk", "nl-bk", "se-sv", "de-de" };
+            var culturesPublished = new []{ "en-us", "da-dk", "nl-bk", "se-sv", "de-de" };
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);
             var notifications = new SimpleNotificationModel();
@@ -220,7 +220,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Done()
                 .Build();
 
-            var culturesPublished = new List<string> { "en-us", "se-sv" };
+            var culturesPublished = new []{ "en-us", "se-sv" };
             var notifications = new SimpleNotificationModel();
 
             ContentController contentController = CreateContentController(domainServiceMock.Object);

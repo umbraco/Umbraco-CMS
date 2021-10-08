@@ -898,6 +898,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         }
 
                         var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
+                        AddDomainWarnings(publishStatus, successfulCultures, globalNotifications);
                         AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                     }
                     break;
@@ -1428,6 +1429,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
+        private void AddDomainWarnings(IEnumerable<PublishResult> publishResults, string[] culturesPublished,
+            SimpleNotificationModel globalNotifications)
+        {
+            foreach (PublishResult publishResult in publishResults)
+            {
+                AddDomainWarnings(publishResult.Content, culturesPublished, globalNotifications);
+            }
+        }
+
         /// <summary>
         /// Verifies that there's an appropriate domain setup for the published cultures
         /// </summary>
@@ -1438,7 +1448,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="persistedContent"></param>
         /// <param name="culturesPublished"></param>
         /// <param name="globalNotifications"></param>
-        internal void AddDomainWarnings(IContent persistedContent, IEnumerable<string> culturesPublished, SimpleNotificationModel globalNotifications)
+        internal void AddDomainWarnings(IContent persistedContent, string[] culturesPublished, SimpleNotificationModel globalNotifications)
         {
             // Don't try to verify if no cultures were published
             if (culturesPublished is null)
