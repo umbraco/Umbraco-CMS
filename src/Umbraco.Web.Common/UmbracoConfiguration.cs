@@ -14,6 +14,11 @@ namespace Umbraco.Cms.Web.Common
 
         private UmbracoConfiguration(IWebHostEnvironment webHostEnvironment)
         {
+            if (webHostEnvironment == null)
+            {
+                throw new ArgumentNullException(nameof(webHostEnvironment));
+            }
+
             // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
             AppDomain.CurrentDomain.SetData("DataDirectory", webHostEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.Data));
         }
@@ -21,7 +26,7 @@ namespace Umbraco.Cms.Web.Common
         public UmbracoConfiguration(IWebHostEnvironment webHostEnvironment, IConfigurationRoot inner)
             : this(webHostEnvironment)
         {
-            _inner = inner;
+            _inner = inner ?? throw new ArgumentNullException(nameof(inner));
         }
 
         public UmbracoConfiguration(IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
@@ -51,12 +56,7 @@ namespace Umbraco.Cms.Web.Common
         {
             var value = _inner[key];
 
-            if (string.IsNullOrEmpty(value))
-            {
-                return value;
-            }
-
-            if (!key.StartsWith("ConnectionStrings"))
+            if (string.IsNullOrEmpty(value) || !key.StartsWith("ConnectionStrings"))
             {
                 return value;
             }
