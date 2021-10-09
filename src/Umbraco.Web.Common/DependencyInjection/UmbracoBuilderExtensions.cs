@@ -49,6 +49,7 @@ using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Web.Common.Extensions;
 using Umbraco.Cms.Web.Common.Localization;
 using Umbraco.Cms.Web.Common.Macros;
 using Umbraco.Cms.Web.Common.Middleware;
@@ -88,15 +89,18 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(config));
             }
 
+            // Handle upgrades that don't have new startup.cs
+            if (config is not UmbracoConfiguration)
+            {
+                config = new UmbracoConfiguration(webHostEnvironment, config);
+            }
+
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
-            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
+            var loggingDir = webHostEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
             var loggingConfig = new LoggingConfiguration(loggingDir);
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
-
-            // The DataDirectory is used to resolve database file paths (directly supported by SQL CE and manually replaced for LocalDB)
-            AppDomain.CurrentDomain.SetData("DataDirectory", tempHostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
             // Manually create and register the HttpContextAccessor. In theory this should not be registered
             // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
@@ -456,6 +460,7 @@ namespace Umbraco.Extensions
         /// We require this to create a TypeLoader during ConfigureServices.<br/>
         /// Instances returned from this method shouldn't be registered in the service collection.
         /// </summary>
+        // TODO: Delete this method, refactor type loader, type finder, UmbracoBuilder, the logging setup etc whatever it takes.
         private static IHostingEnvironment GetTemporaryHostingEnvironment(IWebHostEnvironment webHostEnvironment, IConfiguration config)
         {
             var hostingSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
@@ -467,6 +472,9 @@ namespace Umbraco.Extensions
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddDataProtection();
             serviceCollection.AddSingleton<IHostEnvironment>(s => webHostEnvironment);
+
+            // It took a lot of effort to remove all the calls to BuildServiceProvider so quite sad to find this :(
+            // Could add to Umbraco.Code to build error when present once this is gone.
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
             return new AspNetCoreHostingEnvironment(

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Web.Common;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.UI
@@ -25,7 +26,7 @@ namespace Umbraco.Cms.Web.UI
         public Startup(IWebHostEnvironment webHostEnvironment, IConfiguration config)
         {
             _env = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _config = new UmbracoConfiguration(webHostEnvironment, config);
         }
 
         /// <summary>
