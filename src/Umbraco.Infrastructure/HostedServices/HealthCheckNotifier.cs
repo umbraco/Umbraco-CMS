@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -18,6 +19,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
@@ -36,6 +38,24 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IScopeProvider _scopeProvider;
         private readonly ILogger<HealthCheckNotifier> _logger;
         private readonly IProfilingLogger _profilingLogger;
+
+        [Obsolete("Use the ctor that inject parameters")]
+        public HealthCheckNotifier(
+            IOptions<HealthChecksSettings> healthChecksSettings,
+            HealthCheckCollection healthChecks,
+            HealthCheckNotificationMethodCollection notifications,
+            IRuntimeState runtimeState,
+            IServerRoleAccessor serverRegistrar,
+            IMainDom mainDom,
+            IScopeProvider scopeProvider,
+            ILogger<HealthCheckNotifier> logger,
+            IProfilingLogger profilingLogger,
+            ICronTabParser cronTabParser)
+            : base(
+                healthChecksSettings.Value.Notification.Period,
+                healthChecksSettings.Value.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay),
+                StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HealthCheckNotifier"/> class.

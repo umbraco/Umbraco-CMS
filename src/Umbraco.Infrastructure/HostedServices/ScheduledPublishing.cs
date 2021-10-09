@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -30,6 +32,18 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IServerMessenger _serverMessenger;
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
+
+        [Obsolete("Use the ctor that inject parameters")]
+        public ScheduledPublishing(
+            IRuntimeState runtimeState,
+            IMainDom mainDom,
+            IServerRoleAccessor serverRegistrar,
+            IContentService contentService,
+            IUmbracoContextFactory umbracoContextFactory,
+            ILogger<ScheduledPublishing> logger,
+            IServerMessenger serverMessenger)
+            : base(TimeSpan.FromMinutes(1), DefaultDelay, StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledPublishing"/> class.

@@ -4,10 +4,12 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -26,6 +28,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
         private readonly DirectoryInfo[] _tempFolders;
         private readonly TimeSpan _age = TimeSpan.FromDays(1);
+
+        [Obsolete("Use the ctor that inject parameters")]
+        public TempFileCleanup(IIOHelper ioHelper, IMainDom mainDom, ILogger<TempFileCleanup> logger) : base(TimeSpan.FromMinutes(60), DefaultDelay, StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TempFileCleanup"/> class.

@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -12,6 +13,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -30,6 +32,18 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<LogScrubber> _logger;
         private readonly IScopeProvider _scopeProvider;
+
+        [Obsolete("Use the ctor that inject parameters")]
+        public LogScrubber(
+            IMainDom mainDom,
+            IServerRoleAccessor serverRegistrar,
+            IAuditService auditService,
+            IOptions<LoggingSettings> settings,
+            IScopeProvider scopeProvider,
+            ILogger<LogScrubber> logger,
+            IProfilingLogger profilingLogger)
+            : base(TimeSpan.FromHours(4), DefaultDelay, StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogScrubber"/> class.

@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -14,6 +15,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
@@ -30,6 +32,18 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IProfilingLogger _profilingLogger;
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IHttpClientFactory _httpClientFactory;
+
+        [Obsolete("Use the ctor that inject parameters")]
+        public KeepAlive(
+            IHostingEnvironment hostingEnvironment,
+            IMainDom mainDom,
+            IOptions<KeepAliveSettings> keepAliveSettings,
+            ILogger<KeepAlive> logger,
+            IProfilingLogger profilingLogger,
+            IServerRoleAccessor serverRegistrar,
+            IHttpClientFactory httpClientFactory)
+            : base(TimeSpan.FromMinutes(5), DefaultDelay, StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KeepAlive"/> class.

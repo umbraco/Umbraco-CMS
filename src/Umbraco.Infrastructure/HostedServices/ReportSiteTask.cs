@@ -3,12 +3,14 @@ using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
@@ -19,6 +21,14 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IOptions<GlobalSettings> _globalSettings;
         private static HttpClient s_httpClient;
+
+        [Obsolete("Use the ctor that inject parameters")]
+        public ReportSiteTask(
+            ILogger<ReportSiteTask> logger,
+            IUmbracoVersion umbracoVersion,
+            IOptions<GlobalSettings> globalSettings)
+            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1), StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        { }
 
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,

@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
@@ -24,6 +26,16 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILogger<TouchServerTask> _logger;
         private readonly GlobalSettings _globalSettings;
+
+        [Obsolete("Use the ctor that inject parameters")]
+        public TouchServerTask(
+            IRuntimeState runtimeState,
+            IServerRegistrationService serverRegistrationService,
+            IHostingEnvironment hostingEnvironment,
+            ILogger<TouchServerTask> logger,
+            IOptions<GlobalSettings> globalSettings)
+            : base(globalSettings.Value.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15), StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TouchServerTask"/> class.
