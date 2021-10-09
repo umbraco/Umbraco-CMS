@@ -56,9 +56,12 @@ namespace Umbraco.Cms.Web.Common
                 return value;
             }
 
-            return value.Contains("|DataDirectory|") 
-                ? value.Replace("|DataDirectory|", $"{AppDomain.CurrentDomain.GetData("DataDirectory")}") 
-                : value;
+            if (!key.StartsWith("ConnectionStrings"))
+            {
+                return value;
+            }
+
+            return value.Replace("|DataDirectory|", $"{AppDomain.CurrentDomain.GetData("DataDirectory")}");
         }
 
         public void Reload() => _inner.Reload();
