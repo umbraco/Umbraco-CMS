@@ -4,7 +4,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Infrastructure.Notifications;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -20,26 +24,36 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// The default delay to use for recurring tasks for the first run after application start-up if no alternative is configured.
         /// </summary>
         protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
+        private readonly IEventAggregator _eventAggregator;
 
-        private readonly TimeSpan _period;
-        private readonly TimeSpan _delay;
+        public TimeSpan Period { get; }
+        public TimeSpan Delay { get; }
+
         private Timer _timer;
+
+        [Obsolete("Use the ctor that inject parameters")]
+        protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay) : this(period, delay, StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecurringHostedServiceBase"/> class.
         /// </summary>
         /// <param name="period">Timepsan representing how often the task should recur.</param>
         /// <param name="delay">Timespan represeting the initial delay after application start-up before the first run of the task occurs.</param>
-        protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay)
+        protected RecurringHostedServiceBase(TimeSpan period, TimeSpan delay, IEventAggregator eventAggregator)
         {
-            _period = period;
-            _delay = delay;
+            _eventAggregator = eventAggregator;
+            Period = period;
+            Delay = delay;
         }
 
         /// <inheritdoc/>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(ExecuteAsync, null, (int)_delay.TotalMilliseconds, (int)_period.TotalMilliseconds);
+            _eventAggregator.PublishAsync(new RecurringHostedServiceSchedulingNotification(this, new EventMessages()));
+            _timer = new Timer(ExecuteAsync, null, (int)Delay.TotalMilliseconds, (int)Period.TotalMilliseconds);
+            _eventAggregator.PublishAsync(new RecurringHostedServiceScheduledNotification(this, new EventMessages()));
             return Task.CompletedTask;
         }
 
@@ -51,6 +65,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         {
             try
             {
+                await _eventAggregator.PublishAsync(new RecurringHostedServiceExecutingNotification(this, new EventMessages()));
                 // First, stop the timer, we do not want tasks to execute in parallel
                 _timer?.Change(Timeout.Infinite, 0);
 
@@ -59,12 +74,19 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 // running process to crash.
                 // Hat-tip: https://stackoverflow.com/a/14207615/489433
                 await PerformExecuteAsync(state);
+                await _eventAggregator.PublishAsync(new RecurringHostedServiceExecutedNotification(this, new EventMessages()));
+            }
+            catch (Exception ex)
+            {
+                await _eventAggregator.PublishAsync(new RecurringHostedServiceFailedNotification(this, new EventMessages()));
             }
             finally
             {
                 // Resume now that the task is complete - Note we use period in both because we don't want to execute again after the delay.
                 // So first execution is after _delay, and the we wait _period between each
-                _timer?.Change((int)_period.TotalMilliseconds, (int)_period.TotalMilliseconds);
+                await _eventAggregator.PublishAsync(new RecurringHostedServiceReschedulingNotification(this, new EventMessages()));
+                _timer?.Change((int)Period.TotalMilliseconds, (int)Period.TotalMilliseconds);
+                await _eventAggregator.PublishAsync(new RecurringHostedServiceRescheduledNotification(this, new EventMessages()));
             }
         }
 
@@ -73,7 +95,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            _eventAggregator.PublishAsync(new RecurringHostedServiceStoppingNotification(this, new EventMessages()));
             _timer?.Change(Timeout.Infinite, 0);
+            _eventAggregator.PublishAsync(new RecurringHostedServiceStoppedNotification(this, new EventMessages()));
             return Task.CompletedTask;
         }
 
