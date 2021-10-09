@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Notifications;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 
@@ -51,9 +52,11 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <inheritdoc/>
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _eventAggregator.PublishAsync(new RecurringHostedServiceSchedulingNotification(this, new EventMessages()));
+            var schedulingNotification = new RecurringHostedServiceSchedulingNotification(this, new EventMessages());
+            _eventAggregator.PublishAsync(schedulingNotification);
             _timer = new Timer(ExecuteAsync, null, (int)Delay.TotalMilliseconds, (int)Period.TotalMilliseconds);
-            _eventAggregator.PublishAsync(new RecurringHostedServiceScheduledNotification(this, new EventMessages()));
+
+            _eventAggregator.PublishAsync(new RecurringHostedServiceScheduledNotification(this, new EventMessages()).WithStateFrom(schedulingNotification));
             return Task.CompletedTask;
         }
 
@@ -65,7 +68,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         {
             try
             {
-                await _eventAggregator.PublishAsync(new RecurringHostedServiceExecutingNotification(this, new EventMessages()));
+                var executingNotification = new RecurringHostedServiceExecutingNotification(this, new EventMessages());
+                await _eventAggregator.PublishAsync(executingNotification);
                 // First, stop the timer, we do not want tasks to execute in parallel
                 _timer?.Change(Timeout.Infinite, 0);
 
@@ -74,7 +78,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 // running process to crash.
                 // Hat-tip: https://stackoverflow.com/a/14207615/489433
                 await PerformExecuteAsync(state);
-                await _eventAggregator.PublishAsync(new RecurringHostedServiceExecutedNotification(this, new EventMessages()));
+                await _eventAggregator.PublishAsync(new RecurringHostedServiceExecutedNotification(this, new EventMessages()).WithStateFrom(executingNotification));
             }
             catch (Exception ex)
             {
@@ -82,11 +86,12 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
             finally
             {
+                var reschedulingNotification = new RecurringHostedServiceReschedulingNotification(this, new EventMessages());
                 // Resume now that the task is complete - Note we use period in both because we don't want to execute again after the delay.
                 // So first execution is after _delay, and the we wait _period between each
-                await _eventAggregator.PublishAsync(new RecurringHostedServiceReschedulingNotification(this, new EventMessages()));
+                await _eventAggregator.PublishAsync(reschedulingNotification);
                 _timer?.Change((int)Period.TotalMilliseconds, (int)Period.TotalMilliseconds);
-                await _eventAggregator.PublishAsync(new RecurringHostedServiceRescheduledNotification(this, new EventMessages()));
+                await _eventAggregator.PublishAsync(new RecurringHostedServiceRescheduledNotification(this, new EventMessages()).WithStateFrom(reschedulingNotification));
             }
         }
 
@@ -95,9 +100,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _eventAggregator.PublishAsync(new RecurringHostedServiceStoppingNotification(this, new EventMessages()));
+            var stoppingNotification = new RecurringHostedServiceStoppingNotification(this, new EventMessages());
+            _eventAggregator.PublishAsync(stoppingNotification);
             _timer?.Change(Timeout.Infinite, 0);
-            _eventAggregator.PublishAsync(new RecurringHostedServiceStoppedNotification(this, new EventMessages()));
+            _eventAggregator.PublishAsync(new RecurringHostedServiceStoppedNotification(this, new EventMessages()).WithStateFrom(stoppingNotification));
             return Task.CompletedTask;
         }
 
