@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Collections;
@@ -18,7 +15,6 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
     public class AspNetCoreHostingEnvironment : IHostingEnvironment
     {
         private readonly ConcurrentHashSet<Uri> _applicationUrls = new ConcurrentHashSet<Uri>();
-        private readonly IServiceProvider _serviceProvider;
         private readonly IOptionsMonitor<HostingSettings> _hostingSettings;
         private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -26,13 +22,19 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         private string _localTempPath;
         private UrlMode _urlProviderMode;
 
+        [Obsolete("Please use constructor without IServiceProvider")]
         public AspNetCoreHostingEnvironment(
             IServiceProvider serviceProvider,
             IOptionsMonitor<HostingSettings> hostingSettings,
             IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+            IWebHostEnvironment webHostEnvironment) 
+            : this(hostingSettings, webRoutingSettings, webHostEnvironment) { }
+
+        public AspNetCoreHostingEnvironment(
+            IOptionsMonitor<HostingSettings> hostingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IWebHostEnvironment webHostEnvironment)
         {
-            _serviceProvider = serviceProvider;
             _hostingSettings = hostingSettings ?? throw new ArgumentNullException(nameof(hostingSettings));
             _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
@@ -66,16 +68,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
                     return _applicationId;
                 }
 
-                var appId = _serviceProvider.GetApplicationUniqueIdentifier();
-                if (appId == null)
-                {
-                    throw new InvalidOperationException("Could not acquire an ApplicationId, ensure DataProtection services and an IHostEnvironment are registered");
-                }
-
-                // Hash this value because it can really be anything. By default this will be the application's path.
-                // TODO: Test on IIS, hopefully this would be equivalent to the IIS unique ID.
-                // This could also contain sensitive information (i.e. like the physical path) which we don't want to expose in logs.
-                _applicationId = appId.GenerateHash();
+                _applicationId = ApplicationPhysicalPath.GenerateHash();
 
                 return _applicationId;
             }

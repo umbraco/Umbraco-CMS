@@ -473,12 +473,7 @@ namespace Umbraco.Extensions
             serviceCollection.AddDataProtection();
             serviceCollection.AddSingleton<IHostEnvironment>(s => webHostEnvironment);
 
-            // It took a lot of effort to remove all the calls to BuildServiceProvider so quite sad to find this :(
-            // Could add to Umbraco.Code to build error when present once this is gone.
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-
             return new AspNetCoreHostingEnvironment(
-                serviceProvider,
                 wrappedHostingSettings,
                 wrappedWebRoutingSettings,
                 webHostEnvironment);
