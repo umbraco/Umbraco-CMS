@@ -32,6 +32,15 @@ namespace Umbraco.Extensions
             UrlMode urlMode = UrlMode.Default) =>
             mediaItem.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
+        /// <summary>
+        /// Gets the underlying image processing service URL by the crop alias (from the "umbracoFile" property alias in the MediaWithCrops content item) on the MediaWithCrops item.
+        /// </summary>
+        /// <param name="mediaWithCrops">The MediaWithCrops item.</param>
+        /// <param name="cropAlias">The crop alias e.g. thumbnail.</param>
+        /// <param name="urlMode">The url mode.</param>
+        /// <returns>
+        /// The URL of the cropped image.
+        /// </returns>
         public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string cropAlias, UrlMode urlMode = UrlMode.Default)
             => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
@@ -69,6 +78,16 @@ namespace Umbraco.Extensions
             UrlMode urlMode = UrlMode.Default) =>
             mediaItem.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
+        /// <summary>
+        /// Gets the underlying image processing service URL by the crop alias using the specified property containing the image cropper JSON data on the MediaWithCrops content item.
+        /// </summary>
+        /// <param name="mediaWithCrops">The MediaWithCrops item.</param>
+        /// <param name="propertyAlias">The property alias of the property containing the JSON data e.g. umbracoFile.</param>
+        /// <param name="cropAlias">The crop alias e.g. thumbnail.</param>
+        /// <param name="urlMode">The url mode.</param>
+        /// <returns>
+        /// The URL of the cropped image.
+        /// </returns>
         public static string GetCropUrl(this MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias, UrlMode urlMode = UrlMode.Default)
             => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaWithCrops, propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider, urlMode);
 
