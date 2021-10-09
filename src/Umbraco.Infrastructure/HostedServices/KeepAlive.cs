@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Routing;
@@ -47,8 +48,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             ILogger<KeepAlive> logger,
             IProfilingLogger profilingLogger,
             IServerRoleAccessor serverRegistrar,
-            IHttpClientFactory httpClientFactory)
-            : base(TimeSpan.FromMinutes(5), DefaultDelay)
+            IHttpClientFactory httpClientFactory,
+            IEventAggregator eventAggregator)
+            : base(TimeSpan.FromMinutes(5), DefaultDelay, eventAggregator)
         {
             _hostingEnvironment = hostingEnvironment;
             _mainDom = mainDom;

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
@@ -59,10 +60,12 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IScopeProvider scopeProvider,
             ILogger<HealthCheckNotifier> logger,
             IProfilingLogger profilingLogger,
-            ICronTabParser cronTabParser)
+            ICronTabParser cronTabParser,
+            IEventAggregator eventAggregator)
             : base(
                 healthChecksSettings.Value.Notification.Period,
-                healthChecksSettings.Value.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay))
+                healthChecksSettings.Value.GetNotificationDelay(cronTabParser, DateTime.Now, DefaultDelay),
+                eventAggregator)
         {
             _healthChecksSettings = healthChecksSettings.Value;
             _healthChecks = healthChecks;

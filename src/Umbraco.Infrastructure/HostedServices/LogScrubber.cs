@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
@@ -47,8 +48,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IOptions<LoggingSettings> settings,
             IScopeProvider scopeProvider,
             ILogger<LogScrubber> logger,
-            IProfilingLogger profilingLogger)
-            : base(TimeSpan.FromHours(4), DefaultDelay)
+            IProfilingLogger profilingLogger,
+            IEventAggregator eventAggregator)
+            : base(TimeSpan.FromHours(4), DefaultDelay, eventAggregator)
         {
             _mainDom = mainDom;
             _serverRegistrar = serverRegistrar;

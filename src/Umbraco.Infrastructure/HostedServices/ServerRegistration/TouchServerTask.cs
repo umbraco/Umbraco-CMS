@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -37,8 +38,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
             IServerRegistrationService serverRegistrationService,
             IHostingEnvironment hostingEnvironment,
             ILogger<TouchServerTask> logger,
-            IOptions<GlobalSettings> globalSettings)
-            : base(globalSettings.Value.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15))
+            IOptions<GlobalSettings> globalSettings,
+            IEventAggregator eventAggregator)
+            : base(globalSettings.Value.DatabaseServerRegistrar.WaitTimeBetweenCalls, TimeSpan.FromSeconds(15), eventAggregator)
         {
             _runtimeState = runtimeState;
             _serverRegistrationService = serverRegistrationService ?? throw new ArgumentNullException(nameof(serverRegistrationService));

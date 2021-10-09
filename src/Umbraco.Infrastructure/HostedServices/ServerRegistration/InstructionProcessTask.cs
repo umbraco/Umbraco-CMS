@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
@@ -28,8 +29,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
         /// <param name="messenger">Service broadcasting cache notifications to registered servers.</param>
         /// <param name="logger">The typed logger.</param>
         /// <param name="globalSettings">The configuration for global settings.</param>
-        public InstructionProcessTask(IRuntimeState runtimeState, IServerMessenger messenger, ILogger<InstructionProcessTask> logger, IOptions<GlobalSettings> globalSettings)
-            : base(globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1))
+        public InstructionProcessTask(IRuntimeState runtimeState, IServerMessenger messenger, ILogger<InstructionProcessTask> logger, IOptions<GlobalSettings> globalSettings, IEventAggregator eventAggregator)
+            : base(globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations, TimeSpan.FromMinutes(1), eventAggregator)
         {
             _runtimeState = runtimeState;
             _messenger = messenger;

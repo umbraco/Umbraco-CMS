@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -48,8 +49,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IContentService contentService,
             IUmbracoContextFactory umbracoContextFactory,
             ILogger<ScheduledPublishing> logger,
-            IServerMessenger serverMessenger)
-            : base(TimeSpan.FromMinutes(1), DefaultDelay)
+            IServerMessenger serverMessenger,
+            IEventAggregator eventAggregator)
+            : base(TimeSpan.FromMinutes(1), DefaultDelay, eventAggregator)
         {
             _runtimeState = runtimeState;
             _mainDom = mainDom;

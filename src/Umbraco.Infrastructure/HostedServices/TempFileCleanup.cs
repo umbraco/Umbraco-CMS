@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Runtime;
 
@@ -32,8 +33,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// <param name="ioHelper">Helper service for IO operations.</param>
         /// <param name="mainDom">Representation of the main application domain.</param>
         /// <param name="logger">The typed logger.</param>
-        public TempFileCleanup(IIOHelper ioHelper, IMainDom mainDom, ILogger<TempFileCleanup> logger)
-            : base(TimeSpan.FromMinutes(60), DefaultDelay)
+        public TempFileCleanup(IIOHelper ioHelper, IMainDom mainDom, ILogger<TempFileCleanup> logger, IEventAggregator eventAggregator)
+            : base(TimeSpan.FromMinutes(60), DefaultDelay, eventAggregator)
         {
             _ioHelper = ioHelper;
             _mainDom = mainDom;

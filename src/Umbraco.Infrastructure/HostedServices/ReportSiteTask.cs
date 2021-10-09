@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
@@ -22,8 +23,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
             IUmbracoVersion umbracoVersion,
-            IOptions<GlobalSettings> globalSettings)
-            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
+            IOptions<GlobalSettings> globalSettings,
+            IEventAggregator eventAggregator)
+            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1), eventAggregator)
         {
             _logger = logger;
             _umbracoVersion = umbracoVersion;
