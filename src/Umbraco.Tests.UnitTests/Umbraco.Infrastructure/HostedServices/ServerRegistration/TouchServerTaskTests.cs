@@ -9,6 +9,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
@@ -70,13 +71,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.Serv
                     StaleServerTimeout = _staleServerTimeout,
                 }
             };
+            var mockEventAggregator = new Mock<IEventAggregator>();
 
             return new TouchServerTask(
                 mockRunTimeState.Object,
                 _mockServerRegistrationService.Object,
                 mockRequestAccessor.Object,
                 mockLogger.Object,
-                Options.Create(settings));
+                Options.Create(settings),
+                mockEventAggregator.Object);
         }
 
         private void VerifyServerNotTouched() => VerifyServerTouchedTimes(Times.Never());

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -107,6 +108,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             _mockLogger = new Mock<ILogger<ScheduledPublishing>>();
 
             var mockServerMessenger = new Mock<IServerMessenger>();
+            var mockEventAggregator = new Mock<IEventAggregator>();
 
             return new ScheduledPublishing(
                 mockRunTimeState.Object,
@@ -115,7 +117,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 _mockContentService.Object,
                 mockUmbracoContextFactory.Object,
                 _mockLogger.Object,
-                mockServerMessenger.Object);
+                mockServerMessenger.Object,
+                mockEventAggregator.Object);
         }
 
         private void VerifyScheduledPublishingNotPerformed() => VerifyScheduledPublishingPerformed(Times.Never());

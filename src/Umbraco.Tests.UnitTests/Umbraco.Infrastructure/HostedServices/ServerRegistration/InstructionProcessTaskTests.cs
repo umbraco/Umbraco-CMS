@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
@@ -49,8 +50,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.Serv
             _mockDatabaseServerMessenger = new Mock<IServerMessenger>();
 
             var settings = new GlobalSettings();
+            var mockEventAggregator = new Mock<IEventAggregator>();
 
-            return new InstructionProcessTask(mockRunTimeState.Object, _mockDatabaseServerMessenger.Object, mockLogger.Object, Options.Create(settings));
+            return new InstructionProcessTask(mockRunTimeState.Object, _mockDatabaseServerMessenger.Object, mockLogger.Object, Options.Create(settings), mockEventAggregator.Object);
         }
 
         private void VerifyMessengerNotSynced() => VerifyMessengerSyncedTimes(Times.Never());

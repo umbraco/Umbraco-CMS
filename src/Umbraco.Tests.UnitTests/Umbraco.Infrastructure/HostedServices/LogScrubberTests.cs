@@ -82,6 +82,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockProfilingLogger = new Mock<IProfilingLogger>();
 
             _mockAuditService = new Mock<IAuditService>();
+            var mockEventAggregator = new Mock<IEventAggregator>();
 
             return new LogScrubber(
                 mockMainDom.Object,
@@ -90,7 +91,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 Options.Create(settings),
                 mockScopeProvider.Object,
                 mockLogger.Object,
-                mockProfilingLogger.Object);
+                mockProfilingLogger.Object,
+                mockEventAggregator.Object);
         }
 
         private void VerifyLogsNotScrubbed() => VerifyLogsScrubbed(Times.Never());

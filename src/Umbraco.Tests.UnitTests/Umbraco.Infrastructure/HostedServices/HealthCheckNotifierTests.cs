@@ -12,6 +12,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Logging;
@@ -147,6 +148,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockScopeProvider = new Mock<IScopeProvider>();
             var mockLogger = new Mock<ILogger<HealthCheckNotifier>>();
             var mockProfilingLogger = new Mock<IProfilingLogger>();
+            var mockEventAggregator = new Mock<IEventAggregator>();
 
             return new HealthCheckNotifier(
                 Options.Create(settings),
@@ -158,7 +160,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 mockScopeProvider.Object,
                 mockLogger.Object,
                 mockProfilingLogger.Object,
-                Mock.Of<ICronTabParser>());
+                Mock.Of<ICronTabParser>(),
+                mockEventAggregator.Object);
         }
 
         private void VerifyNotificationsNotSent() => VerifyNotificationsSentTimes(Times.Never());

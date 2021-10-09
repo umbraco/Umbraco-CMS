@@ -12,6 +12,7 @@ using Moq;
 using Moq.Protected;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
@@ -104,6 +105,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockHttpClientFactory = new Mock<IHttpClientFactory>(MockBehavior.Strict);
             mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
+            var mockEventAggregator = new Mock<IEventAggregator>();
+
             return new KeepAlive(
                 mockHostingEnvironment.Object,
                 mockMainDom.Object,
@@ -111,7 +114,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 mockLogger.Object,
                 mockProfilingLogger.Object,
                 mockServerRegistrar.Object,
-                mockHttpClientFactory.Object);
+                mockHttpClientFactory.Object,
+                mockEventAggregator.Object);
         }
 
         private void VerifyKeepAliveRequestNotSent() => VerifyKeepAliveRequestSentTimes(Times.Never());

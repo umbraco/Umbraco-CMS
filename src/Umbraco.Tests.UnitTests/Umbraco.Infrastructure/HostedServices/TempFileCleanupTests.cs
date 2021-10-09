@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
@@ -49,8 +50,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             var mockLogger = new Mock<ILogger<TempFileCleanup>>();
             var mockProfilingLogger = new Mock<IProfilingLogger>();
+            var mockEventAggregator = new Mock<IEventAggregator>();
 
-            return new TempFileCleanup(_mockIOHelper.Object, mockMainDom.Object, mockLogger.Object);
+            return new TempFileCleanup(_mockIOHelper.Object, mockMainDom.Object, mockLogger.Object, mockEventAggregator.Object);
         }
 
         private void VerifyFilesNotCleaned() => VerifyFilesCleaned(Times.Never());
