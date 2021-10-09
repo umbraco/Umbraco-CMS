@@ -16,7 +16,7 @@ context('Media Types', () => {
     cy.umbracoTreeItem("settings", ["Media Types"]).rightclick();
 
     cy.umbracoContextMenuAction("action-create").click();
-    cy.get('.menu-label').first().click(); // TODO: Fucked we cant use something like cy.umbracoContextMenuAction("action-mediaType").click();
+    cy.get('.menu-label localize[key="content_mediatype"]').click();
 
 
     //Type name

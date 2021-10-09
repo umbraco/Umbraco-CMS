@@ -23,7 +23,7 @@ context('Scripts', () => {
     cy.umbracoTreeItem("settings", ["Scripts"]).rightclick();
 
     cy.umbracoContextMenuAction("action-create").click();
-    cy.get('.menu-label').first().click(); // TODO: Fucked we cant use something like cy.umbracoContextMenuAction("action-mediaType").click();
+    cy.get('.menu-label localize[key="create_newJavascriptFile"]').click();
 
     //Type name
     cy.umbracoEditorHeaderName(name);

@@ -29,7 +29,7 @@ context('Partial View Macro Files', () => {
 
     openPartialViewMacroCreatePanel();
 
-    cy.get('.menu-label').first().click(); // TODO: Fucked we cant use something like cy.umbracoContextMenuAction("action-label").click();
+    cy.get('.menu-label localize[key="create_newPartialViewMacro"]').click();
 
     //Type name
     cy.umbracoEditorHeaderName(name);

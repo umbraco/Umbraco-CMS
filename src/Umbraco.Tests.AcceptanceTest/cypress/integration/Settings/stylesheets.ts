@@ -17,7 +17,7 @@ context('Stylesheets', () => {
     cy.umbracoTreeItem("settings", ["Stylesheets"]).rightclick();
 
     cy.umbracoContextMenuAction("action-create").click();
-    cy.get('.menu-label').first().click(); // TODO: Fucked we cant use something like cy.umbracoContextMenuAction("action-mediaType").click();
+    cy.get('.menu-label localize[key="create_newStyleSheetFile"]').click();
 
     //Type name
     cy.umbracoEditorHeaderName(name);
