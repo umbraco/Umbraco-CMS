@@ -127,6 +127,60 @@ namespace Umbraco.Extensions
             );
 
         /// <summary>
+        /// Gets the underlying image processing service URL from the MediaWithCrops item.
+        /// </summary>
+        /// <param name="mediaWithCrops">The MediaWithCrops item.</param>
+        /// <param name="width">The width of the output image.</param>
+        /// <param name="height">The height of the output image.</param>
+        /// <param name="propertyAlias">Property alias of the property containing the JSON data.</param>
+        /// <param name="cropAlias">The crop alias.</param>
+        /// <param name="quality">Quality percentage of the output image.</param>
+        /// <param name="imageCropMode">The image crop mode.</param>
+        /// <param name="imageCropAnchor">The image crop anchor.</param>
+        /// <param name="preferFocalPoint">Use focal point, to generate an output image using the focal point instead of the predefined crop.</param>
+        /// <param name="useCropDimensions">Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters.</param>
+        /// <param name="cacheBuster">Add a serialized date of the last edit of the item to ensure client cache refresh when updated.</param>
+        /// <param name="furtherOptions">These are any query string parameters (formatted as query strings) that the underlying image processing service supports. For example:
+        /// <example><![CDATA[
+        /// furtherOptions: "bgcolor=fff"
+        /// ]]></example></param>
+        /// <param name="urlMode">The url mode.</param>
+        /// <returns>
+        /// The URL of the cropped image.
+        /// </returns>
+        public static string GetCropUrl(
+            this MediaWithCrops mediaWithCrops,
+            int? width = null,
+            int? height = null,
+            string propertyAlias = Cms.Core.Constants.Conventions.Media.File,
+            string cropAlias = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = false,
+            bool cacheBuster = true,
+            string furtherOptions = null,
+            UrlMode urlMode = UrlMode.Default)
+            => mediaWithCrops.GetCropUrl(
+                ImageUrlGenerator,
+                PublishedValueFallback,
+                PublishedUrlProvider,
+                width,
+                height,
+                propertyAlias,
+                cropAlias,
+                quality,
+                imageCropMode,
+                imageCropAnchor,
+                preferFocalPoint,
+                useCropDimensions,
+                cacheBuster,
+                furtherOptions,
+                urlMode
+            );
+
+        /// <summary>
         /// Gets the underlying image processing service URL from the image path.
         /// </summary>
         /// <param name="imageUrl">The image URL.</param>
