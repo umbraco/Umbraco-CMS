@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
@@ -22,14 +23,29 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Create and configure the logger
         /// </summary>
+        [Obsolete("Please use method with UmbracoLoggingConfiguration.")]
         public static IServiceCollection AddLogger(
             this IServiceCollection services,
             IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
         {
+            var umbracoLoggingConfig = new UmbracoLoggerConfiguration(
+                hostingEnvironment.MapPathContentRoot("/"),
+                loggingConfiguration.LogDirectory,
+                hostingEnvironment.ApplicationId
+            );
+
+            return services.AddLogger(umbracoLoggingConfig, configuration);
+        }
+
+        public static IServiceCollection AddLogger(
+            this IServiceCollection services,
+            UmbracoLoggerConfiguration loggerConfiguration,
+            IConfiguration configuration)
+        {
             // Create a serilog logger
-            var logger = SerilogLogger.CreateWithDefaultConfiguration(hostingEnvironment, loggingConfiguration, configuration);
+            var logger = SerilogLogger.CreateWithDefaultConfiguration(loggerConfiguration, configuration);
 
             // This is nessasary to pick up all the loggins to MS ILogger.
             Log.Logger = logger.SerilogLog;
@@ -56,7 +72,7 @@ namespace Umbraco.Extensions
 
             // Consumed by user code
             services.AddSingleton<IDiagnosticContext>(diagnosticContext);
-            services.AddSingleton(loggingConfiguration);
+            services.AddSingleton<ILoggingConfiguration>(loggerConfiguration);
 
             return services;
         }

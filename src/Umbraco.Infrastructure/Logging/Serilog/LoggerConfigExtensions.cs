@@ -27,18 +27,43 @@ namespace Umbraco.Extensions
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="loggingConfiguration"></param>
+        /// <param name="configuration"></param>
+        [Obsolete("Please use method with UmbracoLoggingConfiguration")]
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
             IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
             IConfiguration configuration)
         {
+
+            var umbracoLoggingConfig = new UmbracoLoggerConfiguration(
+                hostingEnvironment.MapPathContentRoot("/"),
+                loggingConfiguration.LogDirectory,
+                hostingEnvironment.ApplicationId
+            );
+
+            return logConfig.MinimalConfiguration(umbracoLoggingConfig, configuration);
+        }
+
+        /// <summary>
+        /// This configures Serilog with some defaults
+        /// Such as adding ProcessID, Thread, AppDomain etc
+        /// It is highly recommended that you keep/use this default in your own logging config customizations
+        /// </summary>
+        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
+        /// <param name="loggerConfiguration"></param>
+        /// <param name="configuration"></param>
+        public static LoggerConfiguration MinimalConfiguration(
+            this LoggerConfiguration logConfig,
+            UmbracoLoggerConfiguration loggerConfiguration,
+            IConfiguration configuration)
+        {
             global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
             //Set this environment variable - so that it can be used in external config file
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
-            Environment.SetEnvironmentVariable("BASEDIR", hostingEnvironment.MapPathContentRoot("/").TrimEnd("\\"), EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("BASEDIR", loggerConfiguration.BasePath, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("UMBLOGDIR", loggerConfiguration.LogDirectory, EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
 
             logConfig.MinimumLevel.Verbose() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
@@ -46,7 +71,7 @@ namespace Umbraco.Extensions
                 .Enrich.WithProcessName()
                 .Enrich.WithThreadId()
                 .Enrich.WithProperty(AppDomainId, AppDomain.CurrentDomain.Id)
-                .Enrich.WithProperty("AppDomainAppId", hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty))
+                .Enrich.WithProperty("AppDomainAppId", loggerConfiguration.ApplicationId.ReplaceNonAlphanumericChars(string.Empty))
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>()
                 .Enrich.FromLogContext(); // allows us to dynamically enrich
@@ -55,7 +80,7 @@ namespace Umbraco.Extensions
             var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
 
             logConfig.WriteTo.UmbracoFile(
-                path : umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
+                path: umbracoFileConfiguration.GetPath(loggerConfiguration.LogDirectory),
                 fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
                 restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
                 rollingInterval: umbracoFileConfiguration.RollingInterval,

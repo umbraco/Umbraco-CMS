@@ -95,12 +95,7 @@ namespace Umbraco.Extensions
                 config = new UmbracoConfiguration(webHostEnvironment, config);
             }
 
-            IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
-
-            var loggingDir = webHostEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
-            var loggingConfig = new LoggingConfiguration(loggingDir);
-
-            services.AddLogger(tempHostingEnvironment, loggingConfig, config);
+            services.AddLogger(webHostEnvironment.ToUmbracoLoggingConfiguration(), config);
 
             // Manually create and register the HttpContextAccessor. In theory this should not be registered
             // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
@@ -119,6 +114,7 @@ namespace Umbraco.Extensions
 
             ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
 
+            IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
             TypeLoader typeLoader = services.AddTypeLoader(
                 Assembly.GetEntryAssembly(),
                 tempHostingEnvironment,
@@ -129,6 +125,13 @@ namespace Umbraco.Extensions
 
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
         }
+
+        private static UmbracoLoggerConfiguration ToUmbracoLoggingConfiguration(this IWebHostEnvironment webHostEnvironment) => 
+            new(
+                basePath: webHostEnvironment.MapPathContentRoot("/"),
+                logDirectory: webHostEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles),
+                applicationId: webHostEnvironment.GetApplicationId()
+            );
 
         /// <summary>
         /// Adds core Umbraco services

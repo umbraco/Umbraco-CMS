@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         private readonly IOptionsMonitor<HostingSettings> _hostingSettings;
         private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private string _applicationId;
         private string _localTempPath;
         private UrlMode _urlProviderMode;
 
@@ -41,7 +40,6 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             _urlProviderMode = _webRoutingSettings.CurrentValue.UrlProviderMode;
 
             SiteName = webHostEnvironment.ApplicationName;
-            ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
 
             if (_webRoutingSettings.CurrentValue.UmbracoApplicationUrl is not null)
             {
@@ -59,23 +57,10 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         public string SiteName { get; }
 
         /// <inheritdoc/>
-        public string ApplicationId
-        {
-            get
-            {
-                if (_applicationId != null)
-                {
-                    return _applicationId;
-                }
-
-                _applicationId = ApplicationPhysicalPath.GenerateHash();
-
-                return _applicationId;
-            }
-        }
+        public string ApplicationId => _webHostEnvironment.GetApplicationId();
 
         /// <inheritdoc/>
-        public string ApplicationPhysicalPath { get; }
+        public string ApplicationPhysicalPath => _webHostEnvironment.ContentRootPath;
 
         // TODO how to find this, This is a server thing, not application thing.
         public string ApplicationVirtualPath => _hostingSettings.CurrentValue.ApplicationVirtualPath?.EnsureStartsWith('/') ?? "/";

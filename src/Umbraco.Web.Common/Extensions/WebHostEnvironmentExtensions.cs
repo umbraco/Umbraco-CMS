@@ -1,24 +1,55 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Extensions
 {
     public static class WebHostEnvironmentExtensions
     {
+        private static string s_applicationId;
+
+        /// <summary>
+        /// Gets a unique application ID for this Umbraco website.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The returned value will be the same consistent value for an Umbraco website on a specific server and will the same
+        /// between restarts of that Umbraco website/application on that specific server.
+        /// </para>
+        /// <para>
+        /// The value of this does not necessarily distinguish between unique workers/servers for this Umbraco application.
+        /// Usage of this must take into account that the same ApplicationId may be returned for the same
+        /// Umbraco website hosted on different servers. Similarly the usage of this must take into account that a different
+        /// ApplicationId may be returned for the same Umbraco website hosted on different servers.
+        /// </para>
+        /// </remarks>
+        public static string GetApplicationId(this IWebHostEnvironment webHostEnvironment)
+        {
+            if (s_applicationId != null)
+            {
+                return s_applicationId;
+            }
+
+            s_applicationId = webHostEnvironment.ContentRootPath.GenerateHash();
+
+            return s_applicationId;
+        }
+
+        /// <summary>
+        /// Maps a virtual path to a physical path to the application's root.
+        /// </summary>
         public static string MapPathContentRoot(this IWebHostEnvironment webHostEnvironment, string path) => MapPath(webHostEnvironment.ContentRootPath, path);
-        
+
+        /// <summary>
+        /// Maps a virtual path to a physical path to the application's web root i.e. {{project}}/wwwroot
+        /// </summary>
         public static string MapPathWebRoot(this IWebHostEnvironment webHostEnvironment, string path) => MapPath(webHostEnvironment.WebRootPath, path);
 
-        internal static string MapPath(string root, string path)
+        private static string MapPath(string root, string path)
         {
             var newPath = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
 
-            // TODO: This is a temporary error because we switched from IOHelper.MapPath to HostingEnvironment.MapPathXXX
-            // IOHelper would check if the path passed in started with the root, and not prepend the root again if it did,
-            // however if you are requesting a path be mapped, it should always assume the path is relative to the root, not
-            // absolute in the file system.  This error will help us find and fix improper uses, and should be removed once
-            // all those uses have been found and fixed
             if (newPath.StartsWith(root))
             {
                 throw new ArgumentException("The path appears to already be fully qualified.  Please remove the call to MapPath");
