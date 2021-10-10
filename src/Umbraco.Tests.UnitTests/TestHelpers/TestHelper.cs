@@ -67,9 +67,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 
             public override IMarchal Marchal { get; } = Mock.Of<IMarchal>();
 
-            public override IBackOfficeInfo GetBackOfficeInfo()
-                => Mock.Of<IBackOfficeInfo>();
-
             public override IHostingEnvironment GetHostingEnvironment()
             {
                 var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
@@ -103,12 +100,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 
         public static MapperConfigurationStore CreateMaps()
             => new MapperConfigurationStore();
-
-        //// public static Configs GetConfigs() => _testHelperInternal.GetConfigs();
-
-        public static IBackOfficeInfo GetBackOfficeInfo() => s_testHelperInternal.GetBackOfficeInfo();
-
-        //// public static IConfigsFactory GetConfigsFactory() => _testHelperInternal.GetConfigsFactory();
 
         /// <summary>
         /// Gets the working directory of the test project.
