@@ -439,6 +439,45 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
             array.push(placeholder);
 
+        },
+
+        rebindSavedContentType: function (contentType, savedContentType) {
+            // The saved content type might have updated values (eg. new IDs/keys), so make sure the view model is updated
+            contentType.ModelState = savedContentType.ModelState;
+            contentType.id = savedContentType.id;
+            contentType.groups.forEach(function (group) {
+                if (!group.alias) return;
+
+                var k = 0;
+                while (k < savedContentType.groups.length && savedContentType.groups[k].alias != group.alias)
+                    k++;
+
+                if (k == savedContentType.groups.length) {
+                    group.id = 0;
+                    return;
+                }
+
+                var savedGroup = savedContentType.groups[k];
+                group.id = savedGroup.id;
+                group.key = savedGroup.key;
+                group.contentTypeId = savedGroup.contentTypeId;
+
+                group.properties.forEach(function (property) {
+                    if (property.id || !property.alias) return;
+
+                    k = 0;
+                    while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
+                        k++;
+
+                    if (k == savedGroup.properties.length) {
+                        property.id = 0;
+                        return;
+                    }
+
+                    var savedProperty = savedGroup.properties[k];
+                    property.id = savedProperty.id;
+                });
+            });
         }
 
     };
