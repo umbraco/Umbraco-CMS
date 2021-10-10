@@ -162,8 +162,7 @@ namespace Umbraco.Extensions
             bool cacheBuster = true,
             string furtherOptions = null,
             UrlMode urlMode = UrlMode.Default)
-            => ImageCropperTemplateCoreExtensions.GetCropUrl(
-                mediaWithCrops,
+            => mediaWithCrops.GetCropUrl(
                 ImageUrlGenerator,
                 PublishedValueFallback,
                 PublishedUrlProvider,
