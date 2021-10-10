@@ -907,8 +907,8 @@ You installed Runway, so why not see how your new website looks.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
-    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to
-        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[Installation failed, check the logs for more details.]]></key>
+
     <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>

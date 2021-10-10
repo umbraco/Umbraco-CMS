@@ -830,19 +830,19 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">The installer cannot connect to the database.</key>
-    <key alias="databaseErrorWebConfig">Could not save the web.config file. Please modify the connection string manually.</key>
+    <key alias="databaseErrorWebConfig">Could not save the appsettings.json file. Please modify the connection string manually.</key>
     <key alias="databaseFound">Your database has been found and is identified as</key>
     <key alias="databaseHeader">Database configuration</key>
     <key alias="databaseInstall"><![CDATA[
       Press the <strong>install</strong> button to install the Umbraco %0% database
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
-              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
+    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "ConnectionStrings" property of the "appsettings.json" file is correct.</p>
+              <p>To proceed, please edit the "appsettings.json" file (using Visual Studio or your favourite text editor), add the connection string for your database in the key named "umbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when
-              done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-			              More information on editing web.config here</a>.</p>]]></key>
+              done.<br /><a href="https://our.umbraco.com/documentation/Reference/V9-Config/ConnectionStringsSettings/" target="_blank" rel="noopener">
+			              More information on editing appsettings.json here</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
         If you're installing on a local machine or server you might need information from your system administrator.]]></key>
@@ -861,7 +861,7 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
     <key alias="greatStart">Get a great start, watch our introduction videos</key>
-    <key alias="licenseText">By clicking the next button (or modifying the umbracoConfigurationStatus in web.config), you accept the license for this software as specified in the box below. Notice that this Umbraco distribution consists of two different licenses, the open source MIT license for the framework and the Umbraco freeware license that covers the UI.</key>
+    <key alias="licenseText">By clicking the next button, you accept the license for this software as specified in the box below. Notice that this Umbraco distribution consists of two different licenses, the open source MIT license for the framework and the Umbraco freeware license that covers the UI.</key>
     <key alias="None">Not installed yet.</key>
     <key alias="permissionsAffectedFolders">Affected files and folders</key>
     <key alias="permissionsAffectedFoldersMoreInfo">More information on setting up permissions for Umbraco here</key>
@@ -924,8 +924,7 @@ You installed Runway, so why not see how your new website looks.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
-    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to
-        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[Installation failed, check the logs for more details.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
@@ -2102,8 +2101,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
     <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">The configuration value 'Umbraco:CMS:Global:UseHttps' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">The configuration value 'Umbraco:CMS:Global:UseHttps' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
+    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco:CMS:Global:UseHttps' is set to 'false' in your appsettings.json file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
+    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco:CMS:Global:UseHttps' is set to '%0%' in your appsettings.json file, your cookies are %1% marked as secure.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
     <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
@@ -2129,10 +2128,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
-    <key alias="smtpMailSettingsNotFound">The 'Umbraco:CMS:Global:Smtp' configuration could not be found.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">The 'Umbraco:CMS:Global:Smtp:Host' configuration could not be found.</key>
+    <key alias="smtpMailSettingsNotFound">In the appsettings.json file, Umbraco:CMS:Global:Smtp could not be found.</key>
+    <key alias="smtpMailSettingsHostNotConfigured">In the appsettings.json file Umbraco:CMS:Global:Smtp section, the host is not configured.</key>
     <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
-    <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the configuration 'Umbraco:CMS:Global:Smtp' are correct.</key>
+    <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the appsettings.json file Umbraco:CMS:Global:Smtp are correct.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
