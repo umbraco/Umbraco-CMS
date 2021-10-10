@@ -381,15 +381,10 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect"><![CDATA[Impossibile connettersi alla base dati.]]></key>
-    <key alias="databaseErrorWebConfig"><![CDATA[Impossibile salvare il file web.config. Modificare la stringa di connessione manualmente.]]></key>
     <key alias="databaseFound"><![CDATA[Database trovato ed identificato come]]></key>
     <key alias="databaseHeader"><![CDATA[Configurazione database]]></key>
     <key alias="databaseInstall"><![CDATA[Premi il tasto <strong>installa</strong> per installare il database Umbraco %0% ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% è stato copiato nel tuo database. Premi <strong>Avanti</strong> per proseguire.]]></key>
-    <key alias="databaseNotFound">
-      <![CDATA[<p>Database non trovato! Perfavore, controlla che le informazioni della stringa di connessione nel file "web.config" siano corrette.</p>
-<p>Per procedere, edita il file "web.config" (utilizzando Visual Studio o l'editor di testo che preferisci), scorri in basso, aggiungi la stringa di connessione per il database chiamato "umbracoDbDSN" e salva il file.</p><p>Clicca il tasto <strong>riprova</strong> quando hai finito.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener"> Maggiori dettagli per la modifica del file web.config qui</a>.</p>]]>
-    </key>
     <key alias="databaseText"><![CDATA[Per completare questo passaggio, devi conoscere alcune informazioni riguardanti il tuo database server ("connection string"). Se è necessario contatta il tuo ISP per reperire le informazioni necessarie. Se stai effettuando l'installazione in locale o su un server, puoi richiederle al tuo amministratore di sistema]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Premi il tasto <strong>aggiorna</strong> per aggiornare il database ad Umbraco %0%</p><p>Non preoccuparti, il contenuto non verrà perso e tutto continuerà a funzionare dopo l'aggiornamento!</p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Il tuo database è stato aggiornato all'ultima versione %0%.<br />Premi il tasto <strong>Avanti</strong> per continuare.]]></key>
@@ -399,7 +394,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>La password è stata modificata con successo</strong></p><p>Non è necessario eseguire altre operazioni. Clicca il tasto <strong>Avanti</strong> per continuare.]]></key>
     <key alias="defaultUserPasswordChanged"><![CDATA[La password è stata modificata!]]></key>
     <key alias="greatStart"><![CDATA[Parti alla grande, guarda i nostri video introduttivi]]></key>
-    <key alias="licenseText"><![CDATA[Cliccando il pulsante Avanti (o modificando la voce UmbracoConfigurationStatus nel file web.config), accettti le condizioni di licenza specificate nel box sottostante. Nota che questa distribuzione di Umbraco è composta da due differenti licenze, la MIT open source per il framework e la Umbraco freeware per la UI.]]></key>
     <key alias="None"><![CDATA[Ancora non installato.]]></key>
     <key alias="permissionsAffectedFolders"><![CDATA[File e directory interessati]]></key>
     <key alias="permissionsAffectedFoldersMoreInfo"><![CDATA[Ulteriori informazioni sull'impostazione dei permessi per Umbraco]]></key>
@@ -457,7 +451,6 @@ Hai installato Runway, quindi perché non dare uno sguardo al vostro nuovo sito 
 Fatti aiutare dalla nostra community, consulta la documentazione o guarda alcuni video gratuiti su come costruire un semplice sito web, come usare i pacchetti e una guida rapida alla terminologia Umbraco]]>
     </key>
     <key alias="theEndHeader"><![CDATA[Umbraco %0% è installato e pronto per l'uso]]></key>
-    <key alias="theEndInstallFailed"><![CDATA[Per terminare l'installazione, dovrai modificare manualmente il file <strong>/web.config</strong> e aggiornare la chiave AppSetting <strong>UmbracoConfigurationStatus</strong> impostando il valore <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Puoi <strong>iniziare immediatamente</strong> cliccando sul bottone "Avvia Umbraco". <br />Se sei <strong>nuovo a Umbraco</strong>, si possono trovare un sacco di risorse sulle nostre pagine Getting Started.]]></key>
     <key alias="theEndOpenUmbraco">
       <![CDATA[<h3>Avvia Umbraco</h3>
