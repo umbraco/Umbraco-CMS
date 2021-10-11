@@ -16,7 +16,7 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
     $scope.$emit("$changeTitle", "");
 
     function cancel() {
-        navigationService.hideDialog();
+        navigationService.hideMenu();
     }
 
     function createItem() {
