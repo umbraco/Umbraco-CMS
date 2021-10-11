@@ -761,6 +761,7 @@
     <key alias="blue">Blauw</key>
   </area>
   <area alias="shortcuts">
+    <key alias="addTab">Tabblad toevoegen</key>
     <key alias="addGroup">Groep toevoegen</key>
     <key alias="addProperty">Eigenschap toevoegen</key>
     <key alias="addEditor">Editor toevoegen</key>
