@@ -12,7 +12,13 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
 
     vm.itemKey = "";
     vm.createItem = createItem;
+    vm.cancel = cancel;
     $scope.$emit("$changeTitle", "");
+
+    function cancel() {
+        navigationService.hideDialog();
+    }
+
     function createItem() {
 
         if (formHelper.submitForm({ scope: $scope, formCtrl: $scope.createDictionaryForm })) {
