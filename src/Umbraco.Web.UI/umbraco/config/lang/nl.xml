@@ -795,12 +795,10 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">De installer kan geen connectie met de database maken.</key>
-    <key alias="databaseErrorWebConfig">De web.config kon niet worden opgeslagen. Gelieve de connectiestring handmatig aan te passen.</key>
     <key alias="databaseFound">Je database is gevonden en is geïdentificeerd als</key>
     <key alias="databaseHeader">Database configuratie </key>
     <key alias="databaseInstall"><![CDATA[Druk op de knop <strong>installeren</strong> om de Umbraco %0% database te installeren]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% is nu gekopieerd naar je database. Druk op <strong>Volgende</strong> om door te gaan.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>De database kon niet gevonden worden! Gelieve na te kijken of de informatie in de "connection string" van het "web.config" bestand correct is.</p><p> Om door te gaan, gelieve het "web.config" bestand aan te passen (met behulp van Visual Studio of je favoriete tekstverwerker), scroll in het bestand naar beneden, voeg de connection string voor je database toe in de key met naam "umbracoDbDSN" en sla het bestand op.</p><p>Klik op de knop <strong>opnieuw proberen</strong> als je hiermee klaar bent. <br/> <a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Meer informatie over het aanpassen van de web.config vind je hier.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Om deze stap te voltooien moet je enkele gegevens weten over je database server ("connection string").<br/> Gelieve contact op te nemen met je ISP indien nodig. Wanneer je installeert op een lokale computer of server, dan heb je waarschijnlijk informatie nodig van je systeembeheerder.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Klik de <strong>upgrade</strong> knop om je database te upgraden naar Umbraco %0%</p> <p> Maak je geen zorgen - er zal geen inhoud worden gewist en alles blijft gewoon werken! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Je database is geupgrade naar de definitieve versie %0%.<br />Klik <strong>Volgende</strong> om verder te gaan.]]></key>
@@ -810,9 +808,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Het wachtwoord van de default gebruiker is sinds installatie met succes veranderd.</strong></p><p>Geen verdere actie noodzakelijk. Klik <strong>Volgende</strong> om verder te gaan.]]></key>
     <key alias="defaultUserPasswordChanged">Het wachtwoord is veranderd!</key>
     <key alias="greatStart">Neem een jumpstart en bekijk onze introductie videos</key>
-    <key alias="licenseText"><![CDATA[Door op de 'Volgende' knop te klikken (of door de UmbracoConfigurationStatus in web.config te veranderen), accepteer je de licentie voor deze software zoals in het onderstaande kader is te lezen. Deze Umbraco distributie bevat twee verschillende licensies: de open-source MIT licensie voor het framework en de Umbraco freeware licensie die de gebruikersinterface behelst.
-
-        ]]></key>
     <key alias="None">Nog niet geïnstalleerd.</key>
     <key alias="permissionsAffectedFolders">Betreffende bestanden en mappen</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Meer informatie over het instellen van machtigingen voor Umbraco vind je hier</key>
@@ -849,7 +844,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="theEndBrowseSite"><![CDATA[<h3>Browse je nieuwe site</h3> Je hebt Runway geinstalleerd, dus kijk eens hoe je nieuwe site eruit ziet.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Meer hulp en informatie</h3> Vind hulp in onze bekroonde community, blader door de documentatie of bekijk enkele gratis videos over het bouwen van een eenvoudige site, het gebruiken van packages en een overzicht van Umbraco terminologie]]></key>
     <key alias="theEndHeader">Umbraco %0% is geïnstalleerd en klaar voor gebruik.</key>
-    <key alias="theEndInstallFailed"><![CDATA[Om de installatie af te sluiten, moet u de handmatig het <strong>/web.config bestand</strong> aanpassen, en de Appsetting key <strong>UmbracoConfigurationStatus</strong> onder in het bestand veranderen naar <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Je kunt <strong>meteen beginnen</strong> door de "Launch Umbraco" knop hieronder te klikken. <br />Als je een <strong>beginnende Umbraco gebruiker</strong> bent, dan kun je you can find veel informatie op onze "getting started" pagina's vinden.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3> Om je website te beheren open je simpelweg de Umbraco backoffice en begin je inhoud toe te voegen, templates en stylesheets aan te passen of nieuwe functionaliteit toe te voegen]]></key>
     <key alias="Unavailable">Verbinding met de database mislukt.</key>
@@ -1853,8 +1847,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="httpsCheckExpiringCertificate">Het SSL certificaat van de website zal vervallen binnen %0% dagen.</key>
     <key alias="healthCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">De site wordt momenteel %0% bekeken via HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">De appSetting 'Umbraco.Core.UseHttps' in web.config staat op 'false'. Indien HTTPS gebruikt wordt moet deze op 'true' staan.</key>
-    <key alias="httpsCheckConfigurationCheckResult">De appSetting 'Umbraco.Core.UseHttps' in web.config is ingesteld op '%0%'. Cookies zijn %1% ingesteld als secure.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Debug compilatie mode staat uit.</key>
     <key alias="compilationDebugCheckErrorMessage">Debug compilatie mode staat momenteel aan. Wij raden aan deze instelling uit te zetten voor livegang.</key>
@@ -1880,10 +1872,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[De volgende headers die informatie tonen over de gebruikte website technologieën zijn aangetroffen: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Er zijn geen headers gevonden die informatie vrijgeven over de gebruikte website technologie!</key>
-    <key alias="smtpMailSettingsNotFound">In de Web.config werd system.net/mailsettings niet gevonden</key>
-    <key alias="smtpMailSettingsHostNotConfigured">In de Web.config sectie system.net/mailsettings is de host niet geconfigureerd.</key>
     <key alias="smtpMailSettingsConnectionSuccess">SMTP instellingen zijn correct ingesteld en werken zoals verwacht.</key>
-    <key alias="smtpMailSettingsConnectionFail">De SMTP server geconfigureerd met host '%0%' en poort '%1%' kon niet gevonden worden. Controleer of de SMTP instellingen in Web.config file system.net/mailsettings correct zijn.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notificatie e-mail is verzonden naar <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notificatie e-mail staat nog steeds op de standaard waarde van <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Resultaten van de geplande Umbraco Health Checks uitgevoerd op %0% op %1%:</p>%2%</body></html>]]></key>
