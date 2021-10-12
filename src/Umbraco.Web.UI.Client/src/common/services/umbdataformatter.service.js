@@ -37,7 +37,7 @@
 
         return {
 
-            formatChangePasswordModel: function(model) {
+            formatChangePasswordModel: function (model) {
                 if (!model) {
                     return null;
                 }
@@ -59,26 +59,23 @@
             },
 
             formatContentTypePostData: function (displayModel, action) {
-
-                //create the save model from the display model
+                // Create the save model from the display model
                 var saveModel = _.pick(displayModel,
                     'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
                     'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
                     'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'allowSegmentVariant', 'isElement');
 
-                // TODO: Map these
                 saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
                 saveModel.defaultTemplate = displayModel.defaultTemplate ? displayModel.defaultTemplate.alias : null;
                 var realGroups = _.reject(displayModel.groups, function (g) {
-                    //do not include these tabs
+                    // Do not include groups with init state
                     return g.tabState === "init";
                 });
                 saveModel.groups = _.map(realGroups, function (g) {
-
-                    var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name', 'key', 'alias', 'type');
+                    var saveGroup = _.pick(g, 'id', 'sortOrder', 'name', 'key', 'alias', 'type');
 
                     var realProperties = _.reject(g.properties, function (p) {
-                        //do not include these properties
+                        // Do not include properties with init state or inherited from a composition
                         return p.propertyState === "init" || p.inherited === true;
                     });
 
@@ -89,16 +86,21 @@
 
                     saveGroup.properties = saveProperties;
 
-                    //if this is an inherited group and there are not non-inherited properties on it, then don't send up the data
-                    if (saveGroup.inherited === true && saveProperties.length === 0) {
-                        return null;
+                    if (g.inherited === true) {
+                        if (saveProperties.length === 0) {
+                            // All properties are inherited from the compositions, no need to save this group
+                            return null;
+                        } else if (g.contentTypeId != saveModel.id) {
+                            // We have local properties, but the group id is not local, ensure a new id/key is generated on save
+                            saveGroup = _.omit(saveGroup, 'id', 'key');
+                        }
                     }
 
                     return saveGroup;
                 });
 
-                //we don't want any null groups
                 saveModel.groups = _.reject(saveModel.groups, function (g) {
+                    // Do not include empty/null groups
                     return !g;
                 });
 
@@ -127,17 +129,17 @@
             },
 
             /** formats the display model used to display the dictionary to the model used to save the dictionary */
-            formatDictionaryPostData : function(dictionary, nameIsDirty) {
+            formatDictionaryPostData: function (dictionary, nameIsDirty) {
                 var saveModel = {
                     parentId: dictionary.parentId,
                     id: dictionary.id,
                     name: dictionary.name,
                     nameIsDirty: nameIsDirty,
                     translations: [],
-                    key : dictionary.key
+                    key: dictionary.key
                 };
 
-                for(var i = 0; i < dictionary.translations.length; i++) {
+                for (var i = 0; i < dictionary.translations.length; i++) {
                     saveModel.translations.push({
                         isoCode: dictionary.translations[i].isoCode,
                         languageId: dictionary.translations[i].languageId,
@@ -335,7 +337,7 @@
                     parentId: displayModel.parentId,
                     //set the action on the save model
                     action: action,
-                    variants: _.map(displayModel.variants, function(v) {
+                    variants: _.map(displayModel.variants, function (v) {
                         return {
                             name: v.name || "", //if its null/empty,we must pass up an empty string else we get json converter errors
                             properties: getContentProperties(v.tabs),
@@ -365,7 +367,7 @@
              * @param {} displayModel
              * @returns {}
              */
-            formatContentGetData: function(displayModel) {
+            formatContentGetData: function (displayModel) {
 
                 // We need to check for invariant properties among the variant variants,
                 // as the value of an invariant property is shared between different variants.
@@ -431,12 +433,12 @@
              * Formats the display model used to display the relation type to a model used to save the relation type.
              * @param {Object} relationType
              */
-            formatRelationTypePostData : function(relationType) {
+            formatRelationTypePostData: function (relationType) {
                 var saveModel = {
                     id: relationType.id,
                     name: relationType.name,
                     alias: relationType.alias,
-                    key : relationType.key,
+                    key: relationType.key,
                     isBidirectional: relationType.isBidirectional,
                     parentObjectType: relationType.parentObjectType,
                     childObjectType: relationType.childObjectType

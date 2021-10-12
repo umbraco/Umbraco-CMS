@@ -237,7 +237,7 @@ namespace Umbraco.Cms.Core.Routing
 
             // re-route
             await RouteRequestInternalAsync(builder);
-            
+
             // return if we are redirect
             if (builder.IsRedirect())
             {
@@ -250,6 +250,11 @@ namespace Umbraco.Cms.Core.Routing
                 // means the engine could not find a proper document to handle 404
                 // restore the saved content so we know it exists
                 builder.SetPublishedContent(content);
+            }
+
+            if (!builder.HasDomain())
+            {
+                FindDomain(builder);
             }
 
             return BuildRequest(builder);
