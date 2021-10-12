@@ -8,6 +8,10 @@ using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Web.Common.TagHelpers
 {
+    /// <summary>
+    /// This will add the hidden input field ufprt that is
+    /// needed for Umbraco Surface Controller routing for form's
+    /// </summary>
     [HtmlTargetElement("form")]
     public class SurfaceControllerFormTagHelper : TagHelper
     {

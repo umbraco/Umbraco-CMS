@@ -14,8 +14,8 @@ namespace Umbraco.Cms.Web.Common.TagHelpers
     [HtmlTargetElement("umb-macro")]
     public class MacroTagHelper : TagHelper
     {
-        private IUmbracoComponentRenderer _umbracoComponentRenderer;
-        private IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IUmbracoComponentRenderer _umbracoComponentRenderer;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         /// <summary>
         /// The alias of the Macro to execute

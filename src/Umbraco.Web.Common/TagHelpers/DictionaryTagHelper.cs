@@ -5,6 +5,10 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.Common.TagHelpers
 {
+    /// <summary>
+    /// Translates an Umbraco Dictionary Key for the current language
+    /// or a fallback language and uses an element
+    /// </summary>
     [HtmlTargetElement("umb-dictionary", TagStructure = TagStructure.NormalOrSelfClosing)]
     public class DictionaryTagHelper : TagHelper
     {
@@ -15,9 +19,16 @@ namespace Umbraco.Cms.Web.Common.TagHelpers
             _localizationService = localizationService;
         }
 
+        /// <summary>
+        /// The dictionary key to translate
+        /// </summary>
         [HtmlAttributeName("key")]
         public string Key { get; set; }
 
+        /// <summary>
+        /// An optional attribute to set a fallback language to use
+        /// If the current language does not contain a translation for the key
+        /// </summary>
         [HtmlAttributeName("fallback-lang")]
         public string FallbackLang { get; set; }
 
