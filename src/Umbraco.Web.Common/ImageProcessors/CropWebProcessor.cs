@@ -32,6 +32,9 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
             RectangleF? coordinates = GetCoordinates(commands, parser, culture);
             if (coordinates != null)
             {
+                //allowed for EXIF rotated image (otherwise width and height are transposed and crops the wrong area)
+                image.Image.Mutate(x => x.AutoOrient());
+                
                 // Convert the coordinates to a pixel based rectangle
                 int sourceWidth = image.Image.Width;
                 int sourceHeight = image.Image.Height;
