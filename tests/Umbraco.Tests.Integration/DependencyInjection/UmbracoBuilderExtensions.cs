@@ -79,11 +79,10 @@ namespace Umbraco.Cms.Tests.Integration.DependencyInjection
                 new Lazy<LocalizedTextServiceFileSources>(() =>
                 {
                     // get the src folder
-                    var currFolder = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
-                    while (!currFolder.Name.Equals("src", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        currFolder = currFolder.Parent;
-                    }
+                    var root = TestContext.CurrentContext.TestDirectory.Split("tests")[0];
+                    var srcFolder = Path.Combine(root, "src");
+
+                    var currFolder = new DirectoryInfo(srcFolder);
 
                     DirectoryInfo uiProject = currFolder.GetDirectories("Umbraco.Web.UI", SearchOption.TopDirectoryOnly).First();
                     var mainLangFolder = new DirectoryInfo(Path.Combine(uiProject.FullName, globalSettings.Value.UmbracoPath.TrimStart("~/"), "config", "lang"));
