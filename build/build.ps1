@@ -265,7 +265,7 @@
 
     # beware of the weird double \\ at the end of paths
     # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
-    &$this.BuildEnv.VisualStudio.MsBuild "$($this.SolutionRoot)\src\Umbraco.Tests\Umbraco.Tests.csproj" `
+    &$this.BuildEnv.VisualStudio.MsBuild "$($this.SolutionRoot)\tests\Umbraco.Tests\Umbraco.Tests.csproj" `
       /p:WarningLevel=0 `
       /p:Configuration=$buildConfiguration `
       /p:Platform=AnyCPU `
