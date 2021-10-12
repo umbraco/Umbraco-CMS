@@ -1,11 +1,13 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.DocumentTypes.ImportController",
-    function ($scope, contentTypeResource, navigationService, Upload, umbRequestHelper) {
+        function ($scope, contentTypeResource, navigationService, Upload, umbRequestHelper) {
             var vm = this;
             vm.serverErrorMessage = "";
             vm.state = "upload";
             vm.model = {};
             vm.uploadStatus = "";
+
+            vm.cancelButtonLabel = "cancel";
 
             $scope.handleFiles = function (files, event) {
                 if (files && files.length > 0) {
@@ -67,10 +69,12 @@ angular.module("umbraco")
             $scope.import = function () {
                 contentTypeResource.import(vm.model.tempFileName);
                 vm.state = "done";
+
+                vm.cancelButtonLabel = "general_close";
             }
 
-            $scope.close = function() {
+            $scope.close = function () {
                 navigationService.hideDialog();
             };
-            
+
         });
