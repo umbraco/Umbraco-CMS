@@ -70,20 +70,20 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		UseIISExpress = "true"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_62926"
-		Debug.AspNetCompiler.PhysicalPath = "src\Umbraco.Tests.AcceptanceTest\"
+		Debug.AspNetCompiler.PhysicalPath = "tests\Umbraco.Tests.AcceptanceTest\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/localhost_62926"
-		Release.AspNetCompiler.PhysicalPath = "src\Umbraco.Tests.AcceptanceTest\"
+		Release.AspNetCompiler.PhysicalPath = "tests\Umbraco.Tests.AcceptanceTest\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "src\Umbraco.Tests.AcceptanceTest\"
+		SlnRelativePath = "tests\Umbraco.Tests.AcceptanceTest\"
 		DefaultWebSiteLanguage = "Visual C#"
 		StartServerOnDebug = "false"
 	EndProjectSection
@@ -132,21 +132,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.BackOffice", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Website", "src\Umbraco.Web.Website\Umbraco.Web.Website.csproj", "{5A246D54-3109-4D2B-BE7D-FC0787D126AE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Common", "src\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj", "{A499779C-1B3B-48A8-B551-458E582E6E96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Common", "tests\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj", "{A499779C-1B3B-48A8-B551-458E582E6E96}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.UnitTests", "src\Umbraco.Tests.UnitTests\Umbraco.Tests.UnitTests.csproj", "{9102ABDF-E537-4E46-B525-C9ED4833EED0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.UnitTests", "tests\Umbraco.Tests.UnitTests\Umbraco.Tests.UnitTests.csproj", "{9102ABDF-E537-4E46-B525-C9ED4833EED0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Common", "src\Umbraco.Web.Common\Umbraco.Web.Common.csproj", "{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Integration", "src\Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj", "{1B885D2F-1599-4557-A4EC-474CC74DEB10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Integration", "tests\Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj", "{1B885D2F-1599-4557-A4EC-474CC74DEB10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Integration.SqlCe", "src\Umbraco.Tests.Integration.SqlCe\Umbraco.Tests.Integration.SqlCe.csproj", "{7A58F7CB-786F-43D6-A946-7BFA1B70D0AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Integration.SqlCe", "tests\Umbraco.Tests.Integration.SqlCe\Umbraco.Tests.Integration.SqlCe.csproj", "{7A58F7CB-786F-43D6-A946-7BFA1B70D0AA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Examine.Lucene", "src\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj", "{96EF355C-A7C8-460E-96D7-ABCE0D489762}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.TestData", "src\Umbraco.TestData\Umbraco.TestData.csproj", "{C44B4389-6E2A-441E-9A10-7CE818CA63A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.TestData", "tests\Umbraco.TestData\Umbraco.TestData.csproj", "{C44B4389-6E2A-441E-9A10-7CE818CA63A9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Benchmarks", "src\Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{37B6264F-A279-42A6-AB83-CC3A3950C3E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Benchmarks", "tests\Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{37B6264F-A279-42A6-AB83-CC3A3950C3E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
