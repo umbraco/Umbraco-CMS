@@ -560,12 +560,15 @@
             });
 
             localizationService.localize("template_mastertemplate").then(function (value) {
-                var title = value;
-                var masterTemplate = {
+                const title = value;
+                const editor = {
                     title: title,
-                    availableItems: availableMasterTemplates,
-                    submit: function (model) {
-                        var template = model.selectedItem;
+                    filterCssClass: 'not-allowed',
+                    filter: item => {
+                        return !availableMasterTemplates.some(template => template.id == item.id);
+                    },
+                    submit: model => {
+                        var template = model.selection[0];
                         if (template && template.alias) {
                             vm.template.masterTemplateAlias = template.alias;
                             setLayout(template.alias + ".cshtml");
@@ -575,14 +578,12 @@
                         }
                         editorService.close();
                     },
-                    close: function (oldModel) {
-                        // close dialog
+                    close: function () {
                         editorService.close();
-                        // focus editor
-                        vm.editor.focus();
                     }
-                };
-                editorService.itemPicker(masterTemplate);
+                }
+
+                editorService.templatePicker(editor);
             });
 
         }
