@@ -2252,7 +2252,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Save(rollback2);
 
             Assert.IsTrue(rollback2.Published);
-            Assert.IsTrue(rollback2.Edited); // till edited, change of behaviour
+            Assert.IsTrue(rollback2.Edited); // Still edited, change of behaviour
 
             Assert.AreEqual("Jane Doe", rollback2.GetValue<string>("author"));
             Assert.AreEqual("Text Page 2 ReReUpdated", rollback2.Name);
