@@ -17,9 +17,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Umbraco.Abstractions\Umbraco.Abstractions.csproj" />
-      <ProjectReference Include="..\Umbraco.Configuration\Umbraco.Configuration.csproj" />
-      <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\Umbraco.Abstractions\Umbraco.Abstractions.csproj" />
+      <ProjectReference Include="..\..\src\Umbraco.Configuration\Umbraco.Configuration.csproj" />
+      <ProjectReference Include="..\..\src\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

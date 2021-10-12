@@ -21,13 +21,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
-    <ProjectReference Include="..\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
+    <ProjectReference Include="..\..\src\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
   </ItemGroup>
 </Project>

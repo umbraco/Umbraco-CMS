@@ -12,8 +12,8 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
-    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
+    <ProjectReference Include="..\..\src\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet">

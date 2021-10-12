@@ -309,23 +309,23 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+    <ProjectReference Include="..\..\src\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{29aa69d9-b597-4395-8d42-43b1263c240a}</Project>
       <Name>Umbraco.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
+    <ProjectReference Include="..\..\src\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj">
       <Project>{0fad7d2a-d7dd-45b1-91fd-488bb6cdacea}</Project>
       <Name>Umbraco.Examine.Lucene</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
+    <ProjectReference Include="...\..\srcUmbraco.Infrastructure\Umbraco.Infrastructure.csproj">
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj">
+    <ProjectReference Include="..\..\src\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj">
       <Project>{33085570-9bf2-4065-a9b0-a29d920d13ba}</Project>
       <Name>Umbraco.Persistence.SqlCe</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
+    <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
       <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
       <Name>Umbraco.PublishedCache.NuCache</Name>
     </ProjectReference>
@@ -333,7 +333,7 @@
       <Project>{a499779c-1b3b-48a8-b551-458e582e6e96}</Project>
       <Name>Umbraco.Tests.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
+    <ProjectReference Include="..\..\src\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
     </ProjectReference>
