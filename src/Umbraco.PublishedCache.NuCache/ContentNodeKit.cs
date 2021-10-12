@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
@@ -7,6 +7,18 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     public struct ContentNodeKit
     {
+        [Obsolete("This will be changed to a property in future versions")]
+        public ContentNode Node;
+
+        [Obsolete("This will be changed to a property in future versions")]
+        public int ContentTypeId;
+
+        [Obsolete("This will be changed to a property in future versions")]
+        public ContentData DraftData;
+
+        [Obsolete("This will be changed to a property in future versions")]
+        public ContentData PublishedData;
+
         public ContentNodeKit(ContentNode node, int contentTypeId, ContentData draftData, ContentData publishedData)
         {
             Node = node;
@@ -15,10 +27,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             PublishedData = publishedData;
         }
 
-        public ContentNode Node { get; }
-        public int ContentTypeId { get; }
-        public ContentData DraftData { get; }
-        public ContentData PublishedData { get; }
 
         public bool IsEmpty => Node == null;
 

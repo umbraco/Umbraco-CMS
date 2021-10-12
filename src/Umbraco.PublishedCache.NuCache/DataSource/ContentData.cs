@@ -35,11 +35,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
         public int? TemplateId { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
         public bool Published { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
 
-        public IDictionary<string, PropertyData[]> Properties { get; }
+        public IDictionary<string, PropertyData[]> Properties { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
 
         /// <summary>
         /// The collection of language Id to name for the content item
         /// </summary>
-        public IReadOnlyDictionary<string, CultureVariation> CultureInfos { get; }
+        public IReadOnlyDictionary<string, CultureVariation> CultureInfos { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
     }
 }
