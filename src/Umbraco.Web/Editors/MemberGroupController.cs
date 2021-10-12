@@ -152,7 +152,7 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
 
             display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/memberGroupSavedHeader"),
+                            Services.TextService.Localize("speechBubbles", "memberGroupSavedHeader"),
                             string.Empty);
 
             return display;

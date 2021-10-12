@@ -40,7 +40,7 @@
 (function () {
     'use strict';
 
-    function UmbRadiobuttonController($timeout, localizationService) {
+    function UmbRadiobuttonController($timeout, $attrs, localizationService) {
 
         var vm = this;
 
@@ -49,7 +49,12 @@
 
         function onInit() {
             vm.inputId = vm.inputId || "umb-radio_" + String.CreateGuid();
-
+            vm.disableDirtyCheck =
+                $attrs.hasOwnProperty("disableDirtyCheck") &&
+                vm.disableDirtyCheck !== '0' &&
+                vm.disableDirtyCheck !== 0 &&
+                vm.disableDirtyCheck !== 'false' &&
+                vm.disableDirtyCheck !== false;
             vm.icon = vm.icon || vm.iconClass || null;
 
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [

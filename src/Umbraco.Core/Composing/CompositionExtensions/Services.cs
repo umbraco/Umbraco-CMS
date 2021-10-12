@@ -52,6 +52,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IExternalLoginService, ExternalLoginService>();
             composition.RegisterUnique<IRedirectUrlService, RedirectUrlService>();
             composition.RegisterUnique<IConsentService, ConsentService>();
+            composition.RegisterUnique<IEmailSender, EmailSender>();
             composition.Register<LocalizedTextServiceFileSources>(SourcesFactory);
             composition.RegisterUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetInstance<Lazy<LocalizedTextServiceFileSources>>(),

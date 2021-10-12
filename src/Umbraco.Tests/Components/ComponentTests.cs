@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Components
             var logger = Mock.Of<ILogger>();
             var f = new UmbracoDatabaseFactory(logger, new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
             var fs = new FileSystems(mock.Object, logger);
-            var p = new ScopeProvider(f, fs, logger);
+            var p = new ScopeProvider(f, fs, logger, Mock.Of<ICoreDebug>(x => x.LogUncompletedScopes == true));
 
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof (IProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));

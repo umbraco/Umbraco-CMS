@@ -173,6 +173,11 @@ namespace Umbraco.Core.Services
         OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
 
         /// <summary>
+        /// Returns true if there is any media in the recycle bin
+        /// </summary>
+        bool RecycleBinSmells();
+
+        /// <summary>
         /// Deletes all media of specified type. All children of deleted media is moved to Recycle Bin.
         /// </summary>
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>

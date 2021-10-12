@@ -12,6 +12,11 @@
             var isLeftColumnAbove = false;
             scope.editors = [];
 
+            /* we need to keep a count of open editors because the length of the editors array is first changed when animations are done
+             we do this because some infinite editors close more than one editor at the time and we get the wrong count from editors.length
+             because of the animation */
+            let editorCount = 0;
+
             function addEditor(editor) {
                 editor.inFront = true;
                 editor.moveRight = true;
@@ -51,13 +56,16 @@
 
                 updateEditors(-1);
 
-                if(scope.editors.length === 1){
+                if(scope.editors.length === 1) {
                     if(isLeftColumnAbove){
                         $('#leftcolumn').addClass(aboveBackDropCssClass);
                     }
 
                     isLeftColumnAbove = false;
+                }
 
+                // when the last editor is closed remove the focus lock
+                if (editorCount === 0) {
                     // Remove the inert attribute from the #mainwrapper
                     focusLockService.removeInertAttribute();
                 }
@@ -105,17 +113,22 @@
             }
 
             evts.push(eventsService.on("appState.editors.open", function (name, args) {
+                editorCount = editorCount + 1;
                 addEditor(args.editor);
             }));
 
             evts.push(eventsService.on("appState.editors.close", function (name, args) {
                 // remove the closed editor
                 if (args && args.editor) {
+                    editorCount = editorCount - 1;
                     removeEditor(args.editor);
                 }
                 // close all editors
                 if (args && !args.editor && args.editors.length === 0) {
-                    scope.editors = [];
+                    editorCount = 0;
+                    scope.editors = [];                    
+                    // Remove the inert attribute from the #mainwrapper
+                    focusLockService.removeInertAttribute();
                 }
             }));
 
@@ -140,11 +153,11 @@
     }
 
     // This directive allows for us to run a custom $compile for the view within the repeater which allows
-    // us to maintain a $scope hierarchy with the rendered view based on the $scope that initiated the 
+    // us to maintain a $scope hierarchy with the rendered view based on the $scope that initiated the
     // infinite editing. The retain the $scope hiearchy a special $parentScope property is passed in to the model.
     function EditorRepeaterDirective($http, $templateCache, $compile, angularHelper) {
-        function link(scope, el, attr, ctrl) {
-            
+        function link(scope, el) {
+
             var editor = scope && scope.$parent ? scope.$parent.model : null;
             if (!editor) {
                 return;

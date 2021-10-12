@@ -26,8 +26,8 @@
                   not want this to happen as the alpha of the next major is, really, the next major already.
                 -->
                 <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.4.0, 2.999999)" />
-                <dependency id="ImageProcessor.Web" version="[4.10.0.100,4.999999)" />
-                <dependency id="ImageProcessor.Web.Config" version="[2.5.0.100,2.999999)" />
+                <dependency id="ImageProcessor.Web" version="[4.12.1,4.999999)" />
+                <dependency id="ImageProcessor.Web.Config" version="[2.6.0,2.999999)" />
                 <dependency id="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="[2.0.1,2.999999)" />
 
             </group>

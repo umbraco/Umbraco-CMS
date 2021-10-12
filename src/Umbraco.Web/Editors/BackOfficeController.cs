@@ -178,6 +178,13 @@ namespace Umbraco.Web.Editors
                     : CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage)
                 : CultureInfo.GetCultureInfo(culture);
 
+            // TODO: Remove this check in v9 when these interfaces merge
+            if(Services.TextService is ILocalizedTextService2 localizedText2)
+            {
+                var nestedDictionary2 = localizedText2.GetAllStoredValuesByAreaAndAlias(cultureInfo);
+                return new JsonNetResult { Data = nestedDictionary2, Formatting = Formatting.None };
+            }
+
             var allValues = Services.TextService.GetAllStoredValues(cultureInfo);
             var pathedValues = allValues.Select(kv =>
             {
@@ -318,7 +325,7 @@ namespace Umbraco.Web.Editors
             }
 
             //Add error and redirect for it to be displayed
-            TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { Services.TextService.Localize("login/resetCodeExpired") };
+            TempData[ViewDataExtensions.TokenPasswordResetCode] = new[] { Services.TextService.Localize("login", "resetCodeExpired") };
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
