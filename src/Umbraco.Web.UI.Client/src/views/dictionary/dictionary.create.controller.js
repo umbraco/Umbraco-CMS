@@ -12,11 +12,11 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
 
     vm.itemKey = "";
     vm.createItem = createItem;
-    vm.cancel = cancel;
+    vm.close = close;
     $scope.$emit("$changeTitle", "");
 
-    function cancel() {
-        navigationService.hideMenu();
+    function close() {
+        navigationService.hideDialog();
     }
 
     function createItem() {
