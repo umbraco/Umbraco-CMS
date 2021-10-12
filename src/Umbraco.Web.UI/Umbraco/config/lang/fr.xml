@@ -1411,6 +1411,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="mediaTypeSavedHeader">Type de média sauvegardé</key>
     <key alias="memberTypeSavedHeader">Type de membre sauvegardé</key>
     <key alias="memberGroupSavedHeader">Groupe de membres sauvegardé</key>
+    <key alias="memberGroupNameDuplicate">Un autre groupe de membres existe déjà avec le même nom</key>
     <key alias="templateErrorHeader">Modèle non sauvegardé</key>
     <key alias="templateErrorText">Assurez-vous de ne pas avoir 2 modèles avec le même alias.</key>
     <key alias="templateSavedHeader">Modèle sauvegardé</key>

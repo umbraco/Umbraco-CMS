@@ -1276,6 +1276,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="mediaTypeSavedHeader">Mediatype opgeslagen</key>
     <key alias="memberTypeSavedHeader">Ledentype opgeslagen</key>
     <key alias="memberGroupSavedHeader">Ledengroep opgeslagen</key>
+    <key alias="memberGroupNameDuplicate">Er bestaat al een andere ledengroep met dezelfde naam</key>
     <key alias="templateErrorHeader">Sjabloon niet opgeslagen</key>
     <key alias="templateErrorText">Controleer dat je geen 2 sjablonen met dezelfde naam hebt</key>
     <key alias="templateSavedHeader">Sjabloon opgeslagen</key>
