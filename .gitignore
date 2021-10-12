@@ -42,6 +42,7 @@ tools/NDepend/
 [sS]ource
 [sS]andbox
 umbraco.config
+!**/TestFiles/umbraco.config
 App_Data/TEMP/*
 [Uu]mbraco/[Pp]resentation/[Uu]mbraco/[Pp]lugins/*
 [Uu]mbraco/[Pp]resentation/[Uu]ser[Cc]ontrols/*
@@ -113,17 +114,17 @@ build/temp/
 
 # Acceptance tests
 cypress.env.json
-/src/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
-/src/Umbraco.Tests.AcceptanceTest/package-lock.json
-/src/Umbraco.Tests.AcceptanceTest/cypress/videos/
-/src/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
+**/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
+**/Umbraco.Tests.AcceptanceTest/package-lock.json
+**/Umbraco.Tests.AcceptanceTest/cypress/videos/
+**/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
 
 /src/Umbraco.Web.UI.Client/TESTS-*.xml
 /src/ApiDocs/api/*
 /src/Umbraco.Web.UI.Client/package-lock.json
 /src/Umbraco.Web.UI/wwwroot/Media/*
-/src/Umbraco.Tests.Integration/App_Data/*
-/src/Umbraco.Tests.Integration/TEMP/*
+**/Umbraco.Tests.Integration/App_Data/*
+**/Umbraco.Tests.Integration/TEMP/*
 /src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/assets/*
 /src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/js/*
 /src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/lib/*
@@ -142,15 +143,15 @@ cypress.env.json
 /src/Umbraco.Web.UI/appsettings.Local.json
 
 
-src/Umbraco.Tests.Integration/umbraco/Data/
-src/Umbraco.Tests.Integration/umbraco/logs/
+**/Umbraco.Tests.Integration/umbraco/Data/
+**/Umbraco.Tests.Integration/umbraco/logs/
 
-src/Umbraco.Tests.Integration/Views/
+**/Umbraco.Tests.Integration/Views/
 
-src/Umbraco.Tests/TEMP/
+**/Umbraco.Tests/TEMP/
 
-src/Umbraco.Tests.UnitTests/umbraco/Data/TEMP/
-src/Umbraco.Tests.Integration.SqlCe/umbraco/Data/TEMP/
-src/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
+**/Umbraco.Tests.UnitTests/umbraco/Data/TEMP/
+**/Umbraco.Tests.Integration.SqlCe/umbraco/Data/TEMP/
+**/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
 
 src/Umbraco.Web.UI/umbraco/config/appsettings-schema.json
