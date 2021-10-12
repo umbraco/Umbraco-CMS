@@ -1,9 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -410,6 +412,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         [Test]
         public async Task PostSave_Validates_Domains_Exist()
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             localizationService.Save(new LanguageBuilder()
                 .WithCultureInfo("da-DK")
@@ -456,6 +459,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         [Test]
         public async Task PostSave_Validates_All_Cultures_Has_Domains()
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             var enString = "en-US";
             var dkString = "da-DK";
 
@@ -506,6 +510,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
             var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{enString});
+
             Assert.Multiple(() =>
             {
                 Assert.NotNull(display);
