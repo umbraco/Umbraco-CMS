@@ -10,17 +10,4 @@
         </PackageReference>
     </ItemGroup>
 
-    <ItemGroup>
-        <!--Shared config files that have to exist at root level to work properly.-->
-        <ConfigFilesToCopy Include="$(MSBuildThisFileDirectory)linting\.editorconfig" />
-    </ItemGroup>
-
-    <!--Ensures our config files are up to date.-->
-    <!--TODO Copy files to root once solution is split up into src/tests folder-->
-    <Target Name="CopyFiles" BeforeTargets="Build">
-        <Copy SourceFiles="@(ConfigFilesToCopy)"
-              SkipUnchangedFiles = "true"
-              DestinationFolder="$(MSBuildThisFileDirectory)src" />
-    </Target>
-
 </Project>
