@@ -810,7 +810,6 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Ni all y gosodydd gysylltu â'r gronfa ddata.</key>
-    <key alias="databaseErrorWebConfig">Methwyd achub y ffeil web.config. Ceisiwch newid y llinyn gyswllt yn uniongyrchol.</key>
     <key alias="databaseFound">Canfwyd eich cronfa ddata ac mae'n cael ei adnabod fel</key>
     <key alias="databaseHeader">Ffurfwedd gronfa ddata</key>
     <key alias="databaseInstall">
@@ -819,14 +818,6 @@
     ]]>
     </key>
     <key alias="databaseInstallDone"><![CDATA[Mae Umbraco %0% yn awr wedi copïo i'ch gronfa ddata. Gwasgwch <strong>Nesaf</strong> i fwrw ymlaen.]]></key>
-    <key alias="databaseNotFound">
-      <![CDATA[<p>Cronfa ddata heb ei ganfod! Gwiriwch fod y gwybodaeth yn y "llinyn gyswllt" o'r ffeil "web.config" yn gywir.</p>
-              <p>Er mwyn parhau, newidiwch y ffeil "web.config" (gan ddefnyddio Visual Studio neu eich hoff olygydd testun), rholiwch at y gwaelod, ychwanegwch y llinyn gyswllt ar gyfer eich cronfa ddata yn yr allwedd o'r enw "UmbracoDbDSN" ac achub y ffeil. </p>
-              <p>
-              Cliciwch y botwm <strong>ceisio eto</strong> pan rydych wedi
-              gorffen.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-                    Mwy o wybodaeth am newid y ffeil web.config yma</a>.</p>]]>
-    </key>
     <key alias="databaseText">
       <![CDATA[Er mwyn cwblhau'r cam yma, rhaid i chi berchen gwybodaeth am eich gweinydd gronfa ddata ("llinyn gyswllt").<br />
         Cysylltwch â'ch darparwr gwe (ISP) os oes angen.
@@ -851,7 +842,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Mae cyfrinair y defnyddiwr Diofyn wedi'i newid yn llwyddiannus ers y gosodiad!</strong></p><p>Does dim angen unrhyw weithredoedd pellach. Cliciwch <strong>Nesaf</strong> i barhau.]]></key>
     <key alias="defaultUserPasswordChanged">Mae'r cyfrinair wedi'i newid!</key>
     <key alias="greatStart">Cewch gychwyn gwych, gwyliwch ein fideos rhaglith</key>
-    <key alias="licenseText">Wrth glicio'r botwm nesaf (neu newid y umbracoConfigurationStatus yn web.config), rydych yn derbyn y trwydded ar gyfer y meddalwedd yma fel y nodir yn y blwch isod. Sylwch fod y dosbarthiad Umbraco yma yn cynnwys 2 drwydded gwahanol, y trwydded cod agored MIT ar gyfer y fframwaith ac y trwydded Umbraco rhadwedd sy'n ymdrin â'r Rhyngwyneb Defnyddiwr.</key>
     <key alias="None">Heb osod eto.</key>
     <key alias="permissionsAffectedFolders">Ffeiliau a ffolderi wedi'u effeithio</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Mwy o wybodaeth am osod hawliau ar gyfer Umbraco yma</key>
@@ -934,10 +924,6 @@ Rydych wedi gosod Runway, felly beth am weld sut mae eich gwefan newydd yn edryc
 Cewch gymorth o'n cymuned gwobrwyol, porwch drwy ein dogfennaeth neu gwyliwch fideos yn rhad ac am ddim ar sut i adeiladu gwefan syml, sut i ddefnyddio pecynnau a chanllaw cyflym i dermeg Umbraco]]>
     </key>
     <key alias="theEndHeader">Mae Umbraco wedi'i osod %0% ac mae'n barod i'w ddefnyddio</key>
-    <key alias="theEndInstallFailed">
-      <![CDATA[Er mwyn gorffen y gosodiad, bydd angen i chi
-        olygu'r ffeil <strong>/web.config</strong> a diweddaru'r allwedd AppSetting <strong>UmbracoConfigurationStatus</strong> yng ngwaelod y gwerth o <strong>'%0%'</strong>.]]>
-    </key>
     <key alias="theEndInstallSuccess">
       <![CDATA[Gallwch gychwyn <strong>yn syth</strong> wrth glicio ar y botwm "Cychwyn Umbraco" isod. <br />Os ydych yn <strong>newydd i Umbraco</strong>,
 gallwch ddarganfod digonedd o adnoddau ar ein tudalennau cychwyn allan.]]>
@@ -2124,8 +2110,6 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="httpsCheckExpiringCertificate">Mae tystysgrif SSL eich gwefan am derfynu mewn %0% diwrnod.</key>
     <key alias="healthCheckInvalidUrl">Gwall yn pingio'r URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Rydych yn bresennol %0% yn gweld y wefan yn defnyddio'r cynllun HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">Mae'r appSetting 'umbracoUseSSL' wedi'i osod at 'false' yn eich ffeil web.config. Unwaith rydych yn ymweld â'r safle gan ddefnyddio'r cynllun HTTPS, dylai hynny gael ei osod i 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">Mae'r appSetting 'umbracoUseSSL' wedi'i osod at '%0%' yn eich ffeil web.config, mae eich cwcis %1% marcio yn ddiogel.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Modd casgliad dadfygio wedi'i analluogi.</key>
     <key alias="compilationDebugCheckErrorMessage">Modd casgliad dadfygio wedi'i alluogi. Argymhellwyd analluogi'r gosodiad yma cyn mynd yn fyw.</key>
@@ -2148,10 +2132,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     -->
     <key alias="excessiveHeadersFound"><![CDATA[Mae'r peniadau canlynol sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Dim peniadau sy'n datgelu gwynodaeth am dechnoleg eich gwefan wedi'u canfod.</key>
-    <key alias="smtpMailSettingsNotFound">Ni ellir darganfod system.net/mailsettings yn y ffeil Web.config.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">Yn yr adran system.net/mailsettings o'r ffeil Web.config, nid yw'r "host" wedi ffurfweddu.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Gosodiadau SMTP wedi ffurfweddu'n gywir ac mae'r gwasanaeth yn gweithio fel y disgwylir.</key>
-    <key alias="smtpMailSettingsConnectionFail">Ni ellir cysylltu â gweinydd SMTP sydd wedi ffurfweddu gyda "host" '%0%' a phorth '%1%'. Gwiriwch fod y gosodiadau SMTP yn y ffeil Web.config, system.net/mailsettings yn gywir.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Ebost hysbusu wedi'i osod at <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Ebost hysbusu yn dal wedi'i osod at y gwerth diofyn o <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Canlyniadau'r gwiriad Statws Iechyd Umbraco ar amserlen rhedwyd ar %0% am %1% fel y ganlyn:</p>%2%</body></html>]]></key>

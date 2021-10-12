@@ -32,6 +32,7 @@ namespace Umbraco.Cms.Core.Packaging
         public IEnumerable<IPartialView> PartialViewsInstalled { get; set; } = Enumerable.Empty<IPartialView>();
         public IEnumerable<IContent> ContentInstalled { get; set; } = Enumerable.Empty<IContent>();
         public IEnumerable<IMedia> MediaInstalled { get; set; } = Enumerable.Empty<IMedia>();
+        public IEnumerable<EntityContainer> EntityContainersInstalled { get; set; } = Enumerable.Empty<EntityContainer>();
 
         public override string ToString()
         {
@@ -77,6 +78,7 @@ namespace Umbraco.Cms.Core.Packaging
             WriteCount("Stylesheets installed: ", StylesheetsInstalled);
             WriteCount("Scripts installed: ", ScriptsInstalled);
             WriteCount("Partial views installed: ", PartialViewsInstalled);
+            WriteCount("Entity containers installed: ", EntityContainersInstalled);
             WriteCount("Content items installed: ", ContentInstalled);
             WriteCount("Media items installed: ", MediaInstalled, false);
 
