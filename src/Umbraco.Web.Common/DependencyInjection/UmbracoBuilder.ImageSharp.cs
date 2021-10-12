@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
@@ -46,6 +48,24 @@ namespace Umbraco.Extensions
                     {
                         context.Commands.Remove(ResizeWebProcessor.Width);
                         context.Commands.Remove(ResizeWebProcessor.Height);
+                    }
+
+                    return Task.CompletedTask;
+                };
+                options.OnBeforeSaveAsync = _ => Task.CompletedTask;
+                options.OnProcessedAsync = _ => Task.CompletedTask;
+                options.OnPrepareResponseAsync = context =>
+                {
+                    // Change Cache-Control header when cache buster value is present
+                    if (context.Request.Query.ContainsKey("rnd"))
+                    {
+                        var headers = context.Response.GetTypedHeaders();
+
+                        var cacheControl = headers.CacheControl;
+                        cacheControl.MustRevalidate = false;
+                        cacheControl.Extensions.Add(new NameValueHeaderValue("immutable"));
+
+                        headers.CacheControl = cacheControl;
                     }
 
                     return Task.CompletedTask;
