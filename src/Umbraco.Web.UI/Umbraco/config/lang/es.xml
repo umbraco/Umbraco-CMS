@@ -196,7 +196,7 @@
         <key alias="contentRoot">Raíz de contenido</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Crear nueva Plantilla de Contenido desde '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Crear nueva Plantilla de Contenido desde <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Vacía</key>
     <key alias="selectBlueprint">Seleccionar Plantilla de Contenido</key>
     <key alias="createdBlueprintHeading">Plantilla de Contenido creada</key>
