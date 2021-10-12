@@ -2415,7 +2415,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tooltipForPropertyActionsMenuClose">Close Property Actions</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Wait</key>
     <key alias="refreshStatus">Refresh status</key>
     <key alias="memoryCache">Memory Cache</key>
     <key alias="memoryCacheDescription">

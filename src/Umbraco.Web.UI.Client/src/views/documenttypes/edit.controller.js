@@ -413,13 +413,14 @@
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
+
             // set isElement checkbox by default
             if (isElement) {
                 contentType.isElement = true;
             }
 
             // set icon if one is provided
-            if (icon !== null) {
+            if (icon !== null && icon !== undefined) {
                 contentType.icon = icon;
             }
 
@@ -427,6 +428,7 @@
             if (allowVaryByCulture) {
                 contentType.allowCultureVariant = true;
             }
+
             // convert icons for content type
             convertLegacyIcons(contentType);
 

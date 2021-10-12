@@ -157,6 +157,7 @@
     <Compile Include="PropertyEditors\NestedContentPropertyComponentTests.cs" />
     <Compile Include="PublishedContent\ContentSerializationTests.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
+    <Compile Include="PublishedContent\NuCacheRebuildTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
     <Compile Include="PublishedContent\PublishedContentSnapshotTestBase.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
