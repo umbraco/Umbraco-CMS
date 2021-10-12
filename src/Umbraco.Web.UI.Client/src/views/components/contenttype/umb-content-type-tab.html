@@ -19,8 +19,14 @@
           </span>
       </div>
       <div class="umb-group-builder__tab-title-wrapper">
-            <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="vm.sorting && !vm.tab.inherited"></i>
-            <i class="umb-group-builder__tab-title-icon icon-merge" ng-if="vm.tab.inherited"></i>
+            <umb-icon icon="icon-navigation"
+                      class="umb-group-builder__tab-title-icon"
+                      ng-if="vm.sorting && !vm.tab.inherited">
+            </umb-icon>
+            <umb-icon icon="icon-merge"
+                      class="umb-group-builder__tab-title-icon"
+                      ng-if="vm.tab.inherited">
+            </umb-icon>
             <ng-form name="tabNameForm" data-element="tab-name">
                 <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited" title="{{vm.tab.alias}}">{{ vm.tab.name }}</div>
                 <input
@@ -65,7 +71,7 @@
   </div>
   <div class="umb-group-builder__tab-remove" ng-if="vm.allowRemove">
       <button type="button" class="btn-reset" ng-click="vm.removeTab()">
-          <i class="icon-trash"></i>
+          <umb-icon icon="icon-trash"></umb-icon>
       </button>
   </div>
 </div>
