@@ -3,6 +3,7 @@ variables:
     buildConfiguration: Release
     SA_PASSWORD: UmbracoIntegration123!
     UmbracoBuild: AzurePipeline
+    nodeVersion: 14.18.1
 resources:
     containers:
         - container: mssql
@@ -194,9 +195,9 @@ stages:
 #                      command: build
 #                      projects: '**/Umbraco.Web.UI.csproj'
                 - task: NodeTool@0
-                  displayName: Use Node 14.18.1 (LTS)
+                  displayName: Use Node $(nodeVersion)
                   inputs:
-                       versionSpec: 14.18.1
+                       versionSpec: $(nodeVersion)
                 - task: Npm@1
                   displayName: npm ci (Client)
                   inputs:
@@ -288,9 +289,9 @@ stages:
                       DBNAME: $(UmbracoDatabaseName)
                       SA_PASSWORD: $(SA_PASSWORD)
                 - task: NodeTool@0
-                  displayName: Use Node 14.18.1 (LTS)
+                  displayName: Use Node $(nodeVersion)
                   inputs:
-                      versionSpec: 14.18.1
+                      versionSpec: $(nodeVersion)
                 - task: Npm@1
                   displayName: npm ci (Client)
                   inputs:
@@ -445,9 +446,9 @@ stages:
 
                           $ubuild.CompileJsonSchema()
                 - task: NodeTool@0
-                  displayName: Use Node 14.18.1 (LTS)
+                  displayName: Use Node $(nodeVersion)
                   inputs:
-                      versionSpec: 14.18.1
+                      versionSpec: $(nodeVersion)
                 - task: Npm@1
                   displayName: npm ci (Client)
                   inputs:
