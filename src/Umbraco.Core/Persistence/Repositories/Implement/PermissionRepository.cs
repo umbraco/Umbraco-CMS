@@ -38,44 +38,41 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <param name="entityIds"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This method will not support passing in more than 2000 group Ids
+        /// This method will not support passing in more than 2000 group IDs when also passing in entity IDs.
         /// </remarks>
         public EntityPermissionCollection GetPermissionsForEntities(int[] groupIds, params int[] entityIds)
         {
             var result = new EntityPermissionCollection();
 
-            foreach (var groupOfGroupIds in groupIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+            if (entityIds.Length == 0)
             {
-                //copy local
-                var localIds = groupOfGroupIds.ToArray();
-
-                if (entityIds.Length == 0)
+                foreach (var group in groupIds.InGroupsOf(Constants.Sql.MaxParameterCount))
                 {
                     var sql = Sql()
                         .SelectAll()
                         .From<UserGroup2NodePermissionDto>()
-                        .Where<UserGroup2NodePermissionDto>(dto => localIds.Contains(dto.UserGroupId));
+                        .Where<UserGroup2NodePermissionDto>(dto => group.Contains(dto.UserGroupId));
+
                     var permissions = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
                     foreach (var permission in ConvertToPermissionList(permissions))
                     {
                         result.Add(permission);
                     }
                 }
-                else
+            }
+            else
+            {
+                foreach (var group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount - groupIds.Length))
                 {
-                    //iterate in groups of 2000 since we don't want to exceed the max SQL param count
-                    foreach (var groupOfEntityIds in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+                    var sql = Sql()
+                        .SelectAll()
+                        .From<UserGroup2NodePermissionDto>()
+                        .Where<UserGroup2NodePermissionDto>(dto => groupIds.Contains(dto.UserGroupId) && group.Contains(dto.NodeId));
+
+                    var permissions = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
+                    foreach (var permission in ConvertToPermissionList(permissions))
                     {
-                        var ids = groupOfEntityIds;
-                        var sql = Sql()
-                            .SelectAll()
-                            .From<UserGroup2NodePermissionDto>()
-                            .Where<UserGroup2NodePermissionDto>(dto => localIds.Contains(dto.UserGroupId) && ids.Contains(dto.NodeId));
-                        var permissions = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
-                        foreach (var permission in ConvertToPermissionList(permissions))
-                        {
-                            result.Add(permission);
-                        }
+                        result.Add(permission);
                     }
                 }
             }

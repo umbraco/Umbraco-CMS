@@ -1094,14 +1094,20 @@ AND umbracoNode.id <> @id",
                 }
             }
 
-            //lookup all matching rows in umbracoDocumentCultureVariation
-            var docCultureVariationsToUpdate = editedLanguageVersions.InGroupsOf(Constants.Sql.MaxParameterCount)
-                .SelectMany(_ => Database.Fetch<DocumentCultureVariationDto>(
-                    Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
-                            .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedLanguageVersions.Keys.Select(x => x.langId).ToList())
-                            .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, editedLanguageVersions.Keys.Select(x => x.nodeId))))
-                //convert to dictionary with the same key type
-                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x);
+            // lookup all matching rows in umbracoDocumentCultureVariation
+            // fetch in batches to account for maximum parameter count (distinct languages can't exceed 2000)
+            var languageIds = editedLanguageVersions.Keys.Select(x => x.langId).Distinct().ToArray();
+            var nodeIds = editedLanguageVersions.Keys.Select(x => x.nodeId).Distinct();
+            var docCultureVariationsToUpdate = nodeIds.InGroupsOf(Constants.Sql.MaxParameterCount - languageIds.Length)
+                .SelectMany(group =>
+                {
+                    var sql = Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
+                        .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, languageIds)
+                        .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, group);
+
+                    return Database.Fetch<DocumentCultureVariationDto>(sql);
+                })
+                .ToDictionary(x => (x.NodeId, (int?)x.LanguageId), x => x); //convert to dictionary with the same key type
 
             var toUpdate = new List<DocumentCultureVariationDto>();
             foreach (var ev in editedLanguageVersions)
