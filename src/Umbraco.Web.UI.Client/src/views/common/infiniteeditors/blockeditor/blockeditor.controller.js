@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.BlockEditorController",
-        function ($scope, localizationService, formHelper, overlayService) {
+        function ($scope, localizationService, formHelper, overlayService, editorService) {
 
             var vm = this;
 
@@ -37,6 +37,12 @@ angular.module("umbraco")
 
                 vm.tabs = apps;
             }
+
+            vm.ancestors = editorService.getEditors().map(item => {
+                return {
+                    name: item.title
+                };
+            });
 
             vm.submitAndClose = function () {
                 if (vm.model && vm.model.submit) {
