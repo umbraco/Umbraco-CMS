@@ -198,8 +198,9 @@ stages:
                   inputs:
                        versionSpec: 11.x
                 - task: Npm@1
-                  displayName: npm install (Client)
+                  displayName: npm ci (Client)
                   inputs:
+                    command: ci
                     workingDir: src\Umbraco.Web.UI.Client
                     verbose: false
                 - task: gulp@0
