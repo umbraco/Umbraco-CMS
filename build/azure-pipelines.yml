@@ -194,9 +194,9 @@ stages:
 #                      command: build
 #                      projects: '**/Umbraco.Web.UI.csproj'
                 - task: NodeTool@0
-                  displayName: Use Node 11.x
+                  displayName: Use Node 14.18.1 (LTS)
                   inputs:
-                       versionSpec: 11.x
+                       versionSpec: 14.18.1
                 - task: Npm@1
                   displayName: npm ci (Client)
                   inputs:
@@ -288,12 +288,13 @@ stages:
                       DBNAME: $(UmbracoDatabaseName)
                       SA_PASSWORD: $(SA_PASSWORD)
                 - task: NodeTool@0
-                  displayName: Use Node 11.x
+                  displayName: Use Node 14.18.1 (LTS)
                   inputs:
-                      versionSpec: 11.x
+                      versionSpec: 14.18.1
                 - task: Npm@1
-                  displayName: npm install (Client)
+                  displayName: npm ci (Client)
                   inputs:
+                      command: ci
                       workingDir: src/Umbraco.Web.UI.Client
                       verbose: false
                 - task: gulp@0
@@ -444,12 +445,13 @@ stages:
 
                           $ubuild.CompileJsonSchema()
                 - task: NodeTool@0
-                  displayName: Use Node 11.x
+                  displayName: Use Node 14.18.1 (LTS)
                   inputs:
-                      versionSpec: 11.x
+                      versionSpec: 14.18.1
                 - task: Npm@1
-                  displayName: npm install
+                  displayName: npm ci (Client)
                   inputs:
+                      command: ci
                       workingDir: src\Umbraco.Web.UI.Client
                       verbose: false
                 - task: gulp@0
