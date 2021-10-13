@@ -260,8 +260,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             Func<Guid[], IEnumerable<IEnumerable<IDictionaryItem>>> getItemsFromParents = guids =>
             {
-                //needs to be in groups of 2000 because we are doing an IN clause and there's a max parameter count that can be used.
-                return guids.InGroupsOf(2000)
+                return guids.InGroupsOf(Constants.Sql.MaxParameterCount)
                     .Select(@group =>
                     {
                         var sqlClause = GetBaseQuery(false)

@@ -768,7 +768,7 @@ AND umbracoNode.id <> @id",
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
 
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
-            if (whereInArgsCount > 2000)
+            if (whereInArgsCount > Constants.Sql.MaxParameterCount)
                 throw new NotSupportedException("Too many property/content types.");
 
             // delete existing relations (for target language)
@@ -906,7 +906,7 @@ AND umbracoNode.id <> @id",
             // note: important to use SqlNullableEquals for nullable types, cannot directly compare language identifiers
             //
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
-            if (whereInArgsCount > 2000)
+            if (whereInArgsCount > Constants.Sql.MaxParameterCount)
                 throw new NotSupportedException("Too many property/content types.");
 
             //first clear out any existing property data that might already exists under the target language
@@ -1005,7 +1005,7 @@ AND umbracoNode.id <> @id",
             //based on the current variance of each item to see if it's 'edited' value should be true/false.
 
             var whereInArgsCount = propertyTypeIds.Count + (contentTypeIds?.Count ?? 0);
-            if (whereInArgsCount > 2000)
+            if (whereInArgsCount > Constants.Sql.MaxParameterCount)
                 throw new NotSupportedException("Too many property/content types.");
 
             var propertySql = Sql()
@@ -1095,7 +1095,7 @@ AND umbracoNode.id <> @id",
             }
 
             //lookup all matching rows in umbracoDocumentCultureVariation
-            var docCultureVariationsToUpdate = editedLanguageVersions.InGroupsOf(2000)
+            var docCultureVariationsToUpdate = editedLanguageVersions.InGroupsOf(Constants.Sql.MaxParameterCount)
                 .SelectMany(_ => Database.Fetch<DocumentCultureVariationDto>(
                     Sql().Select<DocumentCultureVariationDto>().From<DocumentCultureVariationDto>()
                             .WhereIn<DocumentCultureVariationDto>(x => x.LanguageId, editedLanguageVersions.Keys.Select(x => x.langId).ToList())

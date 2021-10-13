@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var result = new EntityPermissionCollection();
 
-            foreach (var groupOfGroupIds in groupIds.InGroupsOf(2000))
+            foreach (var groupOfGroupIds in groupIds.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
                 //copy local
                 var localIds = groupOfGroupIds.ToArray();
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 else
                 {
                     //iterate in groups of 2000 since we don't want to exceed the max SQL param count
-                    foreach (var groupOfEntityIds in entityIds.InGroupsOf(2000))
+                    foreach (var groupOfEntityIds in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount))
                     {
                         var ids = groupOfEntityIds;
                         var sql = Sql()
@@ -133,11 +133,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var db = AmbientScope.Database;
 
-            //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit
             var sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)";
-            foreach (var idGroup in entityIds.InGroupsOf(2000))
+            foreach (var group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                db.Execute(sql, new { groupId, nodeIds = idGroup });
+                db.Execute(sql, new { groupId, nodeIds = group });
             }
 
             var toInsert = new List<UserGroup2NodePermissionDto>();
