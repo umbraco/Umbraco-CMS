@@ -45,6 +45,7 @@ Use this directive to generate a list of breadcrumbs.
 @param {array} ancestors Array of ancestors
 @param {string} entityType The content entity type (member, media, content).
 @param {callback=} onOpen Function callback when an ancestor is clicked. This will override the default link behaviour.
+@param {string} noLinks Determines if the breadcrumbs should only show text instead of showing links
 **/
 
 (function () {
@@ -102,7 +103,8 @@ Use this directive to generate a list of breadcrumbs.
                 ancestors: "=",
                 forNewEntity: "=",
                 entityType: "@",
-                onOpen: "&"
+                onOpen: "&",
+                noLinks: "@"
             },
             link: link
         };

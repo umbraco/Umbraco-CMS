@@ -25,13 +25,10 @@
 
                 <umb-editor-footer-content-left>
 
-                    <ul class="umb-breadcrumbs">
-                        <li class="umb-breadcrumbs__ancestor" ng-repeat="ancestor in vm.ancestors">
-                            <span ng-if="!$last" class="umb-breadcrumbs__ancestor-link" title="{{ancestor.name}}">{{ancestor.name}}</span>
-                            <span ng-if="!$last" class="umb-breadcrumbs__separator">&#47;</span>
-                            <span class="umb-breadcrumbs__ancestor-text" ng-if="$last" title="{{ancestor.name}}">{{ancestor.name}}</span>
-                        </li>
-                    </ul>
+                    <umb-breadcrumbs ng-if="vm.ancestors && vm.ancestors.length > 0"
+                                     ancestors="vm.ancestors"
+                                     no-links="true">
+                    </umb-breadcrumbs>
 
                 </umb-editor-footer-content-left>
 
