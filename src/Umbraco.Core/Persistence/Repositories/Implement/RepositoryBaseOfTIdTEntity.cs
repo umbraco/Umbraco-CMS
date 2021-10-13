@@ -188,7 +188,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
             if (ids.Length <= Constants.Sql.MaxParameterCount)
             {
-                // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
                 return CachePolicy.GetAll(ids, PerformGetAll);
             }
 
