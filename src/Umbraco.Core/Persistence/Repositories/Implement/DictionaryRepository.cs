@@ -261,11 +261,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Func<Guid[], IEnumerable<IEnumerable<IDictionaryItem>>> getItemsFromParents = guids =>
             {
                 return guids.InGroupsOf(Constants.Sql.MaxParameterCount)
-                    .Select(@group =>
+                    .Select(group =>
                     {
                         var sqlClause = GetBaseQuery(false)
                             .Where<DictionaryDto>(x => x.Parent != null)
-                            .Where($"{SqlSyntax.GetQuotedColumnName("parent")} IN (@parentIds)", new { parentIds = @group });
+                            .WhereIn<DictionaryDto>(x => x.Parent, group);
 
                         var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query<IDictionaryItem>());
                         var sql = translator.Translate();
