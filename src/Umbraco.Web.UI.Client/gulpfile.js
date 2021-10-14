@@ -24,15 +24,15 @@ const { watchTask } = require('./gulp/tasks/watchTask');
 // set default current compile mode:
 config.compile.current = config.compile.build;
 
-const buildCore = parallel(dependencies, js, less, views);
+const coreBuild = parallel(dependencies, js, less, views);
 
 // ***********************************************************
 // These Exports are the new way of defining Tasks in Gulp 4.x
 // ***********************************************************
 
-exports.build = series(buildCore, testUnit);
-exports.buildCore = buildCore;
-exports.dev = series(setDevelopmentMode, buildCore, runUnitTestServer, watchTask);
+exports.build = series(coreBuild, testUnit);
+exports.coreBuild = coreBuild;
+exports.dev = series(setDevelopmentMode, coreBuild, runUnitTestServer, watchTask);
 exports.watch = series(watchTask);
 //
 exports.runTests = series(setTestMode, series(js, testUnit));
