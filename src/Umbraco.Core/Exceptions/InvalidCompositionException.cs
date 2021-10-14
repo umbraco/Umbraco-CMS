@@ -85,18 +85,45 @@ namespace Umbraco.Core.Exceptions
 
         private static string FormatMessage(string contentTypeAlias, string addedCompositionAlias, string[] propertyTypeAliases, string[] propertyGroupAliases)
         {
-            // TODO Add property group aliases to message
-            return addedCompositionAlias.IsNullOrWhiteSpace()
-                    ? string.Format(
-                        "ContentType with alias '{0}' has an invalid composition " +
-                        "and there was a conflict on the following PropertyTypes: '{1}'. " +
-                        "PropertyTypes must have a unique alias across all Compositions in order to compose a valid ContentType Composition.",
-                        contentTypeAlias, string.Join(", ", propertyTypeAliases))
-                    : string.Format(
-                        "ContentType with alias '{0}' was added as a Composition to ContentType with alias '{1}', " +
-                        "but there was a conflict on the following PropertyTypes: '{2}'. " +
-                        "PropertyTypes must have a unique alias across all Compositions in order to compose a valid ContentType Composition.",
-                        addedCompositionAlias, contentTypeAlias, string.Join(", ", propertyTypeAliases));
+            // list both propertyTypeAliases and propertyGroupAliases
+            var customMsg = string.Format("PropertyTypes: '{0}' and PropertyGroups: '{1}'. PropertyTypes and PropertyGroups",
+                                    string.Join(", ", propertyTypeAliases), string.Join(", ", propertyGroupAliases));
+
+            var endMsg = " must have a unique alias across all Compositions in order to compose a valid ContentType Composition.";
+
+            // list only propertyGroupAliases when there are no property type aliases
+            if (propertyTypeAliases.Length == 0)
+            {
+                customMsg = string.Format("PropertyGroups: '{0}'. PropertyGroups",
+                                   string.Join(", ", propertyGroupAliases));
+            }
+            else
+            {
+                // list only propertyTypeAliases when there are no property group aliases
+                if (propertyGroupAliases.Length == 0)
+                {
+                    customMsg = string.Format("PropertyTypes: '{0}'. PropertyTypes",
+                                           string.Join(", ", propertyTypeAliases));
+                }
+            }
+
+            string message;
+            if (addedCompositionAlias.IsNullOrWhiteSpace())
+            {
+                var startMsg = "ContentType with alias '{0}' has an invalid composition " +
+                                 "and there was a conflict on the following ";
+
+                message = string.Format(startMsg + customMsg + endMsg, contentTypeAlias);
+            }
+            else
+            {
+                var startMsg = "ContentType with alias '{0}' was added as a Composition to ContentType with alias '{1}', " +
+                        "but there was a conflict on the following ";
+
+                message = string.Format(startMsg + customMsg + endMsg, addedCompositionAlias, contentTypeAlias);
+            }
+
+            return message;
         }
 
         /// <summary>
