@@ -148,8 +148,17 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
                     return multiNodeTreePicker;
                 }
 
+<<<<<<< HEAD
                 // return the first nodeId as this is one of the excluded properties that expects a single id
                 return udis.FirstOrDefault();
+=======
+                if (isSingleNodePicker)
+                {
+                    return multiNodeTreePicker.Count > 0 ? multiNodeTreePicker[0] : null;
+                }
+
+                return multiNodeTreePicker;
+>>>>>>> 56b4e5ae4e (Check IList isn't empty)
             }
         }
 
