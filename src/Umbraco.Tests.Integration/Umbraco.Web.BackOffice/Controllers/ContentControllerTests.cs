@@ -476,8 +476,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
             });
         }
-        [assembly: NUnit.Framework.SetCulture("se-SE")]
-        [assembly: NUnit.Framework.SetUICulture("se-SE")]
         [Test]
         public async Task PostSave_Validates_All_Cultures_Has_Domains()
         {
@@ -531,7 +529,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
 
             ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
-            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain");
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{"en-US"});
 
             Assert.Multiple(() =>
             {
