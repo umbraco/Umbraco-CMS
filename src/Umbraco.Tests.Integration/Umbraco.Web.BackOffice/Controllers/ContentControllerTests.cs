@@ -446,27 +446,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             var currentThreadCulture = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
             var currentUICulture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
-            if (string.IsNullOrEmpty(currentThreadCulture))
-            {
-                TestContext.Progress.Write($"======CURRENT THREAD CULTURE IN TEST====== NO CULTURE");
-            }
-            else
-            {
-                TestContext.Progress.Write($"======CURRENT THREAD CULTURE IN TEST======{currentThreadCulture}");
-            }
-            if (string.IsNullOrEmpty(currentUICulture))
-            {
-                TestContext.Progress.Write($"======CURRENT UI CULTURE IN TEST====== NO CULTURE");
-            }
-            else
-            {
-                TestContext.Progress.Write($"======CURRENT UI CULTURE IN TEST======{currentUICulture}");
-            }
             ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
-            foreach (var culture in localizedTextService.GetSupportedCultures())
-            {
-                TestContext.Progress.Write($"======SUPPORTED CULTURES IN TEXT SERVICE======{culture.Name}");
-            }
             var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithNoDomains");
 
             Assert.Multiple(() =>
