@@ -490,7 +490,7 @@ namespace Umbraco.Web.Editors
                 var groupIndex = contentTypeSave.Groups.IndexOf(group);
 
                 var key = $"Groups[{groupIndex}].Properties[{propertyIndex}].Alias";
-                ModelState.AddModelError(key, "Duplicate property aliases are not allowed between compositions");
+                ModelState.AddModelError(key, "Duplicate property aliases aren't allowed between compositions");
             }
 
             foreach (var propertyGroupAlias in invalidPropertyGroupAliases)
@@ -499,7 +499,7 @@ namespace Umbraco.Web.Editors
                 var group = contentTypeSave.Groups.Single(x => x.Alias == propertyGroupAlias);
                 var groupIndex = contentTypeSave.Groups.IndexOf(group);
                 var key = $"Groups[{groupIndex}].Name";
-                ModelState.AddModelError(key, "Same alias for tab and group is not allowed between compositions");
+                ModelState.AddModelError(key, "Different group types aren't allowed between compositions");
             }
         }
 
