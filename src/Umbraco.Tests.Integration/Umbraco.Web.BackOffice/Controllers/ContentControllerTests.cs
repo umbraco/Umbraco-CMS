@@ -467,7 +467,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             {
                 TestContext.Progress.Write($"======SUPPORTED CULTURES IN TEXT SERVICE======{culture.Name}");
             }
-            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithNoDomains", new []{"en-US"});
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithNoDomains");
 
             Assert.Multiple(() =>
             {
@@ -476,7 +476,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
             });
         }
-
+        [assembly: NUnit.Framework.SetCulture("se-SE")]
+        [assembly: NUnit.Framework.SetUICulture("se-SE")]
         [Test]
         public async Task PostSave_Validates_All_Cultures_Has_Domains()
         {
@@ -530,7 +531,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
 
             ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
-            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{"en-US"});
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain");
 
             Assert.Multiple(() =>
             {
