@@ -456,10 +456,10 @@ namespace Umbraco.Web.Editors
             {
                 // if it's not successful then we need to return some model state for the property type and property group
                 // aliases that are duplicated
-                var invalidPropertyTypeAliases = validateAttempt.Result.Distinct();
+                var duplicatePropertyTypeAliases = validateAttempt.Result.Distinct();
                 var invalidPropertyGroupAliases = (validateAttempt.Exception as InvalidCompositionException)?.PropertyGroupAliases ?? Array.Empty<string>();
 
-                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidPropertyTypeAliases, invalidPropertyGroupAliases);
+                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, duplicatePropertyTypeAliases, invalidPropertyGroupAliases);
 
                 var display = Mapper.Map<TContentTypeDisplay>(composition);
                 //map the 'save' data on top
@@ -474,14 +474,14 @@ namespace Umbraco.Web.Editors
         /// Adds errors to the model state if any invalid aliases are found then throws an error response if there are errors
         /// </summary>
         /// <param name="contentTypeSave"></param>
-        /// <param name="invalidPropertyTypeAliases"></param>
+        /// <param name="duplicatePropertyTypeAliases"></param>
         /// <param name="invalidPropertyGroupAliases"></param>
         /// <returns></returns>
-        private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(TContentTypeSave contentTypeSave, IEnumerable<string> invalidPropertyTypeAliases, IEnumerable<string> invalidPropertyGroupAliases)
+        private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(TContentTypeSave contentTypeSave, IEnumerable<string> duplicatePropertyTypeAliases, IEnumerable<string> invalidPropertyGroupAliases)
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
         {
-            foreach (var propertyTypeAlias in invalidPropertyTypeAliases)
+            foreach (var propertyTypeAlias in duplicatePropertyTypeAliases)
             {
                 // Find the property type relating to these
                 var property = contentTypeSave.Groups.SelectMany(x => x.Properties).Single(x => x.Alias == propertyTypeAlias);
