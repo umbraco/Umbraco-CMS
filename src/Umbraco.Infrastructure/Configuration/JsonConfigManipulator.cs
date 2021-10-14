@@ -209,13 +209,20 @@ namespace Umbraco.Cms.Core.Configuration
                 {
                     var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
 
-                    using (var sw = new StreamWriter(jsonFilePath, false))
-                    using (var jsonTextWriter = new JsonTextWriter(sw)
+                    try
                     {
-                        Formatting = Formatting.Indented,
-                    })
+                        using (var sw = new StreamWriter(jsonFilePath, false))
+                        using (var jsonTextWriter = new JsonTextWriter(sw)
+                        {
+                            Formatting = Formatting.Indented,
+                        })
+                        {
+                            json?.WriteTo(jsonTextWriter);
+                        }
+                    }
+                    catch (IOException exception)
                     {
-                        json?.WriteTo(jsonTextWriter);
+                        _logger.LogWarning(exception, "JSON configuration could not be written: {path}", jsonFilePath);
                     }
                 }
             }
@@ -239,9 +246,9 @@ namespace Umbraco.Cms.Core.Configuration
                     using var jsonTextReader = new JsonTextReader(sr);
                     return serializer.Deserialize<JObject>(jsonTextReader);
                 }
-                catch (FileNotFoundException)
+                catch (IOException exception)
                 {
-                    _logger.LogWarning("JSON configuration file does not exist: {path}", jsonFilePath);
+                    _logger.LogWarning(exception, "JSON configuration could not be read: {path}", jsonFilePath);
                     return null;
                 }
             }
