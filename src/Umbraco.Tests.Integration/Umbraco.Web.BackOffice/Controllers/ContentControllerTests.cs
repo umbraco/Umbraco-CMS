@@ -445,14 +445,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
 
-            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
-            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithNoDomains");
-
             Assert.Multiple(() =>
             {
                 Assert.IsNotNull(display);
                 Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
-                Assert.AreEqual(expectedMessage, display.Notifications.First().Message);
             });
         }
 
@@ -508,14 +504,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
 
-            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
-            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{enString});
 
             Assert.Multiple(() =>
             {
                 Assert.NotNull(display);
                 Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
-                Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
             });
         }
 
