@@ -444,8 +444,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
 
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+            TestContext.Progress.Write($"======CURRENT THREAD CULTURE IN TEST======{Thread.CurrentThread.CurrentCulture.Name}");
             ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
+            foreach (var culture in localizedTextService.GetSupportedCultures())
+            {
+                TestContext.Progress.Write($"======SUPPORTED CULTURES IN TEXT SERVICE======{culture.Name}");
+            }
             var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithNoDomains", new []{"en-US"});
 
             Assert.Multiple(() =>
@@ -506,6 +510,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             var body = await response.Content.ReadAsStringAsync();
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+
 
             ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
             var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{"en-US"});

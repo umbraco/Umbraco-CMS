@@ -261,8 +261,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 Mock.Of<ISqlContext>(),
                 Mock.Of<IJsonSerializer>(),
                 Mock.Of<IScopeProvider>(),
-                Mock.Of<IAuthorizationService>(),
-                Mock.Of<IUserDataService>()
+                Mock.Of<IAuthorizationService>()
             );
 
             return controller;
