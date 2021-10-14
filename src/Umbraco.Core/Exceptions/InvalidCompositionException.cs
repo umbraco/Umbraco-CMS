@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Umbraco.Core.Exceptions
 {
@@ -85,45 +86,28 @@ namespace Umbraco.Core.Exceptions
 
         private static string FormatMessage(string contentTypeAlias, string addedCompositionAlias, string[] propertyTypeAliases, string[] propertyGroupAliases)
         {
-            // list both propertyTypeAliases and propertyGroupAliases
-            var customMsg = string.Format("PropertyTypes: '{0}' and PropertyGroups: '{1}'. PropertyTypes and PropertyGroups",
-                                    string.Join(", ", propertyTypeAliases), string.Join(", ", propertyGroupAliases));
+            var sb = new StringBuilder();
 
-            var endMsg = " must have a unique alias across all Compositions in order to compose a valid ContentType Composition.";
-
-            // list only propertyGroupAliases when there are no property type aliases
-            if (propertyTypeAliases.Length == 0)
-            {
-                customMsg = string.Format("PropertyGroups: '{0}'. PropertyGroups",
-                                   string.Join(", ", propertyGroupAliases));
-            }
-            else
-            {
-                // list only propertyTypeAliases when there are no property group aliases
-                if (propertyGroupAliases.Length == 0)
-                {
-                    customMsg = string.Format("PropertyTypes: '{0}'. PropertyTypes",
-                                           string.Join(", ", propertyTypeAliases));
-                }
-            }
-
-            string message;
             if (addedCompositionAlias.IsNullOrWhiteSpace())
             {
-                var startMsg = "ContentType with alias '{0}' has an invalid composition " +
-                                 "and there was a conflict on the following ";
-
-                message = string.Format(startMsg + customMsg + endMsg, contentTypeAlias);
+                sb.AppendFormat("Content type with alias '{0}' has an invalid composition.", contentTypeAlias);
             }
             else
             {
-                var startMsg = "ContentType with alias '{0}' was added as a Composition to ContentType with alias '{1}', " +
-                        "but there was a conflict on the following ";
-
-                message = string.Format(startMsg + customMsg + endMsg, addedCompositionAlias, contentTypeAlias);
+                sb.AppendFormat("Content type with alias '{0}' was added as a composition to content type with alias '{1}', but there was a conflict.", addedCompositionAlias, contentTypeAlias);
             }
 
-            return message;
+            if (propertyTypeAliases.Length > 0)
+            {
+                sb.AppendFormat(" Property types must have a unique alias across all compositions, these aliases are duplicate: {0}.", string.Join(", ", propertyTypeAliases));
+            }
+
+            if (propertyGroupAliases.Length > 0)
+            {
+                sb.AppendFormat(" Property groups with the same alias must also have the same type across all compositions, these aliases have different types: {0}.", string.Join(", ", propertyGroupAliases));
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>
