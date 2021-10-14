@@ -65,6 +65,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
         private readonly ILogger<ContentController> _logger;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IUserDataService _userDataService;
 
         public object Domains { get; private set; }
 
@@ -90,7 +91,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ISqlContext sqlContext,
             IJsonSerializer serializer,
             IScopeProvider scopeProvider,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService,
+            IUserDataService userDataService)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _propertyEditors = propertyEditors;
@@ -112,6 +114,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _logger = loggerFactory.CreateLogger<ContentController>();
             _scopeProvider = scopeProvider;
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _userDataService = userDataService;
         }
 
         /// <summary>
@@ -1470,14 +1473,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 assignedDomains.UnionWith(_domainService.GetAssignedDomains(ancestorID, true));
             }
-
+            foreach (var data in _userDataService.GetUserData())
+            {
+                _logger.LogWarning($"{data.Name} : {data.Data}");
+            }
             // No domains at all, add a warning, to add domains.
             if (assignedDomains.Count == 0)
             {
                 globalNotifications.AddWarningNotification(
                     _localizedTextService.Localize("auditTrails", "publish"),
                     _localizedTextService.Localize("speechBubbles", "publishWithNoDomains"));
-
+                _logger.LogWarning("NOT REGISTRED DOMAIN FOR: {Cultures}");
                 _logger.LogWarning("The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
                     persistedContent.Name, string.Join(", ", publishedCultures));
                 return;

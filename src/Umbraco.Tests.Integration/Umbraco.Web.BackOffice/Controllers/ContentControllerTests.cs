@@ -412,7 +412,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         [Test]
         public async Task PostSave_Validates_Domains_Exist()
         {
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             localizationService.Save(new LanguageBuilder()
                 .WithCultureInfo("da-DK")
@@ -445,17 +444,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
 
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
+            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithNoDomains", new []{"en-US"});
+
             Assert.Multiple(() =>
             {
                 Assert.IsNotNull(display);
                 Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+                Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
             });
         }
 
         [Test]
         public async Task PostSave_Validates_All_Cultures_Has_Domains()
         {
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US");
             var enString = "en-US";
             var dkString = "da-DK";
 
@@ -504,11 +507,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
 
+            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{"en-US"});
 
             Assert.Multiple(() =>
             {
                 Assert.NotNull(display);
                 Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+                Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
             });
         }
 
