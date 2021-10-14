@@ -97,18 +97,22 @@ namespace Umbraco.Core.Services.Implement
                     stack.Push(c);
             }
 
+            var duplicatePropertyTypeAliases = new List<string>();
+            var invalidPropertyGroupAliases = new List<string>();
+
             foreach (var dependency in dependencies)
             {
                 if (dependency.Id == compositionContentType.Id) continue;
                 var contentTypeDependency = allContentTypes.FirstOrDefault(x => x.Alias.Equals(dependency.Alias, StringComparison.InvariantCultureIgnoreCase));
                 if (contentTypeDependency == null) continue;
 
-                var duplicatePropertyTypeAliases = contentTypeDependency.PropertyTypes.Select(x => x.Alias).Intersect(propertyTypeAliases, StringComparer.InvariantCultureIgnoreCase).ToArray();
-                var invalidPropertyGroupAliases = contentTypeDependency.PropertyGroups.Where(x => propertyGroupAliases.TryGetValue(x.Alias, out var type) && type != x.Type).Select(x => x.Alias).ToArray();
+                duplicatePropertyTypeAliases.AddRange(contentTypeDependency.PropertyTypes.Select(x => x.Alias).Intersect(propertyTypeAliases, StringComparer.InvariantCultureIgnoreCase));
+                invalidPropertyGroupAliases.AddRange(contentTypeDependency.PropertyGroups.Where(x => propertyGroupAliases.TryGetValue(x.Alias, out var type) && type != x.Type).Select(x => x.Alias));
+            }
 
-                if (duplicatePropertyTypeAliases.Length == 0 && invalidPropertyGroupAliases.Length == 0) continue;
-
-                throw new InvalidCompositionException(compositionContentType.Alias, null, duplicatePropertyTypeAliases, invalidPropertyGroupAliases);
+            if (duplicatePropertyTypeAliases.Count > 0 || invalidPropertyGroupAliases.Count > 0)
+            {
+                throw new InvalidCompositionException(compositionContentType.Alias, null, duplicatePropertyTypeAliases.Distinct().ToArray(), invalidPropertyGroupAliases.Distinct().ToArray());
             }
         }
 
