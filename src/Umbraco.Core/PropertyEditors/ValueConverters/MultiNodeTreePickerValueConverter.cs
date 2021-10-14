@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
@@ -19,10 +18,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
     public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IMemberService _memberService;
 
-        private static readonly List<string> PropertiesToExclude = new List<string>
+        private static readonly List<string> PropertiesToExclude = new()
         {
             Constants.Conventions.Content.InternalRedirectId.ToLower(CultureInfo.InvariantCulture),
             Constants.Conventions.Content.Redirect.ToLower(CultureInfo.InvariantCulture)
@@ -30,30 +29,40 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         public MultiNodeTreePickerValueConverter(
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedModelFactory publishedModelFactory,
             IMemberService memberService)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
-            _umbracoContextAccessor = umbracoContextAccessor;
+            _publishedModelFactory = publishedModelFactory;
             _memberService = memberService;
         }
 
-        public override bool IsConverter(IPublishedPropertyType propertyType)
-        {
-            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
-        }
+        public override bool IsConverter(IPublishedPropertyType propertyType) => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
-            => PropertyCacheLevel.Snapshot;
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-            => IsSingleNodePicker(propertyType)
-                ? typeof(IPublishedContent)
+        {
+            var contentTypeStrings = propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>().Filter;
+            var contentTypes = contentTypeStrings?.Split(',') ?? Array.Empty<string>();
+
+            if (IsSingleNodePicker(propertyType))
+            {
+                return contentTypes.Length == 1
+                    ? ModelType.For(contentTypes[0])
+                    : typeof(IPublishedContent);
+            }
+
+            return contentTypes.Length == 1
+                ? typeof(IEnumerable<>).MakeGenericType(ModelType.For(contentTypes[0]))
                 : typeof(IEnumerable<IPublishedContent>);
+        }
+
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
-            if (source == null) return null;
+            if (source == null)
+                return null;
 
             if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
             {
@@ -73,70 +82,65 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 return null;
             }
 
-            // TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
-            if (_umbracoContextAccessor.TryGetUmbracoContext(out _))
+            var udis = (Udi[])source;
+            var isSingleNodePicker = IsSingleNodePicker(propertyType);
+
+            var contentTypeStrings = propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>().Filter;
+            var contentTypes = contentTypeStrings.Split(',');
+
+
+            if ((propertyType.Alias != null && PropertiesToExclude.InvariantContains(propertyType.Alias)) == false)
             {
-                if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
+                var multiNodeTreePicker = contentTypes.Length == 1
+                    ? _publishedModelFactory.CreateModelList(contentTypes[0])
+                    : new List<IPublishedContent>();
+
+                var objectType = UmbracoObjectTypes.Unknown;
+                var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+                foreach (var udi in udis)
                 {
-                    var udis = (Udi[])source;
-                    var isSingleNodePicker = IsSingleNodePicker(propertyType);
+                    var guidUdi = udi as GuidUdi;
+                    if (guidUdi == null)
+                        continue;
 
-                    if ((propertyType.Alias != null && PropertiesToExclude.InvariantContains(propertyType.Alias)) == false)
+                    IPublishedContent multiNodeTreePickerItem = null;
+                    switch (udi.EntityType)
                     {
-                        var multiNodeTreePicker = new List<IPublishedContent>();
-
-                        var objectType = UmbracoObjectTypes.Unknown;
-                        var publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-                        foreach (var udi in udis)
-                        {
-                            var guidUdi = udi as GuidUdi;
-                            if (guidUdi == null) continue;
-
-                            IPublishedContent multiNodeTreePickerItem = null;
-                            switch (udi.EntityType)
+                        case Constants.UdiEntityType.Document:
+                            multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => publishedSnapshot.Content.GetById(guidUdi.Guid));
+                            break;
+                        case Constants.UdiEntityType.Media:
+                            multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => publishedSnapshot.Media.GetById(guidUdi.Guid));
+                            break;
+                        case Constants.UdiEntityType.Member:
+                            multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id =>
                             {
-                                case Constants.UdiEntityType.Document:
-                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Document, id => publishedSnapshot.Content.GetById(guidUdi.Guid));
-                                    break;
-                                case Constants.UdiEntityType.Media:
-                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Media, id => publishedSnapshot.Media.GetById(guidUdi.Guid));
-                                    break;
-                                case Constants.UdiEntityType.Member:
-                                    multiNodeTreePickerItem = GetPublishedContent(udi, ref objectType, UmbracoObjectTypes.Member, id =>
-                                    {
-                                        IMember m = _memberService.GetByKey(guidUdi.Guid);
-                                        if (m == null)
-                                        {
-                                            return null;
-                                        }
-                                        IPublishedContent member = publishedSnapshot.Members.Get(m);
-                                        return member;
-                                    });
-                                    break;
-                            }
-
-                            if (multiNodeTreePickerItem != null && multiNodeTreePickerItem.ContentType.ItemType != PublishedItemType.Element)
-                            {
-                                multiNodeTreePicker.Add(multiNodeTreePickerItem);
-                                if (isSingleNodePicker)
+                                IMember m = _memberService.GetByKey(guidUdi.Guid);
+                                if (m == null)
                                 {
-                                    break;
+                                    return null;
                                 }
-                            }
-                        }
-
-                        if (isSingleNodePicker)
-                        {
-                            return multiNodeTreePicker.FirstOrDefault();
-                        }
-                        return multiNodeTreePicker;
+                                IPublishedContent member = publishedSnapshot.Members.Get(m);
+                                return member;
+                            });
+                            break;
                     }
 
-                    // return the first nodeId as this is one of the excluded properties that expects a single id
-                    return udis.FirstOrDefault();
+                    if (multiNodeTreePickerItem != null && multiNodeTreePickerItem.ContentType.ItemType != PublishedItemType.Element)
+                    {
+                        multiNodeTreePicker.Add(multiNodeTreePickerItem);
+                        if (isSingleNodePicker)
+                        {
+                            break;
+                        }
+                    }
                 }
+
+                return isSingleNodePicker ? multiNodeTreePicker[0] : multiNodeTreePicker;
             }
-            return source;
+
+            // return the first nodeId as this is one of the excluded properties that expects a single id
+            return udis.FirstOrDefault();
         }
 
         /// <summary>
