@@ -136,7 +136,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     }
                 }
 
-                return isSingleNodePicker ? multiNodeTreePicker[0] : multiNodeTreePicker;
+                if (isSingleNodePicker)
+                {
+                    return multiNodeTreePicker.Count > 0 ? multiNodeTreePicker[0] : null;
+                }
+
+                return multiNodeTreePicker;
             }
 
             // return the first nodeId as this is one of the excluded properties that expects a single id
