@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -440,12 +439,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             {
                 { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
             });
+            
             var body = await response.Content.ReadAsStringAsync();
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
 
-            var currentThreadCulture = Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName;
-            var currentUICulture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
             ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
             var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithNoDomains");
 
