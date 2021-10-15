@@ -4,7 +4,6 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -442,7 +441,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             {
                 { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
             });
-            
+
             var body = await response.Content.ReadAsStringAsync();
             body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
             ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
