@@ -19,6 +19,7 @@
 .DS_Store
 ._.DS_Store
 .vs/
+.idea/
 
 # Build directories
 [Bb]in/
@@ -45,7 +46,6 @@ lib-bower
 NDependOut/*
 QueryResult.htm
 tools/docfx/*
-src/.idea/*
 
 # Ignore rule for clearing out Belle (avoid rebuilding all the time)
 preserve.belle
