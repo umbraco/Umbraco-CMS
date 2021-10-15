@@ -148,6 +148,7 @@
     <Compile Include="Migrations\Upgrade\V_8_15_0\UpgradedIncludeIndexes.cs" />
     <Compile Include="Migrations\Upgrade\V_8_10_0\AddPropertyTypeLabelOnTopColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_17_0\AddPropertyTypeGroupColumns.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_18_0\AddContentVersionCleanupFeature.cs" />
     <Compile Include="Migrations\Upgrade\V_8_9_0\ExternalLoginTableUserData.cs" />
     <Compile Include="Models\Blocks\BlockEditorDataConverter.cs" />
     <Compile Include="Models\Blocks\BlockEditorData.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="Persistence\Dtos\ColumnInSchemaDto.cs" />
     <Compile Include="Persistence\Dtos\ConstraintPerColumnDto.cs" />
     <Compile Include="Persistence\Dtos\ConstraintPerTableDto.cs" />
+    <Compile Include="Persistence\Dtos\ContentVersionCleanupPolicyDto.cs" />
     <Compile Include="Persistence\Dtos\DefaultConstraintPerColumnDto.cs" />
     <Compile Include="Persistence\Dtos\UserNotificationDto.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
