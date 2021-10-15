@@ -1,4 +1,5 @@
 {
+  "private": true,
   "scripts": {
     "postinstall": "node postinstall.js",
     "config": "node config.js",
