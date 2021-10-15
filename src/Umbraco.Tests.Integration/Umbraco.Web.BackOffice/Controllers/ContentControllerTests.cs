@@ -25,6 +25,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
     [TestFixture]
     public class ContentControllerTests : UmbracoTestServerTestBase
     {
+        private const string UsIso = "en-US";
+        private const string DkIso = "da-DK";
+
         /// <summary>
         ///     Returns 404 if the content wasn't found based on the ID specified
         /// </summary>
@@ -35,7 +38,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -93,7 +96,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -162,7 +165,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -227,7 +230,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -288,7 +291,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -352,7 +355,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -376,8 +379,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             Content content = new ContentBuilder()
                 .WithId(0)
-                .WithCultureName("en-US", "English")
-                .WithCultureName("da-DK", "Danish")
+                .WithCultureName(UsIso, "English")
+                .WithCultureName(DkIso, "Danish")
                 .WithContentType(contentType)
                 .AddPropertyData()
                 .WithKeyValue("title", "Cool invariant title")
@@ -414,7 +417,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         {
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -425,8 +428,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             Content content = new ContentBuilder()
                 .WithId(1)
                 .WithContentType(contentType)
-                .WithCultureName("en-US", "Root")
-                .WithCultureName("da-DK", "Rod")
+                .WithCultureName(UsIso, "Root")
+                .WithCultureName(DkIso, "Rod")
                 .Build();
 
             ContentItemSave model = new ContentItemSaveBuilder()
@@ -459,12 +462,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         [Test]
         public async Task PostSave_Validates_All_Cultures_Has_Domains()
         {
-            var enString = "en-US";
-            var dkString = "da-DK";
-
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo(dkString)
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -475,8 +475,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             Content content = new ContentBuilder()
                 .WithoutIdentity()
                 .WithContentType(contentType)
-                .WithCultureName(enString, "Root")
-                .WithCultureName(dkString, "Rod")
+                .WithCultureName(UsIso, "Root")
+                .WithCultureName(DkIso, "Rod")
                 .Build();
 
             IContentService contentService = GetRequiredService<IContentService>();
@@ -487,7 +487,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithAction(ContentSaveAction.Publish)
                 .Build();
 
-            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(dkString);
+            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
             IDomainService domainService = GetRequiredService<IDomainService>();
             var dkDomain = new UmbracoDomain("/")
             {
@@ -509,7 +509,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
 
             ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
-            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{"en-US"});
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{UsIso});
 
             Assert.Multiple(() =>
             {
@@ -522,12 +522,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
         [Test]
         public async Task PostSave_Checks_Ancestors_For_Domains()
         {
-            var enString = "en-US";
-            var dkString = "da-DK";
-
             ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo(dkString)
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -538,8 +535,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
             Content rootNode = new ContentBuilder()
                 .WithoutIdentity()
                 .WithContentType(contentType)
-                .WithCultureName(enString, "Root")
-                .WithCultureName(dkString, "Rod")
+                .WithCultureName(UsIso, "Root")
+                .WithCultureName(DkIso, "Rod")
                 .Build();
 
             IContentService contentService = GetRequiredService<IContentService>();
@@ -549,8 +546,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithoutIdentity()
                 .WithParent(rootNode)
                 .WithContentType(contentType)
-                .WithCultureName(dkString, "Barn")
-                .WithCultureName(enString, "Child")
+                .WithCultureName(DkIso, "Barn")
+                .WithCultureName(UsIso, "Child")
                 .Build();
 
             contentService.SaveAndPublish(childNode);
@@ -559,14 +556,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 .WithoutIdentity()
                 .WithParent(childNode)
                 .WithContentType(contentType)
-                .WithCultureName(dkString, "BarneBarn")
-                .WithCultureName(enString, "GrandChild")
+                .WithCultureName(DkIso, "BarneBarn")
+                .WithCultureName(UsIso, "GrandChild")
                 .Build();
 
             contentService.Save(grandChild);
 
-            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(dkString);
-            ILanguage usLanguage = localizationService.GetLanguageByIsoCode(enString);
+            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
+            ILanguage usLanguage = localizationService.GetLanguageByIsoCode(UsIso);
             IDomainService domainService = GetRequiredService<IDomainService>();
             var dkDomain = new UmbracoDomain("/")
             {
