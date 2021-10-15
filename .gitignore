@@ -19,13 +19,12 @@
 .DS_Store
 ._.DS_Store
 .vs/
-/local/
 
 # Build directories
 [Bb]in/
-[Db]ebug*/
-[Rr]elease*/
-obj/
+[Oo]bj/
+[Db]ebug/
+[Rr]elease/
 
 # Tools
 _ReSharper*/
@@ -35,31 +34,18 @@ _NCrunch_*/
 *.ncrunchproject
 *.crunchsolution.cache
 tools/NDepend/
-
 [Tt]est[Rr]esult*
 [Bb]uild[Ll]og.*
-*.[Pp]ublish.xml
 [sS]ource
 [sS]andbox
-
 node_modules
 lib-bower
-
-src/Umbraco.Web.UI.Client/[Bb]uild/*
-src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
-
-src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
-src/Umbraco.Web.UI.Client/vwd.webinfo
-
-src/*.psess
-src/*.vspx
-
+*.psess
+*.vspx
 NDependOut/*
 QueryResult.htm
-
-build/ApiDocs/*
-build/ApiDocs/Output/*
-src/Umbraco.Web.UI.Client/bower_components/*
+tools/docfx/*
+src/.idea/*
 
 # Ignore rule for clearing out Belle (avoid rebuilding all the time)
 preserve.belle
@@ -67,18 +53,6 @@ preserve.belle
 # Ignore rule for output of generated documentation files from grunt docserve
 src/Umbraco.Web.UI.Docs/api
 src/Umbraco.Web.UI.Docs/package-lock.json
-src/*.boltdata/
-src/umbraco.sln.ide/*
-
-tools/docfx/*
-apidocs/_site/*
-src/*/project.lock.json
-src/.idea/*
-
-apidocs/api/*
-build/docs.zip
-build/ui-docs.zip
-build/csharp-docs.zip
 
 # Build
 build.out/
@@ -86,9 +60,18 @@ build.tmp/
 build/hooks/
 build/temp/
 
-# Tests
-cypress.env.json
+# Build output
+build/docs.zip
+build/ui-docs.zip
+build/csharp-docs.zip
+build/ApiDocs/*
+build/ApiDocs/Output/*
 src/ApiDocs/api/*
+
+# Environment specific data
+src/Umbraco.Web.UI.Client/[Bb]uild/*
+src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
+src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
 src/Umbraco.Web.UI.Client/TESTS-*.xml
 src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/*
 src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs
@@ -101,6 +84,9 @@ src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/js/*
 src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/lib/*
 src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/views/*
 src/Umbraco.Web.UI/wwwroot/Media/*
+
+# Tests
+cypress.env.json
 tests/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
 tests/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
 tests/Umbraco.Tests.AcceptanceTest/cypress/videos/
