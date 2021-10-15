@@ -1,4 +1,5 @@
 {
+  "name": "ui",
   "private": true,
   "scripts": {
     "test": "gulp runTests",

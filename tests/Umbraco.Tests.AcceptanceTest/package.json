@@ -1,4 +1,5 @@
 {
+  "name": "acceptancetest",
   "private": true,
   "scripts": {
     "postinstall": "node postinstall.js",
