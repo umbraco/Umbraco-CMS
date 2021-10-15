@@ -49,21 +49,21 @@
                         </p>
 
                         <p>
-                            Placeholders finds the nearest published ID and runs its query from there, so for instance:
+                            A placeholder finds the nearest published ID and runs its query from there, so for instance:
                         </p>
                         
                         <pre>$parent/newsArticle</pre>
                         
                         <p>
-                            Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news articles there.
+                            Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news article children there.
                         </p>
 
                         <p>
                             Available placeholders: <br/>
-                            <code>$current</code>: current page or closest found ancestor<br/>
-                            <code>$parent</code>: parent page or closest found ancestor<br/>
-                            <code>$root</code>: root of the content tree<br/>
-                            <code>$site</code>: Ancestor node at level 1 <br/>
+                            <code>$current</code>: Current page or closest found ancestor<br/>
+                            <code>$parent</code>: Parent page or closest found ancestor<br/>
+                            <code>$root</code>: Root of the content tree<br/>
+                            <code>$site</code>: Ancestor node at level 1<br/>
                         </p>
                         <p>
                             Note: The placeholder can only be used at the beginning of the query.
