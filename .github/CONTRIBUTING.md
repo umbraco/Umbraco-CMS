@@ -159,7 +159,7 @@ There are two big areas that you should know about:
   You may need to run the following commands to set up gulp properly:
   ```
   npm cache clean --force
-  npm install
+  npm ci
   npm run build
   ```
   The caching for the back office has been described as 'aggressive' so we often find it's best when making back office changes to disable caching in the browser to help you to see the changes you're making.

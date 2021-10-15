@@ -222,8 +222,9 @@ stages:
                           @{ username = $env:Umbraco__CMS__Unattended__UnattendedUserEmail; password = $env:Umbraco__CMS__Unattended__UnattendedUserPassword } | ConvertTo-Json | Set-Content -Path "tests\Umbraco.Tests.AcceptanceTest\cypress.env.json"
                 - task: Npm@1
                   name: PrepareTask
-                  displayName: npm install (AcceptanceTest)
+                  displayName: npm ci (AcceptanceTest)
                   inputs:
+                      command: ci
                       workingDir: 'tests\Umbraco.Tests.AcceptanceTest'
                 - task: Npm@1
                   displayName: Run Cypress (Desktop)
@@ -319,8 +320,9 @@ stages:
                     PASSWORD: $(Umbraco__CMS__Unattended__UnattendedUserPassword)
                 - task: Npm@1
                   name: PrepareTask
-                  displayName: npm install (AcceptanceTest)
+                  displayName: npm ci (AcceptanceTest)
                   inputs:
+                      command: ci
                       workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
                 - task: Npm@1
                   displayName: Run Cypress (Desktop)
