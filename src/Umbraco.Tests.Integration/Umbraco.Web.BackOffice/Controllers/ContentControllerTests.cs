@@ -456,6 +456,100 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
             });
         }
+
+        [Test]
+        public async Task PostSave_Validates_All_Ancestor_Cultures_Are_Considered()
+        {
+            var sweIso = "sv-SE";
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            //Create 2 new languages
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo(DkIso)
+                .WithIsDefault(false)
+                .Build());
+
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo(sweIso)
+                .WithIsDefault(false)
+                .Build());
+
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+            IContentType contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
+            contentTypeService.Save(contentType);
+
+            Content content = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithCultureName(UsIso, "Root")
+                .Build();
+
+            IContentService contentService = GetRequiredService<IContentService>();
+            contentService.SaveAndPublish(content);
+
+            Content childContent = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithParent(content)
+                .WithCultureName(DkIso, "Barn")
+                .WithCultureName(UsIso, "Child")
+                .Build();
+
+            contentService.SaveAndPublish(childContent);
+
+            Content grandChildContent = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithParent(childContent)
+                .WithCultureName(sweIso, "Bjarn")
+                .Build();
+
+
+            ContentItemSave model = new ContentItemSaveBuilder()
+                .WithContent(grandChildContent)
+                .WithParentId(childContent.Id)
+                .WithAction(ContentSaveAction.PublishNew)
+                .Build();
+
+            ILanguage enLanguage = localizationService.GetLanguageByIsoCode(UsIso);
+            IDomainService domainService = GetRequiredService<IDomainService>();
+            var enDomain = new UmbracoDomain("/en")
+            {
+                RootContentId = content.Id,
+                LanguageId = enLanguage.Id
+            };
+            domainService.Save(enDomain);
+
+            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
+            var dkDomain = new UmbracoDomain("/dk")
+            {
+                RootContentId = childContent.Id,
+                LanguageId = dkLanguage.Id
+            };
+            domainService.Save(dkDomain);
+
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+
+            HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
+            {
+                { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
+            });
+
+            var body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+
+
+            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{"sv-SE"});
+
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(display);
+                Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+                Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
+            });
+        }
+
         [Test]
         public async Task PostSave_Validates_All_Cultures_Has_Domains()
         {
