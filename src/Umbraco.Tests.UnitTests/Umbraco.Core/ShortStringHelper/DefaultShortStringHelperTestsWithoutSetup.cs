@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         {
             var requestHandlerSettings = new RequestHandlerSettings()
             {
-                CharCollection = Enumerable.Empty<IChar>(),
+                CharCollection = Array.Empty<CharacterReplacement>(),
                 ConvertUrlsToAscii = "false"
             };
 
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         {
             var requestHandlerSettings = new RequestHandlerSettings()
             {
-                CharCollection = Enumerable.Empty<IChar>(),
+                CharCollection = Array.Empty<CharacterReplacement>(),
                 ConvertUrlsToAscii = "false"
             };
 
@@ -339,7 +340,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         {
             var requestHandlerSettings = new RequestHandlerSettings()
             {
-                CharCollection = Enumerable.Empty<IChar>(),
+                CharCollection = Array.Empty<CharacterReplacement>(),
                 ConvertUrlsToAscii = "false"
             };
 
