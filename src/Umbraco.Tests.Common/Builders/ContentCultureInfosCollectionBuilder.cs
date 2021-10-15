@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class ContentCultureInfosCollectionBuilder : ChildBuilderBase<ContentBuilder, ContentCultureInfosCollection>, IBuildContentCultureInfosCollection
     {
-        private List<ContentCultureInfosBuilder> _cultureInfosBuilders;
+        private readonly List<ContentCultureInfosBuilder> _cultureInfosBuilders;
         public ContentCultureInfosCollectionBuilder(ContentBuilder parentBuilder) : base(parentBuilder) => _cultureInfosBuilders = new List<ContentCultureInfosBuilder>();
 
         public ContentCultureInfosBuilder AddCultureInfos()
