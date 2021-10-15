@@ -41,28 +41,6 @@ tools/NDepend/
 *.[Pp]ublish.xml
 [sS]ource
 [sS]andbox
-umbraco.config
-!**/TestFiles/umbraco.config
-App_Data/TEMP/*
-[Uu]mbraco/[Pp]resentation/[Uu]mbraco/[Pp]lugins/*
-[Uu]mbraco/[Pp]resentation/[Uu]ser[Cc]ontrols/*
-[Uu]mbraco/[Pp]resentation/[Ss]cripts/*
-[Uu]mbraco/[Pp]resentation/[Ff]onts/*
-[Uu]mbraco/[Pp]resentation/[Cc]ss/*
-
-src/Umbraco.Tests/App_Data/*
-
-umbraco/presentation/umbraco/plugins/uComponents/uComponentsInstaller.ascx
-umbraco/presentation/packages/uComponents/MultiNodePicker/CustomTreeService.asmx
-
-src/Umbraco.Tests/config/applications.config
-src/Umbraco.Tests/config/trees.config
-src/Umbraco.Tests/config/404handlers.config
-src/Umbraco.Tests/[Cc]onfig/umbracoSettings.config
-src/packages/
-src/packages/repositories.config
-
-*.transformed
 
 node_modules
 lib-bower
@@ -91,9 +69,7 @@ src/Umbraco.Web.UI.Docs/api
 src/Umbraco.Web.UI.Docs/package-lock.json
 src/*.boltdata/
 src/umbraco.sln.ide/*
-src/.vs/
 
-src/Umbraco.Tests/[Mm]edia
 tools/docfx/*
 apidocs/_site/*
 src/*/project.lock.json
@@ -103,8 +79,6 @@ apidocs/api/*
 build/docs.zip
 build/ui-docs.zip
 build/csharp-docs.zip
-src/packages/
-src/PrecompiledWeb/*
 
 # Build
 build.out/
@@ -112,46 +86,32 @@ build.tmp/
 build/hooks/
 build/temp/
 
-# Acceptance tests
+# Tests
 cypress.env.json
-**/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
-**/Umbraco.Tests.AcceptanceTest/package-lock.json
-**/Umbraco.Tests.AcceptanceTest/cypress/videos/
-**/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
+src/ApiDocs/api/*
+src/Umbraco.Web.UI.Client/TESTS-*.xml
+src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/*
+src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs
+src/Umbraco.Web.UI/[Uu]mbraco/[Mm]odels/*
+src/Umbraco.Web.UI/appsettings.Development.json
+src/Umbraco.Web.UI/appsettings.json
+src/Umbraco.Web.UI/appsettings.Local.json
+src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/assets/*
+src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/js/*
+src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/lib/*
+src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/views/*
+src/Umbraco.Web.UI/wwwroot/Media/*
+tests/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
+tests/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
+tests/Umbraco.Tests.AcceptanceTest/cypress/videos/
+tests/Umbraco.Tests.AcceptanceTest/package-lock.json
+tests/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
+tests/Umbraco.Tests.Integration.SqlCe/umbraco/Data/TEMP/
+tests/Umbraco.Tests.Integration/TEMP/*
+tests/Umbraco.Tests.Integration/umbraco/Data/
+tests/Umbraco.Tests.Integration/umbraco/logs/
+tests/Umbraco.Tests.Integration/Views/
+tests/Umbraco.Tests.UnitTests/umbraco/Data/TEMP/
 
-/src/Umbraco.Web.UI.Client/TESTS-*.xml
-/src/ApiDocs/api/*
-/src/Umbraco.Web.UI.Client/package-lock.json
-/src/Umbraco.Web.UI/wwwroot/Media/*
-**/Umbraco.Tests.Integration/App_Data/*
-**/Umbraco.Tests.Integration/TEMP/*
-/src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/assets/*
-/src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/js/*
-/src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/lib/*
-/src/Umbraco.Web.UI/wwwroot/[Uu]mbraco/views/*
-/src/Umbraco.Web.UI/wwwroot/App_Data/TEMP/*
-/src/Umbraco.Web.UI/App_Data/Logs/*
-/src/Umbraco.Web.UI/App_Data/TEMP/TypesCache/*
-/src/Umbraco.Web.UI/App_Data/TEMP/*
-/src/Umbraco.Web.UI/App_Data/Smidge/Cache/*
-/src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs
-/src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/*
-/src/Umbraco.Web.UI/[Uu]mbraco/[Mm]odels/*
-/src/Umbraco.Web.UI/[Vv]iews/*.vbhtml
-/src/Umbraco.Web.UI/appsettings.json
-/src/Umbraco.Web.UI/appsettings.Development.json
-/src/Umbraco.Web.UI/appsettings.Local.json
-
-
-**/Umbraco.Tests.Integration/umbraco/Data/
-**/Umbraco.Tests.Integration/umbraco/logs/
-
-**/Umbraco.Tests.Integration/Views/
-
-**/Umbraco.Tests/TEMP/
-
-**/Umbraco.Tests.UnitTests/umbraco/Data/TEMP/
-**/Umbraco.Tests.Integration.SqlCe/umbraco/Data/TEMP/
-**/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
-
+# Ignore auto-generated schema
 src/Umbraco.Web.UI/umbraco/config/appsettings-schema.json
