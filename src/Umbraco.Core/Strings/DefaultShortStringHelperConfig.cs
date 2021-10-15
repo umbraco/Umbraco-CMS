@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Strings
         /// <returns>The short string helper.</returns>
         public DefaultShortStringHelperConfig WithDefault(RequestHandlerSettings requestHandlerSettings)
         {
-            UrlReplaceCharacters = requestHandlerSettings.CharCollection
+            UrlReplaceCharacters = requestHandlerSettings.GetCharReplacements()
                 .Where(x => string.IsNullOrEmpty(x.Char) == false)
                 .ToDictionary(x => x.Char, x => x.Replacement);
 
