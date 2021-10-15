@@ -234,5 +234,11 @@ namespace Umbraco.Cms.Tests.Common.Builders.Extensions
             builder.PropertyValuesSegment = segment;
             return builder;
         }
+
+        public static T WithDate<T>(this T builder, DateTime date) where T : IWithDateBuilder
+        {
+            builder.Date = date;
+            return builder;
+        }
     }
 }

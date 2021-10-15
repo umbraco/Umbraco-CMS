@@ -1470,6 +1470,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="scheduleErrReleaseDate3">Cannot schedule the document for publishing since the required '%0%' has a publish date later than a non mandatory language</key>
     <key alias="scheduleErrExpireDate1">The expire date cannot be in the past</key>
     <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
+    <key alias="publishWithNoDomains">Domains are not configured for multilingual site, please contact an administrator, see log for more information</key>
+    <key alias="publishWithMissingDomain">There is no domain configured for %0%, please contact an administrator, see log for more information</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>
