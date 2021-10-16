@@ -18,6 +18,8 @@ function clipboardService($window, notificationsService, eventsService, localSto
     TYPES.BLOCK = "block";
     TYPES.RAW = "raw";
     TYPES.MEDIA = "media";
+    TYPES.GRID_CONTROL = "gridControl";
+    TYPES.GRID_ROW = "gridRow";
 
     var clearPropertyResolvers = {};
     var pastePropertyResolvers = {};

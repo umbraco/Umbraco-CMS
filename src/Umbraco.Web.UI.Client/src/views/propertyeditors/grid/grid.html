@@ -88,28 +88,26 @@
                                 </div>
 
                                <!-- Row tool -->
-                               <div class="umb-tools row-tools" ng-show="(row === active || row === currentRowWithActiveChild) && !sortMode">
+                                <div class="umb-tools row-tools" ng-show="(row === active || row === currentRowWithActiveChild) && !sortMode">
 
-                                   <div class="cell-tools-edit row-tool" ng-if="hasSettings">
-                                       <button type="button" class="btn-icon" ng-click="editGridItemSettings(row, 'row')" localize="title" title="@grid_settings">
-                                           <umb-icon icon="icon-settings"></umb-icon>
-                                           <span class="sr-only">
-                                               <localize key="grid_settings">Settings</localize>
-                                           </span>
-                                       </button>
-                                   </div>
+                                    <div class="cell-tools-edit row-tool" ng-if="hasSettings">
+                                        <button type="button" class="btn-icon" ng-click="editGridItemSettings(row, 'row')" localize="title" title="@grid_settings">
+                                            <umb-icon icon="icon-settings"></umb-icon>
+                                            <span class="sr-only">
+                                                <localize key="grid_settings">Settings</localize>
+                                            </span>
+                                        </button>
+                                    </div>
 
                                     <div class="cell-tools-remove row-tool">
                                         <button class="icon-trash btn-reset" ng-click="togglePrompt(row)" type="button"></button>
-                                        <umb-confirm-action
-                                            ng-if="row.deletePrompt"
-                                            direction="left"
-                                            on-confirm="removeRow(section, $index)"
-                                            on-cancel="hidePrompt(row)">
+                                        <umb-confirm-action ng-if="row.deletePrompt"
+                                                            direction="left"
+                                                            on-confirm="removeRow(section, $index)"
+                                                            on-cancel="hidePrompt(row)">
                                         </umb-confirm-action>
                                     </div>
-
-                               </div>
+                                </div>
 
 
                             </div>
@@ -218,6 +216,15 @@
                                                                                                   on-confirm="removeControl(area, $index)"
                                                                                                   on-cancel="hidePrompt(control)">
                                                                               </umb-confirm-action>
+                                                                          </div>
+
+                                                                          <div class="umb-control-tool">
+                                                                              <button type="button" class="umb-control-tool-icon btn-icon" ng-click="copyControl(control)">
+                                                                                  <umb-icon icon="icon-documents"></umb-icon>
+                                                                                  <span class="sr-only">
+                                                                                      <localize key="general_copy">Copy</localize>
+                                                                                  </span>
+                                                                              </button>
                                                                           </div>
 
                                                                       </div>

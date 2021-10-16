@@ -10,6 +10,7 @@ angular.module("umbraco")
             eventsService,
             editorService,
             overlayService,
+            clipboardService,
             $interpolate
         ) {
 
@@ -323,16 +324,51 @@ angular.module("umbraco")
                     filter: area.$allowedEditors.length > 15,
                     availableItems: area.$allowedEditors,
                     event: event,
+                    clickPasteItem: function (model) {
+                        $scope.addControl(model.editor, area, index, false, model.data);
+
+                        overlayService.close();
+                    },
                     submit: function (model) {
                         if (model.selectedItem) {
                             $scope.addControl(model.selectedItem, area, index);
-                            overlayService.close();
                         }
+                        overlayService.close();
                     },
                     close: function () {
                         overlayService.close();
                     }
                 };
+
+                var editorAliases = area.$allowedEditors.map(it => it.alias);
+                var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.GRID_CONTROL, editorAliases);
+                if (entriesForPaste && entriesForPaste.length >= 0) {
+                    dialog.pasteItems = [];
+                    _.each(entriesForPaste, function (entry) {
+                        console.log(entry);
+                        dialog.pasteItems.push({
+                            date: entry.date,
+                            name: entry.label,
+                            data: entry.data,
+                            icon: entry.icon,
+                            editor: area.$allowedEditors.find(it => it.alias === entry.alias)
+                        });
+                    });
+
+                    dialog.pasteItems.sort((a, b) => {
+                        return b.date - a.date;
+                    });
+
+                    dialog.hideHeader = dialog.pasteItems.length > 0;
+
+                    dialog.clickClearPaste = function ($event) {
+                        $event.stopPropagation();
+                        $event.preventDefault();
+                        clipboardService.clearEntriesOfType(clipboardService.TYPES.GRID_CONTROL, editorAliases);
+                        dialog.pasteItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+                        dialog.hideHeader = false;
+                    };
+                }
 
                 localizationService.localize("grid_insertControl").then(value => {
                     dialog.title = value;
@@ -630,12 +666,12 @@ angular.module("umbraco")
                 return String.CreateGuid();
             };
 
-            $scope.addControl = function (editor, cell, index, initialize) {
+            $scope.addControl = function(editor, cell, index, initialize, value) {
 
                 initialize = (initialize !== false);
 
                 var newControl = {
-                    value: null,
+                    value: value,
                     editor: editor,
                     $initializing: initialize
                 };
@@ -683,6 +719,11 @@ angular.module("umbraco")
             $scope.togglePrompt = function (scopedObject) {
                 scopedObject.deletePrompt = !scopedObject.deletePrompt;
             };
+
+            $scope.copyControl = function (control) {
+                console.log(control);
+                clipboardService.copy(clipboardService.TYPES.GRID_CONTROL, control.editor.alias, control.value, $scope.getTemplateName(control), control.editor.icon, control.$uniqueId, null);
+            }
 
             $scope.hidePrompt = function (scopedObject) {
                 scopedObject.deletePrompt = false;
@@ -935,7 +976,6 @@ angular.module("umbraco")
 
 
             };
-
 
             gridService.getGridEditors().then(function (response) {
                 $scope.availableEditors = response.data;
