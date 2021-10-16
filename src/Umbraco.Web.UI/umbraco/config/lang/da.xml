@@ -820,15 +820,12 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Installeringsprogrammet kan ikke forbinde til databasen.</key>
-    <key alias="databaseErrorWebConfig">Kunne ikke gemme web.config filen. Du bedes venligst manuelt ændre database forbindelses strengen.</key>
     <key alias="databaseFound">Din database er blevet fundet og identificeret som</key>
     <key alias="databaseHeader">Database konfiguration</key>
     <key alias="databaseInstall"><![CDATA[
       Klik på <strong>installér</strong> knappen for at installere Umbraco %0% databasen
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>
-<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank" rel="noopener">Mere information om at redigere web.config her.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[For at afslutte dette skridt er du nødt til at have nogle informationer om din database parat ("database forbindelsesstrengen").<br/>Kontakt venligst din ISP hvis det er nødvendigt. Hvis du installerer på en lokal maskine eller server kan du muligvis få informationerne fra din systemadministrator.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Tryk på <strong>Opgradér</strong> knappen for at opgradere din database til Umbraco %0%</p><p>Bare rolig - intet indhold vil blive slettet og alt vil stadig fungere bagefter!</p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din database er blevet opgraderet til den endelige version %0%.<br/>Tryk på <strong>Næste</strong> for at fortsætte.]]></key>
@@ -838,7 +835,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<p><strong>Normalbrugerens adgangskode er på succesfuld vis blevet ændret siden installationen!</strong></p><p>Du behøver ikke foretage yderligere handlinger. Tryk på <strong>Næste</strong> for at fortsætte.</p>]]></key>
     <key alias="defaultUserPasswordChanged">Adgangskoden er blevet ændret!</key>
     <key alias="greatStart">Få en fremragende start, se vores videoer</key>
-    <key alias="licenseText">Ved at klikke på næste knappen (eller ved at ændre UmbracoConfigurationStatus i web.config filen), accepterer du licensaftalen for denne software, som specificeret i boksen nedenfor. Bemærk venligst at denne Umbraco distribution består af to forskellige licenser, MIT's Open Source Licens for frameworket og Umbraco Freeware Licensen som dækker UI'en.</key>
     <key alias="None">Endnu ikke installeret</key>
     <key alias="permissionsAffectedFolders">Berørte filer og foldere</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Flere informationer om at opsætte rettigheder for Umbraco her</key>
@@ -872,7 +868,6 @@
     <key alias="theEndBrowseSite"><![CDATA[<h3>Gennemse dit nye site</h3> Du installerede Runway, så hvorfor ikke se hvordan dit nye website ser ud.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Yderligere hjælpe og informationer</h3> Få hjælp fra vores prisvindende fællesskab, gennemse dokumentationen eller se nogle gratis videoer om hvordan du opsætter et simpelt site, hvordan du bruger pakker og en 'quick guide' til Umbraco terminologier]]></key>
     <key alias="theEndHeader">Umbraco %0% er installeret og klar til brug</key>
-    <key alias="theEndInstallFailed"><![CDATA[For at afslutte installationen er du nødt til manuelt at rette <strong>/web.config filen</strong> og opdatére 'AppSetting' feltet <strong>UmbracoConfigurationStatus</strong> i bunden til <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>komme igang med det samme</strong> ved at klikke på "Start Umbraco" knappen nedenfor.<br/>Hvis du er <strong>ny med Umbraco</strong>, kan du finde masser af ressourcer på vores 'getting started' sider.
 ]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Start Umbraco</h3>For at administrere dit website skal du blot åbne Umbraco administrationen og begynde at tilføje indhold, opdatere skabelonerne og stylesheets'ene eller tilføje ny funktionalitet.]]></key>

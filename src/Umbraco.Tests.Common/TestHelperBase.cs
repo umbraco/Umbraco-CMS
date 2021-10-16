@@ -52,16 +52,10 @@ namespace Umbraco.Cms.Tests.Common
         public TypeLoader GetMockedTypeLoader() =>
             new TypeLoader(Mock.Of<ITypeFinder>(), new VaryingRuntimeHash(), Mock.Of<IAppPolicyCache>(), new DirectoryInfo(GetHostingEnvironment().MapPathContentRoot(Constants.SystemDirectories.TempData)), Mock.Of<ILogger<TypeLoader>>(), Mock.Of<IProfiler>());
 
-        //// public Configs GetConfigs() => GetConfigsFactory().Create();
-
-        public abstract IBackOfficeInfo GetBackOfficeInfo();
-
-        //// public IConfigsFactory GetConfigsFactory() => new ConfigsFactory();
-
         /// <summary>
         /// Gets the working directory of the test project.
         /// </summary>
-        public virtual string WorkingDirectory
+        public string WorkingDirectory
         {
             get
             {
@@ -70,11 +64,15 @@ namespace Umbraco.Cms.Tests.Common
                     return _workingDir;
                 }
 
-                var dir = Path.Combine(Assembly.GetExecutingAssembly().GetRootDirectorySafe(), "TEMP");
+                // Azure DevOps can only store a database in certain locations so we will need to detect if we are running
+                // on a build server and if so we'll use the temp path.
+                var dir = string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("System_DefaultWorkingDirectory"))
+                    ? Path.Combine(Assembly.GetExecutingAssembly().GetRootDirectorySafe(), "TEMP")
+                    : Path.Combine(Path.GetTempPath(), "UmbracoTests", "TEMP");
 
                 if (!Directory.Exists(dir))
                 {
-                    Directory.CreateDirectory(dir);
+                    _ = Directory.CreateDirectory(dir);
                 }
 
                 _workingDir = dir;
