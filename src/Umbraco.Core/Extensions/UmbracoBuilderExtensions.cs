@@ -87,7 +87,9 @@ namespace Umbraco.Cms.Core.Extensions
             foreach (var it in interfaceTypes)
             {
                 if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
+                {
                     return true;
+                }
             }
 
             if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
