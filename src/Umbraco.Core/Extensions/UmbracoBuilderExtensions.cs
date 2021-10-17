@@ -92,8 +92,10 @@ namespace Umbraco.Cms.Core.Extensions
                 }
             }
 
-            if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
+           if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
+            {
                 return true;
+            }
 
             var baseType = givenType.BaseType;
             return baseType != null && IsAssignableToGenericType(baseType, genericType);
