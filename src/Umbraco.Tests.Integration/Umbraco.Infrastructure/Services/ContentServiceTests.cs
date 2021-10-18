@@ -1349,6 +1349,107 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
+        public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_True()
+        {
+            // Arrange
+            IContentService contentService = GetRequiredService<IContentService>();
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+
+            IContentType contentType = new ContentTypeBuilder()
+                .WithId(0)
+                .AddPropertyType()
+                .WithAlias("header")
+                .WithValueStorageType(ValueStorageType.Integer)
+                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                .WithName("header")
+                .Done()
+                .WithContentVariation(ContentVariation.Nothing)
+                .Build();
+
+            contentTypeService.Save(contentType);
+
+            Content content = new ContentBuilder()
+                .WithId(0)
+                .WithName("Home")
+                .WithContentType(contentType)
+                .AddPropertyData()
+                .WithKeyValue("header", "Cool header")
+                .Done()
+                .Build();
+
+            contentService.SaveAndPublish(content);
+
+            content.Properties[0].SetValue("Foo", culture: string.Empty);
+            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
+            contentService.Save(content);
+
+            // Act
+            var result = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsTrue(result.Content.Published);
+                Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, result.Result);
+
+                // We changed property data
+                Assert.IsTrue(result.Content.Edited, "result.Content.Edited");
+            });
+        }
+
+        // V9 - Tests.Integration
+        [Test]
+        public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_False()
+        {
+            // Arrange
+            IContentService contentService = GetRequiredService<IContentService>();
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+
+            IContentType contentType = new ContentTypeBuilder()
+                .WithId(0)
+                .AddPropertyType()
+                    .WithAlias("header")
+                    .WithValueStorageType(ValueStorageType.Integer)
+                    .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
+                    .WithName("header")
+                .Done()
+                .WithContentVariation(ContentVariation.Nothing)
+                .Build();
+
+            contentTypeService.Save(contentType);
+
+            Content content = new ContentBuilder()
+                .WithId(0)
+                .WithName("Home")
+                .WithContentType(contentType)
+                .AddPropertyData()
+                .WithKeyValue("header", "Cool header")
+                .Done()
+                .Build();
+
+            contentService.SaveAndPublish(content);
+
+            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
+            contentService.Save(content);
+
+            // Act
+            var result = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsTrue(result.Content.Published);
+                Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, result.Result);
+
+                // We didn't change any property data
+                Assert.IsFalse(result.Content.Edited, "result.Content.Edited");
+            });
+        }
+
+
+        [Test]
         public void Cannot_Publish_Culture_Awaiting_Release()
         {
             ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
@@ -2151,7 +2252,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentService.Save(rollback2);
 
             Assert.IsTrue(rollback2.Published);
-            Assert.IsFalse(rollback2.Edited); // all changes cleared!
+            Assert.IsTrue(rollback2.Edited); // Still edited, change of behaviour
 
             Assert.AreEqual("Jane Doe", rollback2.GetValue<string>("author"));
             Assert.AreEqual("Text Page 2 ReReUpdated", rollback2.Name);
@@ -2170,7 +2271,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             content.CopyFrom(rollto);
             content.Name = rollto.PublishName; // must do it explicitely AND must pick the publish one!
             ContentService.Save(content);
-            Assert.IsFalse(content.Edited);
+            Assert.IsTrue(content.Edited); //Still edited, change of behaviour
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Jane Doe", content.GetValue("author"));
         }

@@ -23,6 +23,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
     [TestFixture]
     public class ContentControllerTests : UmbracoTestServerTestBase
     {
+        private const string UsIso = "en-US";
+        private const string DkIso = "da-DK";
+
         /// <summary>
         ///     Returns 404 if the content wasn't found based on the ID specified
         /// </summary>
@@ -33,7 +36,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -91,7 +94,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -160,7 +163,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -225,7 +228,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -286,7 +289,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -350,7 +353,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             // Add another language
             localizationService.Save(new LanguageBuilder()
-                .WithCultureInfo("da-DK")
+                .WithCultureInfo(DkIso)
                 .WithIsDefault(false)
                 .Build());
 
@@ -374,8 +377,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
 
             Content content = new ContentBuilder()
                 .WithId(0)
-                .WithCultureName("en-US", "English")
-                .WithCultureName("da-DK", "Danish")
+                .WithCultureName(UsIso, "English")
+                .WithCultureName(DkIso, "Danish")
                 .WithContentType(contentType)
                 .AddPropertyData()
                 .WithKeyValue("title", "Cool invariant title")
@@ -404,6 +407,292 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 Assert.AreEqual(2, display.Errors.Count());
                 CollectionAssert.Contains(display.Errors.Keys, "Variants[0].Name");
                 CollectionAssert.Contains(display.Errors.Keys, "_content_variant_en-US_null_");
+            });
+        }
+
+        [Test]
+        public async Task PostSave_Validates_Domains_Exist()
+        {
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo(DkIso)
+                .WithIsDefault(false)
+                .Build());
+
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+            IContentType contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
+            contentTypeService.Save(contentType);
+
+            Content content = new ContentBuilder()
+                .WithId(1)
+                .WithContentType(contentType)
+                .WithCultureName(UsIso, "Root")
+                .WithCultureName(DkIso, "Rod")
+                .Build();
+
+            ContentItemSave model = new ContentItemSaveBuilder()
+                .WithContent(content)
+                .WithAction(ContentSaveAction.PublishNew)
+                .Build();
+
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+
+            HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
+            {
+                { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
+            });
+
+            var body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+
+            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithNoDomains");
+
+            Assert.Multiple(() =>
+            {
+                Assert.IsNotNull(display);
+                Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+                Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
+            });
+        }
+
+        [Test]
+        public async Task PostSave_Validates_All_Ancestor_Cultures_Are_Considered()
+        {
+            var sweIso = "sv-SE";
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            //Create 2 new languages
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo(DkIso)
+                .WithIsDefault(false)
+                .Build());
+
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo(sweIso)
+                .WithIsDefault(false)
+                .Build());
+
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+            IContentType contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
+            contentTypeService.Save(contentType);
+
+            Content content = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithCultureName(UsIso, "Root")
+                .Build();
+
+            IContentService contentService = GetRequiredService<IContentService>();
+            contentService.SaveAndPublish(content);
+
+            Content childContent = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithParent(content)
+                .WithCultureName(DkIso, "Barn")
+                .WithCultureName(UsIso, "Child")
+                .Build();
+
+            contentService.SaveAndPublish(childContent);
+
+            Content grandChildContent = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithParent(childContent)
+                .WithCultureName(sweIso, "Bjarn")
+                .Build();
+
+
+            ContentItemSave model = new ContentItemSaveBuilder()
+                .WithContent(grandChildContent)
+                .WithParentId(childContent.Id)
+                .WithAction(ContentSaveAction.PublishNew)
+                .Build();
+
+            ILanguage enLanguage = localizationService.GetLanguageByIsoCode(UsIso);
+            IDomainService domainService = GetRequiredService<IDomainService>();
+            var enDomain = new UmbracoDomain("/en")
+            {
+                RootContentId = content.Id,
+                LanguageId = enLanguage.Id
+            };
+            domainService.Save(enDomain);
+
+            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
+            var dkDomain = new UmbracoDomain("/dk")
+            {
+                RootContentId = childContent.Id,
+                LanguageId = dkLanguage.Id
+            };
+            domainService.Save(dkDomain);
+
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+
+            HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
+            {
+                { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
+            });
+
+            var body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+
+
+            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{"sv-SE"});
+
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(display);
+                Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+                Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
+            });
+        }
+
+        [Test]
+        public async Task PostSave_Validates_All_Cultures_Has_Domains()
+        {
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo(DkIso)
+                .WithIsDefault(false)
+                .Build());
+
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+            IContentType contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
+            contentTypeService.Save(contentType);
+
+            Content content = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithCultureName(UsIso, "Root")
+                .WithCultureName(DkIso, "Rod")
+                .Build();
+
+            IContentService contentService = GetRequiredService<IContentService>();
+            contentService.Save(content);
+
+            ContentItemSave model = new ContentItemSaveBuilder()
+                .WithContent(content)
+                .WithAction(ContentSaveAction.Publish)
+                .Build();
+
+            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
+            IDomainService domainService = GetRequiredService<IDomainService>();
+            var dkDomain = new UmbracoDomain("/")
+            {
+                RootContentId = content.Id,
+                LanguageId = dkLanguage.Id
+            };
+            domainService.Save(dkDomain);
+
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+
+            HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
+            {
+                { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
+            });
+
+            var body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+
+
+            ILocalizedTextService localizedTextService = GetRequiredService<ILocalizedTextService>();
+            var expectedMessage = localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{UsIso});
+
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(display);
+                Assert.AreEqual(1, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
+                Assert.AreEqual(expectedMessage, display.Notifications.FirstOrDefault(x => x.NotificationType == NotificationStyle.Warning)?.Message);
+            });
+        }
+
+        [Test]
+        public async Task PostSave_Checks_Ancestors_For_Domains()
+        {
+            ILocalizationService localizationService = GetRequiredService<ILocalizationService>();
+            localizationService.Save(new LanguageBuilder()
+                .WithCultureInfo(DkIso)
+                .WithIsDefault(false)
+                .Build());
+
+            IContentTypeService contentTypeService = GetRequiredService<IContentTypeService>();
+            IContentType contentType = new ContentTypeBuilder().WithContentVariation(ContentVariation.Culture).Build();
+            contentTypeService.Save(contentType);
+
+            Content rootNode = new ContentBuilder()
+                .WithoutIdentity()
+                .WithContentType(contentType)
+                .WithCultureName(UsIso, "Root")
+                .WithCultureName(DkIso, "Rod")
+                .Build();
+
+            IContentService contentService = GetRequiredService<IContentService>();
+            contentService.SaveAndPublish(rootNode);
+
+            Content childNode = new ContentBuilder()
+                .WithoutIdentity()
+                .WithParent(rootNode)
+                .WithContentType(contentType)
+                .WithCultureName(DkIso, "Barn")
+                .WithCultureName(UsIso, "Child")
+                .Build();
+
+            contentService.SaveAndPublish(childNode);
+
+            Content grandChild = new ContentBuilder()
+                .WithoutIdentity()
+                .WithParent(childNode)
+                .WithContentType(contentType)
+                .WithCultureName(DkIso, "BarneBarn")
+                .WithCultureName(UsIso, "GrandChild")
+                .Build();
+
+            contentService.Save(grandChild);
+
+            ILanguage dkLanguage = localizationService.GetLanguageByIsoCode(DkIso);
+            ILanguage usLanguage = localizationService.GetLanguageByIsoCode(UsIso);
+            IDomainService domainService = GetRequiredService<IDomainService>();
+            var dkDomain = new UmbracoDomain("/")
+            {
+                RootContentId = rootNode.Id,
+                LanguageId = dkLanguage.Id
+            };
+
+            var usDomain = new UmbracoDomain("/en")
+            {
+                RootContentId = childNode.Id,
+                LanguageId = usLanguage.Id
+            };
+
+            domainService.Save(dkDomain);
+            domainService.Save(usDomain);
+
+            var url = PrepareApiControllerUrl<ContentController>(x => x.PostSave(null));
+
+            ContentItemSave model = new ContentItemSaveBuilder()
+                .WithContent(grandChild)
+                .WithAction(ContentSaveAction.Publish)
+                .Build();
+
+            HttpResponseMessage response = await Client.PostAsync(url, new MultipartFormDataContent
+            {
+                { new StringContent(JsonConvert.SerializeObject(model)), "contentItem" }
+            });
+
+            var body = await response.Content.ReadAsStringAsync();
+            body = body.TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+            ContentItemDisplay display = JsonConvert.DeserializeObject<ContentItemDisplay>(body);
+
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(display);
+                // Assert all is good, a success notification for each culture published and no warnings.
+                Assert.AreEqual(2, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Success));
+                Assert.AreEqual(0, display.Notifications.Count(x => x.NotificationType == NotificationStyle.Warning));
             });
         }
     }

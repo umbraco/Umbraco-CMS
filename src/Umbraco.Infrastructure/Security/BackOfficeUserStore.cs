@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Security
     /// <summary>
     /// The user store for back office users
     /// </summary>
-    public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>
+    public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>, IUserSessionStore<BackOfficeIdentityUser>
     {
         private readonly IScopeProvider _scopeProvider;
         private readonly IUserService _userService;

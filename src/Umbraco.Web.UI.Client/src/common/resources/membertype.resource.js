@@ -46,10 +46,10 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
-                       "memberTypeApiBaseUrl",
+                       "memberTypeQueryApiBaseUrl",
                        "GetAllTypes")),
                'Failed to retrieve data for member types id');
-        },       
+        },
 
         getById: function (id) {
 
