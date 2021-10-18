@@ -16,6 +16,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
     public class ContentBuilder
         : BuilderBase<Content>,
             IBuildContentTypes,
+            IBuildContentCultureInfosCollection,
             IWithIdBuilder,
             IWithKeyBuilder,
             IWithParentIdBuilder,
@@ -31,6 +32,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             IWithPropertyValues
     {
         private ContentTypeBuilder _contentTypeBuilder;
+        private ContentCultureInfosCollectionBuilder _contentCultureInfosCollectionBuilder;
         private GenericDictionaryBuilder<ContentBuilder, string, object> _propertyDataBuilder;
 
         private int? _id;
@@ -48,6 +50,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
         private bool? _trashed;
         private CultureInfo _cultureInfo;
         private IContentType _contentType;
+        private ContentCultureInfosCollection _contentCultureInfosCollection;
         private readonly IDictionary<string, string> _cultureNames = new Dictionary<string, string>();
         private object _propertyValues;
         private string _propertyValuesCulture;
@@ -70,6 +73,14 @@ namespace Umbraco.Cms.Tests.Common.Builders
         {
             _contentTypeBuilder = null;
             _contentType = contentType;
+            return this;
+        }
+
+        public ContentBuilder WithContentCultureInfosCollection(
+            ContentCultureInfosCollection contentCultureInfosCollection)
+        {
+            _contentCultureInfosCollectionBuilder = null;
+            _contentCultureInfosCollection = contentCultureInfosCollection;
             return this;
         }
 
@@ -102,6 +113,14 @@ namespace Umbraco.Cms.Tests.Common.Builders
         {
             var builder = new GenericDictionaryBuilder<ContentBuilder, string, object>(this);
             _propertyDataBuilder = builder;
+            return builder;
+        }
+
+        public ContentCultureInfosCollectionBuilder AddContentCultureInfosCollection()
+        {
+            _contentCultureInfosCollection = null;
+            var builder = new ContentCultureInfosCollectionBuilder(this);
+            _contentCultureInfosCollectionBuilder = builder;
             return builder;
         }
 
@@ -174,6 +193,13 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 }
 
                 content.ResetDirtyProperties(false);
+            }
+
+            if (_contentCultureInfosCollection is not null || _contentCultureInfosCollectionBuilder is not null)
+            {
+                ContentCultureInfosCollection contentCultureInfos =
+                    _contentCultureInfosCollection ?? _contentCultureInfosCollectionBuilder.Build();
+                content.PublishCultureInfos = contentCultureInfos;
             }
 
             return content;
