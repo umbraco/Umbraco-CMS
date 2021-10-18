@@ -309,7 +309,7 @@ stages:
                   displayName: dotnet run
                   inputs:
                     targetType: 'inline'
-                    script: 'nohup dotnet run  -p ./src/Umbraco.Web.UI/Umbraco.Web.UI.csproj &'
+                    script: 'nohup dotnet run -p ./src/Umbraco.Web.UI/Umbraco.Web.UI.csproj > $(Build.SourcesDirectory)/nohup.out &'
                 - task: Bash@3
                   displayName: Generate Cypress.env.json
                   inputs:
@@ -332,7 +332,6 @@ stages:
                       workingDir: tests/Umbraco.Tests.AcceptanceTest
                       command: 'custom'
                       customCommand: 'run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
-
                 - task: PublishTestResults@2
                   condition: always()
                   inputs:
@@ -361,6 +360,11 @@ stages:
                   inputs:
                       targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                       artifact: 'Test artifacts - Linux'
+                - task: PublishPipelineArtifact@1
+                  displayName: "Publish nohup.out"
+                  inputs:
+                      targetPath: '$(Build.SourcesDirectory)/nohup.out'    
+                      artifact: nohup.out
     - stage: Artifacts
       dependsOn: []
       jobs:
