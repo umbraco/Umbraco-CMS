@@ -14,8 +14,8 @@
         vm.customDashboard = null;
         vm.tours = [];
         vm.systemInfoDisplay = false;
-        vm.copiedSuccesInfo = "";
-        vm.copySuccesStatus = "";
+        vm.copiedSuccessInfo = "";
+        vm.copySuccessStatus = "";
         vm.copiedErrorInfo = "";
         vm.copyErrorStatus = "";
 
@@ -43,11 +43,11 @@
                 vm.title = data;
             });
             //Set help dashboard messages
-            localizationService.localize("speechBubbles_copySuccesMessage").then(function(value){
-              vm.copiedSuccesInfo = value;
+            localizationService.localize("speechBubbles_copySuccessMessage").then(function(value){
+              vm.copiedSuccessInfo = value;
             });
-            localizationService.localize("general_succes").then(function(value){
-              vm.copySuccesStatus = value;
+            localizationService.localize("general_success").then(function(value){
+              vm.copySuccessStatus = value;
             });
             localizationService.localize("speechBubbles_cannotCopyInformation").then(function(value){
               vm.copiedErrorInfo = value;
@@ -241,7 +241,7 @@
           // if it is something went wrong and we will not copy to clipboard
           let emptyCopyText = copyStartText + copyEndText;
           if(copyText !== emptyCopyText){
-            notificationsService.success(vm.copySuccesStatus, vm.copiedSuccesInfo );
+            notificationsService.success(vm.copySuccessStatus, vm.copiedSuccessInfo );
             navigator.clipboard.writeText(copyText);
           }
           else{
