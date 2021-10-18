@@ -130,6 +130,8 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Collections\StackQueue.cs" />
     <Compile Include="Configuration\ICoreDebug.cs" />
+    <Compile Include="Configuration\UmbracoSettings\ContentVersionCleanupPolicyElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IContentVersionCleanupPolicySettings.cs" />
     <Compile Include="Constants-CharArrays.cs" />
     <Compile Include="Collections\EventClearingObservableCollection.cs" />
     <Compile Include="Constants-Sql.cs" />

@@ -22,6 +22,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("notifications", IsRequired = true)]
         internal NotificationsElement Notifications => (NotificationsElement) base["notifications"];
 
+        [ConfigurationProperty("contentVersionCleanupPolicy", IsRequired = false)]
+        internal ContentVersionCleanupPolicyElement ContentVersionCleanupPolicy => (ContentVersionCleanupPolicyElement) this["contentVersionCleanupPolicy"];
+
         [ConfigurationProperty("PreviewBadge")]
         internal InnerTextConfigurationElement<string> PreviewBadge => GetOptionalTextElement("PreviewBadge", DefaultPreviewBadge);
 
@@ -60,6 +63,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IEnumerable<string> IContentSection.DisallowedUploadFiles => DisallowedUploadFiles;
 
         IEnumerable<string> IContentSection.AllowedUploadFiles => AllowedUploadFiles;
+
+        IContentVersionCleanupPolicySettings IContentSection.ContentVersionCleanupPolicySettings => ContentVersionCleanupPolicy;
 
         bool IContentSection.ShowDeprecatedPropertyEditors => ShowDeprecatedPropertyEditors;
 
