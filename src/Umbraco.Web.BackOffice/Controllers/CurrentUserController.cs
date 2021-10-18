@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IPasswordChanger<BackOfficeIdentityUser> passwordChanger) : this(
                 mediaFileManager,
-                contentSettings,
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<ContentSettings>>(),
                 hostingEnvironment,
                 imageUrlGenerator,
                 backofficeSecurityAccessor,
