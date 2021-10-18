@@ -1,3 +1,4 @@
+
 (function () {
     "use strict";
 
@@ -13,6 +14,11 @@
         vm.customDashboard = null;
         vm.tours = [];
         vm.systemInfoDisplay = false;
+        vm.copiedSuccesInfo = "";
+        vm.copySuccesStatus = "";
+        vm.copiedErrorInfo = "";
+        vm.copyErrorStatus = "";
+
 
         vm.closeDrawer = closeDrawer;
         vm.startTour = startTour;
@@ -35,6 +41,19 @@
             // set title
             localizationService.localize("general_help").then(function(data){
                 vm.title = data;
+            });
+            //Set help dashboard messages
+            localizationService.localize("speechBubbles_copyInformation").then(function(value){
+              vm.copiedSuccesInfo = value;
+            });
+            localizationService.localize("auditTrails_copy").then(function(value){
+              vm.copySuccesStatus = value;
+            });
+            localizationService.localize("speechBubbles_cannotCopyInformation").then(function(value){
+              vm.copiedErrorInfo = value;
+            });
+            localizationService.localize("speechBubbles_copyError").then(function(value){
+              vm.copyErrorStatus = value;
             });
             currentUserResource.getUserData().then(function(systemInfo){
               vm.systemInfo = systemInfo;
@@ -208,17 +227,25 @@
             }
         }
         function copyInformation(){
-          let copyText = "<html>\n<body>\n<!--StartFragment-->\n\nCategory | Data\n-- | --\n";
+          //Write start and end text for table formatting in github issues
+          let copyStartText = "<html>\n<body>\n<!--StartFragment-->\n\nCategory | Data\n-- | --\n";
+          let copyEndText = "\n<!--EndFragment-->\n</body>\n</html>";
+
+          let copyText = copyStartText;
           vm.systemInfo.forEach(function (info){
             copyText += info.name + " | " + info.data + "\n";
           });
-          copyText += "\n<!--EndFragment-->\n</body>\n</html>"
-          navigator.clipboard.writeText(copyText);
-          if(copyText != null){
-            notificationsService.success("Copied!", "Your system information is now in your clipboard");
+
+          copyText += copyEndText;
+          //Check if copyText is only start + end text
+          // if it is something went wrong and we will not copy to clipboard
+          let emptyCopyText = copyStartText + copyEndText;
+          if(copyText !== emptyCopyText){
+            notificationsService.success(vm.copySuccesStatus, vm.copiedSuccesInfo );
+            navigator.clipboard.writeText(copyText);
           }
           else{
-            notificationsService.error("Error", "Could not copy system information");
+            notificationsService.error(vm.copyErrorStatus, vm.copiedErrorInfo);
           }
         }
         function getPlatform() {
