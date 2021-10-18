@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<caching xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
-  <caches>
-    <cache name="DiskCache" trimCache="false" xdt:Transform="SetAttributes(trimCache)" xdt:Locator="Match(name)"  />
-  </caches>
-</caching>
