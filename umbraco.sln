@@ -7,16 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.UI", "src\Umbra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
-		linting\.editorconfig = linting\.editorconfig
 		build\azure-pipelines.yml = build\azure-pipelines.yml
 		build\build-bootstrap.ps1 = build\build-bootstrap.ps1
 		build\build.ps1 = build\build.ps1
-		linting\codeanalysis.ruleset = linting\codeanalysis.ruleset
-		linting\codeanalysis.tests.ruleset = linting\codeanalysis.tests.ruleset
-		Directory.Build.props = Directory.Build.props
-		Directory.Build.targets = Directory.Build.targets
-		NuGet.Config = NuGet.Config
-		linting\stylecop.json = linting\stylecop.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
@@ -70,39 +63,28 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTes
 		UseIISExpress = "true"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_62926"
-		Debug.AspNetCompiler.PhysicalPath = "src\Umbraco.Tests.AcceptanceTest\"
+		Debug.AspNetCompiler.PhysicalPath = "tests\Umbraco.Tests.AcceptanceTest\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/localhost_62926"
-		Release.AspNetCompiler.PhysicalPath = "src\Umbraco.Tests.AcceptanceTest\"
+		Release.AspNetCompiler.PhysicalPath = "tests\Umbraco.Tests.AcceptanceTest\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "src\Umbraco.Tests.AcceptanceTest\"
+		SlnRelativePath = "tests\Umbraco.Tests.AcceptanceTest\"
 		DefaultWebSiteLanguage = "Visual C#"
 		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378-AFE1-40A5-90BD-82833375DBFE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "buildTransitive", "buildTransitive", "{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458}"
 	ProjectSection(SolutionItems) = preProject
-		build\NuSpecs\tools\applications.config.install.xdt = build\NuSpecs\tools\applications.config.install.xdt
-		build\NuSpecs\tools\ClientDependency.config.install.xdt = build\NuSpecs\tools\ClientDependency.config.install.xdt
-		build\NuSpecs\tools\install.ps1 = build\NuSpecs\tools\install.ps1
-		build\NuSpecs\tools\Readme.txt = build\NuSpecs\tools\Readme.txt
-		build\NuSpecs\tools\ReadmeUpgrade.txt = build\NuSpecs\tools\ReadmeUpgrade.txt
-		build\NuSpecs\tools\serilog.config.install.xdt = build\NuSpecs\tools\serilog.config.install.xdt
-		build\NuSpecs\tools\Web.config.install.xdt = build\NuSpecs\tools\Web.config.install.xdt
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458}"
-	ProjectSection(SolutionItems) = preProject
-		build\NuSpecs\build\Umbraco.Cms.StaticAssets.props = build\NuSpecs\build\Umbraco.Cms.StaticAssets.props
-		build\NuSpecs\build\Umbraco.Cms.StaticAssets.targets = build\NuSpecs\build\Umbraco.Cms.StaticAssets.targets
+		build\NuSpecs\buildTransitive\Umbraco.Cms.StaticAssets.props = build\NuSpecs\buildTransitive\Umbraco.Cms.StaticAssets.props
+		build\NuSpecs\buildTransitive\Umbraco.Cms.StaticAssets.targets = build\NuSpecs\buildTransitive\Umbraco.Cms.StaticAssets.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53594E5B-64A2-4545-8367-E3627D266AE8}"
@@ -113,7 +95,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53
 		src\ApiDocs\toc.yml = src\ApiDocs\toc.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Benchmarks", "src\Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Benchmarks", "tests\Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IssueTemplates", "IssueTemplates", "{C7311C00-2184-409B-B506-52A5FAEA8736}"
 	ProjectSection(SolutionItems) = preProject
@@ -130,7 +112,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Infrastructure", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Persistence.SqlCe", "src\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj", "{33085570-9BF2-4065-A9B0-A29D920D13BA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.TestData", "src\Umbraco.TestData\Umbraco.TestData.csproj", "{FB5676ED-7A69-492C-B802-E7B24144C0FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.TestData", "tests\Umbraco.TestData\Umbraco.TestData.csproj", "{FB5676ED-7A69-492C-B802-E7B24144C0FC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.PublishedCache.NuCache", "src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj", "{F6DE8DA0-07CC-4EF2-8A59-2BC81DBB3830}"
 EndProject
@@ -140,17 +122,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.BackOffice", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Website", "src\Umbraco.Web.Website\Umbraco.Web.Website.csproj", "{5A246D54-3109-4D2B-BE7D-FC0787D126AE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Integration", "src\Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj", "{D6319409-777A-4BD0-93ED-B2DFD805B32C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Integration", "tests\Umbraco.Tests.Integration\Umbraco.Tests.Integration.csproj", "{D6319409-777A-4BD0-93ED-B2DFD805B32C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Common", "src\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj", "{A499779C-1B3B-48A8-B551-458E582E6E96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Common", "tests\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj", "{A499779C-1B3B-48A8-B551-458E582E6E96}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.UnitTests", "src\Umbraco.Tests.UnitTests\Umbraco.Tests.UnitTests.csproj", "{9102ABDF-E537-4E46-B525-C9ED4833EED0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.UnitTests", "tests\Umbraco.Tests.UnitTests\Umbraco.Tests.UnitTests.csproj", "{9102ABDF-E537-4E46-B525-C9ED4833EED0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Web.Common", "src\Umbraco.Web.Common\Umbraco.Web.Common.csproj", "{79E4293D-C92C-4649-AEC8-F1EFD95BDEB1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSchema", "src\JsonSchema\JsonSchema.csproj", "{2A5027D9-F71D-4957-929E-F7A56AA1B95A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Integration.SqlCe", "src\Umbraco.Tests.Integration.SqlCe\Umbraco.Tests.Integration.SqlCe.csproj", "{1B28FC3E-3D5B-4A46-8961-5483835548D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Tests.Integration.SqlCe", "tests\Umbraco.Tests.Integration.SqlCe\Umbraco.Tests.Integration.SqlCe.csproj", "{1B28FC3E-3D5B-4A46-8961-5483835548D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -233,7 +215,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{227C3B55-80E5-4E7E-A802-BE16C5128B9D} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
 		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
-		{E3F9F378-AFE1-40A5-90BD-82833375DBFE} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{53594E5B-64A2-4545-8367-E3627D266AE8} = {FD962632-184C-4005-A5F3-E705D92FC645}
 		{3A33ADC9-C6C0-4DB1-A613-A9AF0210DF3D} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
