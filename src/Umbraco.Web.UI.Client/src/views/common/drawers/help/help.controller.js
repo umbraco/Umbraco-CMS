@@ -43,16 +43,16 @@
                 vm.title = data;
             });
             //Set help dashboard messages
-            localizationService.localize("speechBubbles_copyInformation").then(function(value){
+            localizationService.localize("speechBubbles_copySuccesMessage").then(function(value){
               vm.copiedSuccesInfo = value;
             });
-            localizationService.localize("auditTrails_copy").then(function(value){
+            localizationService.localize("general_succes").then(function(value){
               vm.copySuccesStatus = value;
             });
             localizationService.localize("speechBubbles_cannotCopyInformation").then(function(value){
               vm.copiedErrorInfo = value;
             });
-            localizationService.localize("speechBubbles_copyError").then(function(value){
+            localizationService.localize("general_error").then(function(value){
               vm.copyErrorStatus = value;
             });
             currentUserResource.getUserData().then(function(systemInfo){
