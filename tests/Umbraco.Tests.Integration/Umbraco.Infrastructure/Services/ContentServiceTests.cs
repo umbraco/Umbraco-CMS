@@ -1387,8 +1387,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             contentService.SaveAndPublish(content);
 
             content.Properties[0].SetValue("Foo", culture: string.Empty);
-            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
             contentService.Save(content);
+            contentService.PersistContentSchedule(content, ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
 
             // Act
             var result = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
@@ -1437,7 +1437,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             contentService.SaveAndPublish(content);
 
-            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
+            contentService.PersistContentSchedule(content, ContentScheduleCollection.CreateWithEntry(DateTime.Now.AddHours(2), null));
             contentService.Save(content);
 
             // Act
