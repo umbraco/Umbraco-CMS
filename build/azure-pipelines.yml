@@ -305,11 +305,16 @@ stages:
                       gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
                       targets: build
                       workingDirectory: src/Umbraco.Web.UI.Client
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet build
+                  inputs:
+                      command: build
+                      projects: src/Umbraco.Web.UI/Umbraco.Web.UI.csproj
                 - task: Bash@3
                   displayName: dotnet run
                   inputs:
                     targetType: 'inline'
-                    script: 'nohup dotnet run -p ./src/Umbraco.Web.UI/Umbraco.Web.UI.csproj > $(Build.SourcesDirectory)/nohup.out &'
+                    script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
                 - task: Bash@3
                   displayName: Generate Cypress.env.json
                   inputs:
@@ -361,10 +366,11 @@ stages:
                       targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                       artifact: 'Test artifacts - Linux'
                 - task: PublishPipelineArtifact@1
-                  displayName: "Publish nohup.out"
+                  displayName: "Publish run log"
+                  condition: failed()
                   inputs:
-                      targetPath: '$(Build.SourcesDirectory)/nohup.out'    
-                      artifact: nohup.out
+                      targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
+                      artifact: Test Run logs - Linux
     - stage: Artifacts
       dependsOn: []
       jobs:
