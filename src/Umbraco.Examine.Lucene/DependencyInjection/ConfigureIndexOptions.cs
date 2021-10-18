@@ -16,14 +16,14 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
     public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirectoryIndexOptions>
     {
         private readonly IUmbracoIndexConfig _umbracoIndexConfig;
-        private readonly IOptions<IndexCreatorSettings> _settings;
+        private readonly IndexCreatorSettings _settings;
 
         public ConfigureIndexOptions(
             IUmbracoIndexConfig umbracoIndexConfig,
             IOptions<IndexCreatorSettings> settings)
         {
             _umbracoIndexConfig = umbracoIndexConfig;
-            _settings = settings;
+            _settings = settings.Value;
         }
 
         public void Configure(string name, LuceneDirectoryIndexOptions options)
@@ -50,13 +50,13 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
             // ensure indexes are unlocked on startup
             options.UnlockIndex = true;
 
-            if (_settings.Value.LuceneDirectoryFactory == LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory)
+            if (_settings.LuceneDirectoryFactory == LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory)
             {
                 // if this directory factory is enabled then a snapshot deletion policy is required
                 options.IndexDeletionPolicy = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
             }
-            
-            
+
+
         }
 
         public void Configure(LuceneDirectoryIndexOptions options)

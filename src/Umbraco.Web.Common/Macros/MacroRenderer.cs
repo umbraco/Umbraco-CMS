@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Web.Common.Macros
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<MacroRenderer> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly ContentSettings _contentSettings;
+        private ContentSettings _contentSettings;
         private readonly ILocalizedTextService _textService;
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             IProfilingLogger profilingLogger,
             ILogger<MacroRenderer> logger,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             ILocalizedTextService textService,
             AppCaches appCaches,
             IMacroService macroService,
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
             _textService = textService;
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
@@ -67,6 +67,8 @@ namespace Umbraco.Cms.Web.Common.Macros
             _requestAccessor = requestAccessor;
             _partialViewMacroEngine = partialViewMacroEngine;
             _httpContextAccessor = httpContextAccessor;
+
+            contentSettings.OnChange(x => _contentSettings = x);
         }
 
         #region MacroContent cache

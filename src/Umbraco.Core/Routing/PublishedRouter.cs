@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Routing
     /// </summary>
     public class PublishedRouter : IPublishedRouter
     {
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private WebRoutingSettings _webRoutingSettings;
         private readonly ContentFinderCollection _contentFinders;
         private readonly IContentLastChanceFinder _contentLastChanceFinder;
         private readonly IProfilingLogger _profilingLogger;
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Routing
         /// Initializes a new instance of the <see cref="PublishedRouter"/> class.
         /// </summary>
         public PublishedRouter(
-            IOptions<WebRoutingSettings> webRoutingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
             IVariationContextAccessor variationContextAccessor,
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Routing
             IUmbracoContextAccessor umbracoContextAccessor,
             IEventAggregator eventAggregator)
         {
-            _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings.CurrentValue ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
             _contentLastChanceFinder = contentLastChanceFinder ?? throw new ArgumentNullException(nameof(contentLastChanceFinder));
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
@@ -69,6 +69,7 @@ namespace Umbraco.Cms.Core.Routing
             _contentTypeService = contentTypeService;
             _umbracoContextAccessor = umbracoContextAccessor;
             _eventAggregator = eventAggregator;
+            webRoutingSettings.OnChange(x => _webRoutingSettings = x);
         }
 
         /// <inheritdoc />

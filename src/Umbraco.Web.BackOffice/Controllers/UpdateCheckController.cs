@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IUmbracoVersion umbracoVersion,
             ICookieManager cookieManager,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IOptions<GlobalSettings> globalSettings)
+            IOptionsSnapshot<GlobalSettings> globalSettings)
         {
             _upgradeService = upgradeService ?? throw new ArgumentNullException(nameof(upgradeService));
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 private readonly GlobalSettings _globalSettings;
 
-                public UpdateCheckResponseFilter(IOptions<GlobalSettings> globalSettings)
+                public UpdateCheckResponseFilter(IOptionsSnapshot<GlobalSettings> globalSettings)
                 {
                     _globalSettings = globalSettings.Value;
                 }

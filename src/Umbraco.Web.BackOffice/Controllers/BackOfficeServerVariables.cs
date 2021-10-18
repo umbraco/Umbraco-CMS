@@ -37,57 +37,63 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly LinkGenerator _linkGenerator;
         private readonly IRuntimeState _runtimeState;
         private readonly UmbracoFeatures _features;
-        private readonly GlobalSettings _globalSettings;
+        private  GlobalSettings _globalSettings;
         private readonly IUmbracoVersion _umbracoVersion;
-        private readonly ContentSettings _contentSettings;
+        private  ContentSettings _contentSettings;
         private readonly TreeCollection _treeCollection;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly RuntimeSettings _runtimeSettings;
-        private readonly SecuritySettings _securitySettings;
+        private  RuntimeSettings _runtimeSettings;
+        private  SecuritySettings _securitySettings;
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly PreviewRoutes _previewRoutes;
         private readonly IEmailSender _emailSender;
-        private readonly MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
+        private MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
             IRuntimeState runtimeState,
             UmbracoFeatures features,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IUmbracoVersion umbracoVersion,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsMonitor<ContentSettings> contentSettings,
             IHttpContextAccessor httpContextAccessor,
             TreeCollection treeCollection,
             IHostingEnvironment hostingEnvironment,
-            IOptions<RuntimeSettings> runtimeSettings,
-            IOptions<SecuritySettings> securitySettings,
+            IOptionsMonitor<RuntimeSettings> runtimeSettings,
+            IOptionsMonitor<SecuritySettings> securitySettings,
             IRuntimeMinifier runtimeMinifier,
             IBackOfficeExternalLoginProviders externalLogins,
             IImageUrlGenerator imageUrlGenerator,
             PreviewRoutes previewRoutes,
             IEmailSender emailSender,
-            IOptions<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings)
+            IOptionsMonitor<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
             _features = features;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings.CurrentValue;
             _umbracoVersion = umbracoVersion;
-            _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.CurrentValue ?? throw new ArgumentNullException(nameof(contentSettings));
             _httpContextAccessor = httpContextAccessor;
             _treeCollection = treeCollection ?? throw new ArgumentNullException(nameof(treeCollection));
             _hostingEnvironment = hostingEnvironment;
-            _runtimeSettings = runtimeSettings.Value;
-            _securitySettings = securitySettings.Value;
+            _runtimeSettings = runtimeSettings.CurrentValue;
+            _securitySettings = securitySettings.CurrentValue;
             _runtimeMinifier = runtimeMinifier;
             _externalLogins = externalLogins;
             _imageUrlGenerator = imageUrlGenerator;
             _previewRoutes = previewRoutes;
             _emailSender = emailSender;
-            _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.Value;
+            _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.CurrentValue;
+
+            globalSettings.OnChange(x => _globalSettings = x);
+            contentSettings.OnChange(x => _contentSettings = x);
+            runtimeSettings.OnChange(x => _runtimeSettings = x);
+            securitySettings.OnChange(x => _securitySettings = x);
+            memberPasswordConfigurationSettings.OnChange(x => _memberPasswordConfigurationSettings = x);
         }
 
         /// <summary>
@@ -491,11 +497,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 // exclude anything marked with CoreTreeAttribute
                 var coreTree = treeType.GetCustomAttribute<CoreTreeAttribute>(false);
-                if (coreTree != null) continue;
+                if (coreTree != null)
+                    continue;
 
                 // exclude anything not marked with PluginControllerAttribute
                 var pluginController = treeType.GetCustomAttribute<PluginControllerAttribute>(false);
-                if (pluginController == null) continue;
+                if (pluginController == null)
+                    continue;
 
                 yield return new PluginTree { Alias = tree.TreeAlias, PackageFolder = pluginController.AreaName };
             }

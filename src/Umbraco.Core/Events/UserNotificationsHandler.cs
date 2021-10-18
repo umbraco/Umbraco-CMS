@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.Events
             private readonly INotificationService _notificationService;
             private readonly IUserService _userService;
             private readonly ILocalizedTextService _textService;
-            private readonly GlobalSettings _globalSettings;
+            private GlobalSettings _globalSettings;
             private readonly ILogger<Notifier> _logger;
 
             /// <summary>
@@ -136,7 +136,7 @@ namespace Umbraco.Cms.Core.Events
                 INotificationService notificationService,
                 IUserService userService,
                 ILocalizedTextService textService,
-                IOptions<GlobalSettings> globalSettings,
+                IOptionsMonitor<GlobalSettings> globalSettings,
                 ILogger<Notifier> logger)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -144,8 +144,10 @@ namespace Umbraco.Cms.Core.Events
                 _notificationService = notificationService;
                 _userService = userService;
                 _textService = textService;
-                _globalSettings = globalSettings.Value;
+                _globalSettings = globalSettings.CurrentValue;
                 _logger = logger;
+
+                globalSettings.OnChange(x => _globalSettings = x);
             }
 
             public void Notify(IAction action, params IContent[] entities)

@@ -24,9 +24,9 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     public class BackOfficeAntiforgery : IBackOfficeAntiforgery
     {
         private readonly IAntiforgery _internalAntiForgery;
-        private readonly GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
 
-        public BackOfficeAntiforgery(IOptions<GlobalSettings> globalSettings)
+        public BackOfficeAntiforgery(IOptionsMonitor<GlobalSettings> globalSettings)
         {
             // NOTE: This is the only way to create a separate IAntiForgery service :(
             // Everything in netcore is internal. I have logged an issue here https://github.com/dotnet/aspnetcore/issues/22217
@@ -40,7 +40,10 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             });
             ServiceProvider container = services.BuildServiceProvider();
             _internalAntiForgery = container.GetRequiredService<IAntiforgery>();
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings.CurrentValue;
+            globalSettings.OnChange(x => {
+                _globalSettings = x;
+            });
         }
 
         /// <inheritdoc />

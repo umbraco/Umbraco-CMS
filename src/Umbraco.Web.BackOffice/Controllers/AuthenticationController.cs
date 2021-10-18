@@ -81,11 +81,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IUserService userService,
             ILocalizedTextService textService,
             IUmbracoMapper umbracoMapper,
-            IOptions<GlobalSettings> globalSettings,
-            IOptions<SecuritySettings> securitySettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
+            IOptionsSnapshot<SecuritySettings> securitySettings,
             ILogger<AuthenticationController> logger,
             IIpResolver ipResolver,
-            IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+            IOptionsSnapshot<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,
             ISmsSender smsSender,
             IHostingEnvironment hostingEnvironment,
@@ -110,6 +110,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _linkGenerator = linkGenerator;
             _externalAuthenticationOptions = externalAuthenticationOptions;
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
+
         }
 
         /// <summary>

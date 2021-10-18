@@ -14,19 +14,21 @@ namespace Umbraco.Cms.Core.Routing
     /// </summary>
     public class AliasUrlProvider : IUrlProvider
     {
-        private readonly RequestHandlerSettings _requestConfig;
+        private RequestHandlerSettings _requestConfig;
         private readonly ISiteDomainMapper _siteDomainMapper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
         private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public AliasUrlProvider(IOptions<RequestHandlerSettings> requestConfig, ISiteDomainMapper siteDomainMapper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
+        public AliasUrlProvider(IOptionsMonitor<RequestHandlerSettings> requestConfig, ISiteDomainMapper siteDomainMapper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
         {
-            _requestConfig = requestConfig.Value;
+            _requestConfig = requestConfig.CurrentValue;
             _siteDomainMapper = siteDomainMapper;
             _uriUtility = uriUtility;
             _publishedValueFallback = publishedValueFallback;
             _umbracoContextAccessor = umbracoContextAccessor;
+
+            requestConfig.OnChange(x => _requestConfig = x);
         }
 
         // note - at the moment we seem to accept pretty much anything as an alias

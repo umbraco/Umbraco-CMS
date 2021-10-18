@@ -22,27 +22,28 @@ namespace Umbraco.Cms.Infrastructure.Mail
     {
         // TODO: This should encapsulate a BackgroundTaskRunner with a queue to send these emails!
         private readonly IEventAggregator _eventAggregator;
-        private readonly GlobalSettings _globalSettings;
+        private GlobalSettings _globalSettings;
         private readonly bool _notificationHandlerRegistered;
         private readonly ILogger<EmailSender> _logger;
 
         public EmailSender(
             ILogger<EmailSender> logger,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IEventAggregator eventAggregator)
             : this(logger, globalSettings, eventAggregator, null, null) { }
 
         public EmailSender(
             ILogger<EmailSender> logger,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IEventAggregator eventAggregator,
             INotificationHandler<SendEmailNotification> handler1,
             INotificationAsyncHandler<SendEmailNotification> handler2)
         {
             _logger = logger;
             _eventAggregator = eventAggregator;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings.CurrentValue;
             _notificationHandlerRegistered = handler1 is not null || handler2 is not null;
+            globalSettings.OnChange(x => _globalSettings = x);
         }
 
         /// <summary>

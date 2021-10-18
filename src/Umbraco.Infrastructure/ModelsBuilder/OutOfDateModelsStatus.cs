@@ -15,16 +15,17 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
     public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCacheRefresherNotification>,
         INotificationHandler<DataTypeCacheRefresherNotification>
     {
-        private readonly ModelsBuilderSettings _config;
+        private ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OutOfDateModelsStatus"/> class.
         /// </summary>
-        public OutOfDateModelsStatus(IOptions<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
+        public OutOfDateModelsStatus(IOptionsMonitor<ModelsBuilderSettings> config, IHostingEnvironment hostingEnvironment)
         {
-            _config = config.Value;
+            _config = config.CurrentValue;
             _hostingEnvironment = hostingEnvironment;
+            config.OnChange(x => _config = x);
         }
 
         /// <summary>

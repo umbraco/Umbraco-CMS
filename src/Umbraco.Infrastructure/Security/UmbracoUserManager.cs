@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets the password configuration
         /// </summary>
-        public IPasswordConfiguration PasswordConfiguration { get; }
+        public IPasswordConfiguration PasswordConfiguration { get; private set; }
 
         /// <summary>
         /// Gets the IP resolver
@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Core.Security
             string password = _passwordGenerator.GeneratePassword();
             return password;
         }
-        
+
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code

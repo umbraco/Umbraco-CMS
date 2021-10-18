@@ -78,11 +78,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public UsersController(
             MediaFileManager mediaFileManager,
-            IOptions<ContentSettings> contentSettings,
+            IOptionsSnapshot<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             ISqlContext sqlContext,
             IImageUrlGenerator imageUrlGenerator,
-            IOptions<SecuritySettings> securitySettings,
+            IOptionsSnapshot<SecuritySettings> securitySettings,
             IEmailSender emailSender,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             AppCaches appCaches,
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IUserService userService,
             ILocalizedTextService localizedTextService,
             IUmbracoMapper umbracoMapper,
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsSnapshot<GlobalSettings> globalSettings,
             IBackOfficeUserManager backOfficeUserManager,
             ILoggerFactory loggerFactory,
             LinkGenerator linkGenerator,

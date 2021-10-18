@@ -10,16 +10,17 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
     public class ModelsGenerator
     {
         private readonly UmbracoServices _umbracoService;
-        private readonly ModelsBuilderSettings _config;
+        private ModelsBuilderSettings _config;
         private readonly OutOfDateModelsStatus _outOfDateModels;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ModelsGenerator(UmbracoServices umbracoService, IOptions<ModelsBuilderSettings> config, OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
+        public ModelsGenerator(UmbracoServices umbracoService, IOptionsMonitor<ModelsBuilderSettings> config, OutOfDateModelsStatus outOfDateModels, IHostingEnvironment hostingEnvironment)
         {
             _umbracoService = umbracoService;
-            _config = config.Value;
+            _config = config.CurrentValue;
             _outOfDateModels = outOfDateModels;
             _hostingEnvironment = hostingEnvironment;
+            config.OnChange(x => _config = x);
         }
 
         public void GenerateModels()

@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public TourController(
             TourFilterCollection filters,
             IHostingEnvironment hostingEnvironment,
-            IOptions<TourSettings> tourSettings,
+            IOptionsSnapshot<TourSettings> tourSettings,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IContentTypeService contentTypeService)
         {

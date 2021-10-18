@@ -824,7 +824,7 @@ AND cmsContentNu.nodeId IS NULL
                     {
                         Name = dto.EditName,
                         Published = published,
-                        TemplateId = dto.EditTemplateId,
+                        TemplateId = dto.EditTemplateId == 0 ? (int?)null : dto.EditTemplateId,
                         VersionId = dto.VersionId,
                         VersionDate = dto.EditVersionDate,
                         WriterId = dto.EditWriterId,
@@ -856,7 +856,7 @@ AND cmsContentNu.nodeId IS NULL
                         Name = dto.PubName,
                         UrlSegment = deserializedContent.UrlSegment,
                         Published = published,
-                        TemplateId = dto.PubTemplateId,
+                        TemplateId = dto.PubTemplateId == 0 ? (int?)null : dto.PubTemplateId,
                         VersionId = dto.VersionId,
                         VersionDate = dto.PubVersionDate,
                         WriterId = dto.PubWriterId,
