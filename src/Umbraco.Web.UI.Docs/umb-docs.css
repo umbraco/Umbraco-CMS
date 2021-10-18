@@ -110,10 +110,10 @@ a:hover {
 
 .close {
     float: initial;
-    font-size: initial;
+    font-size: 14px;
     font-weight: initial;
-    line-height: initial;
-    color: initial;
+    line-height: 20px;
+    color: #333333;
     text-shadow: initial;
     opacity: initial;
     filter: initial;
@@ -121,7 +121,7 @@ a:hover {
 
 .close:hover,
 .close:focus {
-    color: initial;
+    color: #333333;
     text-decoration: initial;
     cursor: initial;
     opacity: initial;
