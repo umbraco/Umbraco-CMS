@@ -25,7 +25,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<string> AllowedUploadFiles { get; }
 
-        IContentVersionCleanupPolicySettings ContentVersionCleanupPolicySettings { get; }
+        IContentVersionCleanupPolicyGlobalSettings ContentVersionCleanupPolicyGlobalSettings { get; }
 
         /// <summary>
         /// Gets a value indicating whether to show deprecated property editors in

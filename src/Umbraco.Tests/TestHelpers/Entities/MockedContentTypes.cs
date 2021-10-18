@@ -216,6 +216,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentType.SortOrder = 1;
             contentType.CreatorId = 0;
             contentType.Trashed = false;
+            contentType.Key = Guid.NewGuid();
 
             var contentCollection = new PropertyTypeCollection(true);
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("title", randomizeAliases), Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88, LabelOnTop = true });

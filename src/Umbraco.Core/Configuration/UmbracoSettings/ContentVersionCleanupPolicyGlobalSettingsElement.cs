@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    internal class ContentVersionCleanupPolicyElement : UmbracoConfigurationElement, IContentVersionCleanupPolicySettings
+    internal class ContentVersionCleanupPolicyGlobalSettingsElement : UmbracoConfigurationElement, IContentVersionCleanupPolicyGlobalSettings
     {
         [ConfigurationProperty("enable", DefaultValue = false)]
         public bool EnableCleanup => (bool)this["enable"];

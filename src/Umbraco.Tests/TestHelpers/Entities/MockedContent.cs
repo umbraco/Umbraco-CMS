@@ -19,7 +19,15 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
         public static Content CreateSimpleContent(IContentType contentType)
         {
-            var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+            var content = new Content("Home", -1, contentType)
+            {
+                Level = 1,
+                SortOrder = 1,
+                CreatorId = 0,
+                WriterId = 0,
+                Key = Guid.NewGuid()
+            };
+
             object obj =
                 new
                     {

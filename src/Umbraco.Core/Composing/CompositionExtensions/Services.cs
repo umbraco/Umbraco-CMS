@@ -31,7 +31,12 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IDomainService, DomainService>();
             composition.RegisterUnique<IAuditService, AuditService>();
             composition.RegisterUnique<ITagService, TagService>();
-            composition.RegisterUnique<IContentService, ContentService>();
+
+            composition.RegisterUnique<ContentService>();
+            composition.RegisterUnique<IContentService>(factory => factory.GetInstance<ContentService>());
+            composition.RegisterUnique<IContentVersionCleanupService>(factory => factory.GetInstance<ContentService>());
+            composition.RegisterUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
+
             composition.RegisterUnique<IUserService, UserService>();
             composition.RegisterUnique<IMemberService, MemberService>();
             composition.RegisterUnique<IMediaService, MediaService>();

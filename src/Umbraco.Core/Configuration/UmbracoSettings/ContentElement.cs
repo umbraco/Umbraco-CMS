@@ -22,8 +22,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("notifications", IsRequired = true)]
         internal NotificationsElement Notifications => (NotificationsElement) base["notifications"];
 
-        [ConfigurationProperty("contentVersionCleanupPolicy", IsRequired = false)]
-        internal ContentVersionCleanupPolicyElement ContentVersionCleanupPolicy => (ContentVersionCleanupPolicyElement) this["contentVersionCleanupPolicy"];
+        [ConfigurationProperty("contentVersionCleanupPolicyGlobalSettings", IsRequired = false)]
+        internal ContentVersionCleanupPolicyGlobalSettingsElement ContentVersionCleanupPolicyGlobalSettingsElement => (ContentVersionCleanupPolicyGlobalSettingsElement) this["contentVersionCleanupPolicyGlobalSettings"];
 
         [ConfigurationProperty("PreviewBadge")]
         internal InnerTextConfigurationElement<string> PreviewBadge => GetOptionalTextElement("PreviewBadge", DefaultPreviewBadge);
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<string> IContentSection.AllowedUploadFiles => AllowedUploadFiles;
 
-        IContentVersionCleanupPolicySettings IContentSection.ContentVersionCleanupPolicySettings => ContentVersionCleanupPolicy;
+        IContentVersionCleanupPolicyGlobalSettings IContentSection.ContentVersionCleanupPolicyGlobalSettings => ContentVersionCleanupPolicyGlobalSettingsElement;
 
         bool IContentSection.ShowDeprecatedPropertyEditors => ShowDeprecatedPropertyEditors;
 
