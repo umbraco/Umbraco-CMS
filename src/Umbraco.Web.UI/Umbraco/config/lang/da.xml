@@ -1455,6 +1455,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="warning">Advarsel</key>
     <key alias="youAreDeleting">Du sletter en rækkekonfiguration</key>
     <key alias="deletingARow">Sletning af et rækkekonfigurations navn vil resultere i et tab af data for alle eksiterende indhold som bruger dens konfiguration.</key>
+    <key alias="deleteLayout">Du sletter et layoutet</key>
+    <key alias="deletingALayout">Når du redigerer et layout vil data gå tabt de steder, hvor denne konfiguration bruges.</key>
     <key alias="maxItems">Maksimalt emner</key>
     <key alias="maxItemsDescription">Efterlad blank eller sæt til 0 for ubegrænset</key>
   </area>
