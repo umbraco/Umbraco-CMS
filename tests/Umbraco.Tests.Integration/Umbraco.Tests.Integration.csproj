@@ -52,6 +52,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
+    <None Remove="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
+    <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
   </ItemGroup>
 
   <ItemGroup>
