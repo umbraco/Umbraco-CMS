@@ -326,35 +326,9 @@
                     scope: $scope,
                     content: vm.contentType,
                     infiniteMode: infiniteMode,
-                    // we need to rebind... the IDs that have been created!
-                    rebindCallback: function (origContentType, savedContentType) {
-                        vm.contentType.ModelState = savedContentType.ModelState;
-                        vm.contentType.id = savedContentType.id;
-                        vm.contentType.groups.forEach(function (group) {
-                            if (!group.name) return;
-                            var k = 0;
-                            while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
-                                k++;
-                            if (k == savedContentType.groups.length) {
-                                group.id = 0;
-                                return;
-                            }
-                            var savedGroup = savedContentType.groups[k];
-                            if (!group.id) group.id = savedGroup.id;
-
-                            group.properties.forEach(function (property) {
-                                if (property.id || !property.alias) return;
-                                k = 0;
-                                while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
-                                    k++;
-                                if (k == savedGroup.properties.length) {
-                                    property.id = 0;
-                                    return;
-                                }
-                                var savedProperty = savedGroup.properties[k];
-                                property.id = savedProperty.id;
-                            });
-                        });
+                    rebindCallback: function (_, savedContentType) {
+                        // we need to rebind... the IDs that have been created!
+                        contentTypeHelper.rebindSavedContentType(vm.contentType, savedContentType);
                     }
                 }).then(function (data) {
                     // allow UI to access server validation state
@@ -413,13 +387,14 @@
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
+
             // set isElement checkbox by default
             if (isElement) {
                 contentType.isElement = true;
             }
 
             // set icon if one is provided
-            if (icon !== null) {
+            if (icon !== null && icon !== undefined) {
                 contentType.icon = icon;
             }
 
@@ -427,6 +402,7 @@
             if (allowVaryByCulture) {
                 contentType.allowCultureVariant = true;
             }
+
             // convert icons for content type
             convertLegacyIcons(contentType);
 

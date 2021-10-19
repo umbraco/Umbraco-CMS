@@ -413,8 +413,13 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             var missingIds = _.difference(valueIds, renderModelIds);
 
             if (missingIds.length > 0) {
-                return entityResource.getByIds(missingIds, entityType).then(function (data) {
 
+                var requests = [
+                    entityResource.getByIds(missingIds, entityType),
+                    entityResource.getUrlsByUdis(missingIds)
+                ];
+
+                return $q.all(requests).then(function ([data, urlMap]) {
                     _.each(valueIds,
                         function (id, i) {
                             var entity = _.find(data, function (d) {
@@ -422,7 +427,12 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
                             });
 
                             if (entity) {
-                                addSelectedItem(entity);
+
+                              entity.url = entity.trashed
+                                ? vm.labels.general_recycleBin
+                                : urlMap[id];
+
+                              addSelectedItem(entity);
                             }
 
                         });
@@ -469,26 +479,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
     }
 
-    function setEntityUrl(entity) {
-
-        // get url for content and media items
-        if (entityType !== "Member") {
-            entityResource.getUrl(entity.id, entityType).then(function (data) {
-                // update url
-                $scope.renderModel.forEach(function (item) {
-                    if (item.id === entity.id) {
-                        if (entity.trashed) {
-                            item.url = vm.labels.general_recycleBin;
-                        } else {
-                            item.url = data;
-                        }
-                    }
-                });
-            });
-        }
-
-    }
-
     function addSelectedItem(item) {
 
         // set icon
@@ -523,8 +513,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct
         });
-
-        setEntityUrl(item);
     }
 
     function setSortingState(items) {
