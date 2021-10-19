@@ -35,9 +35,6 @@
             // List of elements that can be focusable within the focus lock
             var focusableElementsSelector = '[role="button"], a[href]:not([disabled]):not(.ng-hide), button:not([disabled]):not(.ng-hide), textarea:not([disabled]):not(.ng-hide), input:not([disabled]):not(.ng-hide), select:not([disabled]):not(.ng-hide)';
 
-            // Grab the body element so we can add the tabbing class on it when needed
-            var bodyElement = document.querySelector('body');
-
             function getDomNodes(){
                 infiniteEditorsWrapper = document.querySelector('.umb-editors');
                 if(infiniteEditorsWrapper) {
@@ -47,7 +44,10 @@
 
             function getFocusableElements(targetElm) {
                 var elm = targetElm ? targetElm : target;
-                focusableElements = elm.querySelectorAll(focusableElementsSelector);
+
+                // Filter out elements that are children of parents with the .ng-hide class
+                focusableElements = [...elm.querySelectorAll(focusableElementsSelector)].filter(elm => !elm.closest('.ng-hide'));
+
                 // Set first and last focusable elements
                 firstFocusableElement = focusableElements[0];
                 lastFocusableElement = focusableElements[focusableElements.length - 1];
