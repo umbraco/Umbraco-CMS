@@ -33,13 +33,22 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 
             int contentTypeId = PrimitiveSerializer.Int32.ReadFrom(stream);
             var hasDraft = PrimitiveSerializer.Boolean.ReadFrom(stream);
+            ContentData draftData = null;
+            ContentData publishedData = null;
+            if (hasDraft)
+            {
+                draftData = _contentDataSerializer.ReadFrom(stream);
+            }
             var hasPublished = PrimitiveSerializer.Boolean.ReadFrom(stream);
-
+            if (hasPublished)
+            {
+                publishedData = _contentDataSerializer.ReadFrom(stream);
+            }
             var kit = new ContentNodeKit(
                 contentNode,
                 contentTypeId,
-                hasDraft ? _contentDataSerializer.ReadFrom(stream) : null,
-                hasPublished ? _contentDataSerializer.ReadFrom(stream) : null);
+                draftData,
+                publishedData);
 
             return kit;
         }
