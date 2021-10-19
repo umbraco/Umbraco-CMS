@@ -1456,7 +1456,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return;
             }
 
-            var publishedCultures = persistedContent.PublishedCultures.ToList();
+            var publishedCultures = GetPublishedCulturesFromAncestors(persistedContent).ToList();
             // If only a single culture is published we shouldn't have any routing issues
             if (publishedCultures.Count < 2)
             {
@@ -1583,6 +1583,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return true;
         }
 
+        private IEnumerable<string> GetPublishedCulturesFromAncestors(IContent content)
+        {
+            if (content.ParentId == -1)
+            {
+                return content.PublishedCultures;
+            }
+
+            HashSet<string> publishedCultures = new ();
+            publishedCultures.UnionWith(content.PublishedCultures);
+
+            IEnumerable<int> ancestorIds = content.GetAncestorIds();
+
+            foreach (var id in ancestorIds)
+            {
+                IEnumerable<string> cultures = _contentService.GetById(id).PublishedCultures;
+                publishedCultures.UnionWith(cultures);
+            }
+
+            return publishedCultures;
+
+        }
         /// <summary>
         /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
         /// </summary>
