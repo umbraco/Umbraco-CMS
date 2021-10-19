@@ -44,14 +44,15 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     function validate() {
         if ($scope.contentPickerForm) {
             //Validate!
-            if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
+            var hasItemsOrMandatory = $scope.renderModel.length !== 0 || ($scope.model.validation && $scope.model.validation.mandatory);
+            if (hasItemsOrMandatory && $scope.minNumberOfItems > $scope.renderModel.length) {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", false);
             }
             else {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", true);
             }
 
-            if ($scope.model.config && $scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) < $scope.renderModel.length) {
+            if ($scope.maxNumberOfItems < $scope.renderModel.length) {
                 $scope.contentPickerForm.maxCount.$setValidity("maxCount", false);
             }
             else {
@@ -145,6 +146,10 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
             $scope.umbProperty.setPropertyActions(propertyActions);
         }
+
+        // use these to avoid the nested property lookups/null-checks
+        $scope.minNumberOfItems = $scope.model.config.minNumber ? parseInt($scope.model.config.minNumber) : 0;
+        $scope.maxNumberOfItems = $scope.model.config.maxNumber ? parseInt($scope.model.config.maxNumber) : 0;
     }
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
@@ -194,7 +199,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     dialogOptions.dataTypeKey = $scope.model.dataTypeKey;
 
     // if we can't pick more than one item, explicitly disable multiPicker in the dialog options
-    if ($scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) === 1) {
+    if ($scope.maxNumberOfItems === 1) {
         dialogOptions.multiPicker = false;
     }
 
