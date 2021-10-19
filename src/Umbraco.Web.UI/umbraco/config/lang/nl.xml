@@ -18,10 +18,10 @@
     <key alias="delete">Verwijderen</key>
     <key alias="disable">Uitschakelen</key>
     <key alias="editSettings">Instellingen wijzigen</key>
-    <key alias="emptyrecyclebin">Prullenbak leegmaken</key>
+    <key alias="emptyRecycleBin">Prullenbak leegmaken</key>
     <key alias="enable">Inschakelen</key>
     <key alias="exportDocumentType">Documenttype exporteren</key>
-    <key alias="importdocumenttype">Documenttype importeren</key>
+    <key alias="importDocumentType">Documenttype importeren</key>
     <key alias="importPackage">Package importeren</key>
     <key alias="liveEdit">Aanpassen in Canvas</key>
     <key alias="logout">Afsluiten</key>

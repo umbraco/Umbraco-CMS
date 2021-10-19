@@ -18,10 +18,10 @@
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyrecyclebin">Empty recycle bin</key>
+    <key alias="emptyRecycleBin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
-    <key alias="importdocumenttype">Import Document Type</key>
+    <key alias="importDocumentType">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
     <key alias="liveEdit">Edit in Canvas</key>
     <key alias="logout">Exit</key>
@@ -424,6 +424,7 @@
     <key alias="anchorInsert">Name</key>
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <b>%0%</b> of <b>%1%</b> items]]></key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
     <key alias="confirmremove">Are you sure you want to remove</key>
     <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <b>%0%</b>]]></key>
@@ -1470,6 +1471,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="scheduleErrReleaseDate3">Cannot schedule the document for publishing since the required '%0%' has a publish date later than a non mandatory language</key>
     <key alias="scheduleErrExpireDate1">The expire date cannot be in the past</key>
     <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
+    <key alias="publishWithNoDomains">Domains are not configured for multilingual site, please contact an administrator, see log for more information</key>
+    <key alias="publishWithMissingDomain">There is no domain configured for %0%, please contact an administrator, see log for more information</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>

@@ -1,4 +1,7 @@
 ﻿<Project>
+  <!-- Enable multi-level merging -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
   <PropertyGroup>
     <Version>9.1.0</Version>
     <AssemblyVersion>9.1.0</AssemblyVersion>
@@ -36,6 +39,4 @@
   <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
-
 </Project>
-

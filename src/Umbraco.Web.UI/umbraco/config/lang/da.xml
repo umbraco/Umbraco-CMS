@@ -18,10 +18,10 @@
     <key alias="delete">Slet</key>
     <key alias="disable">Deaktivér</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyrecyclebin">Tøm papirkurv</key>
+    <key alias="emptyRecycleBin">Tøm papirkurv</key>
     <key alias="enable">Aktivér</key>
     <key alias="exportDocumentType">Eksportér dokumenttype</key>
-    <key alias="importdocumenttype">Importér dokumenttype</key>
+    <key alias="importDocumentType">Importér dokumenttype</key>
     <key alias="importPackage">Importér pakke</key>
     <key alias="liveEdit">Redigér i Canvas</key>
     <key alias="logout">Log af</key>
@@ -1240,6 +1240,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="scheduleErrReleaseDate3">Kan ikke planlægge dokumentes udgivelse da det krævet '%0%' har en senere udgivelses dato end et ikke krævet sprog</key>
     <key alias="scheduleErrExpireDate1">Afpubliceringsdatoen kan ikke ligge i fortiden</key>
     <key alias="scheduleErrExpireDate2">Afpubliceringsdatoen kan ikke være før udgivelsesdatoen</key>
+    <key alias="publishWithNoDomains">Domæner er ikke konfigureret for en flersproget side, kontakt vensligst en administrator, se loggen for mere information</key>
+    <key alias="publishWithMissingDomain">Der er ikke noget domæne konfigureret for %0%, kontakt vensligst en administrator, se loggen for mere information</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Tilføj style</key>

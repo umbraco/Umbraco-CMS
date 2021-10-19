@@ -553,6 +553,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IContent entity)
         {
             var isEntityDirty = entity.IsDirty();
+            var editedSnapshot = entity.Edited;
 
             // check if we need to make any database changes at all
             if ((entity.PublishedState == PublishedState.Published || entity.PublishedState == PublishedState.Unpublished)
@@ -655,6 +656,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // if !publishing, we may have a new name != current publish name,
                 // also impacts 'edited'
                 if (!publishing && entity.PublishName != entity.Name)
+                {
+                    edited = true;
+                }
+
+                // To establish the new value of "edited" we compare all properties publishedValue to editedValue and look
+                // for differences.
+                //
+                // If we SaveAndPublish but the publish fails (e.g. already scheduled for release)
+                // we have lost the publishedValue on IContent (in memory vs database) so we cannot correctly make that comparison.
+                //
+                // This is a slight change to behaviour, historically a publish, followed by change & save, followed by undo change & save
+                // would change edited back to false.
+                if (!publishing && editedSnapshot)
                 {
                     edited = true;
                 }
