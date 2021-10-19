@@ -108,7 +108,8 @@
 
   </Target>
   <Target Name="BelleBuild">
-<!--    <Exec WorkingDirectory="$(ProjectDir)/../../src/Umbraco.Web.UI.Client/" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;{ npm install ; npm run build }'" />-->
+    <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm ci" />
+    <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm run build:skip-tests" />
   </Target>
   <Target Name="JsonSchemaBuild">
 <!--    <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;dotnet run &#45;&#45;project $pwd/src/JsonSchema/JsonSchema.csproj -c Release &#45;&#45; &#45;&#45;outputFile $pwd/src/Umbraco.Web.UI/$(JsonSchemaPath)'" />-->
