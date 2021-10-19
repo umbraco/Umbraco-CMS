@@ -14,10 +14,11 @@
         vm.customDashboard = null;
         vm.tours = [];
         vm.systemInfoDisplay = false;
-        vm.copiedSuccessInfo = "";
-        vm.copySuccessStatus = "";
-        vm.copiedErrorInfo = "";
-        vm.copyErrorStatus = "";
+        vm.labels = {};
+        vm.labels.copiedSuccessInfo = "";
+        vm.labels.copySuccessStatus = "";
+        vm.labels.copiedErrorInfo = "";
+        vm.labels.copyErrorStatus = "";
 
 
         vm.closeDrawer = closeDrawer;
@@ -43,18 +44,18 @@
                 vm.title = data;
             });
             //Set help dashboard messages
-            localizationService.localize("speechBubbles_copySuccessMessage").then(function(value){
-              vm.copiedSuccessInfo = value;
+            localizationService.localizeMany([
+              "speechBubbles_copySuccessMessage",
+              "general_success",
+              "speechBubbles_cannotCopyInformation",
+              "general_error"
+            ]).then(function(keys){
+              vm.labels.copiedSuccessInfo = keys[0];
+              vm.labels.copySuccessStatus = keys[1];
+              vm.labels.copiedErrorInfo = keys[2];
+              vm.labels.copyErrorStatus = keys[3];
             });
-            localizationService.localize("general_success").then(function(value){
-              vm.copySuccessStatus = value;
-            });
-            localizationService.localize("speechBubbles_cannotCopyInformation").then(function(value){
-              vm.copiedErrorInfo = value;
-            });
-            localizationService.localize("general_error").then(function(value){
-              vm.copyErrorStatus = value;
-            });
+            
             currentUserResource.getUserData().then(function(systemInfo){
               vm.systemInfo = systemInfo;
               let browserInfo = platformService.getBrowserInfo();
@@ -241,11 +242,11 @@
           // if it is something went wrong and we will not copy to clipboard
           let emptyCopyText = copyStartText + copyEndText;
           if(copyText !== emptyCopyText){
-            notificationsService.success(vm.copySuccessStatus, vm.copiedSuccessInfo );
+            notificationsService.success(vm.labels.copySuccessStatus, vm.labels.copiedSuccessInfo );
             navigator.clipboard.writeText(copyText);
           }
           else{
-            notificationsService.error(vm.copyErrorStatus, vm.copiedErrorInfo);
+            notificationsService.error(vm.labels.copyErrorStatus, vm.labels.copiedErrorInfo);
           }
         }
         function getPlatform() {
