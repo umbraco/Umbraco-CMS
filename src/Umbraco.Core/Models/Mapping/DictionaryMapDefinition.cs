@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Mapping;
@@ -14,10 +14,12 @@ namespace Umbraco.Cms.Core.Models.Mapping
     public class DictionaryMapDefinition : IMapDefinition
     {
         private readonly ILocalizationService _localizationService;
+        private readonly CommonMapper _commonMapper;
 
-        public DictionaryMapDefinition(ILocalizationService localizationService)
+        public DictionaryMapDefinition(ILocalizationService localizationService, CommonMapper commonMapper)
         {
             _localizationService = localizationService;
+            _commonMapper = commonMapper;
         }
 
         public void DefineMaps(IUmbracoMapper mapper)
@@ -44,6 +46,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             target.Name = source.ItemKey;
             target.ParentId = source.ParentId ?? Guid.Empty;
             target.Udi = Udi.Create(Constants.UdiEntityType.DictionaryItem, source.Key);
+            target.ContentApps.AddRange(_commonMapper.GetContentApps(source));
 
             // build up the path to make it possible to set active item in tree
             // TODO: check if there is a better way

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Trees;
@@ -55,6 +56,17 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             foreach (var controllerType in controllerTypes)
                 AddTreeController(controllerType);
+        }
+
+        public void RemoveTreeController<T>() => RemoveTreeController(typeof(T));
+
+        public void RemoveTreeController(Type type)
+        {
+            var tree = _trees.FirstOrDefault(it => it.TreeControllerType == type);
+            if (tree != null)
+            {
+                _trees.Remove(tree);
+            }
         }
     }
 }

@@ -5,7 +5,9 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
@@ -25,7 +27,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
         private readonly IPackagingService _packagingService;
         private readonly IShortStringHelper _shortStringHelper;
-        private bool _executed;
+        private readonly PackageMigrationSettings _packageMigrationSettings;
+
+        private bool _executed;        
 
         public ImportPackageBuilderExpression(
             IPackagingService packagingService,
@@ -34,7 +38,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             MediaUrlGeneratorCollection mediaUrlGenerators,
             IShortStringHelper shortStringHelper,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            IMigrationContext context) : base(context)
+            IMigrationContext context,
+            IOptions<PackageMigrationSettings> packageMigrationSettings) : base(context)
         {
             _packagingService = packagingService;
             _mediaService = mediaService;
@@ -42,6 +47,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _mediaUrlGenerators = mediaUrlGenerators;
             _shortStringHelper = shortStringHelper;
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+            _packageMigrationSettings = packageMigrationSettings.Value;
         }
 
         /// <summary>
@@ -59,12 +65,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
 
             _executed = true;
+
             Context.BuildingExpression = false;
 
             if (EmbeddedResourceMigrationType == null && PackageDataManifest == null)
             {
                 throw new InvalidOperationException(
                     $"Nothing to execute, neither {nameof(EmbeddedResourceMigrationType)} or {nameof(PackageDataManifest)} has been set.");
+            }
+
+            if (!_packageMigrationSettings.RunSchemaAndContentMigrations)
+            {
+                Logger.LogInformation("Skipping import of embedded schema file, due to configuration");
+                return;
             }
 
             InstallationSummary installationSummary;
