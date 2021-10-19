@@ -321,15 +321,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay> GetById(int id)
+        public ActionResult<ContentItemDisplayWithSchedule> GetById(int id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
                 return HandleContentNotFound(id);
             }
-            var content = MapToDisplay(foundContent);
-            return content;
+
+            return MapToDisplayWithSchedule(foundContent);
         }
 
         /// <summary>
@@ -339,16 +339,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay> GetById(Guid id)
+        public ActionResult<ContentItemDisplayWithSchedule> GetById(Guid id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
             if (foundContent == null)
             {
                 return HandleContentNotFound(id);
             }
-
-            var content = MapToDisplay(foundContent);
-            return content;
+            return MapToDisplayWithSchedule(foundContent);
         }
 
         /// <summary>
@@ -358,7 +356,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        public ActionResult<ContentItemDisplay> GetById(Udi id)
+        public ActionResult<ContentItemDisplayWithSchedule> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
@@ -710,11 +708,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
-        public async Task<ActionResult<ContentItemDisplay>> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
+        public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>>> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = await PostSaveInternal(
                 contentItem,
-                content =>
+                (content, _) =>
                 {
                     if (!EnsureUniqueName(content.Name, content, "Name"))
                     {
@@ -742,17 +740,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [FileUploadCleanupFilter]
         [ContentSaveValidation]
         [OutgoingEditorModelEvent]
-        public async Task<ActionResult<ContentItemDisplay>> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
+        public async Task<ActionResult<ContentItemDisplay<ContentVariantScheduleDisplay>>> PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = await PostSaveInternal(
                 contentItem,
-                content => _contentService.Save(contentItem.PersistedContent, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id),
-                MapToDisplay);
+                (content, contentSchedule) => _contentService.Save(content, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id, contentSchedule),
+                MapToDisplayWithSchedule);
 
             return contentItemDisplay;
         }
 
-        private async Task<ActionResult<ContentItemDisplay>> PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
+        private async Task<ActionResult<ContentItemDisplay<TVariant>>> PostSaveInternal<TVariant>(ContentItemSave contentItem, Func<IContent, ContentScheduleCollection, OperationResult> saveMethod, Func<IContent, ContentItemDisplay<TVariant>> mapToDisplay)
+            where TVariant : ContentVariantDisplay
         {
             // Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
             // To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
@@ -832,17 +831,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
+                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentSavedText", "editVariantSavedText", cultureForInvariantErrors, null, out wasCancelled);
                     break;
                 case ContentSaveAction.Schedule:
                 case ContentSaveAction.ScheduleNew:
-
-                    if (!SaveSchedule(contentItem, globalNotifications))
+                    ContentScheduleCollection contentSchedule = _contentService.GetContentScheduleByContentId(contentItem.Id);
+                    if (!SaveSchedule(contentItem, contentSchedule, globalNotifications))
                     {
                         wasCancelled = false;
                         break;
                     }
-                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentScheduledSavedText", "editVariantSavedText", cultureForInvariantErrors, out wasCancelled);
+                    SaveAndNotify(contentItem, saveMethod, variantCount, notifications, globalNotifications, "editContentScheduledSavedText", "editVariantSavedText", cultureForInvariantErrors, contentSchedule, out wasCancelled);
                     break;
 
                 case ContentSaveAction.SendPublish:
@@ -1047,12 +1046,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// Method is used for normal Saving and Scheduled Publishing
         /// </remarks>
-        private void SaveAndNotify(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, int variantCount,
+        private void SaveAndNotify(ContentItemSave contentItem, Func<IContent, ContentScheduleCollection, OperationResult> saveMethod, int variantCount,
             Dictionary<string, SimpleNotificationModel> notifications, SimpleNotificationModel globalNotifications,
-            string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string cultureForInvariantErrors,
+            string invariantSavedLocalizationAlias, string variantSavedLocalizationAlias, string cultureForInvariantErrors, ContentScheduleCollection contentSchedule,
             out bool wasCancelled)
         {
-            var saveResult = saveMethod(contentItem.PersistedContent);
+            var saveResult = saveMethod(contentItem.PersistedContent, contentSchedule);
             wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
             if (saveResult.Success)
             {
@@ -1087,20 +1086,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentItem"></param>
         /// <param name="globalNotifications"></param>
-        private bool SaveSchedule(ContentItemSave contentItem, SimpleNotificationModel globalNotifications)
+        private bool SaveSchedule(ContentItemSave contentItem, ContentScheduleCollection contentSchedule, SimpleNotificationModel globalNotifications)
         {
             if (!contentItem.PersistedContent.ContentType.VariesByCulture())
-                return SaveScheduleInvariant(contentItem, globalNotifications);
+                return SaveScheduleInvariant(contentItem, contentSchedule, globalNotifications);
             else
-                return SaveScheduleVariant(contentItem);
+                return SaveScheduleVariant(contentItem, contentSchedule);
         }
 
-        private bool SaveScheduleInvariant(ContentItemSave contentItem, SimpleNotificationModel globalNotifications)
+        private bool SaveScheduleInvariant(ContentItemSave contentItem, ContentScheduleCollection contentSchedule, SimpleNotificationModel globalNotifications)
         {
             var variant = contentItem.Variants.First();
 
-            var currRelease = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Release).ToList();
-            var currExpire = contentItem.PersistedContent.ContentSchedule.GetSchedule(ContentScheduleAction.Expire).ToList();
+            var currRelease = contentSchedule.GetSchedule(ContentScheduleAction.Release).ToList();
+            var currExpire = contentSchedule.GetSchedule(ContentScheduleAction.Expire).ToList();
 
             //Do all validation of data first
 
@@ -1137,45 +1136,41 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //remove any existing release dates so we can replace it
             //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
             if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Release);
+                contentSchedule.Clear(ContentScheduleAction.Release);
 
             //remove any existing expire dates so we can replace it
             //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
             if (variant.ExpireDate.HasValue || currExpire.Count > 0)
-                contentItem.PersistedContent.ContentSchedule.Clear(ContentScheduleAction.Expire);
+                contentSchedule.Clear(ContentScheduleAction.Expire);
 
             //add the new schedule
-            contentItem.PersistedContent.ContentSchedule.Add(variant.ReleaseDate, variant.ExpireDate);
+            contentSchedule.Add(variant.ReleaseDate, variant.ExpireDate);
             return true;
         }
 
-        private bool SaveScheduleVariant(ContentItemSave contentItem)
+        private bool SaveScheduleVariant(ContentItemSave contentItem, ContentScheduleCollection contentSchedule)
         {
             //All variants in this collection should have a culture if we get here but we'll double check and filter here)
             var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
             var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
-            //Make a copy of the current schedule and apply updates to it
-
-            var schedCopy = (ContentScheduleCollection)contentItem.PersistedContent.ContentSchedule.DeepClone();
-
             foreach (var variant in cultureVariants.Where(x => x.Save))
             {
-                var currRelease = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Release).ToList();
-                var currExpire = schedCopy.GetSchedule(variant.Culture, ContentScheduleAction.Expire).ToList();
+                var currRelease = contentSchedule.GetSchedule(variant.Culture, ContentScheduleAction.Release).ToList();
+                var currExpire = contentSchedule.GetSchedule(variant.Culture, ContentScheduleAction.Expire).ToList();
 
                 //remove any existing release dates so we can replace it
                 //if there is a release date in the request or if there was previously a release and the request value is null then we are clearing the schedule
                 if (variant.ReleaseDate.HasValue || currRelease.Count > 0)
-                    schedCopy.Clear(variant.Culture, ContentScheduleAction.Release);
+                    contentSchedule.Clear(variant.Culture, ContentScheduleAction.Release);
 
                 //remove any existing expire dates so we can replace it
                 //if there is an expiry date in the request or if there was a previous expiry and the request value is null then we are clearing the schedule
                 if (variant.ExpireDate.HasValue || currExpire.Count > 0)
-                    schedCopy.Clear(variant.Culture, ContentScheduleAction.Expire);
+                    contentSchedule.Clear(variant.Culture, ContentScheduleAction.Expire);
 
                 //add the new schedule
-                schedCopy.Add(variant.Culture, variant.ReleaseDate, variant.ExpireDate);
+                contentSchedule.Add(variant.Culture, variant.ReleaseDate, variant.ExpireDate);
             }
 
             //now validate the new schedule to make sure it passes all of the rules
@@ -1185,7 +1180,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //create lists of mandatory/non-mandatory states
             var mandatoryVariants = new List<(string culture, bool isPublished, List<DateTime> releaseDates)>();
             var nonMandatoryVariants = new List<(string culture, bool isPublished, List<DateTime> releaseDates)>();
-            foreach (var groupedSched in schedCopy.FullSchedule.GroupBy(x => x.Culture))
+            foreach (var groupedSched in contentSchedule.FullSchedule.GroupBy(x => x.Culture))
             {
                 var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(groupedSched.Key);
                 var releaseDates = groupedSched.Where(x => x.Action == ContentScheduleAction.Release).Select(x => x.Date).ToList();
@@ -1218,7 +1213,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            if (!isValid) return false;
+            if (!isValid)
+                return false;
 
             //now we can validate the more basic rules for individual variants
             foreach (var variant in cultureVariants.Where(x => x.ReleaseDate.HasValue || x.ExpireDate.HasValue))
@@ -1248,11 +1244,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            if (!isValid) return false;
+            if (!isValid)
+                return false;
 
-
-            //now that we are validated, we can assign the copied schedule back to the model
-            contentItem.PersistedContent.ContentSchedule = schedCopy;
             return true;
         }
 
@@ -1855,7 +1849,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="model">The content and variants to unpublish</param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public async Task<ActionResult<ContentItemDisplay>> PostUnpublish(UnpublishContent model)
+        public async Task<ActionResult<ContentItemDisplayWithSchedule>> PostUnpublish(UnpublishContent model)
         {
             var foundContent = _contentService.GetById(model.Id);
 
@@ -1878,7 +1872,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 //this means that the entire content item will be unpublished
                 var unpublishResult = _contentService.Unpublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
-                var content = MapToDisplay(foundContent);
+                var content = MapToDisplayWithSchedule(foundContent);
 
                 if (!unpublishResult.Success)
                 {
@@ -1908,7 +1902,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
 
-                var content = MapToDisplay(foundContent);
+                var content = MapToDisplayWithSchedule(foundContent);
 
                 //check for this status and return the correct message
                 if (results.Any(x => x.Value.Result == PublishResultType.SuccessUnpublishMandatoryCulture))
@@ -2096,7 +2090,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         /// This is required to wire up the validation in the save/publish dialog
         /// </remarks>
-        private void HandleInvalidModelState(ContentItemDisplay display, string cultureForInvariantErrors)
+        private void HandleInvalidModelState<TVariant>(ContentItemDisplay<TVariant> display, string cultureForInvariantErrors)
+            where TVariant : ContentVariantDisplay
         {
             if (!ModelState.IsValid && display.Variants.Count() > 1)
             {
@@ -2454,6 +2449,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 context.Items["CurrentUser"] = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             });
 
+        private ContentItemDisplayWithSchedule MapToDisplayWithSchedule(IContent content)
+        {
+            ContentItemDisplayWithSchedule display = _umbracoMapper.Map<ContentItemDisplayWithSchedule>(content, context =>
+            {
+                context.Items["CurrentUser"] = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                context.Items["Schedule"] = _contentService.GetContentScheduleByContentId(content.Id);
+            });
+            display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
+            return display;
+        }
+        
         /// <summary>
         /// Used to map an <see cref="IContent"/> instance to a <see cref="ContentItemDisplay"/> and ensuring AllowPreview is set correctly.
         /// Also allows you to pass in an action for the mapper context where you can pass additional information on to the mapper.
@@ -2463,7 +2469,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content, Action<MapperContext> contextOptions)
         {
-            var display = _umbracoMapper.Map<ContentItemDisplay>(content, contextOptions);
+            ContentItemDisplay display = _umbracoMapper.Map<ContentItemDisplay>(content, contextOptions);
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }

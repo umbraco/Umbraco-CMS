@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -7,6 +7,20 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IDocumentRepository : IContentRepository<int, IContent>, IReadRepository<Guid, IContent>
     {
+        /// <summary>
+        /// Gets publish/unpublish schedule for a content node.
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns><see cref="ContentScheduleCollection"/></returns>
+        ContentScheduleCollection GetContentSchedule(int contentId);
+
+        /// <summary>
+        /// Persists publish/unpublish schedule for a content node.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="schedule"></param>
+        void PersistContentSchedule(IContent content, ContentScheduleCollection schedule);
+
         /// <summary>
         /// Clears the publishing schedule for all entries having an a date before (lower than, or equal to) a specified date.
         /// </summary>

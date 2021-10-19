@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Models
@@ -12,11 +12,6 @@ namespace Umbraco.Cms.Core.Models
     /// </remarks>
     public interface IContent : IContentBase
     {
-        /// <summary>
-        /// Gets or sets the content schedule
-        /// </summary>
-        ContentScheduleCollection ContentSchedule { get; set; }
-
         /// <summary>
         /// Gets or sets the template id used to render the content.
         /// </summary>

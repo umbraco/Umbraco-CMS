@@ -374,6 +374,26 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
+        /// <inheritdoc />
+        public ContentScheduleCollection GetContentScheduleByContentId(int contentId)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Cms.Core.Constants.Locks.ContentTree);
+                return _documentRepository.GetContentSchedule(contentId);
+            }
+        }
+
+        /// <inheritdoc />
+        public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
+                _documentRepository.PersistContentSchedule(content, contentSchedule);
+            }
+        }
+
         /// <summary>
         ///
         /// </summary>
@@ -757,7 +777,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         #region Save, Publish, Unpublish
 
         /// <inheritdoc />
-        public OperationResult Save(IContent content, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public OperationResult Save(IContent content, int userId = Cms.Core.Constants.Security.SuperUserId, ContentScheduleCollection contentSchedule = null)
         {
             PublishedState publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -800,6 +820,11 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // have always changed if it's been saved in the back office but that's not really fail safe.
 
                 _documentRepository.Save(content);
+
+                if (contentSchedule != null)
+                {
+                    _documentRepository.PersistContentSchedule(content, contentSchedule);
+                }
 
                 scope.Notifications.Publish(new ContentSavedNotification(content, eventMessages).WithStateFrom(savingNotification));
 
@@ -1431,10 +1456,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 foreach (var d in _documentRepository.GetContentForExpiration(date))
                 {
+                    ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(d.Id);
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
-                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleAction.Expire, date)
+                        var pendingCultures = contentSchedule.GetPending(ContentScheduleAction.Expire, date)
                             .Select(x => x.Culture)
                             .Distinct()
                             .ToList();
@@ -1452,11 +1478,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                         foreach (var c in pendingCultures)
                         {
                             //Clear this schedule for this culture
-                            d.ContentSchedule.Clear(c, ContentScheduleAction.Expire, date);
+                            contentSchedule.Clear(c, ContentScheduleAction.Expire, date);
                             //set the culture to be published
                             d.UnpublishCulture(c);
                         }
 
+                        _documentRepository.PersistContentSchedule(d, contentSchedule);
                         var result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1465,8 +1492,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                     }
                     else
                     {
-                        //Clear this schedule
-                        d.ContentSchedule.Clear(ContentScheduleAction.Expire, date);
+                        //Clear this schedule for this culture
+                        contentSchedule.Clear(ContentScheduleAction.Expire, date);
+                        _documentRepository.PersistContentSchedule(d, contentSchedule);
                         var result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1492,10 +1520,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 foreach (var d in _documentRepository.GetContentForRelease(date))
                 {
+                    ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(d.Id);
                     if (d.ContentType.VariesByCulture())
                     {
                         //find which cultures have pending schedules
-                        var pendingCultures = d.ContentSchedule.GetPending(ContentScheduleAction.Release, date)
+                        var pendingCultures = contentSchedule.GetPending(ContentScheduleAction.Release, date)
                             .Select(x => x.Culture)
                             .Distinct()
                             .ToList();
@@ -1514,9 +1543,10 @@ namespace Umbraco.Cms.Core.Services.Implement
                         foreach (var culture in pendingCultures)
                         {
                             //Clear this schedule for this culture
-                            d.ContentSchedule.Clear(culture, ContentScheduleAction.Release, date);
+                            contentSchedule.Clear(culture, ContentScheduleAction.Release, date);
 
-                            if (d.Trashed) continue; // won't publish
+                            if (d.Trashed)
+                                continue; // won't publish
 
                             //publish the culture values and validate the property values, if validation fails, log the invalid properties so the develeper has an idea of what has failed
                             IProperty[] invalidProperties = null;
@@ -1527,7 +1557,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                                     d.Id, culture, string.Join(",", invalidProperties.Select(x => x.Alias)));
 
                             publishing &= tryPublish; //set the culture to be published
-                            if (!publishing) continue; // move to next document
+                            if (!publishing)
+                                continue; // move to next document
                         }
 
                         PublishResult result;
@@ -1537,7 +1568,11 @@ namespace Umbraco.Cms.Core.Services.Implement
                         else if (!publishing)
                             result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
                         else
+                        {
+                            _documentRepository.PersistContentSchedule(d, contentSchedule);
                             result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
+                        }
+                           
 
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1547,11 +1582,19 @@ namespace Umbraco.Cms.Core.Services.Implement
                     else
                     {
                         //Clear this schedule
-                        d.ContentSchedule.Clear(ContentScheduleAction.Release, date);
+                        contentSchedule.Clear(ContentScheduleAction.Release, date);
 
-                        var result = d.Trashed
-                            ? new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d)
-                            : SaveAndPublish(d, userId: d.WriterId);
+                        PublishResult result = null;
+
+                        if (d.Trashed)
+                        {
+                            result = new PublishResult(PublishResultType.FailedPublishIsTrashed, evtMsgs, d);
+                        }
+                        else
+                        {
+                            _documentRepository.PersistContentSchedule(d, contentSchedule);
+                            result = SaveAndPublish(d, userId: d.WriterId);
+                        }
 
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -2638,12 +2681,13 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return new PublishResult(PublishResultType.FailedPublishNothingToPublish, evtMsgs, content);
             }
 
+            ContentScheduleCollection contentSchedule = _documentRepository.GetContentSchedule(content.Id);
             //loop over each culture publishing - or string.Empty for invariant
             foreach (var culture in culturesPublishing ?? (new[] { string.Empty }))
             {
                 // ensure that the document status is correct
                 // note: culture will be string.Empty for invariant
-                switch (content.GetStatus(culture))
+                switch (content.GetStatus(contentSchedule, culture))
                 {
                     case ContentStatus.Expired:
                         if (!variesByCulture)
@@ -2762,20 +2806,18 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var attempt = new PublishResult(PublishResultType.SuccessUnpublish, evtMsgs, content);
 
-            //TODO: What is this check?? we just created this attempt and of course it is Success?!
-            if (attempt.Success == false)
-                return attempt;
-
             // if the document has any release dates set to before now,
             // they should be removed so they don't interrupt an unpublish
             // otherwise it would remain released == published
 
-            var pastReleases = content.ContentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.Now);
+            var contentSchedule = _documentRepository.GetContentSchedule(content.Id);
+            var pastReleases = contentSchedule.GetPending(ContentScheduleAction.Expire, DateTime.Now);
             foreach (var p in pastReleases)
-                content.ContentSchedule.Remove(p);
+                contentSchedule.Remove(p);
             if (pastReleases.Count > 0)
                 _logger.LogInformation("Document {ContentName} (id={ContentId}) had its release date removed, because it was unpublished.", content.Name, content.Id);
 
+            _documentRepository.PersistContentSchedule(content, contentSchedule);
             // change state to unpublishing
             content.PublishedState = PublishedState.Unpublishing;
 

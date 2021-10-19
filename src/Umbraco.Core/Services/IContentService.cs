@@ -68,6 +68,20 @@ namespace Umbraco.Cms.Core.Services
         IContent GetById(Guid key);
 
         /// <summary>
+        /// Gets publish/unpublish schedule for a content node.
+        /// </summary>
+        /// <param name="contentId">Id of the Content to load schedule for</param>
+        /// <returns><see cref="ContentScheduleCollection"/></returns>
+        ContentScheduleCollection GetContentScheduleByContentId(int contentId);
+
+        /// <summary>
+        /// Persists publish/unpublish schedule for a content node.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="contentSchedule"></param>
+        void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule);
+
+        /// <summary>
         /// Gets documents.
         /// </summary>
         IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
@@ -236,7 +250,7 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId);
+        OperationResult Save(IContent content, int userId = Constants.Security.SuperUserId, ContentScheduleCollection contentSchedule = null);
 
         /// <summary>
         /// Saves documents.

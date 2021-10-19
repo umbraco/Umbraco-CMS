@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Mapping;
@@ -19,24 +19,24 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
-        public IEnumerable<ContentVariantDisplay> Map(IContent source, MapperContext context)
+        public IEnumerable<TVariant> Map<TVariant>(IContent source, MapperContext context) where TVariant : ContentVariantDisplay
         {
             var variesByCulture = source.ContentType.VariesByCulture();
             var variesBySegment = source.ContentType.VariesBySegment();
 
-            IList<ContentVariantDisplay> variants = new List<ContentVariantDisplay>();
+            IList<TVariant> variants = new List<TVariant>();
 
             if (!variesByCulture && !variesBySegment)
             {
                 // this is invariant so just map the IContent instance to ContentVariationDisplay
-                var variantDisplay = context.Map<ContentVariantDisplay>(source);
+                var variantDisplay = context.Map<TVariant>(source);
                 variants.Add(variantDisplay);
             }
             else if (variesByCulture && !variesBySegment)
             {
                 var languages = GetLanguages(context);
                 variants = languages
-                    .Select(language => CreateVariantDisplay(context, source, language, null))
+                    .Select(language => CreateVariantDisplay<TVariant>(context, source, language, null))
                     .ToList();
             }
             else if (variesBySegment && !variesByCulture)
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 // Segment only
                 var segments = GetSegments(source);
                 variants = segments
-                    .Select(segment => CreateVariantDisplay(context, source, null, segment))
+                    .Select(segment => CreateVariantDisplay<TVariant>(context, source, null, segment))
                     .ToList();
             }
             else
@@ -61,14 +61,16 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
                 variants = languages
                     .SelectMany(language => segments
-                        .Select(segment => CreateVariantDisplay(context, source, language, segment)))
+                        .Select(segment => CreateVariantDisplay<TVariant>(context, source, language, segment)))
                     .ToList();
             }
 
             return SortVariants(variants);
         }
 
-        private IList<ContentVariantDisplay> SortVariants(IList<ContentVariantDisplay> variants)
+
+
+        private IList<TVariant> SortVariants<TVariant>(IList<TVariant> variants) where TVariant : ContentVariantDisplay
         {
             if (variants == null || variants.Count <= 1)
             {
@@ -128,12 +130,12 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return segments.Distinct();
         }
 
-        private ContentVariantDisplay CreateVariantDisplay(MapperContext context, IContent content, ContentEditing.Language language, string segment)
+        private TVariant CreateVariantDisplay<TVariant>(MapperContext context, IContent content, ContentEditing.Language language, string segment) where TVariant : ContentVariantDisplay
         {
             context.SetCulture(language?.IsoCode);
             context.SetSegment(segment);
 
-            var variantDisplay = context.Map<ContentVariantDisplay>(content);
+            var variantDisplay = context.Map<TVariant>(content);
 
             variantDisplay.Segment = segment;
             variantDisplay.Language = language;

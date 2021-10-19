@@ -294,7 +294,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
                 // load bare minimum, need variants though since this is used to rollback with variants
-                false, false, false, true).Skip(skip).Take(take);
+                false, false, true).Skip(skip).Take(take);
         }
 
         public override IContent GetVersion(int versionId)
@@ -476,9 +476,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             dto.NodeId = nodeDto.NodeId;
             entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
             Database.Insert(dto);
-
-            //insert the schedule
-            PersistContentSchedule(entity, false);
 
             // persist the variations
             if (entity.ContentType.VariesByCulture())
@@ -735,12 +732,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 entity.Edited = dto.Edited = !dto.Published || edited; // if not published, always edited
                 Database.Update(dto);
 
-                //update the schedule
-                if (entity.IsPropertyDirty(nameof(entity.ContentSchedule)))
-                {
-                    PersistContentSchedule(entity, true);
-                }
-
                 // if entity is publishing, update tags, else leave tags there
                 // means that implicitly unpublished, or trashed, entities *still* have tags in db
                 if (entity.PublishedState == PublishedState.Publishing)
@@ -797,19 +788,27 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             //}
         }
 
-        private void PersistContentSchedule(IContent content, bool update)
+        /// <inheritdoc />
+        public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
         {
-            var schedules = ContentBaseFactory.BuildScheduleDto(content, LanguageRepository).ToList();
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            if (contentSchedule == null)
+            {
+                throw new ArgumentNullException(nameof(contentSchedule));
+            }
+
+            var schedules = ContentBaseFactory.BuildScheduleDto(content, contentSchedule, LanguageRepository).ToList();
 
             //remove any that no longer exist
-            if (update)
-            {
-                var ids = schedules.Where(x => x.Model.Id != Guid.Empty).Select(x => x.Model.Id).Distinct();
-                Database.Execute(Sql()
-                    .Delete<ContentScheduleDto>()
-                    .Where<ContentScheduleDto>(x => x.NodeId == content.Id)
-                    .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
-            }
+            var ids = schedules.Where(x => x.Model.Id != Guid.Empty).Select(x => x.Model.Id).Distinct();
+            Database.Execute(Sql()
+                .Delete<ContentScheduleDto>()
+                .Where<ContentScheduleDto>(x => x.NodeId == content.Id)
+                .WhereNotIn<ContentScheduleDto>(x => x.Id, ids));
 
             //add/update the rest
             foreach (var schedule in schedules)
@@ -1208,7 +1207,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             bool withCache = false,
             bool loadProperties = true,
             bool loadTemplates = true,
-            bool loadSchedule = true,
             bool loadVariants = true)
         {
             var temps = new List<TempContent<Content>>();
@@ -1283,8 +1281,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 properties = GetPropertyCollections(temps);
             }
 
-            var schedule = GetContentSchedule(temps.Select(x => x.Content.Id).ToArray());
-
             // assign templates and properties
             foreach (var temp in temps)
             {
@@ -1306,14 +1302,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     else
                         throw new InvalidOperationException($"No property data found for version: '{temp.VersionId}'.");
                 }
-
-                if (loadSchedule)
-                {
-                    // load in the schedule
-                    if (schedule.TryGetValue(temp.Content.Id, out var s))
-                        temp.Content.ContentSchedule = s;
-                }
-
             }
 
             if (loadVariants)
@@ -1371,11 +1359,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     SetVariations(content, contentVariations, documentVariations);
                 }
 
-                //load in the schedule
-                var schedule = GetContentSchedule(dto.NodeId);
-                if (schedule.TryGetValue(dto.NodeId, out var s))
-                    content.ContentSchedule = s;
-
                 // reset dirty initial properties (U4-1946)
                 content.ResetDirtyProperties(false);
                 return content;
@@ -1386,21 +1369,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        private IDictionary<int, ContentScheduleCollection> GetContentSchedule(params int[] contentIds)
+        /// <inheritdoc />
+        public ContentScheduleCollection GetContentSchedule(int contentId)
         {
-            var result = new Dictionary<int, ContentScheduleCollection>();
+            var result = new ContentScheduleCollection();
 
-            var scheduleDtos = Database.FetchByGroups<ContentScheduleDto, int>(contentIds, 2000, batch => Sql()
+            var scheduleDtos = Database.Fetch<ContentScheduleDto>(Sql()
                 .Select<ContentScheduleDto>()
                 .From<ContentScheduleDto>()
-                .WhereIn<ContentScheduleDto>(x => x.NodeId, batch));
+                .Where<ContentScheduleDto>(x => x.NodeId == contentId ));
 
             foreach (var scheduleDto in scheduleDtos)
             {
-                if (!result.TryGetValue(scheduleDto.NodeId, out var col))
-                    col = result[scheduleDto.NodeId] = new ContentScheduleCollection();
-
-                col.Add(new ContentSchedule(scheduleDto.Id,
+                result.Add(new ContentSchedule(scheduleDto.Id,
                     LanguageRepository.GetIsoCodeById(scheduleDto.LanguageId) ?? string.Empty,
                     scheduleDto.Date,
                     scheduleDto.Action == ContentScheduleAction.Release.ToString()
