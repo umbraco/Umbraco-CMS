@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -99,7 +99,6 @@
     <ProjectReference Include="..\..\src\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
     <ProjectReference Include="..\Umbraco.Tests.Common\Umbraco.Tests.Common.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
-    <ProjectReference Include="..\..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj" />
     <ProjectReference Include="..\..\src\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
