@@ -53,8 +53,8 @@
                         </ng-form>
                     </td>
                     <td>
-                        <button type="button" class="btn-icon" ng-click="removeField(val)" aria-label="Remove">
-                            <umb-icon icon="icon-trash"></umb-icon>
+                        <button type="button" class="umb-node-preview__action umb-node-preview__action--red" ng-click="removeField(val)">
+                            <localize key="general_remove">Remove</localize><span class="sr-only"> {{val.alias}}</span>
                         </button>
                     </td>
                 </tr>
@@ -62,6 +62,5 @@
 
         </table>
     </div>
-
 
 </div>
