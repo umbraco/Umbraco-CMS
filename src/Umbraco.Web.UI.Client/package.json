@@ -1,10 +1,12 @@
 {
+  "name": "ui",
   "private": true,
   "scripts": {
     "test": "gulp runTests",
     "unit": "gulp runUnit",
     "e2e": "gulp testE2e",
     "build": "gulp build",
+    "build:skip-tests": "gulp coreBuild",
     "dev": "gulp dev",
     "fastdev": "gulp fastdev",
     "watch": "gulp watch"

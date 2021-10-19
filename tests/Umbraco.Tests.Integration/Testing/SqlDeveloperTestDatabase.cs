@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -118,10 +119,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             {
             }
 
-            foreach (TestDbMeta testDatabase in _testDatabases)
-            {
-                Drop(testDatabase);
-            }
+            Parallel.ForEach(_testDatabases, Drop);
         }
     }
 }

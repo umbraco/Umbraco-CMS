@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -118,13 +119,13 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
             string filename = Path.Combine(s_filesPath, DatabaseName).ToUpper();
 
-            foreach (string database in s_localDbInstance.GetDatabases())
+            Parallel.ForEach(s_localDbInstance.GetDatabases(), instance =>
             {
-                if (database.StartsWith(filename))
+                if (instance.StartsWith(filename))
                 {
-                    s_localDbInstance.DropDatabase(database);
+                    s_localDbInstance.DropDatabase(instance);
                 }
-            }
+            });
 
             _localDb.StopInstance(InstanceName);
 
