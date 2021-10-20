@@ -283,7 +283,7 @@
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Vytvořit novou šablonu obsahu z '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Vytvořit novou šablonu obsahu z <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Prázdná</key>
     <key alias="selectBlueprint">Vybrat obsahovou šablonu</key>
     <key alias="createdBlueprintHeading">Šablona obsahu byla vytvořena</key>
@@ -2118,7 +2118,6 @@
     <key alias="tooltipForPropertyActionsMenu">Otevřít akce vlastností</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Čekejte</key>
     <key alias="refreshStatus">Stav obnovení</key>
     <key alias="memoryCache">Cache paměť</key>
     <key alias="memoryCacheDescription">

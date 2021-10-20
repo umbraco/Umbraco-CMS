@@ -120,6 +120,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(item);
         }
 
+        public bool IsMemberGroupNameUnique(int id, string oldName, string newName)
+        {
+            if (newName == oldName)
+                return true; // name hasn't changed
+
+            var memberGroup = _memberGroupService.GetByName(newName);
+            if (memberGroup == null)
+                return true; // no member group found
+
+            return memberGroup.Id == id;
+        }
+
         public ActionResult<MemberGroupDisplay> PostSave(MemberGroupSave saveModel)
         {
 
@@ -130,16 +142,28 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            memberGroup.Name = saveModel.Name;
-            _memberGroupService.Save(memberGroup);
+            if (IsMemberGroupNameUnique(memberGroup.Id, memberGroup.Name, saveModel.Name))
+            {
+                memberGroup.Name = saveModel.Name;
+                _memberGroupService.Save(memberGroup);
 
-            MemberGroupDisplay display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+                MemberGroupDisplay display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
 
-            display.AddSuccessNotification(
-                            _localizedTextService.Localize("speechBubbles","memberGroupSavedHeader"),
-                            string.Empty);
+                display.AddSuccessNotification(
+                    _localizedTextService.Localize("speechBubbles", "memberGroupSavedHeader"),
+                    string.Empty);
 
-            return display;
+                return display;
+            }
+            else
+            {
+                var display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+                display.AddErrorNotification(
+                    _localizedTextService.Localize("speechBubbles", "memberGroupNameDuplicate"),
+                    string.Empty);
+
+                return display;
+            }
         }
     }
 }
