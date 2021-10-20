@@ -428,9 +428,9 @@ angular.module("umbraco")
             };
 
             function onNavigationChanged(tab) {
-              $scope.model.activeTab.active = false;
-              $scope.model.activeTab = tab;
-              $scope.model.activeTab.active = true;
+              vm.activeTab.active = false;
+              vm.activeTab = tab;
+              vm.activeTab.active = true;
             };
 
             function clickClearClipboard() {
