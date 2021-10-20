@@ -559,14 +559,11 @@
                 }
             });
 
-            localizationService.localize("template_mastertemplate").then(function (value) {
-                const title = value;
+            localizationService.localize("template_mastertemplate").then(title => {
                 const editor = {
-                    title: title,
+                    title,
                     filterCssClass: 'not-allowed',
-                    filter: item => {
-                        return !availableMasterTemplates.some(template => template.id == item.id);
-                    },
+                    filter: item => !availableMasterTemplates.some(template => template.id == item.id),                    
                     submit: model => {
                         var template = model.selection[0];
                         if (template && template.alias) {
@@ -578,9 +575,7 @@
                         }
                         editorService.close();
                     },
-                    close: function () {
-                        editorService.close();
-                    }
+                    close: () => editorService.close(),                    
                 }
 
                 editorService.templatePicker(editor);

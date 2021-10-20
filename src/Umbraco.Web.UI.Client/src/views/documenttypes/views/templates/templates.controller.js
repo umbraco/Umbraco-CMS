@@ -9,7 +9,7 @@
 (function () {
     'use strict';
 
-    function TemplatesController($scope, entityResource, contentTypeHelper, templateResource, contentTypeResource, editorService, $routeParams) {
+    function TemplatesController($scope, entityResource, contentTypeHelper, contentTypeResource, editorService, $routeParams) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -22,7 +22,7 @@
         vm.isElement = $scope.model.isElement;
 
         vm.createTemplate = createTemplate;
-        vm.openItemPicker = openItemPicker;
+        vm.openTemplatePicker = openTemplatePicker;
 
         /* ---------- INIT ---------- */
 
@@ -82,7 +82,7 @@
             vm.canCreateTemplate = existingTemplate ? false : true;
         }
 
-        function openItemPicker() {
+        function openTemplatePicker() {
             const editor = {
                 title: "Choose template",
                 filterCssClass: 'not-allowed',

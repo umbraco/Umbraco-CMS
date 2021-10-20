@@ -1,9 +1,9 @@
 (function () {
     'use strict';
 
-    function GridSelector($location, overlayService, editorService) {
+    function GridSelector(overlayService, editorService) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope) {
 
             var eventBindings = [];
             scope.dialogModel = {};
