@@ -2,8 +2,14 @@
 <div>
 
     <div class="umb-app-header">
+
+        <a class="umb-app-header__logo" href="/" target="_blank" ng-if="backOfficeLogoImage">
+          <img ng-src="{{backOfficeLogoImage}}" alt="" height="30" />
+        </a>
+
         <umb-sections
             ng-if="authenticated"
+            class="flex flex-auto"
             sections="sections">
         </umb-sections>
 

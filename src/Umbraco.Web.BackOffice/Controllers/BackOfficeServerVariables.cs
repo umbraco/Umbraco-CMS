@@ -407,6 +407,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
+                        {"backOfficeLogoImage", _contentSettings.BackOfficeLogoImage},
                         {"loginLogoImage", _contentSettings.LoginLogoImage },
                         {"showUserInvite", _emailSender.CanSendRequiredEmail()},
                         {"canSendRequiredEmail", _emailSender.CanSendRequiredEmail()},

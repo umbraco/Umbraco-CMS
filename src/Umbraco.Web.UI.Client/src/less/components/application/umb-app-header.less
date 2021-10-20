@@ -2,10 +2,18 @@
     background: @blueExtraDark;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     max-width: 100%;
     height: @appHeaderHeight;
     padding: 0 20px;
+}
+
+.umb-app-header__logo {
+    padding-right: 30px;
+    flex-shrink: 0;
+
+    img {
+        height: 30px;
+    }
 }
 
 .umb-app-header__actions {
@@ -14,6 +22,7 @@
     align-items: center;
     margin: 0;
     margin-right: -10px;
+    padding-left: 10px;
 }
 
 .umb-app-header__button {

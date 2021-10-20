@@ -38,6 +38,8 @@
                     }
                 }
 
+                scope.backOfficeLogoImage = Umbraco.Sys.ServerVariables.umbracoSettings.backOfficeLogoImage;
+
             }));
 
             evts.push(eventsService.on("app.userRefresh", function (evt) {

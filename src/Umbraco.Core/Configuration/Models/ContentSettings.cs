@@ -219,6 +219,10 @@ namespace Umbraco.Cms.Core.Configuration.Models
         [DefaultValue(StaticLoginLogoImage)]
         public string LoginLogoImage { get; set; } = StaticLoginLogoImage;
 
+        /// <summary>
+        /// Gets or sets a value for the path to the backoffice logo image.
+        /// </summary>
+        public string BackOfficeLogoImage { get; set; } = string.Empty;
 
     }
 }

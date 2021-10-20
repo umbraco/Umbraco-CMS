@@ -40,8 +40,12 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 
             function calculateWidth() {
                 $timeout(function () {
-                    //total width minus room for avatar, search, and help icon
+                    //total width minus room for avatar, search, help icon and logo
                     var containerWidth = $(".umb-app-header").outerWidth() - $(".umb-app-header__actions").outerWidth();
+                    var logo = $(".umb-app-header__logo");
+                    if (logo.length !== 0) {
+                      containerWidth -= logo.outerWidth();
+                    }
                     var trayToggleWidth = $("#applications .sections li.expand").outerWidth();
                     var sectionsWidth = 0;
                     
