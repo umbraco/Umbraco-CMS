@@ -188,7 +188,6 @@ angular.module("umbraco")
             }
 
             function deleteLayout(layout, index, event) {
-
                 const dialog = {
                     view: "views/propertyEditors/grid/overlays/rowdeleteconfirm.html",
                     layout: layout,

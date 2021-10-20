@@ -1531,6 +1531,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="propertyHasChanges">Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?</key>
     <key alias="displaySettingsHeadline">Visning</key>
     <key alias="displaySettingsLabelOnTop">Label hen over (fuld bredde)</key>
+    <key alias="removeChildNode">Du fjerner noden</key>
+    <key alias="removeChildNodeWarning">Fjernelse af noden, begrænser redaktørens muligheder for at oprette forskellige typer af underindhold.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Tilføj sprog</key>
