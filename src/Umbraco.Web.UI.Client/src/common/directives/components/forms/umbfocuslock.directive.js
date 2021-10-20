@@ -175,34 +175,27 @@
             }
 
             function onInit(targetElm) {
-
                 $timeout(() => {
+                        // Fetch the DOM nodes we need
+                        getDomNodes();
 
-                    // Fetch the DOM nodes we need
-                    getDomNodes();
+                        cleanupEventHandlers();
 
-                    cleanupEventHandlers();
+                        getFocusableElements(targetElm);
 
-                    getFocusableElements(targetElm);
+                        if(focusableElements.length > 0) {
 
-                    if(focusableElements.length > 0) {
+                            observeDomChanges();
 
-                        observeDomChanges();
+                            setElementFocus();
 
-                        setElementFocus();
-
-                        //  Handle keydown
-                        target.addEventListener('keydown', handleKeydown);
-                    }
-
-                });
+                            //  Handle keydown
+                            target.addEventListener('keydown', handleKeydown);
+                        }
+                }, 500);
             }
 
-            scope.$on('$includeContentLoaded', () => {
-                angularHelper.safeApply(scope, () => {
-                    onInit();
-                });
-            });
+            onInit();
 
             // If more than one editor is still open then re-initialize otherwise remove the event listener
             scope.$on('$destroy', function () {
