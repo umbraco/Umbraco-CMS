@@ -123,7 +123,14 @@
                     lastKnownElement.focus();
                 }
                 else if(defaultFocusedElement === null ){
-                    firstFocusableElement.focus();
+                    // If the first focusable elements are either items from the umb-sub-views-nav menu or the umb-button-ellipsis we most likely want to start the focus on the second item
+                    var avoidStartElm = focusableElements.findIndex(elm => elm.classList.contains('umb-button-ellipsis') || elm.classList.contains('umb-sub-views-nav-item__action'));
+                    if(avoidStartElm === 0) {
+                        focusableElements[1].focus();
+                    }
+                    else {
+                        firstFocusableElement.focus();
+                    }
                 }
                 else {
                     defaultFocusedElement.focus();
