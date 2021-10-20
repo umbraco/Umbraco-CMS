@@ -295,7 +295,7 @@
     <key alias="nodeIsInTrash">Dit item is in de prullenbak</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Nieuw Inhoudssjabloon aanmaken voor '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Nieuw Inhoudssjabloon aanmaken voor <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Leeg</key>
     <key alias="selectBlueprint">Selecteer een Inhoudssjabloon</key>
     <key alias="createdBlueprintHeading">Inhoudssjabloon aangemaakt</key>
@@ -1212,6 +1212,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="mediaTypeSavedHeader">Mediatype opgeslagen</key>
     <key alias="memberTypeSavedHeader">Ledentype opgeslagen</key>
     <key alias="memberGroupSavedHeader">Ledengroep opgeslagen</key>
+    <key alias="memberGroupNameDuplicate">Er bestaat al een andere ledengroep met dezelfde naam</key>
     <key alias="templateErrorHeader">Sjabloon niet opgeslagen</key>
     <key alias="templateErrorText">Controleer dat je geen 2 sjablonen met dezelfde naam hebt</key>
     <key alias="templateSavedHeader">Sjabloon opgeslagen</key>
@@ -2065,7 +2066,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="tooltipForPropertyActionsMenuClose">Eigenschapsacties sluiten</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Wachten</key>
     <key alias="refreshStatus">Status vernieuwen</key>
     <key alias="memoryCache">Geheugencache</key>
     <key alias="memoryCacheDescription">

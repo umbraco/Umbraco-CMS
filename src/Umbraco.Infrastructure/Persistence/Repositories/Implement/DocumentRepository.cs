@@ -673,6 +673,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     edited = true;
                 }
 
+                // To establish the new value of "edited" we compare all properties publishedValue to editedValue and look
+                // for differences.
+                //
+                // If we SaveAndPublish but the publish fails (e.g. already scheduled for release)
+                // we have lost the publishedValue on IContent (in memory vs database) so we cannot correctly make that comparison.
+                //
+                // This is a slight change to behaviour, historically a publish, followed by change & save, followed by undo change & save
+                // would change edited back to false.
+                if (!publishing && editedSnapshot)
+                {
+                    edited = true;
+                }
+
                 if (entity.ContentType.VariesByCulture())
                 {
                     // names also impact 'edited'
