@@ -15,7 +15,7 @@ Simple icon
 
 Icon with additional attribute. It can be treated like any other dom element
 <pre>
-    <umb-icon icon="icon-alert" class="icon-class"></umb-icon>
+    <umb-icon icon="icon-alert" class="another-class"></umb-icon>
 </pre>
 @example
  **/
@@ -33,8 +33,8 @@ Icon with additional attribute. It can be treated like any other dom element
                 icon: "@",
                 svgString: "=?"
             },
-
             link: function (scope, element) {
+
                 if (scope.svgString === undefined && scope.svgString !== null && scope.icon !== undefined && scope.icon !== null) {
                     const observer = new IntersectionObserver(_lazyRequestIcon, {rootMargin: "100px"});
                     const iconEl = element[0];
@@ -49,6 +49,7 @@ Icon with additional attribute. It can be treated like any other dom element
 
                 scope.$watch("icon", function (newValue, oldValue) {
                     if (newValue && oldValue) {
+
                         var newicon = newValue.split(" ")[0];
                         var oldicon = oldValue.split(" ")[0];
 
@@ -64,6 +65,7 @@ Icon with additional attribute. It can be treated like any other dom element
                             observer.disconnect();
 
                             var icon = scope.icon.split(" ")[0]; // Ensure that only the first part of the icon is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
+
                             _requestIcon(icon);
                         }
                     });

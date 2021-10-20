@@ -89,7 +89,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
             ISyncBootStateAccessor syncBootStateAccessor,
-            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory, 
+            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory,
             ContentDataSerializer contentDataSerializer = null)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
@@ -177,7 +177,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists, _contentDataSerializer);
             _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists, _contentDataSerializer);
 
-            _logger.Info<PublishedSnapshotService,bool,bool>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
+            _logger.Info<PublishedSnapshotService, bool, bool>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDbExists, _localMediaDbExists);
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             if (!okMedia)
                                 _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
                         }
-                
+
                         if (!okContent)
                             LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
 
@@ -345,28 +345,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 Directory.CreateDirectory(path);
 
             return path;
-        }
-
-        private void DeleteLocalFilesForContent()
-        {
-            if (_isReady && _localContentDb != null)
-                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-
-            var path = GetLocalFilesPath();
-            var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
-            if (File.Exists(localContentDbPath))
-                File.Delete(localContentDbPath);
-        }
-
-        private void DeleteLocalFilesForMedia()
-        {
-            if (_isReady && _localMediaDb != null)
-                throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-
-            var path = GetLocalFilesPath();
-            var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
-            if (File.Exists(localMediaDbPath))
-                File.Delete(localMediaDbPath);
         }
 
         #endregion
@@ -660,38 +638,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Handle Notifications
 
-        // note: if the service is not ready, ie _isReady is false, then notifications are ignored
-
-        // SetUmbracoVersionStep issues a DistributedCache.Instance.RefreshAll...() call which should cause
-        // the entire content, media etc caches to reload from database -- and then the app restarts -- however,
-        // at the time SetUmbracoVersionStep runs, Umbraco is not fully initialized and therefore some property
-        // value converters, etc are not registered, and rebuilding the NuCache may not work properly.
-        //
-        // More details: ApplicationContext.IsConfigured being false, ApplicationEventHandler.ExecuteWhen... is
-        // called and in most cases events are skipped, so property value converters are not registered or
-        // removed, so PublishedPropertyType either initializes with the wrong converter, or throws because it
-        // detects more than one converter for a property type.
-        //
-        // It's not an issue for XmlStore - the app restart takes place *after* the install has refreshed the
-        // cache, and XmlStore just writes a new umbraco.config file upon RefreshAll, so that's OK.
-        //
-        // But for NuCache... we cannot rebuild the cache now. So it will NOT work and we are not fixing it,
-        // because now we should ALWAYS run with the database server messenger, and then the RefreshAll will
-        // be processed as soon as we are configured and the messenger processes instructions.
-
         // note: notifications for content type and data type changes should be invoked with the
         // pure live model factory, if any, locked and refreshed - see ContentTypeCacheRefresher and
         // DataTypeCacheRefresher
 
         public override void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
         {
-            // no cache, trash everything
-            if (_isReady == false)
-            {
-                DeleteLocalFilesForContent();
-                draftChanged = publishedChanged = true;
-                return;
-            }
+            EnsureCaches();
 
             using (_contentStore.GetScopedWriteLock(_scopeProvider))
             {
@@ -785,13 +738,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override void Notify(MediaCacheRefresher.JsonPayload[] payloads, out bool anythingChanged)
         {
-            // no cache, trash everything
-            if (_isReady == false)
-            {
-                DeleteLocalFilesForMedia();
-                anythingChanged = true;
-                return;
-            }
+            EnsureCaches();
 
             using (_mediaStore.GetScopedWriteLock(_scopeProvider))
             {
@@ -878,9 +825,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override void Notify(ContentTypeCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (_isReady == false)
-                return;
+            EnsureCaches();
 
             foreach (var payload in payloads)
                 _logger.Debug<PublishedSnapshotService, ContentTypeChangeTypes, string,int>("Notified {ChangeTypes} for {ItemType} {ItemId}", payload.ChangeTypes, payload.ItemType, payload.Id);
@@ -960,9 +905,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(DataTypeCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (_isReady == false)
-                return;
+            EnsureCaches();
 
             var idsA = payloads.Select(x => x.Id).ToArray();
 
@@ -1000,9 +943,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
         {
-            // no cache, nothing we can do
-            if (_isReady == false)
-                return;
+            EnsureCaches();
 
             // see note in LockAndLoadContent
             using (_domainStore.GetScopedWriteLock(_scopeProvider))
@@ -1168,7 +1109,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (Volatile.Read(ref _isReady) == false)
             {
                 throw new InvalidOperationException("The published snapshot service has not properly initialized.");
-            }   
+            }
 
             var preview = previewToken.IsNullOrWhiteSpace() == false;
             return new PublishedSnapshot(this, preview);
@@ -1491,7 +1432,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 UrlSegment = content.GetUrlSegment(_urlSegmentProviders)
             };
 
-            var serialized = serializer.Serialize(ReadOnlyContentBaseAdapter.Create(content), contentCacheData);
+            var serialized = serializer.Serialize(ReadOnlyContentBaseAdapter.Create(content), contentCacheData, published);
 
             var dto = new ContentNuDto
             {

@@ -11,7 +11,7 @@
  */
 function windowResizeListener($rootScope) {
 
-    var WinReszier = (function () {
+    var WinResizer = (function () {
         var registered = [];
         var inited = false;        
         var resize = _.debounce(function(ev) {
@@ -51,7 +51,7 @@ function windowResizeListener($rootScope) {
          * @param {Function} cb 
          */
         register: function (cb) {
-            WinReszier.register(cb);
+            WinResizer.register(cb);
         },
 
         /**
@@ -59,7 +59,7 @@ function windowResizeListener($rootScope) {
          * @param {Function} cb 
          */
         unregister: function(cb) {
-            WinReszier.unregister(cb);
+            WinResizer.unregister(cb);
         }
 
     };

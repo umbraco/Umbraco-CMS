@@ -65,21 +65,21 @@
 
                                 <button type="button" class="btn-reset editor-info" ng-click="vm.openDataTypeSettings(model.property)">
                                     <div class="editor-icon-wrapper">
-                                        <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}" aria-hidden="true"></i>
+                                        <umb-icon icon="{{model.property.dataTypeIcon || 'icon-autofill'}}" class="icon"></umb-icon>
                                     </div>
 
                                     <div class="editor-details">
-                                        <span class="editor-name">{{ model.property.dataTypeName }}</span>
-                                        <span class="editor-editor">{{ model.property.editor }}</span>
+                                        <span class="editor-name">{{model.property.dataTypeName}}</span>
+                                        <span class="editor-editor">{{model.property.editor}}</span>
                                     </div>
                                 </button>
 
                                 <button type="button" class="editor-remove-icon btn-reset pull-right"
-                                    ng-click="vm.openDataTypePicker(model.property)"
-                                    hotkey="alt+shift+d"
-                                    localize="title"
-                                    title="@actions_changeDataType">
-                                    <i class="icon icon-wrong" aria-hidden="true"></i>
+                                        ng-click="vm.openDataTypePicker(model.property)"
+                                        hotkey="alt+shift+d"
+                                        localize="title"
+                                        title="@actions_changeDataType">
+                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
                                 </button>
                             </div>
 
@@ -153,7 +153,7 @@
                         </div>
                         <div class="umb-control-group clearfix -no-border" ng-if="model.contentType === 'documentType' && model.contentTypeAllowCultureVariant">
 
-                            <h5><localize key="contentTypeEditor_cultureVariantHeading" /></h5>
+                            <h5><localize key="contentTypeEditor_cultureVariantHeading"></localize></h5>
                             <umb-toggle data-element="permissions-allow-culture-variant"
                                         checked="model.property.allowCultureVariant"
                                         on-click="vm.toggleAllowCultureVariants()">
@@ -162,7 +162,7 @@
                         </div>
                         <div class="umb-control-group clearfix" ng-if="model.contentType === 'documentType' && model.contentTypeAllowSegmentVariant">
 
-                            <h5><localize key="contentTypeEditor_segmentVariantHeading" /></h5>
+                            <h5><localize key="contentTypeEditor_segmentVariantHeading"></localize></h5>
 
                             <umb-toggle data-element="permissions-allow-segment-variant"
                                         checked="model.property.allowSegmentVariant"
