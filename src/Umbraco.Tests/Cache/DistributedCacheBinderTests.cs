@@ -170,24 +170,24 @@ namespace Umbraco.Tests.Cache
         }
 
         [Test]
-        public void OnlyHandlesOnContentTypeEvent()
+        public void GroupsContentTypeEvents()
         {
             var num = 30;
             var contentTypes = Enumerable.Repeat(MockedContentTypes.CreateBasicContentType(), num);
             var mediaTypes = Enumerable.Repeat(MockedContentTypes.CreateImageMediaType(), num);
             var memberTypes = Enumerable.Repeat(MockedContentTypes.CreateSimpleMemberType(), num);
-            var definitionsContent = contentTypes.SelectMany(x=> new IEventDefinition[]
+            var definitionsContent = contentTypes.SelectMany(x => new IEventDefinition[]
             {
                 new EventDefinition<IContentTypeService, ContentTypeChange<IContentType>.EventArgs>(null, Current.Services.ContentTypeService, new ContentTypeChange<IContentType>.EventArgs(new ContentTypeChange<IContentType>(x, ContentTypeChangeTypes.Create)), "Changed"),
                 new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, Current.Services.ContentTypeService, new SaveEventArgs<IContentType>(x), "Saved"),
             });
 
-            var definitionsMedia =mediaTypes.SelectMany(x=> new IEventDefinition[]
+            var definitionsMedia = mediaTypes.SelectMany(x => new IEventDefinition[]
             {
                 new EventDefinition<IMediaTypeService, ContentTypeChange<IMediaType>.EventArgs>(null, Current.Services.MediaTypeService, new ContentTypeChange<IMediaType>.EventArgs(new ContentTypeChange<IMediaType>(x, ContentTypeChangeTypes.Create)), "Changed"),
                 new EventDefinition<IMediaTypeService, SaveEventArgs<IMediaType>>(null, Current.Services.MediaTypeService, new SaveEventArgs<IMediaType>(x), "Saved"),
             });
-            var definitionsMember =memberTypes.SelectMany(x=> new IEventDefinition[]
+            var definitionsMember = memberTypes.SelectMany(x => new IEventDefinition[]
             {
                 new EventDefinition<IMemberTypeService, ContentTypeChange<IMemberType>.EventArgs>(null, Current.Services.MemberTypeService, new ContentTypeChange<IMemberType>.EventArgs(new ContentTypeChange<IMemberType>(x, ContentTypeChangeTypes.Create)), "Changed"),
                 new EventDefinition<IMemberTypeService, SaveEventArgs<IMemberType>>(null, Current.Services.MemberTypeService, new SaveEventArgs<IMemberType>(x), "Saved"),
@@ -202,8 +202,8 @@ namespace Umbraco.Tests.Cache
 
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(num*6, definitions.Count(), "Precondition is we have many definitions");
-                Assert.AreEqual(6, result.Count(), "Unexpect number of reduced definitions");
+                Assert.AreEqual(num * 6, definitions.Count(), "Precondition is we have many definitions");
+                Assert.AreEqual(6, result.Count(), "Unexpected number of reduced definitions");
                 foreach (var eventDefinition in result)
                 {
                     if (eventDefinition.Args is SaveEventArgs<IContentType> saveContentEventArgs)
