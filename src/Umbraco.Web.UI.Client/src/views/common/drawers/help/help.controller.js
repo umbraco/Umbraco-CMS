@@ -44,18 +44,23 @@
                 vm.title = data;
             });
             //Set help dashboard messages
-            localizationService.localizeMany([
-              "speechBubbles_copySuccessMessage",
-              "general_success",
-              "speechBubbles_cannotCopyInformation",
-              "general_error"
-            ]).then(function(keys){
-              vm.labels.copiedSuccessInfo = keys[0];
-              vm.labels.copySuccessStatus = keys[1];
-              vm.labels.copiedErrorInfo = keys[2];
-              vm.labels.copyErrorStatus = keys[3];
-            });
-            
+          var labelKeys = [
+            "general_help",
+            "speechBubbles_copySuccessMessage",
+            "general_success",
+            "speechBubbles_cannotCopyInformation",
+            "general_error"
+          ];
+          localizationService.localizeMany(labelKeys).then(function(resp){
+            [
+              vm.title,
+              vm.labels.copiedSuccessInfo,
+              vm.labels.copySuccessStatus,
+              vm.labels.copiedErrorInfo,
+              vm.labels.copyErrorStatus
+            ] = resp;
+          });
+
             currentUserResource.getUserData().then(function(systemInfo){
               vm.systemInfo = systemInfo;
               let browserInfo = platformService.getBrowserInfo();
@@ -63,7 +68,7 @@
                 vm.systemInfo.push({name :"Browser", data: browserInfo.name + " " + browserInfo.version});
               }
               vm.systemInfo.push({name :"Browser OS", data: getPlatform()});
-            });
+            } );
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
                 getTourGroupCompletedPercentage();
