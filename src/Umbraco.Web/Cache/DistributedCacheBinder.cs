@@ -6,6 +6,9 @@ using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Web.Cache
 {
@@ -89,6 +92,97 @@ namespace Umbraco.Web.Cache
         internal static IEnumerable<IEventDefinition> GetReducedEventList(IEnumerable<IEventDefinition> events)
         {
             var reducedEvents = new List<IEventDefinition>();
+
+            var grouped = events.GroupBy(x => x.GetType());
+
+            foreach (var group in grouped)
+            {
+                if (group.Key == typeof(EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>))
+                {
+                    var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
+
+                    foreach (var groupedGroup in groupedGroups)
+                    {
+                        reducedEvents.Add(new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(
+                            null,
+                            (IContentTypeService)groupedGroup.Key.Sender,
+                            new SaveEventArgs<IContentType>(groupedGroup.SelectMany(x => ((SaveEventArgs<IContentType>)x.Args).SavedEntities)),
+                            groupedGroup.Key.EventName));
+                    }
+                }
+                else if (group.Key == typeof(EventDefinition<IContentTypeService, ContentTypeChange<IContentType>.EventArgs>))
+                {
+                    var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
+
+                    foreach (var groupedGroup in groupedGroups)
+                    {
+                        reducedEvents.Add(new EventDefinition<IContentTypeService, ContentTypeChange<IContentType>.EventArgs>(
+                            null,
+                            (IContentTypeService)groupedGroup.Key.Sender,
+                            new ContentTypeChange<IContentType>.EventArgs(groupedGroup.SelectMany(x => ((ContentTypeChange<IContentType>.EventArgs)x.Args).Changes)),
+                            groupedGroup.Key.EventName));
+                    }
+
+                }
+                else if (group.Key == typeof(EventDefinition<IMediaTypeService, SaveEventArgs<IMediaType>>))
+                {
+                    var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
+
+                    foreach (var groupedGroup in groupedGroups)
+                    {
+                        reducedEvents.Add(new EventDefinition<IMediaTypeService, SaveEventArgs<IMediaType>>(
+                            null,
+                            (IMediaTypeService)groupedGroup.Key.Sender,
+                            new SaveEventArgs<IMediaType>(groupedGroup.SelectMany(x => ((SaveEventArgs<IMediaType>)x.Args).SavedEntities)),
+                            groupedGroup.Key.EventName));
+                    }
+                }
+                else if (group.Key == typeof(EventDefinition<IMediaTypeService, ContentTypeChange<IMediaType>.EventArgs>))
+                {
+                    var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
+
+                    foreach (var groupedGroup in groupedGroups)
+                    {
+                        reducedEvents.Add(new EventDefinition<IMediaTypeService, ContentTypeChange<IMediaType>.EventArgs>(
+                            null,
+                            (IMediaTypeService)groupedGroup.Key.Sender,
+                            new ContentTypeChange<IMediaType>.EventArgs(groupedGroup.SelectMany(x => ((ContentTypeChange<IMediaType>.EventArgs)x.Args).Changes)),
+                            groupedGroup.Key.EventName));
+                    }
+                }
+                else if (group.Key == typeof(EventDefinition<IMemberTypeService, SaveEventArgs<IMemberType>>))
+                {
+                    var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
+
+                    foreach (var groupedGroup in groupedGroups)
+                    {
+                        reducedEvents.Add(new EventDefinition<IMemberTypeService, SaveEventArgs<IMemberType>>(
+                            null,
+                            (IMemberTypeService)groupedGroup.Key.Sender,
+                            new SaveEventArgs<IMemberType>(groupedGroup.SelectMany(x => ((SaveEventArgs<IMemberType>)x.Args).SavedEntities)),
+                            groupedGroup.Key.EventName));
+                    }
+                }
+                else if (group.Key == typeof(EventDefinition<IMemberTypeService, ContentTypeChange<IMemberType>.EventArgs>))
+                {
+                    var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
+
+                    foreach (var groupedGroup in groupedGroups)
+                    {
+                        reducedEvents.Add(new EventDefinition<IMemberTypeService, ContentTypeChange<IMemberType>.EventArgs>(
+                            null,
+                            (IMemberTypeService)groupedGroup.Key.Sender,
+                            new ContentTypeChange<IMemberType>.EventArgs(groupedGroup.SelectMany(x => ((ContentTypeChange<IMemberType>.EventArgs)x.Args).Changes)),
+                            groupedGroup.Key.EventName));
+                    }
+                }
+                else
+                {
+                    reducedEvents.AddRange(group);
+                }
+            }
+
+            return reducedEvents;
 
             var gotDoumentType = false;
             var gotMediaType = false;
