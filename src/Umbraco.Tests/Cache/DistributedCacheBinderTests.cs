@@ -198,7 +198,7 @@ namespace Umbraco.Tests.Cache
             definitions.AddRange(definitionsMedia);
             definitions.AddRange(definitionsMember);
 
-            var result = DistributedCacheBinder.GetReducedEventList(definitions);
+            var result = DistributedCacheBinder.GetGroupedEventList(definitions);
 
             Assert.Multiple(() =>
             {

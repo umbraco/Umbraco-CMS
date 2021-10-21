@@ -70,7 +70,8 @@ namespace Umbraco.Web.Cache
             {
                 // When it comes to content types types, a change to any single one will trigger a reload of the content and media caches.
                 // We can reduce the impact of that by grouping the events to invoke just one per type, providing a collection of the individual arguments.
-                foreach (var e in GetReducedEventList(events))
+                var groupedEvents = GetGroupedEventList(events);
+                foreach (var e in groupedEvents)
                 {
                     var handler = FindHandler(e);
                     if (handler == null)
@@ -87,7 +88,7 @@ namespace Umbraco.Web.Cache
         }
 
         // Internal for tests
-        internal static IEnumerable<IEventDefinition> GetReducedEventList(IEnumerable<IEventDefinition> events)
+        internal static IEnumerable<IEventDefinition> GetGroupedEventList(IEnumerable<IEventDefinition> events)
         {
             var groupedEvents = new List<IEventDefinition>();
 
