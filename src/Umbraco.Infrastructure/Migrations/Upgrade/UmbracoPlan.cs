@@ -219,19 +219,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             // so we need to ensure that migrations from 8.15 are included in the next
             // v9*.
 
-            Merge()
-                // to 8.15.0
-                .To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}")
-                .To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}")
-                .To<UpdateCmsPropertyGroupIdSeed>("{5C424554-A32D-4852-8ED1-A13508187901}")
-            .With()
-                // to 9.0.0 RC1
-                .To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}")
-                .To<ExternalLoginTableIndexes>("{50A43237-A6F4-49E2-A7A6-5DAD65C84669}")
-                .To<ExternalLoginTokenTable>("{3D8DADEF-0FDA-4377-A5F0-B52C2110E8F2}")
-                .To<MemberTableColumns>("{1303BDCF-2295-4645-9526-2F32E8B35ABD}")
-                .To<AddPasswordConfigToMemberTable>("{86AC839A-0D08-4D09-B7B5-027445E255A1}")
-            .As("{5060F3D2-88BE-4D30-8755-CF51F28EAD12}");
+            // to 8.15.0
+            To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}");
+            To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}");
+            To<UpdateCmsPropertyGroupIdSeed>("{5C424554-A32D-4852-8ED1-A13508187901}");
 
             Merge()
                 // to 8.17.0
@@ -240,14 +231,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
                 // This should be safe to execute again. We need it with a new name to ensure updates from all the following has executed this step.
                 // - 8.15.0 RC    - Current state: {4695D0C9-0729-4976-985B-048D503665D8}
                 // - 8.15.0 Final - Current state: {5C424554-A32D-4852-8ED1-A13508187901}
-                // - 9.0.0 RC1    - Current state: {5060F3D2-88BE-4D30-8755-CF51F28EAD12}           
+                // - 9.0.0 RC1    - Current state: {5060F3D2-88BE-4D30-8755-CF51F28EAD12}
                 .To<UpdateCmsPropertyGroupIdSeed>("{622E5172-42E1-4662-AD80-9504AF5A4E53}")
                 .To<ExternalLoginTableIndexesFixup>("{10F7BB61-C550-426B-830B-7F954F689CDF}")
                 .To<DictionaryTablesIndexes>("{12DCDE7F-9AB7-4617-804F-AB66BF360980}")
             .As("{5AAE6276-80DB-4ACF-B845-199BC6C37538}");
 
+            // to 9.0.0 RC1
+            To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}");
+            To<ExternalLoginTableIndexes>("{50A43237-A6F4-49E2-A7A6-5DAD65C84669}");
+            To<ExternalLoginTokenTable>("{3D8DADEF-0FDA-4377-A5F0-B52C2110E8F2}");
+            To<MemberTableColumns>("{1303BDCF-2295-4645-9526-2F32E8B35ABD}");
+            To<AddPasswordConfigToMemberTable>("{5060F3D2-88BE-4D30-8755-CF51F28EAD12}");
+
             // TO 9.0.0-rc4
-            To<UmbracoServerColumn>("5E02F241-5253-403D-B5D3-7DB00157E20F");
+            To<UmbracoServerColumn>("5E02F241-5253-403D-B5D3-7DB00157E20F"); // Jaddie: This GUID is missing the { }, although this likely can't be changed now as it will break installs going forwards
 
             // TO 9.0.0
 
