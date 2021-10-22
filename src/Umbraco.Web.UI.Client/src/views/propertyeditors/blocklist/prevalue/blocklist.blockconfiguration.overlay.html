@@ -190,7 +190,10 @@
 
                                         <div class="umb-block-card" ng-if="vm.block.thumbnail !== null">
                                             <div class="__showcase"
-                                                 ng-style="{ 'background-color': vm.block.backgroundColor, 'background-image': vm.getBlockBackground(vm.block) }">
+                                                 ng-style="{
+                                                    'background-color': vm.block.backgroundColor,
+                                                    'background-image': vm.getBlockBackground(vm.block)
+                                                 }">
                                             </div>
                                             <div class="__actions">
                                                 <button type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeThumbnailForBlock(vm.block)">
