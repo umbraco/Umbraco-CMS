@@ -730,8 +730,8 @@ namespace Umbraco.Web.Editors
                             {
                                 var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
                             if (fileProperty != null) {
-                                    var dataTypeKey = fileProperty.DataTypeKey;
-                                    var dataType = Services.DataTypeService.GetDataType(dataTypeKey);
+                                var dataTypeKey = fileProperty.DataTypeKey;
+                                var dataType = Services.DataTypeService.GetDataType(dataTypeKey);
 
                                 if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig) {
                                         var fileExtensions = fileExtensionsConfig.FileExtensions;
