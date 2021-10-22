@@ -12,21 +12,20 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
-    /// An API controller used for dealing with member groups
+    ///     An API controller used for dealing with member groups
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMemberGroups)]
     [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
+        private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberGroupService _memberGroupService;
         private readonly IUmbracoMapper _umbracoMapper;
-        private readonly ILocalizedTextService _localizedTextService;
 
         public MemberGroupController(
             IMemberGroupService memberGroupService,
@@ -35,11 +34,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
-            _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
+            _localizedTextService =
+                localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
         /// <summary>
-        /// Gets the member group json for the member group id
+        ///     Gets the member group json for the member group id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Gets the member group json for the member group guid
+        ///     Gets the member group json for the member group guid
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// Gets the member group json for the member group udi
+        ///     Gets the member group json for the member group udi
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -100,7 +100,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteById(int id)
         {
-            var memberGroup = _memberGroupService.GetById(id);
+            IMemberGroup memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
                 return NotFound();
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public IEnumerable<MemberGroupDisplay> GetAllGroups()
             => _memberGroupService.GetAll()
-                    .Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
+                .Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
 
         public MemberGroupDisplay GetEmpty()
         {
@@ -123,18 +123,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public bool IsMemberGroupNameUnique(int id, string oldName, string newName)
         {
             if (newName == oldName)
+            {
                 return true; // name hasn't changed
+            }
 
-            var memberGroup = _memberGroupService.GetByName(newName);
+            IMemberGroup memberGroup = _memberGroupService.GetByName(newName);
             if (memberGroup == null)
+            {
                 return true; // no member group found
+            }
 
             return memberGroup.Id == id;
         }
 
         public ActionResult<MemberGroupDisplay> PostSave(MemberGroupSave saveModel)
         {
-
             var id = int.Parse(saveModel.Id.ToString(), CultureInfo.InvariantCulture);
             IMemberGroup memberGroup = id > 0 ? _memberGroupService.GetById(id) : new MemberGroup();
             if (memberGroup == null)
@@ -157,7 +160,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
             else
             {
-                var display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+                MemberGroupDisplay display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
                 display.AddErrorNotification(
                     _localizedTextService.Localize("speechBubbles", "memberGroupNameDuplicate"),
                     string.Empty);
