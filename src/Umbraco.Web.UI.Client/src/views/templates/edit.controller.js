@@ -575,7 +575,7 @@
                         }
                         editorService.close();
                     },
-                    close: () => editorService.close(),                    
+                    close: () => editorService.close()
                 }
 
                 editorService.templatePicker(editor);
