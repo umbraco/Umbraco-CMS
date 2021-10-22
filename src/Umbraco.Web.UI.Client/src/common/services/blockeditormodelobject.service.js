@@ -30,9 +30,8 @@
 
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
-                    if (dataModel[prop.alias]) {
-                        prop.value = dataModel[prop.alias];
-                    }
+
+                    prop.value = dataModel[prop.alias];
                 }
             }
 
@@ -53,9 +52,8 @@
 
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
-                    if (prop.value) {
-                        dataModel[prop.alias] = prop.value;
-                    }
+
+                    dataModel[prop.alias] = prop.value;
                 }
             }
 
