@@ -200,7 +200,7 @@
                 }
             }));
 
-            evts.push(eventsService.on("rte.shortcut.publish", function () {
+            evts.push(eventsService.on("rte.shortcut.saveAndPublish", function () {
                 $scope.saveAndPublish();
             }));
 
