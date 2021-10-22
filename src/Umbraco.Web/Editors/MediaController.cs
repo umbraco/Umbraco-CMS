@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -704,34 +704,54 @@ namespace Umbraco.Web.Editors
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        var mediaTypes = Services.MediaTypeService.GetAll();
-                        // Look up MediaTypes
-                        foreach (var mediaTypeItem in mediaTypes)
+                        var mediaTypes = Services.MediaTypeService.GetAll().ToList();
+
+                        var mediaFolderItem = Services.MediaService.GetById(parentId);
+                        var mediaTypeFolder = mediaTypes.FirstOrDefault(x => x.Alias == mediaFolderItem.ContentType.Alias);
+
+                        if (mediaTypeFolder != null)
                         {
-                            var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
+                            foreach (var allowedContentType in mediaTypeFolder.AllowedContentTypes)
+                            {
+                                var mediaTypeItem = Services.MediaTypeService.Get(allowedContentType.Id.Value);
+                                var fileProperty = mediaTypeItem?.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
+                                if (fileProperty != null)
+                                {
+                                    mediaType = mediaTypeItem.Alias;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (string.IsNullOrWhiteSpace(mediaType))
+                        {
+                            // Look up MediaTypes
+                            foreach (var mediaTypeItem in mediaTypes)
+                            {
+                                var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
                             if (fileProperty != null) {
-                                var dataTypeKey = fileProperty.DataTypeKey;
-                                var dataType = Services.DataTypeService.GetDataType(dataTypeKey);
+                                    var dataTypeKey = fileProperty.DataTypeKey;
+                                    var dataType = Services.DataTypeService.GetDataType(dataTypeKey);
 
                                 if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig) {
-                                    var fileExtensions = fileExtensionsConfig.FileExtensions;
-                                    if (fileExtensions != null)
-                                    {
-                                        if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
+                                        var fileExtensions = fileExtensionsConfig.FileExtensions;
+                                        if (fileExtensions != null)
                                         {
-                                            mediaType = mediaTypeItem.Alias;
-                                            break;
+                                            if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
+                                            {
+                                                mediaType = mediaTypeItem.Alias;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
                             }
 
-                        }
-
-                        // If media type is still File then let's check if it's an image.
-                        if (mediaType == Constants.Conventions.MediaTypes.File && Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
-                        {
-                            mediaType = Constants.Conventions.MediaTypes.Image;
+                            // If media type is still File then let's check if it's an image.
+                            if (mediaType == Constants.Conventions.MediaTypes.File && Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
+                            {
+                                mediaType = Constants.Conventions.MediaTypes.Image;
+                            }
                         }
                     }
                     else
