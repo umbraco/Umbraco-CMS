@@ -10,7 +10,7 @@
 (function () {
     "use strict";
 
-    function BlockConfigurationOverlayController($scope, overlayService, localizationService, editorService, elementTypeResource, eventsService, udiService, angularHelper) {
+    function BlockConfigurationOverlayController($scope, overlayService, localizationService, editorService, elementTypeResource, eventsService, udiService, angularHelper, umbRequestHelper) {
 
         var unsubscribe = [];
 
@@ -287,8 +287,26 @@
             });
         };
 
-        vm.removeThumbnailForBlock = function(entry) {
-            entry.thumbnail = null;
+        vm.getBlockBackground = function (block) {
+
+            if (block == null || block.thumbnail == null || block.thumbnail === "") {
+                return "none";
+            }
+
+            console.log("thumbnail 1", block.thumbnail);
+
+            var path = umbRequestHelper.convertVirtualToAbsolutePath(block.thumbnail);
+            if (path.toLowerCase().endsWith(".svg") === false) {
+                path += "?upscale=false&width=400";
+            }
+
+            console.log("thumbnail 2", `url('${path}')`);
+                
+            return `url('${path}')`;
+        };
+
+        vm.removeThumbnailForBlock = function (block) {
+            block.thumbnail = null;
         };
 
         vm.changeIconColor = function (color) {

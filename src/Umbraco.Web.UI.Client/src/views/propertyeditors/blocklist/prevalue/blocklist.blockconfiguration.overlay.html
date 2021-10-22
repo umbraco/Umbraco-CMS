@@ -187,14 +187,19 @@
                                 <div class="umb-el-wrap">
                                     <label class="control-label" for="iconcolor"><localize key="blockEditor_thumbnail">Thumbnail</localize></label>
                                     <div class="controls">
-                                        <div class="__settings-input --hasValue" ng-if="vm.block.thumbnail !== null" >
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.thumbnail !== null">
 
-                                            <umb-node-preview icon="'icon-document'" name="vm.block.thumbnail"></umb-node-preview>
-                                            <div class="__control-actions">
-                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.removeThumbnailForBlock(vm.block)">
-                                                    <umb-icon icon="icon-wrong" class="icon"></umb-icon>
-                                                </button>
+                                            <div class="umb-block-card">
+                                                <div class="__showcase"
+                                                     ng-style="{ 'background-color': vm.block.backgroundColor, 'background-image': vm.getBlockBackground(vm.block) }">
+                                                </div>
+                                                <div class="__actions">
+                                                    <button type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeThumbnailForBlock(vm.block)">
+                                                        <umb-icon icon="icon-trash" class="icon"></umb-icon>
+                                                    </button>
+                                                </div>
                                             </div>
+
                                         </div>
                                         <button type="button" class="btn-reset __settings-input --noValue umb-outline" ng-if="vm.block.thumbnail === null" ng-click="vm.addThumbnailForBlock(vm.block)">
                                             <localize key="blockEditor_addThumbnail">Add thumbnail</localize>
