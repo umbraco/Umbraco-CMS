@@ -1221,6 +1221,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 });
             });
 
+            editor.addShortcut('Ctrl+P', '', function () {
+                angularHelper.safeApply($rootScope, function () {
+                    eventsService.emit("rte.shortcut.publish");
+                });
+            });
+
         },
 
         insertLinkInEditor: function (editor, target, anchorElm) {
