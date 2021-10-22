@@ -293,14 +293,10 @@
                 return "none";
             }
 
-            console.log("thumbnail 1", block.thumbnail);
-
             var path = umbRequestHelper.convertVirtualToAbsolutePath(block.thumbnail);
             if (path.toLowerCase().endsWith(".svg") === false) {
                 path += "?upscale=false&width=400";
             }
-
-            console.log("thumbnail 2", `url('${path}')`);
                 
             return `url('${path}')`;
         };
