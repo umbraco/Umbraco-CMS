@@ -1349,6 +1349,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmRemoveAllMediaEntryMessage">Remove all medias?</key>
     <key alias="tabClipboard">Clipboard</key>
     <key alias="notAllowed">Not allowed</key>
+    <key alias="openMediaPicker">Open media picker</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
