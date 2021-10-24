@@ -57,6 +57,7 @@
         var stepDecimalPlaces = $scope.model.config.step % 1 == 0
             ? 0
             : _.last($scope.model.config.step.toString().replace(",", ".").split(".")).length;
+
         // setup default
         $scope.sliderOptions = {
             "start": start,
