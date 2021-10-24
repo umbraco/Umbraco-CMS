@@ -567,7 +567,7 @@
 
                         const currentTemplate = vm.templates.find(template => template.alias == vm.template.masterTemplateAlias);
 
-                        item.selected = currentTemplate?.id == node.id;
+                        item.selected = currentTemplate?.id == item.id;
 
                         if (currentTemplate)
                         {
