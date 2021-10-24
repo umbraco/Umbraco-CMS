@@ -567,27 +567,22 @@
 
                         const currentTemplate = vm.templates.find(template => template.alias == vm.template.masterTemplateAlias);
 
-                        item.selected = currentTemplate?.id == item.id;
-
                         if (currentTemplate)
                         {
                             const path = currentTemplate.path.split(",");
                             if (path.length > 2) {
                                 // Sync tree if current template not is a root level.
-                                treeService.syncTree({ node: item, path: path }).then(syncArgs =>
-                                {
-                                    console.log("syncArgs", syncArgs);
+                                treeService.syncTree({
+                                    node: item.parent(),
+                                    path: path,
+                                    forceReload: true
+                                })
+                                .then(node => {
+                                    // Update selected node from current selected template.
+                                    node.selected = currentTemplate?.id == node.id;
                                 });
                             }
                         }
-                        
-
-                        console.log("item", item);
-                        
-
-                        console.log("currentTemplate", currentTemplate);
-
-                        
 
                         return !availableMasterTemplates.some(template => template.id == item.id);
                     },
