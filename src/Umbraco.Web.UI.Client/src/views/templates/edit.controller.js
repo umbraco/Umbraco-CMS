@@ -569,6 +569,26 @@
 
                         item.selected = currentTemplate?.id == item.id;
 
+                        if (currentTemplate)
+                        {
+                            const path = currentTemplate.path.split(",");
+                            if (path.length > 2) {
+                                // Sync tree if current template not is a root level.
+                                treeService.syncTree({ node: item, path: path }).then(syncArgs =>
+                                {
+                                    console.log("syncArgs", syncArgs);
+                                });
+                            }
+                        }
+                        
+
+                        console.log("item", item);
+                        
+
+                        console.log("currentTemplate", currentTemplate);
+
+                        
+
                         return !availableMasterTemplates.some(template => template.id == item.id);
                     },
                     submit: model => {
