@@ -566,7 +566,9 @@
                     filter: item => {
 
                         const currentTemplate = vm.templates.find(template => template.alias == vm.template.masterTemplateAlias);
+                        const allowed = availableMasterTemplates.some(template => template.id == item.id);
 
+                        // Set selected node.
                         item.selected = currentTemplate?.id == item.id;
 
                         if (currentTemplate)
@@ -581,11 +583,15 @@
                                 .then(node => {
                                     // Update selected node from current selected template.
                                     node.selected = currentTemplate?.id == node.id;
+
+                                    if (!allowed) {
+                                        node.cssClasses.push("not-allowed");
+                                    }
                                 });
                             }
                         }
 
-                        return !availableMasterTemplates.some(template => template.id == item.id);
+                        return !allowed;
                     },
                     submit: model => {
                         var template = model.selection[0];
