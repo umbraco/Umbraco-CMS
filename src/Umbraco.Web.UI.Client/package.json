@@ -51,9 +51,9 @@
     "wicg-inert": "^3.0.2"
   },
   "devDependencies": {
-    "@babel/core": "7.6.4",
-    "@babel/plugin-proposal-object-rest-spread": "7.13.8",
-    "@babel/preset-env": "7.6.3",
+    "@babel/core": "7.15.8",
+    "@babel/plugin-proposal-object-rest-spread": "7.15.6",
+    "@babel/preset-env": "7.15.8",
     "autoprefixer": "9.6.5",
     "caniuse-lite": "^1.0.30001237",
     "cssnano": "4.1.10",

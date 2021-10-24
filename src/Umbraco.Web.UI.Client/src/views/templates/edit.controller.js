@@ -563,7 +563,14 @@
                 const editor = {
                     title,
                     filterCssClass: 'not-allowed',
-                    filter: item => !availableMasterTemplates.some(template => template.id == item.id),                    
+                    filter: item => {
+
+                        const currentTemplate = vm.templates.find(template => template.alias == vm.template.masterTemplateAlias);
+
+                        item.selected = currentTemplate?.id == item.id;
+
+                        return !availableMasterTemplates.some(template => template.id == item.id);
+                    },
                     submit: model => {
                         var template = model.selection[0];
                         if (template && template.alias) {
