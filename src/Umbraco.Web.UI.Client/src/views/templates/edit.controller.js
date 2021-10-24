@@ -567,6 +567,8 @@
 
                         const currentTemplate = vm.templates.find(template => template.alias == vm.template.masterTemplateAlias);
 
+                        item.selected = currentTemplate?.id == node.id;
+
                         if (currentTemplate)
                         {
                             const path = currentTemplate.path.split(",");
