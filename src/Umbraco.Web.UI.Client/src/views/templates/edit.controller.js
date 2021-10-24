@@ -574,8 +574,7 @@
                                 // Sync tree if current template not is a root level.
                                 treeService.syncTree({
                                     node: item.parent(),
-                                    path: path,
-                                    forceReload: true
+                                    path: path
                                 })
                                 .then(node => {
                                     // Update selected node from current selected template.
