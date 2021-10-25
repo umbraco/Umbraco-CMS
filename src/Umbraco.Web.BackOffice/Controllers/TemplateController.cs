@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
@@ -12,6 +13,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -36,6 +38,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
+        }
+
+        [Obsolete("Use ctor will all params")]
+        public TemplateController(
+            IFileService fileService,
+            IUmbracoMapper umbracoMapper,
+            IShortStringHelper shortStringHelper)
+            : this(fileService, umbracoMapper, shortStringHelper, StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>())
+        {
         }
 
         /// <summary>
