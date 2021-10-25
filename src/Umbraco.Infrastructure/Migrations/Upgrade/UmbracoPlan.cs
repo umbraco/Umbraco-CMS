@@ -224,18 +224,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}");
             To<UpdateCmsPropertyGroupIdSeed>("{5C424554-A32D-4852-8ED1-A13508187901}");
 
-            Merge()
-                // to 8.17.0
-                .To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}")
-            .With()
-                // This should be safe to execute again. We need it with a new name to ensure updates from all the following has executed this step.
-                // - 8.15.0 RC    - Current state: {4695D0C9-0729-4976-985B-048D503665D8}
-                // - 8.15.0 Final - Current state: {5C424554-A32D-4852-8ED1-A13508187901}
-                // - 9.0.0 RC1    - Current state: {5060F3D2-88BE-4D30-8755-CF51F28EAD12}
-                .To<UpdateCmsPropertyGroupIdSeed>("{622E5172-42E1-4662-AD80-9504AF5A4E53}")
-                .To<ExternalLoginTableIndexesFixup>("{10F7BB61-C550-426B-830B-7F954F689CDF}")
-                .To<DictionaryTablesIndexes>("{12DCDE7F-9AB7-4617-804F-AB66BF360980}")
-            .As("{5AAE6276-80DB-4ACF-B845-199BC6C37538}");
+            // to 8.17.0
+            To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
+
+            // This should be safe to execute again. We need it with a new name to ensure updates from all the following has executed this step.
+            // - 8.15.0 RC    - Current state: {4695D0C9-0729-4976-985B-048D503665D8}
+            // - 8.15.0 Final - Current state: {5C424554-A32D-4852-8ED1-A13508187901}
+            // - 9.0.0 RC1    - Current state: {5060F3D2-88BE-4D30-8755-CF51F28EAD12}
+            To<UpdateCmsPropertyGroupIdSeed>("{622E5172-42E1-4662-AD80-9504AF5A4E53}");
+            To<ExternalLoginTableIndexesFixup>("{10F7BB61-C550-426B-830B-7F954F689CDF}");
+            To<DictionaryTablesIndexes>("{5AAE6276-80DB-4ACF-B845-199BC6C37538}");
+            To<AddPropertyTypeGroupColumns>("{A2686B49-A082-4B22-97FD-AAB154D46A57}"); // Re-run this migration to make sure it has executed to account for migrations going out of sync between versions.
 
             // to 9.0.0 RC1
             To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}");
