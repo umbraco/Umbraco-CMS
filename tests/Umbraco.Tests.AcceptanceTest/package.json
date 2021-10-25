@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
-    "cypress": "^6.8.0",
+    "cypress": "^8.6.0",
     "del": "^6.0.0",
     "ncp": "^2.0.0",
     "prompt": "^1.2.0",
