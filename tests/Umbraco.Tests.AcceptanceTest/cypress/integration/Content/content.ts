@@ -762,7 +762,6 @@ context('Content', () => {
         cy.get('.umb-card-grid-item').contains(macroName).then(button => {
           button.click();
         });
-        cy.get('.umb-card-grid-item').contains(macroName).click();
 
 
         // Save and publish
