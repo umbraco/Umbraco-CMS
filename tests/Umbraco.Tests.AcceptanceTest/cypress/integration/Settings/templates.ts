@@ -72,8 +72,9 @@ context('Templates', () => {
 
         // Navigate away
         cy.umbracoSection('content');
+
         // Click stay button
-        cy.get('umb-button[label="Stay"] button:enabled').click();
+        cy.get('.umb-button__button:enabled', {timeout: 60000}).contains('Stay').click();
 
         // Assert
         // That the same document is open
@@ -105,8 +106,9 @@ context('Templates', () => {
 
         // Navigate away
         cy.umbracoSection('content');
+
         // Click discard
-        cy.get('umb-button[label="Discard changes"] button:enabled').click();
+        cy.get('.umb-button__button:enabled', {timeout: 60000}).contains('Discard changes').click();
         // Navigate back
         cy.umbracoSection('settings');
 

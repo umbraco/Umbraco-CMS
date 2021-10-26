@@ -11,6 +11,7 @@ import {
 
       beforeEach(() => {
           cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'), false);
+
       });
 
       afterEach(() =>  {
@@ -19,8 +20,12 @@ import {
 
       function OpenDocTypeFolder(){
           cy.umbracoSection('settings');
+
+          cy.intercept('/umbraco/backoffice/umbracotrees/contenttypetree/GetNodes*').as('getNodes');
+
           cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
           cy.get('.umb-tree-item__inner > .umb-tree-item__arrow').eq(0).click();
+          cy.wait('@getNodes');
           cy.get('.umb-tree-item__inner > .umb-tree-item__label').contains(tabsDocTypeName).click();
       }
 

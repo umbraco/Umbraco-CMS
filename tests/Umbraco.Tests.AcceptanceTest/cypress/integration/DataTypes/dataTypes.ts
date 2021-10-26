@@ -1,14 +1,33 @@
 /// <reference types="Cypress" />
 import {
     AliasHelper,
-    ApprovedColorPickerDataTypeBuilder,
+    ApprovedColorPickerDataTypeBuilder
 } from 'umbraco-cypress-testhelpers';
+
+
 
 context('DataTypes', () => {
 
     beforeEach(() => {
         cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'), false);
-      });
+    });
+
+    // lower level commands missing from testhelpers
+    function backOfficeRequest(url, method, body) {
+        return cy.getCookie('UMB-XSRF-TOKEN', { log: false }).then((token) => {
+          cy.request({
+            method: method ?? 'GET',
+            url: url,
+            body: body,
+            timeout: 90000,
+            json: true,
+            headers: {
+              Accept: 'application/json',
+              'X-UMB-XSRF-TOKEN': token.value,
+            },
+          });
+        });
+    }
 
     it('Tests Approved Colors', () => {
         cy.deleteAllContent();
@@ -31,7 +50,7 @@ context('DataTypes', () => {
         cy.umbracoRefreshContentTree();
         cy.umbracoTreeItem("content", [name]).click();
         //Pick a colour
-        cy.get('.btn-000000').click();
+        cy.get('.btn-000000').click('bottom');
         //Save
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         cy.umbracoSuccessNotification().should('be.visible');
@@ -43,17 +62,22 @@ context('DataTypes', () => {
             '\n<p style="color:@Model.UmbracoTest">Lorem ipsum dolor sit amet</p>');
 
         //Assert
-        const expected = `<p style="color:000000" > Lorem ipsum dolor sit amet </p>`;
-        cy.umbracoVerifyRenderedViewContent('/', expected, true).should('be.true');
+        const expected = `<p style="color:000000"> Lorem ipsum dolor sit amet </p>`;
+        backOfficeRequest('/').then(response => {
+            expect(expected.replace(/\s/g, '')).to.equal(response.body.replace(/\s/g, ''))
+        });
 
         //Pick another colour to verify both work
-        cy.get('.btn-FF0000').click();
+        cy.get('.btn-FF0000').click('bottom');
         //Save
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         cy.umbracoSuccessNotification().should('be.visible');
         //Assert
         const expected2 = '<p style="color:FF0000">Lorem ipsum dolor sit amet</p>';
-        cy.umbracoVerifyRenderedViewContent('/', expected2, true).should('be.true');
+        backOfficeRequest('/').then(response => {
+            expect(expected2.replace(/\s/g, '')).to.equal(response.body.replace(/\s/g, ''))
+        });
+      
 
         //Clean
         cy.umbracoEnsureDataTypeNameNotExists(name);

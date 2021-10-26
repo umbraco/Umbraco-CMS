@@ -356,6 +356,7 @@ context('Content', () => {
         cy.reload();
 
         // Assert
+        cy.get('.history', { timeout: 60000 }); // Too many slow requests.
         cy.get('.history').find('.umb-badge').contains('Save').should('be.visible');
         cy.get('.history').find('.umb-badge').contains('Rollback').should('be.visible');
         cy.get('#headerName').should('have.value', initialNodeName);
