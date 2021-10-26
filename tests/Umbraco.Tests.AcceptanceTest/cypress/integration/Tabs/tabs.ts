@@ -93,7 +93,7 @@ import {
         //Check if tab is there, else if it wasnt created, this test would always pass
         cy.get('[title="aTab 1"]').should('be.visible');
         //Delete a tab
-        cy.get('.btn-reset > [icon="icon-trash"]').click();
+        cy.get('.btn-reset > [icon="icon-trash"]').first().click();
         cy.get('.umb-button > .btn').last().click();
         cy.umbracoButtonByLabelKey('buttons_save').click();
         //Assert
