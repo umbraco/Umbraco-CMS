@@ -240,7 +240,7 @@ namespace Umbraco.Web.Models.Mapping
                 // the entity service due to too many Sql parameters.
 
                 var list = new List<IEntitySlim>();
-                foreach (var idGroup in allContentPermissions.Keys.InGroupsOf(2000))
+                foreach (var idGroup in allContentPermissions.Keys.InGroupsOf(Constants.Sql.MaxParameterCount))
                     list.AddRange(_entityService.GetAll(UmbracoObjectTypes.Document, idGroup.ToArray()));
                 contentEntities = list.ToArray();
             }
