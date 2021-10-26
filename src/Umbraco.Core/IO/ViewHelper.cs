@@ -2,7 +2,9 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO
@@ -13,7 +15,11 @@ namespace Umbraco.Cms.Core.IO
         private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
         [Obsolete("Use ctor with all params")]
-        public ViewHelper(IFileSystem viewFileSystem) => _viewFileSystem = viewFileSystem ?? throw new ArgumentNullException(nameof(viewFileSystem));
+        public ViewHelper(IFileSystem viewFileSystem)
+        {
+            _viewFileSystem = viewFileSystem ?? throw new ArgumentNullException(nameof(viewFileSystem));
+            _defaultViewContentProvider = StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
+        }
 
         public ViewHelper(FileSystems fileSystems, IDefaultViewContentProvider defaultViewContentProvider)
         {
@@ -66,7 +72,7 @@ namespace Umbraco.Cms.Core.IO
         public static string GetDefaultFileContent(string layoutPageAlias = null, string modelClassName = null,
             string modelNamespace = null, string modelNamespaceAlias = null)
         {
-            var viewContentProvider = new DefaultViewContentProvider();
+            var viewContentProvider = StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>();
             return viewContentProvider.GetDefaultFileContent(layoutPageAlias, modelClassName, modelNamespace,
                 modelNamespaceAlias);
         }
