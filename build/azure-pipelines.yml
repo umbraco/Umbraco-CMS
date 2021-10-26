@@ -229,7 +229,6 @@ stages:
                 - task: PowerShell@2
                   displayName: Run Cypress (Desktop)
                   condition: always()
-                  continueOnError: true
                   inputs:
                       targetType: inline
                       workingDirectory: tests\Umbraco.Tests.AcceptanceTest
@@ -332,7 +331,6 @@ stages:
                 - task: Bash@3
                   displayName: Run Cypress (Desktop)
                   condition: always()
-                  continueOnError: true
                   inputs:
                       targetType: inline
                       workingDirectory: tests/Umbraco.Tests.AcceptanceTest
