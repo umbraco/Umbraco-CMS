@@ -33,14 +33,11 @@
                         <select ng-show="elemTypeTabs[config.ncAlias].length || config.ncAlias==''" id="{{model.alias}}_tab_select"
                                 ng-options="t for t in elemTypeTabs[config.ncAlias]"
                                 ng-model="config.ncTabAlias" required></select>
-                        <p ng-show="!elemTypeTabs[config.ncAlias].length && config.ncAlias!==''" class="red">
-                            -<localize key="contentTypeEditor_noGroups">
-                                You have not added any groups
-                            </localize>   <br />
-                            *<localize key="content_nestedContentTabsAreNotSupported">
-                                Tabs are not supported by this editor, either change them to groups or use the Block List editor.
-                            </localize>*
-                        </p>
+                        <span ng-show="!elemTypeTabs[config.ncAlias].length && config.ncAlias!==''" class="red">
+                            <localize key="content_nestedContentNoGroups">
+                                The selected element type does not contain any supported groups (tabs are not supported by this editor, either change them to groups or use the Block List editor).
+                            </localize>
+                        </span>
                     </td>
                     <td>
                         <input type="text" ng-model="config.nameTemplate" />
@@ -73,12 +70,6 @@
             <localize key="content_nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</localize>
             <code ng-non-bindable>{{$index}}</code>
             <localize key="content_nestedContentTemplateHelpTextPart2">to display the item index</localize>
-        </p>
-        <p>
-            <strong><localize key="settings_tab">Tab</localize>:</strong><br />
-            <localize key="content_nestedContentTabsAreNotSupported">
-                Tabs are not supported by this editor, either change them to groups or use the Block List editor.
-            </localize>
         </p>
     </div>
 </div>
