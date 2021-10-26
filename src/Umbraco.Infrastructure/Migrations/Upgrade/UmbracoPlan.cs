@@ -234,7 +234,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             To<UpdateCmsPropertyGroupIdSeed>("{622E5172-42E1-4662-AD80-9504AF5A4E53}");
             To<ExternalLoginTableIndexesFixup>("{10F7BB61-C550-426B-830B-7F954F689CDF}");
             To<DictionaryTablesIndexes>("{5AAE6276-80DB-4ACF-B845-199BC6C37538}");
-            To<AddPropertyTypeGroupColumns>("{A2686B49-A082-4B22-97FD-AAB154D46A57}"); // Re-run this migration to make sure it has executed to account for migrations going out of sync between versions.
 
             // to 9.0.0 RC1
             To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}");
@@ -242,6 +241,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             To<ExternalLoginTokenTable>("{3D8DADEF-0FDA-4377-A5F0-B52C2110E8F2}");
             To<MemberTableColumns>("{1303BDCF-2295-4645-9526-2F32E8B35ABD}");
             To<AddPasswordConfigToMemberTable>("{5060F3D2-88BE-4D30-8755-CF51F28EAD12}");
+            To<AddPropertyTypeGroupColumns>("{A2686B49-A082-4B22-97FD-AAB154D46A57}"); // Re-run this migration to make sure it has executed to account for migrations going out of sync between versions.
 
             // TO 9.0.0-rc4
             To<UmbracoServerColumn>("5E02F241-5253-403D-B5D3-7DB00157E20F"); // Jaddie: This GUID is missing the { }, although this likely can't be changed now as it will break installs going forwards
