@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -15,7 +16,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
         public void Returns_Success_ForValid_Configuration()
         {
             var validator = new GlobalSettingsValidator();
-            GlobalSettings options = BuildGlobalSettings();
+            var options = new GlobalSettings();
             ValidateOptionsResult result = validator.Validate("settings", options);
             Assert.True(result.Succeeded);
         }
@@ -24,18 +25,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
         public void Returns_Fail_For_Configuration_With_Invalid_SmtpFrom_Field()
         {
             var validator = new GlobalSettingsValidator();
-            GlobalSettings options = BuildGlobalSettings(smtpEmail: "invalid");
-            ValidateOptionsResult result = validator.Validate("settings", options);
-            Assert.False(result.Succeeded);
-        }
-
-        private static GlobalSettings BuildGlobalSettings(string smtpEmail = "test@test.com") =>
-            new GlobalSettings
+            var options = new GlobalSettings
             {
                 Smtp = new SmtpSettings
                 {
-                    From = smtpEmail,
+                    From = "invalid",
                 }
             };
+
+            ValidateOptionsResult result = validator.Validate("settings", options);
+            Assert.False(result.Succeeded);
+        }
     }
 }
