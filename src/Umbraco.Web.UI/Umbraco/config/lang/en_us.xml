@@ -813,6 +813,7 @@
     <key alias="avatar">Avatar for</key>
     <key alias="header">Header</key>
     <key alias="systemField">system field</key>
+    <key alias="lastUpdated">Last Updated</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
