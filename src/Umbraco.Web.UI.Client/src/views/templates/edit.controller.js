@@ -559,40 +559,14 @@
                 }
             });
 
+            const currentTemplate = vm.templates.find(template => template.alias == vm.template.masterTemplateAlias);
+
             localizationService.localize("template_mastertemplate").then(title => {
+
                 const editor = {
                     title,
                     filterCssClass: 'not-allowed',
-                    filter: item => {
-
-                        const currentTemplate = vm.templates.find(template => template.alias == vm.template.masterTemplateAlias);
-                        const allowed = availableMasterTemplates.some(template => template.id == item.id);
-
-                        // Set selected node.
-                        item.selected = currentTemplate?.id == item.id;
-
-                        if (currentTemplate)
-                        {
-                            const path = currentTemplate.path.split(",");
-                            if (path.length > 2) {
-                                // Sync tree if current template not is a root level.
-                                treeService.syncTree({
-                                    node: item.parent(),
-                                    path: path
-                                })
-                                .then(node => {
-                                    // Update selected node from current selected template.
-                                    node.selected = currentTemplate?.id == node.id;
-
-                                    if (!allowed) {
-                                        node.cssClasses.push("not-allowed");
-                                    }
-                                });
-                            }
-                        }
-
-                        return !allowed;
-                    },
+                    filter: item => !availableMasterTemplates.some(template => template.id == item.id),
                     submit: model => {
                         var template = model.selection[0];
                         if (template && template.alias) {
@@ -605,6 +579,12 @@
                         editorService.close();
                     },
                     close: () => editorService.close()
+                }
+
+                if (currentTemplate) {
+                    editor.currentNode = {
+                        path: currentTemplate.path
+                    };
                 }
 
                 editorService.templatePicker(editor);
