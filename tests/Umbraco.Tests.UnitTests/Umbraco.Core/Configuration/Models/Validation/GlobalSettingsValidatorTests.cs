@@ -36,5 +36,44 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
             ValidateOptionsResult result = validator.Validate("settings", options);
             Assert.False(result.Succeeded);
         }
+
+        [Test]
+        public void Returns_Fail_For_Configuration_With_Insufficient_SqlWriteLockTimeOut()
+        {
+            var validator = new GlobalSettingsValidator();
+            var options = new GlobalSettings
+            {
+                SqlWriteLockTimeOut = TimeSpan.Parse("00:00:00.099")
+            };
+
+            ValidateOptionsResult result = validator.Validate("settings", options);
+            Assert.False(result.Succeeded);
+        }
+
+        [Test]
+        public void Returns_Fail_For_Configuration_With_Excessive_SqlWriteLockTimeOut()
+        {
+            var validator = new GlobalSettingsValidator();
+            var options = new GlobalSettings
+            {
+                SqlWriteLockTimeOut = TimeSpan.Parse("00:00:21")
+            };
+
+            ValidateOptionsResult result = validator.Validate("settings", options);
+            Assert.False(result.Succeeded);
+        }
+
+        [Test]
+        public void Returns_Fail_For_Configuration_With_Valid_SqlWriteLockTimeOut()
+        {
+            var validator = new GlobalSettingsValidator();
+            var options = new GlobalSettings
+            {
+                SqlWriteLockTimeOut = TimeSpan.Parse("00:00:20")
+            };
+
+            ValidateOptionsResult result = validator.Validate("settings", options);
+            Assert.True(result.Succeeded);
+        }
     }
 }
