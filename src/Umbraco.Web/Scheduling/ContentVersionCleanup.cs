@@ -65,11 +65,16 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            _logger.Info<ContentVersionCleanup>("Starting ContentVersionCleanup task.");
+            var count = _cleanupService.PerformContentVersionCleanup(DateTime.Now).Count;
 
-            var report = _cleanupService.PerformContentVersionCleanup(DateTime.Now);
-
-            _logger.Info<ContentVersionCleanup>("Finished ContentVersionCleanup task. Removed {count} item(s).", report.Count);
+            if (count > 0)
+            {
+                _logger.Info<ContentVersionCleanup>("Deleted {count} ContentVersion(s).", count);
+            }
+            else
+            {
+                _logger.Debug<ContentVersionCleanup>("Task complete, no items were Deleted.");
+            }
 
             return true;
         }
