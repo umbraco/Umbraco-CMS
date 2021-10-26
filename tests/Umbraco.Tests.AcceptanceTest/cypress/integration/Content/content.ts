@@ -759,7 +759,7 @@ context('Content', () => {
         // Click macro
         cy.get(':nth-child(4) > .umb-card-grid-item > :nth-child(1)').click();
         // Select the macro
-        cy.get(`.umb-card-grid-item[title='${macroName}']`).click();
+        cy.get(`.umb-card-grid-item[title='${macroName}']`).click('bottom');
 
 
         // Save and publish
