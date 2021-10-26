@@ -1091,11 +1091,15 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="notificationsSavedFor">Notification settings saved for</key>
     <key alias="mailBody"><![CDATA[
       Hi %0%
+      
       This is an automated mail to inform you that the task '%1%'
       has been performed on the page '%2%'
       by the user '%3%'
+      
       Go to http://%4%/#/content/content/edit/%5% to edit.
+      
       %6%
+      
       Have a nice day!
       Cheers from the Umbraco robot
     ]]></key>
@@ -1791,11 +1795,15 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="includeSubpages">Include subpages</key>
     <key alias="mailBody"><![CDATA[
       Hi %0%
+      
       This is an automated mail to inform you that the document '%1%'
       has been requested for translation into '%5%' by %2%.
+      
       Go to http://%3%/translation/details.aspx?id=%4% to edit.
+      
       Or log into Umbraco to get an overview of your translation tasks
       http://%3%
+      
       Have a nice day!
       Cheers from the Umbraco robot
     ]]></key>
