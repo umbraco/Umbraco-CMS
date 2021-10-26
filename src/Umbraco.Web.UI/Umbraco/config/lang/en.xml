@@ -1720,6 +1720,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
     <key alias="removeChildNode">You are removing the child node</key>
     <key alias="removeChildNodeWarning">Removing a child node will limit the editors options to create different content types beneath a node.</key>
+    <key alias="usingEditor">using this editor will get updated with the new settings.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
