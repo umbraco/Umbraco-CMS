@@ -136,9 +136,7 @@ context('Templates', () => {
         // Insert macro
         cy.umbracoButtonByLabelKey('general_insert').click();
         cy.get('.umb-insert-code-box__title').contains('Macro').click();
-        cy.get('.umb-card-grid-item').contains(name).then(button => {
-          button.click();
-        });
+        cy.get(`.umb-card-grid-item[title='${name}']`).click('bottom');
 
         // Assert
         cy.get('.ace_content').contains('@await Umbraco.RenderMacroAsync("' + name + '")').should('exist');
