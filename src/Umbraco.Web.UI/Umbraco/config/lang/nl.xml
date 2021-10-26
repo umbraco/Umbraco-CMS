@@ -791,6 +791,7 @@
     <key alias="blue">Blauw</key>
   </area>
   <area alias="shortcuts">
+    <key alias="addTab">Tabblad toevoegen</key>
     <key alias="addGroup">Groep toevoegen</key>
     <key alias="addProperty">Eigenschap toevoegen</key>
     <key alias="addEditor">Editor toevoegen</key>
@@ -1530,6 +1531,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="elementCannotToggle">Een documenttype kan niet worden gewijzigd in een elementtype nadat het is gebruikt om een of meer contentitems te maken.</key>
     <key alias="elementDoesNotSupport">Dit is niet van toepassing op een elementtype</key>
     <key alias="propertyHasChanges">Je hebt wijzigingen aangebracht aan deze eigenschap. Ben je zeker dat je ze wil weggooien?</key>
+    <key alias="addTab">Tabblad toevoegen</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Taal toevoegen</key>
