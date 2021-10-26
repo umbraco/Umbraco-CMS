@@ -3,15 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
@@ -165,7 +165,15 @@ namespace Umbraco.Extensions
             return ContentStatus.Unpublished;
         }
 
-
+        /// <summary>
+        /// Gets a collection containing the ids of all ancestors.
+        /// </summary>
+        /// <param name="content"><see cref="IContent"/> to retrieve ancestors for</param>
+        /// <returns>An Enumerable list of integer ids</returns>
+        public static IEnumerable<int> GetAncestorIds(this IContent content) =>
+            content.Path.Split(Constants.CharArrays.Comma)
+                .Where(x => x != Constants.System.RootString && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(s =>
+                    int.Parse(s, CultureInfo.InvariantCulture));
 
         #endregion
 

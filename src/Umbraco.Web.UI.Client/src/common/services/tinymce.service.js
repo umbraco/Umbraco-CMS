@@ -1272,11 +1272,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             function insertLink() {
                 if (anchorElm) {
                     editor.dom.setAttribs(anchorElm, createElemAttributes());
-
                     editor.selection.select(anchorElm);
                     editor.execCommand('mceEndTyping');
                 } else {
-                    editor.execCommand('mceInsertLink', false, createElemAttributes());
+                    var selectedContent = editor.selection.getContent();
+                    // If there is no selected content, we can't insert a link
+                    // as TinyMCE needs selected content for this, so instead we
+                    // create a new dom element and insert it, using the chosen
+                    // link name as the content.
+                    if (selectedContent !== "") {
+                        editor.execCommand('mceInsertLink', false, createElemAttributes());
+                    } else {
+                        // Using the target url as a fallback, as href might be confusing with a local link
+                        var linkContent = typeof target.name !== "undefined" && target.name !== "" ? target.name : target.url
+                        var domElement = editor.dom.createHTML("a", createElemAttributes(), linkContent);
+                        editor.execCommand('mceInsertContent', false, domElement);
+                    }
                 }
             }
 

@@ -3,6 +3,7 @@ variables:
     buildConfiguration: Release
     SA_PASSWORD: UmbracoIntegration123!
     UmbracoBuild: AzurePipeline
+    nodeVersion: 14.18.1
 resources:
     containers:
         - container: mssql
@@ -194,12 +195,13 @@ stages:
 #                      command: build
 #                      projects: '**/Umbraco.Web.UI.csproj'
                 - task: NodeTool@0
-                  displayName: Use Node 11.x
+                  displayName: Use Node $(nodeVersion)
                   inputs:
-                       versionSpec: 11.x
+                       versionSpec: $(nodeVersion)
                 - task: Npm@1
-                  displayName: npm install (Client)
+                  displayName: npm ci (Client)
                   inputs:
+                    command: ci
                     workingDir: src\Umbraco.Web.UI.Client
                     verbose: false
                 - task: gulp@0
@@ -217,18 +219,19 @@ stages:
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
-                          @{ username = $env:Umbraco__CMS__Unattended__UnattendedUserEmail; password = $env:Umbraco__CMS__Unattended__UnattendedUserPassword } | ConvertTo-Json | Set-Content -Path "src\Umbraco.Tests.AcceptanceTest\cypress.env.json"
+                          @{ username = $env:Umbraco__CMS__Unattended__UnattendedUserEmail; password = $env:Umbraco__CMS__Unattended__UnattendedUserPassword } | ConvertTo-Json | Set-Content -Path "tests\Umbraco.Tests.AcceptanceTest\cypress.env.json"
                 - task: Npm@1
                   name: PrepareTask
-                  displayName: npm install (AcceptanceTest)
+                  displayName: npm ci (AcceptanceTest)
                   inputs:
-                      workingDir: 'src\Umbraco.Tests.AcceptanceTest'
+                      command: ci
+                      workingDir: 'tests\Umbraco.Tests.AcceptanceTest'
                 - task: Npm@1
                   displayName: Run Cypress (Desktop)
                   condition: always()
                   continueOnError: true
                   inputs:
-                      workingDir: src\Umbraco.Tests.AcceptanceTest
+                      workingDir: tests\Umbraco.Tests.AcceptanceTest
                       command: 'custom'
                       customCommand: 'run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
 
@@ -236,14 +239,14 @@ stages:
                   condition: always()
                   inputs:
                       testResultsFormat: 'JUnit'
-                      testResultsFiles: 'src/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
+                      testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
                       mergeTestResults: true
                       testRunTitle: "Test results Desktop"
 #                - task: Npm@1
 #                  displayName: Run Cypress (Tablet portrait)
 #                  condition: always()
 #                  inputs:
-#                      workingDir: src\Umbraco.Tests.AcceptanceTest
+#                      workingDir: tests\Umbraco.Tests.AcceptanceTest
 #                      command: 'custom'
 #                      customCommand: 'run test -- --config="viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos,videoUploadOnPasses=false"'
 #
@@ -251,14 +254,14 @@ stages:
 #                  displayName: Run Cypress (Mobile protrait)
 #                  condition: always()
 #                  inputs:
-#                      workingDir: src\Umbraco.Tests.AcceptanceTest
+#                      workingDir: tests\Umbraco.Tests.AcceptanceTest
 #                      command: 'custom'
 #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish test artifacts"
                   condition: failed()
                   inputs:
-                    targetPath: '$(Build.SourcesDirectory)/src/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
+                    targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                     artifact: 'Test artifacts - Windows'
           - job: Linux_Acceptance_tests
             displayName: Linux
@@ -287,12 +290,13 @@ stages:
                       DBNAME: $(UmbracoDatabaseName)
                       SA_PASSWORD: $(SA_PASSWORD)
                 - task: NodeTool@0
-                  displayName: Use Node 11.x
+                  displayName: Use Node $(nodeVersion)
                   inputs:
-                      versionSpec: 11.x
+                      versionSpec: $(nodeVersion)
                 - task: Npm@1
-                  displayName: npm install (Client)
+                  displayName: npm ci (Client)
                   inputs:
+                      command: ci
                       workingDir: src/Umbraco.Web.UI.Client
                       verbose: false
                 - task: gulp@0
@@ -301,45 +305,50 @@ stages:
                       gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
                       targets: build
                       workingDirectory: src/Umbraco.Web.UI.Client
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet build
+                  inputs:
+                      command: build
+                      projects: src/Umbraco.Web.UI/Umbraco.Web.UI.csproj
                 - task: Bash@3
                   displayName: dotnet run
                   inputs:
                     targetType: 'inline'
-                    script: 'nohup dotnet run  -p ./src/Umbraco.Web.UI/Umbraco.Web.UI.csproj &'
+                    script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
                 - task: Bash@3
                   displayName: Generate Cypress.env.json
                   inputs:
                     targetType: 'inline'
-                    script: 'echo "{ \"username\": \"$USERNAME\", \"password\": \"$PASSWORD\" }" > "src/Umbraco.Tests.AcceptanceTest/cypress.env.json"'
+                    script: 'echo "{ \"username\": \"$USERNAME\", \"password\": \"$PASSWORD\" }" > "tests/Umbraco.Tests.AcceptanceTest/cypress.env.json"'
                   env:
                     USERNAME: $(Umbraco__CMS__Unattended__UnattendedUserEmail)
                     PASSWORD: $(Umbraco__CMS__Unattended__UnattendedUserPassword)
                 - task: Npm@1
                   name: PrepareTask
-                  displayName: npm install (AcceptanceTest)
+                  displayName: npm ci (AcceptanceTest)
                   inputs:
-                      workingDir: 'src/Umbraco.Tests.AcceptanceTest'
+                      command: ci
+                      workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
                 - task: Npm@1
                   displayName: Run Cypress (Desktop)
                   condition: always()
                   continueOnError: true
                   inputs:
-                      workingDir: src/Umbraco.Tests.AcceptanceTest
+                      workingDir: tests/Umbraco.Tests.AcceptanceTest
                       command: 'custom'
                       customCommand: 'run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
-
                 - task: PublishTestResults@2
                   condition: always()
                   inputs:
                       testResultsFormat: 'JUnit'
-                      testResultsFiles: 'src/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
+                      testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
                       mergeTestResults: true
                       testRunTitle: "Test results Desktop"
                 #                - task: Npm@1
                 #                  displayName: Run Cypress (Tablet portrait)
                 #                  condition: always()
                 #                  inputs:
-                #                      workingDir: src/Umbraco.Tests.AcceptanceTest
+                #                      workingDir: tests/Umbraco.Tests.AcceptanceTest
                 #                      command: 'custom'
                 #                      customCommand: 'run test -- --config="viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos,videoUploadOnPasses=false"'
                 #
@@ -347,15 +356,21 @@ stages:
                 #                  displayName: Run Cypress (Mobile protrait)
                 #                  condition: always()
                 #                  inputs:
-                #                      workingDir: src/Umbraco.Tests.AcceptanceTest
+                #                      workingDir: tests/Umbraco.Tests.AcceptanceTest
                 #                      command: 'custom'
                 #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish test artifacts"
                   condition: failed()
                   inputs:
-                      targetPath: '$(Build.SourcesDirectory)/src/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
+                      targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                       artifact: 'Test artifacts - Linux'
+                - task: PublishPipelineArtifact@1
+                  displayName: "Publish run log"
+                  condition: failed()
+                  inputs:
+                      targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
+                      artifact: Test Run logs - Linux
     - stage: Artifacts
       dependsOn: []
       jobs:
@@ -443,12 +458,13 @@ stages:
 
                           $ubuild.CompileJsonSchema()
                 - task: NodeTool@0
-                  displayName: Use Node 11.x
+                  displayName: Use Node $(nodeVersion)
                   inputs:
-                      versionSpec: 11.x
+                      versionSpec: $(nodeVersion)
                 - task: Npm@1
-                  displayName: npm install
+                  displayName: npm ci (Client)
                   inputs:
+                      command: ci
                       workingDir: src\Umbraco.Web.UI.Client
                       verbose: false
                 - task: gulp@0

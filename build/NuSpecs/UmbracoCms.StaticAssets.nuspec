@@ -23,11 +23,7 @@
         <file src="$BuildTmp$\WebApp\wwwroot\umbraco\**\*.*" target="content\wwwroot\umbraco" />
         <file src="$BuildTmp$\WebApp\umbraco\**\*.*" target="content\umbraco" />
 
-        <!-- Readme -->
-        <file src="tools\Readme.txt" target="Readme.txt" />
-        <file src="tools\ReadmeUpgrade.txt" target="ReadmeUpgrade.txt" />
-
         <!-- UmbracoCms props and targets used to copy the content into the solution -->
-        <file src="build\**" target="buildTransitive\" />
+        <file src="buildTransitive\**" target="buildTransitive\" />
     </files>
 </package>
