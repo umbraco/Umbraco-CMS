@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validati
         }
 
         [Test]
-        public void Returns_Fail_For_Configuration_With_Valid_SqlWriteLockTimeOut()
+        public void Returns_Success_For_Configuration_With_Valid_SqlWriteLockTimeOut()
         {
             var validator = new GlobalSettingsValidator();
             var options = new GlobalSettings
