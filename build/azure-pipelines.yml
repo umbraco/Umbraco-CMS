@@ -226,14 +226,14 @@ stages:
                   inputs:
                       command: ci
                       workingDir: 'tests\Umbraco.Tests.AcceptanceTest'
-                - task: Npm@1
+                - task: PowerShell@2
                   displayName: Run Cypress (Desktop)
                   condition: always()
                   continueOnError: true
                   inputs:
-                      workingDir: tests\Umbraco.Tests.AcceptanceTest
-                      command: 'custom'
-                      customCommand: 'run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+                      targetType: inline
+                      workingDirectory: tests\Umbraco.Tests.AcceptanceTest
+                      script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
 
                 - task: PublishTestResults@2
                   condition: always()
@@ -329,14 +329,14 @@ stages:
                   inputs:
                       command: ci
                       workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
-                - task: Npm@1
+                - task: Bash@3
                   displayName: Run Cypress (Desktop)
                   condition: always()
                   continueOnError: true
                   inputs:
-                      workingDir: tests/Umbraco.Tests.AcceptanceTest
-                      command: 'custom'
-                      customCommand: 'run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+                      targetType: inline
+                      workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+                      script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
                 - task: PublishTestResults@2
                   condition: always()
                   inputs:
