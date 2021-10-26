@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
+        [ActivatorUtilitiesConstructor]
         public TemplateController(
             IFileService fileService,
             IUmbracoMapper umbracoMapper,
