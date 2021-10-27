@@ -1413,7 +1413,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
-    <key alias="importDocumentTypeHelp">To import a Document Type, find the ".udt" file on your computer by clicking the "Browse" button and click "Import" (you'll be asked for confirmation on the next screen)</key>
+    <key alias="importDocumentTypeHelp">To import a Document Type, find the ".udt" file on your computer by clicking the "Import" button (you'll be asked for confirmation on the next screen)</key>
     <key alias="newtabname">New Tab Title</key>
     <key alias="nodetype">Node type</key>
     <key alias="objecttype">Type</key>
