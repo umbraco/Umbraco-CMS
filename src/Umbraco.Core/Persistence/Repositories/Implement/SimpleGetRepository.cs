@@ -11,6 +11,8 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
+    // TODO: Obsolete this, change all implementations of this like in Dictionary to just use custom Cache policies like in the member repository.
+
     /// <summary>
     /// Simple abstract ReadOnly repository used to simply have PerformGet and PeformGetAll with an underlying cache
     /// </summary>

@@ -3,7 +3,9 @@ angular.module("umbraco")
     function ($scope, $timeout, $sce, editorService) {
 
         function onInit() {
-            
+
+            $scope.control.icon = $scope.control.icon || 'icon-movie-alt';
+
             var embedPreview = Utilities.isObject($scope.control.value) && $scope.control.value.preview ? $scope.control.value.preview : $scope.control.value;
 
             $scope.trustedValue = embedPreview ? $sce.trustAsHtml(embedPreview) : null;
@@ -19,10 +21,10 @@ angular.module("umbraco")
 
         $scope.setEmbed = function () {
 
-            var original = Utilities.isObject($scope.control.value) ? $scope.control.value : null;
+            var modify = Utilities.isObject($scope.control.value) ? $scope.control.value : null;
 
             var embed = {
-                original: original,
+                modify: modify,
                 submit: function (model) {
 
                     var embed = {

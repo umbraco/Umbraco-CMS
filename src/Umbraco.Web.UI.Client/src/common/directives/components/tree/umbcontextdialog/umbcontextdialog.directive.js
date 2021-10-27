@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    function UmbContextDialog(navigationService, keyboardService, localizationService, overlayService) {
+    function UmbContextDialog(navigationService, keyboardService, localizationService, overlayService, backdropService) {
 
         function link($scope) {
 
@@ -23,6 +23,7 @@
             });
 
             function hide() {
+
                 if ($scope.dialog.confirmDiscardChanges) {
                     localizationService.localizeMany(["prompt_unsavedChanges", "prompt_unsavedChangesWarning", "prompt_discardChanges", "prompt_stay"]).then(
                         function (values) {

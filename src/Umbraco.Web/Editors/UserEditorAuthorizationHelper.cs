@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
@@ -14,13 +15,15 @@ namespace Umbraco.Web.Editors
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
+        private readonly AppCaches _appCaches;
 
-        public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IUserService userService, IEntityService entityService)
+        public UserEditorAuthorizationHelper(IContentService contentService, IMediaService mediaService, IUserService userService, IEntityService entityService, AppCaches appCaches)
         {
             _contentService = contentService;
             _mediaService = mediaService;
             _userService = userService;
             _entityService = entityService;
+            _appCaches = appCaches;
         }
 
         /// <summary>
@@ -75,6 +78,18 @@ namespace Umbraco.Web.Editors
             if (userGroupAliases != null)
             {
                 var savingGroupAliases = userGroupAliases.ToArray();
+                var existingGroupAliases = savingUser == null
+                ? new string[0]
+                : savingUser.Groups.Select(x => x.Alias).ToArray();
+
+                var addedGroupAliases = savingGroupAliases.Except(existingGroupAliases);
+
+                // As we know the current user is not admin, it is only allowed to use groups that the user do have themselves.
+                var savingGroupAliasesNotAllowed = addedGroupAliases.Except(currentUser.Groups.Select(x=>x.Alias)).ToArray();
+                if (savingGroupAliasesNotAllowed.Any())
+                {
+                    return Attempt.Fail("Cannot assign the group(s) '" + string.Join(", ", savingGroupAliasesNotAllowed) + "', the current user is not part of them or admin");
+                }
 
                 //only validate any groups that have changed.
                 //a non-admin user can remove groups and add groups that they have access to
@@ -90,9 +105,7 @@ namespace Umbraco.Web.Editors
                 if (userGroupsChanged)
                 {
                     // d) A user cannot assign a group to another user that they do not belong to
-
                     var currentUserGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
-
                     foreach (var group in newGroups)
                     {
                         if (currentUserGroups.Contains(group) == false)
@@ -114,7 +127,7 @@ namespace Umbraco.Web.Editors
                 {
                     if (contentId == Constants.System.Root)
                     {
-                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService), Constants.System.RecycleBinContent);
+                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateContentStartNodeIds(_entityService, _appCaches), Constants.System.RecycleBinContent);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the content root");
                     }
@@ -122,7 +135,7 @@ namespace Umbraco.Web.Editors
                     {
                         var content = _contentService.GetById(contentId);
                         if (content == null) continue;
-                        var hasAccess = currentUser.HasPathAccess(content, _entityService);
+                        var hasAccess = currentUser.HasPathAccess(content, _entityService, _appCaches);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the content path " + content.Path);
                     }
@@ -135,7 +148,7 @@ namespace Umbraco.Web.Editors
                 {
                     if (mediaId == Constants.System.Root)
                     {
-                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService), Constants.System.RecycleBinMedia);
+                        var hasAccess = ContentPermissionsHelper.HasPathAccess("-1", currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches), Constants.System.RecycleBinMedia);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the media root");
                     }
@@ -143,7 +156,7 @@ namespace Umbraco.Web.Editors
                     {
                         var media = _mediaService.GetById(mediaId);
                         if (media == null) continue;
-                        var hasAccess = currentUser.HasPathAccess(media, _entityService);
+                        var hasAccess = currentUser.HasPathAccess(media, _entityService, _appCaches);
                         if (hasAccess == false)
                             return Attempt.Fail("The current user does not have access to the media path " + media.Path);
                     }

@@ -2,10 +2,20 @@
     <ng-form name="listViewOrderDirectionForm" class="flex">
         <ul class="inline">
             <li class="-no-padding-left">
-                <umb-radiobutton name="orderDirection" value="asc" model="model.value" text="Ascending [a-z]" required></umb-radiobutton>
+                <umb-radiobutton name="orderDirection"
+                                 value="asc"
+                                 model="model.value"
+                                 text="Ascending [a-z]"
+                                 required="true">
+                </umb-radiobutton>
             </li>
             <li>
-                <umb-radiobutton name="orderDirection" value="desc" model="model.value" text="Descending [z-a]" required></umb-radiobutton>
+                <umb-radiobutton name="orderDirection"
+                                 value="desc"
+                                 model="model.value"
+                                 text="Descending [z-a]"
+                                 required="true">
+                </umb-radiobutton>
             </li>
         </ul>
 

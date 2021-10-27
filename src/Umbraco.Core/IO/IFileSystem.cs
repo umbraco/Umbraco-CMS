@@ -102,7 +102,7 @@ namespace Umbraco.Core.IO
         /// <summary>
         /// Returns the application relative path to the file.
         /// </summary>
-        /// <param name="fullPathOrUrl">The full path or url.</param>
+        /// <param name="fullPathOrUrl">The full path or URL.</param>
         /// <returns>
         /// The <see cref="string"/> representing the relative path.
         /// </returns>
@@ -118,11 +118,11 @@ namespace Umbraco.Core.IO
         string GetFullPath(string path);
 
         /// <summary>
-        /// Returns the application relative url to the file.
+        /// Returns the application relative URL to the file.
         /// </summary>
-        /// <param name="path">The path to return the url for.</param>
+        /// <param name="path">The path to return the URL for.</param>
         /// <returns>
-        /// <see cref="string"/> representing the relative url.
+        /// <see cref="string"/> representing the relative URL.
         /// </returns>
         string GetUrl(string path);
 

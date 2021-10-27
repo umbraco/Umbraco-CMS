@@ -150,7 +150,7 @@ tinymce.addI18n('tr_TR',{
 "Insert link": "Ba\u011flant\u0131 ekle",
 "Insert\/edit link": "Ba\u011flant\u0131 ekle\/d\u00fczenle",
 "Text to display": "G\u00f6r\u00fcnen yaz\u0131",
-"Url": "Url",
+"Url": "URL",
 "Target": "Hedef",
 "None": "Hi\u00e7biri",
 "New window": "Yeni pencere",

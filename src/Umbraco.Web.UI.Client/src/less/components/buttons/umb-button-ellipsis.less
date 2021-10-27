@@ -1,0 +1,81 @@
+.umb-button-ellipsis {
+    padding: 0 5px;
+    text-align: center;
+    margin: 0 auto;
+    cursor: pointer;
+    border-radius: @baseBorderRadius;
+    color: @ui-action-discreet-type;
+    position: relative;
+    opacity: 0.8;
+    transition: opacity 120ms, color 120ms;
+
+    &--absolute {
+        position: absolute;
+    }
+
+    &--small {
+        height: 15px;
+    }
+
+    &.show-text {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    &:hover {
+        color: @ui-action-discreet-type-hover;
+    }
+
+    .umb-button-ellipsis--tab,
+    .umb-tour-is-visible .umb-tree .umb-tree-item.above-backdrop &,
+    &:hover,
+    &:focus {
+        opacity: 1;
+    }
+
+    &--hidden {
+        opacity: 0;
+
+        &:hover,
+        &:focus {
+            opacity: 1;
+        }
+    }
+
+    &__content {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    &__icon {
+        color: inherit;
+        flex-basis: 100%;
+        font-size: 12px;
+
+        .umb-button-ellipsis--tab & {
+            margin: 0 0 7px;
+        }
+
+        .umb-button-ellipsis--small & {
+            font-size: 8px;
+            position: relative;
+            top: -2px;
+        }
+    }
+
+    &__text {
+        color: inherit;
+        font-size: 12px;
+        line-height: 1em;
+        flex-basis: 100%;
+
+        .umb-button-ellipsis--tab & {
+            position: absolute;
+            right: 0;
+            left: 0;
+            bottom: 13px;
+            margin: 0 auto;
+        }
+    }
+}

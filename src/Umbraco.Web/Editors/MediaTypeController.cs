@@ -49,6 +49,7 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAllowedChildren", "contentId", typeof(int), typeof(Guid), typeof(Udi))));
             }
         }
@@ -58,21 +59,66 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.Count();
         }
 
+        /// <summary>
+        /// Gets the media type a given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public MediaTypeDisplay GetById(int id)
         {
-            var ct = Services.MediaTypeService.Get(id);
-            if (ct == null)
+            var mediaType = Services.MediaTypeService.Get(id);
+            if (mediaType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
             return dto;
         }
 
         /// <summary>
-        /// Deletes a media type with a given ID
+        /// Gets the media type a given guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public MediaTypeDisplay GetById(Guid id)
+        {
+            var mediaType = Services.MediaTypeService.Get(id);
+            if (mediaType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the media type a given udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public MediaTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var mediaType = Services.MediaTypeService.Get(guidUdi.Guid);
+            if (mediaType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Deletes a media type with a given id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -204,7 +250,7 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<MediaTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/mediaTypeSavedHeader"),
+                            Services.TextService.Localize("speechBubbles", "mediaTypeSavedHeader"),
                             string.Empty);
 
             return display;

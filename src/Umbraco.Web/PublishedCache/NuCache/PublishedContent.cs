@@ -33,15 +33,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _urlSegment = ContentData.UrlSegment;
             IsPreviewing = ContentData.Published == false;
 
-            var properties = new List<IPublishedProperty>();
+            var properties = new IPublishedProperty[_contentNode.ContentType.PropertyTypes.Count()];
+            int i =0;
             foreach (var propertyType in _contentNode.ContentType.PropertyTypes)
             {
                 // add one property per property type - this is required, for the indexing to work
                 // if contentData supplies pdatas, use them, else use null
                 contentData.Properties.TryGetValue(propertyType.Alias, out var pdatas); // else will be null
-                properties.Add(new Property(propertyType, this, pdatas, _publishedSnapshotAccessor));
+                properties[i++] =new Property(propertyType, this, pdatas, _publishedSnapshotAccessor);
             }
-            PropertiesArray = properties.ToArray();
+            PropertiesArray = properties;
         }
 
         private string GetProfileNameById(int id)
@@ -297,7 +298,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             throw new PanicException($"failed to get content with id={id}");
                     }
 
-                    id = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
+                    var next = UnwrapIPublishedContent(content)._contentNode.NextSiblingContentId;
+
+#if DEBUG
+                    // I've seen this happen but I think that may have been due to corrupt DB data due to my own
+                    // bugs, but I'm leaving this here just in case we encounter it again while we're debugging.
+                    if (next == id)
+                    {
+                        throw new PanicException($"The current content id {id} is the same as it's next sibling id {next}");
+                    }
+#endif
+
+                    id = next;
                 }
             }
         }

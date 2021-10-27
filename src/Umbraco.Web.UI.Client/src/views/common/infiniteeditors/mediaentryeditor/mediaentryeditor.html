@@ -1,0 +1,127 @@
+<div class="umb-media-entry-editor"  ng-controller="Umbraco.Editors.MediaEntryEditorController as vm">
+
+    <ng-form name="vm.imageCropperForm" val-form-manager>
+
+        <umb-editor-view umb-tabs ng-if="!page.loading">
+
+            <umb-editor-header
+                name="vm.title"
+                name-required="false"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+
+            <div class="umb-editor-container umb-panel-body umb-scrollable">
+
+                <div ng-if="vm.media.trashed" class="umb-editor--trashed-message">
+                    <umb-icon icon="icon-trash" class="icon"></umb-icon> <localize key="content_nodeIsInTrash">This item is in the Recycle Bin</localize>
+                </div>
+
+                <div class="umb-media-entry-editor__pane">
+                    <div class="umb-media-entry-editor__crops" ng-if="vm.isCroppable">
+
+                        <button class="btn-reset umb-outline" ng-class="{'--is-active':vm.currentCrop === null}" ng-click="vm.deselectCrop()">
+                            <span class="__text">Media</span>
+                        </button>
+
+                        <button ng-repeat="crop in vm.mediaEntry.crops track by crop.alias" class="btn-reset umb-outline" ng-class="{'--is-active':vm.currentCrop.alias === crop.alias, '--is-defined':!!vm.currentCrop.coordinates}" ng-click="vm.selectCrop(crop)">
+
+                            <umb-image-thumbnail center="vm.mediaEntry.focalPoint"
+                                                crop="crop.coordinates"
+                                                src="vm.imageSrc"
+                                                height="{{crop.height}}"
+                                                width="{{crop.width}}"
+                                                max-size="75">
+                            </umb-image-thumbnail>
+                            <span class="__text">{{crop.label}}</span>
+                        </button>
+                    </div>
+
+                    <div class="imagecropper umb-media-entry-editor__imagecropper">
+
+                        <div ng-if="vm.currentCrop" class="umb-cropper__container">
+
+                            <umb-image-crop height="{{vm.currentCrop.height}}"
+                                            width="{{vm.currentCrop.width}}"
+                                            crop="vm.currentCrop.coordinates"
+                                            alias="{{vm.currentCrop.alias}}"
+                                            force-update="{{vm.forceUpdateCrop}}"
+                                            center="vm.mediaEntry.focalPoint"
+                                            src="vm.imageSrc">
+                                <button class="btn btn-link" ng-click="vm.resetCrop()">
+                                    <umb-icon icon="icon-wrong"></umb-icon> <localize key="imagecropper_reset">Reset this crop</localize>
+                                </button>
+                            </umb-image-crop>
+
+                        </div>
+
+                        <div ng-if="!vm.currentCrop" class="umb-cropper-imageholder">
+
+                            <umb-image-gravity
+                                class="umb-media-entry-editor__imageholder"
+                                ng-if="vm.imageSrc"
+                                src="vm.imageSrc"
+                                center="vm.mediaEntry.focalPoint"
+                                disable-focal-point="!vm.model.enableFocalPointSetter"
+                                on-value-changed="vm.focalPointChanged(left, top)"
+                                on-image-loaded="vm.onImageLoaded(isCroppable, hasDimensions)">
+                            </umb-image-gravity>
+
+                            <umb-file-icon
+                                class="umb-media-entry-editor__imageholder"
+                                ng-if="vm.loading === false && !vm.imageSrc"
+                                ng-class="{'trashed': vm.media.trashed}"
+                                extension="{{vm.media.extension}}"
+                                icon="{{vm.media.icon}}"
+                                size="m"
+                                text="{{vm.media.name}}">
+                            </umb-file-icon>
+
+                            <div class="umb-media-entry-editor__imageholder-actions">
+                                <button class="btn btn-link" ng-click="vm.repickMedia()">
+                                    <umb-icon icon="icon-wrong"></umb-icon> <localize key="mediaPicker_changeMedia">Replace media</localize>
+                                </button>
+                                <button class="btn btn-link" ng-click="vm.openMedia()">
+                                    <umb-icon icon="icon-out"></umb-icon> <localize key="mediaPicker_openMedia">Open media</localize>
+                                </button>
+                                <button type="button" ng-show="vm.model.enableFocalPointSetter && (vm.mediaEntry.focalPoint.left !== 0.5 && vm.mediaEntry.focalPoint.top !== 0.5)" class="btn btn-link" ng-click="vm.focalPointChanged(0.5, 0.5)">
+                                    <umb-icon icon="icon-axis-rotation"></umb-icon> <localize key="content_resetFocalPoint">Reset focal point</localize>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <umb-editor-footer>
+
+                <!-- Missing breadcrumbs -->
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        action="vm.close()"
+                        shortcut="esc"
+                        button-style="link"
+                        label="{{vm.closeLabel}}"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        action="vm.submitAndClose()"
+                        button-style="primary"
+                        state="vm.saveButtonState"
+                        label="{{vm.submitLabel}}"
+                        type="button">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+        </umb-editor-view>
+    </ng-form>
+</div>

@@ -15,13 +15,15 @@ namespace Umbraco.Core.Services.Implement
         private readonly IEntityService _entityService;
         private readonly IRelationRepository _relationRepository;
         private readonly IRelationTypeRepository _relationTypeRepository;
+        private readonly IAuditRepository _auditRepository;
 
         public RelationService(IScopeProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IEntityService entityService,
-            IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository)
+            IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository, IAuditRepository auditRepository)
             : base(uowProvider, logger, eventMessagesFactory)
         {
             _relationRepository = relationRepository;
             _relationTypeRepository = relationTypeRepository;
+            _auditRepository = auditRepository;
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
@@ -476,6 +478,7 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 _relationTypeRepository.Save(relationType);
+                Audit(AuditType.Save, Constants.Security.SuperUserId, relationType.Id, $"Saved relation type: {relationType.Name}");
                 scope.Complete();
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SavedRelationType, this, saveEventArgs);
@@ -564,6 +567,11 @@ namespace Umbraco.Core.Services.Implement
                 }
             }
             return relations;
+        }
+
+        private void Audit(AuditType type, int userId, int objectId, string message = null)
+        {
+            _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.RelationType), message));
         }
         #endregion
 

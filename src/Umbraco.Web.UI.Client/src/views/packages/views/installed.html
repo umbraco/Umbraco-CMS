@@ -12,13 +12,13 @@
                     <tr ng-repeat="installedPackage in vm.installedPackages track by installedPackage.id">
                         <td class="flex items-center">
                             <div class="umb-package-list__item-icon">
-                                <i ng-if="!installedPackage.iconUrl" class="icon-box"></i>
+                                <umb-icon ng-if="!installedPackage.iconUrl" icon="icon-box"></umb-icon>
                                 <img ng-if="installedPackage.iconUrl" ng-src="{{installedPackage.iconUrl}}" />
                             </div>
                             <div class="umb-package-list__item-content">
                                 <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
                                 <div class="umb-package-list__item-description">
-                                    {{ installedPackage.version }} | <a href="{{ installedPackage.url }}" target="_blank">{{ installedPackage.url }}</a> | {{ installedPackage.author }}
+                                    {{ installedPackage.version }} | <a href="{{ installedPackage.url }}" target="_blank" rel="noopener">{{ installedPackage.url }}</a> | {{ installedPackage.author }}
                                 </div>
                             </div>
                         </td>
@@ -66,18 +66,18 @@
             <div class="umb-info-local-items">
 
                 <form novalidate name="uninstallForm" class="w-100">
+
                     <div class="umb-package-icon">
-                        <i ng-if="!vm.package.iconUrl" class="icon-box"></i>
+                        <umb-icon ng-if="!vm.package.iconUrl" icon="icon-box"></umb-icon>
                         <img ng-if="vm.package.iconUrl" ng-src="{{vm.package.iconUrl}}" alt="" />
                     </div>
-
 
                     <div class="umb-package-info">
                         <h4 class="umb-info-local-item"><strong>{{ vm.package.name }}</strong></h4>
 
                         <div class="umb-info-local-item">
                             <strong><localize key="packager_packageAuthor">Author</localize></strong>
-                            <a href="{{ vm.package.authorLink }}" target="_blank">{{ vm.package.author }}</a>
+                            <a href="{{ vm.package.authorLink }}" target="_blank" rel="noopener">{{ vm.package.author }}</a>
                         </div>
 
                         <div class="umb-info-local-item">
@@ -87,7 +87,7 @@
 
                         <div class="umb-info-local-item">
                             <strong><localize key="packager_packageLicense">License</localize></strong>
-                            <a href="{{ vm.package.licenseUrl }}" target="_blank">{{ vm.package.license }}</a>
+                            <a href="{{ vm.package.licenseUrl }}" target="_blank" rel="noopener">{{ vm.package.license }}</a>
                         </div>
 
                         <div class="umb-info-local-item">

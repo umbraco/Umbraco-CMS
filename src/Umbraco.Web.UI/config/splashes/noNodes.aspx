@@ -39,14 +39,14 @@
 					<h2>Easy start with Umbraco.tv</h2>
 					<p>We have created a bunch of 'how-to' videos, to get you easily started with Umbraco. Learn how to build projects in just a couple of minutes. Easiest CMS in the world.</p>
 					
-					<a href="https://umbraco.tv?ref=tvFromInstaller" target="_blank">Umbraco.tv &rarr;</a>
+					<a href="https://umbraco.tv?ref=tvFromInstaller" target="_blank" rel="noopener">Umbraco.tv &rarr;</a>
 				</div>
 
 				<div class="col">
 					<h2>Be a part of the community</h2>
 					<p>The Umbraco community is the best of its kind, be sure to visit, and if you have any questions, we're sure that you can get your answers from the community.</p>
 					
-					<a href="https://our.umbraco.com/?ref=ourFromInstaller" target="_blank">our.Umbraco &rarr;</a>
+					<a href="https://our.umbraco.com/?ref=ourFromInstaller" target="_blank" rel="noopener">our.Umbraco &rarr;</a>
 				</div>
 			</div>
 
@@ -54,8 +54,6 @@
 	</article>
 
 </section>
-
-<script src="https://code.jquery.com/jquery-latest.min.js"></script>
 
 </body>
 </html>

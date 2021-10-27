@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models
         /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
         /// <param name="id">The unique id of the server registration.</param>
-        /// <param name="serverAddress">The server url.</param>
+        /// <param name="serverAddress">The server URL.</param>
         /// <param name="serverIdentity">The unique server identity.</param>
         /// <param name="registered">The date and time the registration was created.</param>
         /// <param name="accessed">The date and time the registration was last accessed.</param>
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
-        /// <param name="serverAddress">The server url.</param>
+        /// <param name="serverAddress">The server URL.</param>
         /// <param name="serverIdentity">The unique server identity.</param>
         /// <param name="registered">The date and time the registration was created.</param>
         public ServerRegistration(string serverAddress, string serverIdentity, DateTime registered)
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the server url.
+        /// Gets or sets the server URL.
         /// </summary>
         public string ServerAddress
         {

@@ -81,7 +81,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <param name="globalSettings"></param>
         /// <param name="umbracoSettings"></param>
         /// <param name="eventMessagesFactory">An event messages factory.</param>
-        /// <param name="urlSegmentProviders">Some url segment providers.</param>
+        /// <param name="urlSegmentProviders">Some URL segment providers.</param>
         /// <param name="typeLoader"></param>
         /// <param name="factory">A container.</param>
         /// <param name="scopeProvider"></param>
@@ -183,7 +183,7 @@ namespace Umbraco.Tests.TestHelpers
                         compiledPackageXmlParser, Mock.Of<IPackageActionRunner>(),
                         new DirectoryInfo(IOHelper.GetRootDirectorySafe())));
             });
-            var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c)));
+            var relationService = GetLazyService<IRelationService>(factory, c => new RelationService(scopeProvider, logger, eventMessagesFactory, entityService.Value, GetRepo<IRelationRepository>(c), GetRepo<IRelationTypeRepository>(c), GetRepo<IAuditRepository>(c)));
             var tagService = GetLazyService<ITagService>(factory, c => new TagService(scopeProvider, logger, eventMessagesFactory, GetRepo<ITagRepository>(c)));
             var redirectUrlService = GetLazyService<IRedirectUrlService>(factory, c => new RedirectUrlService(scopeProvider, logger, eventMessagesFactory, GetRepo<IRedirectUrlRepository>(c)));
             var consentService = GetLazyService<IConsentService>(factory, c => new ConsentService(scopeProvider, logger, eventMessagesFactory, GetRepo<IConsentRepository>(c)));
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger);
-            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
+            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, Mock.Of<ICoreDebug>(x => x.LogUncompletedScopes == true));
             return scopeProvider;
         }
     }

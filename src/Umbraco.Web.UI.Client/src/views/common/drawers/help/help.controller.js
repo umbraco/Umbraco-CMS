@@ -157,8 +157,8 @@
         }
 
         function openTourGroup(tourAlias) {
-            angular.forEach(vm.tours, function (group) {
-                angular.forEach(group, function (tour) {
+            vm.tours.forEach(function (group) {
+                group.tours.forEach(function (tour) {
                     if (tour.alias === tourAlias) {
                         group.open = true;
                     }
@@ -168,9 +168,9 @@
 
         function getTourGroupCompletedPercentage() {
             // Finding out, how many tours are completed for the progress circle
-            angular.forEach(vm.tours, function(group){
+            vm.tours.forEach(function(group){
                 var completedTours = 0;
-                angular.forEach(group.tours, function(tour){
+                group.tours.forEach(function(tour){
                     if(tour.completed) {
                         completedTours++;
                     }

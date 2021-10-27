@@ -65,15 +65,22 @@
 // --------------------------------------------------
 
 .btn-reset {
-	padding: 0;
-	margin: 0;
-	border: none;
+    padding: 0;
+    margin: 0;
+    border: none;
     background: none;
-	color: currentColor;
+    color: currentColor;
     font-family: @baseFontFamily;
     font-size: @baseFontSize;
     line-height: @baseLineHeight;
-	cursor: pointer;
+    cursor: pointer;
+
+    // Disabled state
+    &.disabled,
+    &[disabled],
+    &:disabled:hover {
+        cursor: default;
+    }
 }
     
 // Button Sizes
@@ -336,20 +343,17 @@ input[type="submit"].btn {
 // This is lifted from umb-group-builder.less
 
 .btn-icon {
-    border: none;
-        
+    border: none;      
     font-size: 18px;
     position: relative;
     cursor: pointer;
     color: @ui-icon;
-
     margin: 0;
-    padding: 5px 10px;
+    padding: 3px 5px;
     width: auto;
     overflow: visible;
     background: transparent;
     line-height: normal;
-    outline: 0;
     -webkit-appearance: none;
 
     &:hover {

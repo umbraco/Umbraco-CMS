@@ -50,7 +50,7 @@ namespace Umbraco.Web
             var end = false;
             var response = context.Response;
 
-            logger.Debug<UmbracoModule>("Response status: Redirect={Redirect}, Is404={Is404}, StatusCode={ResponseStatusCode}",
+            logger.Debug<UmbracoModule, string, string, int>("Response status: Redirect={Redirect}, Is404={Is404}, StatusCode={ResponseStatusCode}",
                 pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
                 pcr.Is404 ? "true" : "false",
                 pcr.ResponseStatusCode);

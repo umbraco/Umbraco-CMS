@@ -105,6 +105,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
                     });
 
                 }, function (err) {
+                    $scope.busy = false;
                     $scope.success = false;
                     $scope.error = err;
                 });

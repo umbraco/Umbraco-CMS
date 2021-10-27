@@ -44,7 +44,7 @@
                 }
 
                 // please to not use angularHelper.safeApply here, it won't work
-                scope.$apply(attrs.onOutsideClick);
+                scope.$evalAsync(attrs.onOutsideClick);
             }
 
 

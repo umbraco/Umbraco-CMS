@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Examine;
+using Examine.Search;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
@@ -30,14 +33,29 @@ namespace Umbraco.Web.Search
         private readonly UmbracoMapper _mapper;
         private readonly ISqlContext _sqlContext;
         private readonly IUmbracoTreeSearcherFields _umbracoTreeSearcherFields;
+        private readonly AppCaches _appCaches;
 
-
-        public UmbracoTreeSearcher(IExamineManager examineManager,
+        [Obsolete("Use constructor specifying all dependencies instead")]
+        public UmbracoTreeSearcher(
+            IExamineManager examineManager,
             UmbracoContext umbracoContext,
             ILocalizationService languageService,
             IEntityService entityService,
             UmbracoMapper mapper,
-            ISqlContext sqlContext,IUmbracoTreeSearcherFields umbracoTreeSearcherFields)
+            ISqlContext sqlContext,
+            IUmbracoTreeSearcherFields umbracoTreeSearcherFields)
+            : this(examineManager, umbracoContext, languageService, entityService, mapper, sqlContext, umbracoTreeSearcherFields, Current.AppCaches)
+        { }
+
+        public UmbracoTreeSearcher(
+            IExamineManager examineManager,
+            UmbracoContext umbracoContext,
+            ILocalizationService languageService,
+            IEntityService entityService,
+            UmbracoMapper mapper,
+            ISqlContext sqlContext,
+            IUmbracoTreeSearcherFields umbracoTreeSearcherFields,
+            AppCaches appCaches)
         {
             _examineManager = examineManager ?? throw new ArgumentNullException(nameof(examineManager));
             _umbracoContext = umbracoContext;
@@ -46,6 +64,7 @@ namespace Umbraco.Web.Search
             _mapper = mapper;
             _sqlContext = sqlContext;
             _umbracoTreeSearcherFields = umbracoTreeSearcherFields;
+            _appCaches = appCaches;
         }
 
         /// <summary>
@@ -83,6 +102,11 @@ namespace Umbraco.Web.Search
             var indexName = Constants.UmbracoIndexes.InternalIndexName;
             var fields = _umbracoTreeSearcherFields.GetBackOfficeFields().ToList();
 
+            // TODO: Remove these checks in v9 when these interfaces merge
+            ISet<string> fieldsToLoad = _umbracoTreeSearcherFields is IUmbracoTreeSearcherFields2 searcherFields2
+                ? new HashSet<string>(searcherFields2.GetBackOfficeFieldsToLoad())
+                : null;
+
             // TODO: WE should try to allow passing in a lucene raw query, however we will still need to do some manual string
             // manipulation for things like start paths, member types, etc...
             //if (Examine.ExamineExtensions.TryParseLuceneQuery(query))
@@ -102,6 +126,13 @@ namespace Umbraco.Web.Search
                     indexName = Constants.UmbracoIndexes.MembersIndexName;
                     type = "member";
                     fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMembersFields());
+                    if (_umbracoTreeSearcherFields is IUmbracoTreeSearcherFields2 umbracoTreeSearcherFieldMember)
+                    {
+                        foreach(var field in umbracoTreeSearcherFieldMember.GetBackOfficeMembersFieldsToLoad())
+                        {
+                            fieldsToLoad.Add(field);
+                        }
+                    }
                     if (searchFrom != null && searchFrom != Constants.Conventions.MemberTypes.AllMembersListId && searchFrom.Trim() != "-1")
                     {
                         sb.Append("+__NodeTypeAlias:");
@@ -112,13 +143,28 @@ namespace Umbraco.Web.Search
                 case UmbracoEntityTypes.Media:
                     type = "media";
                     fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeMediaFields());
-                    var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService);
+                    if (_umbracoTreeSearcherFields is IUmbracoTreeSearcherFields2 umbracoTreeSearcherFieldsMedia)
+                    {
+                        foreach (var field in umbracoTreeSearcherFieldsMedia.GetBackOfficeMediaFieldsToLoad())
+                        {
+                            fieldsToLoad.Add(field);
+                        }
+                    }
+
+                    var allMediaStartNodes = _umbracoContext.Security.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches);
                     AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 case UmbracoEntityTypes.Document:
                     type = "content";
                     fields.AddRange(_umbracoTreeSearcherFields.GetBackOfficeDocumentFields());
-                    var allContentStartNodes = _umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService);
+                    if (_umbracoTreeSearcherFields is IUmbracoTreeSearcherFields2 umbracoTreeSearcherFieldsDocument)
+                    {
+                        foreach (var field in umbracoTreeSearcherFieldsDocument.GetBackOfficeDocumentFieldsToLoad())
+                        {
+                            fieldsToLoad.Add(field);
+                        }
+                    }
+                    var allContentStartNodes = _umbracoContext.Security.CurrentUser.CalculateContentStartNodeIds(_entityService, _appCaches);
                     AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
                 default:
@@ -136,7 +182,13 @@ namespace Umbraco.Web.Search
                 return Enumerable.Empty<SearchResultEntity>();
             }
 
-            var result = internalSearcher.CreateQuery().NativeQuery(sb.ToString())
+            var examineQuery = internalSearcher.CreateQuery().NativeQuery(sb.ToString());
+            if (fieldsToLoad != null)
+            {
+                examineQuery.SelectFields(fieldsToLoad);
+            }
+
+            var result = examineQuery
                 //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
                 .Execute(Convert.ToInt32(pageSize * (pageIndex + 1)));
 
@@ -186,6 +238,9 @@ namespace Umbraco.Web.Search
 
             var allLangs = _languageService.GetAllLanguages().Select(x => x.IsoCode.ToLowerInvariant()).ToList();
 
+            // the chars [*-_] in the query will mess everything up so let's remove those
+            query = Regex.Replace(query, "[\\*\\-_]", "");
+
             //check if text is surrounded by single or double quotes, if so, then exact match
             var surroundedByQuotes = Regex.IsMatch(query, "^\".*?\"$")
                                      || Regex.IsMatch(query, "^\'.*?\'$");
@@ -193,7 +248,7 @@ namespace Umbraco.Web.Search
             if (surroundedByQuotes)
             {
                 //strip quotes, escape string, the replace again
-                query = query.Trim('\"', '\'');
+                query = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
                 query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
@@ -227,7 +282,7 @@ namespace Umbraco.Web.Search
             }
             else
             {
-                var trimmed = query.Trim(new[] { '\"', '\'' });
+                var trimmed = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
                 //nothing to search
                 if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
@@ -240,7 +295,7 @@ namespace Umbraco.Web.Search
                 {
                     query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
-                    var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    var querywords = query.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries);
 
                     sb.Append("+(");
 
@@ -459,11 +514,13 @@ namespace Umbraco.Web.Search
             var defaultLang = _languageService.GetDefaultLanguageIsoCode();
             foreach (var result in results)
             {
-                var entity = _mapper.Map<SearchResultEntity>(result, context => {
-                        if(culture != null) {
-                            context.SetCulture(culture);
-                        }
+                var entity = _mapper.Map<SearchResultEntity>(result, context =>
+                {
+                    if (culture != null)
+                    {
+                        context.SetCulture(culture);
                     }
+                }
                 );
 
                 var intId = entity.Id.TryConvertTo<int>();

@@ -64,13 +64,13 @@ namespace Umbraco.Web.Models.Trees
         public string RoutePath { get; set; }
 
         /// <summary>
-        /// The JSON url to load the nodes children
+        /// The JSON URL to load the nodes children
         /// </summary>
         [DataMember(Name = "childNodesUrl")]
         public string ChildNodesUrl { get; set; }
 
         /// <summary>
-        /// The JSON url to load the menu from
+        /// The JSON URL to load the menu from
         /// </summary>
         [DataMember(Name = "menuUrl")]
         public string MenuUrl { get; set; }
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Models.Trees
 
                 //absolute path with or without tilde
                 if (Icon.StartsWith("~") || Icon.StartsWith("/"))
-                    return IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
+                    return IOHelper.ResolveUrl("~" + Icon.TrimStart(Constants.CharArrays.Tilde));
 
                 //legacy icon path
                 return string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);

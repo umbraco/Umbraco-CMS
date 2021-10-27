@@ -1,139 +1,139 @@
 <?xml version="1.0"?>
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
-  <configSections xdt:Transform="InsertIfMissing" />
-  <configSections>
-    <sectionGroup name="applicationSettings" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-    <sectionGroup name="system.web.webPages.razor" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-    <sectionGroup name="umbracoConfiguration" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing">
-      <section name="settings" type="Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
-      <section name="dashBoard" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <section name="HealthChecks" type="Umbraco.Core.Configuration.HealthChecks.HealthChecksSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
-    </sectionGroup>
-  </configSections>
+    <configSections xdt:Transform="InsertIfMissing" />
+    <configSections>
+        <sectionGroup name="applicationSettings" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+        <sectionGroup name="system.web.webPages.razor" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+        <sectionGroup name="umbracoConfiguration" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+        <sectionGroup name="umbracoConfiguration" xdt:Locator="Match(name)">
+            <section name="settings" type="Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+            <section name="dashBoard" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <section name="HealthChecks" type="Umbraco.Core.Configuration.HealthChecks.HealthChecksSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+        </sectionGroup>
+    </configSections>
 
-  <appSettings xdt:Transform="InsertIfMissing" />
-  <appSettings>
-    <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
-	<add key="Umbraco.ModelsBuilder.Enable" value="false" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
-	<add key="Umbraco.ModelsBuilder.ModelsMode" value="Nothing" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
-  </appSettings>
+    <appSettings xdt:Transform="InsertIfMissing" />
+    <appSettings>
+        <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
+        <add key="Umbraco.ModelsBuilder.Enable" value="false" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
+        <add key="Umbraco.ModelsBuilder.ModelsMode" value="Nothing" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
+    </appSettings>
 
-  <umbracoConfiguration xdt:Transform="InsertIfMissing">
-    <settings configSource="config\umbracoSettings.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
-    <dashBoard configSource="config\Dashboard.config" xdt:Locator="Match(configSource)" xdt:Transform="Remove" />
-    <HealthChecks configSource="config\HealthChecks.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
-  </umbracoConfiguration>
+    <umbracoConfiguration xdt:Transform="InsertIfMissing" />
+    <umbracoConfiguration>
+        <settings configSource="config\umbracoSettings.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
+        <dashBoard configSource="config\Dashboard.config" xdt:Locator="Match(configSource)" xdt:Transform="Remove" />
+        <HealthChecks configSource="config\HealthChecks.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
+    </umbracoConfiguration>
 
-  <system.data xdt:Transform="InsertIfMissing">
-    <DbProviderFactories xdt:Transform="InsertIfMissing">
-      <remove invariant="System.Data.SqlServerCe.4.0" xdt:Locator="Match(invariant)" xdt:Transform="InsertIfMissing" />
-      <add name="Microsoft SQL Server Compact Data Provider 4.0" invariant="System.Data.SqlServerCe.4.0" description=".NET Framework Data Provider for Microsoft SQL Server Compact" type="System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe" xdt:Locator="Match(invariant)" xdt:Transform="SetAttributes(invariant,description,type)" />
-    </DbProviderFactories>
-  </system.data>
-  <clientDependency xdt:Transform="RemoveAttributes(version)" />
+    <system.data xdt:Transform="InsertIfMissing" />
+    <system.data>
+        <DbProviderFactories xdt:Transform="InsertIfMissing" />
+        <DbProviderFactories>
+            <remove invariant="System.Data.SqlServerCe.4.0" xdt:Locator="Match(invariant)" xdt:Transform="InsertIfMissing" />
+            <add name="Microsoft SQL Server Compact Data Provider 4.0" invariant="System.Data.SqlServerCe.4.0" description=".NET Framework Data Provider for Microsoft SQL Server Compact" type="System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe" xdt:Locator="Match(invariant)" xdt:Transform="SetAttributes(invariant,description,type)" />
+        </DbProviderFactories>
+    </system.data>
 
-  <system.web xdt:Transform="InsertIfMissing" />
-  <system.web>
-    <siteMap xdt:Transform="Remove" />
-    <httpRuntime xdt:Transform="InsertIfMissing" />
-    <httpRuntime maxRequestLength="51200" fcnMode="Single" xdt:Transform="SetAttributes(fcnMode,maxRequestLength)" />
-    <httpRuntime targetFramework="4.7.2" xdt:Locator="Condition(count(@targetFramework) != 1)" xdt:Transform="SetAttributes(targetFramework)" />
+    <clientDependency xdt:Transform="RemoveAttributes(version)" />
 
-    <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
-    <roleManager defaultProvider="DefaultRoleProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>
-    <profile defaultProvider="DefaultProfileProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>>
-    <sessionState customProvider="DefaultSessionProvider" xdt:Locator="Match(customProvider)" xdt:Transform="Remove"/>
-    <compilation xdt:Transform="InsertIfMissing" />
+    <system.web xdt:Transform="InsertIfMissing" />
+    <system.web>
+        <siteMap xdt:Transform="Remove" />
+        <httpRuntime xdt:Transform="InsertIfMissing" />
+        <httpRuntime maxRequestLength="51200" fcnMode="Single" xdt:Transform="SetAttributes(fcnMode,maxRequestLength)" />
+        <httpRuntime targetFramework="4.7.2" xdt:Locator="Condition(count(@targetFramework) != 1)" xdt:Transform="SetAttributes(targetFramework)" />
+        <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
+        <roleManager defaultProvider="DefaultRoleProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
+        <profile defaultProvider="DefaultProfileProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
+        <sessionState customProvider="DefaultSessionProvider" xdt:Locator="Match(customProvider)" xdt:Transform="Remove" />
+        <compilation xdt:Transform="InsertIfMissing" />
+        <xhtmlConformance xdt:Transform="Remove" />
 
-    <xhtmlConformance xdt:Transform="Remove" />
+        <httpModules xdt:Transform="InsertIfMissing" />
+        <httpModules>
+            <add name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <add name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <add name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <!-- Don't remove the leading space below, this is to fix a quirk for a lot of releases where we added it with the space by default -->
+            <add name=" UmbracoModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule, Umbraco.Web" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+        </httpModules>
 
-    <httpModules xdt:Transform="InsertIfMissing" />
-    <httpModules>
-      <add name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name=" UmbracoModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule,Umbraco.Web" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
-    </httpModules>
+        <httpHandlers xdt:Transform="InsertIfMissing" />
+        <httpHandlers>
+            <add path="GoogleSpellChecker.ashx" xdt:Locator="Match(path)" xdt:Transform="Remove" />
+        </httpHandlers>
+    </system.web>
 
-    <httpHandlers xdt:Transform="InsertIfMissing" />
-    <httpHandlers>
-      <add path="GoogleSpellChecker.ashx" xdt:Locator="Match(path)" xdt:Transform="Remove"  />
-    </httpHandlers>
-  </system.web>
+    <system.webServer xdt:Transform="InsertIfMissing" />
+    <system.webServer>
+        <modules xdt:Transform="InsertIfMissing" />
+        <modules runAllManagedModulesForAllRequests="true" xdt:Transform="SetAttributes(runAllManagedModulesForAllRequests)" />
+        <modules>
+            <remove name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <remove name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <remove name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <add name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <add name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <add name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <!-- Don't remove the leading space below, this is to fix a quirk for a lot of releases where we added it with the space by default -->
+            <add name=" UmbracoModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule, Umbraco.Web" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+        </modules>
 
-  <system.webServer xdt:Transform="InsertIfMissing" />
-  <system.webServer>
-    <modules xdt:Transform="InsertIfMissing" />
-    <modules runAllManagedModulesForAllRequests="true" xdt:Transform="SetAttributes(runAllManagedModulesForAllRequests)">
-      <remove name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <remove name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <remove name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+        <staticContent xdt:Transform="InsertIfMissing" />
+        <staticContent>
+            <remove fileExtension=".svg" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+            <mimeMap fileExtension=".svg" mimeType="image/svg+xml" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+            <remove fileExtension=".woff" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+            <mimeMap fileExtension=".woff" mimeType="font/woff" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+            <remove fileExtension=".woff2" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+            <mimeMap fileExtension=".woff2" mimeType="font/woff2" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+            <remove fileExtension=".less" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+            <mimeMap fileExtension=".less" mimeType="text/css" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
+        </staticContent>
 
-      <add name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <!-- Note, we're removing the one that starts with a space here, don't correct it -->
-      <!-- This to fix a quirk we for a lot of releases where we added it with the space by default -->
-      <add name=" UmbracoModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name="UmbracoModule" type="Umbraco.Web.UmbracoModule,Umbraco.Web" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
-    </modules>
+        <handlers>
+            <remove name="SpellChecker" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+            <add name="SpellChecker" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+        </handlers>
 
-    <staticContent xdt:Transform="InsertIfMissing" />
-    <staticContent>
-      <remove fileExtension=".svg" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
-      <mimeMap fileExtension=".svg" mimeType="image/svg+xml" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
-      <remove fileExtension=".woff" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
-      <mimeMap fileExtension=".woff" mimeType="application/x-font-woff" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
-      <remove fileExtension=".woff2" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
-      <mimeMap fileExtension=".woff2" mimeType="application/x-font-woff2" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
-      <remove fileExtension=".less" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
-      <mimeMap fileExtension=".less" mimeType="text/css" xdt:Locator="Match(fileExtension)" xdt:Transform="InsertIfMissing" />
-    </staticContent>
+        <security xdt:Transform="InsertIfMissing" />
+        <security>
+            <requestFiltering xdt:Transform="InsertIfMissing" />
+            <requestFiltering>
+                <requestLimits maxAllowedContentLength="52428800" xdt:Transform="InsertIfMissing" />
+            </requestFiltering>
+        </security>
 
-    <handlers>
-      <remove name="SpellChecker" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <add name="SpellChecker" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-    </handlers>
+    </system.webServer>
 
-    <security xdt:Transform="InsertIfMissing">
-      <requestFiltering xdt:Transform="InsertIfMissing">
-        <requestLimits maxAllowedContentLength="52428800" xdt:Transform="InsertIfMissing" />
-      </requestFiltering>
-    </security>
-
-  </system.webServer>
-
-  <runtime xdt:Transform="InsertIfMissing" />
-  <runtime>
-    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1" xdt:Transform="InsertIfMissing" />
-  </runtime>
-
-  <runtime>
-    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='HtmlAgilityPack')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='AutoMapper')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Mvc')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.WebPages.Razor')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Http')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin.Security.OAuth')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin.Security')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin.Security.Cookies')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http.Formatting')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.CodeAnalysis.CSharp')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='log4net')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Data.SqlServerCe')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.ValueTuple')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http.Formatting')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Collections.Immutable')" xdt:Transform="Remove" />
-    </assemblyBinding>
-  </runtime>
-
- <runtime>
+    <runtime xdt:Transform="InsertIfMissing" />
+    <runtime>
+        <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1" xdt:Transform="InsertIfMissing" />
         <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='HtmlAgilityPack')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='AutoMapper')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Mvc')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.WebPages.Razor')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Http')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin.Security.OAuth')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin.Security')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin.Security.Cookies')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http.Formatting')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.CodeAnalysis.CSharp')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='log4net')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Data.SqlServerCe')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.ValueTuple')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http.Formatting')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Collections.Immutable')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Buffers')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Memory')" xdt:Transform="Remove" />
+            <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Numerics.Vectors')" xdt:Transform="Remove" />
             <dependentAssembly xdt:Transform="Insert">
                 <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
                 <bindingRedirect oldVersion="0.0.0.0-4.0.1.0" newVersion="4.0.1.0" />
@@ -156,7 +156,7 @@
             </dependentAssembly>
             <dependentAssembly xdt:Transform="Insert">
                 <assemblyIdentity name="System.Collections.Immutable" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
-                <bindingRedirect oldVersion="0.0.0.0-1.2.3.0" newVersion="1.2.3.0" />
+                <bindingRedirect oldVersion="0.0.0.0-1.2.5.0" newVersion="1.2.5.0" />
             </dependentAssembly>
             <dependentAssembly xdt:Transform="Insert">
                 <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
@@ -174,23 +174,36 @@
                 <assemblyIdentity name="System.Net.Http.Formatting" publicKeyToken="31bf3856ad364e35" />
                 <bindingRedirect oldVersion="0.0.0.0-5.2.7.0" newVersion="5.2.7.0" />
             </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Buffers" publicKeyToken="cc7b13ffcd2ddd51" />
+                <bindingRedirect oldVersion="4.0.0.0-4.0.3.0" newVersion="4.0.3.0" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Memory" publicKeyToken="cc7b13ffcd2ddd51" />
+                <bindingRedirect oldVersion="4.0.0.0-4.0.1.1" newVersion="4.0.1.1" />
+            </dependentAssembly>
+            <dependentAssembly xdt:Transform="Insert">
+                <assemblyIdentity name="System.Numerics.Vectors" publicKeyToken="b03f5f7f11d50a3a" />
+                <bindingRedirect oldVersion="4.0.0.0-4.1.4.0" newVersion="4.1.4.0" />
+            </dependentAssembly>
         </assemblyBinding>
     </runtime>
 
-  <system.web.webPages.razor xdt:Transform="Remove" />
+    <system.web.webPages.razor xdt:Transform="Remove" />
 
-  <location path="umbraco" xdt:Locator="Match(path)" xdt:Transform="InsertIfMissing" />
-  <location path="umbraco" xdt:Locator="Match(path)">
-    <system.webServer xdt:Transform="InsertIfMissing">
-      <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes(doStaticCompression,doDynamicCompression,dynamicCompressionBeforeCache)" />
-    </system.webServer>
-  </location>
+    <location path="umbraco" xdt:Locator="Match(path)" xdt:Transform="InsertIfMissing" />
+    <location path="umbraco" xdt:Locator="Match(path)">
+        <system.webServer xdt:Transform="InsertIfMissing" />
+        <system.webServer>
+            <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes(doStaticCompression,doDynamicCompression,dynamicCompressionBeforeCache)" />
+        </system.webServer>
+    </location>
 
-  <location path="App_Plugins" xdt:Locator="Match(path)" xdt:Transform="InsertIfMissing" />
-  <location path="App_Plugins" xdt:Locator="Match(path)">
-    <system.webServer xdt:Transform="InsertIfMissing">
-      <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes(doStaticCompression,doDynamicCompression,dynamicCompressionBeforeCache)" />
-    </system.webServer>
-  </location>
-
+    <location path="App_Plugins" xdt:Locator="Match(path)" xdt:Transform="InsertIfMissing" />
+    <location path="App_Plugins" xdt:Locator="Match(path)">
+        <system.webServer xdt:Transform="InsertIfMissing" />
+        <system.webServer>
+            <urlCompression doStaticCompression="false" doDynamicCompression="false" dynamicCompressionBeforeCache="false" xdt:Transform="SetAttributes(doStaticCompression,doDynamicCompression,dynamicCompressionBeforeCache)" />
+        </system.webServer>
+    </location>
 </configuration>

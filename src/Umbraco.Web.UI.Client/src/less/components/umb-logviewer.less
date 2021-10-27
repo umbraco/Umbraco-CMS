@@ -78,19 +78,22 @@
                 padding-right: 160px;
             }
 
-            .icon-rate {
+            .save-search,
+            .filter-search {
                 position: absolute;
                 top: 0;
-                line-height: 32px;
+                display: flex;
+                align-items: center;;
+                height: 32px;
+            }
+
+            .save-search {
                 right: 140px;
                 color: @yellow-d1;
                 cursor: pointer;
             }
 
-            .icon-wrong {
-                position: absolute;
-                top: 0;
-                line-height: 32px;
+            .filter-search {
                 right: 120px;
                 color: @gray-7;
                 cursor: pointer;
@@ -119,6 +122,11 @@
         .table {
             table-layout: fixed;
 
+            table {
+                display: table;
+                width: 100%;
+            }
+
             thead th:first-child, thead th:nth-child(3) {
                 width: 20%;
             }
@@ -127,8 +135,15 @@
                 width: 15%;
             }
 
+
             tr td:nth-child(3) {
                 word-break: break-word;
+            }
+
+            button {
+                white-space: normal;
+                word-break: break-word;
+                text-align-last: left;
             }
         }
 

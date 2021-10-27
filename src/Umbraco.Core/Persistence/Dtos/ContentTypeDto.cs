@@ -9,9 +9,10 @@ namespace Umbraco.Core.Persistence.Dtos
     internal class ContentTypeDto
     {
         public const string TableName = Constants.DatabaseSchema.Tables.ContentType;
+        private string _alias;
 
         [Column("pk")]
-        [PrimaryKeyColumn(IdentitySeed = 535)]
+        [PrimaryKeyColumn(IdentitySeed = 700)]
         public int PrimaryKey { get; set; }
 
         [Column("nodeId")]
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("alias")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public string Alias { get; set; }
+        public string Alias { get => _alias; set => _alias = value == null ? null : string.Intern(value); }
 
         [Column("icon")]
         [Index(IndexTypes.NonClustered)]

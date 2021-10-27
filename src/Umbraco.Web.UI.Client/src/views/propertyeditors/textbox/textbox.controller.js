@@ -4,37 +4,45 @@ function textboxController($scope, validationMessageService) {
     if (!$scope.model.config) {
         $scope.model.config = {};
     }
-    $scope.model.count = 0;
-    if (!$scope.model.config.maxChars) {
-        // 500 is the maximum number that can be stored
-        // in the database, so set it to the max, even
-        // if no max is specified in the config
-        $scope.model.config.maxChars = 500;
-    }
+
+    // 512 is the maximum number that can be stored
+    // in the database, so set it to the max, even
+    // if no max is specified in the config
+    $scope.maxChars = Math.min($scope.model.config.maxChars || 512, 512);
+    $scope.charsCount = 0;
+    $scope.nearMaxLimit = false;
+    $scope.validLength = true;
 
     $scope.$on("formSubmitting", function() {
-        if ($scope.isLengthValid()) {
+        if ($scope.validLength === true) {
             $scope.textboxFieldForm.textbox.$setValidity("maxChars", true);
         } else {
             $scope.textboxFieldForm.textbox.$setValidity("maxChars", false);
         }
     });
 
-    $scope.isLengthValid = function() {
-        return $scope.model.config.maxChars >= $scope.model.count;
+    function checkLengthVadility() {
+        $scope.validLength = $scope.charsCount <= $scope.maxChars;
     }
 
-    $scope.model.change = function () {
+    $scope.change = function () {
         if ($scope.model.value) {
-            $scope.model.count = $scope.model.value.length;
+            $scope.charsCount = $scope.model.value.length;
+            checkLengthVadility();
+            $scope.nearMaxLimit = $scope.validLength && $scope.charsCount > Math.max($scope.maxChars*.8, $scope.maxChars-25);
+        }
+        else {
+            $scope.charsCount = 0;
+            checkLengthVadility();
         }
     }
-    $scope.model.change();
+    $scope.model.onValueChanged = $scope.change;
+    $scope.change();
 
     // Set the message to use for when a mandatory field isn't completed.
     // Will either use the one provided on the property type or a localised default.
     validationMessageService.getMandatoryMessage($scope.model.validation).then(function(value) {
         $scope.mandatoryMessage = value;
-    });    
+    });
 }
 angular.module('umbraco').controller("Umbraco.PropertyEditors.textboxController", textboxController);

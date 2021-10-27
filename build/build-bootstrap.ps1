@@ -34,6 +34,7 @@
     if (-not (test-path $nuget))
     {
       Write-Host "Download NuGet..."
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
       Invoke-WebRequest $source -OutFile $nuget
       if (-not $?) { throw "Failed to download NuGet." }
     }

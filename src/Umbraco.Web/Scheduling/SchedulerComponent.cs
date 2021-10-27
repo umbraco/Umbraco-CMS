@@ -16,7 +16,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal sealed class SchedulerComponent : IComponent
+    public sealed class SchedulerComponent : IComponent
     {
         private const int DefaultDelayMilliseconds = 180000; // 3 mins
         private const int OneMinuteMilliseconds = 60000;
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Scheduling
             }
 
             var periodInMilliseconds = healthCheckConfig.NotificationSettings.PeriodInHours * 60 * 60 * 1000;
-            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _runtime, logger);
+            var task = new HealthCheckNotifier(_healthCheckRunner, delayInMilliseconds, periodInMilliseconds, healthChecks, notifications, _scopeProvider, _runtime, logger);
             _healthCheckRunner.TryAdd(task);
             return task;
         }
@@ -177,7 +177,7 @@ namespace Umbraco.Web.Scheduling
                 new[] { new DirectoryInfo(IOHelper.MapPath(SystemDirectories.TempFileUploads)) },
                 TimeSpan.FromDays(1), //files that are over a day old
                 _runtime, _logger);
-            _scrubberRunner.TryAdd(task);
+            _fileCleanupRunner.TryAdd(task);
             return task;
         }
     }

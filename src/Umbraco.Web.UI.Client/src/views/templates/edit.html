@@ -30,12 +30,11 @@
 
                                 <div ng-class="{'btn-group': vm.template.masterTemplateAlias}" style="margin-right: 10px;">
 
-                                    <button
-                                        data-element="button-masterTemplate"
-                                        type="button"
-                                        class="btn umb-button--xs"
-                                        ng-click="vm.openMasterTemplateOverlay()"
-                                        style="font-size: 14px;">
+                                    <button type="button"
+                                            data-element="button-masterTemplate"
+                                            class="btn umb-button__button umb-button--xs umb-outline"
+                                            style="font-size: 14px;"
+                                            ng-click="vm.openMasterTemplateOverlay()">
                                         <span class="bold"><localize key="template_mastertemplate">Master template</localize>:</span>
                                         <span style="margin-left: 5px;">
                                             <span ng-if="vm.template.masterTemplateAlias">{{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}</span>
@@ -43,12 +42,18 @@
                                         </span>
                                     </button>
 
-                                    <a ng-if="vm.template.masterTemplateAlias" ng-click="vm.removeMasterTemplate()" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle">
-                                        <span class="icon icon-wrong"></span>
-                                    </a>
+                                    <button type="button"
+                                            class="btn umb-button__button umb-button--xs dropdown-toggle umb-button-group__toggle flex-inline items-center"
+                                            style="font-size: 14px; height: 100%;"
+                                            localize="title"
+                                            title="@general_remove"
+                                            ng-if="vm.template.masterTemplateAlias"
+                                            ng-click="vm.removeMasterTemplate()">
+                                        <umb-icon icon="icon-wrong" class="icon"></umb-icon>
+                                    </button>
 
                                 </div>
-                                
+
                             </div>
 
                             <div class="flex" style="margin-left: auto;">
@@ -97,7 +102,7 @@
             </umb-editor-container>
 
             <umb-editor-footer>
-                
+
                 <umb-editor-footer-content-left>
 
                     <umb-keyboard-shortcuts-overview
@@ -109,12 +114,13 @@
                 </umb-editor-footer-content-left>
 
             <umb-editor-footer-content-right>
-                
+
                 <umb-button
                     ng-if="model.infiniteMode"
                     type="button"
                     button-style="link"
                     label-key="general_close"
+                    shortcut="esc"
                     action="vm.close()">
                 </umb-button>
 

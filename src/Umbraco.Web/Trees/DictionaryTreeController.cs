@@ -67,12 +67,12 @@ namespace Umbraco.Web.Trees
                             id,
                             queryStrings,
                             x.ItemKey,
-                            "icon-book-alt",
+                            Constants.Icons.Dictionary,
                             Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
             else
             {
-                // maybe we should use the guid as url param to avoid the extra call for getting dictionary item
+                // maybe we should use the guid as URL param to avoid the extra call for getting dictionary item
                 var parentDictionary = Services.LocalizationService.GetDictionaryItemById(intId.Result);
                 if (parentDictionary == null)
                     return nodes;
@@ -83,7 +83,7 @@ namespace Umbraco.Web.Trees
                         id,
                         queryStrings,
                         x.ItemKey,
-                        "icon-book-alt",
+                        Constants.Icons.Dictionary,
                         Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
 

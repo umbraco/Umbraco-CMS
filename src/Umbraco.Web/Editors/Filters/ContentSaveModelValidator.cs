@@ -1,5 +1,8 @@
-﻿using Umbraco.Core.Logging;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Web.Http.ModelBinding;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
@@ -13,5 +16,6 @@ namespace Umbraco.Web.Editors.Filters
         public ContentSaveModelValidator(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService) : base(logger, umbracoContextAccessor, textService)
         {
         }
+
     }
 }

@@ -121,7 +121,7 @@ tinymce.addI18n('cy',{
 "Date\/time": "Dyddiad\/amser",
 "Insert date\/time": "Mewnosod dyddiad\/amser",
 "Remove link": "Tynnu dolen",
-"Url": "Url",
+"Url": "URL",
 "Text to display": "Testun i'w ddangos",
 "Anchors": "Angorau",
 "Insert link": "Mewnosod dolen",

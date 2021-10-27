@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -38,8 +39,7 @@ namespace Umbraco.Web.Dashboards
                     return manifestDashboardDefinition.Weight;
 
                 default:
-                    var weightAttribute = dashboard.GetType().GetCustomAttribute<WeightAttribute>(false);
-                    return weightAttribute?.Weight ?? DefaultWeight;
+                    return GetWeight(dashboard.GetType());
             }
         }
     }

@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource, $q) {
+    function MediaNodeInfoDirective($timeout, $location, $q, eventsService, userService, dateHelper, editorService, mediaHelper, mediaResource) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -25,19 +25,18 @@
             scope.memberOptions.entityType = "MEMBER";
             scope.hasMemberReferences = false;
 
-
             function onInit() {
 
-                userService.getCurrentUser().then(function(user){
+                userService.getCurrentUser().then(user => {
                     // only allow change of media type if user has access to the settings sections
-                    angular.forEach(user.sections, function(section){
-                        if(section.alias === "settings") {
+                    Utilities.forEach(user.sections, section => {
+                        if (section.alias === "settings") {
                             scope.allowChangeMediaType = true;
                         }
                     });
                 });
 
-                // get document type details
+                // get media type details
                 scope.mediaType = scope.node.contentType;
 
                 // set the media link initially
@@ -52,7 +51,7 @@
 
             function formatDatesToLocal() {
                 // get current backoffice user and format dates
-                userService.getCurrentUser().then(function (currentUser) {
+                userService.getCurrentUser().then(currentUser => {
                     scope.node.createDateFormatted = dateHelper.getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
                     scope.node.updateDateFormatted = dateHelper.getLocalDate(scope.node.updateDate, currentUser.locale, 'LLL');
                 });
@@ -73,20 +72,20 @@
                 scope.node.extension = mediaHelper.getFileExtension(scope.nodeUrl);
             }
 
-            scope.openMediaType = function (mediaType) {
+            scope.openMediaType = mediaType => {
                 var editor = {
                     id: mediaType.id,
-                    submit: function(model) {
+                    submit: model => {
                         editorService.close();
                     },
-                    close: function() {
+                    close: () => {
                         editorService.close();
                     }
                 };
                 editorService.mediaTypeEditor(editor);
             };
 
-            scope.openSVG = function () {
+            scope.openSVG = () => {
                 var popup = window.open('', '_blank');
                 var html = '<!DOCTYPE html><body><img src="' + scope.nodeUrl + '"/>' +
                     '<script>history.pushState(null, null,"' + $location.$$absUrl + '");</script></body>';
@@ -136,7 +135,7 @@
 
             function loadMediaRelations() {
                 return mediaResource.getPagedReferences(scope.node.id, scope.mediaOptions)
-                    .then(function (data) {
+                    .then(data => {
                         scope.mediaReferences = data;
                         scope.hasMediaReferences = data.items.length > 0;
                     });
@@ -144,7 +143,7 @@
 
             function loadMemberRelations() {
                 return mediaResource.getPagedReferences(scope.node.id, scope.memberOptions)
-                    .then(function (data) {
+                    .then(data => {
                         scope.memberReferences = data;
                         scope.hasMemberReferences = data.items.length > 0;
                     });

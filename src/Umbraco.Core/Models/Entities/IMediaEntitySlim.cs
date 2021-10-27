@@ -7,7 +7,7 @@
     {
 
         /// <summary>
-        /// The media file's path/url
+        /// The media file's path/URL
         /// </summary>
         string MediaPath { get; }
     }

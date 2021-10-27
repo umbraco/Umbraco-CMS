@@ -77,6 +77,7 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(IMember source, MemberDisplay target, MapperContext context)
         {
             target.ContentApps = _commonMapper.GetContentApps(source);
+            target.ContentType = _commonMapper.GetContentType(source, context);
             target.ContentTypeId = source.ContentType.Id;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = source.ContentType.Name;
@@ -142,6 +143,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Icon -Trashed -ParentId -Alias
         private void Map(IMemberGroup source, MemberGroupDisplay target, MapperContext context)
         {
+            target.Icon = Constants.Icons.MemberGroup;
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;

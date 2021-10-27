@@ -6,7 +6,6 @@
         /* ----------- SCOPE VARIABLES ----------- */
 
         var vm = this;
-        var childNodeSelectorOverlayTitle = "";
 
         vm.mediaTypes = [];
         vm.selectedChildren = [];
@@ -21,10 +20,6 @@
         init();
 
         function init() {
-
-            localizationService.localize("contentTypeEditor_chooseChildNode").then(function(value){
-                childNodeSelectorOverlayTitle = value;
-            });
 
             mediaTypeResource.getAll().then(function(mediaTypes){
 
@@ -44,23 +39,29 @@
         }
 
         function addChild($event) {
-            var childNodeSelectorOverlay = {
+            
+            var dialog = {
                 view: "itempicker",
-                title: childNodeSelectorOverlayTitle,
                 availableItems: vm.mediaTypes,
                 selectedItems: vm.selectedChildren,
                 position: "target",
                 event: $event,
-                submit: function(model) {
-                    vm.selectedChildren.push(model.selectedItem);
-                    $scope.model.allowedContentTypes.push(model.selectedItem.id);
+                submit: function (model) {
+                    if (model.selectedItem) {
+                        vm.selectedChildren.push(model.selectedItem);
+                        $scope.model.allowedContentTypes.push(model.selectedItem.id);
+                    }
                     overlayService.close();
                 },
                 close: function() {
                     overlayService.close();
                 }
             };
-            overlayService.open(childNodeSelectorOverlay);
+
+            localizationService.localize("contentTypeEditor_chooseChildNode").then(value => {
+                dialog.title = value;
+                overlayService.open(dialog);
+            });
         }
 
         function removeChild(selectedChild, index) {

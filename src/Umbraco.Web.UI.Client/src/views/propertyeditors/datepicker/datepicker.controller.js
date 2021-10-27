@@ -24,7 +24,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         };
 
         // map the user config
-        $scope.model.config = angular.extend(config, $scope.model.config);
+        $scope.model.config = Utilities.extend(config, $scope.model.config);;
         
         // ensure the format doesn't get overwritten with an empty string
         if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
@@ -55,7 +55,9 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         };
 
         // Don't show calendar if date format has been set to only time
-        if ($scope.model.config.format === "HH:mm:ss" || $scope.model.config.format === "HH:mm" || $scope.model.config.format === "HH") {
+        const timeFormat = $scope.model.config.format.toLowerCase();
+        const timeFormatPattern = /^h{1,2}:m{1,2}:s{1,2}\s?a?$/gmi;
+        if (timeFormat.match(timeFormatPattern)) {            
             $scope.datePickerConfig.enableTime = true;
             $scope.datePickerConfig.noCalendar = true;
         }
@@ -159,7 +161,14 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         else {
             $scope.model.value = null;
         }
-        angularHelper.getCurrentForm($scope).$setDirty();
+
+        setDirty();
+    }
+
+    function setDirty() {
+        if ($scope.datePickerForm) {
+            $scope.datePickerForm.datepicker.$setDirty();
+        }
     }
 
     /** Sets the value of the date picker control adn associated viewModel objects based on the model value */

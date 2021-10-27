@@ -21,14 +21,6 @@ Use this directive to render a ui component for selecting child items to a paren
                 on-remove="vm.removeChild">
         </umb-child-selector>
 
-        <!-- use overlay to select children from -->
-        <umb-overlay
-           ng-if="vm.overlay.show"
-           model="vm.overlay"
-           position="target"
-           view="vm.overlay.view">
-        </umb-overlay>
-
 	</div>
 </pre>
 
@@ -37,7 +29,7 @@ Use this directive to render a ui component for selecting child items to a paren
 	(function () {
 		"use strict";
 
-		function Controller() {
+		function Controller(overlayService) {
 
             var vm = this;
 
@@ -64,23 +56,29 @@ Use this directive to render a ui component for selecting child items to a paren
             vm.removeChild = removeChild;
 
             function addChild($event) {
-                vm.overlay = {
+                
+                const dialog = {
                     view: "itempicker",
                     title: "Choose child",
                     availableItems: vm.availableChildren,
                     selectedItems: vm.selectedChildren,
                     event: $event,
-                    show: true,
                     submit: function(model) {
-
-                        // add selected child
-                        vm.selectedChildren.push(model.selectedItem);
+                        
+                        if (model.selectedItem) {
+                            // add selected child
+                            vm.selectedChildren.push(model.selectedItem);
+                        }
 
                         // close overlay
-                        vm.overlay.show = false;
-                        vm.overlay = null;
+                        overlayService.close();
+                    },
+                    close: function() {
+                        overlayService.close();
                     }
                 };
+
+                overlayService.open(dialog);
             }
 
             function removeChild($index) {
@@ -128,14 +126,14 @@ Use this directive to render a ui component for selecting child items to a paren
             scope.dialogModel = {};
             scope.showDialog = false;
 
-            scope.removeChild = function(selectedChild, $index) {
-               if(scope.onRemove) {
+            scope.removeChild = (selectedChild, $index) => {
+               if (scope.onRemove) {
                   scope.onRemove(selectedChild, $index);
                }
             };
 
-            scope.addChild = function($event) {
-               if(scope.onAdd) {
+            scope.addChild = $event => {
+               if (scope.onAdd) {
                   scope.onAdd($event);
                }
             };
@@ -143,16 +141,16 @@ Use this directive to render a ui component for selecting child items to a paren
             function syncParentName() {
 
               // update name on available item
-              angular.forEach(scope.availableChildren, function(availableChild){
-                if(availableChild.id === scope.parentId) {
-                  availableChild.name = scope.parentName;
+              Utilities.forEach(scope.availableChildren, availableChild => {
+                if (availableChild.id === scope.parentId) {
+                   availableChild.name = scope.parentName;
                 }
               });
 
               // update name on selected child
-              angular.forEach(scope.selectedChildren, function(selectedChild){
-                if(selectedChild.id === scope.parentId) {
-                  selectedChild.name = scope.parentName;
+              Utilities.forEach(scope.selectedChildren, selectedChild => {
+                if (selectedChild.id === scope.parentId) {
+                   selectedChild.name = scope.parentName;
                 }
               });
 
@@ -161,16 +159,16 @@ Use this directive to render a ui component for selecting child items to a paren
             function syncParentIcon() {
 
               // update icon on available item
-              angular.forEach(scope.availableChildren, function(availableChild){
-                if(availableChild.id === scope.parentId) {
-                  availableChild.icon = scope.parentIcon;
+              Utilities.forEach(scope.availableChildren, availableChild => {
+                if (availableChild.id === scope.parentId) {
+                   availableChild.icon = scope.parentIcon;
                 }
               });
 
               // update icon on selected child
-              angular.forEach(scope.selectedChildren, function(selectedChild){
-                if(selectedChild.id === scope.parentId) {
-                  selectedChild.icon = scope.parentIcon;
+              Utilities.forEach(scope.selectedChildren, selectedChild => {
+                if (selectedChild.id === scope.parentId) {
+                   selectedChild.icon = scope.parentIcon;
                 }
               });
 

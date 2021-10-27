@@ -1,10 +1,13 @@
 ﻿describe('serverValidationManager tests', function () {
-    var serverValidationManager;
+    var $rootScope, serverValidationManager, $timeout;
 
     beforeEach(module('umbraco.services'));
     
     beforeEach(inject(function ($injector) {
-        serverValidationManager = $injector.get('serverValidationManager');        
+        $rootScope = $injector.get('$rootScope');
+        $timeout = $injector.get('$timeout');
+        serverValidationManager = $injector.get('serverValidationManager');
+        serverValidationManager.clear();
     }));
 
     describe('managing field validation errors', function () {
@@ -314,6 +317,158 @@
 
     });
 
+    describe('managing complex editor validation errors', function () {
+
+        // this root element doesn't have it's own attached errors, instead it has model state just 
+        // showing that it has errors within it's nested properties. that ModelState is automatically
+        // added on the server side.
+        var nonRootLevelComplexValidationMsg = `[
+    {
+        "$elementTypeAlias": "addressBook",
+		"$id": "34E3A26C-103D-4A05-AB9D-7E14032309C3",
+        "addresses":
+        [
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			},
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "7170A4DD-2441-4B1B-A8D3-437D75C4CBC9",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			}
+        ],
+        "ModelState":
+        {
+            "_Properties.addresses.invariant.null": [
+                ""
+            ]
+        }
+    }
+]`;
+
+        it('create dictionary of id to ModelState', function () {
+
+            //arrange
+            var complexValidationMsg = `[
+    {
+        "$elementTypeAlias": "addressBook",
+		"$id": "34E3A26C-103D-4A05-AB9D-7E14032309C3",
+        "addresses":
+        [
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			},
+			{
+				"$elementTypeAlias": "addressInfo",
+				"$id": "7170A4DD-2441-4B1B-A8D3-437D75C4CBC9",
+				"ModelState":
+                {
+                    "_Properties.city.invariant.null.country": [
+                        "City is not in Australia"
+                    ],
+                    "_Properties.city.invariant.null.capital": [
+                        "Not a capital city"
+                    ]
+                }
+			}
+        ],
+        "ModelState":
+        {
+            "_Properties.addresses.invariant.null.counter": [
+                "Must have at least 3 addresses"
+            ],
+            "_Properties.bookName.invariant.null.book": [
+                "Invalid address book name"
+            ]
+        }
+    }
+]`;
+            
+            //act 
+            var ms = serverValidationManager.parseComplexEditorError(complexValidationMsg, "myBlockEditor");
+
+            //assert
+            expect(ms.length).toEqual(3);
+            expect(ms[0].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3");
+            expect(ms[1].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
+            expect(ms[2].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
+
+        });
+
+        it('create dictionary of id to ModelState with inherited errors', function () {
+
+            //act 
+            var ms = serverValidationManager.parseComplexEditorError(nonRootLevelComplexValidationMsg, "myBlockEditor");
+
+            //assert
+            expect(ms.length).toEqual(3);
+            expect(ms[0].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3");
+            var item0ModelState = ms[0].modelState;
+            expect(Object.keys(item0ModelState).length).toEqual(1);
+            expect(item0ModelState["_Properties.addresses.invariant.null"].length).toEqual(1);
+            expect(item0ModelState["_Properties.addresses.invariant.null"][0]).toEqual("");
+            expect(ms[1].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1");
+            expect(ms[2].validationPath).toEqual("myBlockEditor/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/7170A4DD-2441-4B1B-A8D3-437D75C4CBC9");
+
+        });
+
+        it('add errors for ModelState with inherited errors', function () {
+
+            //act 
+            let modelState = {
+                "_Properties.blockFeatures.invariant.null": [
+                    nonRootLevelComplexValidationMsg
+                ]
+            };
+            serverValidationManager.addErrorsForModelState(modelState);
+
+            //assert
+            var propertyErrors = [
+                "blockFeatures",
+                "blockFeatures/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses",
+                "blockFeatures/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city",
+                "blockFeatures/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/7170A4DD-2441-4B1B-A8D3-437D75C4CBC9/city"
+            ]
+            // These will all exist
+            propertyErrors.forEach(x => expect(serverValidationManager.getPropertyError(x)).toBeDefined());
+
+            // These field errors also exist
+            expect(serverValidationManager.getPropertyError(propertyErrors[2], null, "country")).toBeDefined();
+            expect(serverValidationManager.getPropertyError(propertyErrors[2], null, "capital")).toBeDefined();
+            expect(serverValidationManager.getPropertyError(propertyErrors[3], null, "country")).toBeDefined();
+            expect(serverValidationManager.getPropertyError(propertyErrors[3], null, "capital")).toBeDefined();
+        });
+
+    });
+
     describe('validation error subscriptions', function() {
 
         it('can subscribe to a field error', function() {
@@ -327,7 +482,9 @@
                     allErrors: allErrors
                 };
             }, null);
+
             
+
             //act
             serverValidationManager.addFieldError("Name", "Required");
             serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1", null);
@@ -348,7 +505,9 @@
             var cb2 = function () {
             };
             serverValidationManager.subscribe(null, null, "Name", cb1, null);
+            
             serverValidationManager.subscribe(null, null, "Title", cb2, null);
+            
 
             //act
             serverValidationManager.addFieldError("Name", "Required");
@@ -374,6 +533,7 @@
             var args1;
             var args2;
             var numCalled = 0;
+            var numCalledWithErrors = 0;
 
             //arrange
             serverValidationManager.subscribe("myProperty", null, "value1", function (isValid, propertyErrors, allErrors) {
@@ -384,15 +544,19 @@
                 };
             }, null);
             
+            
             serverValidationManager.subscribe("myProperty", null, "", function (isValid, propertyErrors, allErrors) {
                 numCalled++;
+                if (propertyErrors.length > 0) {
+                    numCalledWithErrors++;
+                }
                 args2 = {
                     isValid: isValid,
                     propertyErrors: propertyErrors,
                     allErrors: allErrors
                 };
             }, null);
-
+            
             //act
             serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1", null);
             serverValidationManager.addPropertyError("myProperty", null, "value2", "Some value 2", null);
@@ -415,28 +579,36 @@
             expect(args2.propertyErrors[0].errorMsg).toEqual("Some value 1");
             expect(args2.propertyErrors[1].errorMsg).toEqual("Some value 2");
             expect(args2.allErrors.length).toEqual(2);
-            //Even though only 2 errors are added, the callback is called 3 times because any call to addPropertyError will invoke the callback
-            // if the property has errors existing.
-            expect(numCalled).toEqual(3);
+            //3 errors are added but a call to subscribe also calls the callback
+            expect(numCalled).toEqual(4);
+            expect(numCalledWithErrors).toEqual(3);
         });
 
         it('can subscribe to a culture error for both a property and its sub field', function () {
             var args1;
             var args2;
             var numCalled = 0;
+            var numCalledWithErrors = 0;
 
             //arrange
             serverValidationManager.subscribe(null, "en-US", null, function (isValid, propertyErrors, allErrors) {
                 numCalled++;
+                if (propertyErrors.length > 0) {
+                    numCalledWithErrors++;
+                }
                 args1 = {
                     isValid: isValid,
                     propertyErrors: propertyErrors,
                     allErrors: allErrors
                 };
             }, null);
+            
 
             serverValidationManager.subscribe(null, "es-ES", null, function (isValid, propertyErrors, allErrors) {
                 numCalled++;
+                if (propertyErrors.length > 0) {
+                    numCalledWithErrors++;
+                }
                 args2 = {
                     isValid: isValid,
                     propertyErrors: propertyErrors,
@@ -445,20 +617,162 @@
             }, null);
 
             //act
-            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1", null);
-            serverValidationManager.addPropertyError("myProperty", "en-US", "value1", "Some value 1", null);
-            serverValidationManager.addPropertyError("myProperty", "en-US", "value2", "Some value 2", null);
-            serverValidationManager.addPropertyError("myProperty", "fr-FR", "", "Some value 3", null);
+            serverValidationManager.addPropertyError("myProperty", null, "value1", "Some value 1", null);       // doesn't match
+            serverValidationManager.addPropertyError("myProperty", "en-US", "value1", "Some value 1", null);    // matches callback 1
+            serverValidationManager.addPropertyError("myProperty", "en-US", "value2", "Some value 2", null);    // matches callback 1
+            serverValidationManager.addPropertyError("myProperty", "fr-FR", "", "Some value 3", null);          // doesn't match - but all callbacks still execute
 
             //assert
-            expect(args1).not.toBeUndefined();
             expect(args1.isValid).toBe(false);
+            expect(args2.isValid).toBe(true); // no errors registered for this callback
 
-            expect(args2).toBeUndefined();
-
-            expect(numCalled).toEqual(2);
+            expect(numCalled).toEqual(10); // both subscriptions will be called once per addPropertyError and also called on subscribe
+            expect(numCalledWithErrors).toEqual(3); // the first subscription is called 3 times with errors because the 4th time we call addPropertyError all callbacks still execute
         });
-        
+
+        it('can subscribe to a property validation path prefix', function () {
+            var callbackA = [];
+            var callbackB = [];
+
+            //arrange
+            serverValidationManager.subscribe("myProperty", null, null, function (isValid, propertyErrors, allErrors) {
+                if (propertyErrors.length > 0) {
+                    callbackA.push(propertyErrors);
+                }
+            }, null, { matchType: "prefix" });
+
+            serverValidationManager.subscribe("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses", null, null, function (isValid, propertyErrors, allErrors) {
+                if (propertyErrors.length > 0) {
+                    callbackB.push(propertyErrors);
+                }
+            }, null, { matchType: "prefix" });
+
+            //act
+            // will match A:
+            serverValidationManager.addPropertyError("myProperty", null, null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty", null, "value1", "value error", null);
+            // will match A + B
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", null, null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", null, "value1", "value error", null);
+            // won't match:
+            serverValidationManager.addPropertyError("myProperty", "en-US", null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", "en-US", null, "property error", null);
+            serverValidationManager.addPropertyError("otherProperty", null, null, "property error", null);
+            serverValidationManager.addPropertyError("otherProperty", null, "value1", "value error", null);
+
+            //assert
+
+            // both will be called each time addPropertyError is called
+            expect(callbackA.length).toEqual(8);
+            expect(callbackB.length).toEqual(6); // B - will only be called 6 times with errors because the first 2 calls to addPropertyError haven't added errors for B yet
+            expect(callbackA[callbackA.length - 1].length).toEqual(4); // 4 errors for A
+            expect(callbackB[callbackB.length - 1].length).toEqual(2); // 2 errors for B
+
+            // clear the data and notify
+            callbackA = [];
+            callbackB = [];
+
+            serverValidationManager.notify();
+            $timeout.flush();
+
+            expect(callbackA.length).toEqual(1);
+            expect(callbackB.length).toEqual(1);
+            expect(callbackA[0].length).toEqual(4); // 4 errors for A
+            expect(callbackB[0].length).toEqual(2); // 2 errors for B
+            
+        });
+
+        it('can subscribe to a property validation path suffix', function () {
+            var callbackA = [];
+            var callbackB = [];
+
+            //arrange
+            serverValidationManager.subscribe("myProperty", null, null, function (isValid, propertyErrors, allErrors) {
+                if (propertyErrors.length > 0) {
+                    callbackA.push(propertyErrors);
+                }
+            }, null, { matchType: "suffix" });
+
+            serverValidationManager.subscribe("city", null, null, function (isValid, propertyErrors, allErrors) {
+                if (propertyErrors.length > 0) {
+                    callbackB.push(propertyErrors);
+                }
+            }, null, { matchType: "suffix" });
+
+            //act
+            // will match A:
+            serverValidationManager.addPropertyError("myProperty", null, null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty", null, "value1", "value error", null);
+            // will match B
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", null, null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", null, "value1", "value error", null);
+            // won't match:
+            serverValidationManager.addPropertyError("myProperty", "en-US", null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", "en-US", null, "property error", null);
+            serverValidationManager.addPropertyError("otherProperty", null, null, "property error", null);
+            serverValidationManager.addPropertyError("otherProperty", null, "value1", "value error", null);
+
+            //assert
+
+            // both will be called each time addPropertyError is called
+            expect(callbackA.length).toEqual(8);
+            expect(callbackB.length).toEqual(6); // B - will only be called 6 times with errors because the first 2 calls to addPropertyError haven't added errors for B yet
+            expect(callbackA[callbackA.length - 1].length).toEqual(2); // 2 errors for A
+            expect(callbackB[callbackB.length - 1].length).toEqual(2); // 2 errors for B
+
+            // clear the data and notify
+            callbackA = [];
+            callbackB = [];
+
+            serverValidationManager.notify();
+            $timeout.flush();
+
+            expect(callbackA.length).toEqual(1);
+            expect(callbackB.length).toEqual(1);
+            expect(callbackA[0].length).toEqual(2); // 2 errors for A
+            expect(callbackB[0].length).toEqual(2); // 2 errors for B
+
+        });
+
+        it('can subscribe to a property validation path contains', function () {
+            var callbackA = [];
+
+            //arrange
+            serverValidationManager.subscribe("addresses", null, null, function (isValid, propertyErrors, allErrors) {
+                if (propertyErrors.length > 0) {
+                    callbackA.push(propertyErrors);
+                }
+            }, null, { matchType: "contains" });
+
+            //act
+            // will match A:
+            serverValidationManager.addPropertyError("addresses", null, null, "property error", null);
+            serverValidationManager.addPropertyError("addresses", null, "value1", "value error", null);
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", null, null, "property error", null);
+            serverValidationManager.addPropertyError("myProperty/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", null, "value1", "value error", null);
+            // won't match:
+            serverValidationManager.addPropertyError("addresses", "en-US", null, "property error", null);
+            serverValidationManager.addPropertyError("addresses/34E3A26C-103D-4A05-AB9D-7E14032309C3/addresses/FBEAEE8F-4BC9-43EE-8B81-FCA8978850F1/city", "en-US", null, "property error", null);
+            serverValidationManager.addPropertyError("otherProperty", null, null, "property error", null);
+            serverValidationManager.addPropertyError("otherProperty", null, "value1", "value error", null);
+
+            //assert
+
+            // both will be called each time addPropertyError is called
+            expect(callbackA.length).toEqual(8);
+            expect(callbackA[callbackA.length - 1].length).toEqual(4); // 4 errors for A
+
+            // clear the data and notify
+            callbackA = [];
+
+            serverValidationManager.notify();
+            $timeout.flush();
+
+            expect(callbackA.length).toEqual(1);
+            expect(callbackA[0].length).toEqual(4); // 4 errors for A
+
+        });
+
         // TODO: Finish testing the rest!
 
     });

@@ -5,6 +5,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Persistence.Mappers;
@@ -27,6 +28,13 @@ namespace Umbraco.Core
         /// <param name="composition">The composition.</param>
         public static CacheRefresherCollectionBuilder CacheRefreshers(this Composition composition)
             => composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the map definitions collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static MapDefinitionCollectionBuilder MapDefinitions(this Composition composition)
+            => composition.WithCollectionBuilder<MapDefinitionCollectionBuilder>();
 
         /// <summary>
         /// Gets the mappers collection builder.
@@ -64,7 +72,7 @@ namespace Umbraco.Core
             => composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
         /// <summary>
-        /// Gets the url segment providers collection builder.
+        /// Gets the URL segment providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static UrlSegmentProviderCollectionBuilder UrlSegmentProviders(this Composition composition)

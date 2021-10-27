@@ -17,6 +17,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using System.Web.Http.Controllers;
 
 namespace Umbraco.Web.Editors
 {
@@ -26,6 +27,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.RelationTypes)]
     [EnableOverrideAuthorization]
+    [RelationTypeControllerConfiguration]
     public class RelationTypeController : BackOfficeNotificationsController
     {
         public RelationTypeController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
@@ -34,22 +36,65 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets a relation type by ID.
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class RelationTypeControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
+        }
+
+        /// <summary>
+        /// Gets a relation type by id
         /// </summary>
         /// <param name="id">The relation type ID.</param>
         /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
         public RelationTypeDisplay GetById(int id)
         {
             var relationType = Services.RelationService.GetRelationTypeById(id);
-
             if (relationType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
+            return Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
+        }
 
-            var display = Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
-            
-            return display;
+        /// <summary>
+        /// Gets a relation type by guid
+        /// </summary>
+        /// <param name="id">The relation type ID.</param>
+        /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        public RelationTypeDisplay GetById(Guid id)
+        {
+            var relationType = Services.RelationService.GetRelationTypeById(id);
+            if (relationType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
+        }
+
+        /// <summary>
+        /// Gets a relation type by udi
+        /// </summary>
+        /// <param name="id">The relation type ID.</param>
+        /// <returns>Returns the <see cref="RelationTypeDisplay"/>.</returns>
+        public RelationTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var relationType = Services.RelationService.GetRelationTypeById(guidUdi.Guid);
+            if (relationType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return Mapper.Map<IRelationType, RelationTypeDisplay>(relationType);
         }
 
         public PagedResult<RelationDisplay> GetPagedResults(int id, int pageNumber = 1, int pageSize = 100)
@@ -100,7 +145,7 @@ namespace Umbraco.Web.Editors
         /// <returns>A <see cref="HttpResponseMessage"/> containing the persisted relation type's ID.</returns>
         public HttpResponseMessage PostCreate(RelationTypeSave relationType)
         {
-            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(true), relationType.IsBidirectional, relationType.ChildObjectType, relationType.ParentObjectType);
+            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(true), relationType.IsBidirectional, relationType.ParentObjectType, relationType.ChildObjectType);
 
             try
             {
@@ -110,7 +155,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
+                Logger.Error<string>(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
                 return Request.CreateNotificationValidationErrorResponse("Error creating relation type.");
             }
         }
@@ -141,7 +186,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error(GetType(), ex, "Error saving relation type with {Id}", relationType.Id);
+                Logger.Error<object>(GetType(), ex, "Error saving relation type with {Id}", relationType.Id);
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Something went wrong when saving the relation type"));
             }
         }

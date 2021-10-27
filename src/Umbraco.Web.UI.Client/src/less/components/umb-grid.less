@@ -392,7 +392,7 @@
 // EDITOR PLACEHOLDER
 // -------------------------
 .umb-grid .umb-editor-placeholder {
-    min-height: 65px;
+    min-height: 110px;
     padding: 20px;
     padding-bottom: 30px;
     position: relative;
@@ -400,19 +400,21 @@
     border: 4px dashed @gray-8;
     text-align: center;
     text-align: -moz-center;
-    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.umb-grid .umb-editor-placeholder i {
+.umb-grid .umb-editor-placeholder .icon {
     color: @gray-8;
     font-size: 85px;
-    line-height: 85px;
+    line-height: 1;
     display: block;
-    margin-bottom: 10px;
+    margin: 10px auto;
 }
 
 .umb-grid .umb-editor-preview {
     position: relative;
+    width: 100%;
 
     .umb-editor-preview-overlay {
         cursor: pointer;
@@ -474,9 +476,19 @@
     }
 }
 
+// Control states 
+.umb-grid-media--controls {
+    display:none;
+    position: absolute;
+    top:0.5rem;
+    right:0.5rem;    
+}
 
-
-
+.umb-grid .umb-row .umb-control.-active {
+    .umb-grid-media--controls {
+        display:flex;
+    }
+}
 
 // Title bar and tools
 .umb-grid .umb-row-title-bar {
@@ -553,12 +565,11 @@
 // ICONS
 // -------------------------
 .umb-grid .iconBox {
-    padding: 4px 6px;
-    display: inline-block;
-    cursor: pointer;
+    padding: 6px;
+    display: flex;
     border-radius: 200px;
     border: 1px solid @ui-action-discreet-border;
-    margin: 2px;
+    margin: 0 auto;
 
     &:hover, &:hover * {
         background: @ui-action-discreet-type-hover !important;
@@ -587,8 +598,6 @@
     -webkit-appearance: none;
     background-image: linear-gradient(to bottom,@gray-9,@gray-7);
     background-repeat: repeat-x;
-    zoom: 1;
-    border-color: @gray-7 @gray-7 @gray-6;
     border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
     border-radius: 3px;
@@ -596,9 +605,10 @@
 }
 
 .umb-grid .iconBox i {
-    font-size: 16px !important;
-    color: @gray-3 ;
+    color: @gray-3;
     display: block;
+    font-size: 16px;
+    line-height: inherit;
 }
 
 .umb-grid .help-text {
@@ -608,8 +618,6 @@
     display: inline-block;
     clear: both;
 }
-
-
 
 // TINYMCE EDITOR
 // -------------------------
@@ -751,9 +759,19 @@
     margin-right: 5px;
     position: relative;
     cursor: pointer;
-    display:inline-block;
+    display: inline-block;
 }
 
+.umb-grid .cell-tools,
+.umb-grid .umb-control-tool {
+    .btn-icon {
+        padding: 0;
+    }
+}
+
+.umb-grid .umb-control-tool .btn-icon {
+    color: @white;
+}
 
 
 // Template
@@ -820,8 +838,8 @@
             position: absolute;
             width: 100%;
             left: 0;
-            bottom: -25px;
             padding-top: 15px;
+            top: 15px;
         }
 
         .help-text {
@@ -1006,8 +1024,6 @@
     color: @gray-6;
     display: block;
 }
-
-
 
 // Configuration specific styles
 // -------------------------

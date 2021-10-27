@@ -174,7 +174,6 @@ AND umbracoNode.nodeObjectType = @objectType",
                 });
             }
 
-
             //Insert Tabs
             foreach (var propertyGroup in entity.PropertyGroups)
             {
@@ -366,7 +365,7 @@ AND umbracoNode.id <> @id",
                     // see http://issues.umbraco.org/issue/U4-8663
                     orphanPropertyTypeIds = Database.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete })
                         .Select(x => x.Id).ToList();
-                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId=NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete });
+                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId = NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = groupsToDelete });
 
                     // now we can delete the tabs
                     Database.Delete<PropertyTypeGroupDto>("WHERE id IN (@ids)", new { ids = groupsToDelete });
@@ -448,8 +447,14 @@ AND umbracoNode.id <> @id",
                     // The composed property is only considered segment variant when the base content type is also segment variant.
                     // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
                     var target = newContentTypeVariation & composedPropertyType.Variations;
+                    // Determine the previous variation
+                    // We have to compare with the old content type variation because the composed property might already have changed
+                    // Example: A property with variations in an element type with variations is used in a document without
+                    //          when you enable variations the property has already enabled variations from the element type,
+                    //          but it's still a change from nothing because the document did not have variations, but it does now.
+                    var from = oldContentTypeVariation & composedPropertyType.Variations;
 
-                    propertyTypeVariationChanges[composedPropertyType.Id] = (composedPropertyType.Variations, target);
+                    propertyTypeVariationChanges[composedPropertyType.Id] = (from, target);
                 }
             }
 
@@ -1184,7 +1189,7 @@ AND umbracoNode.id <> @id",
         {
             // first clear dependencies
             Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
-            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyTypeId });
+            Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
             // then delete the property type
             Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
@@ -1197,7 +1202,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"Property Type '{pt.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.Error<ContentTypeRepositoryBase<TEntity>, string>("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     pt.Name);
 
                 throw ex;
@@ -1210,7 +1215,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"{typeof(TEntity).Name} '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.Error<ContentTypeRepositoryBase<TEntity>, string, string>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     typeof(TEntity).Name,
                     entity.Name);
 
@@ -1242,7 +1247,7 @@ AND umbracoNode.id <> @id",
                 }
                 else
                 {
-                    Logger.Warn<ContentTypeRepositoryBase<TEntity>>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
+                    Logger.Warn<ContentTypeRepositoryBase<TEntity>, string, string>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
                 }
             }
         }
@@ -1312,7 +1317,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         /// <inheritdoc />
         public bool HasContainerInPath(string contentPath)
         {
-            var ids = contentPath.Split(',').Select(int.Parse).ToArray();
+            var ids = contentPath.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray();
             return HasContainerInPath(ids);
         }
 
@@ -1352,8 +1357,8 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
                 "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @id",
                 "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
-                "DELETE FROM cmsPropertyType WHERE contentTypeId = @id",
-                "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyType + " WHERE contentTypeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyTypeGroup + " WHERE contenttypeNodeId = @id"
             };
             return list;
         }

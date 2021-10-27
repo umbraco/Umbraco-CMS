@@ -44,7 +44,7 @@ namespace Umbraco.Web.Routing
                 if (node != null)
                 {
                     frequest.PublishedContent = node;
-                    Logger.Debug<ContentFinderByUrlAlias>("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, frequest.PublishedContent.Id);
+                    Logger.Debug<ContentFinderByUrlAlias, string, int>("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, frequest.PublishedContent.Id);
                 }
             }
 
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Routing
 
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;
 
-            var test1 = alias.TrimStart('/') + ",";
+            var test1 = alias.TrimStart(Constants.CharArrays.ForwardSlash) + ",";
             var test2 = ",/" + test1; // test2 is ",/alias,"
             test1 = "," + test1; // test1 is ",alias,"
 
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Routing
             }
 
             // TODO: even with Linq, what happens below has to be horribly slow
-            // but the only solution is to entirely refactor url providers to stop being dynamic
+            // but the only solution is to entirely refactor URL providers to stop being dynamic
 
             if (rootNodeId > 0)
             {

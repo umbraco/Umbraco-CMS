@@ -17,7 +17,7 @@
 
             <div ng-switch-default>
                 <p>
-                	<i class="icon-alert red"></i>
+                    <umb-icon icon="icon-alert" class="red"></umb-icon>
                     <strong class="red">
                         <localize key="contentTypeEditor_allDocuments">All Documents</localize>
                     </strong>
@@ -28,10 +28,9 @@
 
                 <hr />
 
-                <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}">
-                </umb-checkbox>
+                <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}"></umb-checkbox>
 
-                <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel" confirm-button-style="danger">
+                <umb-confirm confirm-disabled="!confirmed" confirm-label-key="delete" on-confirm="performDelete" on-cancel="cancel" confirm-button-style="danger">
                 </umb-confirm>
             </div>
         </ng-switch>

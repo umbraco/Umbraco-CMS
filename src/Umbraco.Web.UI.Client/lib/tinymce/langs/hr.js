@@ -144,7 +144,7 @@ tinymce.addI18n('hr',{
 "Insert link": "Umetni poveznicu",
 "Insert\/edit link": "Umetni\/izmijeni poveznicu",
 "Text to display": "Tekst za prikaz",
-"Url": "Url",
+"Url": "URL",
 "Target": "Meta",
 "None": "Ni\u0161ta",
 "New window": "Novi prozor",

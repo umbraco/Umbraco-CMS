@@ -2,12 +2,13 @@
 
     <umb-control-group label="Toolbar" description="Pick the toolbar options that should be available when editing">
         <div ng-repeat="cmd in tinyMceConfig.commands">
-                <umb-checkbox
-                    model="cmd.selected"
-                    on-change="selectCommand(cmd)"
-                    icon-class="mce-ico {{(cmd.isCustom ? ' mce-i-custom ' : ' mce-i-') + cmd.fontIcon}}"
-                    text="{{cmd.name}}"
-                    class="mce-cmd" />
+            <umb-checkbox
+                model="cmd.selected"
+                on-change="selectCommand(cmd)"
+                icon="{{cmd.icon}}"
+                text="{{cmd.name}}"
+                class="mce-cmd">
+            </umb-checkbox>
         </div>
     </umb-control-group>
 
@@ -17,7 +18,9 @@
             <umb-checkbox
                 model="css.selected"
                 on-change="selectStylesheet(css)"
-                text="{{css.name}}"/>
+                text="{{css.name}}">
+            </umb-checkbox>
+
         </div>
     </umb-control-group>
 

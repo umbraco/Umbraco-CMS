@@ -8,7 +8,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
     /// <summary>
     /// Special component used for when MB is disabled with the legacy MB is detected
     /// </summary>
-    internal class DisabledModelsBuilderComponent : IComponent
+    public sealed class DisabledModelsBuilderComponent : IComponent
     {
         private readonly UmbracoFeatures _features;
 

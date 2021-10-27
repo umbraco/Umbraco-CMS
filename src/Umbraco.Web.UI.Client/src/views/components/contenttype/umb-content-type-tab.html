@@ -1,0 +1,71 @@
+<div 
+    ng-click="vm.click()" 
+    class="umb-group-builder__tab" 
+    ng-class="{
+        'is-active': vm.isOpen,
+        'is-inherited': vm.tab.inherited,
+        'is-deletable': vm.allowRemove,
+        'umb-group-builder__tab-handle -sortable': vm.sorting && !vm.tab.inherited,
+        'has-error': vm.tab.hasError }"
+    val-tab="vm.tab"
+    ng-mouseenter="vm.mouseenter()"
+    ng-mouseleave="vm.mouseleave()">
+  <div>
+      <div class="umb-group-builder__tab-inherited-label" ng-if="vm.compositionLabelIsVisible">
+          <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ vm.tab.inheritedFromName }}
+          <span ng-repeat="contentTypeName in vm.tab.parentTabContentTypeNames">
+              <button type="button" class="btn-link btn-small p0" ng-click="vm.clickComposition(vm.tab.parentTabContentTypes[$index])">{{ contentTypeName }}</button>
+              <span ng-if="!$last">, </span>
+          </span>
+      </div>
+      <div class="umb-group-builder__tab-title-wrapper">
+            <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="vm.sorting && !vm.tab.inherited"></i>
+            <i class="umb-group-builder__tab-title-icon icon-merge" ng-if="vm.tab.inherited"></i>
+            <ng-form name="tabNameForm" data-element="tab-name">
+                <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited" title="{{vm.tab.alias}}">{{ vm.tab.name }}</div>
+                <input
+                    ng-if="!vm.tab.inherited"
+                    class="umb-group-builder__group-title-input"
+                    data-element="tab-name-field"
+                    type="text"
+                    localize="placeholder"
+                    placeholder="@placeholders_entername"
+                    name="tabName"
+                    title="{{vm.tab.alias}}"
+                    ng-model="vm.tab.name"
+                    ng-class="{'-placeholder': vm.tab.name == ''}"
+                    ng-disabled="!vm.isOpen || vm.allowChangeName === false"
+                    ng-change="vm.changeName()"
+                    umb-auto-focus
+                    umb-auto-resize
+                    val-server-field="{{ vm.valServerFieldName }}"
+                    data-lpignore="true"
+                    required />
+
+                <div class="umb-group-builder__tab-val-message" ng-messages="tabNameForm.tabName.$error" show-validation-on-submit>
+                    <div class="umb-validation-label" ng-message="valServerField">{{tabNameForm.tabName.errorMsg}}</div>
+                    <div class="umb-validation-label" ng-message="required"><localize key="required"></localize></div>
+                </div>
+            </ng-form>
+
+            <div ng-show="vm.tab.hasError && !vm.isOpen" class="badge">!</div>
+
+            <ng-form name="tabSortOrderForm">
+                <div class="umb-group-builder__tab-sort-order" ng-if="vm.sorting">
+                    <input name="tabSortOrder" type="number" class="umb-property-editor-tiny" style="margin-bottom: 0;" ng-model="vm.tab.sortOrder" ng-disabled="vm.tab.inherited" ng-blur="vm.changeSortOrderValue()" required />
+
+                    <!-- This is a manual validation message not bound to a validator -->
+                    <div class="umb-validation-label -arrow-left" ng-if="tabSortOrderForm.tabSortOrder.$error.required && vm.tab.showSortOrderMissing"><localize key="required"></localize></div>
+                    <div ng-messages="tabSortOrderForm.tabSortOrder.$error" show-validation-on-submit>
+                        <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required"></localize></div>
+                    </div>
+                </div>
+            </ng-form>
+      </div>
+  </div>
+  <div class="umb-group-builder__tab-remove" ng-if="vm.allowRemove">
+      <button type="button" class="btn-reset" ng-click="vm.removeTab()">
+          <i class="icon-trash"></i>
+      </button>
+  </div>
+</div>

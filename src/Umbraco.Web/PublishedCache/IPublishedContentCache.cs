@@ -4,6 +4,11 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.PublishedCache
 {
+    public interface IPublishedContentCache2 : IPublishedContentCache, IPublishedCache2
+    {
+        // NOTE: this is here purely to avoid API breaking changes
+    }
+
     public interface IPublishedContentCache : IPublishedCache
     {
         /// <summary>
@@ -38,16 +43,26 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         /// <param name="preview">A value indicating whether to consider unpublished content.</param>
         /// <param name="contentId">The content unique identifier.</param>
-        /// <returns>The route.</returns>
-        /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
+        /// <returns>A special string formatted route path.</returns>
+        /// <remarks>
+        /// <para>
+        /// The resulting string is a special encoded route string that may contain the domain ID
+        /// for the current route. If a domain is present the string will be prefixed with the domain ID integer, example: {domainId}/route-path-of-item
+        /// </para>
+        /// <para>The value of <paramref name="preview"/> overrides defaults.</para>
+        /// </remarks>
         string GetRouteById(bool preview, int contentId, string culture = null);
 
         /// <summary>
         /// Gets the route for a content identified by its unique identifier.
         /// </summary>
         /// <param name="contentId">The content unique identifier.</param>
-        /// <returns>The route.</returns>
+        /// <returns>A special string formatted route path.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+        /// <para>
+        /// The resulting string is a special encoded route string that may contain the domain ID
+        /// for the current route. If a domain is present the string will be prefixed with the domain ID integer, example: {domainId}/route-path-of-item
+        /// </para>
         string GetRouteById(int contentId, string culture = null);
     }
 }

@@ -5,6 +5,7 @@
           ng-submit="vm.save()"
           novalidate
           val-form-manager>
+
         <umb-editor-view ng-if="!vm.page.loading">
             <umb-editor-header
                 name="vm.content.name"
@@ -22,8 +23,20 @@
                 <umb-box>
                     <umb-box-content>
                         <p ng-bind-html="vm.description"></p>
-                        <umb-property ng-repeat="translation in vm.content.translations" property="translation.property">
-                            <textarea ng-model="translation.translation"></textarea>
+                        <umb-property ng-repeat="translation in vm.content.translations | orderBy:'displayName'" property="translation.property">
+
+                            <textarea rows="2" class="autogrow w-100"
+                                      id="{{translation.property.alias}}"
+                                      ng-model="translation.translation"
+                                      maxlength="1000"
+                                      ng-keyup="vm.change(translation)"
+                                      ng-trim="false"></textarea>
+                            <div class="help" ng-if="translation.nearMaxLimit">
+                                <p tabindex="0">
+                                    <span class="sr-only">{{ translation.displayName }} </span>
+                                    <localize key="textbox_characters_left" tokens="[vm.maxlength - translation.translation.length]" watch-tokens="true">%0% characters left.</localize>
+                                </p>
+                            </div>
                         </umb-property>
                     </umb-box-content>
                 </umb-box>

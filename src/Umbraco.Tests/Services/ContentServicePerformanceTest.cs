@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Services
                     total.AddRange(ServiceContext.ContentService.GetPagedDescendants(content.Id, 0, int.MaxValue, out var _));
                 }
                 TestProfiler.Disable();
-                Current.Logger.Info<ContentServicePerformanceTest>("Returned {Total} items", total.Count);
+                Current.Logger.Info<ContentServicePerformanceTest,int>("Returned {Total} items", total.Count);
             }
         }
 

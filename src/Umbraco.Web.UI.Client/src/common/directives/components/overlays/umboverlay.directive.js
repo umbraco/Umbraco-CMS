@@ -221,6 +221,10 @@ Opens an overlay to show a custom YSOD. </br>
 
                 $timeout(function () {
 
+                    if (!scope.name) {
+                        scope.name = 'overlay';
+                    }
+
                     if (scope.position === "target" && scope.model.event) {
                         setTargetPosition();
 
@@ -280,7 +284,7 @@ Opens an overlay to show a custom YSOD. </br>
                                 templateScope.model = scope.model;
                                 element.html(response.data);
                                 element.show();
-                                $compile(element.contents())(templateScope);
+                                $compile(element)(templateScope);
                             });
                     }
                 }
@@ -403,11 +407,15 @@ Opens an overlay to show a custom YSOD. </br>
 
             function setTargetPosition() {
 
-                var container = $("#contentwrapper");
-                var containerLeft = container[0].offsetLeft;
-                var containerRight = containerLeft + container[0].offsetWidth;
-                var containerTop = container[0].offsetTop;
-                var containerBottom = containerTop + container[0].offsetHeight;
+                var overlay = $(scope.model.event.target).closest('.umb-overlay');
+                var container = overlay.length > 0 ? overlay : $("#contentwrapper");
+
+                let rect = container[0].getBoundingClientRect();
+
+                var containerLeft = rect.left;
+                var containerRight = containerLeft + rect.width;
+                var containerTop = rect.top;
+                var containerBottom = containerTop + rect.height;
 
                 var mousePositionClickX = null;
                 var mousePositionClickY = null;
@@ -430,8 +438,9 @@ Opens an overlay to show a custom YSOD. </br>
                 elementWidth = el[0].clientWidth;
 
                 // move element to this position
-                position.left = mousePositionClickX - (elementWidth / 2);
-                position.top = mousePositionClickY - (elementHeight / 2);
+                // when using hotkey it fallback to center of container
+                position.left = mousePositionClickX ? mousePositionClickX - (elementWidth / 2) : (containerLeft + containerRight) / 2 - (elementWidth / 2);
+                position.top = mousePositionClickY ? mousePositionClickY - (elementHeight / 2) : (containerTop + containerBottom) / 2 - (elementHeight / 2);
 
                 // check to see if element is outside screen
                 // outside right
@@ -459,11 +468,12 @@ Opens an overlay to show a custom YSOD. </br>
                 }
 
                 el.css(position);
+                el.css("visibility", "visible");
             }
 
             scope.submitForm = function (model) {
                 if (scope.model.submit) {
-                    if (formHelper.submitForm({ scope: scope, skipValidation: scope.model.skipFormValidation })) {
+                    if (formHelper.submitForm({ scope: scope, skipValidation: scope.model.skipFormValidation, keepServerValidation: true })) {
 
                         if (scope.model.confirmSubmit && scope.model.confirmSubmit.enable && !scope.directive.enableConfirmButton) {
                             //wrap in a when since we don't know if this is a promise or not
@@ -530,6 +540,7 @@ Opens an overlay to show a custom YSOD. </br>
                 view: "=",
                 position: "@",
                 size: "=?",
+                name: "=?",
                 parentScope: "=?"
             },
             link: link

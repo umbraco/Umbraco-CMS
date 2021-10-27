@@ -91,6 +91,7 @@
   {
     $src = "$($this.SolutionRoot)\src"
     $log = "$($this.BuildTemp)\belle.log"
+	
 
     Write-Host "Compile Belle"
     Write-Host "Logging to $log"
@@ -125,7 +126,23 @@
         $error.Clear()
 
         Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
-        npx gulp build --buildversion=$this.Version.Release >> $log 2>&1
+        npm run build --buildversion=$this.Version.Release >> $log 2>&1
+		
+		# We can ignore this warning, we need to update to node 12 at some point - https://github.com/jsdom/jsdom/issues/2939
+		$indexes = [System.Collections.ArrayList]::new()
+		$index = 0;
+		$error | ForEach-Object {
+			# Find which of the errors is the ExperimentalWarning
+			if($_.ToString().Contains("ExperimentalWarning: The fs.promises API is experimental")) {
+				[void]$indexes.Add($index)
+			}
+			$index++
+		}
+		$indexes | ForEach-Object {
+			# Loop through the list of indexes and remove the errors that we expect and feel confident we can ignore
+			$error.Remove($error[$_])
+		}
+		
         if (-not $?) { throw "Failed to build" } # that one is expected to work
     } finally {
         Pop-Location
@@ -336,6 +353,14 @@
       "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" `
       > $null
     if (-not $?) { throw "Failed to zip UmbracoCms." }
+	
+    Write-Host "Zip cms cloud"
+	$this.CopyFile("$($this.SolutionRoot)\build\NuSpecs\tools\Web.config.cloud.xdt", "$tmp\WebApp\Web.config.install.xdt")
+    &$this.BuildEnv.Zip a -r "$out\UmbracoCms.$($this.Version.Semver).Cloud.zip" `
+      "$tmp\WebApp\*" `
+      "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" `
+      > $null
+    if (-not $?) { throw "Failed to zip UmbracoCms." }
   })
 
   $ubuild.DefineMethod("PrepareBuild",
@@ -438,14 +463,11 @@
     Write-Host "Prepare C# Documentation"
 
     $src = "$($this.SolutionRoot)\src"
-      $tmp = $this.BuildTemp
-      $out = $this.BuildOutput
+    $tmp = $this.BuildTemp
+    $out = $this.BuildOutput
     $DocFxJson = Join-Path -Path $src "\ApiDocs\docfx.json"
     $DocFxSiteOutput = Join-Path -Path $tmp "\_site\*.*"
 
-
-	#restore nuget packages
-	$this.RestoreNuGet()
     # run DocFx
     $DocFx = $this.BuildEnv.DocFx
 
@@ -463,17 +485,22 @@
     $src = "$($this.SolutionRoot)\src"
     $out = $this.BuildOutput
 
+    # Check if the solution has been built		
+    if (!(Test-Path "$src\Umbraco.Web.UI.Client\node_modules")) {throw "Umbraco needs to be built before generating the Angular Docs"}
+
     "Moving to Umbraco.Web.UI.Docs folder"
-    cd ..\src\Umbraco.Web.UI.Docs
+    cd $src\Umbraco.Web.UI.Docs
 
     "Generating the docs and waiting before executing the next commands"
 	& npm install
     & npx gulp docs
 
+    Pop-Location
+    
     # change baseUrl
     $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
     $IndexPath = "./api/index.html"
-    (Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
+    (Get-Content $IndexPath).replace('origin + location.href.substr(origin.length).replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
 
     # zip it
     & $this.BuildEnv.Zip a -tzip -r "$out\ui-docs.zip" "$src\Umbraco.Web.UI.Docs\api\*.*"
@@ -535,7 +562,6 @@
   # run
   if (-not $get)
   {
-cd
     if ($command.Length -eq 0)
     {
       $command = @( "Build" )

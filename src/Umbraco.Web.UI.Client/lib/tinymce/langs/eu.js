@@ -150,7 +150,7 @@ tinymce.addI18n('eu',{
 "Insert link": "Esteka txertatu",
 "Insert\/edit link": "Esteka txertatu\/editatu",
 "Text to display": "Bistaratzeko testua",
-"Url": "Url",
+"Url": "URL",
 "Target": "Target",
 "None": "Bat ere ez",
 "New window": "Lehio berria",

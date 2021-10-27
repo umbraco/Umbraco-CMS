@@ -41,6 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoadTestComponent.cs" />
+    <Compile Include="LoadTestComposer.cs" />
+    <Compile Include="LoadTestController.cs" />
     <Compile Include="SegmentTestController.cs" />
     <Compile Include="UmbracoTestDataController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

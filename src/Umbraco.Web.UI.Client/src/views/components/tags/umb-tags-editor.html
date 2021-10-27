@@ -1,5 +1,6 @@
-<div>
+<div class="umb-tags-editor">
     <ng-form name="vm.tagEditorForm">
+
         <div ng-if="vm.isLoading">
             <localize key="loading">Loading</localize>...
         </div>
@@ -11,7 +12,11 @@
             <span ng-repeat="tag in vm.viewModel track by $index" class="label label-primary tag" ng-keyup="vm.onKeyUpOnTag(tag, $event)" tabindex="0">
                 <span ng-bind-html="tag"></span>
 
-                <i class="icon-trash" ng-click="vm.showPrompt($index, tag)" localize="title" title="@buttons_deleteTag"></i>
+                <umb-icon icon="icon-trash"
+                          ng-click="vm.showPrompt($index, tag)"
+                          localize="title"
+                          title="@buttons_deleteTag">
+                </umb-icon>
 
                 <umb-confirm-action ng-if="vm.promptIsVisible === $index"
                                     direction="left"
@@ -26,6 +31,8 @@
                    ng-model="vm.tagToAdd"
                    ng-keydown="vm.addTagOnEnter($event)"
                    ng-blur="vm.addTag()"
+                   ng-maxlength="200"
+                   maxlength="200"
                    localize="placeholder"
                    placeholder="@placeholders_enterTags" />
 
