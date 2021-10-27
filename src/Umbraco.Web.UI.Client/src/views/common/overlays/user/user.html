@@ -11,9 +11,8 @@
 
         <umb-button
             alias="editUser"
-            type="link"
-            href="#/users/users/user/{{user.id}}"
-            action="model.close()"
+            type="button"
+            action="editUser()"
             button-style="action"
             label="Edit"
             label-key="general_edit"
@@ -75,7 +74,7 @@
                     <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
                 </button>
             </div>
-            
+
         </div>
 
     </div>
