@@ -2,10 +2,13 @@
 using System.Data.SqlServerCe;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -34,9 +37,9 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void SingleReadLockTest()
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = (Scope)ScopeProvider.CreateScope())
             {
-                scope.ReadLock(Constants.Locks.Servers);
+                scope.EagerReadLock(Constants.Locks.Servers);
                 scope.Complete();
             }
         }
@@ -57,11 +60,11 @@ namespace Umbraco.Tests.Persistence
                 var ic = i; // capture
                 threads[i] = new Thread(() =>
                 {
-                    using (var scope = ScopeProvider.CreateScope())
+                    using (var scope = (Scope)ScopeProvider.CreateScope())
                     {
                         try
                         {
-                            scope.ReadLock(Constants.Locks.Servers);
+                            scope.EagerReadLock(Constants.Locks.Servers);
                             lock (locker)
                             {
                                 acquired++;
@@ -103,6 +106,35 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
+        public void GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted()
+        {
+            var sqlCount = 0;
+
+            using (var scope = (Scope)ScopeProvider.CreateScope())
+            {
+                var db = (UmbracoDatabase)scope.Database;                
+                try
+                {
+                    db.EnableSqlCount = true;
+
+                    // Issue a lock request, but we are using non-eager
+                    // locks so this only queues the request.
+                    // The lock will not be issued unless we resolve
+                    // scope.Database
+                    scope.WriteLock(Constants.Locks.Servers);
+
+                    sqlCount = db.SqlCount;
+                }
+                finally
+                {
+                    db.EnableSqlCount = false;
+                }
+            }
+
+            Assert.AreEqual(0, sqlCount);
+        }
+
+        [Test]
         public void ConcurrentWritersTest()
         {
             const int threadCount = 8;
@@ -120,7 +152,7 @@ namespace Umbraco.Tests.Persistence
                 var ic = i; // capture
                 threads[i] = new Thread(() =>
                 {
-                    using (var scope = ScopeProvider.CreateScope())
+                    using (var scope = (Scope)ScopeProvider.CreateScope())
                     {
                         try
                         {
@@ -130,7 +162,7 @@ namespace Umbraco.Tests.Persistence
                                 if (entered == threadCount) m1.Set();
                             }
                             ms[ic].WaitOne();
-                            scope.WriteLock(Constants.Locks.Servers);
+                            scope.EagerWriteLock(Constants.Locks.Servers);
                             lock (locker)
                             {
                                 acquired++;
@@ -159,8 +191,10 @@ namespace Umbraco.Tests.Persistence
             m1.Wait();
             // all threads have entered
             ms[0].Set(); // let 0 go
+            // TODO: This timing is flaky
             Thread.Sleep(100);
             for (var i = 1; i < threadCount; i++) ms[i].Set(); // let others go
+            // TODO: This timing is flaky
             Thread.Sleep(500);
             // only 1 thread has locked
             Assert.AreEqual(1, acquired);
@@ -214,13 +248,13 @@ namespace Umbraco.Tests.Persistence
 
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = (Scope)ScopeProvider.CreateScope())
             {
                 try
                 {
                     otherEv.WaitOne();
                     Console.WriteLine($"[{id1}] WAIT {id1}");
-                    scope.WriteLock(id1);
+                    scope.EagerWriteLock(id1);
                     Console.WriteLine($"[{id1}] GRANT {id1}");
                     WriteLocks(scope.Database);
                     myEv.Set();
@@ -231,7 +265,7 @@ namespace Umbraco.Tests.Persistence
                         Thread.Sleep(200); // cannot wait due to deadlock... just give it a bit of time
 
                     Console.WriteLine($"[{id1}] WAIT {id2}");
-                    scope.WriteLock(id2);
+                    scope.EagerWriteLock(id2);
                     Console.WriteLine($"[{id1}] GRANT {id2}");
                     WriteLocks(scope.Database);
                 }
@@ -275,15 +309,161 @@ namespace Umbraco.Tests.Persistence
             Assert.IsNull(e2);
         }
 
-        private void NoDeadLockTestThread(int id, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
+        [Test]
+        public void Throws_When_Lock_Timeout_Is_Exceeded()
+        {
+            var t1 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Write lock A");
+                    // This will acquire right away
+                    realScope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+                    Thread.Sleep(6000); // Wait longer than the Read Lock B timeout
+                    scope.Complete();
+                    Console.WriteLine("Finished Write lock A");
+                }
+            });
+
+            Thread.Sleep(500); // 100% sure task 1 starts first
+
+            var t2 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Read lock B");
+
+                    // This will wait for the write lock to release but it isn't going to wait long
+                    // enough so an exception will be thrown.
+                    Assert.Throws<SqlCeLockTimeoutException>(() =>
+                        realScope.EagerReadLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+
+                    scope.Complete();
+                    Console.WriteLine("Finished Read lock B");
+                }
+            });
+
+            var t3 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Write lock C");
+
+                    // This will wait for the write lock to release but it isn't going to wait long
+                    // enough so an exception will be thrown.
+                    Assert.Throws<SqlCeLockTimeoutException>(() =>
+                        realScope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+
+                    scope.Complete();
+                    Console.WriteLine("Finished Write lock C");
+                }
+            });
+
+            Task.WaitAll(t1, t2, t3);
+        }
+
+        [Test]
+        public void Read_Lock_Waits_For_Write_Lock()
+        {
+            var locksCompleted = 0;
+
+            var t1 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Write lock A");
+                    // This will acquire right away
+                    realScope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+                    Thread.Sleep(4000); // Wait less than the Read Lock B timeout
+                    scope.Complete();
+                    Interlocked.Increment(ref locksCompleted);
+                    Console.WriteLine("Finished Write lock A");
+                }
+            });
+
+            Thread.Sleep(500); // 100% sure task 1 starts first
+
+            var t2 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Read lock B");
+
+                    // This will wait for the write lock to release
+                    Assert.DoesNotThrow(() =>
+                        realScope.EagerReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
+
+                    Assert.GreaterOrEqual(locksCompleted, 1);
+
+                    scope.Complete();
+                    Interlocked.Increment(ref locksCompleted);
+                    Console.WriteLine("Finished Read lock B");
+                }
+            });
+
+            var t3 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Read lock C");
+
+                    // This will wait for the write lock to release
+                    Assert.DoesNotThrow(() =>
+                        realScope.EagerReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
+
+                    Assert.GreaterOrEqual(locksCompleted, 1);
+
+                    scope.Complete();
+                    Interlocked.Increment(ref locksCompleted);
+                    Console.WriteLine("Finished Read lock C");
+                }
+            });
+
+            Task.WaitAll(t1, t2, t3);
+
+            Assert.AreEqual(3, locksCompleted);
+        }
+
+        [Test]
+        [NUnit.Framework.Ignore("We cannot run this test with SQLCE because it does not support a Command Timeout")]
+        public void Lock_Exceeds_Command_Timeout()
         {
             using (var scope = ScopeProvider.CreateScope())
+            {
+                var realScope = (Scope)scope;
+
+                var realDb = (Database)realScope.Database;
+                realDb.CommandTimeout = 1000;
+
+                Console.WriteLine("Write lock A");
+                // TODO: In theory this would throw
+                realScope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree);
+                scope.Complete();
+                Console.WriteLine("Finished Write lock A");
+            }
+        }
+
+        private void NoDeadLockTestThread(int id, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
+        {
+            using (var scope = (Scope)ScopeProvider.CreateScope())
             {
                 try
                 {
                     otherEv.WaitOne();
                     Console.WriteLine($"[{id}] WAIT {id}");
-                    scope.WriteLock(id);
+                    scope.EagerWriteLock(id);
                     Console.WriteLine($"[{id}] GRANT {id}");
                     WriteLocks(scope.Database);
                     myEv.Set();

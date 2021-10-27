@@ -2,8 +2,10 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -19,11 +21,17 @@ namespace Umbraco.Web.Editors
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSection;
+        private readonly IImageUrlGenerator _imageUrlGenerator;
 
-        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSection contentSection)
+        [Obsolete("This constructor will be removed in a future release.  Please use the constructor with the IImageUrlGenerator overload")]
+        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSection contentSection) : this (mediaFileSystem, contentSection, Current.ImageUrlGenerator)
+        {
+        }
+        public ImagesController(IMediaFileSystem mediaFileSystem, IContentSection contentSection, IImageUrlGenerator imageUrlGenerator)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSection = contentSection;
+            _imageUrlGenerator = imageUrlGenerator;
         }
 
         /// <summary>
@@ -60,8 +68,25 @@ namespace Umbraco.Web.Editors
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
             var response = Request.CreateResponse(HttpStatusCode.Found);
-            var imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
-            response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&upscale=false&width={width}&animationprocessmode=first&mode=max", UriKind.Relative);
+
+            DateTimeOffset? imageLastModified = null;
+            try
+            {
+                imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
+                
+            }
+            catch (Exception)
+            {
+                // if we get an exception here it's probably because the image path being requested is an image that doesn't exist
+                // in the local media file system. This can happen if someone is storing an absolute path to an image online, which
+                // is perfectly legal but in that case the media file system isn't going to resolve it.
+                // so ignore and we won't set a last modified date.
+            }
+
+            var rnd = imageLastModified.HasValue ? $"&rnd={imageLastModified:yyyyMMddHHmmss}" : null;
+            var imageUrl = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(imagePath) { UpScale = false, Width = width, AnimationProcessMode = "first", ImageCropMode = "max", CacheBusterValue = rnd });
+
+            response.Headers.Location = new Uri(imageUrl, UriKind.RelativeOrAbsolute);
             return response;
         }
         

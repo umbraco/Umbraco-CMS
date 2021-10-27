@@ -142,7 +142,7 @@ namespace Umbraco.Core.Services.Implement
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            if (userId < 0)
+            if (userId < Constants.Security.SuperUserId)
             {
                 totalRecords = 0;
                 return Enumerable.Empty<IAuditItem>();

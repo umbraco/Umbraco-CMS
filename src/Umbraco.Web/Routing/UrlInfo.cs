@@ -4,14 +4,14 @@ using System.Runtime.Serialization;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Represents infos for a url.
+    /// Represents infos for a URL.
     /// </summary>
     [DataContract(Name = "urlInfo", Namespace = "")]
     public class UrlInfo : IEquatable<UrlInfo>
     {
 
         /// <summary>
-        /// Creates a <see cref="UrlInfo"/> instance representing a true url.
+        /// Creates a <see cref="UrlInfo"/> instance representing a true URL.
         /// </summary>
         public static UrlInfo Url(string text, string culture = null) => new UrlInfo(text, true, culture);
 
@@ -38,14 +38,14 @@ namespace Umbraco.Web.Routing
         public string Culture { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the url is a true url.
+        /// Gets a value indicating whether the URL is a true URL.
         /// </summary>
         /// <remarks>Otherwise, it is a message.</remarks>
         [DataMember(Name = "isUrl")]
         public bool IsUrl { get; }
 
         /// <summary>
-        /// Gets the text, which is either the url, or a message.
+        /// Gets the text, which is either the URL, or a message.
         /// </summary>
         [DataMember(Name = "text")]
         public string Text { get; }

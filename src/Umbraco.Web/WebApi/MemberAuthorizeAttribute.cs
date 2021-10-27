@@ -38,7 +38,7 @@ namespace Umbraco.Web.WebApi
                 AllowType = "";
 
             var members = new List<int>();
-            foreach (var s in AllowMembers.Split(','))
+            foreach (var s in AllowMembers.Split(Constants.CharArrays.Comma))
             {
                 if (int.TryParse(s, out var id))
                 {
@@ -47,7 +47,7 @@ namespace Umbraco.Web.WebApi
             }
 
             var helper = Current.Factory.GetInstance<MembershipHelper>();
-            return helper.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
+            return helper.IsMemberAuthorized(AllowType.Split(Constants.CharArrays.Comma), AllowGroup.Split(Constants.CharArrays.Comma), members);
         }
 
     }

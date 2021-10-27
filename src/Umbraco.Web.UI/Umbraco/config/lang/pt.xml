@@ -67,7 +67,7 @@
     <key alias="save">Salvar</key>
     <key alias="saveAndPublish">Salvar e publicar</key>
     <key alias="saveToPublish">Salvar e mandar para aprovação</key>
-    <key alias="showPage">Prévia</key>
+    <key alias="saveAndPreview">Prévia</key>
     <key alias="styleChoose">Escolha estilo</key>
     <key alias="styleShow">Mostrar estilos</key>
     <key alias="tableInsert">Inserir tabela</key>
@@ -180,8 +180,8 @@
     <key alias="recycleBinDeleting">Os itens na lixeira agora estão sendo removidos. Favor não fechar esta janela enquanto este processo é concluído</key>
     <key alias="recycleBinIsEmpty">A lixeira agora está vazia</key>
     <key alias="recycleBinWarning">Quando itens são removidos da lixeira estes somem para sempre</key>
-    <key alias="regexSearchError"><![CDATA[O serviço web <a target='_blank' href='http://regexlib.com'>regexlib.com</a> está no momento sofrendo dificuldades dos quais não temos controle. Pedimos desculpas pela inconveniência.]]></key>
-    <key alias="regexSearchHelp">Busque por uma expressão regular para adicionar validação à um campo de formulário. Exemplo: 'email', 'zip-code' (código postal), 'url'</key>
+    <key alias="regexSearchError"><![CDATA[O serviço web <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> está no momento sofrendo dificuldades dos quais não temos controle. Pedimos desculpas pela inconveniência.]]></key>
+    <key alias="regexSearchHelp">Busque por uma expressão regular para adicionar validação à um campo de formulário. Exemplo: 'email', 'zip-code' (código postal), 'URL'</key>
     <key alias="removeMacro">Remover Macro</key>
     <key alias="requiredField">Campo obrigatório</key>
     <key alias="sitereindexed">Site foi re-indexado</key>
@@ -324,7 +324,7 @@
     <key alias="update">Atualizar</key>
     <key alias="upgrade">Atualizar</key>
     <key alias="upload">Subir (Upload)</key>
-    <key alias="url">Url</key>
+    <key alias="url">URL</key>
     <key alias="user">Usuário</key>
     <key alias="username">Usuário</key>
     <key alias="value">Valor</key>
@@ -354,8 +354,8 @@
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% agora foi copiado para seu banco de dados. Pressione <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Banco de dados não encontrado! Favor checar se a informação no "connection string" do "web.config" esteja correta. </p>
 <p>Para prosseguir, favor editar o arquivo "web.config" (usando Visual Studio ou seu editor de texto favorito), role até embaixo, adicione a connection string para seu banco de dados com a chave de nome "UmbracoDbDSN" e salve o arquivo </p>
-<p>Clique o botão <strong>tentar novamente</strong> quando terminar. <br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-			              Mais informações em como editar o web.config aqui.</a></p>]]></key>
+<p>Clique o botão <strong>tentar novamente</strong> quando terminar. <br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              Mais informações em como editar o web.config aqui</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[Para completar este passo, você deve saber algumas informações relativas ao seu servidor de banco de dados ("connection string"). <br /> Favor contatar seu provedor de internet ou hospedagem web se necessário. Se você estiver instalando em uma máquina ou servidor local é possível que você precise dessas informações por um administrador de sistema.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>
       Pressione o botão <strong>atualizar</strong> para atualizar seu banco de dados para Umbraco %0%</p>
@@ -394,7 +394,7 @@ Para correr Umbraco você vai precisar atualizar as configurações de permissõ
 Também guarda informações temporárias (cache) para melhorar a performance do seu website.]]></key>
     <key alias="runwayFromScratch">Eu quero começar do zero</key>
     <key alias="runwayFromScratchText"><![CDATA[Seu site está completamente vazio no momento, então isso é perfeito se você deseja começar do zero e criar seus próprios documentos e modelos.
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         Você ainda pode escolher instalar Runway mais tarde. Favor ir à seção Desenvolvedor e selecione pacotes.]]></key>
     <key alias="runwayHeader">Você acabou de configurar uma plataforma Umbraco limpa. O que deseja fazer a seguir?</key>
     <key alias="runwayInstalled">Runway está instalado</key>
@@ -445,7 +445,7 @@ Pressione <strong>"próximo"</strong> para iniciar o assistente.]]></key>
     <key alias="renewSession">Renovar agora para salvar seu trabalho</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Painel</key>
@@ -834,5 +834,9 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="usertype">Tipo de usuário</key>
     <key alias="userTypes">Tipos de usuários</key>
     <key alias="writer">Escrevente</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Selecionar tudo</key>
+    <key alias="deselectAllLogLevelFilters">Desmarcar todos</key>
   </area>
 </language>

@@ -10,12 +10,12 @@
 <pre>
     <div>
         <ul umb-keyboard-list>
-            <li><a href="">Item 1</a></li>
-            <li><a href="">Item 2</a></li>
-            <li><a href="">Item 3</a></li>
-            <li><a href="">Item 4</a></li>
-            <li><a href="">Item 5</a></li>
-            <li><a href="">Item 6</a></li>
+            <li><button type="button" class="btn-reset">Item 1</button></li>
+            <li><button type="button" class="btn-reset">Item 2</button></li>
+            <li><button type="button" class="btn-reset">Item 3</button></li>
+            <li><button type="button" class="btn-reset">Item 4</button></li>
+            <li><button type="button" class="btn-reset">Item 5</button></li>
+            <li><button type="button" class="btn-reset">Item 6</button></li>
         </ul>
     </div>
 </pre>
@@ -32,20 +32,20 @@ angular.module('umbraco.directives')
 
         return {
             restrict: 'A',
-            link: function (scope, element, attr) {
-                
+            link: function (scope, element) {
+
                 var listItems = [];
                 var currentIndex = 0;
                 var focusSet = false;
-            
-                $timeout(function(){
+
+                $timeout(function() {
                     // get list of all links in the list
                     listItems = element.find("li :tabbable");
                 });
 
                 // Handle keydown events
                 function keydown(event) {
-                    $timeout(function(){
+                    $timeout(function() {
                         checkFocus();
                         // arrow down
                         if (event.keyCode === 40) {
@@ -62,7 +62,7 @@ angular.module('umbraco.directives')
                     var found = false;
 
                     // check if any element has focus
-                    angular.forEach(listItems, function (item, index) {
+                    Utilities.forEach(listItems, (item, index) => {
                         if ($(item).is(":focus")) {
                             // if an element already has focus set the
                             // currentIndex so we navigate from that element
@@ -82,7 +82,7 @@ angular.module('umbraco.directives')
 
                 function arrowDown() {
                     if (currentIndex < listItems.length - 1) {
-                        // only bump the current index if the focus is already 
+                        // only bump the current index if the focus is already
                         // set else we just want to focus the first element
                         if (focusSet) {
                             currentIndex++;
@@ -109,7 +109,6 @@ angular.module('umbraco.directives')
 
                 // Stop listening when scope is destroyed.
                 scope.$on('$destroy', stopListening);
-
             }
         };
     }]);

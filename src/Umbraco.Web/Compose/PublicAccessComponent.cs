@@ -14,7 +14,9 @@ namespace Umbraco.Web.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            MemberGroupService.Saved -= MemberGroupService_Saved;
+        }
 
         static void MemberGroupService_Saved(IMemberGroupService sender, Core.Events.SaveEventArgs<Core.Models.IMemberGroup> e)
         {

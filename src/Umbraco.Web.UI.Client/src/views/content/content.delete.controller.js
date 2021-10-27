@@ -67,6 +67,11 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
             if (err.status && err.status >= 500) {
                 // TODO: All YSOD handling should be done with an interceptor
                 overlayService.ysod(err);
+                navigationService.hideDialog();
+            }
+
+            if(err.data && err.data.notifications && err.data.notifications.length > 0) {
+                navigationService.hideDialog();
             }
         });
 

@@ -36,7 +36,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceFileNotFound", new[] { _configFilePath })
+                        Result = _textService.Localize("healthcheck", "configurationServiceFileNotFound", new[] { _configFilePath })
                     };
 
                 var xmlDocument = new XmlDocument();
@@ -47,7 +47,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
+                        Result = _textService.Localize("healthcheck", "configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
                     };
 
                 return new ConfigurationServiceResult
@@ -62,7 +62,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 return new ConfigurationServiceResult
                 {
                     Success = false,
-                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { ex.Message })
+                    Result = _textService.Localize("healthcheck", "configurationServiceError", new[] { ex.Message })
                 };
             }
         }
@@ -80,7 +80,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceFileNotFound", new[] { _configFilePath })
+                        Result = _textService.Localize("healthcheck", "configurationServiceFileNotFound", new[] { _configFilePath })
                     };
 
                 var xmlDocument = new XmlDocument { PreserveWhitespace = true };
@@ -91,7 +91,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                     return new ConfigurationServiceResult
                     {
                         Success = false,
-                        Result = _textService.Localize("healthcheck/configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
+                        Result = _textService.Localize("healthcheck", "configurationServiceNodeNotFound", new[] { _xPath, _configFilePath })
                     };
 
                 if (node.NodeType == XmlNodeType.Element)
@@ -108,7 +108,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 return new ConfigurationServiceResult
                 {
                     Success = false,
-                    Result = _textService.Localize("healthcheck/configurationServiceError", new[] { ex.Message })
+                    Result = _textService.Localize("healthcheck", "configurationServiceError", new[] { ex.Message })
                 };
             }
         }

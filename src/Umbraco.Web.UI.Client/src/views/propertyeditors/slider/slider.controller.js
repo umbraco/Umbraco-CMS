@@ -1,4 +1,4 @@
-﻿function sliderController($scope, angularHelper) {
+﻿function sliderController($scope) {
 
     let sliderRef = null;
 
@@ -14,7 +14,13 @@
 
     function setModelValue(values) {
         $scope.model.value = values ? values.toString() : null;
-        angularHelper.getCurrentForm($scope).$setDirty();
+        setDirty();
+    }
+
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
     }
 
     $scope.setup = function(slider) {
@@ -39,8 +45,13 @@
         if (!$scope.model.value) {
             $scope.model.value = start.toString();
         }
-        // convert to array
-        $scope.sliderValue = $scope.model.value ? $scope.model.value.split(',') : null;
+
+        // convert to array - exiting value can be a number if switching from numeric/decimal property editor
+        $scope.sliderValue = $scope.model.value
+            ? Utilities.isString($scope.model.value) || Utilities.isNumber($scope.model.value)
+                    ? $scope.model.value.toString().split(',')
+                    : null
+            : null;
         
         // don't render values with decimal places if the step increment in a whole number
         var stepDecimalPlaces = $scope.model.config.step % 1 == 0
@@ -56,7 +67,7 @@
                     return value.toFixed(stepDecimalPlaces);
                 },
                 from: function (value) {
-                    return value;
+                    return Number(value);
                 }
             },
             "range": {

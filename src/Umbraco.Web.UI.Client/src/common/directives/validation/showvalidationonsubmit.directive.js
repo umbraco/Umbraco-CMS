@@ -11,6 +11,7 @@
             link: function (scope, element, attr, ctrl) {
 
                 var formMgr = ctrl.length > 1 ? ctrl[1] : null;
+                const hiddenClass = 'ng-hide';
 
                 //We can either get the form submitted status by the parent directive valFormManager
                 //or we can check upwards in the DOM for the css class... lets try both :)
@@ -18,17 +19,17 @@
                 //reset the status.
                 var submitted = element.closest(".show-validation").length > 0 || (formMgr && formMgr.showValidation);
                 if (!submitted) {
-                    element.hide();
+                    element[0].classList.add(hiddenClass);
                 }
 
                 var unsubscribe = [];
 
                 unsubscribe.push(scope.$on("formSubmitting", function (ev, args) {
-                    element.show();
+                    element[0].classList.remove(hiddenClass);
                 }));
 
                 unsubscribe.push(scope.$on("formSubmitted", function (ev, args) {
-                    element.hide();
+                    element[0].classList.add(hiddenClass);
                 }));
 
                 //no isolate scope to listen to element destroy

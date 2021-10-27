@@ -56,7 +56,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
             var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
             if (settings == null)
             {
-                message = _textService.Localize("healthcheck/smtpMailSettingsNotFound");
+                message = _textService.Localize("healthcheck", "smtpMailSettingsNotFound");
             }
             else
             {
@@ -64,14 +64,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
                 var port = settings.Smtp.Network.Port == 0 ? DefaultSmtpPort : settings.Smtp.Network.Port;
                 if (string.IsNullOrEmpty(host))
                 {
-                    message = _textService.Localize("healthcheck/smtpMailSettingsHostNotConfigured");
+                    message = _textService.Localize("healthcheck", "smtpMailSettingsHostNotConfigured");
                 }
                 else
                 {
                     success = CanMakeSmtpConnection(host, port);
                     message = success
-                        ? _textService.Localize("healthcheck/smtpMailSettingsConnectionSuccess")
-                        : _textService.Localize("healthcheck/smtpMailSettingsConnectionFail", new [] { host, port.ToString() });
+                        ? _textService.Localize("healthcheck", "smtpMailSettingsConnectionSuccess")
+                        : _textService.Localize("healthcheck", "smtpMailSettingsConnectionFail", new [] { host, port.ToString() });
                 }
             }
 

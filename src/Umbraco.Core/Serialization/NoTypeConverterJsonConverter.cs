@@ -19,6 +19,7 @@ namespace Umbraco.Core.Serialization
     internal class NoTypeConverterJsonConverter<T> : JsonConverter
     {
         static readonly IContractResolver resolver = new NoTypeConverterContractResolver();
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings { ContractResolver = resolver };
 
         private class NoTypeConverterContractResolver : DefaultContractResolver
         {
@@ -41,12 +42,12 @@ namespace Umbraco.Core.Serialization
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return JsonSerializer.CreateDefault(new JsonSerializerSettings { ContractResolver = resolver }).Deserialize(reader, objectType);
+            return JsonSerializer.CreateDefault(JsonSerializerSettings).Deserialize(reader, objectType);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            JsonSerializer.CreateDefault(new JsonSerializerSettings { ContractResolver = resolver }).Serialize(writer, value);
+            JsonSerializer.CreateDefault(JsonSerializerSettings).Serialize(writer, value);
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Models
@@ -43,7 +42,8 @@ namespace Umbraco.Core.Models
         public Member(string name, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
 
             IsApproved = true;
 
@@ -63,9 +63,12 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, IMemberType contentType, bool isApproved = true)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentNullOrEmptyException(nameof(email));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentNullOrEmptyException(nameof(username));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (email == null) throw new ArgumentNullException(nameof(email));
+            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(email));
+            if (username == null) throw new ArgumentNullException(nameof(username));
+            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(username));
 
             _email = email;
             _username = username;
@@ -498,7 +501,7 @@ namespace Umbraco.Core.Models
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                Current.Logger.Warn<Member>("Trying to access the '{PropertyName}' property on '{MemberType}' " +
+                Current.Logger.Warn<Member,string,Type,string>("Trying to access the '{PropertyName}' property on '{MemberType}' " +
                                             "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
                                             "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
                                                 logPropertyName,
@@ -523,7 +526,7 @@ namespace Umbraco.Core.Models
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                Current.Logger.Warn<Member>("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
+                Current.Logger.Warn<Member,string,Type,string>("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
                                             "property type {PropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.",
                                                 logPropertyName,
                                                 typeof(Member),

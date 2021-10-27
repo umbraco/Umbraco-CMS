@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentSortController($scope, $filter, $routeParams, contentResource, navigationService) {
+    function ContentSortController($scope, $filter, $routeParams, contentResource, navigationService, eventsService) {
 
         var vm = this;
         var id = $scope.currentNode.id;
@@ -11,6 +11,8 @@
         vm.saveButtonState = "init";
         vm.sortOrder = {};
         vm.sortableOptions = {
+            axis: "y",
+            containment: "parent",
             distance: 10,
             tolerance: "pointer",
             opacity: 0.7,
@@ -50,6 +52,7 @@
                     navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true })
                         .then(() => navigationService.reloadNode($scope.currentNode));
 
+                    eventsService.emit("sortCompleted", { id: id });
                     vm.saveButtonState = "success";
                 }, function(error) {
                     vm.error = error;
@@ -67,7 +70,7 @@
 
         function sort(column) {
             // reverse if it is already ordered by that column
-            if(vm.sortOrder.column === column) {
+            if (vm.sortOrder.column === column) {
                 vm.sortOrder.reverse = !vm.sortOrder.reverse
             } else {
                 vm.sortOrder.column = column;
@@ -81,7 +84,6 @@
         }
 
         onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Content.SortController", ContentSortController);

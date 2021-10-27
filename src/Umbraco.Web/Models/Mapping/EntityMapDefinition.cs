@@ -54,6 +54,8 @@ namespace Umbraco.Web.Models.Mapping
 
             if (source is IMediaEntitySlim mediaSlim)
             {
+                //pass UpdateDate for MediaPicker ListView ordering
+                source.AdditionalData["UpdateDate"] = mediaSlim.UpdateDate;
                 source.AdditionalData["MediaPath"] = mediaSlim.MediaPath;
             }
 
@@ -82,7 +84,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Udi -Trashed
         private static void Map(PropertyGroup source, EntityBasic target, MapperContext context)
         {
-            target.Alias = source.Name.ToLowerInvariant();
+            target.Alias = source.Alias;
             target.Icon = "icon-tab";
             target.Id = source.Id;
             target.Key = source.Key;
@@ -149,6 +151,10 @@ namespace Umbraco.Web.Models.Mapping
 
             if (target.Icon.IsNullOrWhiteSpace())
             {
+                if (source.NodeObjectType == Constants.ObjectTypes.Document)
+                    target.Icon = Constants.Icons.Content;
+                if (source.NodeObjectType == Constants.ObjectTypes.Media)
+                    target.Icon = Constants.Icons.Content;
                 if (source.NodeObjectType == Constants.ObjectTypes.Member)
                     target.Icon = Constants.Icons.Member;
                 else if (source.NodeObjectType == Constants.ObjectTypes.DataType)
@@ -157,6 +163,8 @@ namespace Umbraco.Web.Models.Mapping
                     target.Icon = Constants.Icons.ContentType;
                 else if (source.NodeObjectType == Constants.ObjectTypes.MediaType)
                     target.Icon = Constants.Icons.MediaType;
+                else if (source.NodeObjectType == Constants.ObjectTypes.MemberType)
+                    target.Icon = Constants.Icons.MemberType;
                 else if (source.NodeObjectType == Constants.ObjectTypes.TemplateType)
                     target.Icon = Constants.Icons.Template;
             }
@@ -177,12 +185,15 @@ namespace Umbraco.Web.Models.Mapping
 
             target.Name = source.Values.ContainsKey("nodeName") ? source.Values["nodeName"] : "[no name]";
 
-            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile))
+            var culture = context.GetCulture()?.ToLowerInvariant();
+            if(culture.IsNullOrWhiteSpace() == false)
             {
-                if (umbracoFile != null)
-                {
-                    target.Name = $"{target.Name} ({umbracoFile})";
-                }
+                target.Name = source.Values.ContainsKey($"nodeName_{culture}") ? source.Values[$"nodeName_{culture}"] : target.Name;
+            }
+
+            if (source.Values.TryGetValue(UmbracoExamineIndex.UmbracoFileFieldName, out var umbracoFile) && umbracoFile.IsNullOrWhiteSpace() == false)
+            {
+                target.Name = $"{target.Name} ({umbracoFile})";
             }
 
             if (source.Values.ContainsKey(UmbracoExamineIndex.NodeKeyFieldName))
@@ -234,11 +245,11 @@ namespace Umbraco.Web.Models.Mapping
         {
             switch (entity)
             {
-                case ContentEntitySlim contentEntity:
+                case IMemberEntitySlim memberEntity:
+                    return memberEntity.ContentTypeIcon;
+                case IContentEntitySlim contentEntity:
                     // NOTE: this case covers both content and media entities
                     return contentEntity.ContentTypeIcon;
-                case MemberEntitySlim memberEntity:
-                    return memberEntity.ContentTypeIcon.IfNullOrWhiteSpace(Constants.Icons.Member);
             }
 
             return null;

@@ -21,17 +21,18 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
     }
 
     $scope.createContainer = function () {
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm })) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: $scope.createFolderForm })) {
             dataTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";
                 navigationService.syncTree({ tree: "datatypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm });
 
             }, function(err) {
 
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm, hasErrors: true });
                // TODO: Handle errors
             });
         };

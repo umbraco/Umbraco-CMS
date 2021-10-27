@@ -32,11 +32,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     if (string.IsNullOrEmpty(dataType.Configuration))
                     {
                         config.Format = "YYYY-MM-DD";
-                    };
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<DropDownPropertyEditorsMigration>(
+                    Logger.Error<DropDownPropertyEditorsMigration, string>(
                         ex,
                         "Invalid property editor configuration detected: \"{Configuration}\", cannot convert editor, values will be cleared",
                         dataType.Configuration);

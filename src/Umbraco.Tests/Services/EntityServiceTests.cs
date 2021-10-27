@@ -8,12 +8,12 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
+
     /// <summary>
     /// Tests covering the EntityService
     /// </summary>
@@ -477,7 +477,7 @@ namespace Umbraco.Tests.Services
             var entities = service.GetAll(UmbracoObjectTypes.Document).ToArray();
 
             Assert.That(entities.Any(), Is.True);
-            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(entities.Length, Is.EqualTo(5));
             Assert.That(entities.Any(x => x.Trashed), Is.True);
         }
 
@@ -490,7 +490,7 @@ namespace Umbraco.Tests.Services
             var entities = service.GetAll(objectTypeId).ToArray();
 
             Assert.That(entities.Any(), Is.True);
-            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(entities.Length, Is.EqualTo(5));
             Assert.That(entities.Any(x => x.Trashed), Is.True);
         }
 
@@ -502,7 +502,7 @@ namespace Umbraco.Tests.Services
             var entities = service.GetAll<IContent>().ToArray();
 
             Assert.That(entities.Any(), Is.True);
-            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(entities.Length, Is.EqualTo(5));
             Assert.That(entities.Any(x => x.Trashed), Is.True);
         }
 

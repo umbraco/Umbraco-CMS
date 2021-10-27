@@ -11,7 +11,10 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
     var vm = this;
 
     vm.promises = {};
-    
+    vm.header = {};
+    vm.header.editorfor = "general_macro";
+    vm.header.setPageTitle = true;
+
     vm.page = {};
     vm.page.loading = false;
     vm.page.saveButtonState = "init";
@@ -30,10 +33,11 @@ function MacrosEditController($scope, $q, $routeParams, macroResource, editorSta
             vm.page.saveButtonState = "busy";
             
             macroResource.saveMacro(vm.macro).then(function (data) {
-                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                formHelper.resetForm({ scope: $scope });
                 bindMacro(data);
                 vm.page.saveButtonState = "success";
             }, function (error) {
+                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 contentEditingHelper.handleSaveError({
                     err: error
                 });

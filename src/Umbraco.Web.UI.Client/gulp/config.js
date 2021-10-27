@@ -1,6 +1,20 @@
 'use strict';
 
 module.exports = {
+    compile: {
+        build: {
+            sourcemaps: false,
+            embedtemplates: true
+        },
+        dev: {
+            sourcemaps: true,
+            embedtemplates: true
+        },
+        test: {
+            sourcemaps: false,
+            embedtemplates: true
+        }
+    },
     sources: {
 
         // less files used by backoffice and preview
@@ -9,20 +23,21 @@ module.exports = {
             installer: { files: "./src/less/installer.less", watch: "./src/less/**/*.less", out: "installer.css" },
             nonodes: { files: "./src/less/pages/nonodes.less", watch: "./src/less/**/*.less", out: "nonodes.style.min.css"},
             preview: { files: "./src/less/canvas-designer.less", watch: "./src/less/**/*.less", out: "canvasdesigner.css" },
-            umbraco: { files: "./src/less/belle.less", watch: "./src/less/**/*.less", out: "umbraco.css" },
+            umbraco: { files: "./src/less/belle.less", watch: "./src/**/*.less", out: "umbraco.css" },
             rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" }
         },
 
         // js files for backoffice
         // processed in the js task
         js: {
+            websitepreview: { files: "./src/websitepreview/**/*.js", out: "umbraco.websitepreview.js" },
             preview: { files: "./src/preview/**/*.js", out: "umbraco.preview.js" },
             installer: { files: "./src/installer/**/*.js", out: "umbraco.installer.js" },
             filters: { files: "./src/common/filters/**/*.js", out: "umbraco.filters.js" },
             resources: { files: "./src/common/resources/**/*.js", out: "umbraco.resources.js" },
-            services: { files: "./src/common/services/**/*.js", out: "umbraco.services.js" },
+            services: { files: ["./src/common/services/**/*.js", "./src/utilities.js"], out: "umbraco.services.js" },
             security: { files: "./src/common/interceptors/**/*.js", out: "umbraco.interceptors.js" },
-            
+
             //the controllers for views
             controllers: {
                 files: [
@@ -42,7 +57,7 @@ module.exports = {
                 ],
                 out: "umbraco.directives.js"
             }
-            
+
         },
 
         //selectors for copying all views into the build

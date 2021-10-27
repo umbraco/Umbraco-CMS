@@ -3,7 +3,10 @@
   "scripts": {
     "docs": "gulp docs",
     "start": "gulp docs",
-    "default": "gulp docs"
+    "default": "gulp docs",
+    "dev": "gulp watch",
+    "serve": "gulp watch",
+    "watch": "gulp watch"
   },
   "devDependencies": {
     "gulp": "^3.9.1",

@@ -73,14 +73,14 @@ namespace Umbraco.Tests.PublishedContent
                 yield return factory.CreatePropertyType(contentType, "noprop", 1, variations: ContentVariation.Culture);
             }
 
-            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes1);
+            var contentType1 = factory.CreateContentType(Guid.NewGuid(), 1, "ContentType1", Enumerable.Empty<string>(), CreatePropertyTypes1);
 
             IEnumerable<IPublishedPropertyType> CreatePropertyTypes2(IPublishedContentType contentType)
             {
                 yield return factory.CreatePropertyType(contentType, "prop3", 1, variations: ContentVariation.Culture);
             }
 
-            var contentType2 = factory.CreateContentType(2, "contentType2", Enumerable.Empty<string>(), CreatePropertyTypes2);
+            var contentType2 = factory.CreateContentType(Guid.NewGuid(), 2, "contentType2", Enumerable.Empty<string>(), CreatePropertyTypes2);
 
             var prop1 = new SolidPublishedPropertyWithLanguageVariants
             {

@@ -8,11 +8,11 @@ namespace Umbraco.Core.Strings
     public class DefaultUrlSegmentProvider : IUrlSegmentProvider
     {
         /// <summary>
-        /// Gets the url segment for a specified content and culture.
+        /// Gets the URL segment for a specified content and culture.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="culture">The culture.</param>
-        /// <returns>The url segment.</returns>
+        /// <returns>The URL segment.</returns>
         public string GetUrlSegment(IContentBase content, string culture = null)
         {
             return GetUrlSegmentSource(content, culture).ToUrlSegment(culture);
@@ -24,7 +24,13 @@ namespace Umbraco.Core.Strings
             if (content.HasProperty(Constants.Conventions.Content.UrlName))
                 source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture) ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(source))
-                source = content.GetCultureName(culture);
+            {
+                // If the name of a node has been updated, but it has not been published, the url should use the published name, not the current node name
+                // If this node has never been published (GetPublishName is null), use the unpublished name
+                source = (content is IContent document) && document.Edited && document.GetPublishName(culture) != null
+                    ? document.GetPublishName(culture)
+                    : content.GetCultureName(culture);
+            }
             return source;
         }
     }

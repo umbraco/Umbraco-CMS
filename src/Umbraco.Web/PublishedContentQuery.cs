@@ -16,7 +16,7 @@ namespace Umbraco.Web
     /// <summary>
     /// A class used to query for published content, media items
     /// </summary>
-    public class PublishedContentQuery : IPublishedContentQuery
+    public class PublishedContentQuery : IPublishedContentQuery2
     {
         private readonly IPublishedSnapshot _publishedSnapshot;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -183,54 +183,70 @@ namespace Umbraco.Web
         #region Search
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
         {
             return Search(term, 0, 0, out _, culture, indexName);
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = null)
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName)
+            => Search(term, skip, take, out totalRecords, culture, indexName, null);
+
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName, ISet<string> loadedFields = null)
         {
-            indexName = string.IsNullOrEmpty(indexName)
-                ? Constants.UmbracoIndexes.ExternalIndexName
-                : indexName;
+            if (skip < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(skip), skip, "The value must be greater than or equal to zero.");
+            }
+
+            if (take < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(take), take, "The value must be greater than or equal to zero.");
+            }
+
+            if (string.IsNullOrEmpty(indexName))
+            {
+                indexName = Constants.UmbracoIndexes.ExternalIndexName;
+            }
 
             if (!_examineManager.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
+            {
                 throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
+            }
 
-            var searcher = umbIndex.GetSearcher();
-
-            // default to max 500 results
-            var count = skip == 0 && take == 0 ? 500 : skip + take;
-
-            ISearchResults results;
+            var query = umbIndex.GetSearcher().CreateQuery(IndexTypes.Content);
+            
+            IQueryExecutor queryExecutor;
             if (culture == "*")
             {
-                //search everything
-
-                results = searcher.Search(term, count);
+                // Search everything
+                queryExecutor = query.ManagedQuery(term);
             }
-            else if (culture.IsNullOrWhiteSpace())
+            else if (string.IsNullOrWhiteSpace(culture))
             {
-                //only search invariant
-
-                var qry = searcher.CreateQuery().Field(UmbracoContentIndex.VariesByCultureFieldName, "n"); //must not vary by culture
-                qry = qry.And().ManagedQuery(term);
-                results = qry.Execute(count);
+                // Only search invariant
+                queryExecutor = query.Field(UmbracoContentIndex.VariesByCultureFieldName, "n") // Must not vary by culture
+                    .And().ManagedQuery(term);
             }
             else
             {
-                //search only the specified culture
-
-                //get all index fields suffixed with the culture name supplied
-                var cultureFields = umbIndex.GetCultureAndInvariantFields(culture).ToArray();
-                var qry = searcher.CreateQuery().ManagedQuery(term, cultureFields);
-                results = qry.Execute(count);
+                // Only search the specified culture
+                var fields = umbIndex.GetCultureAndInvariantFields(culture).ToArray(); // Get all index fields suffixed with the culture name supplied
+                queryExecutor = query.ManagedQuery(term, fields);
             }
+            if (loadedFields != null && queryExecutor is IBooleanOperation booleanOperation)
+            {
+                queryExecutor = booleanOperation.SelectFields(loadedFields);
+            }
+
+            var results = skip == 0 && take == 0
+                ? queryExecutor.Execute()
+                : queryExecutor.Execute(skip + take);
 
             totalRecords = results.TotalItemCount;
 
-            return new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
+            return new CultureContextualSearchResults(results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
         }
 
         /// <inheritdoc />
@@ -242,12 +258,23 @@ namespace Umbraco.Web
         /// <inheritdoc />
         public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
         {
+            if (skip < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(skip), skip, "The value must be greater than or equal to zero.");
+            }
+
+            if (take < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(take), take, "The value must be greater than or equal to zero.");
+            }
+
             var results = skip == 0 && take == 0
                 ? query.Execute()
-                : query.Execute(maxResults: skip + take);
+                : query.Execute(skip + take);
 
             totalRecords = results.TotalItemCount;
-            return results.ToPublishedSearchResults(_publishedSnapshot.Content);
+
+            return results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot);
         }
 
         /// <summary>
@@ -319,9 +346,6 @@ namespace Umbraco.Web
                 object IEnumerator.Current => Current;
             }
         }
-
-
-
 
         #endregion
     }

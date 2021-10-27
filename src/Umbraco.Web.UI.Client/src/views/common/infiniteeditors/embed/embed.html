@@ -15,8 +15,8 @@
                 <umb-box>
                     <umb-box-content>
 
-                        <umb-control-group label="@general_url">
-                            <input id="url" class="umb-property-editor input-block-level" type="text" style="margin-bottom: 10px;" ng-model="model.embed.url" ng-keyup="$event.keyCode == 13 ? vm.showPreview() : null" focus-when="{{true}}" required />
+                        <umb-control-group label="@general_url" alias="url">
+                            <input type="text" id="url" class="umb-property-editor input-block-level" ng-model="model.embed.url" ng-keyup="$event.keyCode == 13 ? vm.showPreview() : null" focus-when="{{true}}" required />
                             <umb-button
                                 type="button"
                                 action="vm.showPreview()"
@@ -30,21 +30,22 @@
                         <div ng-if="!vm.loading">
 
                             <umb-control-group>
-                                <p ng-bind="model.embed.info"></p>
+                                <p ng-bind="model.embed.info" aria-hidden="true"></p>
+                                <p ng-bind="model.embed.a11yInfo" class="sr-only" role="alert"></p>
                                 <div ng-bind-html="vm.trustedPreview"></div>
                             </umb-control-group>
                             
                             <div ng-show="model.embed.supportsDimensions && model.embed.success">
-                                <umb-control-group label="@general_width">
-                                    <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.width" ng-blur="vm.changeSize('width')" />
+                                <umb-control-group label="@general_width" alias="width">
+                                    <input type="number" id="width" pattern="[0-9]*" min="0" ng-model="model.embed.width" ng-blur="vm.changeSize('width')" />
                                 </umb-control-group>
                 
-                                <umb-control-group label="@general_height">
-                                    <input type="number" pattern="[0-9]*" min="0" ng-model="model.embed.height" ng-blur="vm.changeSize('height')" />
+                                <umb-control-group label="@general_height" alias="height">
+                                    <input type="number" id="height" pattern="[0-9]*" min="0" ng-model="model.embed.height" ng-blur="vm.changeSize('height')" />
                                 </umb-control-group>
                 
-                                <umb-control-group label="@general_constrain">
-                                    <umb-toggle checked="model.embed.constrain" on-click="vm.toggleConstrain()"></umb-toggle>
+                                <umb-control-group label="@general_constrain" alias="constrain">
+                                    <umb-toggle checked="model.embed.constrain" id="constrain"  on-click="vm.toggleConstrain()"></umb-toggle>
                                 </umb-control-group>
                             </div>
 

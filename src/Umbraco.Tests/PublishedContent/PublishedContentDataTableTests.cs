@@ -98,7 +98,7 @@ namespace Umbraco.Tests.PublishedContent
             var doc = GetContent(true, 1);
             //change a doc type alias
             var c = (SolidPublishedContent)doc.Children.ElementAt(0);
-            c.ContentType = new PublishedContentType(22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
+            c.ContentType = new PublishedContentType(Guid.NewGuid(), 22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
 
             var dt = doc.ChildrenAsTable(Current.Services, "Child");
 
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var contentTypeAlias = createChildren ? "Parent" : "Child";
-            var contentType = new PublishedContentType(22, contentTypeAlias, PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
+            var contentType = new PublishedContentType(Guid.NewGuid(), 22, contentTypeAlias, PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var d = new SolidPublishedContent(contentType)
                 {
                     CreateDate = DateTime.Now,

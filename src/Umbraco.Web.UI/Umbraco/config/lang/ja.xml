@@ -85,31 +85,11 @@
     <key alias="saveAndPublish">保存及び公開</key>
     <key alias="saveToPublish">保存して承認に送る</key>
     <key alias="saveListView">リスト ビューの保存</key>
-    <key alias="showPage">プレビュー</key>
+    <key alias="saveAndPreview">プレビュー</key>
     <key alias="showPageDisabled">テンプレートが指定されていないのでプレビューは無効になっています</key>
     <key alias="styleChoose">スタイルの選択</key>
     <key alias="styleShow">スタイルの表示</key>
     <key alias="tableInsert">表の挿入</key>
-  </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">ドキュメントタイプを変更するには、まず有効なドキュメントタイプのリストから選択します</key>
-    <key alias="changeDocTypeInstruction2">確認および現在のドキュメントタイプからのマッピングを割り当て、保存します。</key>
-    <key alias="contentRepublished">コンテントは再公開されています</key>
-    <key alias="currentProperty">現在のプロパティ</key>
-    <key alias="currentType">現在のドキュメントタイプ</key>
-    <key alias="docTypeCannotBeChanged">有効な代替タイプが存在しないため変更することができません。選択されたコンテントの親の下に許可されたドキュメントタイプへのみ変更ができます</key>
-    <key alias="docTypeChanged">ドキュメントタイプを変更しました</key>
-    <key alias="mapProperties">プロパティを割り当てる</key>
-    <key alias="mapToProperty">割り当てるプロパティ</key>
-    <key alias="newTemplate">新しいテンプレート</key>
-    <key alias="newType">新しいドキュメントタイプ</key>
-    <key alias="none">なし</key>
-    <key alias="selectedContent">コンテント</key>
-    <key alias="selectNewDocType">ドキュメントタイプを変更する</key>
-    <key alias="successMessage">選択コンテンツのドキュメント タイプは、[新しいタイプ] に変更され、以下のプロパティがマップされました。</key>
-    <key alias="to">から</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">1つ以上のプロパティを割り当てられませんでした。プロパティが定義が重複しています</key>
-    <key alias="validDocTypesNote">有効なドキュメントタイプのみが表示されます</key>
   </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">公開されました</key>
@@ -246,8 +226,8 @@
     <key alias="recycleBinDeleting">ごみ箱を空にしています。実行中はウィンドウを閉じないでください。</key>
     <key alias="recycleBinIsEmpty">ごみ箱は空です</key>
     <key alias="recycleBinWarning">ごみ箱から削除すると復活させることはできません</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>のウェブサービスに現在問題が起きているかもしれず、操作できませんでした。大変申し訳ありませんがこの機能は使用できません。]]></key>
-    <key alias="regexSearchHelp">フォームのフィールドを正規表現で検証できます。例: 'email, 'zip-code' 'url'</key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>のウェブサービスに現在問題が起きているかもしれず、操作できませんでした。大変申し訳ありませんがこの機能は使用できません。]]></key>
+    <key alias="regexSearchHelp">フォームのフィールドを正規表現で検証できます。例: 'email, 'zip-code' 'URL'</key>
     <key alias="removeMacro">マクロを削除</key>
     <key alias="requiredField">必須フィールド</key>
     <key alias="sitereindexed">サイトは再インデックスされました</key>
@@ -493,7 +473,7 @@
               <p>続行するには"web.config"ファイルを編集(Visual Studioないし使い慣れたテキストエディタで)し、下の方にスクロールし、"umbracoDbDSN"という名前のキーでデータベースの接続文字列を追加して保存します。</p>
               <p>
               <strong>再施行</strong>ボタンをクリックして
-              続けます。<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
+              続けます。<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
 			              より詳細にはこちらの web.config を編集します。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[このステップを完了するには、データベースサーバー(の"接続文字列")について把握していなければなりません。<br />
         必要ならISPに連絡するなどしてみてください。
@@ -541,7 +521,7 @@
     <key alias="runwayFromScratch">スクラッチから始めたい</key>
     <key alias="runwayFromScratchText"><![CDATA[
         ウェブサイトはさしあたり完全に空っぽで、必要なドキュメント型やテンプレートを作成するところから始められます。
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
         後からRunwayをインストールする事もできます。そうしたくなった時は、Developerセクションのパッケージへどうぞ。
       ]]></key>
     <key alias="runwayHeader">Umbracoプラットフォームのクリーンセットアップが完了しました。この後はどうしますか？</key>
@@ -608,7 +588,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="greeting6">ハッピー土曜日</key>
     <key alias="instruction">ウェブサイトにログインします。</key>
     <key alias="timeout">セッションタイムアウトしました。</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">ダッシュボード</key>
@@ -804,7 +784,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="tabs">タブ</key>
     <key alias="contentTypeEnabled">マスターコンテンツタイプが有効</key>
     <key alias="contentTypeUses">このコンテンツタイプの使用</key>
-    <key alias="asAContentMasterType">マスターコンテンツタイプについては、マスターコンテンツタイプからのタブは表示されず、マスターコンテンツタイプでのみ編集することができます。</key>
     <key alias="noPropertiesDefinedOnTab">このタブにはプロパティが定義されていません、上部のリンクから新しいプロパティを作成してください</key>
     <key alias="addIcon">アイコンの追加</key>
   </area>
@@ -1105,5 +1084,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="validateAsUrl">URL で検証</key>
     <key alias="enterCustomValidation">... またはカスタム検証を入力</key>
     <key alias="fieldIsMandatory">必須フィールドです</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">すべて選択</key>
+    <key alias="deselectAllLogLevelFilters">すべての選択を解除</key>
   </area>
 </language>

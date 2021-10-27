@@ -12,7 +12,6 @@
             editor: "<",
             editorIndex: "<",
             editorCount: "<",
-            openVariants: "<",
             onCloseSplitView: "&",
             onSelectVariant: "&",
             onOpenSplitView: "&",
@@ -24,8 +23,8 @@
         controllerAs: 'vm',
         controller: umbVariantContentController
     };
-    
-    function umbVariantContentController($scope, $element, $location) {
+
+    function umbVariantContentController($scope, contentAppHelper) {
 
         var unsubscribe = [];
 
@@ -42,30 +41,30 @@
         vm.showBackButton = showBackButton;
 
         function onInit() {
-            // disable the name field if the active content app is not "Content"
-            vm.nameDisabled = false;
-            angular.forEach(vm.editor.content.apps, function(app){
-                if(app.active && app.alias !== "umbContent" && app.alias !== "umbInfo" && app.alias !== "umbListView") {
-                    vm.nameDisabled = true;
-                }
-            });
+
+            // Make copy of apps, so we can have a variant specific model for the App. (needed for validation etc.)
+            vm.editor.variantApps = Utilities.copy(vm.content.apps);
+
+            var activeApp = vm.content.apps.find((app) => app.active);
+
+            onAppChanged(activeApp);
         }
-        
+
         function showBackButton() {
             return vm.page.listViewPath !== null && vm.showBack;
         }
-        
+
         /** Called when the component has linked all elements, this is when the form controller is available */
         function postLink() {
             //set the content to dirty if the header changes
-            unsubscribe.push($scope.$watch("contentHeaderForm.$dirty",
-                function(newValue, oldValue) {
-                    if (newValue === true) {
+            unsubscribe.push($scope.$watch("vm.editor.content.name",
+                function (newValue, oldValue) {
+                    if (newValue !== oldValue) {
                         vm.editor.content.isDirty = true;
                     }
                 }));
         }
-        
+
         function onDestroy() {
             for (var i = 0; i < unsubscribe.length; i++) {
                 unsubscribe[i]();
@@ -88,19 +87,31 @@
          */
         function selectApp(item) {
             // call the callback if any is registered
-            if(vm.onSelectApp) {
-                vm.onSelectApp({"app": item});
+            if (vm.onSelectApp) {
+                vm.onSelectApp({ "app": item });
             }
         }
-        
-        $scope.$on("editors.apps.appChanged", function($event, $args) {
-            var app = $args.app;
-            // disable the name field if the active content app is not "Content" or "Info"
-            vm.nameDisabled = false;
-            if(app && app.alias !== "umbContent" && app.alias !== "umbInfo" && app.alias !== "umbListView") {
-                vm.nameDisabled = true;
-            }
+
+        $scope.$on("editors.apps.appChanged", function ($event, $args) {
+            var activeApp = $args.app;
+
+            // sync varaintApps active with new active.
+            _.forEach(vm.editor.variantApps, function (app) {
+                app.active = (app.alias === activeApp.alias);
+            });
+
+            onAppChanged(activeApp);
         });
+
+        $scope.$on("listView.itemsChanged", function ($event, $args) {
+            vm.disableActionsMenu = $args.items.length > 0;
+        });
+
+        function onAppChanged(activeApp) {
+
+            // disable the name field if the active content app is not "Content" or "Info"
+            vm.nameDisabled = (activeApp && !contentAppHelper.isContentBasedApp(activeApp)); 
+        }
 
         /**
          * Used to proxy a callback
@@ -108,8 +119,8 @@
          */
         function selectAppAnchor(item, anchor) {
             // call the callback if any is registered
-            if(vm.onSelectAppAnchor) {
-                vm.onSelectAppAnchor({"app": item, "anchor": anchor});
+            if (vm.onSelectAppAnchor) {
+                vm.onSelectAppAnchor({ "app": item, "anchor": anchor });
             }
         }
 

@@ -30,16 +30,22 @@ namespace Umbraco.Tests.UmbracoExamine
     /// </summary>
     internal static class IndexInitializer
     {
-        public static ContentValueSetBuilder GetContentValueSetBuilder(PropertyEditorCollection propertyEditors, bool publishedValuesOnly)
+        public static ContentValueSetBuilder GetContentValueSetBuilder(PropertyEditorCollection propertyEditors, IScopeProvider scopeProvider, bool publishedValuesOnly)
         {
-            var contentValueSetBuilder = new ContentValueSetBuilder(propertyEditors, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), GetMockUserService(), publishedValuesOnly);
+            var contentValueSetBuilder = new ContentValueSetBuilder(
+                propertyEditors,
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                GetMockUserService(),
+                scopeProvider,
+                publishedValuesOnly);
+
             return contentValueSetBuilder;
         }
 
-        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, ISqlContext sqlContext, bool publishedValuesOnly)
+        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, IScopeProvider scopeProvider, bool publishedValuesOnly)
         {
-            var contentValueSetBuilder = GetContentValueSetBuilder(propertyEditors, publishedValuesOnly);
-            var contentIndexDataSource = new ContentIndexPopulator(true, null, contentService, sqlContext, contentValueSetBuilder);
+            var contentValueSetBuilder = GetContentValueSetBuilder(propertyEditors, scopeProvider, publishedValuesOnly);
+            var contentIndexDataSource = new ContentIndexPopulator(publishedValuesOnly, null, contentService, scopeProvider.SqlContext, contentValueSetBuilder);
             return contentIndexDataSource;
         }
 

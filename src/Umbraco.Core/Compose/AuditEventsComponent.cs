@@ -42,7 +42,19 @@ namespace Umbraco.Core.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            UserService.SavedUserGroup -= OnSavedUserGroupWithUsers;
+
+            UserService.SavedUser -= OnSavedUser;
+            UserService.DeletedUser -= OnDeletedUser;
+            UserService.UserGroupPermissionsAssigned -= UserGroupPermissionAssigned;
+
+            MemberService.Saved -= OnSavedMember;
+            MemberService.Deleted -= OnDeletedMember;
+            MemberService.AssignedRoles -= OnAssignedRoles;
+            MemberService.RemovedRoles -= OnRemovedRoles;
+            MemberService.Exported -= OnMemberExported;
+        }
 
         internal static IUser UnknownUser => new User { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
 
@@ -68,7 +80,7 @@ namespace Umbraco.Core.Compose
             {
                 var httpContext = HttpContext.Current == null ? (HttpContextBase) null : new HttpContextWrapper(HttpContext.Current);
                 var ip = httpContext.GetCurrentRequestIpAddress();
-                if (ip.ToLowerInvariant().StartsWith("unknown")) ip = "";
+                if (ip == null || ip.ToLowerInvariant().StartsWith("unknown")) ip = "";
                 return ip;
             }
         }

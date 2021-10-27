@@ -24,6 +24,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "name", IsRequired = true)]
         public string Name { get; set; }
 
+        [DataMember(Name = "displayName")]
+        public string DisplayName { get; set; }
+
         /// <summary>
         /// Defines the tabs containing display properties
         /// </summary>

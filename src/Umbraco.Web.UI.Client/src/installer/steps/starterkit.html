@@ -10,18 +10,19 @@
 
     <ul class="thumbnails">
         <li class="span3" ng-repeat="pck in packages">
-            <a ng-click="setPackageAndContinue(pck.id)" class="thumbnail">
+            <button type="button" ng-click="setPackageAndContinue(pck.id)" class="btn-reset thumbnail">
                 <img ng-src="https://our.umbraco.com{{
                         pck.thumbnail
                     }}?width=170"
                      alt="{{ pck.name }}" />
                 <small>Install starter website</small>
-            </a>
+            </button>
         </li>
     </ul>
 
-    <a href ng-click="setPackageAndContinue('00000000-0000-0000-0000-000000000000')"
-       class="btn btn-link btn-link-reverse">
+    <button type="button"
+            class="btn btn-link btn-link-reverse"
+            ng-click="setPackageAndContinue('00000000-0000-0000-0000-000000000000')">
         No thanks, I do not want to install a starter website
-    </a>
+    </button>
 </div>

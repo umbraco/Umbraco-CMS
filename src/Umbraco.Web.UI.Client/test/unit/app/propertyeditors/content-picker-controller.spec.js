@@ -5,11 +5,11 @@ describe('Content picker controller tests', function () {
     beforeEach(module('umbraco'));
 
     //inject the contentMocks service
-    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, entityMocks, mocksUtils, localizationMocks) {
+    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, entityMocks, mocksUtils, localizationMocks, userMocks) {
 
         //for these tests we don't want any authorization to occur
-        mocksUtils.disableAuth();
-
+        mocksUtils.setAuth();
+		
         httpBackend = $httpBackend;
         scope = $rootScope.$new();
 
@@ -34,6 +34,7 @@ describe('Content picker controller tests', function () {
         //see /mocks/content.mocks.js for how its setup
         entityMocks.register();
         localizationMocks.register();
+        userMocks.register();
 
         controller = $controller('Umbraco.PropertyEditors.ContentPickerController', {
             $scope: scope,
@@ -42,7 +43,7 @@ describe('Content picker controller tests', function () {
 
         //For controller tests its easiest to have the digest and flush happen here
         //since its intially always the same $http calls made
-
+		
         //scope.$digest resolves the promise against the httpbackend
         scope.$digest();
 

@@ -45,8 +45,7 @@
 (function () {
     'use strict';
 
-    function listViewHelper($location, localStorageService, urlHelper) {
-
+    function listViewHelper($location, $rootScope, localStorageService, urlHelper, editorService) {
         var firstSelectedIndex = 0;
         var localStorageKey = "umblistViewLayout";
 
@@ -286,6 +285,7 @@
 
                 selection.push(obj);
                 item.selected = true;
+                $rootScope.$broadcast("listView.itemsChanged", { items: selection });
             }
         }
 
@@ -308,6 +308,7 @@
                 if ((item.id !== 2147483647 && item.id === selectedItem.id) || (item.key && item.key === selectedItem.key)) {
                     selection.splice(i, 1);
                     item.selected = false;
+                    $rootScope.$broadcast("listView.itemsChanged", { items: selection });
                 }
             }
         }
@@ -332,19 +333,20 @@
 
             selection.length = 0;
 
-            if (angular.isArray(items)) {
+            if (Utilities.isArray(items)) {
                 for (i = 0; items.length > i; i++) {
                     var item = items[i];
                     item.selected = false;
                 }
             }
 
-         if(angular.isArray(folders)) {
+            if (Utilities.isArray(folders)) {
                 for (i = 0; folders.length > i; i++) {
                     var folder = folders[i];
                     folder.selected = false;
                 }
             }
+            $rootScope.$broadcast("listView.itemsChanged", { items: selection });
         }
 
         /**
@@ -366,7 +368,7 @@
             var checkbox = $event.target;
             var clearSelection = false;
 
-            if (!angular.isArray(items)) {
+            if (!Utilities.isArray(items)) {
                 return;
             }
 
@@ -395,10 +397,11 @@
             if (clearSelection) {
                 selection.length = 0;
             }
+            $rootScope.$broadcast("listView.itemsChanged", { items: selection });
 
         }
-        
-        
+
+
         /**
         * @ngdoc method
         * @name umbraco.services.listViewHelper#selectAllItemsToggle
@@ -410,29 +413,29 @@
         * @param {Array} items Items to toggle selection on, should be $scope.items
         * @param {Array} selection Listview selection, available as $scope.selection
         */
-        
+
         function selectAllItemsToggle(items, selection) {
-            
-            if (!angular.isArray(items)) {
+
+            if (!Utilities.isArray(items)) {
                 return;
             }
-            
+
             if (isSelectedAll(items, selection)) {
                 // unselect all items
-                angular.forEach(items, function (item) {
+                items.forEach(function (item) {
                     item.selected = false;
                 });
-                
+
                 // reset selection without loosing reference.
                 selection.length = 0;
-                
+
             } else {
-                
+
                 // reset selection without loosing reference.
                 selection.length = 0;
-                
+
                 // select all items
-                angular.forEach(items, function (item) {
+                items.forEach(function (item) {
                     var obj = {
                         id: item.id
                     };
@@ -443,6 +446,7 @@
                     selection.push(obj);
                 });
             }
+            $rootScope.$broadcast("listView.itemsChanged", { items: selection });
 
         }
 
@@ -558,7 +562,7 @@
             };
         }
 
-        
+
         /**
         * @ngdoc method
         * @name umbraco.services.listViewHelper#editItem
@@ -568,23 +572,60 @@
         * Method for opening an item in a list view for editing.
         *
         * @param {Object} item The item to edit
+        * @param {Object} scope The scope with options
         */
-        function editItem(item) {
+        function editItem(item, scope) {
+
             if (!item.editPath) {
                 return;
             }
+
+            if (scope && scope.options && scope.options.useInfiniteEditor)
+            {
+                var editorModel = {
+                    id: item.id,
+                    submit: function(model) {
+                        editorService.close();
+                        scope.getContent(scope.contentId);
+                    },
+                    close: function() {
+                        editorService.close();
+                        scope.getContent(scope.contentId);
+                    }
+                };
+
+                if (item.editPath.indexOf("/content/") == 0)
+                {
+                    editorService.contentEditor(editorModel);
+                    return;
+                }
+
+                if (item.editPath.indexOf("/media/") == 0)
+                {
+                    editorService.mediaEditor(editorModel);
+                    return;
+                }
+
+                if (item.editPath.indexOf("/member/") == 0)
+                {
+                    editorModel.id = item.key;
+                    editorService.memberEditor(editorModel);
+                    return;
+                }
+            }
+            
             var parts = item.editPath.split("?");
             var path = parts[0];
             var params = parts[1]
-                ? urlHelper.getQueryStringParams("?" + parts[1])
-                : {};
-
+            ? urlHelper.getQueryStringParams("?" + parts[1])
+            : {};
+            
             $location.path(path);
             for (var p in params) {
                 $location.search(p, params[p]);
             }
         }
-        
+
         function isMatchingLayout(id, layout) {
             // legacy format uses "nodeId", be sure to look for both
             return layout.id === id || layout.nodeId === id;
@@ -592,21 +633,21 @@
 
         var service = {
 
-          getLayout: getLayout,
-          getFirstAllowedLayout: getFirstAllowedLayout,
-          setLayout: setLayout,
-          saveLayoutInLocalStorage: saveLayoutInLocalStorage,
-          selectHandler: selectHandler,
-          selectItem: selectItem,
-          deselectItem: deselectItem,
-          clearSelection: clearSelection,
-          selectAllItems: selectAllItems,
-          selectAllItemsToggle: selectAllItemsToggle,
-          isSelectedAll: isSelectedAll,
-          setSortingDirection: setSortingDirection,
-          setSorting: setSorting,
-          getButtonPermissions: getButtonPermissions,
-          editItem: editItem
+            getLayout: getLayout,
+            getFirstAllowedLayout: getFirstAllowedLayout,
+            setLayout: setLayout,
+            saveLayoutInLocalStorage: saveLayoutInLocalStorage,
+            selectHandler: selectHandler,
+            selectItem: selectItem,
+            deselectItem: deselectItem,
+            clearSelection: clearSelection,
+            selectAllItems: selectAllItems,
+            selectAllItemsToggle: selectAllItemsToggle,
+            isSelectedAll: isSelectedAll,
+            setSortingDirection: setSortingDirection,
+            setSorting: setSorting,
+            getButtonPermissions: getButtonPermissions,
+            editItem: editItem
 
         };
 

@@ -35,6 +35,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// </remarks>
         public static Sql GetDeleteSubquery(this ISqlSyntaxProvider sqlProvider, string tableName, string columnName, Sql subQuery, WhereInType whereInType = WhereInType.In)
         {
+            //TODO: This is no longer necessary since this used to be a specific requirement for MySql!
+            // Now we can do a Delete<T> + sub query, see RelationRepository.DeleteByParent for example
 
             return
                 new Sql(string.Format(

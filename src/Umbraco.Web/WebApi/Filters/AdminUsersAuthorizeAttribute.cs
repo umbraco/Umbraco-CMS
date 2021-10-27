@@ -50,7 +50,7 @@ namespace Umbraco.Web.WebApi.Filters
             if (userIds.Length == 0) return base.IsAuthorized(actionContext);
 
             var users = Current.Services.UserService.GetUsersById(userIds);
-            var authHelper = new UserEditorAuthorizationHelper(Current.Services.ContentService, Current.Services.MediaService, Current.Services.UserService, Current.Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Current.Services.ContentService, Current.Services.MediaService, Current.Services.UserService, Current.Services.EntityService, Current.AppCaches);
             return users.All(user => authHelper.IsAuthorized(Current.UmbracoContext.Security.CurrentUser, user, null, null, null) != false);
         }
     }

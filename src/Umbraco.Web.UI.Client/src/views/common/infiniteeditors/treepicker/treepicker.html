@@ -19,25 +19,25 @@
                             <div ng-hide="vm.miniListView">
 
                                 <div class="umb-language-picker" ng-if="vm.showLanguageSelector && vm.languages.length > 1" on-outside-click="vm.page.languageSelectorIsOpen = false" style="padding-bottom: 5px">
-                                    <div class="umb-language-picker__toggle" ng-click="vm.toggleLanguageSelector()">
-                                        <div>{{vm.selectedLanguage.name}}</div>
-                                        <ins class="umb-language-picker__expand" ng-class="{'icon-navigation-down': !vm.languageSelectorIsOpen, 'icon-navigation-up': vm.languageSelectorIsOpen}" class="icon-navigation-right">&nbsp;</ins>
-                                    </div>
+                                    <button class="umb-language-picker__toggle btn-reset" ng-click="vm.toggleLanguageSelector()">
+                                        <span>{{vm.selectedLanguage.name}}</span>
+                                        <umb-icon icon="{{vm.languageSelectorIsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-language-picker__expand"></umb-icon>
+                                    </button>
                                     <div class="umb-language-picker__dropdown" ng-if="vm.languageSelectorIsOpen">
-                                        <a ng-click="vm.selectLanguage(language)" ng-repeat="language in vm.languages" href="">{{language.name}}</a>
+                                        <button class="btn-reset" ng-click="vm.selectLanguage(language)" ng-repeat="language in vm.languages">{{language.name}}</button>
                                     </div>
                                 </div>
 
-                                <div class="umb-control-group">
+                                <div class="umb-control-group" ng-if="vm.enableSearh">
                                     <umb-tree-search-box
-                                        ng-if="vm.enableSearh"
                                         hide-search-callback="vm.hideSearch"
                                         search-callback="vm.onSearchResults"
                                         search-from-id="{{vm.searchInfo.searchFromId}}"
                                         search-from-name="{{vm.searchInfo.searchFromName}}"
                                         show-search="{{vm.searchInfo.showSearch}}"
                                         datatype-key="{{vm.searchInfo.dataTypeKey}}"
-                                        section="{{vm.section}}">
+                                        section="{{vm.section}}"
+                                        auto-focus="true">
                                     </umb-tree-search-box>
                                 </div>
 
@@ -75,6 +75,7 @@
                                 start-node-id="vm.startNodeId"
                                 on-select="vm.selectListViewNode(node)"
                                 on-close="vm.closeMiniListView()"
+                                on-items-loaded="vm.listViewItemsLoaded(items)"
                                 entity-type-filter="vm.filter">
                             </umb-mini-list-view>
 
@@ -92,6 +93,15 @@
                         label-key="general_close"
                         shortcut="esc"
                         action="vm.close()">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="model.extraActions"
+                        ng-repeat="action in model.extraActions track by $index"
+                        type="button"
+                        button-style="{{action.style || 'link'}}"
+                        label-key="{{action.labelKey}}"
+                        action="action.action()">
                     </umb-button>
 
                     <umb-button

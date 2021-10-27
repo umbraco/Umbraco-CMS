@@ -2,24 +2,34 @@
     <div ng-show="pagination.length > 1">
         <ul>
             <li ng-class="{disabled:pageNumber <= 1}">
-                <a href="#" ng-click="prev()" prevent-default>
+                <button type="button"
+                        class="btn-reset"
+                        ng-disabled="pageNumber <= 1"
+                        ng-click="prev()">
                     <localize key="general_previous">Previous</localize>
-                </a>
+                </button>
             </li>
 
             <li ng-repeat="pgn in pagination track by $index"
                 ng-class="{active:pgn.isActive}">
 
-                <a href="#" ng-click="goToPage(pgn.val - 1)" prevent-default
-                   ng-bind="pgn.name ? pgn.name : pgn.val"
-                   ng-if="pgn.val != '...'"></a>
+                <button type="button"
+                        class="btn-reset"
+                        ng-click="goToPage(pgn.val - 1)"
+                        ng-bind="pgn.name ? pgn.name : pgn.val"
+                        ng-disabled="pgn.val === pageNumber"
+                        ng-if="pgn.val != '...'">
+                </button>
                 <span ng-bind="pgn.val" ng-if="pgn.val == '...'"></span>
             </li>
 
             <li ng-class="{disabled:pageNumber >= totalPages}">
-                <a href="#" ng-click="next()" prevent-default>
+                <button type="button"
+                        class="btn-reset"
+                        ng-disabled="pageNumber >= totalPages"
+                        ng-click="next()">
                     <localize key="general_next">Next</localize>
-                </a>
+                </button>
             </li>
         </ul>
     </div>

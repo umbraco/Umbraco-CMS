@@ -5,6 +5,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;
@@ -29,6 +30,7 @@ namespace Umbraco.Core.Composing
     public static class Current
     {
         private static IFactory _factory;
+        private static IRuntimeState _state;
 
         // TODO: get rid of these oddities
         // we don't want Umbraco tests to die because the container has not been properly initialized,
@@ -124,7 +126,17 @@ namespace Umbraco.Core.Composing
                ?? new ProfilingLogger(Logger, Profiler);
 
         public static IRuntimeState RuntimeState
-            => Factory.GetInstance<IRuntimeState>();
+        {
+            get
+            {
+                return _state ?? Factory.GetInstance<IRuntimeState>();
+            }
+            internal set
+            {
+                // this is only used when the boot entirely fails, we need to manually set this so we can report
+                _state = value;
+            }
+        }
 
         public static TypeLoader TypeLoader
             => Factory.GetInstance<TypeLoader>();
@@ -153,6 +165,9 @@ namespace Umbraco.Core.Composing
 
         public static DataEditorCollection DataEditors
             => Factory.GetInstance<DataEditorCollection>();
+
+        public static DataValueReferenceFactoryCollection DataValueReferenceFactories
+            => Factory.GetInstance<DataValueReferenceFactoryCollection>();
 
         public static PropertyEditorCollection PropertyEditors
             => Factory.GetInstance<PropertyEditorCollection>();
@@ -205,6 +220,8 @@ namespace Umbraco.Core.Composing
         public static IVariationContextAccessor VariationContextAccessor
             => Factory.GetInstance<IVariationContextAccessor>();
 
+        public static IImageUrlGenerator ImageUrlGenerator
+            => Factory.GetInstance<IImageUrlGenerator>();
         #endregion
     }
 }

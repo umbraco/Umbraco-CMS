@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
 using Microsoft.Owin;
+using Newtonsoft.Json;
 using Umbraco.Core;
 
 namespace Umbraco.Web
@@ -37,10 +39,10 @@ namespace Umbraco.Web
                 if (cookiesHeaderValue == null)
                     return null;
 
-                var cookieCollection = cookiesHeaderValue.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var cookieCollection = cookiesHeaderValue.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var cookieNameValue in cookieCollection)
                 {
-                    var parts = cookieNameValue.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                    var parts = cookieNameValue.Split(Constants.CharArrays.EqualsChar, StringSplitOptions.RemoveEmptyEntries);
                     if (parts.Length != 2) continue;
                     if (parts[0].Trim().Equals(cookieName, StringComparison.InvariantCultureIgnoreCase))
                         return parts[1].Trim();
@@ -61,11 +63,11 @@ namespace Umbraco.Web
             http.Request.Cookies.Remove(cookieName);
 
             //expire from the response
-            var angularCookie = http.Response.Cookies[cookieName];
-            if (angularCookie != null)
+            var cookie = http.Response.Cookies[cookieName];
+            if (cookie != null)
             {
                 //this will expire immediately and be removed from the browser
-                angularCookie.Expires = DateTime.Now.AddYears(-1);
+                cookie.Expires = DateTime.Now.AddYears(-1);
             }
             else
             {

@@ -127,6 +127,40 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve url for id:' + id);
         },
 
+        getUrlsByUdis: function(udis, culture) {
+          var query = "culture=" + (culture || "");
+
+          return umbRequestHelper.resourcePromise(
+             $http.post(
+                 umbRequestHelper.getApiUrl(
+                     "entityApiBaseUrl",
+                     "GetUrlsByUdis",
+                     query),
+                 {
+                     udis: udis
+                 }),
+             'Failed to retrieve url map for udis ' + udis);
+        },
+
+        getUrlByUdi: function (udi, culture) {
+
+            if (!udi) {
+                return "";
+            }
+
+            if (!culture) {
+                culture = "";
+            }
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetUrl",
+                       [{ udi: udi }, {culture: culture }])),
+               'Failed to retrieve url for UDI:' + udi);
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getById
@@ -166,10 +200,14 @@ function entityResource($q, $http, umbRequestHelper) {
         },
 
 
-        getUrlAndAnchors: function (id) {
+        getUrlAndAnchors: function (id, culture) {
 
             if (id === -1 || id === "-1") {
                 return null;
+            }
+
+            if (!culture) {
+                culture = "";
             }
 
             return umbRequestHelper.resourcePromise(
@@ -177,14 +215,14 @@ function entityResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "entityApiBaseUrl",
                         "GetUrlAndAnchors",
-                        [{ id: id }])),
+                        [{ id: id }, {culture: culture }])),
                 'Failed to retrieve url and anchors data for id ' + id);
         },
 
         getAnchors: function (rteContent) {
 
             if (!rteContent || rteContent.length === 0) {
-                return [];
+                return $q.when([]);
             }
 
             return umbRequestHelper.resourcePromise(
@@ -416,7 +454,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct
@@ -489,7 +527,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct

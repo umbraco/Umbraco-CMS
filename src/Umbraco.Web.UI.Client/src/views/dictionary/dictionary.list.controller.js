@@ -19,7 +19,7 @@ function DictionaryListController($scope, $location, dictionaryResource, localiz
         dictionaryResource.getList()
             .then(function (data) {
                 vm.items = data;
-                angular.forEach(vm.items, function(item){
+                vm.items.forEach(function(item){
                     item.style = { "paddingLeft": item.level * 10 };
                 });
                 vm.loading = false;

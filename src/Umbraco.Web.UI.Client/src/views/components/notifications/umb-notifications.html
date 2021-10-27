@@ -7,19 +7,20 @@
             <div ng-if="notification.view">
                 <div ng-include="notification.view"></div>
             </div>
-            <div ng-if="notification.headline" ng-switch on="{{notification}}">
-                <a ng-href="{{notification.url}}" ng-switch-when="{{notification.url && notification.url.trim() != ''}}" target="_blank">
-                    <strong>{{notification.headline}}</strong>
+
+            <div ng-if="notification.headline">
+                <a ng-if="notification.url" ng-href="{{notification.url}}" href="" target="{{notification.target}}" rel="noreferrer">
+                    <strong ng-bind="notification.headline"></strong>
                     <span ng-bind-html="notification.message"></span>
                 </a>
-                <div ng-switch-default>
-                    <strong>{{notification.headline}}</strong>
+                <div ng-if="!notification.url">
+                    <strong ng-bind="notification.headline"></strong>
                     <span ng-bind-html="notification.message"></span>
                 </div>
             </div>
 
-            <button type="button" class='close -align-right' ng-click="removeNotification($index)" aria-hidden="true">
-                <span aria-hidden="true">&times;</span>
+            <button type="button" class="close -align-right" ng-click="removeNotification($index)" aria-hidden="true">
+                <span>&times;</span>
             </button>
         </li>
     </ul>

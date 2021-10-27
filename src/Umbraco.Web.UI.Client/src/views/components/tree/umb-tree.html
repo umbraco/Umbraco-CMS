@@ -1,26 +1,40 @@
 <ul class="umb-tree" ng-class="{'hide-options': hideoptions === 'true'}">
 
     <li ng-if="!tree.root.containsGroups">
-        <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-hide="hideheader === 'true'" on-right-click="altSelect(tree.root, $event)">
+        <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-if="hideheader !== 'true'" on-right-click="altSelect(tree.root, $event)">
             <h5>
                 <a ng-href="#/{{section}}" ng-click="select(tree.root, $event)" class="umb-tree-root-link umb-outline" data-element="tree-root-link">
-                    <i ng-if="enablecheckboxes === 'true'" ng-class="selectEnabledNodeClass(tree.root)"></i>
+                    <umb-icon icon="icon-check"
+                              class="umb-tree-icon"
+                              ng-class="selectEnabledNodeClass(tree.root)"
+                              ng-if="enablecheckboxes === 'true'">
+                    </umb-icon>
                     {{tree.name}}
                 </a>
             </h5>
-            <button data-element="tree-item-options" class="umb-options btn-reset sr-only sr-only--focusable sr-only--hoverable" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)">
-                <i></i><i></i><i></i>
-            </button>
+
+            <umb-button-ellipsis element="tree-item-options"
+                                 action="options(tree.root, $event)"
+                                 text="Open context node for {{tree.name}}"
+                                 state="hidden"
+                                 class="umb-options"
+                                 ng-hide="tree.root.isContainer || !tree.root.menuUrl"
+                                 ng-swipe-right="options(tree.root, $event)">
+            </umb-button-ellipsis>
+
         </div>
-        <umb-tree-item class="umb-animated"
-                       ng-repeat="child in tree.root.children"
-                       enablelistviewexpand="{{enablelistviewexpand}}"
-                       node="child"
-                       current-node="currentNode"
-                       tree="this"
-                       is-dialog="isdialog"
-                       section="{{section}}">
-        </umb-tree-item>
+
+        <ul ng-if="tree.root.children.length > 0">
+            <umb-tree-item class="umb-animated"
+                           ng-repeat="child in tree.root.children"
+                           enablelistviewexpand="{{enablelistviewexpand}}"
+                           node="child"
+                           current-node="currentNode"
+                           tree="this"
+                           is-dialog="isdialog"
+                           section="{{section}}">
+            </umb-tree-item>
+        </ul>
     </li>
 
     <!-- REPEAT for each group in the tree -->
@@ -30,24 +44,36 @@
         <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(group)" ng-hide="hideheader === 'true'" on-right-click="altSelect(group, $event)">
             <h5>
                 <a ng-href="#/{{section}}" ng-click="select(group, $event)" class="umb-tree-root-link umb-outline" data-element="tree-root-link">
-                    <i ng-if="enablecheckboxes === 'true'" ng-class="selectEnabledNodeClass(group)"></i>
+                    <umb-icon icon="icon-check"
+                              class="umb-tree-icon"
+                              ng-class="selectEnabledNodeClass(group)"
+                              ng-if="enablecheckboxes === 'true'">
+                    </umb-icon>
                     {{group.name}}
                 </a>
             </h5>
-            <button data-element="tree-item-options" class="umb-options umb-outline btn-reset sr-only sr-only--focusable sr-only--hoverable" ng-hide="group.isContainer || !group.menuUrl" ng-click="options(group, $event)" ng-swipe-right="options(group, $event)">
-                <i></i><i></i><i></i>
-            </button>
+
+            <umb-button-ellipsis element="tree-item-options"
+                                 action="options(group, $event)"
+                                 text="Open context node for {{group.name}}"
+                                 state="hidden"
+                                 class="umb-options"
+                                 ng-hide="group.isContainer || !group.menuUrl"
+                                 ng-swipe-right="options(group, $event)">
+            </umb-button-ellipsis>
         </div>
 
-        <umb-tree-item class="umb-animated"
-                       ng-repeat="child in group.children"
-                       enablelistviewexpand="{{enablelistviewexpand}}"
-                       node="child"
-                       current-node="currentNode"
-                       tree="this"
-                       is-dialog="isdialog"
-                       section="{{section}}">
-        </umb-tree-item>
+        <ul ng-if="group.children.length > 0">
+            <umb-tree-item class="umb-animated"
+                           ng-repeat="child in group.children"
+                           enablelistviewexpand="{{enablelistviewexpand}}"
+                           node="child"
+                           current-node="currentNode"
+                           tree="this"
+                           is-dialog="isdialog"
+                           section="{{section}}">
+            </umb-tree-item>
+        </ul>
     </li>
     <!-- END REPEAT -->
 </ul>

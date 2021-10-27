@@ -6,9 +6,13 @@
  * @description
  * The controller for editing relation types.
  */
-function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService) {
+function RelationTypeEditController($scope, $routeParams, relationTypeResource, editorState, navigationService, dateHelper, userService, entityResource, formHelper, contentEditingHelper, localizationService, eventsService) {
 
     var vm = this;
+
+    vm.header = {};
+    vm.header.editorfor = "relationType_tabRelationType";
+    vm.header.setPageTitle = true;
 
     vm.page = {};
     vm.page.loading = false;
@@ -21,6 +25,10 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
 
     function init() {
         vm.page.loading = true;
+        vm.relationsLoading = true;
+
+        vm.changePageNumber = changePageNumber;
+        vm.options = {};
 
         var labelKeys = [
             "relationType_tabRelationType",
@@ -45,17 +53,42 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
             ];
         });
 
+        // load references when the 'relations' tab is first activated/switched to
+        var appTabChange =  eventsService.on("app.tabChange", function (event, args) {
+            if (args.alias === "relations") {
+                loadRelations();
+            }
+        });
+        $scope.$on('$destroy', function () {
+            appTabChange();
+        });
+
+        // Inital page/overview API call of relation type
         relationTypeResource.getById($routeParams.id)
-            .then(function(data) {
+            .then(function (data) {
                 bindRelationType(data);
                 vm.page.loading = false;
             });
     }
 
-    function bindRelationType(relationType) {
-        formatDates(relationType.relations);
-        getRelationNames(relationType);
+    function changePageNumber(pageNumber) {
+        vm.options.pageNumber = pageNumber;
+        loadRelations();
+    } 
 
+
+    /** Loads in the references one time  when content app changed */
+    function loadRelations() {
+        relationTypeResource.getPagedResults($routeParams.id, vm.options)
+            .then(function (data) {
+                formatDates(data.items);
+                vm.relationsLoading = false;
+                vm.relations = data;
+            });
+    }
+    
+
+    function bindRelationType(relationType) {
         // Convert property value to string, since the umb-radiobutton component at the moment only handle string values.
         // Sometime later the umb-radiobutton might be able to handle value as boolean.
         relationType.isBidirectional = (relationType.isBidirectional || false).toString();
@@ -70,48 +103,13 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     }
 
     function formatDates(relations) {
-        if(relations) {
+        if (relations) {
             userService.getCurrentUser().then(function (currentUser) {
-                angular.forEach(relations, function (relation) {
+                relations.forEach(function (relation) {
                     relation.timestampFormatted = dateHelper.getLocalDate(relation.createDate, currentUser.locale, 'LLL');
                 });
             });
         }
-    }
-
-    function getRelationNames(relationType) {
-        if (relationType.relations) {
-            // can we grab app entity types in one go?
-            if (relationType.parentObjectType === relationType.childObjectType) {
-                // yep, grab the distinct list of parent and child entities
-                var entityIds = _.uniq(_.union(_.pluck(relationType.relations, "parentId"), _.pluck(relationType.relations, "childId")));
-                entityResource.getByIds(entityIds, relationType.parentObjectTypeName).then(function (entities) {
-                    updateRelationNames(relationType, entities);
-                });
-            } else {
-                // nope, grab the parent and child entities individually
-                var parentEntityIds = _.uniq(_.pluck(relationType.relations, "parentId"));
-                var childEntityIds = _.uniq(_.pluck(relationType.relations, "childId"));
-                entityResource.getByIds(parentEntityIds, relationType.parentObjectTypeName).then(function (entities) {
-                    updateRelationNames(relationType, entities);
-                });
-                entityResource.getByIds(childEntityIds, relationType.childObjectTypeName).then(function (entities) {
-                    updateRelationNames(relationType, entities);
-                });
-            }
-        }
-    }
-
-    function updateRelationNames(relationType, entities) {
-        var entitiesById = _.indexBy(entities, "id");
-        _.each(relationType.relations, function(relation) {
-            if (entitiesById[relation.parentId]) {
-                relation.parentName = entitiesById[relation.parentId].name;
-            }
-            if (entitiesById[relation.childId]) {
-                relation.childName = entitiesById[relation.childId].name;
-            }
-        });
     }
 
     function saveRelationType() {
@@ -121,12 +119,13 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
             vm.page.saveButtonState = "busy";
 
             relationTypeResource.save(vm.relationType).then(function (data) {
-                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                formHelper.resetForm({ scope: $scope });
                 bindRelationType(data);
 
                 vm.page.saveButtonState = "success";
 
             }, function (error) {
+                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 contentEditingHelper.handleSaveError({
                     err: error
                 });

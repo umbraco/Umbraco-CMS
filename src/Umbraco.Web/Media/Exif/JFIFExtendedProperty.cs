@@ -19,7 +19,7 @@ namespace Umbraco.Web.Media.Exif
         public JFIFVersion(ExifTag tag, ushort value)
             : base(tag, value)
         {
-            ;
+
         }
 
         public override string ToString()

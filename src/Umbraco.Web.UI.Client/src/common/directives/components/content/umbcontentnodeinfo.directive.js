@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     'use strict';
 
     function ContentNodeInfoDirective($timeout, logResource, eventsService, userService, localizationService, dateHelper, editorService, redirectUrlsResource, overlayService, entityResource) {
@@ -17,6 +17,8 @@
             scope.allowChangeDocumentType = false;
             scope.allowChangeTemplate = false;
             scope.allTemplates = [];
+
+            scope.historyLabelKey = scope.node.variants && scope.node.variants.length === 1 ? "general_history" : "auditTrails_historyIncludingVariants";
 
             function onInit() {
                 entityResource.getAll("Template").then(function (templates) {
@@ -46,25 +48,21 @@
                     "content_notCreated",
                     "prompt_unsavedChanges",
                     "prompt_doctypeChangeWarning",
-                    "general_history",
-                    "auditTrails_historyIncludingVariants",
                     "content_itemNotPublished",
                     "general_choose"
                 ];
 
                 localizationService.localizeMany(keys)
                     .then(function (data) {
-                        labels.deleted = data[0];
-                        labels.unpublished = data[1]; //aka draft
-                        labels.published = data[2];
-                        labels.publishedPendingChanges = data[3];
-                        labels.notCreated = data[4];
-                        labels.unsavedChanges = data[5];
-                        labels.doctypeChangeWarning = data[6];
-                        labels.notPublished = data[9];
-
-                        scope.historyLabel = scope.node.variants && scope.node.variants.length === 1 ? data[7] : data[8];
-                        scope.chooseLabel = data[10];
+                        [labels.deleted, 
+                        labels.unpublished, 
+                        labels.published,
+                        labels.publishedPendingChanges,
+                        labels.notCreated,
+                        labels.unsavedChanges,
+                        labels.doctypeChangeWarning,
+                        labels.notPublished,
+                        scope.chooseLabel] = data;
 
                         setNodePublishStatus();
 
@@ -130,6 +128,7 @@
                         view: "default",
                         content: labels.doctypeChangeWarning,
                         submitButtonLabelKey: "general_continue",
+                        submitButtonStyle: "warning",
                         closeButtonLabelKey: "general_cancel",
                         submit: function () {
                             openDocTypeEditor(documentType);
@@ -160,7 +159,7 @@
             }
 
             scope.openTemplate = function () {
-                var template = _.findWhere(scope.allTemplates, {alias: scope.node.template})
+                var template = _.findWhere(scope.allTemplates, { alias: scope.node.template })
                 if (!template) {
                     return;
                 }
@@ -201,17 +200,17 @@
 
                 //don't load this if it's already done
                 if (auditTrailLoaded && !forceReload) {
-                    return; 
+                    return;
                 }
 
                 scope.loadingAuditTrail = true;
 
                 logResource.getPagedEntityLog(scope.auditTrailOptions)
-                    .then(function (data) {
+                    .then(data => {
 
                         // get current backoffice user and format dates
-                        userService.getCurrentUser().then(function (currentUser) {
-                            angular.forEach(data.items, function (item) {
+                        userService.getCurrentUser().then(currentUser => {
+                            Utilities.forEach(data.items, item => {
                                 item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
@@ -232,13 +231,13 @@
             }
             function loadRedirectUrls() {
                 scope.loadingRedirectUrls = true;
-                //check if Redirect Url Management is enabled
-                redirectUrlsResource.getEnableState().then(function (response) {
+                //check if Redirect URL Management is enabled
+                redirectUrlsResource.getEnableState().then(response => {
                     scope.urlTrackerDisabled = response.enabled !== true;
                     if (scope.urlTrackerDisabled === false) {
 
                         redirectUrlsResource.getRedirectsForContentItem(scope.node.udi)
-                            .then(function (data) {
+                            .then(data => {
                                 scope.redirectUrls = data.searchResults;
                                 scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
                                 scope.loadingRedirectUrls = false;
@@ -251,8 +250,8 @@
             }
 
             function setAuditTrailLogTypeColor(auditTrail) {
-                angular.forEach(auditTrail, function (item) {
-                    
+                Utilities.forEach(auditTrail, item => {
+
                     switch (item.logType) {
                         case "Save":
                             item.logTypeColor = "primary";
@@ -264,7 +263,7 @@
                         case "Unpublish":
                         case "UnpublishVariant":
                             item.logTypeColor = "warning";
-                        break;
+                            break;
                         case "Delete":
                             item.logTypeColor = "danger";
                             break;
@@ -305,7 +304,7 @@
 
             function formatDatesToLocal() {
                 // get current backoffice user and format dates
-                userService.getCurrentUser().then(function (currentUser) {
+                userService.getCurrentUser().then(currentUser => {
                     scope.currentVariant.createDateFormatted = dateHelper.getLocalDate(scope.currentVariant.createDate, currentUser.locale, 'LLL');
                     scope.currentVariant.releaseDateFormatted = dateHelper.getLocalDate(scope.currentVariant.releaseDate, currentUser.locale, 'LLL');
                     scope.currentVariant.expireDateFormatted = dateHelper.getLocalDate(scope.currentVariant.expireDate, currentUser.locale, 'LLL');
@@ -313,20 +312,18 @@
             }
 
             function updateCurrentUrls() {
-                // never show urls for element types (if they happen to have been created in the content tree)
-                if (scope.node.isElement) {
+                // never show URLs for element types (if they happen to have been created in the content tree)
+                if (scope.node.isElement || scope.node.urls === null) {
                     scope.currentUrls = null;
                     return;
                 }
 
                 // find the urls for the currently selected language
-                if (scope.node.variants.length > 1) {
-                    // nodes with variants
-                    scope.currentUrls = _.filter(scope.node.urls, (url) => scope.currentVariant.language.culture === url.culture);
-                } else {
-                    // invariant nodes
-                    scope.currentUrls = scope.node.urls;
-                }
+                // when there is no selected language (allow vary by culture == false), show all urls of the node.
+                scope.currentUrls = _.filter(scope.node.urls, (url) => (scope.currentVariant.language == null || scope.currentVariant.language.culture === url.culture));
+
+                // figure out if multiple cultures apply across the content URLs
+                scope.currentUrlsHaveMultipleCultures = _.keys(_.groupBy(scope.currentUrls, url => url.culture)).length > 1;
             }
 
             // load audit trail and redirects when on the info tab

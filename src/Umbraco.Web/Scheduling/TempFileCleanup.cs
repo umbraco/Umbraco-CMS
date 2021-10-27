@@ -50,7 +50,8 @@ namespace Umbraco.Web.Scheduling
             dir.Refresh(); //in case it's changed during runtime
             if (!dir.Exists)
             {
-                _logger.Debug<TempFileCleanup>("The cleanup folder doesn't exist {Folder}", dir.FullName);
+                _logger.Debug<TempFileCleanup, string>("The cleanup folder doesn't exist {Folder}", dir.FullName);
+                return;
             }
 
             var files = dir.GetFiles("*.*", SearchOption.AllDirectories);
@@ -60,11 +61,12 @@ namespace Umbraco.Web.Scheduling
                 {
                     try
                     {
+                        file.IsReadOnly = false;
                         file.Delete();
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error<TempFileCleanup>(ex, "Could not delete temp file {FileName}", file.FullName);
+                        _logger.Error<TempFileCleanup, string>(ex, "Could not delete temp file {FileName}", file.FullName);
                     }
                 }
             }

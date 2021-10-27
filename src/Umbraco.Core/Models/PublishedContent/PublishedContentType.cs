@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -9,7 +10,8 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     /// <remarks>Instances of the <see cref="PublishedContentType"/> class are immutable, ie
     /// if the content type changes, then a new class needs to be created.</remarks>
-    public class PublishedContentType : IPublishedContentType
+    [DebuggerDisplay("{Alias}")]
+    public class PublishedContentType : IPublishedContentType2
     {
         private readonly IPublishedPropertyType[] _propertyTypes;
 
@@ -20,7 +22,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// Initializes a new instance of the <see cref="PublishedContentType"/> class with a content type.
         /// </summary>
         public PublishedContentType(IContentTypeComposition contentType, IPublishedContentTypeFactory factory)
-            : this(contentType.Id, contentType.Alias, contentType.GetItemType(), contentType.CompositionAliases(), contentType.Variations, contentType.IsElement)
+            : this(contentType.Key, contentType.Id, contentType.Alias, contentType.GetItemType(), contentType.CompositionAliases(), contentType.Variations, contentType.IsElement)
         {
             var propertyTypes = contentType.CompositionPropertyTypes
                 .Select(x => factory.CreatePropertyType(this, x))
@@ -40,8 +42,20 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <remarks>
         /// <para>Values are assumed to be consistent and are not checked.</para>
         /// </remarks>
+        public PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations, bool isElement = false)
+            : this(key, id, alias, itemType, compositionAliases, variations, isElement)
+        {
+            var propertyTypesA = propertyTypes.ToArray();
+            foreach (var propertyType in propertyTypesA)
+                propertyType.ContentType = this;
+            _propertyTypes = propertyTypesA;
+
+            InitializeIndexes();
+        }
+
+        [Obsolete("Use the overload specifying a key instead")]
         public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations, bool isElement = false)
-            : this (id, alias, itemType, compositionAliases, variations, isElement)
+            : this (Guid.Empty, id, alias, itemType, compositionAliases, variations, isElement)
         {
             var propertyTypesA = propertyTypes.ToArray();
             foreach (var propertyType in propertyTypesA)
@@ -57,16 +71,26 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <remarks>
         /// <para>Values are assumed to be consistent and are not checked.</para>
         /// </remarks>
+        public PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations, bool isElement = false)
+            : this(key, id, alias, itemType, compositionAliases, variations, isElement)
+        {
+            _propertyTypes = propertyTypes(this).ToArray();
+
+            InitializeIndexes();
+        }
+        
+        [Obsolete("Use the overload specifying a key instead")]
         public PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, Func<IPublishedContentType, IEnumerable<IPublishedPropertyType>> propertyTypes, ContentVariation variations, bool isElement = false)
-            : this(id, alias, itemType, compositionAliases, variations, isElement)
+            : this(Guid.Empty, id, alias, itemType, compositionAliases, variations, isElement)
         {
             _propertyTypes = propertyTypes(this).ToArray();
 
             InitializeIndexes();
         }
 
-        private PublishedContentType(int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, ContentVariation variations, bool isElement)
+        private PublishedContentType(Guid key, int id, string alias, PublishedItemType itemType, IEnumerable<string> compositionAliases, ContentVariation variations, bool isElement)
         {
+            Key = key;
             Id = id;
             Alias = alias;
             ItemType = itemType;
@@ -105,16 +129,19 @@ namespace Umbraco.Core.Models.PublishedContent
             { "Email", Constants.DataTypes.Textbox },
             { "Username", Constants.DataTypes.Textbox },
             { "PasswordQuestion", Constants.DataTypes.Textbox },
-            { "Comments", Constants.DataTypes.Textbox },
+            { "Comments", Constants.DataTypes.Textarea },
             { "IsApproved", Constants.DataTypes.Boolean },
             { "IsLockedOut", Constants.DataTypes.Boolean },
-            { "LastLockoutDate", Constants.DataTypes.DateTime },
-            { "CreateDate", Constants.DataTypes.DateTime },
-            { "LastLoginDate", Constants.DataTypes.DateTime },
-            { "LastPasswordChangeDate", Constants.DataTypes.DateTime },
+            { "LastLockoutDate", Constants.DataTypes.LabelDateTime },
+            { "CreateDate", Constants.DataTypes.LabelDateTime },
+            { "LastLoginDate", Constants.DataTypes.LabelDateTime },
+            { "LastPasswordChangeDate", Constants.DataTypes.LabelDateTime }
         };
 
         #region Content type
+
+        /// <inheritdoc />
+        public Guid Key { get; }
 
         /// <inheritdoc />
         public int Id { get; }

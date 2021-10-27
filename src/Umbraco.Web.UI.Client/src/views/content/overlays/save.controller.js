@@ -9,8 +9,6 @@
         vm.isNew = true;
 
         vm.changeSelection = changeSelection;
-        vm.dirtyVariantFilter = dirtyVariantFilter;
-        vm.pristineVariantFilter = pristineVariantFilter;
 
         function changeSelection(variant) {
             var firstSelected = _.find(vm.variants, function (v) {
@@ -19,16 +17,18 @@
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
 
-        function dirtyVariantFilter(variant) {
+        function saveableVariantFilter(variant) {
             //determine a variant is 'dirty' (meaning it will show up as save-able) if it's
             // * the active one
             // * it's editor is in a $dirty state
-            // * it is in NotCreated state
             return (variant.active || variant.isDirty);
         }
 
-        function pristineVariantFilter(variant) {
-            return !(dirtyVariantFilter(variant));
+        function isMandatoryFilter(variant) {
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * has a mandatory language
+            // * without having a segment, segments cant be mandatory at current state of code.
+            return (variant.language && variant.language.isMandatory === true && variant.segment == null);
         }
 
         function hasAnyData(variant) {
@@ -57,51 +57,35 @@
 
         function onInit() {
             vm.variants = $scope.model.variants;
+            vm.availableVariants = vm.variants.filter(saveableVariantFilter);
+            vm.isNew = vm.variants.some(variant => variant.state === 'NotCreated');
 
-            if(!$scope.model.title) {
-                localizationService.localize("content_readyToSave").then(function(value){
+            if (!$scope.model.title) {
+                localizationService.localize("content_readyToSave").then(value => {
                     $scope.model.title = value;
                 });
             }
 
-            vm.hasPristineVariants = false;
+            vm.variants.forEach(variant => {
 
-            _.each(vm.variants,
-                function (variant) {
-                    if(variant.state !== "NotCreated"){
-                        vm.isNew = false;
-                    }
-                });
+                //reset state:
+                variant.save = variant.publish = false;
+                variant.isMandatory = isMandatoryFilter(variant);
 
-            _.each(vm.variants,
-                function (variant) {
-                    variant.compositeId = contentEditingHelper.buildCompositeVariantId(variant);
-                    variant.htmlId = "_content_variant_" + variant.compositeId;
-
-                    //check for pristine variants
-                    if (!vm.hasPristineVariants) {
-                        vm.hasPristineVariants = pristineVariantFilter(variant);
-                    }
-
-                    if(vm.isNew && hasAnyData(variant)){
-                        variant.save = true;
-                    }
-                });
+                if(vm.isNew && hasAnyData(variant)){
+                    variant.save = true;
+                }
+            });
 
             if (vm.variants.length !== 0) {
-                //now sort it so that the current one is at the top
-                vm.variants = _.sortBy(vm.variants, function (v) {
-                    return v.active ? 0 : 1;
-                });
-
-                var active = _.find(vm.variants, function (v) {
-                    return v.active;
-                });
-
+                        
+                //ensure that the current one is selected
+                var active = vm.variants.find(v => v.active);
                 if (active) {
-                    //ensure that the current one is selected
                     active.save = true;
                 }
+
+                vm.availableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.availableVariants);
 
             } else {
                 //disable save button if we have nothing to save
@@ -114,10 +98,10 @@
         onInit();
 
         //when this dialog is closed, reset all 'save' flags
-        $scope.$on('$destroy', function () {
-            for (var i = 0; i < vm.variants.length; i++) {
-                vm.variants[i].save = false;
-            }
+        $scope.$on('$destroy', () => {
+            vm.variants.forEach(variant => {
+                variant.save = false;
+            });
         });
 
     }

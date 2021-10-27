@@ -8,7 +8,7 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache
 {
-    abstract class PublishedCacheBase : IPublishedCache
+    internal abstract class PublishedCacheBase : IPublishedCache2
     {
         public bool PreviewDefault { get; }
 
@@ -89,8 +89,8 @@ namespace Umbraco.Web.PublishedCache
         }
 
         public abstract IPublishedContentType GetContentType(int id);
-
         public abstract IPublishedContentType GetContentType(string alias);
+        public abstract IPublishedContentType GetContentType(Guid key);
 
         public virtual IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {

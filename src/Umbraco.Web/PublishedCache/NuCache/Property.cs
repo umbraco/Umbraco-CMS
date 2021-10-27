@@ -90,7 +90,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // determines whether a property has value
         public override bool HasValue(string culture = null, string segment = null)
         {
-            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
             var value = GetSourceValue(culture, segment);
             var hasValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -124,7 +124,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
         {
             CacheValues cacheValues;
-            PublishedSnapshot publishedSnapshot;
+            IPublishedSnapshot publishedSnapshot;
             IAppCache cache;
             switch (cacheLevel)
             {
@@ -141,7 +141,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // elements cache (if we don't want to pollute the elements cache with short-lived
                     // data) depending on settings
                     // for members, always cache in the snapshot cache - never pollute elements cache
-                    publishedSnapshot = (PublishedSnapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+                    publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
                     cache = publishedSnapshot == null
                         ? null
                         : ((_isPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (_isMember == false)
@@ -151,7 +151,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     break;
                 case PropertyCacheLevel.Snapshot:
                     // cache within the snapshot cache
-                    publishedSnapshot = (PublishedSnapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+                    publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
                     cache = publishedSnapshot?.SnapshotCache;
                     cacheValues = GetCacheValues(cache);
                     break;
@@ -194,7 +194,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override object GetSourceValue(string culture = null, string segment = null)
         {
-            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
             if (culture == "" && segment == "")
                 return _sourceValue;
@@ -208,7 +208,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override object GetValue(string culture = null, string segment = null)
         {
-            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
             object value;
             lock (_locko)
@@ -229,7 +229,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override object GetXPathValue(string culture = null, string segment = null)
         {
-            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
             lock (_locko)
             {

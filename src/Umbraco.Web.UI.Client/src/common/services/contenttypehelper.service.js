@@ -7,52 +7,152 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
     var contentTypeHelperService = {
 
-        createIdArray: function(array) {
+        TYPE_GROUP: 0,
+        TYPE_TAB: 1,
 
-          var newArray = [];
+        isAliasUnique(groups, alias) {
+            return groups.find(group => group.alias === alias) ? false : true;
+        },
 
-          angular.forEach(array, function(arrayItem){
-
-            if(angular.isObject(arrayItem)) {
-              newArray.push(arrayItem.id);
-            } else {
-              newArray.push(arrayItem);
+        createUniqueAlias(groups, alias) {
+            let i = 1;
+            while(this.isAliasUnique(groups, alias + i.toString()) === false) {
+                i++;
             }
+            return alias + i.toString();
+        },
 
-          });
+        generateLocalAlias: function(name) {
+            return name ? name.toUmbracoAlias() : String.CreateGuid();
+        },
 
-          return newArray;
+        getLocalAlias: function (alias) {
+            const lastIndex = alias.lastIndexOf('/');
+
+            return (lastIndex === -1) ? alias : alias.substring(lastIndex + 1);
+        },
+
+        updateLocalAlias: function (alias, localAlias) {
+            const parentAlias = this.getParentAlias(alias);
+
+            return (parentAlias == null || parentAlias === '') ? localAlias : parentAlias + '/' + localAlias;
+        },
+
+        getParentAlias: function (alias) {
+            if(alias) {
+                const lastIndex = alias.lastIndexOf('/');
+
+                return (lastIndex === -1) ? null : alias.substring(0, lastIndex);
+            }
+            return null;
+        },
+
+        updateParentAlias: function (alias, parentAlias) {
+            const localAlias = this.getLocalAlias(alias);
+
+            return (parentAlias == null || parentAlias === '') ? localAlias : parentAlias + '/' + localAlias;
+        },
+
+        updateDescendingAliases: function (groups, oldParentAlias, newParentAlias) {
+            groups.forEach(group => {
+                const parentAlias = this.getParentAlias(group.alias);
+
+                if (parentAlias === oldParentAlias) {
+                    const oldAlias = group.alias,
+                        newAlias = this.updateParentAlias(oldAlias, newParentAlias);
+
+                    group.alias = newAlias;
+                    group.parentAlias = newParentAlias;
+                    this.updateDescendingAliases(groups, oldAlias, newAlias);
+
+                }
+            });
+        },
+
+        defineParentAliasOnGroups: function (groups) {
+            groups.forEach(group => {
+                group.parentAlias = this.getParentAlias(group.alias);
+            });
+        },
+
+        relocateDisorientedGroups: function (groups) {
+            const existingAliases = groups.map(group => group.alias);
+            existingAliases.push(null);
+            const disorientedGroups = groups.filter(group => existingAliases.indexOf(group.parentAlias) === -1);
+            disorientedGroups.forEach(group => {
+                const oldAlias = group.alias,
+                        newAlias = this.updateParentAlias(oldAlias, null);
+
+                group.alias = newAlias;
+                group.parentAlias = null;
+                this.updateDescendingAliases(groups, oldAlias, newAlias);
+            });
+        },
+
+        convertGroupToTab: function (groups, group) {
+            const tabs = groups.filter(group => group.type === this.TYPE_TAB).sort((a, b) => a.sortOrder - b.sortOrder);
+            const nextSortOrder = tabs && tabs.length > 0 ? tabs[tabs.length - 1].sortOrder + 1 : 0;
+
+            group.convertingToTab = true;
+
+            group.type = this.TYPE_TAB;
+
+            const newAlias = this.generateLocalAlias(group.name);
+            // when checking for alias uniqueness we need to exclude the current group or the alias would get a + 1
+            const otherGroups = [...groups].filter(groupCopy => !groupCopy.convertingToTab);
+
+            group.alias = this.isAliasUnique(otherGroups, newAlias) ? newAlias : this.createUniqueAlias(otherGroups, newAlias);
+            group.parentAlias = null;
+            group.sortOrder = nextSortOrder;
+            group.convertingToTab = false;
+        },
+
+        createIdArray: function (array) {
+
+            var newArray = [];
+
+            array.forEach(function (arrayItem) {
+
+                if (Utilities.isObject(arrayItem)) {
+                    newArray.push(arrayItem.id);
+                } else {
+                    newArray.push(arrayItem);
+                }
+
+            });
+
+            return newArray;
 
         },
 
         generateModels: function () {
             var deferred = $q.defer();
-            var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
+            var modelsResource = $injector.has("modelsBuilderManagementResource") ? $injector.get("modelsBuilderManagementResource") : null;
             var modelsBuilderEnabled = Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled;
             if (modelsBuilderEnabled && modelsResource) {
-                modelsResource.buildModels().then(function(result) {
+                modelsResource.buildModels().then(function (result) {
                     deferred.resolve(result);
 
                     //just calling this to get the servar back to life
                     modelsResource.getModelsOutOfDateStatus();
 
-                }, function(e) {
+                }, function (e) {
                     deferred.reject(e);
                 });
             }
-            else {                
-                deferred.resolve(false);                
+            else {
+                deferred.resolve(false);
             }
             return deferred.promise;
         },
 
         checkModelsBuilderStatus: function () {
             var deferred = $q.defer();
-            var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
-            var modelsBuilderEnabled = (Umbraco && Umbraco.Sys && Umbraco.Sys.ServerVariables && Umbraco.Sys.ServerVariables.umbracoPlugins && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled === true);            
-            
+            var modelsResource = $injector.has("modelsBuilderManagementResource") ? $injector.get("modelsBuilderManagementResource") : null;
+            var modelsBuilderEnabled = (Umbraco && Umbraco.Sys && Umbraco.Sys.ServerVariables && Umbraco.Sys.ServerVariables.umbracoPlugins && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled === true);
+
             if (modelsBuilderEnabled && modelsResource) {
-                modelsResource.getModelsOutOfDateStatus().then(function(result) {
+                modelsResource.getModelsOutOfDateStatus().then(function (result) {
                     //Generate models buttons should be enabled if it is 0
                     deferred.resolve(result.status === 0);
                 });
@@ -64,37 +164,37 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
         },
 
         makeObjectArrayFromId: function (idArray, objectArray) {
-           var newArray = [];
+            var newArray = [];
 
-           for (var idIndex = 0; idArray.length > idIndex; idIndex++) {
-             var id = idArray[idIndex];
+            for (var idIndex = 0; idArray.length > idIndex; idIndex++) {
+                var id = idArray[idIndex];
 
-             for (var objectIndex = 0; objectArray.length > objectIndex; objectIndex++) {
-                 var object = objectArray[objectIndex];
-                 if (id === object.id) {
-                    newArray.push(object);
-                 }
-             }
+                for (var objectIndex = 0; objectArray.length > objectIndex; objectIndex++) {
+                    var object = objectArray[objectIndex];
+                    if (id === object.id) {
+                        newArray.push(object);
+                    }
+                }
 
-           }
+            }
 
-           return newArray;
+            return newArray;
         },
 
-        validateAddingComposition: function(contentType, compositeContentType) {
+        validateAddingComposition: function (contentType, compositeContentType) {
 
             //Validate that by adding this group that we are not adding duplicate property type aliases
 
-            var propertiesAdding = _.flatten(_.map(compositeContentType.groups, function(g) {
-                return _.map(g.properties, function(p) {
+            var propertiesAdding = _.flatten(_.map(compositeContentType.groups, function (g) {
+                return _.map(g.properties, function (p) {
                     return p.alias;
                 });
             }));
-            var propAliasesExisting = _.filter(_.flatten(_.map(contentType.groups, function(g) {
-                return _.map(g.properties, function(p) {
+            var propAliasesExisting = _.filter(_.flatten(_.map(contentType.groups, function (g) {
+                return _.map(g.properties, function (p) {
                     return p.alias;
                 });
-            })), function(f) {
+            })), function (f) {
                 return f !== null && f !== undefined;
             });
 
@@ -108,7 +208,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
             return [];
         },
 
-        mergeCompositeContentType: function(contentType, compositeContentType) {
+        mergeCompositeContentType: function (contentType, compositeContentType) {
 
             //Validate that there are no overlapping aliases
             var overlappingAliases = this.validateAddingComposition(contentType, compositeContentType);
@@ -116,107 +216,106 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                 throw new Error("Cannot add this composition, these properties already exist on the content type: " + overlappingAliases.join());
             }
 
-           angular.forEach(compositeContentType.groups, function(compositionGroup) {
+            compositeContentType.groups.forEach(function (compositionGroup) {
+                // order composition groups based on sort order
+                compositionGroup.properties = $filter('orderBy')(compositionGroup.properties, 'sortOrder');
 
-              // order composition groups based on sort order
-              compositionGroup.properties = $filter('orderBy')(compositionGroup.properties, 'sortOrder');
+                // get data type details
+                compositionGroup.properties.forEach(function (property) {
+                    dataTypeResource.getById(property.dataTypeId)
+                        .then(function (dataType) {
+                            property.dataTypeIcon = dataType.icon;
+                            property.dataTypeName = dataType.name;
+                        });
+                });
 
-              // get data type details
-              angular.forEach(compositionGroup.properties, function(property) {
-                 dataTypeResource.getById(property.dataTypeId)
-                    .then(function(dataType) {
-                       property.dataTypeIcon = dataType.icon;
-                       property.dataTypeName = dataType.name;
-                    });
-              });
+                // set inherited state on tab
+                compositionGroup.inherited = true;
 
-              // set inherited state on tab
-              compositionGroup.inherited = true;
+                // set inherited state on properties
+                compositionGroup.properties.forEach(function (compositionProperty) {
+                    compositionProperty.inherited = true;
+                });
 
-              // set inherited state on properties
-              angular.forEach(compositionGroup.properties, function(compositionProperty) {
-                 compositionProperty.inherited = true;
-              });
+                // set tab state
+                compositionGroup.tabState = "inActive";
 
-              // set tab state
-              compositionGroup.tabState = "inActive";
+                // if groups are named the same - merge the groups
+                contentType.groups.forEach(function (contentTypeGroup) {
 
-              // if groups are named the same - merge the groups
-              angular.forEach(contentType.groups, function(contentTypeGroup) {
+                    if (contentTypeGroup.name === compositionGroup.name && contentTypeGroup.type === compositionGroup.type) {
 
-                 if (contentTypeGroup.name === compositionGroup.name) {
+                        // set flag to show if properties has been merged into a tab
+                        compositionGroup.groupIsMerged = true;
 
-                    // set flag to show if properties has been merged into a tab
-                    compositionGroup.groupIsMerged = true;
+                        // make group inherited
+                        contentTypeGroup.inherited = true;
 
-                    // make group inherited
-                    contentTypeGroup.inherited = true;
+                        // add properties to the top of the array
+                        contentTypeGroup.properties = compositionGroup.properties.concat(contentTypeGroup.properties);
 
-                    // add properties to the top of the array
-                    contentTypeGroup.properties = compositionGroup.properties.concat(contentTypeGroup.properties);
+                        // update sort order on all properties in merged group
+                        contentTypeGroup.properties = contentTypeHelperService.updatePropertiesSortOrder(contentTypeGroup.properties);
 
-                    // update sort order on all properties in merged group
-                    contentTypeGroup.properties = contentTypeHelperService.updatePropertiesSortOrder(contentTypeGroup.properties);
+                        // make parentTabContentTypeNames to an array so we can push values
+                        if (contentTypeGroup.parentTabContentTypeNames === null || contentTypeGroup.parentTabContentTypeNames === undefined) {
+                            contentTypeGroup.parentTabContentTypeNames = [];
+                        }
+
+                        // push name to array of merged composite content types
+                        contentTypeGroup.parentTabContentTypeNames.push(compositeContentType.name);
+
+                        // make parentTabContentTypes to an array so we can push values
+                        if (contentTypeGroup.parentTabContentTypes === null || contentTypeGroup.parentTabContentTypes === undefined) {
+                            contentTypeGroup.parentTabContentTypes = [];
+                        }
+
+                        // push id to array of merged composite content types
+                        contentTypeGroup.parentTabContentTypes.push(compositeContentType.id);
+
+                        // get sort order from composition
+                        contentTypeGroup.sortOrder = compositionGroup.sortOrder;
+
+                        // splice group to the top of the array
+                        var contentTypeGroupCopy = Utilities.copy(contentTypeGroup);
+                        var index = contentType.groups.indexOf(contentTypeGroup);
+                        contentType.groups.splice(index, 1);
+                        contentType.groups.unshift(contentTypeGroupCopy);
+
+                    }
+
+                });
+
+                // if group is not merged - push it to the end of the array - before init tab
+                if (compositionGroup.groupIsMerged === false || compositionGroup.groupIsMerged === undefined) {
 
                     // make parentTabContentTypeNames to an array so we can push values
-                    if (contentTypeGroup.parentTabContentTypeNames === null || contentTypeGroup.parentTabContentTypeNames === undefined) {
-                       contentTypeGroup.parentTabContentTypeNames = [];
+                    if (compositionGroup.parentTabContentTypeNames === null || compositionGroup.parentTabContentTypeNames === undefined) {
+                        compositionGroup.parentTabContentTypeNames = [];
                     }
 
                     // push name to array of merged composite content types
-                    contentTypeGroup.parentTabContentTypeNames.push(compositeContentType.name);
+                    compositionGroup.parentTabContentTypeNames.push(compositeContentType.name);
 
                     // make parentTabContentTypes to an array so we can push values
-                    if (contentTypeGroup.parentTabContentTypes === null || contentTypeGroup.parentTabContentTypes === undefined) {
-                       contentTypeGroup.parentTabContentTypes = [];
+                    if (compositionGroup.parentTabContentTypes === null || compositionGroup.parentTabContentTypes === undefined) {
+                        compositionGroup.parentTabContentTypes = [];
                     }
 
                     // push id to array of merged composite content types
-                    contentTypeGroup.parentTabContentTypes.push(compositeContentType.id);
+                    compositionGroup.parentTabContentTypes.push(compositeContentType.id);
 
-                    // get sort order from composition
-                    contentTypeGroup.sortOrder = compositionGroup.sortOrder;
+                    // push group before placeholder tab
+                    contentType.groups.unshift(compositionGroup);
 
-                    // splice group to the top of the array
-                    var contentTypeGroupCopy = angular.copy(contentTypeGroup);
-                    var index = contentType.groups.indexOf(contentTypeGroup);
-                    contentType.groups.splice(index, 1);
-                    contentType.groups.unshift(contentTypeGroupCopy);
+                }
 
-                 }
+            });
 
-              });
+            // sort all groups by sortOrder property
+            contentType.groups = $filter('orderBy')(contentType.groups, 'sortOrder');
 
-              // if group is not merged - push it to the end of the array - before init tab
-              if (compositionGroup.groupIsMerged === false || compositionGroup.groupIsMerged === undefined) {
-
-                 // make parentTabContentTypeNames to an array so we can push values
-                 if (compositionGroup.parentTabContentTypeNames === null || compositionGroup.parentTabContentTypeNames === undefined) {
-                    compositionGroup.parentTabContentTypeNames = [];
-                 }
-
-                 // push name to array of merged composite content types
-                 compositionGroup.parentTabContentTypeNames.push(compositeContentType.name);
-
-                 // make parentTabContentTypes to an array so we can push values
-                 if (compositionGroup.parentTabContentTypes === null || compositionGroup.parentTabContentTypes === undefined) {
-                    compositionGroup.parentTabContentTypes = [];
-                 }
-
-                 // push id to array of merged composite content types
-                 compositionGroup.parentTabContentTypes.push(compositeContentType.id);
-                  
-                 // push group before placeholder tab
-                 contentType.groups.unshift(compositionGroup);
-
-              }
-
-           });
-
-           // sort all groups by sortOrder property
-           contentType.groups = $filter('orderBy')(contentType.groups, 'sortOrder');
-
-           return contentType;
+            return contentType;
 
         },
 
@@ -224,22 +323,22 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
             var groups = [];
 
-            angular.forEach(contentType.groups, function(contentTypeGroup){
+            contentType.groups.forEach(function (contentTypeGroup) {
 
-                if( contentTypeGroup.tabState !== "init" ) {
+                if (contentTypeGroup.tabState !== "init") {
 
                     var idIndex = contentTypeGroup.parentTabContentTypes.indexOf(compositeContentType.id);
                     var nameIndex = contentTypeGroup.parentTabContentTypeNames.indexOf(compositeContentType.name);
                     var groupIndex = contentType.groups.indexOf(contentTypeGroup);
 
 
-                    if( idIndex !== -1  ) {
+                    if (idIndex !== -1) {
 
                         var properties = [];
 
                         // remove all properties from composite content type
-                        angular.forEach(contentTypeGroup.properties, function(property){
-                            if(property.contentTypeId !== compositeContentType.id) {
+                        contentTypeGroup.properties.forEach(function (property) {
+                            if (property.contentTypeId !== compositeContentType.id) {
                                 properties.push(property);
                             }
                         });
@@ -252,22 +351,21 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
                         contentTypeGroup.parentTabContentTypeNames.splice(nameIndex, 1);
 
                         // remove inherited state if there are no inherited properties
-                        if(contentTypeGroup.parentTabContentTypes.length === 0) {
+                        if (contentTypeGroup.parentTabContentTypes.length === 0) {
                             contentTypeGroup.inherited = false;
                         }
 
                         // remove group if there are no properties left
-                        if(contentTypeGroup.properties.length > 1) {
-                            //contentType.groups.splice(groupIndex, 1);
+                        if (contentTypeGroup.properties.length > 0) {
                             groups.push(contentTypeGroup);
                         }
 
                     } else {
-                      groups.push(contentTypeGroup);
+                        groups.push(contentTypeGroup);
                     }
 
                 } else {
-                  groups.push(contentTypeGroup);
+                    groups.push(contentTypeGroup);
                 }
 
                 // update sort order on properties
@@ -281,67 +379,112 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
         updatePropertiesSortOrder: function (properties) {
 
-          var sortOrder = 0;
+            var sortOrder = 0;
 
-          angular.forEach(properties, function(property) {
-            if( !property.inherited && property.propertyState !== "init") {
-              property.sortOrder = sortOrder;
+            properties.forEach(function (property) {
+                if (!property.inherited && property.propertyState !== "init") {
+                    property.sortOrder = sortOrder;
+                }
+                sortOrder++;
+            });
+
+            return properties;
+
+        },
+
+        getTemplatePlaceholder: function () {
+
+            var templatePlaceholder = {
+                "name": "",
+                "icon": "icon-layout",
+                "alias": "templatePlaceholder",
+                "placeholder": true
+            };
+
+            return templatePlaceholder;
+
+        },
+
+        insertDefaultTemplatePlaceholder: function (defaultTemplate) {
+
+            // get template placeholder
+            var templatePlaceholder = contentTypeHelperService.getTemplatePlaceholder();
+
+            // add as default template
+            defaultTemplate = templatePlaceholder;
+
+            return defaultTemplate;
+
+        },
+
+        insertTemplatePlaceholder: function (array) {
+
+            // get template placeholder
+            var templatePlaceholder = contentTypeHelperService.getTemplatePlaceholder();
+
+            // add as selected item
+            array.push(templatePlaceholder);
+
+            return array;
+
+        },
+
+        insertChildNodePlaceholder: function (array, name, icon, id) {
+
+            var placeholder = {
+                "name": name,
+                "icon": icon,
+                "id": id
+            };
+
+            array.push(placeholder);
+
+        },
+
+        rebindSavedContentType: function (contentType, savedContentType) {
+            // The saved content type might have updated values (eg. new IDs/keys), so make sure the view model is updated
+            contentType.ModelState = savedContentType.ModelState;
+            contentType.id = savedContentType.id;
+
+            // Prevent rebinding if there was an error: https://github.com/umbraco/Umbraco-CMS/pull/11257
+            if (savedContentType.ModelState) {
+              return;
             }
-            sortOrder++;
-          });
 
-          return properties;
+            contentType.groups.forEach(function (group) {
+                if (!group.alias) return;
 
-        },
+                var k = 0;
+                while (k < savedContentType.groups.length && savedContentType.groups[k].alias != group.alias)
+                    k++;
 
-        getTemplatePlaceholder: function() {
+                if (k == savedContentType.groups.length) {
+                    group.id = 0;
+                    return;
+                }
 
-          var templatePlaceholder = {
-            "name": "",
-            "icon": "icon-layout",
-            "alias": "templatePlaceholder",
-            "placeholder": true
-          };
+                var savedGroup = savedContentType.groups[k];
+                group.id = savedGroup.id;
+                group.key = savedGroup.key;
+                group.contentTypeId = savedGroup.contentTypeId;
 
-          return templatePlaceholder;
+                group.properties.forEach(function (property) {
+                    if (property.id || !property.alias) return;
 
-        },
+                    k = 0;
+                    while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
+                        k++;
 
-        insertDefaultTemplatePlaceholder: function(defaultTemplate) {
+                    if (k == savedGroup.properties.length) {
+                        property.id = 0;
+                        return;
+                    }
 
-          // get template placeholder
-          var templatePlaceholder = contentTypeHelperService.getTemplatePlaceholder();
-
-          // add as default template
-          defaultTemplate = templatePlaceholder;
-
-          return defaultTemplate;
-
-        },
-
-        insertTemplatePlaceholder: function(array) {
-
-          // get template placeholder
-          var templatePlaceholder = contentTypeHelperService.getTemplatePlaceholder();
-
-          // add as selected item
-          array.push(templatePlaceholder);
-
-          return array;
-
-       },
-
-       insertChildNodePlaceholder: function (array, name, icon, id) {
-
-         var placeholder = {
-           "name": name,
-           "icon": icon,
-           "id": id
-         };
-
-         array.push(placeholder);
-
-       }
+                    var savedProperty = savedGroup.properties[k];
+                    property.id = savedProperty.id;
+                });
+            });
+        }
 
     };
 

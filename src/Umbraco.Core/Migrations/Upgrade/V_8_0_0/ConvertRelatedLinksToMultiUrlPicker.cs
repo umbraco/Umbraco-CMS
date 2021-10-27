@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -34,11 +33,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             }
 
             var sqlPropertyTpes = Sql()
-                .Select<PropertyTypeDto>()
-                .From<PropertyTypeDto>()
-                .Where<PropertyTypeDto>(x => dataTypeIds.Contains(x.DataTypeId));
+                .Select<PropertyTypeDto80>()
+                .From<PropertyTypeDto80>()
+                .Where<PropertyTypeDto80>(x => dataTypeIds.Contains(x.DataTypeId));
 
-            var propertyTypeIds = Database.Fetch<PropertyTypeDto>(sqlPropertyTpes).Select(x => x.Id).ToList();
+            var propertyTypeIds = Database.Fetch<PropertyTypeDto80>(sqlPropertyTpes).Select(x => x.Id).ToList();
 
             if (propertyTypeIds.Count == 0) return;
 

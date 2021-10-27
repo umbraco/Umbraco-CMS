@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -18,6 +19,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// Provides an abstract base class for <c>IPublishedContent</c> implementations that
     /// wrap and extend another <c>IPublishedContent</c>.
     /// </summary>
+    [DebuggerDisplay("{Id}: {Name} ({ContentType?.Alias})")]
     public abstract class PublishedContentWrapped : IPublishedContent
     {
         private readonly IPublishedContent _content;
@@ -94,6 +96,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual DateTime UpdateDate => _content.UpdateDate;
 
         /// <inheritdoc />
+        [Obsolete("Use the Url() extension instead")]
         public virtual string Url => _content.Url;
 
         /// <inheritdoc />

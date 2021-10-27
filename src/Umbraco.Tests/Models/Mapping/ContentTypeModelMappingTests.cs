@@ -215,6 +215,7 @@ namespace Umbraco.Tests.Models.Mapping
                 {
                     Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
                     Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeId);
+                    Assert.AreEqual(propTypes.ElementAt(j).LabelOnTop, result.PropertyTypes.ElementAt(j).LabelOnTop);
                 }
             }
 
@@ -449,6 +450,7 @@ namespace Umbraco.Tests.Models.Mapping
                 {
                     Assert.AreEqual(propTypes[j].Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
                     Assert.AreEqual(propTypes[j].DataTypeId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                    Assert.AreEqual(propTypes[j].LabelOnTop, result.Groups.ElementAt(i).Properties.ElementAt(j).LabelOnTop);
                 }
             }
 
@@ -476,6 +478,7 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 Id = 222,
                 Name = "Group 1",
+                Alias = "group1",
                 SortOrder = 1,
                 Properties = new[]
                 {
@@ -547,6 +550,7 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 Id = 222,
                 Name = "Group 1",
+                Alias = "group1",
                 SortOrder = 1,
                 Properties = new[]
                 {
@@ -621,7 +625,9 @@ namespace Umbraco.Tests.Models.Mapping
                 Validation = new PropertyTypeValidation()
                 {
                     Mandatory = true,
-                    Pattern = "xyz"
+                    MandatoryMessage = "Please enter a value",
+                    Pattern = "xyz",
+                    PatternMessage = "Please match the pattern",
                 }
             };
 
@@ -634,7 +640,10 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.DataTypeId, result.DataTypeId);
             Assert.AreEqual(basic.Label, result.Name);
             Assert.AreEqual(basic.Validation.Mandatory, result.Mandatory);
+            Assert.AreEqual(basic.Validation.MandatoryMessage, result.MandatoryMessage);
             Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
+            Assert.AreEqual(basic.Validation.PatternMessage, result.ValidationRegExpMessage);
+            Assert.AreEqual(basic.LabelOnTop, result.LabelOnTop);
         }
 
         [Test]
@@ -655,7 +664,9 @@ namespace Umbraco.Tests.Models.Mapping
                 Validation = new PropertyTypeValidation()
                 {
                     Mandatory = true,
-                    Pattern = "xyz"
+                    MandatoryMessage = "Please enter a value",
+                    Pattern = "xyz",
+                    PatternMessage = "Please match the pattern",
                 }
             };
 
@@ -668,7 +679,10 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.DataTypeId, result.DataTypeId);
             Assert.AreEqual(basic.Label, result.Name);
             Assert.AreEqual(basic.Validation.Mandatory, result.Mandatory);
+            Assert.AreEqual(basic.Validation.MandatoryMessage, result.MandatoryMessage);
             Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
+            Assert.AreEqual(basic.Validation.PatternMessage, result.ValidationRegExpMessage);
+            Assert.AreEqual(basic.LabelOnTop, result.LabelOnTop);
         }
 
         [Test]
@@ -949,9 +963,10 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
-                        Properties = new []
+                        Properties = new[]
                         {
                             new MemberPropertyTypeBasic
                             {
@@ -965,7 +980,7 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
                                 DataTypeId = 555
@@ -998,9 +1013,10 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
-                        Properties = new []
+                        Properties = new[]
                         {
                             new PropertyTypeBasic
                             {
@@ -1011,7 +1027,7 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
                                 DataTypeId = 555
@@ -1050,9 +1066,10 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
-                        Properties = new []
+                        Properties = new[]
                         {
                             new PropertyTypeBasic
                             {
@@ -1063,10 +1080,11 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = 555,
+                                LabelOnTop = true
                             }
                         }
                     }
@@ -1096,6 +1114,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
                         Properties = new[]
@@ -1109,10 +1128,11 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = 555,
+                                LabelOnTop = true
                             }
                         }
                     },
@@ -1120,6 +1140,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 894,
                         Name = "Tab 2",
+                        Alias = "tab2",
                         SortOrder = 0,
                         Inherited = true,
                         Properties = new[]
@@ -1133,10 +1154,11 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = 555,
+                                LabelOnTop = false
                             }
                         }
 
@@ -1174,6 +1196,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 987,
                         Name = "Tab 1",
+                        Alias = "tab1",
                         SortOrder = 0,
                         Inherited = false,
                         Properties = new[]
@@ -1187,10 +1210,11 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = 555,
+                                LabelOnTop = true
                             }
                         }
                     },
@@ -1198,6 +1222,7 @@ namespace Umbraco.Tests.Models.Mapping
                     {
                         Id = 894,
                         Name = "Tab 2",
+                        Alias = "tab2",
                         SortOrder = 0,
                         Inherited = true,
                         Properties = new[]
@@ -1211,10 +1236,11 @@ namespace Umbraco.Tests.Models.Mapping
                                 Validation = new PropertyTypeValidation
                                 {
                                     Mandatory = false,
-                                    Pattern = ""
+                                    Pattern = string.Empty
                                 },
                                 SortOrder = 0,
-                                DataTypeId = 555
+                                DataTypeId = 555,
+                                LabelOnTop = false
                             }
                         }
 

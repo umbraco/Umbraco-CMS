@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
                 string cookieToken, headerToken;
                 AngularAntiForgeryHelper.GetTokens(out cookieToken, out headerToken);
 
-                Assert.AreEqual(true, AngularAntiForgeryHelper.ValidateTokens(cookieToken, headerToken));
+                Assert.IsTrue(AngularAntiForgeryHelper.ValidateTokens(cookieToken, headerToken));
             }
 
         }
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
                 string cookieToken, headerToken;
                 AngularAntiForgeryHelper.GetTokens(out cookieToken, out headerToken);
 
-                Assert.AreEqual(true, AngularAntiForgeryHelper.ValidateTokens(cookieToken, headerToken));
+                Assert.IsTrue(AngularAntiForgeryHelper.ValidateTokens(cookieToken, headerToken));
             }
 
         }

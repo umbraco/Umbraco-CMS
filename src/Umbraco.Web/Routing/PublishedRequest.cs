@@ -369,14 +369,14 @@ namespace Umbraco.Web.Routing
         public bool IsRedirectPermanent { get; private set; }
 
         /// <summary>
-        /// Gets or sets the url to redirect to, when the content request triggers a redirect.
+        /// Gets or sets the URL to redirect to, when the content request triggers a redirect.
         /// </summary>
         public string RedirectUrl { get; private set; }
 
         /// <summary>
         /// Indicates that the content request should trigger a redirect (302).
         /// </summary>
-        /// <param name="url">The url to redirect to.</param>
+        /// <param name="url">The URL to redirect to.</param>
         /// <remarks>Does not actually perform a redirect, only registers that the response should
         /// redirect. Redirect will or will not take place in due time.</remarks>
         public void SetRedirect(string url)
@@ -389,7 +389,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Indicates that the content request should trigger a permanent redirect (301).
         /// </summary>
-        /// <param name="url">The url to redirect to.</param>
+        /// <param name="url">The URL to redirect to.</param>
         /// <remarks>Does not actually perform a redirect, only registers that the response should
         /// redirect. Redirect will or will not take place in due time.</remarks>
         public void SetRedirectPermanent(string url)
@@ -402,7 +402,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Indicates that the content request should trigger a redirect, with a specified status code.
         /// </summary>
-        /// <param name="url">The url to redirect to.</param>
+        /// <param name="url">The URL to redirect to.</param>
         /// <param name="status">The status code (300-308).</param>
         /// <remarks>Does not actually perform a redirect, only registers that the response should
         /// redirect. Redirect will or will not take place in due time.</remarks>

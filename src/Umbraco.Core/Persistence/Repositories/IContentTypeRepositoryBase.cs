@@ -26,5 +26,17 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="contentPath"></param>
         /// <returns></returns>
         bool HasContainerInPath(string contentPath);
+
+        /// <summary>
+        /// Gets a value indicating whether there is a list view content item in the path.
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        bool HasContainerInPath(params int[] ids);
+
+        /// <summary>
+        /// Returns true or false depending on whether content nodes have been created based on the provided content type id.
+        /// </summary>
+        bool HasContentNodes(int id);
     }
 }
