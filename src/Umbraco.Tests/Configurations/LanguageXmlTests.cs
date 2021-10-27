@@ -35,7 +35,16 @@ namespace Umbraco.Tests.Configurations
             var solutionDirectoryPathParts = testDirectoryPathParts
                 .Take(Array.IndexOf(testDirectoryPathParts, "src") + 1);
             var languageFolderPathParts = new List<string>(solutionDirectoryPathParts);
-            languageFolderPathParts.AddRange(new[] { "Umbraco.Web.UI", "Umbraco", "config", "lang" });
+            var additionalPathParts = new[] { "Umbraco.Web.UI", "Umbraco", "config", "lang" };
+            languageFolderPathParts.AddRange(additionalPathParts);
+
+            // Hack for build-server - when this path is generated in that envrionment it's missing the "src" folder.
+            // Not sure why, but if it's missing we'll add it in the right place.
+            if (!languageFolderPathParts.Contains("src"))
+            {
+                languageFolderPathParts.Insert(languageFolderPathParts.Count - additionalPathParts.Length, "src");
+            }
+
             return new DirectoryInfo(string.Join(Path.DirectorySeparatorChar.ToString(), languageFolderPathParts));
         }
     }
