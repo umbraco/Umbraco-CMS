@@ -9,7 +9,7 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    [DefaultPropertyValueConverter]
+    [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
