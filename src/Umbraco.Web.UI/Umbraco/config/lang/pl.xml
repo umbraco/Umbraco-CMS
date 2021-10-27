@@ -193,7 +193,7 @@
     <key alias="contentRoot">Korzeń zawartości</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Stwórz nowy Szablon Zawartości z '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Stwórz nowy Szablon Zawartości z <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Pusty</key>
     <key alias="selectBlueprint">Wybierz Szablon Zawartości</key>
     <key alias="createdBlueprintHeading">Szablon Zawartości został stworzony</key>

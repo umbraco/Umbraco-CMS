@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace Umbraco.Core.Exceptions
 {
@@ -85,18 +86,28 @@ namespace Umbraco.Core.Exceptions
 
         private static string FormatMessage(string contentTypeAlias, string addedCompositionAlias, string[] propertyTypeAliases, string[] propertyGroupAliases)
         {
-            // TODO Add property group aliases to message
-            return addedCompositionAlias.IsNullOrWhiteSpace()
-                    ? string.Format(
-                        "ContentType with alias '{0}' has an invalid composition " +
-                        "and there was a conflict on the following PropertyTypes: '{1}'. " +
-                        "PropertyTypes must have a unique alias across all Compositions in order to compose a valid ContentType Composition.",
-                        contentTypeAlias, string.Join(", ", propertyTypeAliases))
-                    : string.Format(
-                        "ContentType with alias '{0}' was added as a Composition to ContentType with alias '{1}', " +
-                        "but there was a conflict on the following PropertyTypes: '{2}'. " +
-                        "PropertyTypes must have a unique alias across all Compositions in order to compose a valid ContentType Composition.",
-                        addedCompositionAlias, contentTypeAlias, string.Join(", ", propertyTypeAliases));
+            var sb = new StringBuilder();
+
+            if (addedCompositionAlias.IsNullOrWhiteSpace())
+            {
+                sb.AppendFormat("Content type with alias '{0}' has an invalid composition.", contentTypeAlias);
+            }
+            else
+            {
+                sb.AppendFormat("Content type with alias '{0}' was added as a composition to content type with alias '{1}', but there was a conflict.", addedCompositionAlias, contentTypeAlias);
+            }
+
+            if (propertyTypeAliases.Length > 0)
+            {
+                sb.AppendFormat(" Property types must have a unique alias across all compositions, these aliases are duplicate: {0}.", string.Join(", ", propertyTypeAliases));
+            }
+
+            if (propertyGroupAliases.Length > 0)
+            {
+                sb.AppendFormat(" Property groups with the same alias must also have the same type across all compositions, these aliases have different types: {0}.", string.Join(", ", propertyGroupAliases));
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

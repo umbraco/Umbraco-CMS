@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var dtos = ids.Length == 0
                 ? Database.Fetch<TagDto>(Sql().Select<TagDto>().From<TagDto>())
-                : Database.FetchByGroups<TagDto, int>(ids, 2000, batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
+                : Database.FetchByGroups<TagDto, int>(ids, Constants.Sql.MaxParameterCount, batch => Sql().Select<TagDto>().From<TagDto>().WhereIn<TagDto>(x => x.Id, batch));
 
             return dtos.Select(TagFactory.BuildEntity).ToList();
         }

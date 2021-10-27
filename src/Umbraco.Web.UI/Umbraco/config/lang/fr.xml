@@ -138,7 +138,7 @@
     <key alias="saveListView">Sauver la mise en page de la liste</key>
     <key alias="schedulePublish">Planifier</key>
     <key alias="saveAndPreview">Prévisualiser</key>
-    <key alias="showPage">Prévisualiser</key>    
+    <key alias="showPage">Prévisualiser</key>
     <key alias="showPageDisabled">La prévisualisation est désactivée car aucun modèle n'a été assigné.</key>
     <key alias="styleChoose">Choisir un style</key>
     <key alias="styleShow">Afficher les styles</key>
@@ -289,7 +289,7 @@
     <key alias="createFromClipboard">Copier du clipboard</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Créer un nouveau Modèle de Contenu à partir de '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Créer un nouveau Modèle de Contenu à partir de <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Vide</key>
     <key alias="selectBlueprint">Sélectionner un Modèle de Contenu</key>
     <key alias="createdBlueprintHeading">Modèle de Contenu créé</key>
@@ -1411,6 +1411,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="mediaTypeSavedHeader">Type de média sauvegardé</key>
     <key alias="memberTypeSavedHeader">Type de membre sauvegardé</key>
     <key alias="memberGroupSavedHeader">Groupe de membres sauvegardé</key>
+    <key alias="memberGroupNameDuplicate">Un autre groupe de membres existe déjà avec le même nom</key>
     <key alias="templateErrorHeader">Modèle non sauvegardé</key>
     <key alias="templateErrorText">Assurez-vous de ne pas avoir 2 modèles avec le même alias.</key>
     <key alias="templateSavedHeader">Modèle sauvegardé</key>
@@ -2245,7 +2246,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="tooltipForPropertyActionsMenu">Ouvrir les Property Actions</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Attendez</key>
     <key alias="refreshStatus">Rafraîchir le Statut</key>
     <key alias="memoryCache">Cache Mémoire</key>
     <key alias="memoryCacheDescription">

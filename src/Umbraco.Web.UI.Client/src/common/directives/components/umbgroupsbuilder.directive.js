@@ -933,12 +933,12 @@
                 }
             };
 
-            scope.deleteProperty = (properties, { id, label }) => {
-                const propertyName = label || "";
+            scope.deleteProperty = (properties, property) => {
+                const propertyName = property.label || "";
 
                 const localizeMany = localizationService.localizeMany(['general_delete']);
-                const localize =  localizationService.localize('contentTypeEditor_confirmDeletePropertyMessage',  [propertyName]);
-                
+                const localize = localizationService.localize('contentTypeEditor_confirmDeletePropertyMessage', [propertyName]);
+
                 $q.all([localizeMany, localize]).then(values => {
                     const translations = values[0];
                     const message = values[1];
@@ -948,7 +948,7 @@
                         content: message,
                         submitButtonLabelKey: 'actions_delete',
                         submit: () => {
-                            const index = properties.findIndex(property => property.id === id);
+                            const index = properties.findIndex(p => property.id ? p.id === property.id : p === property);
                             properties.splice(index, 1);
                             notifyChanged();
 

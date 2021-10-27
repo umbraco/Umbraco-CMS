@@ -107,3 +107,23 @@ a:hover {
 .form-search > ul.nav > li.module > a:hover{
     color: #fff;
 }
+
+.close {
+    float: initial;
+    font-size: 14px;
+    font-weight: initial;
+    line-height: 20px;
+    color: #333333;
+    text-shadow: initial;
+    opacity: initial;
+    filter: initial;
+}
+
+.close:hover,
+.close:focus {
+    color: #333333;
+    text-decoration: initial;
+    cursor: initial;
+    opacity: initial;
+    filter: initial;
+}

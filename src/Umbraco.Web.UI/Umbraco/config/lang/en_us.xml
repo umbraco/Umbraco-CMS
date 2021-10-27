@@ -315,7 +315,7 @@
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Blank</key>
     <key alias="selectBlueprint">Select a Content Template</key>
     <key alias="createdBlueprintHeading">Content Template created</key>
@@ -811,6 +811,8 @@
     <key alias="videos">Videos</key>
     <key alias="installing">Installing</key>
     <key alias="avatar">Avatar for</key>
+    <key alias="header">Header</key>
+    <key alias="systemField">system field</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1359,6 +1361,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmRemoveAllMediaEntryMessage">Remove all medias?</key>
     <key alias="tabClipboard">Clipboard</key>
     <key alias="notAllowed">Not allowed</key>
+    <key alias="openMediaPicker">Open media picker</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
@@ -1382,7 +1385,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="created">Created</key>
     <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
-    <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
+    <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
@@ -1488,6 +1491,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="mediaTypeSavedHeader">Media Type saved</key>
     <key alias="memberTypeSavedHeader">Member Type saved</key>
     <key alias="memberGroupSavedHeader">Member Group saved</key>
+    <key alias="memberGroupNameDuplicate">Another Member Group with the same name already exists</key>
     <key alias="templateErrorHeader">Template not saved</key>
     <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
     <key alias="templateSavedHeader">Template saved</key>
@@ -1660,12 +1664,13 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="setAsDefault">Set as default</key>
     <key alias="chooseExtra">Choose extra</key>
     <key alias="chooseDefault">Choose default</key>
-      <key alias="areAdded">are added</key>
-        <key alias="warning">Warning</key>
-        <key alias="youAreDeleting">You are deleting the row configuration</key>
-        <key alias="deletingARow">
-            Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.
-        </key>
+    <key alias="areAdded">are added</key>
+    <key alias="warning">Warning</key>
+    <key alias="warningText"><![CDATA[<p>Modifying a row configuration name will result in loss of data for any existing content that is based on this configuration.</p> <p><strong>Modifying only the label will not result in data loss.</strong></p>]]></key>
+    <key alias="youAreDeleting">You are deleting the row configuration</key>
+    <key alias="deletingARow">Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.</key>
+    <key alias="deleteLayout">You are deleting the layout</key>
+    <key alias="deletingALayout">Modifying a layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
@@ -1745,6 +1750,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addTab">Add tab</key>
     <key alias="convertToTab">Convert to tab</key>
     <key alias="tabDirectPropertiesDropZone">Drag properties here to place directly on the tab</key>
+    <key alias="removeChildNode">You are removing the child node</key>
+    <key alias="removeChildNodeWarning">Removing a child node will limit the editors options to create different content types beneath a node.</key>
+    <key alias="usingEditor">using this editor will get updated with the new settings.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2350,7 +2358,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="noDocumentTypes">No references to Document Types.</key>
     <key alias="labelUsedByMediaTypes">Used in Media Types</key>
     <key alias="noMediaTypes">No references to Media Types.</key>
-    <key alias="labelUsedByMemberTypes">Used in  Member Types</key>
+    <key alias="labelUsedByMemberTypes">Used in Member Types</key>
     <key alias="noMemberTypes">No references to Member Types.</key>
     <key alias="usedByProperties">Used by</key>
     <key alias="labelUsedByDocuments">Used in Documents</key>
@@ -2414,7 +2422,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tooltipForPropertyActionsMenuClose">Close Property Actions</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Wait</key>
     <key alias="refreshStatus">Refresh status</key>
     <key alias="memoryCache">Memory Cache</key>
     <key alias="memoryCacheDescription">

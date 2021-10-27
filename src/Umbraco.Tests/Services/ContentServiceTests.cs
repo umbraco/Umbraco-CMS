@@ -1375,6 +1375,65 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, published.Result);
         }
 
+        // V9 - Tests.Integration
+        [Test]
+        public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_True()
+        {
+            const int rootNodeId = NodeDto.NodeIdSeed + 2;
+
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(rootNodeId);
+            contentService.SaveAndPublish(content);
+
+            content.Properties[0].SetValue("Foo", culture: string.Empty);
+            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
+            contentService.Save(content);
+
+            // Act
+            var result = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsTrue(result.Content.Published);
+                Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, result.Result);
+
+                // We changed property data
+                Assert.IsTrue(result.Content.Edited, "result.Content.Edited");
+            });
+        }
+
+        // V9 - Tests.Integration
+        [Test]
+        public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_False()
+        {
+            const int rootNodeId = NodeDto.NodeIdSeed + 2;
+
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(rootNodeId);
+            contentService.SaveAndPublish(content);
+
+            content.ContentSchedule.Add(DateTime.Now.AddHours(2), null);
+            contentService.Save(content);
+
+            // Act
+            var result = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.IsFalse(result.Success);
+                Assert.IsTrue(result.Content.Published);
+                Assert.AreEqual(PublishResultType.FailedPublishAwaitingRelease, result.Result);
+
+                // We didn't change any property data
+                Assert.IsFalse(result.Content.Edited, "result.Content.Edited");
+            });
+        }
+
         [Test]
         public void Cannot_Publish_Culture_Awaiting_Release()
         {
@@ -2176,7 +2235,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(rollback2);
 
             Assert.IsTrue(rollback2.Published);
-            Assert.IsFalse(rollback2.Edited); // all changes cleared!
+            Assert.IsTrue(rollback2.Edited); // Still edited, change of behaviour
 
             Assert.AreEqual("Jane Doe", rollback2.GetValue<string>("author"));
             Assert.AreEqual("Text Page 2 ReReUpdated", rollback2.Name);
@@ -2195,7 +2254,7 @@ namespace Umbraco.Tests.Services
             content.CopyFrom(rollto);
             content.Name = rollto.PublishName; // must do it explicitely AND must pick the publish one!
             contentService.Save(content);
-            Assert.IsFalse(content.Edited);
+            Assert.IsTrue(content.Edited); // Still edited, change of behaviour
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Jane Doe", content.GetValue("author"));
         }
