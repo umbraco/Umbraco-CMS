@@ -273,6 +273,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var found = currentlyAssigned.Where(x => x.MemberId == mId).ToArray();
                 var assignedRoles = found.Where(x => roleNames.Contains(x.RoleName, StringComparer.CurrentCultureIgnoreCase)).Select(x => x.RoleName);
                 var nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
+
                 foreach (var toAssign in nonAssignedRoles)
                 {
                     var groupId = rolesForNames.First(x => x.Text.InvariantEquals(toAssign)).NodeId;

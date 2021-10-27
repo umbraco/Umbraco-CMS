@@ -242,7 +242,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             fileSystems = fileSystems ?? new FileSystems(Current.Factory, logger);
-            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger);
+            var scopeProvider = new ScopeProvider(databaseFactory, fileSystems, logger, Mock.Of<ICoreDebug>(x => x.LogUncompletedScopes == true));
             return scopeProvider;
         }
     }

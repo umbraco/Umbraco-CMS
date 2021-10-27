@@ -49,7 +49,7 @@ namespace Umbraco.Web.Trees
             var sb = new StringBuilder("-1");
 
             //split the virtual path and iterate through it
-            var pathPaths = virtualPath.Split('/');
+            var pathPaths = virtualPath.Split(Constants.CharArrays.ForwardSlash);
 
             for (var p = 0; p < pathPaths.Length; p++)
             {

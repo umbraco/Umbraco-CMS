@@ -240,7 +240,7 @@ namespace Umbraco.Web.Models.Mapping
                 // the entity service due to too many Sql parameters.
 
                 var list = new List<IEntitySlim>();
-                foreach (var idGroup in allContentPermissions.Keys.InGroupsOf(2000))
+                foreach (var idGroup in allContentPermissions.Keys.InGroupsOf(Constants.Sql.MaxParameterCount))
                     list.AddRange(_entityService.GetAll(UmbracoObjectTypes.Document, idGroup.ToArray()));
                 contentEntities = list.ToArray();
             }
@@ -273,8 +273,8 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.AvailableCultures = _textService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName);
             target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache);
-            target.CalculatedStartContentIds = GetStartNodes(source.CalculateContentStartNodeIds(_entityService), UmbracoObjectTypes.Document, "content/contentRoot", context);
-            target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService), UmbracoObjectTypes.Media, "media/mediaRoot", context);
+            target.CalculatedStartContentIds = GetStartNodes(source.CalculateContentStartNodeIds(_entityService,_appCaches), UmbracoObjectTypes.Document, "content","contentRoot", context);
+            target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Media, "media","mediaRoot", context);
             target.CreateDate = source.CreateDate;
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
@@ -289,8 +289,8 @@ namespace Umbraco.Web.Models.Mapping
             target.Navigation = CreateUserEditorNavigation();
             target.ParentId = -1;
             target.Path = "-1," + source.Id;
-            target.StartContentIds = GetStartNodes(source.StartContentIds.ToArray(), UmbracoObjectTypes.Document, "content/contentRoot", context);
-            target.StartMediaIds = GetStartNodes(source.StartMediaIds.ToArray(), UmbracoObjectTypes.Media, "media/mediaRoot", context);
+            target.StartContentIds = GetStartNodes(source.StartContentIds.ToArray(), UmbracoObjectTypes.Document, "content","contentRoot", context);
+            target.StartMediaIds = GetStartNodes(source.StartMediaIds.ToArray(), UmbracoObjectTypes.Media, "media","mediaRoot", context);
             target.UpdateDate = source.UpdateDate;
             target.UserGroups = context.MapEnumerable<IReadOnlyUserGroup, UserGroupBasic>(source.Groups);
             target.Username = source.Username;
@@ -327,8 +327,8 @@ namespace Umbraco.Web.Models.Mapping
             target.Email = source.Email;
             target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
             target.Name = source.Name;
-            target.StartContentIds = source.CalculateContentStartNodeIds(_entityService);
-            target.StartMediaIds = source.CalculateMediaStartNodeIds(_entityService);
+            target.StartContentIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
+            target.StartMediaIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
             target.UserId = source.Id;
 
             //we need to map the legacy UserType
@@ -347,12 +347,12 @@ namespace Umbraco.Web.Models.Mapping
             if (sourceStartMediaId > 0)
                 target.MediaStartNode = context.Map<EntityBasic>(_entityService.Get(sourceStartMediaId.Value, UmbracoObjectTypes.Media));
             else if (sourceStartMediaId == -1)
-                target.MediaStartNode = CreateRootNode(_textService.Localize("media/mediaRoot"));
+                target.MediaStartNode = CreateRootNode(_textService.Localize("media", "mediaRoot"));
 
             if (sourceStartContentId > 0)
                 target.ContentStartNode = context.Map<EntityBasic>(_entityService.Get(sourceStartContentId.Value, UmbracoObjectTypes.Document));
             else if (sourceStartContentId == -1)
-                target.ContentStartNode = CreateRootNode(_textService.Localize("content/contentRoot"));
+                target.ContentStartNode = CreateRootNode(_textService.Localize("content", "contentRoot"));
 
             if (target.Icon.IsNullOrWhiteSpace())
                 target.Icon = Constants.Icons.UserGroup;
@@ -364,10 +364,10 @@ namespace Umbraco.Web.Models.Mapping
                 => new Permission
                 {
                     Category = action.Category.IsNullOrWhiteSpace()
-                        ? _textService.Localize($"actionCategories/{Constants.Conventions.PermissionCategories.OtherCategory}")
-                        : _textService.Localize($"actionCategories/{action.Category}"),
-                    Name = _textService.Localize($"actions/{action.Alias}"),
-                    Description = _textService.Localize($"actionDescriptions/{action.Alias}"),
+                        ? _textService.Localize("actionCategories",Constants.Conventions.PermissionCategories.OtherCategory)
+                        : _textService.Localize("actionCategories", action.Category),
+                    Name = _textService.Localize("actions", action.Alias),
+                    Description = _textService.Localize("actionDescriptions", action.Alias),
                     Icon = action.Icon,
                     Checked = source.Permissions != null && source.Permissions.Contains(action.Letter.ToString(CultureInfo.InvariantCulture)),
                     PermissionCode = action.Letter.ToString(CultureInfo.InvariantCulture)
@@ -383,14 +383,14 @@ namespace Umbraco.Web.Models.Mapping
         private static string MapContentTypeIcon(IEntitySlim entity)
             => entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
-        private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedKey, MapperContext context)
+        private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedArea,string localizedAlias, MapperContext context)
         {
             if (startNodeIds.Length <= 0)
                 return Enumerable.Empty<EntityBasic>();
 
             var startNodes = new List<EntityBasic>();
             if (startNodeIds.Contains(-1))
-                startNodes.Add(CreateRootNode(_textService.Localize(localizedKey)));
+                startNodes.Add(CreateRootNode(_textService.Localize(localizedArea, localizedAlias)));
 
             var mediaItems = _entityService.GetAll(objectType, startNodeIds);
             startNodes.AddRange(context.MapEnumerable<IEntitySlim, EntityBasic>(mediaItems));
@@ -406,7 +406,7 @@ namespace Umbraco.Web.Models.Mapping
                     Active = true,
                     Alias = "details",
                     Icon = "icon-umb-users",
-                    Name = _textService.Localize("general/user"),
+                    Name = _textService.Localize("general","user"),
                     View = "views/users/views/user/details.html"
                 }
             };

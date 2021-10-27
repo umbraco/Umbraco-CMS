@@ -44,6 +44,9 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("Description")]
         public string Description { get; set; }
 
+        [Column("labelOnTop")]
+        public bool LabelOnTop { get; set; }
+
         /* cmsMemberType */
         [Column("memberCanEdit")]
         public bool CanEdit { get; set; }

@@ -1,17 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Events;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Scoping;
 using Umbraco.Web.Models.ContentEditing;
+using PropertyCollection = Umbraco.Core.Models.PropertyCollection;
 
 namespace Umbraco.Tests.Mapping
 {
     [TestFixture]
     public class MappingTests
     {
+        private IScopeProvider _scopeProvider;
+
+        [SetUp]
+        public void MockScopeProvider()
+        {
+            var scopeMock = new Mock<IScopeProvider>();
+            scopeMock.Setup(x => x.CreateScope(
+                    It.IsAny<IsolationLevel>(),
+                    It.IsAny<RepositoryCacheMode>(),
+                    It.IsAny<IEventDispatcher>(),
+                    It.IsAny<bool?>(),
+                    It.IsAny<bool>(),
+                    It.IsAny<bool>()))
+                .Returns(Mock.Of<IScope>);
+
+            _scopeProvider = scopeMock.Object;
+        }
+
         [Test]
         public void SimpleMap()
         {
@@ -19,7 +42,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition1(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             var thing1 = new Thing1 { Value = "value" };
             var thing2 = mapper.Map<Thing1, Thing2>(thing1);
@@ -44,7 +67,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition1(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             var thing1A = new Thing1 { Value = "valueA" };
             var thing1B = new Thing1 { Value = "valueB" };
@@ -78,7 +101,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition1(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             var thing3 = new Thing3 { Value = "value" };
             var thing2 = mapper.Map<Thing3, Thing2>(thing3);
@@ -103,7 +126,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition2(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             // can map a PropertyCollection
             var source = new PropertyCollection();
@@ -119,7 +142,7 @@ namespace Umbraco.Tests.Mapping
                 new MapperDefinition1(),
                 new MapperDefinition3(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             // the mapper currently has a map from Thing1 to Thing2
             // because Thing3 inherits from Thing1, it will map a Thing3 instance,
@@ -179,7 +202,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition4(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             var thing5 = new Thing5()
             {
@@ -203,7 +226,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition5(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             var thing7 = new Thing7();
 

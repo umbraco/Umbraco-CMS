@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService, backdropService) {
+function umbTreeDirective($q, treeService, notificationsService) {
 
     return {
         restrict: 'E',
@@ -318,18 +318,6 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 }
             }
 
-            // Close any potential backdrop and remove the #leftcolumn modifier class
-            function closeBackdrop() {
-                var aboveClass = 'above-backdrop';
-                var leftColumn = $('#leftcolumn');
-                var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
-
-                if(isLeftColumnOnTop){
-                    backdropService.close();
-                    leftColumn.removeClass(aboveClass);
-                }
-            }
-
             /** Returns the css classses assigned to the node (div element) */
             $scope.getNodeCssClass = function (node) {
                 if (!node) {
@@ -348,7 +336,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             };
 
             $scope.selectEnabledNodeClass = node =>
-                node && node.selected ? 'icon umb-tree-icon sprTree icon-check green temporary' : '';            
+                node && node.selected ? 'icon sprTree icon-check green temporary' : '-hidden';
 
             /* helper to force reloading children of a tree node */
             $scope.loadChildren = (node, forceReload) => loadChildren(node, forceReload);
@@ -369,8 +357,6 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
               defined on the tree
             */
             $scope.select = function (n, ev) {
-
-                closeBackdrop()
                 
                 if (n.metaData && n.metaData.noAccess === true) {
                     ev.preventDefault();
@@ -409,8 +395,8 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 //load the tree
                 loadTree().then(function () {
                     //because angular doesn't return a promise for the resolve method, we need to resort to some hackery, else
-                    //like normal JS promises we could do resolve(...).then() 
-                    if (args && args.onLoaded && angular.isFunction(args.onLoaded)) {
+                    //like normal JS promises we could do resolve(...).then()
+                    if (args && args.onLoaded && Utilities.isFunction(args.onLoaded)) {
                         args.onLoaded();
                     }
                 });

@@ -626,7 +626,7 @@ namespace Umbraco.Core.Services.Implement
                         query.Where(member => member.Username.EndsWith(login));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Email.SqlWildcard(login, TextColumnType.NVarchar));
+                        query.Where(member => member.Username.SqlWildcard(login, TextColumnType.NVarchar));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(matchType));

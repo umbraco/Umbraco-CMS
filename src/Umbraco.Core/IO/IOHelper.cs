@@ -40,7 +40,7 @@ namespace Umbraco.Core.IO
                 retval = virtualPath.Replace("~", SystemDirectories.Root);
 
             if (virtualPath.StartsWith("/") && virtualPath.StartsWith(SystemDirectories.Root) == false)
-                retval = SystemDirectories.Root + "/" + virtualPath.TrimStart('/');
+                retval = SystemDirectories.Root + "/" + virtualPath.TrimStart(Constants.CharArrays.ForwardSlash);
 
             return retval;
         }
@@ -81,6 +81,7 @@ namespace Umbraco.Core.IO
         public static string MapPath(string path, bool useHttpContext)
         {
             if (path == null) throw new ArgumentNullException("path");
+
             useHttpContext = useHttpContext && IsHosted;
 
             // Check if the path is already mapped
@@ -89,20 +90,18 @@ namespace Umbraco.Core.IO
             {
                 return path;
             }
-            // Check that we even have an HttpContext! otherwise things will fail anyways
-            // http://umbraco.codeplex.com/workitem/30946
 
-            if (useHttpContext && HttpContext.Current != null)
+            if (useHttpContext)
             {
                 //string retval;
                 if (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))
                     return HostingEnvironment.MapPath(path);
                 else
-                    return HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
+                    return HostingEnvironment.MapPath("~/" + path.TrimStart(Constants.CharArrays.ForwardSlash));
             }
 
             var root = GetRootDirectorySafe();
-            var newPath = path.TrimStart('~', '/').Replace('/', IOHelper.DirSepChar);
+            var newPath = path.TrimStart(Constants.CharArrays.TildeForwardSlash).Replace('/', IOHelper.DirSepChar);
             var retval = root + IOHelper.DirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
             return retval;
@@ -121,7 +120,7 @@ namespace Umbraco.Core.IO
             if (string.IsNullOrEmpty(retval))
                 retval = standardPath;
 
-            return retval.TrimEnd('/');
+            return retval.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
 
         internal static string ReturnPath(string settingsKey, string standardPath)
@@ -188,7 +187,7 @@ namespace Umbraco.Core.IO
         internal static bool VerifyFileExtension(string filePath, IEnumerable<string> validFileExtensions)
         {
             var ext = Path.GetExtension(filePath);
-            return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));
+            return ext != null && validFileExtensions.Contains(ext.TrimStart(Constants.CharArrays.Period));
         }
 
         public static bool PathStartsWith(string path, string root, char separator)

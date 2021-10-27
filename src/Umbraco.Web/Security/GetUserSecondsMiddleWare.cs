@@ -62,7 +62,7 @@ namespace Umbraco.Web.Security
 
                         response.ContentType = "application/json; charset=utf-8";
                         response.StatusCode = 200;
-                        response.Headers.Add("Cache-Control", new[] { "no-cache" });
+                        response.Headers.Add("Cache-Control", new[] { "no-store", "must-revalidate", "no-cache", "max-age=0" });
                         response.Headers.Add("Pragma", new[] { "no-cache" });
                         response.Headers.Add("Expires", new[] { "-1" });
                         response.Headers.Add("Date", new[] { _authOptions.SystemClock.UtcNow.ToString("R") });

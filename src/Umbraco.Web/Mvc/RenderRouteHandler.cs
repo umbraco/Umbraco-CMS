@@ -253,7 +253,7 @@ namespace Umbraco.Web.Mvc
                 //the template Alias should always be already saved with a safe name.
                 //if there are hyphens in the name and there is a hijacked route, then the Action will need to be attributed
                 // with the action name attribute.
-                var templateName = request.TemplateAlias.Split('.')[0].ToSafeAlias();
+                var templateName = request.TemplateAlias.Split(Umbraco.Core.Constants.CharArrays.Period)[0].ToSafeAlias();
                 def.ActionName = templateName;
             }
 

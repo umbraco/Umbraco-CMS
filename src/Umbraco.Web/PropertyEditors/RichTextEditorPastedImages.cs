@@ -132,7 +132,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error(typeof(HtmlImageSourceParser), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+                        _logger.Error<string>(typeof(HtmlImageSourceParser), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
                     }
                 }
             }

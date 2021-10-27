@@ -41,8 +41,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
                                   };
 
             var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "title", Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = Constants.DataTypes.Textbox });
-            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.DataTypes.RichtextEditor });
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "title", Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = Constants.DataTypes.Textbox, LabelOnTop = true });
+            contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = Constants.DataTypes.RichtextEditor, LabelOnTop = false });
 
             var metaCollection = new PropertyTypeCollection(true);
             metaCollection.Add(new PropertyType("test", ValueStorageType.Ntext) { Alias = "keywords", Name = "Meta Keywords", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = Constants.DataTypes.Textbox });
@@ -155,7 +155,12 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext) { Alias = "bodyText", Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -87 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = "author", Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeId = -88 });
 
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
+            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection)
+            {
+                Name = "Content",
+                Alias = "content",
+                SortOrder = 1
+            });
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
@@ -213,11 +218,15 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentType.Trashed = false;
 
             var contentCollection = new PropertyTypeCollection(true);
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("title", randomizeAliases), Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("title", randomizeAliases), Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88, LabelOnTop = true });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TinyMce, ValueStorageType.Ntext) { Alias = RandomAlias("bodyText", randomizeAliases), Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeId = -87 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("author", randomizeAliases) , Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeId = -88 });
 
-            var pg = new PropertyGroup(contentCollection) {Name = propertyGroupName, SortOrder = 1};
+            var pg = new PropertyGroup(contentCollection)
+            {
+                Name = propertyGroupName,
+                SortOrder = 1
+            };
             contentType.PropertyGroups.Add(pg);
 
             //ensure that nothing is marked as dirty
@@ -368,7 +377,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.DropDownListFlexible, ValueStorageType.Integer) { Alias = "ddl", Name = "Dropdown List", Mandatory = false, SortOrder = 14, DataTypeId = -42 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.CheckBoxList, ValueStorageType.Nvarchar) { Alias = "chklist", Name = "Checkbox List", Mandatory = false, SortOrder = 15, DataTypeId = -43 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.ContentPicker, ValueStorageType.Integer) { Alias = "contentPicker", Name = "Content Picker", Mandatory = false, SortOrder = 16, DataTypeId = 1046 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MediaPicker, ValueStorageType.Integer) { Alias = "mediaPicker", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeId = 1048 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MediaPicker3, ValueStorageType.Integer) { Alias = "mediapicker3", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeId = 1051 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MemberPicker, ValueStorageType.Integer) { Alias = "memberPicker", Name = "Member Picker", Mandatory = false, SortOrder = 18, DataTypeId = 1047 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.MultiUrlPicker, ValueStorageType.Nvarchar) { Alias = "multiUrlPicker", Name = "Multi URL Picker", Mandatory = false, SortOrder = 21, DataTypeId = 1050 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.Tags, ValueStorageType.Ntext) { Alias = "tags", Name = "Tags", Mandatory = false, SortOrder = 22, DataTypeId = 1041 });
@@ -378,13 +387,13 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-        public static MediaType CreateVideoMediaType()
+        public static MediaType CreateNewMediaType()
         {
             var mediaType = new MediaType(-1)
                                 {
-                                    Alias = "video",
-                                    Name = "Video",
-                                    Description = "ContentType used for videos",
+                                    Alias = "newMediaType",
+                                    Name = "New Media Type",
+                                    Description = "ContentType used for a new format",
                                     Icon = ".sprTreeDoc3",
                                     Thumbnail = "doc.png",
                                     SortOrder = 1,

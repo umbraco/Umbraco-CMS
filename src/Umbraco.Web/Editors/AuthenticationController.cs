@@ -17,7 +17,6 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -34,10 +33,11 @@ namespace Umbraco.Web.Editors
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [Mvc.PluginController("UmbracoApi")]
     [ValidationFilter]
     [AngularJsonOnlyConfiguration]
     [IsBackOffice]
+    [DisableBrowserCache]
     public class AuthenticationController : UmbracoApiController
     {
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
@@ -337,7 +337,7 @@ namespace Umbraco.Web.Editors
                         new[] { identityUser.UserName, callbackUrl });
 
                     await UserManager.SendEmailAsync(identityUser.Id,
-                        Services.TextService.Localize("login/resetPasswordEmailCopySubject",
+                        Services.TextService.Localize("login", "resetPasswordEmailCopySubject",
                             // Ensure the culture of the found user is used for the email!
                             UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
                         message);
@@ -433,19 +433,19 @@ namespace Umbraco.Web.Editors
                 var lockedOut = await UserManager.IsLockedOutAsync(model.UserId);
                 if (lockedOut)
                 {
-                    Logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
+                    Logger.Info<AuthenticationController,int>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
 
                     //// var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController, int, string>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
                     }
 
                     var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController,int, string>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
                     }
                 }
 
@@ -499,7 +499,7 @@ namespace Umbraco.Web.Editors
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
-            Logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, owinContext.Request.RemoteIpAddress);
+            Logger.Info<AuthenticationController, string, string>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, owinContext.Request.RemoteIpAddress);
 
             if (UserManager != null)
             {

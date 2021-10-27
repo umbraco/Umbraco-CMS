@@ -79,7 +79,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
             var startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
-            var parts = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = path.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
 
             IPublishedContent content;
 

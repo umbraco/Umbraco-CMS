@@ -33,8 +33,8 @@ namespace Umbraco.Web.Trees
             var root = base.CreateRootNode(queryStrings);
 
             //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Settings, Constants.Trees.LogViewer, "overview");
-            root.Icon = "icon-box-alt";
+            root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.LogViewer}/overview";
+            root.Icon = Constants.Icons.LogViewer;
             root.HasChildren = false;
             root.MenuUrl = null;
 

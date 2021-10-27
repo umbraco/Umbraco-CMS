@@ -45,8 +45,7 @@
 (function () {
     'use strict';
 
-    function listViewHelper($location, $rootScope, localStorageService, urlHelper) {
-
+    function listViewHelper($location, $rootScope, localStorageService, urlHelper, editorService) {
         var firstSelectedIndex = 0;
         var localStorageKey = "umblistViewLayout";
 
@@ -573,17 +572,54 @@
         * Method for opening an item in a list view for editing.
         *
         * @param {Object} item The item to edit
+        * @param {Object} scope The scope with options
         */
-        function editItem(item) {
+        function editItem(item, scope) {
+
             if (!item.editPath) {
                 return;
             }
+
+            if (scope && scope.options && scope.options.useInfiniteEditor)
+            {
+                var editorModel = {
+                    id: item.id,
+                    submit: function(model) {
+                        editorService.close();
+                        scope.getContent(scope.contentId);
+                    },
+                    close: function() {
+                        editorService.close();
+                        scope.getContent(scope.contentId);
+                    }
+                };
+
+                if (item.editPath.indexOf("/content/") == 0)
+                {
+                    editorService.contentEditor(editorModel);
+                    return;
+                }
+
+                if (item.editPath.indexOf("/media/") == 0)
+                {
+                    editorService.mediaEditor(editorModel);
+                    return;
+                }
+
+                if (item.editPath.indexOf("/member/") == 0)
+                {
+                    editorModel.id = item.key;
+                    editorService.memberEditor(editorModel);
+                    return;
+                }
+            }
+            
             var parts = item.editPath.split("?");
             var path = parts[0];
             var params = parts[1]
-                ? urlHelper.getQueryStringParams("?" + parts[1])
-                : {};
-
+            ? urlHelper.getQueryStringParams("?" + parts[1])
+            : {};
+            
             $location.path(path);
             for (var p in params) {
                 $location.search(p, params[p]);

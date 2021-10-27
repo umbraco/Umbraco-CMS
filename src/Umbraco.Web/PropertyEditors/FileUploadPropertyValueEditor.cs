@@ -92,14 +92,15 @@ namespace Umbraco.Web.PropertyEditors
             if (editorFile == null) return null;
             return filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
 
-            
+
         }
 
         private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)
         {
             // process the file
             // no file, invalid file, reject change
-            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName) == false)
+            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName) is false ||
+                UploadFileTypeValidator.IsAllowedInDataTypeConfiguration(file.FileName, editorValue.DataTypeConfiguration) is false)
                 return null;
 
             // get the filepath

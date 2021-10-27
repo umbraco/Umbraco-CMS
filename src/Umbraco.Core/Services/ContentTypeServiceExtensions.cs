@@ -37,7 +37,7 @@ namespace Umbraco.Core.Services
         /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
         /// be looked up via the db, they need to be passed in.
         /// </param>
-        /// <param name="isElement">Wether the composite content types should be applicable for an element type</param>
+        /// <param name="isElement">Whether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
         internal static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
             IContentTypeComposition source,
