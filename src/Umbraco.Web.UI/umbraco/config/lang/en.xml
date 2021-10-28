@@ -304,6 +304,7 @@
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
+    <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
