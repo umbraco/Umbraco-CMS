@@ -62,13 +62,15 @@ stages:
             inputs:
               command: test
               projects: '**/*.Tests.UnitTests.csproj'
-              arguments: '--no-build  --collect:"Code Coverage"'
+              arguments: '--no-build  --collect:"XPlat Code Coverage"'
               publishTestResults: true
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish code coverage'
             inputs:
-              codeCoverageTool: 'JaCoCo' # Available options: 'JaCoCo', 'Cobertura'
-              summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+              codeCoverageTool: 'Cobertura' # Available options: 'JaCoCo', 'Cobertura'
+              summaryFileLocation:
+                codeCoverageTool: Cobertura
+                summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
       - job: MacOS_Unit_Tests
         displayName: Mac OS
         pool:
@@ -135,15 +137,15 @@ stages:
             inputs:
               command: test
               projects: '**/Umbraco.Tests.Integration.csproj'
-              arguments: '--no-build  --collect:"Code Coverage"'
+              arguments: '--no-build  --collect:"XPlat Code Coverage"'
               publishTestResults: true
             env:
               UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish code coverage'
             inputs:
-              codeCoverageTool: 'JaCoCo' # Available options: 'JaCoCo', 'Cobertura'
-              summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+              codeCoverageTool: 'Cobertura' # Available options: 'JaCoCo', 'Cobertura'
+              summaryFileLocation: '$(Agent.TempDirectory)/**/l'
       - job: Windows_Integration_Tests
         timeoutInMinutes: 120
         displayName: Windows
