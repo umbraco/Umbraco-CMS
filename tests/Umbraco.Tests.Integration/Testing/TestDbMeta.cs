@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
         public string ConnectionString { get; set; }
 
-        private TestDbMeta(string name, bool isEmpty, string connectionString)
+        public TestDbMeta(string name, bool isEmpty, string connectionString)
         {
             IsEmpty = isEmpty;
             Name = name;

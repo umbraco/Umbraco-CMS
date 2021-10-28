@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Infrastructure.Persistence;
 
+
 // ReSharper disable ConvertToUsingDeclaration
 namespace Umbraco.Cms.Tests.Integration.Testing
 {

@@ -14,10 +14,17 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         {
             string connectionString = Environment.GetEnvironmentVariable("UmbracoIntegrationTestConnectionString");
 
+            switch (settings.Engine)
+            {
+                case "sqlite":
+                    return new SQLiteTestDatabase(settings, dbFactory.Create(), loggerFactory);
+                // TODO: Handle others.
+            }
             return string.IsNullOrEmpty(connectionString)
                 ? CreateLocalDb(settings, filesPath, loggerFactory, dbFactory)
                 : CreateSqlDeveloper(settings, loggerFactory, dbFactory, connectionString);
         }
+
 
         private static ITestDatabase CreateLocalDb(TestDatabaseSettings settings, string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {

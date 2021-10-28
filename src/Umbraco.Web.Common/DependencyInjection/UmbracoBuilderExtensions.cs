@@ -147,6 +147,7 @@ namespace Umbraco.Extensions
             // Add supported databases
             builder.AddUmbracoSqlServerSupport();
             builder.AddUmbracoSqlCeSupport();
+            builder.AddUmbracoSQLiteSupport();
             builder.Services.AddUnique<DatabaseSchemaCreatorFactory>();
 
             // Must be added here because DbProviderFactories is netstandard 2.1 so cannot exist in Infra for now
@@ -434,6 +435,12 @@ namespace Umbraco.Extensions
             return builder;
         }
 
+        private static IUmbracoBuilder AddUmbracoSQLiteSupport(this IUmbracoBuilder builder)
+        {
+            DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SQLite, Microsoft.Data.Sqlite.SqliteFactory.Instance);
+
+            return builder;
+        }
         private static IProfiler GetWebProfiler(IConfiguration config)
         {
             var isDebug = config.GetValue<bool>($"{Cms.Core.Constants.Configuration.ConfigHosting}:Debug");

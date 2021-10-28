@@ -176,7 +176,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                     configBuilder.Sources.Clear();
                     configBuilder.AddInMemoryCollection(InMemoryConfiguration);
-
+                    configBuilder.AddJsonFile("appsettings.integrationtests.json");
                     Configuration = configBuilder.Build();
                 })
                 .ConfigureServices((hostContext, services) =>
@@ -276,7 +276,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         /// <remarks>
         /// There must only be ONE instance shared between all tests in a session
         /// </remarks>
-        private static ITestDatabase GetOrCreateDatabase(string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
+        private ITestDatabase GetOrCreateDatabase(string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
             lock (s_dbLocker)
             {
@@ -285,12 +285,13 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     return s_dbInstance;
                 }
 
-                // TODO: pull from IConfiguration
                 var settings = new TestDatabaseSettings
                 {
-                    PrepareThreadCount = 4,
-                    EmptyDatabasesCount = 2,
-                    SchemaDatabaseCount = 4
+                    PrepareThreadCount = Configuration.GetValue<int>("Tests:Database:PrepareThreadCount"),
+                    EmptyDatabasesCount = Configuration.GetValue<int>("Tests:Database:EmptyDatabasesCount"),
+                    SchemaDatabaseCount = Configuration.GetValue<int>("Tests:Database:SchemaDatabaseCount"),
+                    Engine = Configuration.GetValue<string>("Tests:Database:Engine"),
+                    FilesPath = filesPath
                 };
 
                 s_dbInstance = TestDatabaseFactory.Create(settings, filesPath, loggerFactory, dbFactory);
