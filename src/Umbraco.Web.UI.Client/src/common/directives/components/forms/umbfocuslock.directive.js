@@ -124,7 +124,8 @@
                 }
                 else if(defaultFocusedElement === null ){
                     // If the first focusable elements are either items from the umb-sub-views-nav menu or the umb-button-ellipsis we most likely want to start the focus on the second item
-                    var avoidStartElm = focusableElements.findIndex(elm => elm.classList.contains('umb-button-ellipsis') || elm.classList.contains('umb-sub-views-nav-item__action'));
+                    var avoidStartElm = focusableElements.findIndex(elm => elm.classList.contains('umb-button-ellipsis') || elm.classList.contains('umb-sub-views-nav-item__action') || elm.classList.contains('umb-tab-button'));
+
                     if(avoidStartElm === 0) {
                         focusableElements[1].focus();
                     }
@@ -243,6 +244,3 @@
     angular.module('umbraco.directives').directive('umbFocusLock', FocusLock);
 
 })();
-
-
-// TODO: Ensure the domObserver is NOT started when there is only one infinite overlay and it's being destroyed!
