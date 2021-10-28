@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -20,8 +20,8 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
     public abstract class BaseHttpHeaderCheck : HealthCheck
     {
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly ILocalizedTextService _textService;
         private readonly string _header;
-        private readonly string _value;
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
         private static HttpClient s_httpClient;
@@ -33,25 +33,17 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             IHostingEnvironment hostingEnvironment,
             ILocalizedTextService textService,
             string header,
-            string value,
             string localizedTextPrefix,
             bool metaTagOptionAvailable)
         {
-            LocalizedTextService = textService ?? throw new ArgumentNullException(nameof(textService));
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _hostingEnvironment = hostingEnvironment;
             _header = header;
-            _value = value;
             _localizedTextPrefix = localizedTextPrefix;
             _metaTagOptionAvailable = metaTagOptionAvailable;
         }
 
         private static HttpClient HttpClient => s_httpClient ??= new HttpClient();
-
-
-        /// <summary>
-        /// Gets the localized text service.
-        /// </summary>
-        protected ILocalizedTextService LocalizedTextService { get; }
 
         /// <summary>
         /// Gets a link to an external read more page.
@@ -95,12 +87,12 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
                 }
 
                 message = success
-                    ? LocalizedTextService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderFound")
-                    : LocalizedTextService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderNotFound");
+                    ? _textService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderFound")
+                    : _textService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderNotFound");
             }
             catch (Exception ex)
             {
-                message = LocalizedTextService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = _textService.Localize("healthcheck","healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             return
