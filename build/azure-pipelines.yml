@@ -140,7 +140,7 @@ stages:
             displayName: 'Publish code coverage'
             inputs:
               codeCoverageTool: 'Cobertura' # Available options: 'JaCoCo', 'Cobertura'
-              summaryFileLocation: '$(Agent.TempDirectory)/**/l'
+              summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
       - job: Windows_Integration_Tests
         timeoutInMinutes: 120
         displayName: Windows
