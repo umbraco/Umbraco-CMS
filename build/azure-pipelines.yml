@@ -62,7 +62,7 @@ stages:
             inputs:
               command: test
               projects: '**/*.Tests.UnitTests.csproj'
-              arguments: '--no-build  --collect:"XPlat Code Coverage"'
+              arguments: '--no-build  --collect:"Code Coverage"'
               publishTestResults: true
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish code coverage'
@@ -135,7 +135,7 @@ stages:
             inputs:
               command: test
               projects: '**/Umbraco.Tests.Integration.csproj'
-              arguments: '--no-build  --collect:"XPlat Code Coverage"'
+              arguments: '--no-build  --collect:"Code Coverage"'
               publishTestResults: true
             env:
               UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
