@@ -112,7 +112,7 @@ stages:
         services:
           mssql: mssql
         timeoutInMinutes: 120
-        displayName: Linux (+unit &coverage)
+        displayName: Linux (+Unit & Coverage)
         pool:
           vmImage: ubuntu-latest
         steps:
@@ -130,8 +130,8 @@ stages:
             inputs:
               command: test
               projects: |
-                '**/Umbraco.Tests.UnitTests.csproj
-                '**/Umbraco.Tests.Integration.csproj
+                **/Umbraco.Tests.UnitTests.csproj
+                **/Umbraco.Tests.Integration.csproj
               arguments: '--no-build  --collect:"XPlat Code Coverage"'
               publishTestResults: true
             env:
