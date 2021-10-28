@@ -1,596 +1,598 @@
 name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 variables:
-    buildConfiguration: Release
-    SA_PASSWORD: UmbracoIntegration123!
-    UmbracoBuild: AzurePipeline
-    nodeVersion: 14.18.1
+  buildConfiguration: Release
+  SA_PASSWORD: UmbracoIntegration123!
+  UmbracoBuild: AzurePipeline
+  nodeVersion: 14.18.1
 resources:
-    containers:
-        - container: mssql
-          image: 'mcr.microsoft.com/mssql/server:2017-latest'
-          env:
-              ACCEPT_EULA: 'Y'
-              SA_PASSWORD: $(SA_PASSWORD)
-              MSSQL_PID: Developer
-          ports:
-              - '1433:1433'
-          options: '--name mssql'
+  containers:
+    - container: mssql
+      image: 'mcr.microsoft.com/mssql/server:2017-latest'
+      env:
+        ACCEPT_EULA: 'Y'
+        SA_PASSWORD: $(SA_PASSWORD)
+        MSSQL_PID: Developer
+      ports:
+        - '1433:1433'
+      options: '--name mssql'
 stages:
-    - stage: Determine_build_type
-      displayName: Determine build type
-      dependsOn: [ ]
-      jobs:
-          - job: Set_build_variables
-            displayName: Set build variables
-            pool:
-                vmImage: windows-latest
-            steps:
-                - task: PowerShell@1
-                  name: setReleaseVariable
-                  displayName: Set isRelease variable
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: >
-                          $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
+  - stage: Determine_build_type
+    displayName: Determine build type
+    dependsOn: [ ]
+    jobs:
+      - job: Set_build_variables
+        displayName: Set build variables
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: PowerShell@1
+            name: setReleaseVariable
+            displayName: Set isRelease variable
+            inputs:
+              scriptType: inlineScript
+              inlineScript: >
+                $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
 
-                          if ($isRelease.Count -gt 0){
-                             Write-Host "##vso[build.addbuildtag]Release build"
-                             Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]true"
-                          }else{
-                             Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]false"
-                          }
-    - stage: Unit_Tests
-      displayName: Unit Tests
-      dependsOn: []
-      jobs:
-          - job: Linux_Unit_Tests
-            displayName: Linux
-            pool:
-                vmImage: ubuntu-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 5.x
-                  inputs:
-                      version: 5.x
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet build
-                  inputs:
-                      command: build
-                      projects: '**/umbraco-netcore-only.sln'
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet test
-                  inputs:
-                      command: test
-                      projects: '**/*.Tests.UnitTests.csproj'
-                      arguments: '--no-build'
-          - job: MacOS_Unit_Tests
-            displayName: Mac OS
-            pool:
-                vmImage: macOS-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 5.x
-                  inputs:
-                      version: 5.x
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet build
-                  inputs:
-                      command: build
-                      projects: '**/umbraco-netcore-only.sln'
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet test
-                  inputs:
-                      command: test
-                      projects: '**/*.Tests.UnitTests.csproj'
-                      arguments: '--no-build'
-          - job: Windows_Unit_Tests
-            displayName: Windows
-            pool:
-                vmImage: windows-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 5.x
-                  inputs:
-                      version: 5.x
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet build
-                  inputs:
-                      command: build
-                      projects: '**/umbraco.sln'
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet test
-                  inputs:
-                      command: test
-                      projects: '**/*.Tests.UnitTests.csproj'
-                      arguments: '--no-build'
-    - stage: Integration_Tests
-      displayName: Integration Tests
-      dependsOn: []
-      jobs:
-          - job: Linux_Integration_Tests
-            services:
-                mssql: mssql
-            timeoutInMinutes: 120
-            displayName: Linux
-            pool:
-                vmImage: ubuntu-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 5.x
-                  inputs:
-                      version: 5.x
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet build
-                  inputs:
-                      command: build
-                      projects: '**/umbraco-netcore-only.sln'
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet test
-                  inputs:
-                      command: test
-                      projects: '**/Umbraco.Tests.Integration.csproj'
-                      arguments: '--no-build'
-                  env:
-                      UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
-          - job: Windows_Integration_Tests
-            timeoutInMinutes: 120
-            displayName: Windows
-            pool:
-                vmImage: windows-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 5.x
-                  inputs:
-                      version: 5.x
-                - powershell: sqllocaldb start mssqllocaldb
-                  displayName: Start MSSQL LocalDb
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet build
-                  inputs:
-                      command: build
-                      projects: '**/umbraco.sln'
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet test
-                  inputs:
-                      command: test
-                      projects: '**\Umbraco.Tests.Integration*.csproj'
-                      arguments: '--no-build'
-    - stage: Acceptance_Tests
-      displayName: Acceptance Tests
-      dependsOn: []
-      variables:
-          - name: Umbraco__CMS__Unattended__InstallUnattended
-            value: true
-          - name: Umbraco__CMS__Unattended__UnattendedUserName
-            value: Cypress Test
-          - name: Umbraco__CMS__Unattended__UnattendedUserEmail
-            value: cypress@umbraco.com
-          - name: Umbraco__CMS__Unattended__UnattendedUserPassword
-            value: UmbracoAcceptance123!
-      jobs:
-          - job: Windows_Acceptance_tests
-            variables:
-                - name: UmbracoDatabaseServer
-                  value: (LocalDB)\MSSQLLocalDB
-                - name: UmbracoDatabaseName
-                  value: Cypress
-                - name: ConnectionStrings__umbracoDbDSN
-                  value: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
-            displayName: Windows
-            pool:
-                vmImage: windows-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 5.x
-                  inputs:
-                      version: 5.x
+                if ($isRelease.Count -gt 0){
+                   Write-Host "##vso[build.addbuildtag]Release build"
+                   Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]true"
+                }else{
+                   Write-Host "##vso[task.setvariable variable=isRelease;isOutput=true]false"
+                }
+  - stage: Unit_Tests
+    displayName: Unit Tests
+    dependsOn: [ ]
+    jobs:
+      - job: Linux_Unit_Tests
+        displayName: Linux
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 5.x
+            inputs:
+              version: 5.x
+          - task: DotNetCoreCLI@2
+            displayName: dotnet build
+            inputs:
+              command: build
+              projects: '**/umbraco-netcore-only.sln'
+          - task: DotNetCoreCLI@2
+            displayName: dotnet test
+            inputs:
+              command: test
+              projects: '**/*.Tests.UnitTests.csproj'
+              arguments: '--no-build  --collect "Code coverage"'
+              publishTestResults: true
+      - job: MacOS_Unit_Tests
+        displayName: Mac OS
+        pool:
+          vmImage: macOS-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 5.x
+            inputs:
+              version: 5.x
+          - task: DotNetCoreCLI@2
+            displayName: dotnet build
+            inputs:
+              command: build
+              projects: '**/umbraco-netcore-only.sln'
+          - task: DotNetCoreCLI@2
+            displayName: dotnet test
+            inputs:
+              command: test
+              projects: '**/*.Tests.UnitTests.csproj'
+              arguments: '--no-build'
+      - job: Windows_Unit_Tests
+        displayName: Windows
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 5.x
+            inputs:
+              version: 5.x
+          - task: DotNetCoreCLI@2
+            displayName: dotnet build
+            inputs:
+              command: build
+              projects: '**/umbraco.sln'
+          - task: DotNetCoreCLI@2
+            displayName: dotnet test
+            inputs:
+              command: test
+              projects: '**/*.Tests.UnitTests.csproj'
+              arguments: '--no-build'
+  - stage: Integration_Tests
+    displayName: Integration Tests
+    dependsOn: [ ]
+    jobs:
+      - job: Linux_Integration_Tests
+        services:
+          mssql: mssql
+        timeoutInMinutes: 120
+        displayName: Linux
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 5.x
+            inputs:
+              version: 5.x
+          - task: DotNetCoreCLI@2
+            displayName: dotnet build
+            inputs:
+              command: build
+              projects: '**/umbraco-netcore-only.sln'
+          - task: DotNetCoreCLI@2
+            displayName: dotnet test
+            inputs:
+              command: test
+              projects: '**/Umbraco.Tests.Integration.csproj'
+              arguments: '--no-build --collect "Code coverage"'
+              publishTestResults: true
+            env:
+              UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+      - job: Windows_Integration_Tests
+        timeoutInMinutes: 120
+        displayName: Windows
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 5.x
+            inputs:
+              version: 5.x
+          - powershell: sqllocaldb start mssqllocaldb
+            displayName: Start MSSQL LocalDb
+          - task: DotNetCoreCLI@2
+            displayName: dotnet build
+            inputs:
+              command: build
+              projects: '**/umbraco.sln'
+          - task: DotNetCoreCLI@2
+            displayName: dotnet test
+            inputs:
+              command: test
+              projects: '**\Umbraco.Tests.Integration*.csproj'
+              arguments: '--no-build'
+  - stage: Acceptance_Tests
+    displayName: Acceptance Tests
+    dependsOn: [ ]
+    variables:
+      - name: Umbraco__CMS__Unattended__InstallUnattended
+        value: true
+      - name: Umbraco__CMS__Unattended__UnattendedUserName
+        value: Cypress Test
+      - name: Umbraco__CMS__Unattended__UnattendedUserEmail
+        value: cypress@umbraco.com
+      - name: Umbraco__CMS__Unattended__UnattendedUserPassword
+        value: UmbracoAcceptance123!
+    jobs:
+      - job: Windows_Acceptance_tests
+        variables:
+          - name: UmbracoDatabaseServer
+            value: (LocalDB)\MSSQLLocalDB
+          - name: UmbracoDatabaseName
+            value: Cypress
+          - name: ConnectionStrings__umbracoDbDSN
+            value: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
+        displayName: Windows
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 5.x
+            inputs:
+              version: 5.x
 
-                - powershell: sqllocaldb start mssqllocaldb
-                  displayName: Start MSSQL LocalDb
-                - powershell:  Invoke-Sqlcmd -Query "CREATE DATABASE $env:UmbracoDatabaseName" -ServerInstance $env:UmbracoDatabaseServer
-                  displayName: Create database
-#                - task: DotNetCoreCLI@2
-#                  displayName: dotnet build
-#                  inputs:
-#                      command: build
-#                      projects: '**/Umbraco.Web.UI.csproj'
-                - task: NodeTool@0
-                  displayName: Use Node $(nodeVersion)
-                  inputs:
-                       versionSpec: $(nodeVersion)
-                - task: Npm@1
-                  displayName: npm ci (Client)
-                  inputs:
-                    command: ci
-                    workingDir: src\Umbraco.Web.UI.Client
-                    verbose: false
-                - task: gulp@0
-                  displayName: gulp build
-                  inputs:
-                    gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
-                    targets: build
-                    workingDirectory: src\Umbraco.Web.UI.Client
-                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
-                  displayName: dotnet run
-#                - powershell: dotnet run --no-build -p .\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj
-#                  displayName: dotnet run
-                - task: PowerShell@1
-                  displayName: Generate Cypress.env.json
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: >
-                          @{ username = $env:Umbraco__CMS__Unattended__UnattendedUserEmail; password = $env:Umbraco__CMS__Unattended__UnattendedUserPassword } | ConvertTo-Json | Set-Content -Path "tests\Umbraco.Tests.AcceptanceTest\cypress.env.json"
-                - task: Npm@1
-                  name: PrepareTask
-                  displayName: npm ci (AcceptanceTest)
-                  inputs:
-                      command: ci
-                      workingDir: 'tests\Umbraco.Tests.AcceptanceTest'
-                - task: PowerShell@2
-                  displayName: Run Cypress (Desktop)
-                  condition: always()
-                  continueOnError: true
-                  inputs:
-                      targetType: inline
-                      workingDirectory: tests\Umbraco.Tests.AcceptanceTest
-                      script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+          - powershell: sqllocaldb start mssqllocaldb
+            displayName: Start MSSQL LocalDb
+          - powershell: Invoke-Sqlcmd -Query "CREATE DATABASE $env:UmbracoDatabaseName" -ServerInstance $env:UmbracoDatabaseServer
+            displayName: Create database
+          #                - task: DotNetCoreCLI@2
+          #                  displayName: dotnet build
+          #                  inputs:
+          #                      command: build
+          #                      projects: '**/Umbraco.Web.UI.csproj'
+          - task: NodeTool@0
+            displayName: Use Node $(nodeVersion)
+            inputs:
+              versionSpec: $(nodeVersion)
+          - task: Npm@1
+            displayName: npm ci (Client)
+            inputs:
+              command: ci
+              workingDir: src\Umbraco.Web.UI.Client
+              verbose: false
+          - task: gulp@0
+            displayName: gulp build
+            inputs:
+              gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
+              targets: build
+              workingDirectory: src\Umbraco.Web.UI.Client
+          - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
+            displayName: dotnet run
+          #                - powershell: dotnet run --no-build -p .\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj
+          #                  displayName: dotnet run
+          - task: PowerShell@1
+            displayName: Generate Cypress.env.json
+            inputs:
+              scriptType: inlineScript
+              inlineScript: >
+                @{ username = $env:Umbraco__CMS__Unattended__UnattendedUserEmail; password = $env:Umbraco__CMS__Unattended__UnattendedUserPassword } | ConvertTo-Json | Set-Content -Path "tests\Umbraco.Tests.AcceptanceTest\cypress.env.json"
+          - task: Npm@1
+            name: PrepareTask
+            displayName: npm ci (AcceptanceTest)
+            inputs:
+              command: ci
+              workingDir: 'tests\Umbraco.Tests.AcceptanceTest'
+          - task: PowerShell@2
+            displayName: Run Cypress (Desktop)
+            condition: always()
+            continueOnError: true
+            inputs:
+              targetType: inline
+              workingDirectory: tests\Umbraco.Tests.AcceptanceTest
+              script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
 
-                - task: PublishTestResults@2
-                  condition: always()
-                  inputs:
-                      testResultsFormat: 'JUnit'
-                      testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
-                      mergeTestResults: true
-                      testRunTitle: "Test results Desktop"
-#                - task: Npm@1
-#                  displayName: Run Cypress (Tablet portrait)
-#                  condition: always()
-#                  inputs:
-#                      workingDir: tests\Umbraco.Tests.AcceptanceTest
-#                      command: 'custom'
-#                      customCommand: 'run test -- --config="viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos,videoUploadOnPasses=false"'
-#
-#                - task: Npm@1
-#                  displayName: Run Cypress (Mobile protrait)
-#                  condition: always()
-#                  inputs:
-#                      workingDir: tests\Umbraco.Tests.AcceptanceTest
-#                      command: 'custom'
-#                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
-                - task: PublishPipelineArtifact@1
-                  displayName: "Publish test artifacts"
-                  condition: failed()
-                  inputs:
-                    targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
-                    artifact: 'Test artifacts - Windows'
-          - job: Linux_Acceptance_tests
-            displayName: Linux
-            variables:
-                - name: UmbracoDatabaseServer
-                  value: localhost
-                - name: UmbracoDatabaseName
-                  value: Cypress
-                - name: ConnectionStrings__umbracoDbDSN
-                  value: Server=localhost,1433;Database=$(UmbracoDatabaseName);User Id=sa;Password=$(SA_PASSWORD);
-            services:
-                mssql: mssql
-            pool:
-                vmImage: ubuntu-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 5.x
-                  inputs:
-                      version: 5.x
-                - task: Bash@3
-                  displayName: Create database
-                  inputs:
-                      targetType: 'inline'
-                      script: 'sqlcmd -S . -U sa -P $SA_PASSWORD -Q "CREATE DATABASE $DBNAME"'
-                  env:
-                      DBNAME: $(UmbracoDatabaseName)
-                      SA_PASSWORD: $(SA_PASSWORD)
-                - task: NodeTool@0
-                  displayName: Use Node $(nodeVersion)
-                  inputs:
-                      versionSpec: $(nodeVersion)
-                - task: Npm@1
-                  displayName: npm ci (Client)
-                  inputs:
-                      command: ci
-                      workingDir: src/Umbraco.Web.UI.Client
-                      verbose: false
-                - task: gulp@0
-                  displayName: gulp build
-                  inputs:
-                      gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
-                      targets: build
-                      workingDirectory: src/Umbraco.Web.UI.Client
-                - task: DotNetCoreCLI@2
-                  displayName: dotnet build
-                  inputs:
-                      command: build
-                      projects: src/Umbraco.Web.UI/Umbraco.Web.UI.csproj
-                - task: Bash@3
-                  displayName: dotnet run
-                  inputs:
-                    targetType: 'inline'
-                    script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
-                - task: Bash@3
-                  displayName: Generate Cypress.env.json
-                  inputs:
-                    targetType: 'inline'
-                    script: 'echo "{ \"username\": \"$USERNAME\", \"password\": \"$PASSWORD\" }" > "tests/Umbraco.Tests.AcceptanceTest/cypress.env.json"'
-                  env:
-                    USERNAME: $(Umbraco__CMS__Unattended__UnattendedUserEmail)
-                    PASSWORD: $(Umbraco__CMS__Unattended__UnattendedUserPassword)
-                - task: Npm@1
-                  name: PrepareTask
-                  displayName: npm ci (AcceptanceTest)
-                  inputs:
-                      command: ci
-                      workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
-                - task: Bash@3
-                  displayName: Run Cypress (Desktop)
-                  condition: always()
-                  continueOnError: true
-                  inputs:
-                      targetType: inline
-                      workingDirectory: tests/Umbraco.Tests.AcceptanceTest
-                      script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
-                - task: PublishTestResults@2
-                  condition: always()
-                  inputs:
-                      testResultsFormat: 'JUnit'
-                      testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
-                      mergeTestResults: true
-                      testRunTitle: "Test results Desktop"
-                #                - task: Npm@1
-                #                  displayName: Run Cypress (Tablet portrait)
-                #                  condition: always()
-                #                  inputs:
-                #                      workingDir: tests/Umbraco.Tests.AcceptanceTest
-                #                      command: 'custom'
-                #                      customCommand: 'run test -- --config="viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos,videoUploadOnPasses=false"'
-                #
-                #                - task: Npm@1
-                #                  displayName: Run Cypress (Mobile protrait)
-                #                  condition: always()
-                #                  inputs:
-                #                      workingDir: tests/Umbraco.Tests.AcceptanceTest
-                #                      command: 'custom'
-                #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
-                - task: PublishPipelineArtifact@1
-                  displayName: "Publish test artifacts"
-                  condition: failed()
-                  inputs:
-                      targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
-                      artifact: 'Test artifacts - Linux'
-                - task: PublishPipelineArtifact@1
-                  displayName: "Publish run log"
-                  condition: failed()
-                  inputs:
-                      targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
-                      artifact: Test Run logs - Linux
-    - stage: Artifacts
-      dependsOn: []
-      jobs:
-          - job: Build_Artifacts
-            displayName: Build Artifacts
-            pool:
-                vmImage: windows-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 5.x
-                  inputs:
-                      version: 5.x
-                - task: NuGetToolInstaller@1
-                  displayName: Use NuGet Latest
-                - task: NuGetCommand@2
-                  displayName: Restore NuGet Packages
-                  inputs:
-                      restoreSolution: 'umbraco.sln'
-                      feedsToUse: config
-                - task: PowerShell@1
-                  displayName: Update Version and Artifact Name
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: >
-                        Write-Host "Working folder: $pwd"
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
+              mergeTestResults: true
+              testRunTitle: "Test results Desktop"
+          #                - task: Npm@1
+          #                  displayName: Run Cypress (Tablet portrait)
+          #                  condition: always()
+          #                  inputs:
+          #                      workingDir: tests\Umbraco.Tests.AcceptanceTest
+          #                      command: 'custom'
+          #                      customCommand: 'run test -- --config="viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos,videoUploadOnPasses=false"'
+          #
+          #                - task: Npm@1
+          #                  displayName: Run Cypress (Mobile protrait)
+          #                  condition: always()
+          #                  inputs:
+          #                      workingDir: tests\Umbraco.Tests.AcceptanceTest
+          #                      command: 'custom'
+          #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish test artifacts"
+            condition: failed()
+            inputs:
+              targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
+              artifact: 'Test artifacts - Windows'
+      - job: Linux_Acceptance_tests
+        displayName: Linux
+        variables:
+          - name: UmbracoDatabaseServer
+            value: localhost
+          - name: UmbracoDatabaseName
+            value: Cypress
+          - name: ConnectionStrings__umbracoDbDSN
+            value: Server=localhost,1433;Database=$(UmbracoDatabaseName);User Id=sa;Password=$(SA_PASSWORD);
+        services:
+          mssql: mssql
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 5.x
+            inputs:
+              version: 5.x
+          - task: Bash@3
+            displayName: Create database
+            inputs:
+              targetType: 'inline'
+              script: 'sqlcmd -S . -U sa -P $SA_PASSWORD -Q "CREATE DATABASE $DBNAME"'
+            env:
+              DBNAME: $(UmbracoDatabaseName)
+              SA_PASSWORD: $(SA_PASSWORD)
+          - task: NodeTool@0
+            displayName: Use Node $(nodeVersion)
+            inputs:
+              versionSpec: $(nodeVersion)
+          - task: Npm@1
+            displayName: npm ci (Client)
+            inputs:
+              command: ci
+              workingDir: src/Umbraco.Web.UI.Client
+              verbose: false
+          - task: gulp@0
+            displayName: gulp build
+            inputs:
+              gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
+              targets: build
+              workingDirectory: src/Umbraco.Web.UI.Client
+          - task: DotNetCoreCLI@2
+            displayName: dotnet build
+            inputs:
+              command: build
+              projects: src/Umbraco.Web.UI/Umbraco.Web.UI.csproj
+          - task: Bash@3
+            displayName: dotnet run
+            inputs:
+              targetType: 'inline'
+              script: 'nohup dotnet run --no-build -p ./src/Umbraco.Web.UI/ > $(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt &'
+          - task: Bash@3
+            displayName: Generate Cypress.env.json
+            inputs:
+              targetType: 'inline'
+              script: 'echo "{ \"username\": \"$USERNAME\", \"password\": \"$PASSWORD\" }" > "tests/Umbraco.Tests.AcceptanceTest/cypress.env.json"'
+            env:
+              USERNAME: $(Umbraco__CMS__Unattended__UnattendedUserEmail)
+              PASSWORD: $(Umbraco__CMS__Unattended__UnattendedUserPassword)
+          - task: Npm@1
+            name: PrepareTask
+            displayName: npm ci (AcceptanceTest)
+            inputs:
+              command: ci
+              workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
+          - task: Bash@3
+            displayName: Run Cypress (Desktop)
+            condition: always()
+            continueOnError: true
+            inputs:
+              targetType: inline
+              workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+              script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'tests/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
+              mergeTestResults: true
+              testRunTitle: "Test results Desktop"
+          #                - task: Npm@1
+          #                  displayName: Run Cypress (Tablet portrait)
+          #                  condition: always()
+          #                  inputs:
+          #                      workingDir: tests/Umbraco.Tests.AcceptanceTest
+          #                      command: 'custom'
+          #                      customCommand: 'run test -- --config="viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos,videoUploadOnPasses=false"'
+          #
+          #                - task: Npm@1
+          #                  displayName: Run Cypress (Mobile protrait)
+          #                  condition: always()
+          #                  inputs:
+          #                      workingDir: tests/Umbraco.Tests.AcceptanceTest
+          #                      command: 'custom'
+          #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish test artifacts"
+            condition: failed()
+            inputs:
+              targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
+              artifact: 'Test artifacts - Linux'
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish run log"
+            condition: failed()
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
+              artifact: Test Run logs - Linux
+  - stage: Artifacts
+    dependsOn: [ ]
+    jobs:
+      - job: Build_Artifacts
+        displayName: Build Artifacts
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 5.x
+            inputs:
+              version: 5.x
+          - task: NuGetToolInstaller@1
+            displayName: Use NuGet Latest
+          - task: NuGetCommand@2
+            displayName: Restore NuGet Packages
+            inputs:
+              restoreSolution: 'umbraco.sln'
+              feedsToUse: config
+          - task: PowerShell@1
+            displayName: Update Version and Artifact Name
+            inputs:
+              scriptType: inlineScript
+              inlineScript: >
+                Write-Host "Working folder: $pwd"
 
-                        $ubuild = build/build.ps1 -get -continue
-
-
-                        $version = $ubuild.GetUmbracoVersion()
-
-                        $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
-
-                        if ($isRelease.Count -gt 0){
-                          $continuous = $version.Semver
-
-                        }
-                        else
-                        {
-                            $date = (Get-Date).ToString("yyyyMMdd")
-                            $continuous = "$($version.release)-preview$date.$(Build.BuildId)"
-                            $ubuild.SetUmbracoVersion($continuous)
-
-                            #Update the version in templates also
-
-                            $templatePath =
-                            'build/templates/UmbracoProject/.template.config/template.json'
-
-                            $a = Get-Content $templatePath -raw | ConvertFrom-Json
-
-                            $a.symbols.version.defaultValue = $continuous
-
-                            $a | ConvertTo-Json -depth 32| set-content $templatePath
+                $ubuild = build/build.ps1 -get -continue
 
 
-                            $templatePath =
-                            'build/templates/UmbracoPackage/.template.config/template.json'
+                $version = $ubuild.GetUmbracoVersion()
 
-                            $a = Get-Content $templatePath -raw | ConvertFrom-Json
+                $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
 
-                            $a.symbols.version.defaultValue = $continuous
+                if ($isRelease.Count -gt 0){
+                  $continuous = $version.Semver
 
-                            $a | ConvertTo-Json -depth 32| set-content $templatePath
-                          }
+                }
+                else
+                {
+                    $date = (Get-Date).ToString("yyyyMMdd")
+                    $continuous = "$($version.release)-preview$date.$(Build.BuildId)"
+                    $ubuild.SetUmbracoVersion($continuous)
 
-                        Write-Host "##vso[build.updatebuildnumber]$continuous.$(Build.BuildId)"
+                    #Update the version in templates also
 
-                        Write-Host "Building: $continuous"
-                - task: PowerShell@1
-                  displayName: Prepare Build
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: |
-                          Write-Host "Working folder: $pwd"
-                          $ubuild = build\build.ps1 -get
+                    $templatePath =
+                    'build/templates/UmbracoProject/.template.config/template.json'
 
-                          $ubuild.PrepareBuild("vso")
-                - task: PowerShell@1
-                  displayName: Prepare JSON Schema
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: |
-                          Write-Host "Working folder: $pwd"
-                          $ubuild = build\build.ps1 -get -continue
+                    $a = Get-Content $templatePath -raw | ConvertFrom-Json
 
-                          $ubuild.CompileJsonSchema()
-                - task: NodeTool@0
-                  displayName: Use Node $(nodeVersion)
-                  inputs:
-                      versionSpec: $(nodeVersion)
-                - task: Npm@1
-                  displayName: npm ci (Client)
-                  inputs:
-                      command: ci
-                      workingDir: src\Umbraco.Web.UI.Client
-                      verbose: false
-                - task: gulp@0
-                  displayName: gulp build
-                  inputs:
-                      gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
-                      targets: build
-                      workingDirectory: src\Umbraco.Web.UI.Client
-                      publishJUnitResults: true
-                      testResultsFiles: '**\TESTS-*.xml'
-                - task: PowerShell@1
-                  displayName: Prepare Packages
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: |
-                          Write-Host "Working folder: $pwd"
-                          $ubuild = build\build.ps1 -get -continue
+                    $a.symbols.version.defaultValue = $continuous
 
-                          $ubuild.CompileUmbraco()
-                          $ubuild.PreparePackages()
-                - task: PowerShell@1
-                  displayName: Verify & Package NuGet
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: |
-                          Write-Host "Working folder: $pwd"
-                          $ubuild = build\build.ps1 -get -continue
+                    $a | ConvertTo-Json -depth 32| set-content $templatePath
 
-                          $ubuild.VerifyNuGet()
-                          $ubuild.PackageNuGet()
-                - task: CopyFiles@2
-                  displayName: Copy NuPkg Files to Staging
-                  inputs:
-                      SourceFolder: build.out
-                      Contents: '*.*nupkg'
-                      TargetFolder: $(build.artifactstagingdirectory)
-                      CleanTargetFolder: true
-                - task: PublishBuildArtifacts@1
-                  displayName: Publish NuPkg Files
-                  inputs:
-                      PathtoPublish: $(build.artifactstagingdirectory)
-                      ArtifactName: nupkg
-                - task: CopyFiles@2
-                  displayName: Copy Log Files to Staging
-                  inputs:
-                      SourceFolder: build.tmp
-                      Contents: '*.log'
-                      TargetFolder: $(build.artifactstagingdirectory)
-                      CleanTargetFolder: true
-                  condition: succeededOrFailed()
-                - task: PublishBuildArtifacts@1
-                  displayName: Publish Log Files
-                  inputs:
-                      PathtoPublish: $(build.artifactstagingdirectory)
-                      ArtifactName: logs
-                  condition: succeededOrFailed()
-    - stage: Artifacts_Docs
-      displayName: 'Static Code Documentation'
-      dependsOn: [Determine_build_type]
-      jobs:
-          - job: Generate_Docs_CSharp
-            timeoutInMinutes: 60
-            displayName: Generate C# Docs
-            condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
-            pool:
-                vmImage: windows-latest
-            steps:
-                - task: UseDotNet@2
-                  displayName: Use .Net 5.x
-                  inputs:
-                      version: 5.x
-                - task: PowerShell@2
-                  displayName: 'Prep build tool -  C# Docs'
-                  inputs:
-                      targetType: inline
-                      script: |
-                        choco install docfx -y
-                        if ($lastexitcode -ne 0){
-                           throw ("Error installing DocFX")
-                        }
-                        docfx metadata --loglevel Verbose "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
-                        if ($lastexitcode -ne 0){
-                           throw ("Error generating docs.")
-                        }
-                        docfx build --loglevel Verbose "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
-                        if ($lastexitcode -ne 0){
-                             throw ("Error generating docs.")
-                        }
-                      errorActionPreference: continue
-                      workingDirectory: build
-                - task: ArchiveFiles@2
-                  displayName: 'Zip C# Docs'
-                  inputs:
-                      rootFolderOrFile: $(Build.SourcesDirectory)\src\ApiDocs\_site
-                      includeRootFolder: false
-                      archiveType: zip
-                      archiveFile: $(Build.ArtifactStagingDirectory)\docs\csharp-docs.zip
-                      replaceExistingArchive: true
-                - task: PublishPipelineArtifact@1
-                  displayName: Publish to artifacts - C# Docs
-                  inputs:
-                      targetPath: $(Build.ArtifactStagingDirectory)\docs\csharp-docs.zip
-                      artifact: docs-cs
-                      publishLocation: pipeline
-          - job: Generate_Docs_JS
-            timeoutInMinutes: 60
-            displayName: Generate JS Docs
-            condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
-            pool:
-                vmImage: windows-latest
-            steps:
-                - task: PowerShell@2
-                  displayName: Prep build tool - JS Docs
-                  inputs:
-                      targetType: inline
-                      script: |
-                          $uenv=./build.ps1 -get -doc
-                          $uenv.SandboxNode()
-                          $uenv.CompileBelle()
-                          $uenv.PrepareAngularDocs()
-                          $uenv.RestoreNode()
-                      errorActionPreference: continue
-                      workingDirectory: build
-                - task: PublishPipelineArtifact@1
-                  displayName: Publish to artifacts - JS Docs
-                  inputs:
-                      targetPath: $(Build.Repository.LocalPath)\build.out\
-                      artifact: docs
-                      publishLocation: pipeline
+
+                    $templatePath =
+                    'build/templates/UmbracoPackage/.template.config/template.json'
+
+                    $a = Get-Content $templatePath -raw | ConvertFrom-Json
+
+                    $a.symbols.version.defaultValue = $continuous
+
+                    $a | ConvertTo-Json -depth 32| set-content $templatePath
+                  }
+
+                Write-Host "##vso[build.updatebuildnumber]$continuous.$(Build.BuildId)"
+
+                Write-Host "Building: $continuous"
+          - task: PowerShell@1
+            displayName: Prepare Build
+            inputs:
+              scriptType: inlineScript
+              inlineScript: |
+                Write-Host "Working folder: $pwd"
+                $ubuild = build\build.ps1 -get
+
+                $ubuild.PrepareBuild("vso")
+          - task: PowerShell@1
+            displayName: Prepare JSON Schema
+            inputs:
+              scriptType: inlineScript
+              inlineScript: |
+                Write-Host "Working folder: $pwd"
+                $ubuild = build\build.ps1 -get -continue
+
+                $ubuild.CompileJsonSchema()
+          - task: NodeTool@0
+            displayName: Use Node $(nodeVersion)
+            inputs:
+              versionSpec: $(nodeVersion)
+          - task: Npm@1
+            displayName: npm ci (Client)
+            inputs:
+              command: ci
+              workingDir: src\Umbraco.Web.UI.Client
+              verbose: false
+          - task: gulp@0
+            displayName: gulp build
+            inputs:
+              gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
+              targets: build
+              workingDirectory: src\Umbraco.Web.UI.Client
+              publishJUnitResults: true
+              testResultsFiles: '**\TESTS-*.xml'
+          - task: PowerShell@1
+            displayName: Prepare Packages
+            inputs:
+              scriptType: inlineScript
+              inlineScript: |
+                Write-Host "Working folder: $pwd"
+                $ubuild = build\build.ps1 -get -continue
+
+                $ubuild.CompileUmbraco()
+                $ubuild.PreparePackages()
+          - task: PowerShell@1
+            displayName: Verify & Package NuGet
+            inputs:
+              scriptType: inlineScript
+              inlineScript: |
+                Write-Host "Working folder: $pwd"
+                $ubuild = build\build.ps1 -get -continue
+
+                $ubuild.VerifyNuGet()
+                $ubuild.PackageNuGet()
+          - task: CopyFiles@2
+            displayName: Copy NuPkg Files to Staging
+            inputs:
+              SourceFolder: build.out
+              Contents: '*.*nupkg'
+              TargetFolder: $(build.artifactstagingdirectory)
+              CleanTargetFolder: true
+          - task: PublishBuildArtifacts@1
+            displayName: Publish NuPkg Files
+            inputs:
+              PathtoPublish: $(build.artifactstagingdirectory)
+              ArtifactName: nupkg
+          - task: CopyFiles@2
+            displayName: Copy Log Files to Staging
+            inputs:
+              SourceFolder: build.tmp
+              Contents: '*.log'
+              TargetFolder: $(build.artifactstagingdirectory)
+              CleanTargetFolder: true
+            condition: succeededOrFailed()
+          - task: PublishBuildArtifacts@1
+            displayName: Publish Log Files
+            inputs:
+              PathtoPublish: $(build.artifactstagingdirectory)
+              ArtifactName: logs
+            condition: succeededOrFailed()
+  - stage: Artifacts_Docs
+    displayName: 'Static Code Documentation'
+    dependsOn: [ Determine_build_type ]
+    jobs:
+      - job: Generate_Docs_CSharp
+        timeoutInMinutes: 60
+        displayName: Generate C# Docs
+        condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .Net 5.x
+            inputs:
+              version: 5.x
+          - task: PowerShell@2
+            displayName: 'Prep build tool -  C# Docs'
+            inputs:
+              targetType: inline
+              script: |
+                choco install docfx -y
+                if ($lastexitcode -ne 0){
+                   throw ("Error installing DocFX")
+                }
+                docfx metadata --loglevel Verbose "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                if ($lastexitcode -ne 0){
+                   throw ("Error generating docs.")
+                }
+                docfx build --loglevel Verbose "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                if ($lastexitcode -ne 0){
+                     throw ("Error generating docs.")
+                }
+              errorActionPreference: continue
+              workingDirectory: build
+          - task: ArchiveFiles@2
+            displayName: 'Zip C# Docs'
+            inputs:
+              rootFolderOrFile: $(Build.SourcesDirectory)\src\ApiDocs\_site
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: $(Build.ArtifactStagingDirectory)\docs\csharp-docs.zip
+              replaceExistingArchive: true
+          - task: PublishPipelineArtifact@1
+            displayName: Publish to artifacts - C# Docs
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)\docs\csharp-docs.zip
+              artifact: docs-cs
+              publishLocation: pipeline
+      - job: Generate_Docs_JS
+        timeoutInMinutes: 60
+        displayName: Generate JS Docs
+        condition: eq(stageDependencies.Determine_build_type.Set_build_variables.outputs['setReleaseVariable.isRelease'], 'true')
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: PowerShell@2
+            displayName: Prep build tool - JS Docs
+            inputs:
+              targetType: inline
+              script: |
+                $uenv=./build.ps1 -get -doc
+                $uenv.SandboxNode()
+                $uenv.CompileBelle()
+                $uenv.PrepareAngularDocs()
+                $uenv.RestoreNode()
+              errorActionPreference: continue
+              workingDirectory: build
+          - task: PublishPipelineArtifact@1
+            displayName: Publish to artifacts - JS Docs
+            inputs:
+              targetPath: $(Build.Repository.LocalPath)\build.out\
+              artifact: docs
+              publishLocation: pipeline
