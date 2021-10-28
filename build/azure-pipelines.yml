@@ -68,9 +68,7 @@ stages:
             displayName: 'Publish code coverage'
             inputs:
               codeCoverageTool: 'Cobertura' # Available options: 'JaCoCo', 'Cobertura'
-              summaryFileLocation:
-                codeCoverageTool: Cobertura
-                summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+              summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
       - job: MacOS_Unit_Tests
         displayName: Mac OS
         pool:
