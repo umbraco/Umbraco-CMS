@@ -163,6 +163,7 @@
     <Compile Include="Models\ContentDataIntegrityReport.cs" />
     <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
     <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />
+    <Compile Include="Models\ContentEditing\HistoryCleanup.cs" />
     <Compile Include="Models\ContentVersionCleanupPolicySettings.cs" />
     <Compile Include="Models\Identity\ExternalLogin.cs" />
     <Compile Include="Models\Identity\IExternalLogin.cs" />

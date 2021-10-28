@@ -31,5 +31,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "apps")]
         public IEnumerable<ContentApp> ContentApps { get; set; }
 
+        [DataMember(Name = "historyCleanup")]
+        public HistoryCleanupViewModel HistoryCleanup { get; set; }
     }
 }

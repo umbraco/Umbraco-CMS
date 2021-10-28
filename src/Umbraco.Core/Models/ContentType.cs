@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models.ContentEditing;
 
 namespace Umbraco.Core.Models
 {
@@ -46,6 +47,8 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         public override bool SupportsPublishing => SupportsPublishingConst;
+
+
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
@@ -92,6 +95,8 @@ namespace Umbraco.Core.Models
                     DefaultTemplateId = 0;
             }
         }
+
+        public HistoryCleanup HistoryCleanup { get; set; }
 
         /// <summary>
         /// Determines if AllowedTemplates contains templateId

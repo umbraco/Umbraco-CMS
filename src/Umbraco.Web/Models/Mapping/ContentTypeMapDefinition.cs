@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -9,6 +10,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -25,10 +27,11 @@ namespace Umbraco.Web.Models.Mapping
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly ILogger _logger;
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
 
         public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IFileService fileService,
             IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
-            ILogger logger)
+            ILogger logger, IUmbracoSettingsSection umbracoSettingsSection)
         {
             _commonMapper = commonMapper;
             _propertyEditors = propertyEditors;
@@ -38,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
             _mediaTypeService = mediaTypeService;
             _memberTypeService = memberTypeService;
             _logger = logger;
+            _umbracoSettingsSection = umbracoSettingsSection;
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -84,6 +88,8 @@ namespace Umbraco.Web.Models.Mapping
             MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _contentTypeService.Get(alias));
 
+            target.HistoryCleanup = source.HistoryCleanup;
+
             target.AllowedTemplates = source.AllowedTemplates
                 .Where(x => x != null)
                 .Select(_fileService.GetTemplate)
@@ -121,6 +127,15 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(IContentType source, DocumentTypeDisplay target, MapperContext context)
         {
             MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
+
+            target.HistoryCleanup = new HistoryCleanupViewModel()
+            {
+                PreventCleanup = source.HistoryCleanup.PreventCleanup,
+                KeepAllVersionsNewerThanDays = source.HistoryCleanup.KeepAllVersionsNewerThanDays,
+                KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays,
+                GlobalKeepAllVersionsNewerThanDays = _umbracoSettingsSection.Content.ContentVersionCleanupPolicyGlobalSettings.KeepAllVersionsNewerThanDays,
+                GlobalKeepLatestVersionPerDayForDays = _umbracoSettingsSection.Content.ContentVersionCleanupPolicyGlobalSettings.KeepLatestVersionPerDayForDays,
+            };
 
             target.AllowCultureVariant = source.VariesByCulture();
             target.AllowSegmentVariant = source.VariesBySegment();

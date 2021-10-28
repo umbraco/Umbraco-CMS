@@ -256,6 +256,7 @@
     <Compile Include="Models\ContentEditing\ContentTypesByAliases.cs" />
     <Compile Include="Models\ContentEditing\ContentTypesByKeys.cs" />
     <Compile Include="Models\ContentEditing\DataTypeReferences.cs" />
+    <Compile Include="Models\ContentEditing\HistoryCleanup.cs" />
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
