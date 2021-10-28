@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Umbraco.Cms.Core.Configuration;
@@ -32,13 +33,13 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         public TestDbMeta AttachEmpty()
         {
             var name = $"{DatabaseName}-{counter++}.db";
-            return new TestDbMeta(name, true, CreateConnectionString(name));
+            return new TestDbMeta(name, true, CreateConnectionString(name), Constants.DatabaseProviders.SQLite);
         }
 
         public TestDbMeta AttachSchema()
         {
             var name = $"{DatabaseName}-{counter++}.db";
-            var meta = new TestDbMeta(name, true, CreateConnectionString(name));
+            var meta = new TestDbMeta(name, false, CreateConnectionString(name), Constants.DatabaseProviders.SQLite);
 
             _dbFactory.Configure(meta.ConnectionString, Constants.DatabaseProviders.SQLite);
 
@@ -66,7 +67,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         private string CreateConnectionString(string name)
         {
             var path = Path.Combine(_settings.FilesPath, $"{name}");
-            return $"Data Source={path}";
+            return $"Data Source={path};";
         }
     }
 }

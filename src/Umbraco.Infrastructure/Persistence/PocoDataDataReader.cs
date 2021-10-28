@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     internal class PocoDataDataReader<T, TSyntax> : BulkDataReader
         where TSyntax : ISqlSyntaxProvider
     {
-        private readonly MicrosoftSqlSyntaxProviderBase<TSyntax> _sqlSyntaxProvider;
+        private readonly SqlSyntaxProviderBase<TSyntax> _sqlSyntaxProvider;
         private readonly TableDefinition _tableDefinition;
         private readonly PocoColumn[] _readerColumns;
         private readonly IEnumerator<T> _enumerator;
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public PocoDataDataReader(
             IEnumerable<T> dataSource,
             PocoData pd,
-            MicrosoftSqlSyntaxProviderBase<TSyntax> sqlSyntaxProvider)
+            SqlSyntaxProviderBase<TSyntax> sqlSyntaxProvider)
         {
             if (dataSource == null) throw new ArgumentNullException(nameof(dataSource));
             if (sqlSyntaxProvider == null) throw new ArgumentNullException(nameof(sqlSyntaxProvider));

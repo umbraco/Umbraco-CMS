@@ -328,6 +328,28 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 Database.Execute(Sql().Delete<RelationDto>().WhereIn<RelationDto>(x => x.Id, subQuery));
 
             }
+            // TODO: SQLite - (but also just in general) Hey this isn't very sustainable if we want to support more databases
+            else if (Database.DatabaseType.IsSQLite())
+            {
+                // TODO: SQLite - Probably shouldn't be raw SQL
+                var query = Sql().Append(@"
+                    delete
+                    from umbracoRelation");
+
+                var subQuery = Sql().Select<RelationDto>(x => x.Id)
+                    .From<RelationDto>()
+                    .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
+                    .Where<RelationDto>(x => x.ParentId == parentId);
+
+                if (relationTypeAliases.Length > 0)
+                {
+                    subQuery.WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
+                }
+
+                var fullQuery = query.WhereIn<RelationDto>(x => x.Id, subQuery);
+
+                Database.Execute(fullQuery);
+            }
             else
             {
                 if (relationTypeAliases.Length > 0)

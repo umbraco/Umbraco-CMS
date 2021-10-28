@@ -112,6 +112,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         // only invoked from ContentRepositoryBase with all cultures + replaceTags being true
         public void Assign(int contentId, int propertyTypeId, IEnumerable<ITag> tags, bool replaceTags = true)
         {
+            if (Database.DatabaseType.IsSQLite())
+            {
+                // TODO: SQLite - Probably need to do things here
+                return;
+            }
+
             // to no-duplicates array
             var tagsA = tags.Distinct(new TagComparer()).ToArray();
 

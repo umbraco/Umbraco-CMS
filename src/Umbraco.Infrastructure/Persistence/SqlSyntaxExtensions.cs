@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using NPoco;
@@ -21,7 +21,7 @@ namespace Umbraco.Extensions
             return string.IsNullOrWhiteSpace(attr?.Value) ? string.Empty : attr.Value;
         }
 
-        private static string GetColumnName(this PropertyInfo column)
+        public static string GetColumnName(this PropertyInfo column)
         {
             var attr = column.FirstAttribute<ColumnAttribute>();
             return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;

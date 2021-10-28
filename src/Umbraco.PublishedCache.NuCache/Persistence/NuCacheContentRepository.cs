@@ -463,15 +463,26 @@ AND cmsContentNu.nodeId IS NULL
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
                 .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId)
 
-                .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-                .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+                .InnerJoin<ContentVersionDto>()
+                .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+                .InnerJoin<DocumentVersionDto>()
+                .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id);
 
-                .LeftJoin<ContentVersionDto>(j =>
-                    j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"), "pcver")
-                .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
 
-                .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
-                .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub");
+            if (Database.DatabaseType == DatabaseType.SQLite)
+            {
+                // TODO: We should be able to palm this off on SqlSyntaxProvider, but this is less effort fo cyclehack.
+                sql = sql.Append(@"LEFT JOIN (""umbracoContentVersion"" ""pcver"" INNER JOIN ""umbracoDocumentVersion"" ""pdver"" ON ((""pcver"".""id"" = ""pdver"".""id"") AND (""pdver"".""published"" = @0))) ""pcver"" ON (""umbracoNode"".""id"" = ""pcver"".""nodeId"")", true);
+            }
+            else
+            {
+                sql = sql.LeftJoin<ContentVersionDto>(j =>
+                        j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"), "pcver")
+                    .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver");
+            }
+
+            sql = sql.LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
+            .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>((left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub");
 
             return sql;
         }
@@ -553,10 +564,19 @@ AND cmsContentNu.nodeId IS NULL
             // TODO: We can't use a template with this one because of the 'right.Current' and 'right.Published' ends up being a parameter so not sure how we can do that
             sql = sql
                 .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
-                .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
-                .LeftJoin<ContentVersionDto>(j =>
+                .InnerJoin<DocumentVersionDto>().On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id);
+
+            if (Database.DatabaseType == DatabaseType.SQLite)
+            {
+                // TODO: We should be able to palm this off on SqlSyntaxProvider, but this is less effort fo cyclehack.
+                sql = sql.Append(@"LEFT JOIN (""umbracoContentVersion"" ""pcver"" INNER JOIN ""umbracoDocumentVersion"" ""pdver"" ON ((""pcver"".""id"" = ""pdver"".""id"") AND (""pdver"".""published"" = @0))) ""pcver"" ON (""umbracoNode"".""id"" = ""pcver"".""nodeId"")", true);
+            }
+            else
+            {
+                sql = sql.LeftJoin<ContentVersionDto>(j =>
                         j.InnerJoin<DocumentVersionDto>("pdver").On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcver", "pdver"), "pcver")
                     .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver");
+            }
 
             return sql;
         }
@@ -614,7 +634,8 @@ AND cmsContentNu.nodeId IS NULL
 
             var dto = Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
 
-            if (dto == null) return ContentNodeKit.Empty;
+            if (dto == null)
+                return ContentNodeKit.Empty;
 
             var serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
             return CreateContentNodeKit(dto, serializer);

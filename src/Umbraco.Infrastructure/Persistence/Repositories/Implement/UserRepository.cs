@@ -222,6 +222,14 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             // cause deadlocks, and the ForUpdate() hint is required to tell the database
             // to acquire an exclusive lock when reading
 
+            if (Database.DatabaseType == DatabaseType.SQLite)
+            {
+                // TODO: SQLite - This deadlocks on SQLite, probably a good idea to do something better here.
+                // However for cycle hack demo, booting user out of backoffice is better than forcing app restart
+                // So meh.
+                return false;
+            }
+
             // that query is going to run a *lot*, make it a template
             var t = SqlContext.Templates.Get("Umbraco.Core.UserRepository.ValidateLoginSession", s => s
                 .Select<UserLoginDto>()

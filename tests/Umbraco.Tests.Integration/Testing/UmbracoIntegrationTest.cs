@@ -395,7 +395,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             // It's just been pulled from container and wasn't used to create test database
             Assert.IsFalse(factory.Configured);
 
-            factory.Configure(meta.ConnectionString, Constants.DatabaseProviders.SqlServer);
+            factory.Configure(meta.ConnectionString, meta.Provider);
             state.DetermineRuntimeLevel();
             log.LogInformation($"ConfigureTestDatabaseFactory - Determined RuntimeLevel: [{state.Level}]");
         }

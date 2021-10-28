@@ -10,6 +10,7 @@ using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Extensions
 {
@@ -406,6 +407,7 @@ namespace Umbraco.Extensions
         /// <param name="alias">An optional alias for the joined table.</param>
         /// <returns>A SqlJoin statement.</returns>
         /// <remarks>Nested statement produces LEFT JOIN xxx JOIN yyy ON ... ON ...</remarks>
+        // TODO: SQLite - This doesn't work for SQLite, make work or workaround for all usages.
         public static Sql<ISqlContext>.SqlJoinClause<ISqlContext> LeftJoin<TDto>(this Sql<ISqlContext> sql, Func<Sql<ISqlContext>, Sql<ISqlContext>> nestedJoin, string alias = null)
         {
             var type = typeof(TDto);
@@ -998,9 +1000,18 @@ namespace Umbraco.Extensions
 
             public SqlUpd<TDto> Set(Expression<Func<TDto, object>> fieldSelector, object value)
             {
-                var fieldName = _sqlContext.SqlSyntax.GetFieldName(fieldSelector);
-                _setExpressions.Add(new Tuple<string, object>(fieldName, value));
-                return this;
+                if (_sqlContext.SqlSyntax is ISqlSyntaxProviderExtended extendedSyntax)
+                {
+                    var fieldName = extendedSyntax.GetFieldNameForUpdate(fieldSelector);
+                    _setExpressions.Add(new Tuple<string, object>(fieldName, value));
+                    return this;
+                }
+                else
+                {
+                    var fieldName = _sqlContext.SqlSyntax.GetFieldName(fieldSelector);
+                    _setExpressions.Add(new Tuple<string, object>(fieldName, value));
+                    return this;
+                }
             }
 
             public List<Tuple<string, object>> SetExpressions => _setExpressions;
@@ -1018,6 +1029,12 @@ namespace Umbraco.Extensions
         /// <remarks>NOTE: This method will not work for all queries, only simple ones!</remarks>
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
         {
+            // TODO: SQLite - we're probably going to deadlock.
+            if (sql.SqlContext.SqlSyntax is ISqlSyntaxProviderExtended extended)
+            {
+                return extended.ForUpdate(sql);
+            }
+
             // go find the first FROM clause, and append the lock hint
             Sql s = sql;
             var updated = false;
@@ -1159,12 +1176,6 @@ namespace Umbraco.Extensions
             // should either throw, or fix these code bits...
             var attr = type.FirstAttribute<TableNameAttribute>();
             return string.IsNullOrWhiteSpace(attr?.Value) ? string.Empty : attr.Value;
-        }
-
-        private static string GetColumnName(this PropertyInfo column)
-        {
-            var attr = column.FirstAttribute<ColumnAttribute>();
-            return string.IsNullOrWhiteSpace(attr?.Name) ? column.Name : attr.Name;
         }
 
         public static string ToText(this Sql sql)

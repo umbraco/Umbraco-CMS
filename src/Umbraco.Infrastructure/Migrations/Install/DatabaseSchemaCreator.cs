@@ -453,8 +453,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             //If any statements exists for the primary key execute them here
             if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
             {
-                _database.Execute(new Sql(createPrimaryKeySql));
                 _logger.LogInformation("Create Primary Key:\n {Sql}", createPrimaryKeySql);
+                _database.Execute(new Sql(createPrimaryKeySql));
             }
 
             if (SqlSyntax.SupportsIdentityInsert() && tableDefinition.Columns.Any(x => x.IsIdentity))
@@ -471,15 +471,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             //Loop through index statements and execute sql
             foreach (var sql in indexSql)
             {
-                _database.Execute(new Sql(sql));
                 _logger.LogInformation("Create Index:\n {Sql}", sql);
+                _database.Execute(new Sql(sql));
             }
 
             //Loop through foreignkey statements and execute sql
             foreach (var sql in foreignSql)
             {
-                _database.Execute(new Sql(sql));
                 _logger.LogInformation("Create Foreign Key:\n {Sql}", sql);
+                _database.Execute(new Sql(sql));
             }
 
             if (overwrite)

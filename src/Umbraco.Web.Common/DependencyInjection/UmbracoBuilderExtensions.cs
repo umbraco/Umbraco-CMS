@@ -43,6 +43,7 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SQLite;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
@@ -430,7 +431,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
             builder.Services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
-            builder.Services.AddSingleton<IDatabaseCreator, SqlServerDatabaseCreator>();
+           // builder.Services.AddSingleton<IDatabaseCreator, SqlServerDatabaseCreator>();
 
             return builder;
         }
@@ -439,8 +440,14 @@ namespace Umbraco.Extensions
         {
             DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SQLite, Microsoft.Data.Sqlite.SqliteFactory.Instance);
 
+            builder.Services.AddSingleton<ISqlSyntaxProvider, SqliteSyntaxProvider>();
+            builder.Services.AddSingleton<IBulkSqlInsertProvider, SqliteBulkSqlInsertProvider>();
+            builder.Services.AddSingleton<IDatabaseCreator, SqlServerDatabaseCreator>();
+
+            builder.Services.AddSingleton<IProviderSpecificMapperFactory, SQLiteSpecificMapperFactory>();
             return builder;
         }
+
         private static IProfiler GetWebProfiler(IConfiguration config)
         {
             var isDebug = config.GetValue<bool>($"{Cms.Core.Constants.Configuration.ConfigHosting}:Debug");

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     /// Tests covering methods in the KeyValueService class.
     /// </summary>
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
     public class KeyValueServiceTests : UmbracoIntegrationTest
     {
         private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();

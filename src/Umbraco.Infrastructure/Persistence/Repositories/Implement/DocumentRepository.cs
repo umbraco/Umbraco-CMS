@@ -184,23 +184,32 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .InnerJoin<ContentVersionDto>()
                     .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId)
                 .InnerJoin<DocumentVersionDto>()
-                    .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id)
+                    .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id);
 
+            if (Database.DatabaseType == DatabaseType.SQLite)
+            {
+                // TODO: We should be able to palm this off on SqlSyntaxProvider, but this is less effort fo cyclehack.
+                sql = sql.Append(@"LEFT JOIN (""umbracoContentVersion"" ""pcv"" INNER JOIN ""umbracoDocumentVersion"" ""pdv"" ON ((""pcv"".""id"" = ""pdv"".""id"") AND ""pdv"".""published"" = @0)) ""pcv"" ON (""umbracoDocument"".""nodeId"" = ""pcv"".""nodeId"")", true)
+                    .Append(@"LEFT JOIN (""umbracoContentVersionCultureVariation"" ""ccv"" INNER JOIN ""umbracoLanguage"" ""lang"" ON ((""ccv"".""languageId"" = ""lang"".""id"") AND (""lang"".""languageISOCode"" = @0))) ""ccv"" ON (""umbracoContentVersion"".""id"" = ""ccv"".""versionId"")
+", "[[[ISOCODE]]]");
+            }
+            else
+            {
                 // left join on optional published version
-                .LeftJoin<ContentVersionDto>(nested =>
-                    nested.InnerJoin<DocumentVersionDto>("pdv")
+                sql = sql.LeftJoin<ContentVersionDto>(nested =>
+                        nested.InnerJoin<DocumentVersionDto>("pdv")
                             .On<ContentVersionDto, DocumentVersionDto>((left, right) => left.Id == right.Id && right.Published, "pcv", "pdv"), "pcv")
                     .On<DocumentDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcv")
 
-                // TODO: should we be joining this when the query type is not single/many?
-                // left join on optional culture variation
-                //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
-                .LeftJoin<ContentVersionCultureVariationDto>(nested =>
-                    nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv")
+                    // TODO: should we be joining this when the query type is not single/many?
+                    // left join on optional culture variation
+                    //the magic "[[[ISOCODE]]]" parameter value will be replaced in ContentRepositoryBase.GetPage() by the actual ISO code
+                    .LeftJoin<ContentVersionCultureVariationDto>(nested =>
+                        nested.InnerJoin<LanguageDto>("lang").On<ContentVersionCultureVariationDto, LanguageDto>((ccv, lang) => ccv.LanguageId == lang.Id && lang.IsoCode == "[[[ISOCODE]]]", "ccv", "lang"), "ccv")
                     .On<ContentVersionDto, ContentVersionCultureVariationDto>((version, ccv) => version.Id == ccv.VersionId, aliasRight: "ccv");
+            }
 
-            sql
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+            sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             // this would ensure we don't get the published version - keep for reference
             //sql
@@ -586,8 +595,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // check if we need to create a new version
                 if (publishing && entity.PublishedVersionId > 0)
                 {
+                    var query = Sql()
+                        .Update<DocumentVersionDto>(u => u.Set(x => x.Published, false))
+                        .Where<DocumentVersionDto>(x => x.Id == entity.PublishedVersionId);
                     // published version is not published anymore
-                    Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == entity.PublishedVersionId));
+                    Database.Execute(query);
                 }
 
                 // sanitize names

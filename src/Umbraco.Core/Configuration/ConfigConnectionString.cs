@@ -80,10 +80,14 @@ namespace Umbraco.Cms.Core.Configuration
 
         private static string ParseProviderName(DbConnectionStringBuilder builder)
         {
-            if ((builder.TryGetValue("Data Source", out var dataSource) || builder.TryGetValue("DataSource", out dataSource)) &&
-                dataSource?.ToString().EndsWith(".sdf", StringComparison.OrdinalIgnoreCase) == true)
+            if ((builder.TryGetValue("Data Source", out var dataSource) || builder.TryGetValue("DataSource", out dataSource)))
             {
-                return Constants.DbProviderNames.SqlCe;
+                if (dataSource.ToString().EndsWith(".sdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Constants.DbProviderNames.SqlCe;
+                }
+
+                return Constants.DatabaseProviders.SQLite;
             }
 
             return Constants.DbProviderNames.SqlServer;

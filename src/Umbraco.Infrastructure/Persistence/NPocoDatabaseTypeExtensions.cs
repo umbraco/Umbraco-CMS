@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 
 namespace Umbraco.Cms.Infrastructure.Persistence
 {
@@ -25,6 +25,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         public static bool IsSqlCe(this DatabaseType databaseType)
         {
             return databaseType is NPoco.DatabaseTypes.SqlServerCEDatabaseType;
+        }
+
+        public static bool IsSQLite(this DatabaseType databaseType)
+        {
+            return databaseType is NPoco.DatabaseTypes.SQLiteDatabaseType;
         }
 
         public static bool IsSqlServerOrCe(this DatabaseType databaseType)

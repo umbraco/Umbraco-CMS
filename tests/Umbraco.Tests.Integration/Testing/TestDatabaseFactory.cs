@@ -17,14 +17,21 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             switch (settings.Engine)
             {
                 case "sqlite":
-                    return new SQLiteTestDatabase(settings, dbFactory.Create(), loggerFactory);
-                // TODO: Handle others.
+                    return CreateSQLite(settings, loggerFactory, dbFactory);
+                    // TODO: Handle others.
             }
             return string.IsNullOrEmpty(connectionString)
                 ? CreateLocalDb(settings, filesPath, loggerFactory, dbFactory)
                 : CreateSqlDeveloper(settings, loggerFactory, dbFactory, connectionString);
         }
 
+        private static ITestDatabase CreateSQLite(TestDatabaseSettings settings, ILoggerFactory loggerFactory,
+            TestUmbracoDatabaseFactoryProvider dbFactory)
+        {
+            Directory.CreateDirectory(settings.FilesPath);
+
+            return new SQLiteTestDatabase(settings, dbFactory.Create(), loggerFactory);
+        }
 
         private static ITestDatabase CreateLocalDb(TestDatabaseSettings settings, string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
         {
