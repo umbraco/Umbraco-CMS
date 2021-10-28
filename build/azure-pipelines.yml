@@ -67,10 +67,8 @@ stages:
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish code coverage'
             inputs:
-              codeCoverageTool: 'JaCoCo' # Available options: 'JaCoCo', 'Cobertura'
-              summaryFileLocation:
-                codeCoverageTool: Cobertura
-                summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+              codeCoverageTool: 'Cobertura' # Available options: 'JaCoCo', 'Cobertura'
+              summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
       - job: MacOS_Unit_Tests
         displayName: Mac OS
         pool:
@@ -144,10 +142,8 @@ stages:
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish code coverage'
             inputs:
-              codeCoverageTool: 'JaCoCo' # Available options: 'JaCoCo', 'Cobertura'
-              summaryFileLocation:
-                codeCoverageTool: Cobertura
-                summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+              codeCoverageTool: 'Cobertura' # Available options: 'JaCoCo', 'Cobertura'
+              summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
       - job: Windows_Integration_Tests
         timeoutInMinutes: 120
         displayName: Windows
