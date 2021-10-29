@@ -1,6 +1,6 @@
-<div 
-    ng-click="vm.click()" 
-    class="umb-group-builder__tab" 
+<div
+    ng-click="vm.click()"
+    class="umb-group-builder__tab"
     ng-class="{
         'is-active': vm.isOpen,
         'is-inherited': vm.tab.inherited,
@@ -12,7 +12,7 @@
     ng-mouseleave="vm.mouseleave()">
   <div>
       <div class="umb-group-builder__tab-inherited-label" ng-if="vm.compositionLabelIsVisible">
-          <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ vm.tab.inheritedFromName }}
+          <localize key="contentTypeEditor_inheritedFrom">Inherited from</localize>: {{ vm.tab.inheritedFromName }}
           <span ng-repeat="contentTypeName in vm.tab.parentTabContentTypeNames">
               <button type="button" class="btn-link btn-small p0" ng-click="vm.clickComposition(vm.tab.parentTabContentTypes[$index])">{{ contentTypeName }}</button>
               <span ng-if="!$last">, </span>
@@ -50,7 +50,7 @@
 
                 <div class="umb-group-builder__tab-val-message" ng-messages="tabNameForm.tabName.$error" show-validation-on-submit>
                     <div class="umb-validation-label" ng-message="valServerField">{{tabNameForm.tabName.errorMsg}}</div>
-                    <div class="umb-validation-label" ng-message="required"><localize key="required"></localize></div>
+                    <div class="umb-validation-label" ng-message="required"><localize key="required">Required</localize></div>
                 </div>
             </ng-form>
 
@@ -61,9 +61,9 @@
                     <input name="tabSortOrder" type="number" class="umb-property-editor-tiny" style="margin-bottom: 0;" ng-model="vm.tab.sortOrder" ng-disabled="vm.tab.inherited" ng-blur="vm.changeSortOrderValue()" required />
 
                     <!-- This is a manual validation message not bound to a validator -->
-                    <div class="umb-validation-label -arrow-left" ng-if="tabSortOrderForm.tabSortOrder.$error.required && vm.tab.showSortOrderMissing"><localize key="required"></localize></div>
+                    <div class="umb-validation-label -arrow-left" ng-if="tabSortOrderForm.tabSortOrder.$error.required && vm.tab.showSortOrderMissing"><localize key="required">Required</localize></div>
                     <div ng-messages="tabSortOrderForm.tabSortOrder.$error" show-validation-on-submit>
-                        <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required"></localize></div>
+                        <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required">Required</localize></div>
                     </div>
                 </div>
             </ng-form>
