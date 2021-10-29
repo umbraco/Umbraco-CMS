@@ -49,7 +49,7 @@ context('Languages', () => {
         cy.umbracoButtonByLabelKey('contentTypeEditor_yesDelete').click();
 
         // Assert there is only 2 language
-        cy.get('tbody > tr').should('have.length', 3);        
+        cy.get('tbody > tr').should('have.length', 2);        
 
         // Cleanup
         cy.umbracoEnsureLanguageNotExists(language1);
