@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 using (SqlCommand command = connection.CreateCommand())
                 {
                     string sql = $@"
-                        ALTER DATABASE{LocalDb.QuotedName(meta.Name)}
+                        ALTER DATABASE {LocalDb.QuotedName(meta.Name)}
                         SET SINGLE_USER
                         WITH ROLLBACK IMMEDIATE";
                     SetCommand(command, sql);

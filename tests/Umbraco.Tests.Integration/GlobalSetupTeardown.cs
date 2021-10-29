@@ -32,6 +32,7 @@ public class GlobalSetupTeardown
     {
         LocalDbTestDatabase.Instance?.Finish();
         SqlDeveloperTestDatabase.Instance?.Finish();
+        SQLiteTestDatabase.Instance?.Finish();
         Console.WriteLine("TOTAL TESTS DURATION: {0}", _stopwatch.Elapsed);
     }
 }

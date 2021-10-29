@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
         protected abstract void Initialize();
 
-        public TestDbMeta AttachEmpty()
+        public virtual TestDbMeta AttachEmpty()
         {
             if (_prepareQueue == null)
             {
@@ -44,7 +45,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             return _readyEmptyQueue.Take();
         }
 
-        public TestDbMeta AttachSchema()
+        public virtual TestDbMeta AttachSchema()
         {
             if (_prepareQueue == null)
             {
@@ -54,7 +55,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             return _readySchemaQueue.Take();
         }
 
-        public void Detach(TestDbMeta meta)
+        public virtual void Detach(TestDbMeta meta)
         {
             _prepareQueue.TryAdd(meta);
         }
@@ -74,11 +75,12 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                             continue;
                         }
 
-                        using (var conn = new SqlConnection(meta.ConnectionString))
-                        using (SqlCommand cmd = conn.CreateCommand())
+                        ResetTestDatabase(meta);
+
+                        using (var conn = GetConnection(meta))
+                        using (var cmd = conn.CreateCommand())
                         {
                             conn.Open();
-                            ResetTestDatabase(cmd);
 
                             if (!meta.IsEmpty)
                             {
@@ -97,7 +99,9 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     }
                 });
 
-        private void RebuildSchema(IDbCommand command, TestDbMeta meta)
+        protected virtual DbConnection GetConnection(TestDbMeta meta) => new SqlConnection(meta.ConnectionString);
+
+        protected virtual void RebuildSchema(IDbCommand command, TestDbMeta meta)
         {
             lock (_cachedDatabaseInitCommands)
             {
@@ -129,7 +133,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
         private void RebuildSchemaFirstTime(TestDbMeta meta)
         {
-            _databaseFactory.Configure(meta.ConnectionString, Constants.DatabaseProviders.SqlServer);
+            _databaseFactory.Configure(meta.ConnectionString, meta.Provider);
 
             using (var database = (UmbracoDatabase)_databaseFactory.CreateDatabase())
             {
@@ -169,31 +173,38 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             cmd.Parameters.Add(p);
         }
 
-        protected static void ResetTestDatabase(IDbCommand cmd)
+        protected virtual void ResetTestDatabase(TestDbMeta meta)
         {
-            // https://stackoverflow.com/questions/536350
-            cmd.CommandType = CommandType.Text;
-            cmd.CommandText = @"
-                declare @n char(1);
-                set @n = char(10);
-                declare @stmt nvarchar(max);
-                -- check constraints
-                select @stmt = isnull( @stmt + @n, '' ) +
-                    'alter table [' + schema_name(schema_id) + '].[' + object_name( parent_object_id ) + '] drop constraint [' + name + ']'
-                from sys.check_constraints;
-                -- foreign keys
-                select @stmt = isnull( @stmt + @n, '' ) +
-                    'alter table [' + schema_name(schema_id) + '].[' + object_name( parent_object_id ) + '] drop constraint [' + name + ']'
-                from sys.foreign_keys;
-                -- tables
-                select @stmt = isnull( @stmt + @n, '' ) +
-                    'drop table [' + schema_name(schema_id) + '].[' + name + ']'
-                from sys.tables;
-                exec sp_executesql @stmt;
-            ";
+            using (var connection = GetConnection(meta))
+            {
+                connection.Open();
+                using (var cmd = connection.CreateCommand())
+                {
+                    // https://stackoverflow.com/questions/536350
+                    cmd.CommandType = CommandType.Text;
+                    cmd.CommandText = @"
+                        declare @n char(1);
+                        set @n = char(10);
+                        declare @stmt nvarchar(max);
+                        -- check constraints
+                        select @stmt = isnull( @stmt + @n, '' ) +
+                            'alter table [' + schema_name(schema_id) + '].[' + object_name( parent_object_id ) + '] drop constraint [' + name + ']'
+                        from sys.check_constraints;
+                        -- foreign keys
+                        select @stmt = isnull( @stmt + @n, '' ) +
+                            'alter table [' + schema_name(schema_id) + '].[' + object_name( parent_object_id ) + '] drop constraint [' + name + ']'
+                        from sys.foreign_keys;
+                        -- tables
+                        select @stmt = isnull( @stmt + @n, '' ) +
+                            'drop table [' + schema_name(schema_id) + '].[' + name + ']'
+                        from sys.tables;
+                        exec sp_executesql @stmt;
+                    ";
 
-            // rudimentary retry policy since a db can still be in use when we try to drop
-            Retry(10, () => cmd.ExecuteNonQuery());
+                    // rudimentary retry policy since a db can still be in use when we try to drop
+                    Retry(10, () => cmd.ExecuteNonQuery());
+                }
+            }
         }
 
         protected static void Retry(int maxIterations, Action action)

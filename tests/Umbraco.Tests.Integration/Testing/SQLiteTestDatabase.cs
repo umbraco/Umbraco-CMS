@@ -1,73 +1,143 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NPoco;
+using SQLitePCL;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
-using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {
-    public class SQLiteTestDatabase : ITestDatabase
+    public class SQLiteTestDatabase : BaseTestDatabase, ITestDatabase
     {
+        public static SQLiteTestDatabase Instance { get; private set; }
+
         private readonly TestDatabaseSettings _settings;
-        private readonly IUmbracoDatabaseFactory _dbFactory;
-        private readonly ILoggerFactory _loggerFactory;
-        private int counter = 0;
         public const string DatabaseName = "UmbracoTests";
 
         public SQLiteTestDatabase(TestDatabaseSettings settings, IUmbracoDatabaseFactory dbFactory, ILoggerFactory loggerFactory)
         {
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _dbFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
+            _databaseFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
             _loggerFactory = loggerFactory;
+
+            var counter = 0;
+
+            var schema = Enumerable.Range(0, _settings.SchemaDatabaseCount)
+                .Select(x => CreateSQLiteMeta(++counter, false));
+
+            var empty = Enumerable.Range(0, _settings.SchemaDatabaseCount)
+                .Select(x => CreateSQLiteMeta(++counter, true));
+
+            _testDatabases = schema.Concat(empty).ToList();
+
+            Instance = this; // For GlobalSetupTeardown.cs
         }
 
-        public TestDbMeta AttachEmpty()
+        protected override void Initialize()
         {
-            var name = $"{DatabaseName}-{counter++}.db";
-            return new TestDbMeta(name, true, CreateConnectionString(name), Constants.DatabaseProviders.SQLite);
-        }
+            _prepareQueue = new BlockingCollection<TestDbMeta>();
+            _readySchemaQueue = new BlockingCollection<TestDbMeta>();
+            _readyEmptyQueue = new BlockingCollection<TestDbMeta>();
 
-        public TestDbMeta AttachSchema()
-        {
-            var name = $"{DatabaseName}-{counter++}.db";
-            var meta = new TestDbMeta(name, false, CreateConnectionString(name), Constants.DatabaseProviders.SQLite);
-
-            _dbFactory.Configure(meta.ConnectionString, Constants.DatabaseProviders.SQLite);
-
-            using (var database = (UmbracoDatabase)_dbFactory.CreateDatabase())
+            foreach (TestDbMeta meta in _testDatabases)
             {
-                database.LogCommands = true;
-
-                using (NPoco.ITransaction transaction = database.GetTransaction())
-                {
-                    var schemaCreator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>());
-                    schemaCreator.InitializeDatabaseSchema();
-
-                    transaction.Complete();
-                }
+                Drop(meta);
+                _prepareQueue.Add(meta);
             }
 
-            return meta;
+            for (int i = 0; i < _settings.PrepareThreadCount; i++)
+            {
+                var thread = new Thread(PrepareDatabase);
+                thread.Start();
+            }
         }
 
-        public void Detach(TestDbMeta id)
+        protected override void ResetTestDatabase(TestDbMeta meta)
         {
+            using (var connection = GetConnection(meta))
+            {
+                connection.Open();
 
+                using (var db = new Database(connection))
+                {
+                    var tables = db.Fetch<string>("select name from sqlite_master where type='table'");
+                    foreach (var table in tables.Where(x => !x.StartsWith("sqlite")))
+                    {
+                        db.Execute($"drop table {table}");
+                    }
+                }
+            }
         }
 
-        private string CreateConnectionString(string name)
+        protected override DbConnection GetConnection(TestDbMeta meta) => new SqliteConnection(meta.ConnectionString);
+
+        protected override void RebuildSchema(IDbCommand command, TestDbMeta meta)
         {
-            var path = Path.Combine(_settings.FilesPath, $"{name}");
-            return $"Data Source={path};";
+            base.RebuildSchema(command, meta);
+
+            // Base rebuilds from cached commands, for whatever reason keyvalue table updated column ends up null
+            // and DetermineRuntimeLevel is install for second test.
+            // TODO: SQLite - Fix all the things.
+            command.CommandText = "update umbracoKeyValue set updated = date()";
+            command.Parameters.Clear();
+            command.ExecuteNonQuery();
+        }
+
+        public void Finish()
+        {
+            if (_prepareQueue == null)
+            {
+                return;
+            }
+
+            _prepareQueue.CompleteAdding();
+            while (_prepareQueue.TryTake(out _)) { }
+
+            _readyEmptyQueue.CompleteAdding();
+            while (_readyEmptyQueue.TryTake(out _)) { }
+
+            _readySchemaQueue.CompleteAdding();
+            while (_readySchemaQueue.TryTake(out _)) { }
+
+            Parallel.ForEach(_testDatabases, Drop);
+        }
+
+        private void Drop(TestDbMeta meta)
+        {
+            // DO something... In memory only?
+            try
+            {
+                GC.WaitForPendingFinalizers();
+                GC.Collect();
+                File.Delete(meta.Path);
+            }
+            catch (IOException ex)
+            {
+
+            }
+        } 
+
+        private TestDbMeta CreateSQLiteMeta(int i, bool empty)
+        {
+            var name = $"{DatabaseName}-{i}.sqlite";
+            var path = Path.Combine(_settings.FilesPath, name);
+            var connectionString = $"Data Source={path}"; // In memory only? just keep a connection open here to stop it getting wiped.
+            // Data Source={name};Mode=Memory;Cache=Shared // The database persists as long as at least one connection to it remains open. 
+
+
+            return new TestDbMeta(name, empty, connectionString, Constants.DatabaseProviders.SQLite, path);
         }
     }
 }
