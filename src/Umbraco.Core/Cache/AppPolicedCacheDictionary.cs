@@ -10,7 +10,15 @@ namespace Umbraco.Cms.Core.Cache
     /// <typeparam name="TKey">The type of the dictionary key.</typeparam>
     public abstract class AppPolicedCacheDictionary<TKey> : IDisposable
     {
-        private readonly ConcurrentDictionary<TKey, IAppPolicyCache> _caches = new ConcurrentDictionary<TKey, IAppPolicyCache>();
+        private readonly ConcurrentDictionary<TKey, IAppPolicyCache> _caches =
+            new ConcurrentDictionary<TKey, IAppPolicyCache>();
+
+        /// <summary>
+        /// Gets the internal cache factory, for tests only!
+        /// </summary>
+        private readonly Func<TKey, IAppPolicyCache> _cacheFactory;
+
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AppPolicedCacheDictionary{TKey}"/> class.
@@ -22,12 +30,6 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <summary>
-        /// Gets the internal cache factory, for tests only!
-        /// </summary>
-        private readonly Func<TKey, IAppPolicyCache> _cacheFactory;
-        private bool _disposedValue;
-
-        /// <summary>
         /// Gets or creates a cache.
         /// </summary>
         public IAppPolicyCache GetOrCreate(TKey key)
@@ -37,31 +39,29 @@ namespace Umbraco.Cms.Core.Cache
         /// Tries to get a cache.
         /// </summary>
         protected Attempt<IAppPolicyCache> Get(TKey key)
-            => _caches.TryGetValue(key, out var cache) ? Attempt.Succeed(cache) : Attempt.Fail<IAppPolicyCache>();
+            => _caches.TryGetValue(key, out IAppPolicyCache cache)
+                ? Attempt.Succeed(cache)
+                : Attempt.Fail<IAppPolicyCache>();
 
         /// <summary>
         /// Removes a cache.
         /// </summary>
-        public void Remove(TKey key)
-        {
-            _caches.TryRemove(key, out _);
-        }
+        public void Remove(TKey key) => _caches.TryRemove(key, out _);
 
         /// <summary>
         /// Removes all caches.
         /// </summary>
-        public void RemoveAll()
-        {
-            _caches.Clear();
-        }
+        public void RemoveAll() => _caches.Clear();
 
         /// <summary>
         /// Clears a cache.
         /// </summary>
         protected void ClearCache(TKey key)
         {
-            if (_caches.TryGetValue(key, out var cache))
+            if (_caches.TryGetValue(key, out IAppPolicyCache cache))
+            {
                 cache.Clear();
+            }
         }
 
         /// <summary>
@@ -69,17 +69,22 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         public void ClearAllCaches()
         {
-            foreach (var cache in _caches.Values)
+            foreach (IAppPolicyCache cache in _caches.Values)
+            {
                 cache.Clear();
+            }
         }
 
+        /// <summary>
+        /// Disposes of the Cache
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposedValue)
             {
                 if (disposing)
                 {
-                    foreach(var value in _caches.Values)
+                    foreach (IAppPolicyCache value in _caches.Values)
                     {
                         value.DisposeIfDisposable();
                     }
@@ -89,10 +94,10 @@ namespace Umbraco.Cms.Core.Cache
             }
         }
 
-        public void Dispose()
-        {
+        /// <inheritdoc/>
+        public void Dispose() =>
+
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
-        }
     }
 }

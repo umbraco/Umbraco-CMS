@@ -13,13 +13,26 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
+    /// <inheritdoc />
     public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresherNotification, ContentTypeCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
         private readonly IIdKeyMap _idKeyMap;
+        public static readonly Guid UniqueId = Guid.Parse("6902E22C-9C10-483C-91F3-66B7CAE9E2F5");
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContentTypeCacheRefresher"/> class.
+        /// </summary>
+        /// <param name="appCaches">The <see cref="AppCaches"/> to use</param>
+        /// <param name="serializer">The <see cref="IJsonSerializer"/> to use</param>
+        /// <param name="publishedSnapshotService">The <see cref="IPublishedSnapshotService"/> to use</param>
+        /// <param name="publishedModelFactory">The <see cref="IPublishedModelFactory"/> to use</param>
+        /// <param name="idKeyMap">The <see cref="IIdKeyMap"/> to use</param>
+        /// <param name="contentTypeCommonRepository">The <see cref="IContentTypeCommonRepository"/> to use</param>
+        /// <param name="eventAggregator">The <see cref="IEventAggregator"/> to use</param>
+        /// <param name="factory">The <see cref="ICacheRefresherNotificationFactory"/> to use</param>
         public ContentTypeCacheRefresher(
             AppCaches appCaches,
             IJsonSerializer serializer,
@@ -39,22 +52,22 @@ namespace Umbraco.Cms.Core.Cache
 
         #region Define
 
-        public static readonly Guid UniqueId = Guid.Parse("6902E22C-9C10-483C-91F3-66B7CAE9E2F5");
-
+        /// <inheritdoc/>
         public override Guid RefresherUniqueId => UniqueId;
 
+        /// <inheritdoc/>
         public override string Name => "Content Type Cache Refresher";
 
         #endregion
 
         #region Refresher
 
+        /// <inheritdoc/>
         public override void Refresh(JsonPayload[] payloads)
         {
             // TODO: refactor
             // we should NOT directly clear caches here, but instead ask whatever class
             // is managing the cache to please clear that cache properly
-
             _contentTypeCommonRepository.ClearCache(); // always
 
             if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
@@ -81,16 +94,22 @@ namespace Umbraco.Cms.Core.Cache
             }
 
             if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
+            {
                 // don't try to be clever - refresh all
                 ContentCacheRefresher.RefreshContentTypes(AppCaches);
+            }
 
             if (payloads.Any(x => x.ItemType == typeof(IMediaType).Name))
+            {
                 // don't try to be clever - refresh all
                 MediaCacheRefresher.RefreshMediaTypes(AppCaches);
+            }
 
             if (payloads.Any(x => x.ItemType == typeof(IMemberType).Name))
+            {
                 // don't try to be clever - refresh all
                 MemberCacheRefresher.RefreshMemberTypes(AppCaches);
+            }
 
             // refresh the models and cache
             _publishedModelFactory.WithSafeLiveFactoryReset(() =>
@@ -101,21 +120,25 @@ namespace Umbraco.Cms.Core.Cache
         }
 
 
+        /// <inheritdoc/>
         public override void RefreshAll()
         {
             throw new NotSupportedException();
         }
 
+        /// <inheritdoc/>
         public override void Refresh(int id)
         {
             throw new NotSupportedException();
         }
 
+        /// <inheritdoc/>
         public override void Refresh(Guid id)
         {
             throw new NotSupportedException();
         }
 
+        /// <inheritdoc/>
         public override void Remove(int id)
         {
             throw new NotSupportedException();
@@ -127,6 +150,12 @@ namespace Umbraco.Cms.Core.Cache
 
         public class JsonPayload
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="JsonPayload"/> class.
+            /// </summary>
+            /// <param name="itemType">The itemType string</param>
+            /// <param name="id">The id</param>
+            /// <param name="changeTypes">The <see cref="ContentTypeChangeTypes"/> to use</param>
             public JsonPayload(string itemType, int id, ContentTypeChangeTypes changeTypes)
             {
                 ItemType = itemType;
@@ -134,10 +163,19 @@ namespace Umbraco.Cms.Core.Cache
                 ChangeTypes = changeTypes;
             }
 
+            /// <summary>
+            /// Gets the Id of the Payload
+            /// </summary>
             public string ItemType { get; }
 
+            /// <summary>
+            /// Gets the Key of the Payload
+            /// </summary>
             public int Id { get; }
 
+            /// <summary>
+            /// Gets the <see cref="ContentTypeChangeTypes"/> of the Payload/>
+            /// </summary>
             public ContentTypeChangeTypes ChangeTypes { get; }
         }
 

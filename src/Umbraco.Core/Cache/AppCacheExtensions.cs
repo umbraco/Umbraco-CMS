@@ -50,6 +50,7 @@ namespace Umbraco.Extensions
             {
                 return default(T);
             }
+
             return result.TryConvertTo<T>().Result;
         }
 
@@ -60,6 +61,7 @@ namespace Umbraco.Extensions
             {
                 return default(T);
             }
+
             return result.TryConvertTo<T>().Result;
         }
     }
