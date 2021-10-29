@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         {
             string message;
             var success = false;
-            var url = _hostingEnvironment.ApplicationMainUrl.GetLeftPart(UriPartial.Authority);;
+            var url = _hostingEnvironment.ApplicationMainUrl.GetLeftPart(UriPartial.Authority);
 
             // Access the site home page and check for the headers
             var request = new HttpRequestMessage(HttpMethod.Head, url);

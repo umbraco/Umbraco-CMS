@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Hosting;
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         /// but then you should include subdomains and I wouldn't suggest to do that for Umbraco-sites.
         /// </remarks>
         public XssProtectionCheck(IHostingEnvironment hostingEnvironment, ILocalizedTextService textService)
-            : base(hostingEnvironment, textService, "X-XSS-Protection", "1; mode=block", "xssProtection", true)
+            : base(hostingEnvironment, textService, "X-XSS-Protection", "xssProtection", true)
         {
         }
 
