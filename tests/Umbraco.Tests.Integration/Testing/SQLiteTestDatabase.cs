@@ -24,12 +24,14 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         public static SQLiteTestDatabase Instance { get; private set; }
 
         private readonly TestDatabaseSettings _settings;
+        private readonly TestUmbracoDatabaseFactoryProvider _dbFactoryProvider;
         public const string DatabaseName = "UmbracoTests";
 
-        public SQLiteTestDatabase(TestDatabaseSettings settings, IUmbracoDatabaseFactory dbFactory, ILoggerFactory loggerFactory)
+        public SQLiteTestDatabase(TestDatabaseSettings settings, TestUmbracoDatabaseFactoryProvider dbFactoryProvider, ILoggerFactory loggerFactory)
         {
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _databaseFactory = dbFactory ?? throw new ArgumentNullException(nameof(dbFactory));
+            _dbFactoryProvider = dbFactoryProvider;
+            _databaseFactory = dbFactoryProvider.Create();
             _loggerFactory = loggerFactory;
 
             var counter = 0;
@@ -85,14 +87,19 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
         protected override void RebuildSchema(IDbCommand command, TestDbMeta meta)
         {
-            base.RebuildSchema(command, meta);
+            var dbFactory = _dbFactoryProvider.Create();
+            dbFactory.Configure(meta.ConnectionString, meta.Provider);
 
-            // Base rebuilds from cached commands, for whatever reason keyvalue table updated column ends up null
-            // and DetermineRuntimeLevel is install for second test.
-            // TODO: SQLite - Fix all the things.
-            command.CommandText = "update umbracoKeyValue set updated = date()";
-            command.Parameters.Clear();
-            command.ExecuteNonQuery();
+            using (var database = (UmbracoDatabase)dbFactory.CreateDatabase())
+            {
+                using (NPoco.ITransaction transaction = database.GetTransaction())
+                {
+                    var schemaCreator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>());
+                    schemaCreator.InitializeDatabaseSchema();
+
+                    transaction.Complete();
+                }
+            }
         }
 
         public void Finish()

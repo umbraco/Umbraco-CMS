@@ -87,7 +87,10 @@ namespace Umbraco.Cms.Core.Configuration
                     return Constants.DbProviderNames.SqlCe;
                 }
 
-                return Constants.DatabaseProviders.SQLite;
+                if (dataSource.ToString().EndsWith(".sqlite", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Constants.DatabaseProviders.SQLite;
+                }
             }
 
             return Constants.DbProviderNames.SqlServer;

@@ -10,30 +10,30 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 {
     public class TestDatabaseFactory
     {
-        public static ITestDatabase Create(TestDatabaseSettings settings, string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
+        public static ITestDatabase Create(TestDatabaseSettings settings, string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactoryProvider)
         {
             string connectionString = Environment.GetEnvironmentVariable("UmbracoIntegrationTestConnectionString");
 
             switch (settings.Engine)
             {
                 case "sqlite":
-                    return CreateSQLite(settings, loggerFactory, dbFactory);
+                    return CreateSQLite(settings, loggerFactory, dbFactoryProvider);
                     // TODO: Handle others.
             }
             return string.IsNullOrEmpty(connectionString)
-                ? CreateLocalDb(settings, filesPath, loggerFactory, dbFactory)
-                : CreateSqlDeveloper(settings, loggerFactory, dbFactory, connectionString);
+                ? CreateLocalDb(settings, filesPath, loggerFactory, dbFactoryProvider)
+                : CreateSqlDeveloper(settings, loggerFactory, dbFactoryProvider, connectionString);
         }
 
         private static ITestDatabase CreateSQLite(TestDatabaseSettings settings, ILoggerFactory loggerFactory,
-            TestUmbracoDatabaseFactoryProvider dbFactory)
+            TestUmbracoDatabaseFactoryProvider dbFactoryProvider)
         {
             Directory.CreateDirectory(settings.FilesPath);
 
-            return new SQLiteTestDatabase(settings, dbFactory.Create(), loggerFactory);
+            return new SQLiteTestDatabase(settings, dbFactoryProvider, loggerFactory);
         }
 
-        private static ITestDatabase CreateLocalDb(TestDatabaseSettings settings, string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory)
+        private static ITestDatabase CreateLocalDb(TestDatabaseSettings settings, string filesPath, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactoryProvider)
         {
             if (!Directory.Exists(filesPath))
             {
@@ -47,10 +47,10 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 throw new InvalidOperationException("LocalDB is not available.");
             }
 
-            return new LocalDbTestDatabase(settings, loggerFactory, localDb, filesPath, dbFactory.Create());
+            return new LocalDbTestDatabase(settings, loggerFactory, localDb, filesPath, dbFactoryProvider.Create());
         }
 
-        private static ITestDatabase CreateSqlDeveloper(TestDatabaseSettings settings, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory, string connectionString)
+        private static ITestDatabase CreateSqlDeveloper(TestDatabaseSettings settings, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactoryProvider, string connectionString)
         {
             // NOTE: Example setup for Linux box.
             // $ export SA_PASSWORD=Foobar123!
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 throw new InvalidOperationException("ENV: UmbracoIntegrationTestConnectionString is not set");
             }
 
-            return new SqlDeveloperTestDatabase(settings, loggerFactory, dbFactory.Create(), connectionString);
+            return new SqlDeveloperTestDatabase(settings, loggerFactory, dbFactoryProvider.Create(), connectionString);
         }
     }
 }

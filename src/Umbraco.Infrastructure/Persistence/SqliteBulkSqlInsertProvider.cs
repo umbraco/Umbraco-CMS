@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.Linq;
+using Microsoft.Data.Sqlite;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
@@ -37,32 +39,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <returns>The number of records that were inserted.</returns>
         private int BulkInsertRecordsSqlite<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
         {
-            // create command against the original database.Connection
-            using (var command = database.CreateCommand(database.Connection, CommandType.Text, string.Empty))
+            var count = 0;
+            var inTrans = database.InTransaction;
+
+            if (!inTrans)
             {
-                // use typed connection and transaction or SqlBulkCopy
-                var tConnection = NPocoDatabaseExtensions.GetTypedConnection<SqlConnection>(database.Connection);
-                var tTransaction = NPocoDatabaseExtensions.GetTypedTransaction<SqlTransaction>(command.Transaction);
-                var tableName = pocoData.TableInfo.TableName;
-
-                var syntax = database.SqlContext.SqlSyntax as SqliteSyntaxProvider;
-                if (syntax == null) throw new NotSupportedException("SqlSyntax must be SqliteSyntaxProvider.");
-
-                using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction) { BulkCopyTimeout = 10000, DestinationTableName = tableName })
-                using (var bulkReader = new PocoDataDataReader<T, SqliteSyntaxProvider>(records, pocoData, syntax))
-                {
-                    //we need to add column mappings here because otherwise columns will be matched by their order and if the order of them are different in the DB compared
-                    //to the order in which they are declared in the model then this will not work, so instead we will add column mappings by name so that this explicitly uses
-                    //the names instead of their ordering.
-                    foreach (var col in bulkReader.ColumnMappings)
-                    {
-                        copy.ColumnMappings.Add(col.DestinationColumn, col.DestinationColumn);
-                    }
-
-                    copy.WriteToServer(bulkReader);
-                    return bulkReader.RecordsAffected;
-                }
+                database.BeginTransaction();
             }
+
+            foreach (var record in records)
+            {
+                database.Insert(record);
+                count++;
+            }
+
+            if (!inTrans)
+            {
+                database.CompleteTransaction();
+            }
+
+            return count;
         }
     }
 }

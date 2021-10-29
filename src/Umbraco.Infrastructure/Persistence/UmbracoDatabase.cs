@@ -336,6 +336,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             public string Text { get; }
 
             public ParameterInfo[] Parameters { get; }
+
+            public override string ToString() => Text;
         }
 
         // used for tracking commands
