@@ -1026,6 +1026,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 case UmbracoEntityTypes.Macro:
 
+                case UmbracoEntityTypes.Template:
+                    var template = Services.FileService.GetTemplate(key);
+                    if (template is null)
+                    {
+                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                    }
+
+                    return Mapper.Map<ITemplate, EntityBasic>(template);
+
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) +
                                                     " does not currently support data for the type " + entityType);
@@ -1058,6 +1067,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case UmbracoEntityTypes.User:
 
                 case UmbracoEntityTypes.Macro:
+
+                case UmbracoEntityTypes.Template:
+                    var template = Services.FileService.GetTemplate(id);
+                    if (template is null)
+                    {
+                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                    }
+
+                    return Mapper.Map<ITemplate, EntityBasic>(template);
 
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) +

@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             var entries = new List<IAuditEntry>();
 
-            foreach (var group in ids.InGroupsOf(2000))
+            foreach (var group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
                 var sql = Sql()
                     .Select<AuditEntryDto>()
