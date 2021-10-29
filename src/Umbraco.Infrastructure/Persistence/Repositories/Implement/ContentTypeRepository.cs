@@ -289,8 +289,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistUpdatedBaseContentType(entity);
             PersistTemplates(entity, true);
+            PersistHistoryCleanup(entity);
 
             entity.ResetDirtyProperties();
+        }
+
+        private void PersistHistoryCleanup(IContentType entity)
+        {
+            ContentVersionCleanupPolicyDto dto = new ContentVersionCleanupPolicyDto()
+            {
+                ContentTypeId = entity.Id,
+                Updated = DateTime.Now,
+                PreventCleanup = entity.HistoryCleanup.PreventCleanup,
+                KeepAllVersionsNewerThanDays = entity.HistoryCleanup.KeepAllVersionsNewerThanDays,
+                KeepLatestVersionPerDayForDays = entity.HistoryCleanup.KeepLatestVersionPerDayForDays,
+            };
+            Database.InsertOrUpdate(dto);
         }
     }
 }

@@ -43,6 +43,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IBasicAuthService, BasicAuthService>();
             builder.Services.AddUnique<ITagService, TagService>();
             builder.Services.AddUnique<IContentService, ContentService>();
+            builder.Services.AddUnique<IContentVersionService, ContentVersionService>();
             builder.Services.AddUnique<IUserService, UserService>();
             builder.Services.AddUnique<IMemberService, MemberService>();
             builder.Services.AddUnique<IMediaService, MediaService>();
