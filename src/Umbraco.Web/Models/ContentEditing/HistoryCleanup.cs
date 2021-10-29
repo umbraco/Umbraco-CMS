@@ -12,7 +12,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "globalKeepLatestVersionPerDayForDays")]
         public int? GlobalKeepLatestVersionPerDayForDays { get; set;}
 
-        [DataMember(Name = "GlobalEnableCleanup")]
+        [DataMember(Name = "globalEnableCleanup")]
         public bool GlobalEnableCleanup { get; set; }
     }
 
