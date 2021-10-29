@@ -76,6 +76,18 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="App_Plugins\Vendr\templates\email\GiftCardEmail.cshtml" />
+    <_ContentIncludedByDefault Remove="App_Plugins\Vendr\templates\email\OrderConfirmationEmail.cshtml" />
+    <_ContentIncludedByDefault Remove="App_Plugins\Vendr\templates\email\OrderErrorEmail.cshtml" />
+    <_ContentIncludedByDefault Remove="App_Plugins\Vendr\templates\export\OrderCsvExport.cshtml" />
+    <_ContentIncludedByDefault Remove="App_Plugins\Vendr\templates\print\OrderPackingSlip.cshtml" />
+    <_ContentIncludedByDefault Remove="App_Plugins\Vendr\templates\print\OrderReceipt.cshtml" />
+    <_ContentIncludedByDefault Remove="App_Plugins\Vendr\templates\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="App_Plugins\Vendr\templates\_ViewStart.cshtml" />
+    <_ContentIncludedByDefault Remove="App_Plugins\Vendr\templates\Web.config" />
+  </ItemGroup>
+
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>

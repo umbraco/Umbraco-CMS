@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Cms.Core.Collections
+namespace Umbraco.Core.Collections
 {
     /// <summary>
     ///     Collection that can be both a queue and a stack.
