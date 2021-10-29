@@ -3,9 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">Umbraco.Cms.Web.UI</RootNamespace>
-        <DefaultItemExcludes>$(DefaultItemExcludes);App_Plugins/**;</DefaultItemExcludes>
-        <DefaultItemExcludes>$(DefaultItemExcludes);umbraco/**;</DefaultItemExcludes>
-        <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot/media/**;</DefaultItemExcludes>
     </PropertyGroup>
 
     <!-- Force windows to use ICU. Otherwise Windows 10 2019H1+ will do it, but older windows 10 and most if not all winodws servers will run NLS -->
@@ -24,16 +21,6 @@
 
     <ItemGroup Condition="'$(PackageTestSiteName)' != ''">
         <ProjectReference Include="..\PackageTestSiteName\PackageTestSiteName.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="App_Plugins/**" CopyToOutputDirectory="Always" />
-        <Content Include="umbraco/**" CopyToOutputDirectory="Always" />
-        <Content Remove="umbraco/Data/**" />
-        <Content Remove="umbraco/Logs/**" />
-        <Content Remove="umbraco/mediacache/**" />
-        <Content Remove="umbraco/models/**" />
-        <Compile Include="umbraco/models/**" Exclude="**/*.flag" />
     </ItemGroup>
 
     <PropertyGroup>

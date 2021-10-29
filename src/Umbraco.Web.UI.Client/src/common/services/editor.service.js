@@ -214,17 +214,18 @@ When building a custom infinite editor view you can use the same components as a
          * Method to tell editors that they are begin blurred.
          */
         function blur() {
-
-            /* keyboard shortcuts will be overwritten by the new infinite editor
+            if (isEnabled === true) {
+                /* keyboard shortcuts will be overwritten by the new infinite editor
                 so we need to store the shortcuts for the current editor so they can be rebound
                 when the infinite editor closes
             */
-            unbindKeyboardShortcuts();
-            isEnabled = false;
+                unbindKeyboardShortcuts();
+                isEnabled = false;
+            }
         }
         /**
          * @ngdoc method
-         * @name umbraco.services.editorService#blur
+         * @name umbraco.services.editorService#focus
          * @methodOf umbraco.services.editorService
          *
          * @description

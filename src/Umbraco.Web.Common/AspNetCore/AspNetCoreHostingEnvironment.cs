@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
                         // hopefully it gets a new Guid or new application id?
                         string hashString = SiteName + "::" + ApplicationId;
                         string hash = hashString.GenerateHash();
-                        string siteTemp = Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", hash);
+                        string siteTemp = Path.Combine(Path.GetTempPath(), "UmbracoData", hash);
 
                         return _localTempPath = siteTemp;
 
