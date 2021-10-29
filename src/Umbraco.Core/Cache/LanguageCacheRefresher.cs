@@ -9,43 +9,56 @@ using static Umbraco.Cms.Core.Cache.LanguageCacheRefresher.JsonPayload;
 
 namespace Umbraco.Cms.Core.Cache
 {
+    /// <inheritdoc />
     public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageCacheRefresherNotification, LanguageCacheRefresher.JsonPayload>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LanguageCacheRefresher"/> class.
+        /// </summary>
+        /// <param name="appCaches">The <see cref="AppCaches"/> to use</param>
+        /// <param name="serializer">The <see cref="IJsonSerializer"/> to use</param>
+        /// <param name="publishedSnapshotService">The <see cref="IPublishedSnapshotService"/> to use</param>
+        /// <param name="eventAggregator">The <see cref="IEventAggregator"/> to use</param>
+        /// <param name="factory">The <see cref="ICacheRefresherNotificationFactory"/> to use</param>
         public LanguageCacheRefresher(
             AppCaches appCaches,
             IJsonSerializer serializer,
             IPublishedSnapshotService publishedSnapshotService,
             IEventAggregator eventAggregator,
             ICacheRefresherNotificationFactory factory)
-            : base(appCaches, serializer, eventAggregator, factory)
-        {
+            : base(appCaches, serializer, eventAggregator, factory) =>
             _publishedSnapshotService = publishedSnapshotService;
-        }
 
         #region Define
 
         public static readonly Guid UniqueId = Guid.Parse("3E0F95D8-0BE5-44B8-8394-2B8750B62654");
         private readonly IPublishedSnapshotService _publishedSnapshotService;
 
+        /// <inheritdoc/>
         public override Guid RefresherUniqueId => UniqueId;
 
+        /// <inheritdoc/>
         public override string Name => "Language Cache Refresher";
 
         #endregion
 
         #region Refresher
 
+        /// <inheritdoc/>
         public override void Refresh(JsonPayload[] payloads)
         {
-            if (payloads.Length == 0) return;
+            if (payloads.Length == 0)
+            {
+                return;
+            }
 
             var clearDictionary = false;
             var clearContent = false;
 
-            //clear all no matter what type of payload
+            // clear all no matter what type of payload
             ClearAllIsolatedCacheByEntityType<ILanguage>();
 
-            foreach (var payload in payloads)
+            foreach (JsonPayload payload in payloads)
             {
                 switch (payload.ChangeType)
                 {
@@ -65,14 +78,15 @@ namespace Umbraco.Cms.Core.Cache
                 ClearAllIsolatedCacheByEntityType<IDictionaryItem>();
             }
 
-            //if this flag is set, we will tell the published snapshot service to refresh ALL content and evict ALL IContent items
+            // if this flag is set, we will tell the published snapshot service to refresh ALL content and evict ALL IContent items
             if (clearContent)
             {
-                //clear all domain caches
+                // clear all domain caches
                 RefreshDomains();
                 ContentCacheRefresher.RefreshContentTypes(AppCaches); // we need to evict all IContent items
-                //now refresh all nucache
-                var clearContentPayload = new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
+
+                // now refresh all nucache
+                ContentCacheRefresher.JsonPayload[] clearContentPayload = new[] { new ContentCacheRefresher.JsonPayload(0, null, TreeChangeTypes.RefreshAll) };
                 ContentCacheRefresher.NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, clearContentPayload);
             }
 
@@ -83,12 +97,16 @@ namespace Umbraco.Cms.Core.Cache
         // these events should never trigger
         // everything should be PAYLOAD/JSON
 
+        /// <inheritdoc/>
         public override void RefreshAll() => throw new NotSupportedException();
 
+        /// <inheritdoc/>
         public override void Refresh(int id) => throw new NotSupportedException();
 
+        /// <inheritdoc/>
         public override void Refresh(Guid id) => throw new NotSupportedException();
 
+        /// <inheritdoc/>
         public override void Remove(int id) => throw new NotSupportedException();
 
         #endregion
@@ -104,7 +122,7 @@ namespace Umbraco.Cms.Core.Cache
             // content and when the PublishedCachesService is notified of changes it does not see
             // the new content...
 
-            var payloads = new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) };
+            DomainCacheRefresher.JsonPayload[] payloads = new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) };
             _publishedSnapshotService.Notify(payloads);
         }
 
@@ -112,6 +130,12 @@ namespace Umbraco.Cms.Core.Cache
 
         public class JsonPayload
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="JsonPayload"/> class.
+            /// </summary>
+            /// <param name="id">The int id to use</param>
+            /// <param name="isoCode">The isoCode to use, you can get this from the CultureInfo</param>
+            /// <param name="changeType">The <see cref="LanguageChangeType"/> to use</param>
             public JsonPayload(int id, string isoCode, LanguageChangeType changeType)
             {
                 Id = id;
