@@ -273,6 +273,7 @@
     <key alias="nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the Element Type will be used.</key>
     <key alias="nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</key>
     <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
+    <key alias="nestedContentNoGroups">The selected element type does not contain any supported groups (tabs are not supported by this editor, either change them to groups or use the Block List editor).</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -1091,17 +1092,16 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="notificationsSavedFor">Notification settings saved for</key>
     <key alias="mailBody"><![CDATA[
       Hi %0%
-
+      
       This is an automated mail to inform you that the task '%1%'
       has been performed on the page '%2%'
       by the user '%3%'
-
+      
       Go to http://%4%/#/content/content/edit/%5% to edit.
-
+      
       %6%
-
+      
       Have a nice day!
-
       Cheers from the Umbraco robot
     ]]></key>
     <key alias="mailBodyVariantSummary">The following languages have been modified %0%</key>
@@ -1799,17 +1799,16 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="includeSubpages">Include subpages</key>
     <key alias="mailBody"><![CDATA[
       Hi %0%
-
+      
       This is an automated mail to inform you that the document '%1%'
       has been requested for translation into '%5%' by %2%.
-
+      
       Go to http://%3%/translation/details.aspx?id=%4% to edit.
-
+      
       Or log into Umbraco to get an overview of your translation tasks
       http://%3%
-
+      
       Have a nice day!
-
       Cheers from the Umbraco robot
     ]]></key>
     <key alias="noTranslators">No translator users found. Please create a translator user before you start sending content to translation</key>

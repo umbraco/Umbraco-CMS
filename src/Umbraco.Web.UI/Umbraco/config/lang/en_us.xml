@@ -278,6 +278,7 @@
     <key alias="nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the Element Type will be used.</key>
     <key alias="nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</key>
     <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
+    <key alias="nestedContentNoGroups">The selected element type does not contain any supported groups (tabs are not supported by this editor, either change them to groups or use the Block List editor).</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
