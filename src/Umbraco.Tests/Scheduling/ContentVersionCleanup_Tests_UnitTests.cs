@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Scheduling
         public void ContentVersionCleanup_WhenNotEnabled_DoesNotCleanupWillRepeat(
             [Frozen] Mock<IContentVersionCleanupPolicyGlobalSettings> settings,
             [Frozen] Mock<IRuntimeState> state,
-            [Frozen] Mock<IContentVersionCleanupService> cleanupService,
+            [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
             settings.Setup(x => x.EnableCleanup).Returns(false);
@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Scheduling
         public void ContentVersionCleanup_RuntimeLevelNotRun_DoesNotCleanupWillRepeat(
             [Frozen] Mock<IContentVersionCleanupPolicyGlobalSettings> settings,
             [Frozen] Mock<IRuntimeState> state,
-            [Frozen] Mock<IContentVersionCleanupService> cleanupService,
+            [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
             settings.Setup(x => x.EnableCleanup).Returns(true);
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Scheduling
         public void ContentVersionCleanup_ServerRoleUnknown_DoesNotCleanupWillRepeat(
             [Frozen] Mock<IContentVersionCleanupPolicyGlobalSettings> settings,
             [Frozen] Mock<IRuntimeState> state,
-            [Frozen] Mock<IContentVersionCleanupService> cleanupService,
+            [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
             settings.Setup(x => x.EnableCleanup).Returns(true);
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Scheduling
         public void ContentVersionCleanup_NotMainDom_DoesNotCleanupWillNotRepeat(
             [Frozen] Mock<IContentVersionCleanupPolicyGlobalSettings> settings,
             [Frozen] Mock<IRuntimeState> state,
-            [Frozen] Mock<IContentVersionCleanupService> cleanupService,
+            [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
             settings.Setup(x => x.EnableCleanup).Returns(true);
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.Scheduling
         public void ContentVersionCleanup_Enabled_DelegatesToCleanupService(
             [Frozen] Mock<IContentVersionCleanupPolicyGlobalSettings> settings,
             [Frozen] Mock<IRuntimeState> state,
-            [Frozen] Mock<IContentVersionCleanupService> cleanupService,
+            [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
             settings.Setup(x => x.EnableCleanup).Returns(true);

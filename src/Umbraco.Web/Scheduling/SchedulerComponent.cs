@@ -25,7 +25,7 @@ namespace Umbraco.Web.Scheduling
 
         private readonly IRuntimeState _runtime;
         private readonly IContentService _contentService;
-        private readonly IContentVersionCleanupService _cleanupService;
+        private readonly IContentVersionService _service;
         private readonly IAuditService _auditService;
         private readonly IProfilingLogger _logger;
         private readonly IScopeProvider _scopeProvider;
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Scheduling
         public SchedulerComponent(
             IRuntimeState runtime,
             IContentService contentService,
-            IContentVersionCleanupService cleanupService,
+            IContentVersionService service,
             IAuditService auditService,
             HealthCheckCollection healthChecks,
             HealthCheckNotificationMethodCollection notifications,
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Scheduling
         {
             _runtime = runtime;
             _contentService = contentService;
-            _cleanupService = cleanupService;
+            _service = service;
             _auditService = auditService;
             _scopeProvider = scopeProvider;
             _logger = logger;
@@ -203,7 +203,7 @@ namespace Umbraco.Web.Scheduling
                 _runtime,
                 _logger,
                 settings.Content.ContentVersionCleanupPolicyGlobalSettings,
-                _cleanupService);
+                _service);
 
             _contentVersionCleanupRunner.TryAdd(task);
 

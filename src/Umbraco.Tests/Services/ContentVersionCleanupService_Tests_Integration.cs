@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Services
             // Kill all historic
             InsertCleanupPolicy(contentTypeA, 0, 0);
 
-            ((IContentVersionCleanupService)ServiceContext.ContentService).PerformContentVersionCleanup(DateTime.Now.AddHours(1));
+            ((IContentVersionService)ServiceContext.ContentService).PerformContentVersionCleanup(DateTime.Now.AddHours(1));
 
             var after = GetReport();
 

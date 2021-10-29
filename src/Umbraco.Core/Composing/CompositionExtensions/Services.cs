@@ -34,7 +34,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
 
             composition.RegisterUnique<ContentService>();
             composition.RegisterUnique<IContentService>(factory => factory.GetInstance<ContentService>());
-            composition.RegisterUnique<IContentVersionCleanupService>(factory => factory.GetInstance<ContentService>());
+            composition.RegisterUnique<IContentVersionService>(factory => factory.GetInstance<ContentService>());
             composition.RegisterUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
 
             composition.RegisterUnique<IUserService, UserService>();

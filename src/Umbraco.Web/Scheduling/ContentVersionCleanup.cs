@@ -12,7 +12,7 @@ namespace Umbraco.Web.Scheduling
         private readonly IRuntimeState _runtimeState;
         private readonly IProfilingLogger _logger;
         private readonly IContentVersionCleanupPolicyGlobalSettings _settings;
-        private readonly IContentVersionCleanupService _cleanupService;
+        private readonly IContentVersionService _service;
 
         public ContentVersionCleanup(
             IBackgroundTaskRunner<RecurringTaskBase> runner,
@@ -21,13 +21,13 @@ namespace Umbraco.Web.Scheduling
             IRuntimeState runtimeState,
             IProfilingLogger logger,
             IContentVersionCleanupPolicyGlobalSettings settings,
-            IContentVersionCleanupService cleanupService)
+            IContentVersionService service)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtimeState = runtimeState ?? throw new ArgumentNullException(nameof(runtimeState));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _cleanupService = cleanupService ?? throw new ArgumentNullException(nameof(cleanupService));
+            _service = service ?? throw new ArgumentNullException(nameof(service));
         }
 
         public override bool PerformRun()
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            var count = _cleanupService.PerformContentVersionCleanup(DateTime.Now).Count;
+            var count = _service.PerformContentVersionCleanup(DateTime.Now).Count;
 
             if (count > 0)
             {
