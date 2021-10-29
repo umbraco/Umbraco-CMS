@@ -118,7 +118,7 @@ Use this directive to render a ui component for selecting child items to a paren
 (function() {
     'use strict';
 
-    function ChildSelectorDirective() {
+    function ChildSelectorDirective(overlayService, localizationService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -126,10 +126,30 @@ Use this directive to render a ui component for selecting child items to a paren
             scope.dialogModel = {};
             scope.showDialog = false;
 
-            scope.removeChild = (selectedChild, $index) => {
-               if (scope.onRemove) {
-                  scope.onRemove(selectedChild, $index);
-               }
+            scope.removeChild = (selectedChild, $index, event) => {
+               const dialog = {
+                    view: "views/components/overlays/umb-template-remove-confirm.html",
+                    layout: selectedChild,
+                    submitButtonLabelKey: "defaultdialogs_yesRemove",
+                    submitButtonStyle: "danger",
+                    submit: function () {
+                        if(scope.onRemove) {
+                            scope.onRemove(selectedChild, $index);
+                            overlayService.close();
+                        }
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+
+                localizationService.localize("general_delete").then(value => {
+                    dialog.title = value;
+                    overlayService.open(dialog);
+                });
+
+                event.preventDefault();
+                event.stopPropagation();
             };
 
             scope.addChild = $event => {
