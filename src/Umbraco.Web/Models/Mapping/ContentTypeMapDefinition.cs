@@ -135,6 +135,7 @@ namespace Umbraco.Web.Models.Mapping
                 KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays,
                 GlobalKeepAllVersionsNewerThanDays = _umbracoSettingsSection.Content.ContentVersionCleanupPolicyGlobalSettings.KeepAllVersionsNewerThanDays,
                 GlobalKeepLatestVersionPerDayForDays = _umbracoSettingsSection.Content.ContentVersionCleanupPolicyGlobalSettings.KeepLatestVersionPerDayForDays,
+                GlobalEnableCleanup = _umbracoSettingsSection.Content.ContentVersionCleanupPolicyGlobalSettings.EnableCleanup,
             };
 
             target.AllowCultureVariant = source.VariesByCulture();

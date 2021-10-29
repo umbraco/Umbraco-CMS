@@ -27,6 +27,7 @@ namespace Umbraco.Core.Models
         public ContentType(int parentId) : base(parentId)
         {
             _allowedTemplates = new List<ITemplate>();
+            HistoryCleanup = new HistoryCleanup();
         }
 
 
@@ -40,6 +41,7 @@ namespace Umbraco.Core.Models
             : base(parent, alias)
         {
             _allowedTemplates = new List<ITemplate>();
+            HistoryCleanup = new HistoryCleanup();
         }
 
         /// <inheritdoc />
