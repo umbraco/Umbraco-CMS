@@ -75,13 +75,15 @@ namespace Umbraco.Cms.Infrastructure.Mail
                 }
             }
 
-            if (!_globalSettings.IsSmtpServerConfigured && !_globalSettings.IsPickupDirectoryLocationConfigured)
+            var isPickupDirectoryConfigured = !string.IsNullOrWhiteSpace(_globalSettings.Smtp?.PickupDirectoryLocation);
+
+            if (_globalSettings.IsSmtpServerConfigured == false && !isPickupDirectoryConfigured)
             {
                 _logger.LogDebug("Could not send email for {Subject}. It was not handled by a notification handler and there is no SMTP configured.", message.Subject);
                 return;
             }
 
-            if (_globalSettings.IsPickupDirectoryLocationConfigured && !string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From))
+            if (isPickupDirectoryConfigured && !string.IsNullOrWhiteSpace(_globalSettings.Smtp?.From))
             {
             // The following code snippet is the recommended way to handle PickupDirectoryLocation. 
             // See more https://github.com/jstedfast/MailKit/blob/master/FAQ.md#q-how-can-i-send-email-to-a-specifiedpickupdirectory
@@ -152,10 +154,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
         /// </summary>
         /// <remarks>
         /// We assume this is possible if either an event handler is registered or an smtp server is configured
-        /// or a pickup directory location is configured
         /// </remarks>
-        public bool CanSendRequiredEmail() => _globalSettings.IsSmtpServerConfigured
-                                              || _globalSettings.IsPickupDirectoryLocationConfigured
-                                              || _notificationHandlerRegistered;
+        public bool CanSendRequiredEmail() => _globalSettings.IsSmtpServerConfigured || _notificationHandlerRegistered;
     }
 }
