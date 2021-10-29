@@ -183,7 +183,8 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 KeepAllVersionsNewerThanDays = source.HistoryCleanup.KeepAllVersionsNewerThanDays,
                 KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays,
                 GlobalKeepAllVersionsNewerThanDays = _contentSettings.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays,
-                GlobalKeepLatestVersionPerDayForDays = _contentSettings.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays
+                GlobalKeepLatestVersionPerDayForDays = _contentSettings.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays,
+                GlobalEnableCleanup = _contentSettings.ContentVersionCleanupPolicy.EnableCleanup
             };
 
             target.AllowCultureVariant = source.VariesByCulture();

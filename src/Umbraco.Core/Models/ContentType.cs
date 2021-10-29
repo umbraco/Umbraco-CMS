@@ -32,8 +32,11 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <remarks>Only use this for creating ContentTypes at the root (with ParentId -1).</remarks>
         /// <param name="parentId"></param>
-        public ContentType(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId) =>
+        public ContentType(IShortStringHelper shortStringHelper, int parentId) : base(shortStringHelper, parentId)
+        {
             _allowedTemplates = new List<ITemplate>();
+            HistoryCleanup = new HistoryCleanup();
+        }
 
 
         /// <summary>
@@ -43,8 +46,11 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="parent"></param>
         /// <param name="alias"></param>
         public ContentType(IShortStringHelper shortStringHelper, IContentType parent, string alias)
-            : base(shortStringHelper, parent, alias) =>
+            : base(shortStringHelper, parent, alias)
+        {
             _allowedTemplates = new List<ITemplate>();
+            HistoryCleanup = new HistoryCleanup();
+        }
 
         /// <inheritdoc />
         public override bool SupportsPublishing => SupportsPublishingConst;
