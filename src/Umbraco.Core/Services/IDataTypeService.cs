@@ -13,18 +13,68 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Returns a dictionary of content type <see cref="Udi"/>s and the property type aliases that use a <see cref="IDataType"/>
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id);
 
+        /// <summary>
+        /// Attempts to create container
+        /// </summary>
         Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, Guid key, string name, int userId = Constants.Security.SuperUserId);
+
+        /// <summary>
+        /// Attempts to save a container
+        /// </summary>
         Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId);
+
+        /// <summary>
+        /// Gets a <see cref="EntityContainer"/> by its Id
+        /// </summary>
+        /// <param name="containerId">Id of the <see cref="EntityContainer"/></param>
+        /// <returns><see cref="EntityContainer"/></returns>
         EntityContainer GetContainer(int containerId);
+
+        /// <summary>
+        /// Gets a <see cref="EntityContainer"/> by its Id
+        /// </summary>
+        /// <param name="containerId">Id of the <see cref="EntityContainer"/></param>
+        /// <returns><see cref="EntityContainer"/></returns>
         EntityContainer GetContainer(Guid containerId);
+
+        /// <summary>
+        /// Gets multiple <see cref="EntityContainer"/> by their ids
+        /// </summary>
+        /// <param name="folderName">folderName the <see cref="EntityContainer"/> lives in</param>
+        /// <param name="level">level of the folder</param>
+        /// /// <returns>An enumerable list of <see cref="EntityContainer"/> objects</returns>
         IEnumerable<EntityContainer> GetContainers(string folderName, int level);
+
+        /// <summary>
+        /// Gets multiple <see cref="EntityContainer"/> by their dataTypes
+        /// </summary>
+        /// <param name="dataType"> The datatype in the<see cref="EntityContainer"/></param>
+        /// /// <returns>An enumerable list of <see cref="EntityContainer"/> objects</returns>
         IEnumerable<EntityContainer> GetContainers(IDataType dataType);
+
+        /// <summary>
+        /// Gets multiple <see cref="EntityContainer"/> by their ids
+        /// </summary>
+        /// <param name="containerIds">Id of the <see cref="EntityContainer"/></param>
+        /// <returns>An enumerable list of <see cref="EntityContainer"/> objects</returns>
         IEnumerable<EntityContainer> GetContainers(int[] containerIds);
+
+        /// <summary>
+        /// Deletes a <see cref="EntityContainer"/> by id
+        /// </summary>
+        /// <param name="containerId">Id of the <see cref="EntityContainer"/></param>
+        /// <param name="userId">Id of the user deleting the container</param>
+        /// <returns><see cref="OperationResult"/></returns>
         Attempt<OperationResult> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId);
+
+        /// <summary>
+        /// Attempts to rename a <see cref="EntityContainer"/> by id
+        /// </summary>
+        /// <param name="id">Id of the <see cref="EntityContainer"/></param>
+        /// <param name="name">New name of the <see cref="EntityContainer"/></param>
+        /// <returns><see cref="Attempt"/></returns>
         Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
@@ -87,6 +137,12 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>Collection of <see cref="IDataType"/> objects with a matching control id</returns>
         IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
 
+        /// <summary>
+        /// Attempts to move a<see cref="IDataType"/>
+        /// </summary>
+        /// <param name="toMove"><see cref="IDataType"/> to move</param>
+        /// <param name="parentId">id of the <see cref="IDataType"/> parent</param>
+        /// <returns><see cref="Attempt"/></returns>
         Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId);
     }
 }
