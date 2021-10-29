@@ -13,11 +13,22 @@
     {
         public const char ActionLetter = 'F';
 
+        /// <inheritdoc/>
         public char Letter => ActionLetter;
+
+        /// <inheritdoc/>
         public bool ShowInNotifier => false;
+
+        /// <inheritdoc/>
         public bool CanBePermissionAssigned => true;
+
+        /// <inheritdoc/>
         public string Icon => "";
+
+        /// <inheritdoc/>
         public string Alias => "browse";
+
+        /// <inheritdoc/>
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
     }
 }

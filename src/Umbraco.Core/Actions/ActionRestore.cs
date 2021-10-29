@@ -9,11 +9,22 @@ namespace Umbraco.Cms.Core.Actions
     {
         public const string ActionAlias = "restore";
 
+        /// <inheritdoc/>
         public char Letter => 'V';
+
+        /// <inheritdoc/>
         public string Alias => ActionAlias;
+
+        /// <inheritdoc/>
         public string Category => null;
+
+        /// <inheritdoc/>
         public string Icon => "undo";
+
+        /// <inheritdoc/>
         public bool ShowInNotifier => true;
+
+        /// <inheritdoc/>
         public bool CanBePermissionAssigned => false;
 
     }

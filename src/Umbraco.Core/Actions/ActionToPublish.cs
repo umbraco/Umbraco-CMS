@@ -7,11 +7,22 @@
     {
         public const char ActionLetter = 'H';
 
+        /// <inheritdoc/>
         public char Letter => ActionLetter;
+
+        /// <inheritdoc/>
         public string Alias => "sendtopublish";
+
+        /// <inheritdoc/>
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
+
+        /// <inheritdoc/>
         public string Icon => "outbox";
+
+        /// <inheritdoc/>
         public bool ShowInNotifier => true;
+
+        /// <inheritdoc/>
         public bool CanBePermissionAssigned => true;
     }
 }

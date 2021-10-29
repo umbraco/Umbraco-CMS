@@ -7,11 +7,22 @@
     {
         public const char ActionLetter = 'I';
 
+        /// <inheritdoc/>
         public char Letter => ActionLetter;
+
+        /// <inheritdoc/>
         public string Alias => "assignDomain";
+
+        /// <inheritdoc/>
         public string Category => Constants.Conventions.PermissionCategories.AdministrationCategory;
+
+        /// <inheritdoc/>
         public string Icon => "home";
+
+        /// <inheritdoc/>
         public bool ShowInNotifier => false;
+
+        /// <inheritdoc/>
         public bool CanBePermissionAssigned => true;
     }
 }

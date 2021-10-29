@@ -7,11 +7,22 @@
     {
         public const char ActionLetter = 'M';
 
+        /// <inheritdoc/>
         public char Letter => ActionLetter;
+
+        /// <inheritdoc/>
         public string Alias => "move";
+
+        /// <inheritdoc/>
         public string Category => Constants.Conventions.PermissionCategories.StructureCategory;
+
+        /// <inheritdoc/>
         public string Icon => "enter";
+
+        /// <inheritdoc/>
         public bool ShowInNotifier => true;
+
+        /// <inheritdoc/>
         public bool CanBePermissionAssigned => true;
     }
 }

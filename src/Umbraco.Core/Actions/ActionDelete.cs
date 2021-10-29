@@ -8,11 +8,22 @@
         public const string ActionAlias = "delete";
         public const char ActionLetter = 'D';
 
+        /// <inheritdoc/>
         public char Letter => ActionLetter;
+
+        /// <inheritdoc/>
         public string Alias => ActionAlias;
+
+        /// <inheritdoc/>
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
+
+        /// <inheritdoc/>
         public string Icon => "delete";
+
+        /// <inheritdoc/>
         public bool ShowInNotifier => true;
+
+        /// <inheritdoc/>
         public bool CanBePermissionAssigned => true;
     }
 }

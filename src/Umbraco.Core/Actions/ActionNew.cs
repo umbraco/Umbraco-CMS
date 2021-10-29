@@ -8,11 +8,22 @@
         public const string ActionAlias = "create";
         public const char ActionLetter = 'C';
 
+        /// <inheritdoc/>
         public char Letter => ActionLetter;
+
+        /// <inheritdoc/>
         public string Alias => ActionAlias;
+
+        /// <inheritdoc/>
         public string Icon => "add";
+
+        /// <inheritdoc/>
         public bool ShowInNotifier => true;
+
+        /// <inheritdoc/>
         public bool CanBePermissionAssigned => true;
+
+        /// <inheritdoc/>
         public string Category => Constants.Conventions.PermissionCategories.ContentCategory;
     }
 }
