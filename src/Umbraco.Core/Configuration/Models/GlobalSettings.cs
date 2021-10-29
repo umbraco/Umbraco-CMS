@@ -158,6 +158,11 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
 
         /// <summary>
+        /// Gets a value indicating whether there is a physical pickup directory configured.
+        /// </summary>
+        public bool IsPickupDirectoryLocationConfigured => !string.IsNullOrWhiteSpace(Smtp?.PickupDirectoryLocation);
+
+        /// <summary>
         /// An int value representing the time in milliseconds to lock the database for a write operation
         /// </summary>
         /// <remarks>
