@@ -5,18 +5,19 @@
       <div ng-if="vm.state === 'upload'">
         <p>
           <localize key="settings_importDocumentTypeHelp">
-            To import a document type, find the '.udt' file on your computer by clicking the 'Browse' button and click
-            'Import' (you'll be asked for confirmation on the next screen)
+            To import a document type, find the '.udt' file on your computer by clicking the 'Import' button (you'll be
+            asked for confirmation on the next screen)
           </localize>
         </p>
 
         <form name="importDoctype">
 
           <!-- Select files -->
-          <button class="btn btn-action"
+          <button accept=".udt"
+                  class="btn btn-action"
                   name="file"
                   ng-model="filesHolder"
-                  ngf-change="handleFiles($files, $event)"
+                  ngf-change="handleFiles($files, $event, $invalidFiles)"
                   ngf-multiple="true"
                   ngf-pattern="*.udt"
                   ngf-select>

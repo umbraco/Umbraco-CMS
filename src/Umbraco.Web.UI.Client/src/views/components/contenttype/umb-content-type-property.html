@@ -28,7 +28,7 @@
 
                   <div ng-messages="propertyTypeForm.groupName.$error" show-validation-on-submit>
                       <div class="umb-validation-label" ng-message="valServerField">{{propertyTypeForm.groupName.errorMsg}}</div>
-                      <div class="umb-validation-label" ng-message="required"><localize key="contentTypeEditor_requiredLabel"></localize></div>
+                      <div class="umb-validation-label" ng-message="required"><localize key="contentTypeEditor_requiredLabel">Required label</localize></div>
                   </div>
 
               </div>
@@ -61,37 +61,37 @@
 
           <span class="umb-group-builder__property-tag -white">
               <span ng-if="vm.property.dataTypeName !== undefined">{{vm.property.dataTypeName}}</span>
-              <span ng-if="vm.property.dataTypeName == undefined"><localize key="general_preview"></localize></span>
+              <span ng-if="vm.property.dataTypeName == undefined"><localize key="general_preview">Preview</localize></span>
           </span>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.validation.mandatory">
               <span class="umb-group-builder__property-tag-icon">*</span>
-              <localize key="general_mandatory"></localize>
+              <localize key="general_mandatory">Mandatory</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.showOnMemberProfile">
               <umb-icon icon="icon-eye" class="umb-group-builder__property-tag-icon"></umb-icon>
-              <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+              <localize key="contentTypeEditor_showOnMemberProfile">Show on member profile</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.memberCanEdit">
               <umb-icon icon="icon-edit" class="umb-group-builder__property-tag-icon"></umb-icon>
-              <localize key="contentTypeEditor_memberCanEdit"></localize>
+              <localize key="contentTypeEditor_memberCanEdit">Member can edit</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.isSensitiveData">
               <umb-icon icon="icon-lock" class="umb-group-builder__property-tag-icon"></umb-icon>
-              <localize key="contentTypeEditor_isSensitiveData"></localize>
+              <localize key="contentTypeEditor_isSensitiveData">Is sensitive data</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.allowCultureVariant">
               <umb-icon icon="icon-shuffle" class="umb-group-builder__property-tag-icon"></umb-icon>
-              <localize key="contentTypeEditor_cultureVariantLabel"></localize>
+              <localize key="contentTypeEditor_cultureVariantLabel">Vary by culture</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.allowSegmentVariant">
               <umb-icon icon="icon-shuffle" class="umb-group-builder__property-tag-icon"></umb-icon>
-              <localize key="contentTypeEditor_segmentVariantLabel"></localize>
+              <localize key="contentTypeEditor_segmentVariantLabel">Vary by segments</localize>
           </div>
 
       </div>
@@ -100,13 +100,13 @@
 
           <div class="umb-group-builder__property-tag" ng-if="vm.property.inherited">
               <umb-icon icon="icon-merge"></umb-icon>
-              <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom"></localize></span>
+              <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom">Inherited from</localize></span>
               {{vm.property.contentTypeName}}
           </div>
 
           <div class="umb-group-builder__property-tag" ng-if="vm.property.locked">
               <umb-icon icon="icon-lock"></umb-icon>
-              <localize key="general_locked"></localize>
+              <localize key="general_locked">Locked</localize>
           </div>
 
       </div>
