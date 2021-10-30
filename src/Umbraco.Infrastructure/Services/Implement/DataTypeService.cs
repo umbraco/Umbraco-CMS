@@ -29,13 +29,19 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityRepository _entityRepository;
         private readonly IIOHelper _ioHelper;
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IShortStringHelper _shortStringHelper;
+        private readonly IJsonSerializer _jsonSerializer;
 
         public DataTypeService(
             IDataValueEditorFactory dataValueEditorFactory,
             IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
             IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService,
+            IShortStringHelper shortStringHelper,
+            IJsonSerializer jsonSerializer)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
@@ -45,6 +51,10 @@ namespace Umbraco.Cms.Core.Services.Implement
             _entityRepository = entityRepository;
             _contentTypeRepository = contentTypeRepository;
             _ioHelper = ioHelper;
+            _localizedTextService = localizedTextService;
+            _localizationService = localizationService;
+            _shortStringHelper = shortStringHelper;
+            _jsonSerializer = jsonSerializer;
         }
 
         #region Containers
