@@ -32,9 +32,9 @@ The people [listed here](https://umbraco.com/about-us/trust-center/security-and-
 
 | Major Version | Bugs and Regression Fixes  | Security Patches  |
 | ------------- | -------------------------- |------------------ |
-| 9             | :white_check_mark:         |:white_check_mark:|
-| 8             | :white_check_mark:         |:white_check_mark:|
-| 7 (>7.15)     | :x:                        |:white_check_mark:|
-| 7 (< 7.15)    | :x:                        |:x:|
+|9              | :white_check_mark:         |:white_check_mark:|
+|8              | :white_check_mark:         |:white_check_mark:|
+|7              | :x:                        |:white_check_mark:|
+|< 7            | :x:                        |:x:|
 
 Detailed information regarding supported versions can be found [here](https://umbraco.com/products/knowledge-center/long-term-support-and-end-of-life/). 
