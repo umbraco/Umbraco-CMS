@@ -47,7 +47,12 @@ namespace Umbraco.Cms.Core.Models.Mapping
             return contentTypeBasic;
         }
 
-        public IEnumerable<ContentApp> GetContentApps(IEntity source)
+        public IEnumerable<ContentApp> GetContentApps(IUmbracoEntity source)
+        {
+            return GetContentAppsForEntity(source);
+        }
+
+        public IEnumerable<ContentApp> GetContentAppsForEntity(IEntity source)
         {
             var apps = _contentAppDefinitions.GetContentAppsFor(source).ToArray();
 
