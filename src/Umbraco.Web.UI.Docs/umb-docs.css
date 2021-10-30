@@ -34,7 +34,8 @@ a:hover {
     color: rgba(0, 0, 0, .8);
 }
 
-.content p code {
+.content p code,
+.content li code {
     font-size: 85%;
     font-family: inherit;
     background-color: #f7f7f9;
