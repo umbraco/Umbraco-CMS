@@ -35,6 +35,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationModels
                     {
                         p.BindingInfo = new BindingInfo
                         {
+                            BindingSource = BindingSource.Body,
                             BinderType = typeof(UmbracoJsonModelBinder)
                         };
                     }
