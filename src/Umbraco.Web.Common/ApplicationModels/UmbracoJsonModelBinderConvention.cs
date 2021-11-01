@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.ModelBinders;
 
 namespace Umbraco.Cms.Web.Common.ApplicationModels
@@ -11,6 +13,11 @@ namespace Umbraco.Cms.Web.Common.ApplicationModels
     public class UmbracoJsonModelBinderConvention : IActionModelConvention
     {
         private readonly IModelMetadataProvider _modelMetadataProvider;
+
+        public UmbracoJsonModelBinderConvention()
+            : this(StaticServiceProvider.Instance.GetRequiredService<IModelMetadataProvider>())
+        {
+        }
 
         public UmbracoJsonModelBinderConvention(IModelMetadataProvider modelMetadataProvider)
         {
