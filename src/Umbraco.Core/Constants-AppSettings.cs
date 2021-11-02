@@ -109,7 +109,7 @@ namespace Umbraco.Core
             /// A true or false indicating whether umbraco should force a secure (https) connection to the backoffice.
             /// </summary>
             public const string UseHttps = "Umbraco.Core.UseHttps";
-            
+
             /// <summary>
             /// A true/false value indicating whether the content dashboard should be visible for all user groups.
             /// </summary>
@@ -155,6 +155,11 @@ namespace Umbraco.Core
             /// An int value representing the time in milliseconds to lock the database for a write operation
             /// </summary>
             public const string SqlWriteLockTimeOut = "Umbraco.Core.SqlWriteLockTimeOut";
+
+            /// <summary>
+            /// Returns true if TinyMCE scripting sanitization should be applied
+            /// </summary>
+            public const string SanitizeTinyMce = "Umbraco.Web.SanitizeTinyMce";
         }
     }
 }
