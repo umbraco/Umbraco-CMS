@@ -396,7 +396,7 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// A boolean value to prevent low privilege backoffice users from attempting to execute an XSS attacks
+        /// Returns true if TinyMCE sanitization should be applied
         /// </summary>
         /// <remarks>
         /// The default value is false

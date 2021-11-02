@@ -157,7 +157,7 @@ namespace Umbraco.Core
             public const string SqlWriteLockTimeOut = "Umbraco.Core.SqlWriteLockTimeOut";
 
             /// <summary>
-            /// A boolean value to prevent low privilege backoffice users from attempting to execute an XSS attacks
+            /// Returns true if TinyMCE sanitization should be applied
             /// </summary>
             public const string SanitizeTinyMce = "Umbraco.Web.MCE.SanitizeTinyMce";
         }
