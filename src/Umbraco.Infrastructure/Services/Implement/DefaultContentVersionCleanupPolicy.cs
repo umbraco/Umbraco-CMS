@@ -4,11 +4,10 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Services;
-using ContentVersionCleanupPolicySettings = Umbraco.Core.Models.ContentVersionCleanupPolicySettings;
+using Umbraco.Cms.Core.Services;
+using ContentVersionCleanupPolicySettings = Umbraco.Cms.Core.Models.ContentVersionCleanupPolicySettings;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement
 {

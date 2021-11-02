@@ -7,8 +7,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement

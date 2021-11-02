@@ -7,10 +7,10 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
-using Umbraco.Core.Persistence.Repositories;
-using ContentVersionCleanupPolicySettings = Umbraco.Core.Models.ContentVersionCleanupPolicySettings;
+using ContentVersionCleanupPolicySettings = Umbraco.Cms.Core.Models.ContentVersionCleanupPolicySettings;
 
 namespace Umbraco.Tests.Services
 {
@@ -31,9 +31,15 @@ namespace Umbraco.Tests.Services
                 new HistoricContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
             };
 
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays).Returns(0);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays).Returns(0);
+            contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new Cms.Core.Configuration.Models.ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true,
+                    KeepAllVersionsNewerThanDays = 0,
+                    KeepLatestVersionPerDayForDays = 0
+                }
+            });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(Array.Empty<ContentVersionCleanupPolicySettings>());
@@ -60,9 +66,15 @@ namespace Umbraco.Tests.Services
                 new HistoricContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
             };
 
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays).Returns(2);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays).Returns(2);
+            contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new Cms.Core.Configuration.Models.ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true,
+                    KeepAllVersionsNewerThanDays = 2,
+                    KeepLatestVersionPerDayForDays = 2
+                }
+            });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(Array.Empty<ContentVersionCleanupPolicySettings>());
@@ -96,9 +108,15 @@ namespace Umbraco.Tests.Services
                 new HistoricContentVersionMeta(versionId: 9, contentId: 2, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
             };
 
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays).Returns(0);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays).Returns(3);
+            contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new Cms.Core.Configuration.Models.ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true,
+                    KeepAllVersionsNewerThanDays = 0,
+                    KeepLatestVersionPerDayForDays = 3
+                }
+            });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(Array.Empty<ContentVersionCleanupPolicySettings>());
@@ -134,9 +152,15 @@ namespace Umbraco.Tests.Services
                 new HistoricContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-1)),
             };
 
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays).Returns(0);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays).Returns(0);
+            contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new Cms.Core.Configuration.Models.ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true,
+                    KeepAllVersionsNewerThanDays = 0,
+                    KeepLatestVersionPerDayForDays = 0
+                }
+            });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(new ContentVersionCleanupPolicySettings[]
@@ -169,9 +193,15 @@ namespace Umbraco.Tests.Services
                 new HistoricContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-1)),
             };
 
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays).Returns(0);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays).Returns(0);
+            contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new Cms.Core.Configuration.Models.ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true,
+                    KeepAllVersionsNewerThanDays = 0,
+                    KeepLatestVersionPerDayForDays = 0
+                }
+            });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(new ContentVersionCleanupPolicySettings[]
@@ -204,9 +234,15 @@ namespace Umbraco.Tests.Services
                 new HistoricContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-1)),
             };
 
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays).Returns(0);
-            contentSettings.Setup(x => x.Value.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays).Returns(0);
+            contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new Cms.Core.Configuration.Models.ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true,
+                    KeepAllVersionsNewerThanDays = 0,
+                    KeepLatestVersionPerDayForDays = 0
+                }
+            });
 
             documentVersionRepository.Setup(x => x.GetCleanupPolicies())
                 .Returns(new ContentVersionCleanupPolicySettings[]

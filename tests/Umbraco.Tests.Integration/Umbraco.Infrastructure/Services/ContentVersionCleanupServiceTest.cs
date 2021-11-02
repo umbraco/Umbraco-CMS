@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
         public IContentService ContentService => GetRequiredService<IContentService>();
+        public IContentVersionService ContentVersionService => GetRequiredService<IContentVersionService>();
 
         /// <remarks>
         ///     This is covered by the unit tests, but nice to know it deletes on infra.
@@ -33,8 +34,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // With 200K Versions
             // With 11M Property data
 
-            ContentType contentTypeA = ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA");
-            FileService.SaveTemplate(contentTypeA.DefaultTemplate);
+            Template template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            ContentType contentTypeA = ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentTypeA);
 
             Content content = ContentBuilder.CreateSimpleContent(contentTypeA);
@@ -53,7 +56,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Kill all historic
             InsertCleanupPolicy(contentTypeA, 0, 0);
 
-            ((IContentVersionService)ContentService).PerformContentVersionCleanup(DateTime.Now.AddHours(1));
+            ContentVersionService.PerformContentVersionCleanup(DateTime.Now.AddHours(1));
 
             Report after = GetReport();
 

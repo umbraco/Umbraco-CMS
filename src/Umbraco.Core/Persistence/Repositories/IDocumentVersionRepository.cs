@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IDocumentVersionRepository : IRepository
     {

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -25,8 +26,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void GetDocumentVersionsEligibleForCleanup_Always_ExcludesActiveVersions()
         {
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage");
-            FileService.SaveTemplate(contentType.DefaultTemplate);
+            Template template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+            ContentTypeService.Save(contentType);
             ContentTypeService.Save(contentType);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
@@ -53,8 +57,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void GetDocumentVersionsEligibleForCleanup_Always_ExcludesPinnedVersions()
         {
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage");
-            FileService.SaveTemplate(contentType.DefaultTemplate);
+            Template template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
+            ContentTypeService.Save(contentType);
             ContentTypeService.Save(contentType);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);
@@ -92,8 +99,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void DeleteVersions_Always_DeletesSpecifiedVersions()
         {
-            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage");
-            FileService.SaveTemplate(contentType.DefaultTemplate);
+            Template template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
             var content = ContentBuilder.CreateSimpleContent(contentType);

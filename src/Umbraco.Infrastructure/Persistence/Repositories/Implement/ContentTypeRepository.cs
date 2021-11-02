@@ -296,15 +296,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private void PersistHistoryCleanup(IContentType entity)
         {
-            ContentVersionCleanupPolicyDto dto = new ContentVersionCleanupPolicyDto()
+            if (entity is IContentTypeWithHistoryCleanup entityWithHistoryCleanup)
             {
-                ContentTypeId = entity.Id,
-                Updated = DateTime.Now,
-                PreventCleanup = entity.HistoryCleanup.PreventCleanup,
-                KeepAllVersionsNewerThanDays = entity.HistoryCleanup.KeepAllVersionsNewerThanDays,
-                KeepLatestVersionPerDayForDays = entity.HistoryCleanup.KeepLatestVersionPerDayForDays,
-            };
-            Database.InsertOrUpdate(dto);
+                ContentVersionCleanupPolicyDto dto = new ContentVersionCleanupPolicyDto()
+                {
+                    ContentTypeId = entity.Id,
+                    Updated = DateTime.Now,
+                    PreventCleanup = entityWithHistoryCleanup.HistoryCleanup.PreventCleanup,
+                    KeepAllVersionsNewerThanDays = entityWithHistoryCleanup.HistoryCleanup.KeepAllVersionsNewerThanDays,
+                    KeepLatestVersionPerDayForDays = entityWithHistoryCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays,
+                };
+                Database.InsertOrUpdate(dto);
+            }
+
         }
     }
 }

@@ -1,8 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Cms.Core.Models
 {
+    [Obsolete("This will be merged into IContentType in Umbraco 10")]
+    public interface IContentTypeWithHistoryCleanup : IContentType
+    {
+        /// <summary>
+        ///     Gets or Sets the history cleanup configuration
+        /// </summary>
+        HistoryCleanup HistoryCleanup { get; set; }
+    }
+
+
     /// <summary>
     ///     Defines a ContentType, which Content is based on
     /// </summary>
@@ -22,11 +33,6 @@ namespace Umbraco.Cms.Core.Models
         ///     Gets or Sets a list of Templates which are allowed for the ContentType
         /// </summary>
         IEnumerable<ITemplate> AllowedTemplates { get; set; }
-
-        /// <summary>
-        ///     Gets or Sets the history cleanup configuration
-        /// </summary>
-        HistoryCleanup HistoryCleanup { get; set; }
 
         /// <summary>
         ///     Determines if AllowedTemplates contains templateId

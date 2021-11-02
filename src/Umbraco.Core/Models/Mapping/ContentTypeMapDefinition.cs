@@ -45,9 +45,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             IMemberTypeService memberTypeService,
             ILoggerFactory loggerFactory, IShortStringHelper shortStringHelper, IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment)
-            : this(commonMapper, propertyEditors, dataTypeService, fileService, contentTypeService, mediaTypeService, memberTypeService, loggerFactory, shortStringHelper, globalSettings, hostingEnvironment, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
+            : this(commonMapper, propertyEditors, dataTypeService, fileService, contentTypeService, mediaTypeService,
+                memberTypeService, loggerFactory, shortStringHelper, globalSettings, hostingEnvironment,
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<ContentSettings>>())
         {
-
         }
 
         public ContentTypeMapDefinition(CommonMapper commonMapper, PropertyEditorCollection propertyEditors,
@@ -130,7 +131,10 @@ namespace Umbraco.Cms.Core.Models.Mapping
             MapSaveToTypeBase<DocumentTypeSave, PropertyTypeBasic>(source, target, context);
             MapComposition(source, target, alias => _contentTypeService.Get(alias));
 
-            target.HistoryCleanup = source.HistoryCleanup;
+            if (target is IContentTypeWithHistoryCleanup targetWithHistoryCleanup)
+            {
+                targetWithHistoryCleanup.HistoryCleanup = source.HistoryCleanup;
+            }
 
             target.AllowedTemplates = source.AllowedTemplates
                 .Where(x => x != null)
@@ -177,15 +181,23 @@ namespace Umbraco.Cms.Core.Models.Mapping
         {
             MapTypeToDisplayBase<DocumentTypeDisplay, PropertyTypeDisplay>(source, target);
 
-            target.HistoryCleanup = new HistoryCleanupViewModel
+            if (source is IContentTypeWithHistoryCleanup sourceWithHistoryCleanup)
             {
-                PreventCleanup = source.HistoryCleanup.PreventCleanup,
-                KeepAllVersionsNewerThanDays = source.HistoryCleanup.KeepAllVersionsNewerThanDays,
-                KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays,
-                GlobalKeepAllVersionsNewerThanDays = _contentSettings.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays,
-                GlobalKeepLatestVersionPerDayForDays = _contentSettings.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays,
-                GlobalEnableCleanup = _contentSettings.ContentVersionCleanupPolicy.EnableCleanup
-            };
+                target.HistoryCleanup = new HistoryCleanupViewModel
+                {
+                    PreventCleanup = sourceWithHistoryCleanup.HistoryCleanup.PreventCleanup,
+                    KeepAllVersionsNewerThanDays =
+                        sourceWithHistoryCleanup.HistoryCleanup.KeepAllVersionsNewerThanDays,
+                    KeepLatestVersionPerDayForDays =
+                        sourceWithHistoryCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays,
+                    GlobalKeepAllVersionsNewerThanDays =
+                        _contentSettings.ContentVersionCleanupPolicy.KeepAllVersionsNewerThanDays,
+                    GlobalKeepLatestVersionPerDayForDays =
+                        _contentSettings.ContentVersionCleanupPolicy.KeepLatestVersionPerDayForDays,
+                    GlobalEnableCleanup = _contentSettings.ContentVersionCleanupPolicy.EnableCleanup
+                };
+            }
+
 
             target.AllowCultureVariant = source.VariesByCulture();
             target.AllowSegmentVariant = source.VariesBySegment();

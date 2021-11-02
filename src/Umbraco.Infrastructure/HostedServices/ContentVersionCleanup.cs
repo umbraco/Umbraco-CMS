@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -18,10 +17,10 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     {
         private readonly IRuntimeState _runtimeState;
         private readonly ILogger<ContentVersionCleanup> _logger;
+        private readonly IOptionsMonitor<ContentSettings> _settingsMonitor;
         private readonly IContentVersionService _service;
         private readonly IMainDom _mainDom;
         private readonly IServerRoleAccessor _serverRoleAccessor;
-        private ContentVersionCleanupPolicySettings _settings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentVersionCleanup"/> class.
@@ -29,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         public ContentVersionCleanup(
             IRuntimeState runtimeState,
             ILogger<ContentVersionCleanup> logger,
-            IOptionsMonitor<ContentSettings> settings,
+            IOptionsMonitor<ContentSettings> settingsMonitor,
             IContentVersionService service,
             IMainDom mainDom,
             IServerRoleAccessor serverRoleAccessor)
@@ -37,19 +36,17 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         {
             _runtimeState = runtimeState;
             _logger = logger;
-            _settings = settings.CurrentValue.ContentVersionCleanupPolicy;
+            _settingsMonitor = settingsMonitor;
             _service = service;
             _mainDom = mainDom;
             _serverRoleAccessor = serverRoleAccessor;
-
-            settings.OnChange(x => _settings = x.ContentVersionCleanupPolicy);
         }
 
         /// <inheritdoc />
         public override Task PerformExecuteAsync(object state)
         {
             // Globally disabled by feature flag
-            if (!_settings.EnableCleanup)
+            if (!_settingsMonitor.CurrentValue.ContentVersionCleanupPolicy.EnableCleanup)
             {
                 _logger.LogInformation("ContentVersionCleanup task will not run as it has been globally disabled via configuration");
                 return Task.CompletedTask;

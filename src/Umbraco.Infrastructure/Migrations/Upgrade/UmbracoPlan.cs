@@ -13,7 +13,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
-using Umbraco.Core.Migrations.Upgrade.V_9_1_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade

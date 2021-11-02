@@ -2,7 +2,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_9_1_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0
 {
     class AddContentVersionCleanupFeature : MigrationBase
     {

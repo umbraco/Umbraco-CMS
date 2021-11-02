@@ -19,15 +19,20 @@ namespace Umbraco.Tests.Scheduling
     {
         [Test, AutoMoqData]
         public async Task ContentVersionCleanup_WhenNotEnabled_DoesNotCleanupWillRepeat(
-            [Frozen] Mock<IOptions<ContentSettings>> settings,
+            [Frozen] Mock<IOptionsMonitor<ContentSettings>> settings,
             [Frozen] Mock<IMainDom> mainDom,
             [Frozen] Mock<IServerRoleAccessor> serverRoleAccessor,
             [Frozen] Mock<IRuntimeState> runtimeState,
             [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
-            settings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(false);
-
+            settings.Setup(x => x.CurrentValue).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = false
+                }
+            });
             runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             mainDom.Setup(x => x.IsMainDom).Returns(true);
             serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.SchedulingPublisher);
@@ -39,14 +44,20 @@ namespace Umbraco.Tests.Scheduling
 
         [Test, AutoMoqData]
         public async Task ContentVersionCleanup_RuntimeLevelNotRun_DoesNotCleanupWillRepeat(
-            [Frozen] Mock<IOptions<ContentSettings>> settings,
+            [Frozen] Mock<IOptionsMonitor<ContentSettings>> settings,
             [Frozen] Mock<IMainDom> mainDom,
             [Frozen] Mock<IServerRoleAccessor> serverRoleAccessor,
             [Frozen] Mock<IRuntimeState> runtimeState,
             [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
-            settings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
+            settings.Setup(x => x.CurrentValue).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true
+                }
+            });
             runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Unknown);
             mainDom.Setup(x => x.IsMainDom).Returns(true);
             serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.SchedulingPublisher);
@@ -58,14 +69,20 @@ namespace Umbraco.Tests.Scheduling
 
         [Test, AutoMoqData]
         public async Task  ContentVersionCleanup_ServerRoleUnknown_DoesNotCleanupWillRepeat(
-            [Frozen] Mock<IOptions<ContentSettings>> settings,
+            [Frozen] Mock<IOptionsMonitor<ContentSettings>> settings,
             [Frozen] Mock<IMainDom> mainDom,
             [Frozen] Mock<IServerRoleAccessor> serverRoleAccessor,
             [Frozen] Mock<IRuntimeState> runtimeState,
             [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
-            settings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
+            settings.Setup(x => x.CurrentValue).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true
+                }
+            });
             runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             mainDom.Setup(x => x.IsMainDom).Returns(true);
             serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.Unknown);
@@ -77,14 +94,21 @@ namespace Umbraco.Tests.Scheduling
 
         [Test, AutoMoqData]
         public async Task ContentVersionCleanup_NotMainDom_DoesNotCleanupWillNotRepeat(
-            [Frozen] Mock<IOptions<ContentSettings>> settings,
+            [Frozen] Mock<IOptionsMonitor<ContentSettings>> settings,
             [Frozen] Mock<IMainDom> mainDom,
             [Frozen] Mock<IServerRoleAccessor> serverRoleAccessor,
             [Frozen] Mock<IRuntimeState> runtimeState,
             [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
-            settings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
+            settings.Setup(x => x.CurrentValue).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true
+                }
+            });
+
             runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             mainDom.Setup(x => x.IsMainDom).Returns(false);
             serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.SchedulingPublisher);
@@ -96,14 +120,21 @@ namespace Umbraco.Tests.Scheduling
 
         [Test, AutoMoqData]
         public async Task ContentVersionCleanup_Enabled_DelegatesToCleanupService(
-            [Frozen] Mock<IOptions<ContentSettings>> settings,
+            [Frozen] Mock<IOptionsMonitor<ContentSettings>> settings,
             [Frozen] Mock<IMainDom> mainDom,
             [Frozen] Mock<IServerRoleAccessor> serverRoleAccessor,
             [Frozen] Mock<IRuntimeState> runtimeState,
             [Frozen] Mock<IContentVersionService> cleanupService,
             ContentVersionCleanup sut)
         {
-            settings.Setup(x => x.Value.ContentVersionCleanupPolicy.EnableCleanup).Returns(true);
+            settings.Setup(x => x.CurrentValue).Returns(new ContentSettings()
+            {
+                ContentVersionCleanupPolicy = new ContentVersionCleanupPolicySettings()
+                {
+                    EnableCleanup = true
+                }
+            });
+
             runtimeState.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             mainDom.Setup(x => x.IsMainDom).Returns(true);
             serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.SchedulingPublisher);
