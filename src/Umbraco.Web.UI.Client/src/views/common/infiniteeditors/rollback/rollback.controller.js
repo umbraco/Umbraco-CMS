@@ -214,13 +214,15 @@
         }
 
         // TODO: implement
-        function pinVersion (version) {
+        function pinVersion (version, event) {
             version.pinningState = 'busy';
 
             $timeout(() => {
                 version.pinningState = 'init';
                 version.isPinned = !version.isPinned;
             }, 2000);
+
+            event.stopPropagation();
         }
 
         // TODO: implement
