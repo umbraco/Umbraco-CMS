@@ -236,6 +236,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistNewBaseContentType(entity);
             PersistTemplates(entity, false);
+            PersistHistoryCleanup(entity);
 
             entity.ResetDirtyProperties();
         }
