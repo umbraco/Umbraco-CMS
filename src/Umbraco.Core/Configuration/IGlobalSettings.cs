@@ -79,7 +79,7 @@
         int SqlWriteLockTimeOut { get; }
 
         /// <summary>
-        /// Returns true if TinyMCE sanitization should be applied
+        /// Returns true if TinyMCE scripting sanitization should be applied
         /// </summary>
         bool SanitizeTinyMce { get; }
     }
