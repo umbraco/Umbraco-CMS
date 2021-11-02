@@ -76,6 +76,7 @@
             if (vm.previousVersion && version && vm.previousVersion.versionId === version.versionId) {
                 vm.previousVersion = null;
                 vm.diff = null;
+                vm.rollbackButtonDisabled = true;
                 return;
             }
 
