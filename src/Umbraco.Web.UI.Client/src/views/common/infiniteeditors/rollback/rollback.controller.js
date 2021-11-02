@@ -10,6 +10,8 @@
         vm.changeVersion = changeVersion;
         vm.submit = submit;
         vm.close = close;
+        vm.pinVersion = pinVersion;
+        vm.goToPage = goToPage;
 
         //////////
 
@@ -21,6 +23,10 @@
             vm.currentVersion = null;
             vm.rollbackButtonDisabled = true;
             vm.labels = {};
+
+            // TODO: implement
+            vm.totalPages = 25;
+            vm.currentPage = 1;
 
             // find the current version for invariant nodes
             if($scope.model.node.variants.length === 1) {
@@ -68,7 +74,7 @@
 
             if(version && version.versionId) {
 
-                vm.loading = true;
+                vm.loadingDiff = true;
 
                 const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
@@ -78,10 +84,10 @@
                         vm.previousVersion.versionId = version.versionId;
                         createDiff(vm.currentVersion, vm.previousVersion);
 
-                        vm.loading = false;
+                        vm.loadingDiff = false;
                         vm.rollbackButtonDisabled = false;
                     }, function () {
-                        vm.loading = false;
+                        vm.loadingDiff = false;
                     });
 
             } else {
@@ -198,6 +204,16 @@
             if($scope.model.close) {
                 $scope.model.close();
             }
+        }
+
+        // TODO: implement
+        function pinVersion (version) {
+            console.log('PIN VERSION', version);
+        }
+
+        // TODO: implement
+        function goToPage (pageNumber) {
+            console.log('PAGE NUMBER', pageNumber);
         }
 
         onInit();
