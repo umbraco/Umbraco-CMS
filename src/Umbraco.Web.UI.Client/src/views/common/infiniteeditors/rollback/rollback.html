@@ -19,6 +19,10 @@
             <div class="main-content">
 
                 <umb-box class="side-panel">
+                    <umb-box-header title="Versions">
+                        <small>Showing version {{ (vm.currentPage * vm.itemsPerPage - vm.itemsPerPage) + 1 }} to {{ vm.currentPage * vm.itemsPerPage }} of {{ vm.itemsPerPage * vm.totalPages }} versions</small>
+                    </umb-box-header>
+
                     <umb-box-content>
 
                         <div ng-if="model.node.variants.length > 1">
@@ -32,23 +36,12 @@
                         </div>
 
                         <div>
-
-                            <h5><localize key="rollback_currentVersion">Current version</localize></h5>
-                            <p>{{vm.currentVersion.name}} (<localize key="rollback_created">Created</localize>: {{vm.currentVersion.createDate}})</p>
-
-                            <!--
-                            <h5><localize key="rollback_rollbackTo">Rollback to</localize></h5>
-                            -->
+                            <div class="mb3">
+                                <span class="bold"><localize key="rollback_currentVersion">Current version</localize>: </span>
+                                <span>{{vm.currentVersion.name}} (<localize key="rollback_created">Created</localize>: {{vm.currentVersion.createDate}})</span>
+                            </div>
 
                             <div class="umb-table umb-table--condensed">
-
-                                <div class="umb-table-head">
-                                    <div class="umb-table-row">
-                                        <div class="umb-table-cell dn"></div>
-                                        <div class="umb-table-cell umb-table-cell-padding">Version</div>
-                                        <div class="umb-table-cell umb-table-cell-padding umb-table-cell--auto-width"></div>
-                                    </div>
-                                </div>
 
                                 <div class="umb-table-body">
                                     <div class="umb-table-row cursor-pointer umb-outline -selectable"
@@ -63,8 +56,9 @@
                                                 button-style="outline"
                                                 type="button"
                                                 size="xxs"
+                                                state="version.pinningState"
                                                 action="vm.pinVersion(version)"
-                                                label="Pin">
+                                                label="{{ version.isPinned ? 'Unpin' : 'Pin' }}">
                                             </umb-button>
                                         </div>
                                     </div>
@@ -85,6 +79,8 @@
 
                 <umb-box class="compare-panel">
 
+                    <umb-box-header ng-if="vm.previousVersion" title="{{vm.previousVersion.displayValue}}"></umb-box-header>
+
                     <umb-box-content>
 
                         <umb-load-indicator ng-if="vm.loadingDiff"></umb-load-indicator>
@@ -96,7 +92,7 @@
                         </umb-empty-state>
 
                         <div ng-if="vm.diff && !vm.loadingDiff" class="diff">
-
+                            
                             <small class="db" style="margin-bottom: 15px;">
                                 <localize key="rollback_diffHelp">
                                     This shows the differences between the current version and the selected version<br /><del>Red text</del> will be

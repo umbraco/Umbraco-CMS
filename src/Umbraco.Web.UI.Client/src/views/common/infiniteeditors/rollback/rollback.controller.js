@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function RollbackController($scope, contentResource, localizationService, assetsService, dateHelper, userService) {
+    function RollbackController($scope, $timeout, contentResource, localizationService, assetsService, dateHelper, userService) {
 
         var vm = this;
 
@@ -25,7 +25,8 @@
             vm.labels = {};
 
             // TODO: implement
-            vm.totalPages = 25;
+            vm.itemsPerPage = 10;
+            vm.totalPages = 10;
             vm.currentPage = 1;
 
             // find the current version for invariant nodes
@@ -72,16 +73,21 @@
 
         function changeVersion(version) {
 
-            if(version && version.versionId) {
+            if (vm.previousVersion && version && vm.previousVersion.versionId === version.versionId) {
+                vm.previousVersion = null;
+                vm.diff = null;
+                return;
+            }
 
+            if (version && version.versionId) {
                 vm.loadingDiff = true;
-
                 const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
                 contentResource.getRollbackVersion(version.versionId, culture)
                     .then(function(data) {
                         vm.previousVersion = data;
                         vm.previousVersion.versionId = version.versionId;
+                        vm.previousVersion.displayValue = version.displayValue;
                         createDiff(vm.currentVersion, vm.previousVersion);
 
                         vm.loadingDiff = false;
@@ -208,7 +214,12 @@
 
         // TODO: implement
         function pinVersion (version) {
-            console.log('PIN VERSION', version);
+            version.pinningState = 'busy';
+
+            $timeout(() => {
+                version.pinningState = 'init';
+                version.isPinned = !version.isPinned;
+            }, 2000);
         }
 
         // TODO: implement
