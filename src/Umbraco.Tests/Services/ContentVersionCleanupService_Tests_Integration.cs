@@ -28,6 +28,11 @@ namespace Umbraco.Tests.Services
             // With 11M Property data
 
             var contentTypeA = MockedContentTypes.CreateSimpleContentType("contentTypeA", "contentTypeA");
+            // Kill all historic
+            contentTypeA.HistoryCleanup.PreventCleanup = false;
+            contentTypeA.HistoryCleanup.KeepAllVersionsNewerThanDays = 0;
+            contentTypeA.HistoryCleanup.KeepLatestVersionPerDayForDays = 0;
+
             ServiceContext.FileService.SaveTemplate(contentTypeA.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentTypeA);
 
@@ -44,8 +49,7 @@ namespace Umbraco.Tests.Services
             Debug.Assert(before.ContentVersions == 12); // 10 historic + current draft + current published
             Debug.Assert(before.PropertyData == 12 * 3); // CreateSimpleContentType = 3 props
 
-            // Kill all historic
-            InsertCleanupPolicy(contentTypeA, 0, 0);
+
 
             ((IContentVersionService)ServiceContext.ContentService).PerformContentVersionCleanup(DateTime.Now.AddHours(1));
 
