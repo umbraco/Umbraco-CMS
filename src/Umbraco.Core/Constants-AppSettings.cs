@@ -157,9 +157,9 @@ namespace Umbraco.Core
             public const string SqlWriteLockTimeOut = "Umbraco.Core.SqlWriteLockTimeOut";
 
             /// <summary>
-            /// A boolean value representing if the Tiny MCE security patches should be applied
+            /// A boolean value to prevent low privilege backoffice users from attempting to execute an XSS attacks
             /// </summary>
-            public const string ApplyMceSecurityPatches = "Umbraco.Web.MCE.ApplyMceSecurityPatches";
+            public const string SanitizeTinyMce = "Umbraco.Web.MCE.SanitizeTinyMce";
         }
     }
 }

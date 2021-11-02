@@ -396,18 +396,18 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// A boolean value defining if TinyMCE security patches should be applied or not
+        /// A boolean value to prevent low privilege backoffice users from attempting to execute an XSS attacks
         /// </summary>
         /// <remarks>
         /// The default value is false
         /// </remarks>
-        public bool ApplyMceSecurityPatches
+        public bool SanitizeTinyMce
         {
             get
             {
                 try
                 {
-                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.ApplyMceSecurityPatches]);
+                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.SanitizeTinyMce]);
                 }
                 catch
                 {

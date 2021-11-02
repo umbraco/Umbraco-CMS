@@ -1498,9 +1498,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 }
 
-                if(Umbraco.Sys.ServerVariables.umbracoSettings.applyMceSecurityPatches === true){
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
                     /** prevent injecting arbitrary JavaScript execution in on-attributes. */
-                    var allNodes =  Array.prototype.slice.call(args.editor.dom.doc.getElementsByTagName("*"));
+                    const allNodes = Array.prototype.slice.call(args.editor.dom.doc.getElementsByTagName("*"));
                     allNodes.forEach(node => {
                         for (var i = 0; i < node.attributes.length; i++) {
                             if(node.attributes[i].name.indexOf("on") === 0) {
@@ -1525,8 +1525,8 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 /** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
                  * https://github.com/advisories/GHSA-w7jx-j77m-wp65
                  * https://github.com/advisories/GHSA-5vm8-hhgr-jcjp
-                */
-                var uriAttributesToSanitize = ['src','href','data','background','action','formaction','poster','xlink:href'];
+                 */
+                const uriAttributesToSanitize = ['src', 'href', 'data', 'background', 'action', 'formaction', 'poster', 'xlink:href'];
                 const parseUri = function() {
                     // Encapsulated JS logic.
                     const safeSvgDataUrlElements = [ 'img', 'video' ];
@@ -1534,9 +1534,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     const trimRegExp = /[\s\u0000-\u001F]+/g;
                     const isInvalidUri = (uri, tagName) => {
                         if (/^data:image\//i.test(uri)) {
-                        return safeSvgDataUrlElements.indexOf(tagName) !== -1 && /^data:image\/svg\+xml/i.test(uri);
+                            return safeSvgDataUrlElements.indexOf(tagName) !== -1 && /^data:image\/svg\+xml/i.test(uri);
                         } else {
-                        return /^data:/i.test(uri);
+                            return /^data:/i.test(uri);
                         }
                     };
 
@@ -1553,14 +1553,16 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         if (scriptUriRegExp.test(uri)) {
                             return;
                         }
+
                         if (isInvalidUri(uri, tagName)) {
                             return;
                         }
+
                         return uri;
                     }
                 }();
 
-                if(Umbraco.Sys.ServerVariables.umbracoSettings.applyMceSecurityPatches === true){
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
                     args.editor.serializer.addAttributeFilter(uriAttributesToSanitize, function (nodes) {
                         nodes.forEach(function(node) {
                             node.attributes.forEach(function(attr) {
