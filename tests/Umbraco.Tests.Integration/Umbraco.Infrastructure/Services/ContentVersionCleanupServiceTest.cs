@@ -38,6 +38,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             FileService.SaveTemplate(template);
 
             ContentType contentTypeA = ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
+            // Kill all historic
+            contentTypeA.HistoryCleanup.PreventCleanup = false;
+            contentTypeA.HistoryCleanup.KeepAllVersionsNewerThanDays = 0;
+            contentTypeA.HistoryCleanup.KeepLatestVersionPerDayForDays = 0;
+
+
             ContentTypeService.Save(contentTypeA);
 
             Content content = ContentBuilder.CreateSimpleContent(contentTypeA);
@@ -52,9 +58,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Debug.Assert(before.ContentVersions == 12); // 10 historic + current draft + current published
             Debug.Assert(before.PropertyData == 12 * 3); // CreateSimpleContentType = 3 props
-
-            // Kill all historic
-            InsertCleanupPolicy(contentTypeA, 0, 0);
 
             ContentVersionService.PerformContentVersionCleanup(DateTime.Now.AddHours(1));
 
