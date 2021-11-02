@@ -8,8 +8,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
     public class ContentVersionCleanupPolicySettings
     {
         private const bool StaticEnableCleanup = false;
-        private const int StaticKeepAllVersionsNewerThanDays = 2;
-        private const int StaticKeepLatestVersionPerDayForDays = 30;
+        private const int StaticKeepAllVersionsNewerThanDays = 7;
+        private const int StaticKeepLatestVersionPerDayForDays = 90;
 
         /// <summary>
         /// Gets or sets a value indicating whether or not the cleanup job should be executed.
