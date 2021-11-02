@@ -1396,6 +1396,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
     <key alias="view">View</key>
+    <key alias="pagination"><![CDATA[Showing version %0% to %1% of %2% versions]]></key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Edit script file</key>

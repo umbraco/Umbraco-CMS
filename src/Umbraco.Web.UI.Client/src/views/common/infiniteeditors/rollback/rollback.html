@@ -20,7 +20,13 @@
 
                 <umb-box class="side-panel">
                     <umb-box-header title="Versions">
-                        <small>Showing version {{ (vm.currentPage * vm.itemsPerPage - vm.itemsPerPage) + 1 }} to {{ vm.currentPage * vm.itemsPerPage }} of {{ vm.itemsPerPage * vm.totalPages }} versions</small>
+                        <small>
+                            <localize 
+                                key="rollback_pagination"
+                                tokens="[(vm.currentPage * vm.itemsPerPage - vm.itemsPerPage) + 1, vm.currentPage * vm.itemsPerPage, vm.itemsPerPage * vm.totalPages]"
+                                watch-tokens="true">
+                            </localize>
+                        </small>
                     </umb-box-header>
 
                     <umb-box-content>
@@ -88,7 +94,7 @@
                         <umb-empty-state
                             ng-if="!vm.diff"
                             position="center">
-                            Select version to compare
+                            <localize key="rollback_headline"></localize>
                         </umb-empty-state>
 
                         <div ng-if="vm.diff && !vm.loadingDiff" class="diff">
