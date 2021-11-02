@@ -1221,6 +1221,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 });
             });
 
+            editor.addShortcut('Ctrl+P', '', function () {
+                angularHelper.safeApply($rootScope, function () {
+                    eventsService.emit("rte.shortcut.saveAndPublish");
+                });
+            });
+
         },
 
         insertLinkInEditor: function (editor, target, anchorElm) {
@@ -1601,22 +1607,23 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //create link picker
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
 
+                entityResource.getAnchors(args.model.value).then(anchorValues => {
 
-                entityResource.getAnchors(args.model.value).then(function (anchorValues) {
-                    var linkPicker = {
+                    const linkPicker = {
                         currentTarget: currentTarget,
                         dataTypeKey: args.model.dataTypeKey,
                         ignoreUserStartNodes: args.model.config.ignoreUserStartNodes,
                         anchors: anchorValues,
-                        size: args.model.config.editor.overlayWidthSize,
-                        submit: function (model) {
+                        size: args.model.config.overlaySize,
+                        submit: model => {
                             self.insertLinkInEditor(args.editor, model.target, anchorElement);
                             editorService.close();
                         },
-                        close: function () {
+                        close: () => {
                             editorService.close();
                         }
                     };
+
                     editorService.linkPicker(linkPicker);
                 });
 

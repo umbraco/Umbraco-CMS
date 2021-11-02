@@ -14,7 +14,7 @@ namespace Umbraco.Web.PropertyEditors
         public string DefaultValue { get; set; }
 
 
-        [ConfigurationField("overlayWidthSize", "Overlay Width Size", "views/propertyeditors/multiurlpicker/multiurlpicker.prevalues.html")]
-        public string OverlayWidthSize { get; set; }
+        [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay (link picker).")]
+        public string OverlaySize { get; set; }
     }
 }

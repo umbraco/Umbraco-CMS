@@ -137,7 +137,7 @@ namespace Umbraco.Core.Persistence
             // Math.Floor(2100 / 8) = 262 record per command
             // 4168 / 262 = 15.908... = there will be 16 command in total
             // (if we have disabled db parameters, then all records will be included, in only one command)
-            var recordsPerCommand = paramsPerRecord == 0 ? int.MaxValue : Convert.ToInt32(Math.Floor(2000.00 / paramsPerRecord));
+            var recordsPerCommand = paramsPerRecord == 0 ? int.MaxValue : Convert.ToInt32(Math.Floor((double)Constants.Sql.MaxParameterCount / paramsPerRecord));
             var commandsCount = Convert.ToInt32(Math.Ceiling((double)records.Length / recordsPerCommand));
 
             var commands = new IDbCommand[commandsCount];

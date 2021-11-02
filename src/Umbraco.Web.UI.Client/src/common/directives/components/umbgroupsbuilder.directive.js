@@ -534,6 +534,8 @@
 
                 scope.openTabAlias = tab.alias;
 
+                notifyChanged();
+
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
                 scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
             };
@@ -570,6 +572,8 @@
                             });
 
                             scope.$broadcast('umbOverflowChecker.checkOverflow');
+
+                            notifyChanged();
 
                             overlayService.close();
                         }
@@ -712,6 +716,8 @@
                 scope.model.groups = [...scope.model.groups, group];
 
                 scope.activateGroup(group);
+
+                notifyChanged();
             };
 
             scope.activateGroup = selectedGroup => {
@@ -758,6 +764,7 @@
                             scope.model.groups.splice(index, 1);
 
                             overlayService.close();
+                            notifyChanged();
                         }
                     });
                 });
@@ -926,12 +933,12 @@
                 }
             };
 
-            scope.deleteProperty = (properties, { id, label }) => {
-                const propertyName = label || "";
+            scope.deleteProperty = (properties, property) => {
+                const propertyName = property.label || "";
 
                 const localizeMany = localizationService.localizeMany(['general_delete']);
-                const localize =  localizationService.localize('contentTypeEditor_confirmDeletePropertyMessage',  [propertyName]);
-                
+                const localize = localizationService.localize('contentTypeEditor_confirmDeletePropertyMessage', [propertyName]);
+
                 $q.all([localizeMany, localize]).then(values => {
                     const translations = values[0];
                     const message = values[1];
@@ -941,7 +948,7 @@
                         content: message,
                         submitButtonLabelKey: 'actions_delete',
                         submit: () => {
-                            const index = properties.findIndex(property => property.id === id);
+                            const index = properties.findIndex(p => property.id ? p.id === property.id : p === property);
                             properties.splice(index, 1);
                             notifyChanged();
 
@@ -1022,7 +1029,6 @@
 
                 return (result.length > 0);
             }
-
 
             eventBindings.push(scope.$watch('model', (newValue, oldValue) => {
                 if (newValue !== undefined && newValue.groups !== undefined) {

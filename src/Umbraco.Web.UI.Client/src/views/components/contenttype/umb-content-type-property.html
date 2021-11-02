@@ -28,7 +28,7 @@
 
                   <div ng-messages="propertyTypeForm.groupName.$error" show-validation-on-submit>
                       <div class="umb-validation-label" ng-message="valServerField">{{propertyTypeForm.groupName.errorMsg}}</div>
-                      <div class="umb-validation-label" ng-message="required"><localize key="contentTypeEditor_requiredLabel"></localize></div>
+                      <div class="umb-validation-label" ng-message="required"><localize key="contentTypeEditor_requiredLabel">Required label</localize></div>
                   </div>
 
               </div>
@@ -46,7 +46,7 @@
       </ng-form>
 
       <div ng-if="vm.sortable" class="flex items-center">
-          <i class="icon icon-navigation" ng-if="!vm.property.inherited" style="margin-right: 10px;"></i>
+          <umb-icon icon="icon-navigation" class="icon" ng-if="!vm.property.inherited" style="margin-right: 10px;"></umb-icon>
           <span class="umb-group-builder__property-meta-label">{{ vm.property.label }}</span>
           <span class="umb-group-builder__property-meta-alias" style="margin-bottom: 0; margin-left: 5px; margin-top: 1px;">({{ vm.property.alias }})</span>
           <input name="propertySortOrder" type="number" class="umb-group-builder__group-sort-value umb-property-editor-tiny" ng-model="vm.property.sortOrder" ng-disabled="vm.property.inherited" ng-blur="vm.changeSortOrderValue()" />
@@ -61,37 +61,37 @@
 
           <span class="umb-group-builder__property-tag -white">
               <span ng-if="vm.property.dataTypeName !== undefined">{{vm.property.dataTypeName}}</span>
-              <span ng-if="vm.property.dataTypeName == undefined"><localize key="general_preview"></localize></span>
+              <span ng-if="vm.property.dataTypeName == undefined"><localize key="general_preview">Preview</localize></span>
           </span>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.validation.mandatory">
-              <i class="umb-group-builder__property-tag-icon">*</i>
-              <localize key="general_mandatory"></localize>
+              <span class="umb-group-builder__property-tag-icon">*</span>
+              <localize key="general_mandatory">Mandatory</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.showOnMemberProfile">
-              <i class="icon-eye umb-group-builder__property-tag-icon"></i>
-              <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+              <umb-icon icon="icon-eye" class="umb-group-builder__property-tag-icon"></umb-icon>
+              <localize key="contentTypeEditor_showOnMemberProfile">Show on member profile</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.memberCanEdit">
-              <i class="icon-edit umb-group-builder__property-tag-icon"></i>
-              <localize key="contentTypeEditor_memberCanEdit"></localize>
+              <umb-icon icon="icon-edit" class="umb-group-builder__property-tag-icon"></umb-icon>
+              <localize key="contentTypeEditor_memberCanEdit">Member can edit</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.isSensitiveData">
-              <i class="icon-lock umb-group-builder__property-tag-icon"></i>
-              <localize key="contentTypeEditor_isSensitiveData"></localize>
+              <umb-icon icon="icon-lock" class="umb-group-builder__property-tag-icon"></umb-icon>
+              <localize key="contentTypeEditor_isSensitiveData">Is sensitive data</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.allowCultureVariant">
-              <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
-              <localize key="contentTypeEditor_cultureVariantLabel"></localize>
+              <umb-icon icon="icon-shuffle" class="umb-group-builder__property-tag-icon"></umb-icon>
+              <localize key="contentTypeEditor_cultureVariantLabel">Vary by culture</localize>
           </div>
 
           <div class="umb-group-builder__property-tag -white" ng-if="vm.property.allowSegmentVariant">
-              <i class="icon-shuffle umb-group-builder__property-tag-icon"></i>
-              <localize key="contentTypeEditor_segmentVariantLabel"></localize>
+              <umb-icon icon="icon-shuffle" class="umb-group-builder__property-tag-icon"></umb-icon>
+              <localize key="contentTypeEditor_segmentVariantLabel">Vary by segments</localize>
           </div>
 
       </div>
@@ -99,14 +99,14 @@
       <div class="umb-group-builder__property-tags -right">
 
           <div class="umb-group-builder__property-tag" ng-if="vm.property.inherited">
-              <umb-icon icon="icon-merge" class="icon-merge"></umb-icon>
-              <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom"></localize></span>
+              <umb-icon icon="icon-merge"></umb-icon>
+              <span style="margin-right: 3px"><localize key="contentTypeEditor_inheritedFrom">Inherited from</localize></span>
               {{vm.property.contentTypeName}}
           </div>
 
           <div class="umb-group-builder__property-tag" ng-if="vm.property.locked">
-              <umb-icon icon="icon-lock" class="icon-lock"></umb-icon>
-              <localize key="general_locked"></localize>
+              <umb-icon icon="icon-lock"></umb-icon>
+              <localize key="general_locked">Locked</localize>
           </div>
 
       </div>
@@ -119,7 +119,7 @@
           </umb-property-editor>
       </ng-form>
 
-      <button aria-label="Open settings" class="umb-group-builder__open-settings" ng-if="!vm.property.inherited && !vm.property.locked" ng-click="vm.edit()"></button>
+      <button type="button" aria-label="Open settings" class="umb-group-builder__open-settings" ng-if="!vm.property.inherited && !vm.property.locked" ng-click="vm.edit()"></button>
 
   </div>
 
@@ -130,15 +130,15 @@
 
           <!-- settings for property -->
           <div class="umb-group-builder__property-action">
-              <button aria-label="Open settings" class="btn-icon" ng-click="vm.edit()" localize="title" title="@general_edit">
-                  <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
+              <button type="button" aria-label="Open settings" class="btn-icon" ng-click="vm.edit()" localize="title" title="@general_edit">
+                  <umb-icon icon="icon-settings"></umb-icon>
               </button>
           </div>
 
           <!-- delete property -->
           <div ng-if="!vm.property.locked" class="umb-group-builder__property-action">
-              <button aria-label="Delete property" class="btn-icon" ng-click="vm.remove()">
-                  <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
+              <button type="button" aria-label="Delete property" class="btn-icon" ng-click="vm.remove()">
+                  <umb-icon icon="icon-trash"></umb-icon>
               </button>
           </div>
 

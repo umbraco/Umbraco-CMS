@@ -236,6 +236,50 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Get entity URLs by UDIs
+        /// </summary>
+        /// <param name="udis">
+        /// A list of UDIs to lookup items by
+        /// </param>
+        /// <param name="culture">The culture to fetch the URL for</param>
+        /// <returns>Dictionary mapping Udi -> Url</returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids.
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        public IDictionary<Udi, string> GetUrlsByUdis([FromJsonPath] Udi[] udis, string culture = null)
+        {
+            if (udis == null || udis.Length == 0)
+            {
+                return new Dictionary<Udi, string>();
+            }
+
+            // TODO: PMJ 2021-09-27 - Should GetUrl(Udi) exist as an extension method on UrlProvider/IUrlProvider (in v9)
+            string MediaOrDocumentUrl(Udi udi)
+            {
+                if (udi is not GuidUdi guidUdi)
+                {
+                    return null;
+                }
+
+                return guidUdi.EntityType switch
+                {
+                    Constants.UdiEntityType.Document => UmbracoContext.UrlProvider.GetUrl(guidUdi.Guid, culture: culture ?? ClientCulture()),
+                    // NOTE: If culture is passed here we get an empty string rather than a media item URL WAT
+                    Constants.UdiEntityType.Media => UmbracoContext.UrlProvider.GetMediaUrl(guidUdi.Guid, culture: null),
+                    _ => null
+                };
+            }
+
+            return udis
+                .Select(udi => new {
+                    Udi = udi,
+                    Url = MediaOrDocumentUrl(udi)
+                }).ToDictionary(x => x.Udi, x => x.Url);
+        }
+
+        /// <summary>
         /// Gets the URL of an entity
         /// </summary>
         /// <param name="id">Int id of the entity to fetch URL for</param>
@@ -953,6 +997,15 @@ namespace Umbraco.Web.Editors
 
                 case UmbracoEntityTypes.Macro:
 
+                case UmbracoEntityTypes.Template:
+                    var template = Services.FileService.GetTemplate(key);
+                    if (template is null)
+                    {
+                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                    }
+
+                    return Mapper.Map<ITemplate, EntityBasic>(template);
+
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
             }
@@ -984,6 +1037,15 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.User:
 
                 case UmbracoEntityTypes.Macro:
+
+                case UmbracoEntityTypes.Template:
+                    var template = Services.FileService.GetTemplate(id);
+                    if (template is null)
+                    {
+                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                    }
+
+                    return Mapper.Map<ITemplate, EntityBasic>(template);
 
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);

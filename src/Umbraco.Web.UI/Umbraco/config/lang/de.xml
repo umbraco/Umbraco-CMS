@@ -294,8 +294,8 @@
     <key alias="createEmpty">Neues Element anlegen</key>
     <key alias="createFromClipboard">Aus der Zwischenablage einfügen</key>
   </area>
-  <area alias="blueprints">
-    <key alias="createBlueprintFrom">Erzeuge eine neue Inhaltsvorlage von '%0%'</key>
+    <area alias="blueprints">
+    <key alias="createBlueprintFrom"><![CDATA[Erzeuge eine neue Inhaltsvorlage von <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Leer</key>
     <key alias="selectBlueprint">Wählen Sie eine Inhaltsvorlage</key>
     <key alias="createdBlueprintHeading">Inhaltsvorlage erzeugt</key>
