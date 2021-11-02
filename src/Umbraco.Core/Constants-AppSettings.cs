@@ -159,7 +159,7 @@ namespace Umbraco.Core
             /// <summary>
             /// Returns true if TinyMCE scripting sanitization should be applied
             /// </summary>
-            public const string SanitizeTinyMce = "Umbraco.Web.MCE.SanitizeTinyMce";
+            public const string SanitizeTinyMce = "Umbraco.Web.SanitizeTinyMce";
         }
     }
 }
