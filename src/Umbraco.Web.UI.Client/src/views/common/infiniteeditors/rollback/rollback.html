@@ -32,9 +32,9 @@
                     <umb-box-content>
 
                         <div ng-if="model.node.variants.length > 1">
-                            <h5><localize key="general_language">Language</localize></h5>
+                            <h5 class="mt0"><localize key="general_language">Language</localize></h5>
                             <select
-                                class="input-block-level"
+                                class="culture-select input-block-level"
                                 ng-model="vm.selectedLanguage"
                                 ng-options="variant as variant.displayName for variant in model.node.variants track by variant.language.culture"
                                 ng-change="vm.changeLanguage(vm.selectedLanguage)">
@@ -42,7 +42,7 @@
                         </div>
 
                         <div>
-                            <div class="mb3">
+                            <div class="current-version">
                                 <span class="bold"><localize key="rollback_currentVersion">Current version</localize>: </span>
                                 <span>{{vm.currentVersion.name}} (<localize key="rollback_created">Created</localize>: {{vm.currentVersion.createDate}})</span>
                             </div>
