@@ -1226,6 +1226,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 });
             });
 
+            editor.addShortcut('Ctrl+P', '', function () {
+                angularHelper.safeApply($rootScope, function () {
+                    eventsService.emit("rte.shortcut.saveAndPublish");
+                });
+            });
+
         },
 
         insertLinkInEditor: function (editor, target, anchorElm) {
@@ -1496,6 +1502,19 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     });
 
                 }
+
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
+                    /** prevent injecting arbitrary JavaScript execution in on-attributes. */
+                    const allNodes = Array.prototype.slice.call(args.editor.dom.doc.getElementsByTagName("*"));
+                    allNodes.forEach(node => {
+                        for (var i = 0; i < node.attributes.length; i++) {
+                            if(node.attributes[i].name.indexOf("on") === 0) {
+                                node.removeAttribute(node.attributes[i].name)
+                            }
+                        }
+                    });
+                }
+
             });
 
             args.editor.on('init', function (e) {
@@ -1506,6 +1525,60 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 //enable browser based spell checking
                 args.editor.getBody().setAttribute('spellcheck', true);
+
+
+                /** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
+                 * https://github.com/advisories/GHSA-w7jx-j77m-wp65
+                 * https://github.com/advisories/GHSA-5vm8-hhgr-jcjp
+                 */
+                const uriAttributesToSanitize = ['src', 'href', 'data', 'background', 'action', 'formaction', 'poster', 'xlink:href'];
+                const parseUri = function() {
+                    // Encapsulated JS logic.
+                    const safeSvgDataUrlElements = [ 'img', 'video' ];
+                    const scriptUriRegExp = /((java|vb)script|mhtml):/i;
+                    const trimRegExp = /[\s\u0000-\u001F]+/g;
+                    const isInvalidUri = (uri, tagName) => {
+                        if (/^data:image\//i.test(uri)) {
+                            return safeSvgDataUrlElements.indexOf(tagName) !== -1 && /^data:image\/svg\+xml/i.test(uri);
+                        } else {
+                            return /^data:/i.test(uri);
+                        }
+                    };
+
+                    return function parseUri(uri, tagName) {
+                        uri = uri.replace(trimRegExp, '');
+                        try {
+                            // Might throw malformed URI sequence
+                            uri = decodeURIComponent(uri);
+                        } catch (ex) {
+                            // Fallback to non UTF-8 decoder
+                            uri = unescape(uri);
+                        }
+
+                        if (scriptUriRegExp.test(uri)) {
+                            return;
+                        }
+
+                        if (isInvalidUri(uri, tagName)) {
+                            return;
+                        }
+
+                        return uri;
+                    }
+                }();
+
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
+                    args.editor.serializer.addAttributeFilter(uriAttributesToSanitize, function (nodes) {
+                        nodes.forEach(function(node) {
+                            node.attributes.forEach(function(attr) {
+                                const attrName = attr.name.toLowerCase();
+                                if(uriAttributesToSanitize.indexOf(attrName) !== -1) {
+                                    attr.value = parseUri(attr.value, node.name);
+                                }
+                            });
+                        });
+                    });
+                }
 
                 //start watching the value
                 startWatch();

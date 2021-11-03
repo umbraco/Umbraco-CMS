@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var allowedSections = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.AllowedSections.ToArray();
 
             foreach (KeyValuePair<string, SearchableApplicationTree> searchableTree in _searchableTreeCollection
-                .SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
+                         .SearchableApplicationTrees.OrderBy(t => t.Value.SortOrder))
             {
                 if (allowedSections.Contains(searchableTree.Value.AppAlias))
                 {
@@ -1026,6 +1026,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 case UmbracoEntityTypes.Macro:
 
+                case UmbracoEntityTypes.Template:
+                    ITemplate template = _fileService.GetTemplate(key);
+                    if (template is null)
+                    {
+                        return NotFound();
+                    }
+
+                    return _umbracoMapper.Map<ITemplate, EntityBasic>(template);
+
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) +
                                                     " does not currently support data for the type " + entityType);
@@ -1058,6 +1067,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case UmbracoEntityTypes.User:
 
                 case UmbracoEntityTypes.Macro:
+
+                case UmbracoEntityTypes.Template:
+                    ITemplate template = _fileService.GetTemplate(id);
+                    if (template is null)
+                    {
+                        return NotFound();
+                    }
+
+                    return _umbracoMapper.Map<ITemplate, EntityBasic>(template);
 
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) +
@@ -1429,7 +1447,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var list = new List<EntityBasic>();
 
             foreach (IDictionaryItem dictionaryItem in _localizationService.GetRootDictionaryItems()
-                .OrderBy(DictionaryItemSort()))
+                         .OrderBy(DictionaryItemSort()))
             {
                 EntityBasic item = _umbracoMapper.Map<IDictionaryItem, EntityBasic>(dictionaryItem);
                 list.Add(item);
@@ -1444,7 +1462,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private void GetChildItemsForList(IDictionaryItem dictionaryItem, ICollection<EntityBasic> list)
         {
             foreach (IDictionaryItem childItem in _localizationService.GetDictionaryItemChildren(dictionaryItem.Key)
-                .OrderBy(DictionaryItemSort()))
+                         .OrderBy(DictionaryItemSort()))
             {
                 EntityBasic item = _umbracoMapper.Map<IDictionaryItem, EntityBasic>(childItem);
                 list.Add(item);

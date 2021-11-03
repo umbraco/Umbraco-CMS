@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Collections
         public void Queue()
         {
             var sq = new StackQueue<int>();
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 sq.Enqueue(i);
             }
@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Collections
         public void Stack()
         {
             var sq = new StackQueue<int>();
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 sq.Push(i);
             }
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Collections
         public void Stack_And_Queue()
         {
             var sq = new StackQueue<int>();
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 if (i % 2 == 0)
                 {

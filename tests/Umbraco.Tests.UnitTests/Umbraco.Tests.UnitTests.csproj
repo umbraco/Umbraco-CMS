@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Umbraco.Core\Persistence\Repositories" />
     <Folder Include="umbraco\Data\TEMP\TypesCache" />
   </ItemGroup>
 
