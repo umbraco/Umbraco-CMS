@@ -19,8 +19,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configurations
             var xmlDocument = new XmlDocument();
 
             var directoryInfo = new DirectoryInfo(languageDirectoryPath);
-            Console.WriteLine("directoryInfo:" + directoryInfo);
-            Console.WriteLine("FullName:" + directoryInfo.FullName);
 
             foreach (var languageFile in directoryInfo.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
             {
