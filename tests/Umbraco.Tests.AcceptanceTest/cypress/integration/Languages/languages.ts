@@ -32,6 +32,7 @@ context('Languages', () => {
         const language2 = 'en-GB';
         cy.umbracoEnsureLanguageCultureNotExists(language1);
         cy.umbracoEnsureLanguageCultureNotExists(language2);
+
         cy.umbracoCreateLanguage(language1, true, '1');
         cy.umbracoCreateLanguage(language2, true, '1');
         cy.umbracoSection('settings');
