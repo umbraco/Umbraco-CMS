@@ -11,12 +11,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configurations
     public class LanguageXmlTests
     {
         [Test]
+        [Platform("Win")] //TODO figure out why Path.GetFullPath("/mnt/c/...") is not considered an absolute path on linux + mac
         public void Can_Load_Language_Xml_Files()
         {
-            var languageDirectory = GetLanguageDirectory();
+            var languageDirectoryPath = GetLanguageDirectory();
             var readFilesCount = 0;
             var xmlDocument = new XmlDocument();
-            foreach (var languageFile in languageDirectory.EnumerateFiles("*.xml"))
+
+            var directoryInfo = new DirectoryInfo(languageDirectoryPath);
+            Console.WriteLine("directoryInfo:" + directoryInfo);
+            Console.WriteLine("FullName:" + directoryInfo.FullName);
+
+            foreach (var languageFile in directoryInfo.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
             {
                 // Load will throw an exception if the XML isn't valid.
                 xmlDocument.Load(languageFile.FullName);
@@ -27,10 +33,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configurations
             Assert.AreNotEqual(0, readFilesCount);
         }
 
-        private static DirectoryInfo GetLanguageDirectory()
+        private static string GetLanguageDirectory()
         {
             var testDirectoryPathParts = Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory)
                 .Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
             var solutionDirectoryPathParts = testDirectoryPathParts
                 .Take(Array.IndexOf(testDirectoryPathParts, "tests"));
             var languageFolderPathParts = new List<string>(solutionDirectoryPathParts);
@@ -44,7 +51,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configurations
                 languageFolderPathParts.Insert(languageFolderPathParts.Count - additionalPathParts.Length, "src");
             }
 
-            return new DirectoryInfo(string.Join(Path.DirectorySeparatorChar.ToString(), languageFolderPathParts));
+            return string.Join(Path.DirectorySeparatorChar.ToString(), languageFolderPathParts);
         }
     }
 }
