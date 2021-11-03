@@ -282,6 +282,7 @@
       name. Use
     </key>
     <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
+    <key alias="nestedContentNoGroups">The selected element type does not contain any supported groups (tabs are not supported by this editor, either change them to groups or use the Block List editor).</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -325,6 +326,7 @@
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
+    <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
@@ -848,6 +850,7 @@
     <key alias="avatar">Avatar for</key>
     <key alias="header">Header</key>
     <key alias="systemField">system field</key>
+    <key alias="lastUpdated">Last Updated</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1168,7 +1171,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       %6%
 
       Have a nice day!
-
       Cheers from the Umbraco robot
     ]]></key>
     <key alias="mailBodyVariantSummary">The following languages have been modified %0%</key>
@@ -1912,7 +1914,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       http://%3%
 
       Have a nice day!
-
       Cheers from the Umbraco robot
     ]]></key>
     <key alias="noTranslators">No translator users found. Please create a translator user before you start sending
