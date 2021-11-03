@@ -43,6 +43,7 @@
     <Content Remove="umbraco/Data/**" />
     <Content Remove="umbraco/logs/**" />
     <Content Remove="umbraco/mediacache/**" />
+    <Content Remove="umbraco\UmbracoWebsite\NotFound.cshtml" />
     <Content Remove="wwwroot/Web.config" />
   </ItemGroup>
 
