@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configurations
         private static DirectoryInfo GetLanguageDirectory()
         {
             var testDirectoryPathParts = Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory)
-                .Split(new[] { Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+                .Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
             var solutionDirectoryPathParts = testDirectoryPathParts
                 .Take(Array.IndexOf(testDirectoryPathParts, "tests"));
             var languageFolderPathParts = new List<string>(solutionDirectoryPathParts);
