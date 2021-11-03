@@ -502,7 +502,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     new Mock<ILoggerFactory>().Object,
                     mockShortStringHelper,
                     globalSettings,
-                    new Mock<IHostingEnvironment>().Object)
+                    new Mock<IHostingEnvironment>().Object,
+                    new Mock<IOptionsMonitor<ContentSettings>>().Object)
             });
             var scopeProvider = Mock.Of<IScopeProvider>(x => x.CreateScope(
                 It.IsAny<IsolationLevel>(),

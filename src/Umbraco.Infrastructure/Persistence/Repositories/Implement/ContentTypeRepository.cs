@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -236,6 +236,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistNewBaseContentType(entity);
             PersistTemplates(entity, false);
+            PersistHistoryCleanup(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -289,8 +290,26 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistUpdatedBaseContentType(entity);
             PersistTemplates(entity, true);
+            PersistHistoryCleanup(entity);
 
             entity.ResetDirtyProperties();
+        }
+
+        private void PersistHistoryCleanup(IContentType entity)
+        {
+            if (entity is IContentTypeWithHistoryCleanup entityWithHistoryCleanup)
+            {
+                ContentVersionCleanupPolicyDto dto = new ContentVersionCleanupPolicyDto()
+                {
+                    ContentTypeId = entity.Id,
+                    Updated = DateTime.Now,
+                    PreventCleanup = entityWithHistoryCleanup.HistoryCleanup.PreventCleanup,
+                    KeepAllVersionsNewerThanDays = entityWithHistoryCleanup.HistoryCleanup.KeepAllVersionsNewerThanDays,
+                    KeepLatestVersionPerDayForDays = entityWithHistoryCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays
+                };
+                Database.InsertOrUpdate(dto);
+            }
+
         }
     }
 }
