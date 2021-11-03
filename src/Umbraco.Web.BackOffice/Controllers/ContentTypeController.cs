@@ -590,35 +590,43 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
                 var tempPath = Path.Combine(root,fileName);
-
-                using (var stream = System.IO.File.Create(tempPath))
+                if (Path.GetFullPath(tempPath).StartsWith(Path.GetFullPath(root)))
                 {
-                    formFile.CopyToAsync(stream).GetAwaiter().GetResult();
-                }
-
-                if (ext.InvariantEquals("udt"))
-                {
-                    model.TempFileName = Path.Combine(root, fileName);
-
-                    var xd = new XmlDocument
+                    using (var stream = System.IO.File.Create(tempPath))
                     {
-                        XmlResolver = null
-                    };
-                    xd.Load(model.TempFileName);
+                        formFile.CopyToAsync(stream).GetAwaiter().GetResult();
+                    }
 
-                    model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild.Value;
-                    model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild.Value;
+                    if (ext.InvariantEquals("udt"))
+                    {
+                        model.TempFileName = Path.Combine(root, fileName);
+
+                        var xd = new XmlDocument
+                        {
+                            XmlResolver = null
+                        };
+                        xd.Load(model.TempFileName);
+
+                        model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild.Value;
+                        model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild.Value;
+                    }
+                    else
+                    {
+                        model.Notifications.Add(new BackOfficeNotification(
+                            _localizedTextService.Localize("speechBubbles","operationFailedHeader"),
+                            _localizedTextService.Localize("media","disallowedFileType"),
+                            NotificationStyle.Warning));
+                    }
                 }
                 else
                 {
                     model.Notifications.Add(new BackOfficeNotification(
-                        _localizedTextService.Localize("speechBubbles","operationFailedHeader"),
-                        _localizedTextService.Localize("media","disallowedFileType"),
+                        _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
+                        _localizedTextService.Localize("media", "invalidFileName"),
                         NotificationStyle.Warning));
                 }
+
             }
-
-
 
             return model;
 

@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            Uri url = _hostingEnvironment.ApplicationMainUrl;
+            var url = _hostingEnvironment.ApplicationMainUrl.GetLeftPart(UriPartial.Authority);
 
             try
             {
