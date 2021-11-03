@@ -66,7 +66,7 @@
                         <umb-empty-state
                             position="center"
                             size="small">
-                            <localize key="content_noChanges"></localize>
+                            <localize key="content_noChanges">No changes have been made</localize>
                         </umb-empty-state>
                     </div>
 
@@ -168,7 +168,7 @@
                             <option value="">{{chooseLabel}}...</option>
                         </select>
                         <button type="button" ng-show="allowChangeTemplate && node.template !== null" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()">
-                            <localize key="general_open">Open</localize><span class="sr-only">&nbsp;{{node.template}} <localize key="template_template"></localize></span>
+                            <localize key="general_open">Open</localize><span class="sr-only">&nbsp;{{node.template}} <localize key="template_template">Template</localize></span>
                         </button>
                     </div>
                 </umb-control-group>
