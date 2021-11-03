@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
         public IContentService ContentService => GetRequiredService<IContentService>();
+
         public IContentVersionService ContentVersionService => GetRequiredService<IContentVersionService>();
 
         /// <remarks>
@@ -29,7 +30,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void PerformContentVersionCleanup_WithNoKeepPeriods_DeletesEverythingExceptActive()
         {
-            // For reference currently has
+            // For reference, Our currently has
             // 5000 Documents
             // With 200K Versions
             // With 11M Property data
@@ -38,11 +39,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             FileService.SaveTemplate(template);
 
             ContentType contentTypeA = ContentTypeBuilder.CreateSimpleContentType("contentTypeA", "contentTypeA", defaultTemplateId: template.Id);
+
             // Kill all historic
             contentTypeA.HistoryCleanup.PreventCleanup = false;
             contentTypeA.HistoryCleanup.KeepAllVersionsNewerThanDays = 0;
             contentTypeA.HistoryCleanup.KeepLatestVersionPerDayForDays = 0;
-
 
             ContentTypeService.Save(contentTypeA);
 

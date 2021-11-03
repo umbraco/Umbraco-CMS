@@ -261,6 +261,5 @@ namespace Umbraco.Tests.Services
                 Assert.AreEqual(6, results.Single(x => x.ContentTypeId == 2).VersionId);
             });
         }
-
     }
 }

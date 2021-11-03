@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.ContentEditing
@@ -16,7 +16,8 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [DataMember(Name = "allowedTemplates")]
         public IEnumerable<EntityBasic> AllowedTemplates { get; set; }
 
-        [DataMember(Name = "defaultTemplate")] public EntityBasic DefaultTemplate { get; set; }
+        [DataMember(Name = "defaultTemplate")]
+        public EntityBasic DefaultTemplate { get; set; }
 
         [DataMember(Name = "allowCultureVariant")]
         public bool AllowCultureVariant { get; set; }
@@ -24,8 +25,10 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         [DataMember(Name = "allowSegmentVariant")]
         public bool AllowSegmentVariant { get; set; }
 
-        [DataMember(Name = "apps")] public IEnumerable<ContentApp> ContentApps { get; set; }
+        [DataMember(Name = "apps")]
+        public IEnumerable<ContentApp> ContentApps { get; set; }
 
-        [DataMember(Name = "historyCleanup")] public HistoryCleanupViewModel HistoryCleanup { get; set; }
+        [DataMember(Name = "historyCleanup")]
+        public HistoryCleanupViewModel HistoryCleanup { get; set; }
     }
 }

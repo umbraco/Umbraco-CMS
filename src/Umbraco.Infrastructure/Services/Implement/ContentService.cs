@@ -74,19 +74,19 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
-            //Get the current copy of the node
+            // Get the current copy of the node
             IContent content = GetById(id);
 
-            //Get the version
+            // Get the version
             IContent version = GetVersion(versionId);
 
-            //Good ole null checks
+            // Good old null checks
             if (content == null || version == null || content.Trashed)
             {
                 return new OperationResult(OperationResultType.FailedCannot, evtMsgs);
             }
 
-            //Store the result of doing the save of content for the rollback
+            // Store the result of doing the save of content for the rollback
             OperationResult rollbackSaveResult;
 
             using (IScope scope = ScopeProvider.CreateScope())
@@ -98,16 +98,16 @@ namespace Umbraco.Cms.Core.Services.Implement
                     return OperationResult.Cancel(evtMsgs);
                 }
 
-                //Copy the changes from the version
+                // Copy the changes from the version
                 content.CopyFrom(version, culture);
 
-                //Save the content for the rollback
+                // Save the content for the rollback
                 rollbackSaveResult = Save(content, userId);
 
-                //Depending on the save result - is what we log & audit along with what we return
+                // Depending on the save result - is what we log & audit along with what we return
                 if (rollbackSaveResult.Success == false)
                 {
-                    //Log the error/warning
+                    // Log the error/warning
                     _logger.LogError(
                         "User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId,
                         id, versionId);
@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     scope.Notifications.Publish(
                         new ContentRolledBackNotification(content, evtMsgs).WithStateFrom(rollingBackNotification));
 
-                    //Logging & Audit message
+                    // Logging & Audit message
                     _logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'",
                         userId, id, versionId);
                     Audit(AuditType.RollBack, userId, id,
@@ -1799,6 +1799,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                             publishing &= tryPublish; //set the culture to be published
                             if (!publishing)
                             {
+                                continue;
                             }
                         }
 

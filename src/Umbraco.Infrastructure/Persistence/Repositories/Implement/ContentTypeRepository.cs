@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -305,7 +305,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     Updated = DateTime.Now,
                     PreventCleanup = entityWithHistoryCleanup.HistoryCleanup.PreventCleanup,
                     KeepAllVersionsNewerThanDays = entityWithHistoryCleanup.HistoryCleanup.KeepAllVersionsNewerThanDays,
-                    KeepLatestVersionPerDayForDays = entityWithHistoryCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays,
+                    KeepLatestVersionPerDayForDays = entityWithHistoryCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays
                 };
                 Database.InsertOrUpdate(dto);
             }

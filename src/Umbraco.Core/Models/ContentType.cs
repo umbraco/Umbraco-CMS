@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -17,9 +17,8 @@ namespace Umbraco.Cms.Core.Models
     {
         public const bool SupportsPublishingConst = true;
 
-
-        //Custom comparer for enumerable
-        private static readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new(
+        // Custom comparer for enumerable
+        private static readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new (
             (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
             templates => templates.GetHashCode());
 
@@ -88,8 +87,7 @@ namespace Umbraco.Cms.Core.Models
             get => _allowedTemplates;
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, nameof(AllowedTemplates),
-                    TemplateComparer);
+                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, nameof(AllowedTemplates), TemplateComparer);
 
                 if (_allowedTemplates.Any(x => x.Id == _defaultTemplate) == false)
                 {

@@ -139,7 +139,6 @@ namespace Umbraco.Tests.Scheduling
             mainDom.Setup(x => x.IsMainDom).Returns(true);
             serverRoleAccessor.Setup(x => x.CurrentServerRole).Returns(ServerRole.SchedulingPublisher);
 
-
             await sut.PerformExecuteAsync(null);
 
             cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Once);

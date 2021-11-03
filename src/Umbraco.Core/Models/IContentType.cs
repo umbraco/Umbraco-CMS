@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -12,7 +12,6 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         HistoryCleanup HistoryCleanup { get; set; }
     }
-
 
     /// <summary>
     ///     Defines a ContentType, which Content is based on
