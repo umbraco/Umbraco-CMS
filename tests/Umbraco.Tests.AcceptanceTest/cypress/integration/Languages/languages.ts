@@ -10,7 +10,7 @@ context('Languages', () => {
       // Setup
       const language = 'Danish';
       const culture = 'da';
-      cy.umbracoEnsureLanguageNotExists(culture);
+      cy.umbracoEnsureLanguageCultureNotExists(culture);
       cy.umbracoSection('settings');
 
       // Enter language tree and create new language
@@ -23,15 +23,15 @@ context('Languages', () => {
       cy.umbracoSuccessNotification().should('be.visible');
 
       // Cleanup
-      cy.umbracoEnsureLanguageNotExists(culture);
+      cy.umbracoEnsureLanguageCultureNotExists(culture);
     });
 
     it('Deletes language', () => {
         // Setup
         const language1 = 'da';
         const language2 = 'en-GB';
-        cy.umbracoEnsureLanguageNotExists(language1);
-        cy.umbracoEnsureLanguageNotExists(language2);
+        cy.umbracoEnsureLanguageCultureNotExists(language1);
+        cy.umbracoEnsureLanguageCultureNotExists(language2);
         cy.umbracoCreateLanguage(language1, true, '1');
         cy.umbracoCreateLanguage(language2, true, '1');
         cy.umbracoSection('settings');
@@ -52,8 +52,8 @@ context('Languages', () => {
         cy.get('tbody > tr').should('have.length', 2);        
 
         // Cleanup
-        cy.umbracoEnsureLanguageNotExists(language1);
-        cy.umbracoEnsureLanguageNotExists(language2);
+        cy.umbracoEnsureLanguageCultureNotExists(language1);
+        cy.umbracoEnsureLanguageCultureNotExists(language2);
     });
 
 }); 

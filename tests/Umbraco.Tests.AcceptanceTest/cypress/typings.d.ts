@@ -11,12 +11,12 @@ declare global {
     namespace Cypress {
         interface Chainable<Subject> {
             /**
-             * Checks to see if the language with specified name does not exist
+             * Checks to see if the language with specified culture does not exist
              * If it does it will automatically delete it
-             * @param  {string} name Name of language to delete
-             * @example cy.umbracoEnsureLanguageNotExists('Danish');
+             * @param  {string} culture Culture of language to delete
+             * @example cy.umbracoEnsureLanguageCultureNotExists('da-DK');
              */
-            umbracoEnsureLanguageNotExists: (name: string) => Chainable<void>;
+             umbracoEnsureLanguageCultureNotExists: (culture: string) => Chainable<void>;
             /**
              * Creates a language from a culture
              * @param {string} culture Culture of the language - fx "da_DK"
