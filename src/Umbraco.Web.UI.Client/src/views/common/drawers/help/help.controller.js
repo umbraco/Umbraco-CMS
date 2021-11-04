@@ -243,20 +243,23 @@
           });
 
           copyText += copyEndText;
-          //Check if copyText is only start + end text
+
+          // Check if copyText is only start + end text
           // if it is something went wrong and we will not copy to clipboard
           let emptyCopyText = copyStartText + copyEndText;
-          if(copyText !== emptyCopyText){
-            notificationsService.success(vm.labels.copySuccessStatus, vm.labels.copiedSuccessInfo );
+          if(copyText !== emptyCopyText) {
+            notificationsService.success(vm.labels.copySuccessStatus, vm.labels.copiedSuccessInfo);
             navigator.clipboard.writeText(copyText);
           }
-          else{
+          else {
             notificationsService.error(vm.labels.copyErrorStatus, vm.labels.copiedErrorInfo);
           }
         }
+
         function getPlatform() {
           return window.navigator.platform;
         }
+
         evts.push(eventsService.on("appState.tour.complete", function (event, tour) {
             tourService.getGroupedTours().then(function(groupedTours) {
                 vm.tours = groupedTours;
@@ -272,8 +275,8 @@
         });
 
         oninit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Drawers.Help", HelpDrawerController);
+
 })();
