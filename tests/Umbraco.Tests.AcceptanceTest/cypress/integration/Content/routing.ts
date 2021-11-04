@@ -7,6 +7,8 @@ import {
 context('Routing', () => {
 
     let swedishLanguageId = 0;
+    const swedishCulture = "sv";
+    const danishCulture = "da"
     const nodeName = "Root";
     const childNodeName = "Child";
     const grandChildNodeName = "Grandchild";
@@ -22,18 +24,16 @@ context('Routing', () => {
 
     function saveNewLanguages() {
         // Save Danish
-        cy.umbracoEnsureLanguageNameNotExists("Danish");
         const url = "/umbraco/backoffice/umbracoapi/language/SaveLanguage";
         const danishRequestBody = {
-            culture: "da"
+            culture: danishCulture
         }
 
         cy.umbracoApiRequest(url, "POST", danishRequestBody);
-        
+
         // Save Swedish
-        cy.umbracoEnsureLanguageNameNotExists("Swedish");
         const swedishRequestBody = {
-            culture: "sv"
+            culture: swedishCulture
         }
         cy.umbracoApiRequest(url, "POST", swedishRequestBody).then((responseBody) => {
             swedishLanguageId = responseBody["id"];
@@ -57,10 +57,14 @@ context('Routing', () => {
 
     beforeEach(() => {
         cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'));
+        cy.umbracoEnsureLanguageNotExists(danishCulture);
+        cy.umbracoEnsureLanguageNotExists(swedishCulture);
     });
 
     afterEach(() => {
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
+        cy.umbracoEnsureLanguageNotExists(danishCulture);
+        cy.umbracoEnsureLanguageNotExists(swedishCulture);
     })
 
     it('Root node published in language A, Child node published in language A', () => {
@@ -116,7 +120,7 @@ context('Routing', () => {
         cy.get('.alert-success').should('exist');
     });
 
-    
+
     it('Root node published in language A, Child node published in language B', () => {
 
         const rootDocType = new DocumentTypeBuilder()
@@ -153,7 +157,7 @@ context('Routing', () => {
                     .withSave(true)
                 .done()
                 .addVariant()
-                    .withCulture('sv')
+                    .withCulture(swedishCulture)
                     .withName("Bärn")
                     .withSave(true)
                 .done()
@@ -215,7 +219,7 @@ context('Routing', () => {
                     .withSave(true)
                 .done()
                 .addVariant()
-                    .withCulture('sv')
+                    .withCulture(swedishCulture)
                     .withName("Barn")
                     .withSave(true)
                 .done()
@@ -234,7 +238,7 @@ context('Routing', () => {
                     .withSave(true)
                 .done()
                 .addVariant()
-                    .withCulture('sv')
+                    .withCulture(swedishCulture)
                     .withName("Barnbarn")
                     .withSave(true)
                 .done()
@@ -305,7 +309,7 @@ context('Routing', () => {
                     .withSave(true)
                 .done()
                 .addVariant()
-                    .withCulture('sv')
+                    .withCulture(swedishCulture)
                     .withName("Barn")
                     .withSave(true)
                 .done()
@@ -324,12 +328,12 @@ context('Routing', () => {
                     .withSave(true)
                 .done()
                 .addVariant()
-                    .withCulture('sv')
+                    .withCulture(swedishCulture)
                     .withName("Barnbarn")
                     .withSave(true)
                 .done()
                 .addVariant()
-                    .withCulture('da')
+                    .withCulture(danishCulture)
                     .withName("Barnebarn")
                     .withSave(true)
                 .done()
