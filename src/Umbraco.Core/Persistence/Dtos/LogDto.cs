@@ -47,7 +47,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("logComment")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(4000)]
+        [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
         public string Comment { get; set; }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Dtos
         /// </summary>
         [Column("parameters")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(500)]
+        [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
         public string Parameters { get; set; }
     }
 }
