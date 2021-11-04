@@ -1395,6 +1395,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="publishWithMissingDomain">Der er ikke noget domæne konfigureret for %0%, kontakt vensligst en
       administrator, se loggen for mere information
     </key>
+    <key alias="copySuccessMessage">Dit systems information er blevet kopieret til udklipsholderen</key>
+    <key alias="cannotCopyInformation">Kunne desværre ikke kopiere dit systems information til udklipsholderen</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Tilføj style</key>

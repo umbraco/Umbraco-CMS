@@ -1572,6 +1572,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="publishWithMissingDomain">There is no domain configured for %0%, please contact an administrator, see
       log for more information
     </key>
+    <key alias="copySuccessMessage">Your system information has successfully been copied to the clipboard</key>
+    <key alias="cannotCopyInformation">Could not copy your system information to the clipboard</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>
