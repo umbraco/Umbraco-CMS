@@ -413,6 +413,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"showAllowSegmentationForDocumentTypes", false},
                         {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
                         {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
+                        {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce}
                     }
                 },
                 {

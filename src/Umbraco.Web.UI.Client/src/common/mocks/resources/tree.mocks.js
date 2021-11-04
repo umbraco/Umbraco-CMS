@@ -28,7 +28,7 @@ angular.module('umbraco.mocks').
 
               { separator: true, name: "Reload", cssclass: "refresh", alias: "users", metaData: {} },
           
-                { separator: true, name: "Empty Recycle Bin", cssclass: "trash", alias: "emptyrecyclebin", metaData: {} }
+                { separator: true, name: "Empty Recycle Bin", cssclass: "trash", alias: "emptyRecycleBin", metaData: {} }
           ];
 
           var result = {

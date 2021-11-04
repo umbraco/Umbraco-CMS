@@ -17,12 +17,12 @@
 
         <umb-empty-state ng-if="!items && options.filter.length > 0"
                          position="center">
-            <localize key="general_searchNoResult"></localize>
+            <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
         </umb-empty-state>
 
         <umb-empty-state ng-if="!items && options.filter.length == 0 && vm.isRecycleBin"
                          position="center">
-            <localize key="general_recycleBinEmpty"></localize>
+            <localize key="general_recycleBinEmpty">Your recycle bin is empty</localize>
         </umb-empty-state>
 
     </div>
@@ -69,12 +69,12 @@
 
         <umb-empty-state ng-if="vm.itemsWithoutFolders.length === 0 && folders.length === 0 && options.filter.length == 0 && vm.isRecycleBin"
                          position="center">
-            <localize key="general_recycleBinEmpty"></localize>
+            <localize key="general_recycleBinEmpty">Your recycle bin is empty</localize>
         </umb-empty-state>
 
         <umb-empty-state ng-if="vm.itemsWithoutFolders.length === 0 && folders.length === 0 && options.filter.length > 0"
                          position="center">
-            <localize key="general_searchNoResult"></localize>
+            <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
         </umb-empty-state>
 
     </div>
