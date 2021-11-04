@@ -8,11 +8,11 @@ context('Routing', () => {
 
     let swedishLanguageId = 0;
     const nodeName = "Root";
-    const childNodeName = "Child";''
-    const rootDocTypeName = "Test document type";
+    const childNodeName = "Child";
     const grandChildNodeName = "Grandchild";
+    const rootDocTypeName = "Test document type";
 
-    function refreshContentTree(){
+    function refreshContentTree() {
         // Refresh to update the tree
         cy.get('li .umb-tree-root:contains("Content")').should("be.visible").rightclick();
         cy.umbracoContextMenuAction("action-refreshNode").click();
@@ -20,8 +20,8 @@ context('Routing', () => {
         cy.get('.umb-tree-item__inner').should('exist', {timeout: 10000});
     }
 
-    function saveNewLanguages(){
-        //Save danish
+    function saveNewLanguages() {
+        // Save Danish
         cy.umbracoEnsureLanguageNameNotExists("Danish");
         const url = "/umbraco/backoffice/umbracoapi/language/SaveLanguage";
         const danishRequestBody = {
@@ -30,7 +30,7 @@ context('Routing', () => {
 
         cy.umbracoApiRequest(url, "POST", danishRequestBody);
         
-        //Save swedish
+        // Save Swedish
         cy.umbracoEnsureLanguageNameNotExists("Swedish");
         const swedishRequestBody = {
             culture: "sv"
@@ -40,8 +40,7 @@ context('Routing', () => {
         });
     }
 
-    function configureDomain(id, name, lang)
-    {
+    function configureDomain(id, name, lang) {
         //Save domain for child node
         const url = "/umbraco/backoffice/umbracoapi/content/PostSaveLanguageAndDomains"
         const body = {
@@ -104,12 +103,13 @@ context('Routing', () => {
             cy.saveContent(childContentNode);
             });
         });
+
         // Refresh to update the tree
         refreshContentTree();
 
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
-        //Popup with what cultures you want to publish shows, click popup
+        // Pop-up with what cultures you want to publish shows, click it
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Assert
@@ -162,12 +162,13 @@ context('Routing', () => {
             cy.saveContent(childContentNode);
             });
         });
+
         // Refresh to update the tree
         refreshContentTree();
 
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
-        //Popup with what cultures you want to publish shows, click popup
+        // Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').contains("Swedish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
@@ -243,27 +244,27 @@ context('Routing', () => {
                 });
             });
         });
+
         // Refresh to update the tree
         refreshContentTree();
 
-        //publish child
+        // Publish Child
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
-        //Popup with what cultures you want to publish shows, click popup
+        //Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').contains("Swedish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
-        //publish Grandchild
+        // Publish Grandchild
         cy.umbracoTreeItem("content", [nodeName, childNodeName, grandChildNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
-        //Popup with what cultures you want to publish shows, click popup
+        // Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').contains("Swedish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Assert
         cy.get('.alert-success').should('have.length', 2);
         cy.get('.alert-warning').should('not.exist');
-
     });
 
     it('Root node published in language A, Child node published in language A + B, Grandchild published in A + B + C', () => {
@@ -338,20 +339,21 @@ context('Routing', () => {
                 });
             });
         });
+
         // Refresh to update the tree
         refreshContentTree();
 
-        //publish child
+        // Publish Child
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
-        //Popup with what cultures you want to publish shows, click popup
+        // Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').contains("Swedish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
-        //publish Grandchild
+        // Publish Grandchild
         cy.umbracoTreeItem("content", [nodeName, childNodeName, grandChildNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
-        //Popup with what cultures you want to publish shows, click popup
+        // Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').contains("Swedish").click();
         cy.get('.umb-list').contains("Danish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
@@ -359,6 +361,5 @@ context('Routing', () => {
         // Assert
         cy.get('.alert-success').should('exist');
         cy.get('.alert-warning').should('exist');
-
     });
 });
