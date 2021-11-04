@@ -163,6 +163,7 @@
     <Compile Include="Models\ContentDataIntegrityReport.cs" />
     <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
     <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />
+    <Compile Include="Models\ContentEditing\HistoryCleanup.cs" />
     <Compile Include="Models\ContentVersionCleanupPolicySettings.cs" />
     <Compile Include="Models\Identity\ExternalLogin.cs" />
     <Compile Include="Models\Identity\IExternalLogin.cs" />
@@ -198,7 +199,7 @@
     <Compile Include="PropertyEditors\EyeDropperColorPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ComplexPropertyEditorContentEventHandler.cs" />
     <Compile Include="Services\IContentVersionCleanupPolicy.cs" />
-    <Compile Include="Services\IContentVersionCleanupService.cs" />
+    <Compile Include="Services\IContentVersionService.cs" />
     <Compile Include="Services\IIconService.cs" />
     <Compile Include="Services\Implement\DefaultContentVersionCleanupPolicy.cs" />
     <Compile Include="Services\Implement\InstallationService.cs" />
