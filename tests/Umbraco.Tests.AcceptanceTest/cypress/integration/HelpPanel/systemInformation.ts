@@ -36,7 +36,6 @@ context('System Information', () => {
         cy.reload();
         cy.get('.umb-tour-step', { timeout: 60000 }).should('be.visible'); // We now due to the api calls this will be shown, but slow computers can take a while
         cy.get('.umb-tour-step__close').click();
-
         openSystemInformation();
         //Assert
         cy.contains('Current Culture').parent().should('contain', 'da-DK');
