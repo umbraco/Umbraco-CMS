@@ -403,6 +403,7 @@
     <key alias="anchorInsert">Nom</key>
     <key alias="closeThisWindow">Fermer cette fenêtre</key>
     <key alias="confirmdelete">Êtes-vous certain(e) de vouloir supprimer</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Êtes-vous certain(e) de vouloir supprimer <b>%0%</b> des <b>%1%</b> éléments]]></key>
     <key alias="confirmdisable">Êtes-vous certain(e) de vouloir désactiver</key>
     <key alias="confirmlogout">Êtes-vous certain(e)?</key>
     <key alias="confirmSure">Êtes-vous certain(e)?</key>

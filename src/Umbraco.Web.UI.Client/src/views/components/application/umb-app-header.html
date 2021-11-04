@@ -10,7 +10,7 @@
         <div class="flex items-center">
             <ul class="umb-app-header__actions">
                 <li data-element="global-search" class="umb-app-header__action">
-                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+space" ng-click="searchClick()" ng-mousedown="rememberFocus()">
+                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+space" ng-click="searchClick()" ng-mousedown="rememberFocus()" localize="title" title="@general_search">
                         <span class="sr-only">
                             <localize key="visuallyHiddenTexts_openBackofficeSearch">Open backoffice search</localize>...
                         </span>
@@ -18,7 +18,7 @@
                     </button>
                 </li>
                 <li data-element="global-help" class="umb-app-header__action">
-                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+shift+h" ng-click="helpClick()">
+                    <button type="button" class="umb-app-header__button btn-reset" hotkey="ctrl+shift+h" ng-click="helpClick()" localize="title" title="@general_help">
                         <span class="sr-only">
                             <localize key="visuallyHiddenTexts_openCloseBackofficeHelp">Open/Close backoffice help</localize>...
                         </span>
