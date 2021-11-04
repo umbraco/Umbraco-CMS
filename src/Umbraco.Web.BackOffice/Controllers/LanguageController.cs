@@ -9,8 +9,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.BackOffice.Extensions;
-using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -23,7 +21,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     /// Backoffice controller supporting the dashboard for language administration.
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-    //[PrefixlessBodyModelValidator]
     public class LanguageController : UmbracoAuthorizedJsonController
     {
         private readonly ILocalizationService _localizationService;
@@ -51,10 +48,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // (see notes in Language class about culture info names)
             // TODO: Fix this requirement, see https://github.com/umbraco/Umbraco-CMS/issues/3623
             return CultureInfo.GetCultures(CultureTypes.AllCultures)
-                .Where(x => !x.Name.IsNullOrWhiteSpace())
-                .Select(x => new CultureInfo(x.Name)) // important!
-                .OrderBy(x => x.EnglishName)
-                .ToDictionary(x => x.Name, x => x.EnglishName);
+                                   .Select(x=>x.Name)
+                                   .Distinct()
+                                   .Where(x => !x.IsNullOrWhiteSpace())
+                                   .Select(x => new CultureInfo(x)) // important!
+                                   .OrderBy(x => x.EnglishName)
+                                   .ToDictionary(x => x.Name, x => x.EnglishName);
         }
 
         /// <summary>

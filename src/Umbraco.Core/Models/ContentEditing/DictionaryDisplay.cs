@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -17,7 +17,6 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         {
             Notifications = new List<BackOfficeNotification>();
             Translations = new List<DictionaryTranslationDisplay>();
-            ContentApps = new List<ContentApp>();
         }
 
         /// <inheritdoc />
@@ -38,11 +37,5 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "translations")]
         public List<DictionaryTranslationDisplay> Translations { get; private set; }
-
-        /// <summary>
-        /// Apps for the dictionary item
-        /// </summary>
-        [DataMember(Name = "apps")]
-        public List<ContentApp> ContentApps { get; private set; }
     }
 }

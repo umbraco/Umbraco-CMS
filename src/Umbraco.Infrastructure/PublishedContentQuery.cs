@@ -295,7 +295,7 @@ namespace Umbraco.Cms.Infrastructure
             totalRecords = results.TotalItemCount;
 
             return new CultureContextualSearchResults(
-                results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor,
+                results.ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor,
                 culture);
         }
 
@@ -324,7 +324,7 @@ namespace Umbraco.Cms.Infrastructure
 
             totalRecords = results.TotalItemCount;
 
-            return results.Skip(skip).ToPublishedSearchResults(_publishedSnapshot);
+            return results.ToPublishedSearchResults(_publishedSnapshot);
         }
 
         /// <summary>

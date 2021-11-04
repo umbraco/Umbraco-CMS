@@ -6,90 +6,104 @@
  * @description
  * The controller for the doc type creation dialog
  */
-function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService, localizationService, iconHelper) {
+function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState) {
 
-    $scope.model = {
-        allowCreateFolder: $scope.currentNode.parentId === null || $scope.currentNode.nodeType === "container",
-        folderName: "",
-        creatingFolder: false
-    };
+  $scope.model = {
+    allowCreateFolder: $scope.currentNode.parentId === null || $scope.currentNode.nodeType === 'container',
+    folderName: '',
+    creatingFolder: false
+  };
 
-    var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
-    $scope.model.disableTemplates = disableTemplates;
+  var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
+  $scope.model.disableTemplates = disableTemplates;
 
-    var node = $scope.currentNode;
+  var node = $scope.currentNode;
 
-    $scope.showCreateFolder = function () {
-        $scope.model.creatingFolder = true;
-    };
+  $scope.showCreateFolder = function () {
+    $scope.model.creatingFolder = true;
+  };
 
-    $scope.createContainer = function () {
+  $scope.createContainer = function () {
 
-        if (formHelper.submitForm({ scope: $scope, formCtrl: $scope.createFolderForm })) {
+    if (formHelper.submitForm({scope: $scope, formCtrl: $scope.createFolderForm})) {
 
-            contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
+      contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
-                navigationService.hideMenu();
+        navigationService.hideMenu();
 
-                var currPath = node.path ? node.path : "-1";
+        var currPath = node.path ? node.path : '-1';
 
-                navigationService.syncTree({
-                    tree: "documentTypes",
-                    path: currPath + "," + folderId,
-                    forceReload: true,
-                    activate: true
-                });
+        navigationService.syncTree({
+          tree: 'documentTypes',
+          path: currPath + ',' + folderId,
+          forceReload: true,
+          activate: true
+        });
 
-                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm });
+        formHelper.resetForm({scope: $scope, formCtrl: $scope.createFolderForm});
 
-                var section = appState.getSectionState("currentSection");
+        var section = appState.getSectionState('currentSection');
 
-            }, function (err) {
+      }, function (err) {
 
-                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createFolderForm, hasErrors: true });
-                $scope.error = err;
+        formHelper.resetForm({scope: $scope, formCtrl: $scope.createFolderForm, hasErrors: true});
+        $scope.error = err;
 
-            });
-        }
-    };
+      });
+    }
+  };
 
-    // Disabling logic for creating document type with template if disableTemplates is set to true
-    if (!disableTemplates) {
-        $scope.createDocType = function () {
-            $location.search('create', null);
-            $location.search('notemplate', null);
-            $location.path("/settings/documentTypes/edit/" + node.id).search("create", "true");
-            navigationService.hideMenu();
-        };
+  function createDocType(config) {
+
+    $location.search('create', null);
+    $location.search('notemplate', null);
+    $location.search('iscomposition', null);
+    $location.search('iselement', null);
+    $location.search('icon', null);
+
+    var icon = null;
+
+    if (config.icon != undefined && config.icon != null) {
+      icon = config.icon;
+      if (config.color) {
+        icon += ' ' + config.color;
+      }
     }
 
-    $scope.createComponent = function () {
-        $location.search('create', null);
-        $location.search('notemplate', null);
-        $location.path("/settings/documentTypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
-        navigationService.hideMenu();
-    };
+    $location
+      .path('/settings/documentTypes/edit/' + node.id)
+      .search('create', 'true')
+      .search('notemplate', config.notemplate ? 'true' : null)
+      .search('iscomposition', config.iscomposition ? 'true' : null)
+      .search('iselement', config.iselement ? 'true' : null)
+      .search('icon', icon);
+    navigationService.hideMenu();
+  }
 
-    $scope.createComposition = function () {
-        $location.search('create', null);
-        $location.search('notemplate', null);
-        $location.search('iscomposition', null);
-        $location.path("/settings/documentTypes/edit/" + node.id).search("create", "true").search("notemplate", "true").search("iscomposition", "true");
-        navigationService.hideMenu();
-    };
 
-    $scope.createElement = function () {
-        $location.search('create', null);
-        $location.search('notemplate', null);
-        $location.search('iselement', null);
-        $location.path("/settings/documentTypes/edit/" + node.id).search("create", "true").search("notemplate", "true").search("iselement", "true");
-        navigationService.hideMenu();
+  // Disabling logic for creating document type with template if disableTemplates is set to true
+  if (!disableTemplates) {
+    $scope.createDocType = function (icon) {
+      createDocType({icon});
     };
+  }
 
-    $scope.close = function() {
-        const showMenu = true;
-        navigationService.hideDialog(showMenu);
-    };
+  $scope.createComponent = function (icon) {
+    createDocType({notemplate: true, icon});
+  };
+
+  $scope.createComposition = function (icon) {
+    createDocType({notemplate: true, iscomposition: true, iselement: true, icon});
+  };
+
+  $scope.createElement = function (icon) {
+    createDocType({notemplate: true, iselement: true, icon});
+  };
+
+  $scope.close = function () {
+    const showMenu = true;
+    navigationService.hideDialog(showMenu);
+  };
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.DocumentTypes.CreateController", DocumentTypesCreateController);
+angular.module('umbraco').controller('Umbraco.Editors.DocumentTypes.CreateController', DocumentTypesCreateController);

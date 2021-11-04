@@ -90,7 +90,6 @@ cypress.env.json
 tests/Umbraco.Tests.AcceptanceTest/cypress/screenshots/
 tests/Umbraco.Tests.AcceptanceTest/cypress/support/chainable.ts
 tests/Umbraco.Tests.AcceptanceTest/cypress/videos/
-tests/Umbraco.Tests.AcceptanceTest/package-lock.json
 tests/Umbraco.Tests.Integration.SqlCe/DatabaseContextTests.sdf
 tests/Umbraco.Tests.Integration.SqlCe/umbraco/Data/TEMP/
 tests/Umbraco.Tests.Integration/TEMP/*

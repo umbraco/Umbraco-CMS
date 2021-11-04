@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -69,10 +69,6 @@ namespace Umbraco.Cms.Core.Manifest
                 case IContentType contentType:
                     partA = "contentType";
                     partB = contentType.Alias;
-                    break;
-                case IDictionaryItem _:
-                    partA = "dictionary";
-                    partB = "*"; //Not really a different type for dictionary items
                     break;
 
                 default:
