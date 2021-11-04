@@ -7,12 +7,14 @@ using Umbraco.Cms.Core.IO;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
 {
     [TestFixture]
-    public class ViewHelperTests
+    public class DefaultViewContentProviderTests
     {
+        private IDefaultViewContentProvider DefaultViewContentProvider => new DefaultViewContentProvider();
+
         [Test]
         public void NoOptions()
         {
-            var view = ViewHelper.GetDefaultFileContent();
+            var view = DefaultViewContentProvider.GetDefaultFileContent();
             Assert.AreEqual(
                 FixView(@"@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
@@ -24,7 +26,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
         [Test]
         public void Layout()
         {
-            var view = ViewHelper.GetDefaultFileContent(layoutPageAlias: "Dharznoik");
+            var view = DefaultViewContentProvider.GetDefaultFileContent(layoutPageAlias: "Dharznoik");
             Assert.AreEqual(
                 FixView(@"@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
@@ -36,7 +38,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
         [Test]
         public void ClassName()
         {
-            var view = ViewHelper.GetDefaultFileContent(modelClassName: "ClassName");
+            var view = DefaultViewContentProvider.GetDefaultFileContent(modelClassName: "ClassName");
             Assert.AreEqual(
                 FixView(@"@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ClassName>
@@ -48,7 +50,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
         [Test]
         public void Namespace()
         {
-            var view = ViewHelper.GetDefaultFileContent(modelNamespace: "Models");
+            var view = DefaultViewContentProvider.GetDefaultFileContent(modelNamespace: "Models");
             Assert.AreEqual(
                 FixView(@"@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
@@ -60,7 +62,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
         [Test]
         public void ClassNameAndNamespace()
         {
-            var view = ViewHelper.GetDefaultFileContent(modelClassName: "ClassName", modelNamespace: "My.Models");
+            var view = DefaultViewContentProvider.GetDefaultFileContent(modelClassName: "ClassName", modelNamespace: "My.Models");
             Assert.AreEqual(
                 FixView(@"@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.ClassName>
@@ -73,7 +75,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
         [Test]
         public void ClassNameAndNamespaceAndAlias()
         {
-            var view = ViewHelper.GetDefaultFileContent(modelClassName: "ClassName", modelNamespace: "My.Models", modelNamespaceAlias: "MyModels");
+            var view = DefaultViewContentProvider.GetDefaultFileContent(modelClassName: "ClassName", modelNamespace: "My.Models", modelNamespaceAlias: "MyModels");
             Assert.AreEqual(
                 FixView(@"@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<MyModels.ClassName>
@@ -86,7 +88,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
         [Test]
         public void Combined()
         {
-            var view = ViewHelper.GetDefaultFileContent(layoutPageAlias: "Dharznoik", modelClassName: "ClassName", modelNamespace: "My.Models", modelNamespaceAlias: "MyModels");
+            var view = DefaultViewContentProvider.GetDefaultFileContent(layoutPageAlias: "Dharznoik", modelClassName: "ClassName", modelNamespace: "My.Models", modelNamespaceAlias: "MyModels");
             Assert.AreEqual(
                 FixView(@"@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<MyModels.ClassName>

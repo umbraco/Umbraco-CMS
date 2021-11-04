@@ -13,9 +13,9 @@
     <key alias="createPackage">צור חבילה</key>
     <key alias="delete">מחק</key>
     <key alias="disable">נטרל</key>
-    <key alias="emptyrecyclebin">רוקן סל מיחזור</key>
+    <key alias="emptyRecycleBin">רוקן סל מיחזור</key>
     <key alias="exportDocumentType">ייצא סוג קובץ</key>
-    <key alias="importdocumenttype">ייבא סוג מסמך</key>
+    <key alias="importDocumentType">ייבא סוג מסמך</key>
     <key alias="importPackage">ייבא חבילה</key>
     <key alias="liveEdit">ערוך במצב "קנבס"</key>
     <key alias="logout">יציאה</key>
@@ -346,19 +346,12 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">ההתקנה לא מצליחה להתחבר לבסיס הנתונים.</key>
-    <key alias="databaseErrorWebConfig">אין אפשרות לשמור את הקובץ Web.config file. הגדר את ה- connection string באופן ידני.</key>
     <key alias="databaseFound">בסיס הנתונים שלך נמצא והוא מזוהה כ</key>
     <key alias="databaseHeader">הגדרת בסיס נתונים</key>
     <key alias="databaseInstall"><![CDATA[
       Press the <strong>install</strong> button to install the Umbraco %0% database
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the “web.config” file is correct.</p>
-              <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
-              <p>
-              Click the <strong>retry</strong> button when
-              done.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-			              More information on editing web.config here</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
         If you're installing on a local machine or server you might need information from your system administrator.]]></key>
@@ -377,7 +370,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">הסיסמה שונתה!</key>
     <key alias="greatStart">התחל מכאן, צפה בסרטוני ההדרכה עבור אומברקו</key>
-    <key alias="licenseText">על ידי לחיצה על 'הבא', הנך מאשר את פרטי התקנון כפי שמפורט בתיבת הטקטס למטה. שים לב, הפצה זו של אומברקו כוללת שני גירסאות שונות של רשיון,קוד פתוח ברשיון MIT עבור ה- framework ורשיון Umbraco freeware המכסה את ה- UI.</key>
     <key alias="None">לא הותקן עדיין.</key>
     <key alias="permissionsAffectedFolders">קבצים ותיקיות המושפעים</key>
     <key alias="permissionsAffectedFoldersMoreInfo">מידע נוסף אודות התקנה ורשאות עבור אומרקו ניתן לקרוא כאן</key>
@@ -440,8 +432,6 @@ You installed Runway, so why not see how your new website looks.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">אומברקו %0% מותקנת ומוכנה לשימוש</key>
-    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to
-        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
