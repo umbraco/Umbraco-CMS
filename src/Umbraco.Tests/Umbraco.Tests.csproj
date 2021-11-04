@@ -78,6 +78,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AutoFixture.NUnit3" Version="4.17.0" />
+    <PackageReference Include="AutoFixture.AutoMoq" Version="4.17.0" />
     <PackageReference Include="Castle.Core" Version="4.4.1" />
     <PackageReference Include="Examine" Version="1.2.0" />
     <PackageReference Include="HtmlAgilityPack">
@@ -100,10 +102,11 @@
     <PackageReference Include="Microsoft.Owin.Testing" Version="4.0.1" />
     <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
-    <PackageReference Include="Moq" Version="4.14.5" />
+    <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
@@ -151,6 +154,7 @@
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\DocumentVersionRepository_Tests_Integration.cs" />
     <Compile Include="Persistence\Repositories\EntityRepositoryTest.cs" />
     <Compile Include="PropertyEditors\BlockEditorComponentTests.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyValueConverterTests.cs" />
@@ -167,13 +171,17 @@
     <Compile Include="Routing\RoutableDocumentFilterTests.cs" />
     <Compile Include="Runtimes\StandaloneTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
+    <Compile Include="Scheduling\ContentVersionCleanup_Tests_UnitTests.cs" />
     <Compile Include="Serialization\AutoInterningStringConverterTests.cs" />
     <Compile Include="Scoping\ScopeUnitTests.cs" />
     <Compile Include="Services\AmbiguousEventTests.cs" />
     <Compile Include="Services\ContentServiceEventTests.cs" />
     <Compile Include="Services\ContentServicePublishBranchTests.cs" />
     <Compile Include="Services\ContentServiceTagsTests.cs" />
+    <Compile Include="Services\ContentVersionCleanupService_Tests_Integration.cs" />
+    <Compile Include="Services\ContentVersionCleanupService_Tests_UnitTests.cs" />
     <Compile Include="Services\ContentTypeServiceVariantsTests.cs" />
+    <Compile Include="Services\DefaultContentVersionCleanupPolicy_Tests_UnitTests.cs" />
     <Compile Include="Services\EntityXmlSerializerTests.cs" />
     <Compile Include="Packaging\CreatedPackagesRepositoryTests.cs" />
     <Compile Include="Services\ExternalLoginServiceTests.cs" />
@@ -184,6 +192,7 @@
     <Compile Include="Templates\HtmlLocalLinkParserTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\TestSyncBootStateAccessor.cs" />
+    <Compile Include="Testing\AutoMoqDataAttribute.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
