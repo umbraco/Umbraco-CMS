@@ -4,6 +4,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Net.Http;
+using System.Reflection;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,7 +25,6 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Cms.Web.UI;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
 
@@ -52,17 +52,22 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
              *
              * See https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests
              */
-            var factory = new UmbracoWebApplicationFactory<Startup>(CreateHostBuilder, BeforeHostStart);
+            var factory = new UmbracoWebApplicationFactory<UmbracoTestServerTestBase>(CreateHostBuilder, BeforeHostStart);
 
             // additional host configuration for web server integration tests
             Factory = factory.WithWebHostBuilder(builder =>
+            {
+                // Otherwise inferred as $(SolutionDir)/Umbraco.Tests.Integration (note lack of src/tests)
+                builder.UseContentRoot(Assembly.GetExecutingAssembly().GetRootDirectorySafe());
 
                 // Executes after the standard ConfigureServices method
                 builder.ConfigureTestServices(services =>
 
                     // Add a test auth scheme with a test auth handler to authn and assign the user
                     services.AddAuthentication(TestAuthHandler.TestAuthenticationScheme)
-                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { })));
+                        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.TestAuthenticationScheme, options => { }));
+            });
+
 
             Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
             {
@@ -141,7 +146,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         protected LinkGenerator LinkGenerator { get; private set; }
 
-        protected WebApplicationFactory<Startup> Factory { get; private set; }
+        protected WebApplicationFactory<UmbracoTestServerTestBase> Factory { get; private set; }
 
         public override void ConfigureServices(IServiceCollection services)
         {

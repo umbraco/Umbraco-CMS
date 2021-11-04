@@ -820,18 +820,16 @@ AND cmsContentNu.nodeId IS NULL
                     bool published = false;
                     var deserializedContent = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
 
-                    d = new ContentData
-                    {
-                        Name = dto.EditName,
-                        Published = published,
-                        TemplateId = dto.EditTemplateId,
-                        VersionId = dto.VersionId,
-                        VersionDate = dto.EditVersionDate,
-                        WriterId = dto.EditWriterId,
-                        Properties = deserializedContent.PropertyData, // TODO: We don't want to allocate empty arrays
-                        CultureInfos = deserializedContent.CultureData,
-                        UrlSegment = deserializedContent.UrlSegment
-                    };
+                    d = new ContentData(
+                        dto.EditName,
+                        deserializedContent.UrlSegment,
+                        dto.VersionId,
+                        dto.EditVersionDate,
+                        dto.EditWriterId,
+                        dto.EditTemplateId,
+                        published,
+                        deserializedContent.PropertyData,
+                        deserializedContent.CultureData);
                 }
             }
 
@@ -851,31 +849,23 @@ AND cmsContentNu.nodeId IS NULL
                     bool published = true;
                     var deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, published);
 
-                    p = new ContentData
-                    {
-                        Name = dto.PubName,
-                        UrlSegment = deserializedContent.UrlSegment,
-                        Published = published,
-                        TemplateId = dto.PubTemplateId,
-                        VersionId = dto.VersionId,
-                        VersionDate = dto.PubVersionDate,
-                        WriterId = dto.PubWriterId,
-                        Properties = deserializedContent.PropertyData, // TODO: We don't want to allocate empty arrays
-                        CultureInfos = deserializedContent.CultureData
-                    };
+                    p = new ContentData(
+                        dto.PubName,
+                        deserializedContent.UrlSegment,
+                        dto.VersionId,
+                        dto.PubVersionDate,
+                        dto.PubWriterId,
+                        dto.PubTemplateId,
+                        published,
+                        deserializedContent.PropertyData,
+                        deserializedContent.CultureData);
                 }
             }
 
             var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
-            var s = new ContentNodeKit
-            {
-                Node = n,
-                ContentTypeId = dto.ContentTypeId,
-                DraftData = d,
-                PublishedData = p
-            };
+            var s = new ContentNodeKit(n, dto.ContentTypeId, d, p);
 
             return s;
         }
@@ -888,27 +878,21 @@ AND cmsContentNu.nodeId IS NULL
             bool published = true;
             var deserializedMedia = serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
 
-            var p = new ContentData
-            {
-                Name = dto.EditName,
-                Published = published,
-                TemplateId = -1,
-                VersionId = dto.VersionId,
-                VersionDate = dto.EditVersionDate,
-                WriterId = dto.CreatorId, // what-else?
-                Properties = deserializedMedia.PropertyData, // TODO: We don't want to allocate empty arrays
-                CultureInfos = deserializedMedia.CultureData
-            };
+            var p = new ContentData(
+                dto.EditName,
+                null,
+                dto.VersionId,
+                dto.EditVersionDate,
+                dto.CreatorId,
+                -1,
+                published,
+                deserializedMedia.PropertyData,
+                deserializedMedia.CultureData);
 
             var n = new ContentNode(dto.Id, dto.Key,
                 dto.Level, dto.Path, dto.SortOrder, dto.ParentId, dto.CreateDate, dto.CreatorId);
 
-            var s = new ContentNodeKit
-            {
-                Node = n,
-                ContentTypeId = dto.ContentTypeId,
-                PublishedData = p
-            };
+            var s = new ContentNodeKit(n, dto.ContentTypeId, null, p);
 
             return s;
         }

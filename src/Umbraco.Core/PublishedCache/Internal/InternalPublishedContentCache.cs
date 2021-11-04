@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Xml;
 
 namespace Umbraco.Cms.Core.PublishedCache.Internal
 {
+    // TODO: Only used in unit tests, needs to be moved to test project
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class InternalPublishedContentCache : PublishedCacheBase, IPublishedContentCache, IPublishedMediaCache
     {
         private readonly Dictionary<int, IPublishedContent> _content = new Dictionary<int, IPublishedContent>();

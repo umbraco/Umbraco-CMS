@@ -9,27 +9,33 @@
             <h5 ng-show="selectBlueprint"><localize key="blueprints_selectBlueprint">Select a blueprint</localize></h5>
 
             <div ng-if="allowedTypes && allowedTypes.length === 0">
-                <p class="abstract" ng-if="!hasSettingsAccess"><localize key="create_noDocumentTypesWithNoSettingsAccess"></localize></p>
+                <p class="abstract" ng-if="!hasSettingsAccess">
+                    <localize key="create_noDocumentTypesWithNoSettingsAccess">The selected page in the content tree doesn't allow for any pages to be created below it.</localize>
+                </p>
                 <div ng-if="hasSettingsAccess && currentNode.id >= 0">
                     <p class="abstract">
-                        <localize key="create_noDocumentTypes"></localize>
+                        <localize key="create_noDocumentTypes">There are no allowed Document Types available for creating content here. You must enable these in <strong>Document
+                            Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node
+                            types</strong> under <strong>Permissions</strong>.</localize>
                     </p>
                     <button type="button" class="btn umb-outline" ng-click="editContentType()">
-                        <localize key="create_noDocumentTypesEditPermissions"></localize>
+                        <localize key="create_noDocumentTypesEditPermissions">Edit permissions for this Document Type</localize>
                     </button>
                 </div>
                 <div ng-if="hasSettingsAccess && currentNode.id < 0">
                     <!-- There are existing document types, but none are allowed at root -->
                     <p class="abstract" ng-if="countTypes > 0">
-                        <localize key="create_noDocumentTypesAllowedAtRoot"></localize>
+                        <localize key="create_noDocumentTypesAllowedAtRoot">There are no allowed Document Types available for creating content here. You must enable these in <strong>Document
+                            Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.</localize>
                     </p>
 
                     <!-- There's no document types, help people create one -->
                     <p class="abstract" ng-if="countTypes === 0">
-                        <localize key="create_noDocumentTypesAtRoot"></localize>
+                        <localize key="create_noDocumentTypesAtRoot">There are no Document Types available for creating content here. You must create these in <strong>Document
+                            Types</strong> within the <strong>Settings</strong> section.</localize>
                     </p>
                     <button type="button" class="btn umb-outline" ng-click="createContentType()" ng-if="countTypes === 0">
-                        <localize key="create_noDocumentTypesCreateNew"></localize>
+                        <localize key="create_noDocumentTypesCreateNew">Create a new Document Type</localize>
                     </button>
                 </div>
             </div>
@@ -58,7 +64,7 @@
                 </li>
 
             </ul>
-           
+
             <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint">
 
                 <li class="umb-action" ng-repeat="blueprint in selectableBlueprints | orderBy:'name':false track by $index">

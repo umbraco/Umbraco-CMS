@@ -104,7 +104,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private class WriteLockInfo
         {
+#pragma warning disable IDE1006 // Naming Styles
+
+            // This is a field that is used for ref operations
             public bool Taken;
+#pragma warning restore IDE1006 // Naming Styles
         }
 
         // a scope contextual that represents a locked writer to the dictionary

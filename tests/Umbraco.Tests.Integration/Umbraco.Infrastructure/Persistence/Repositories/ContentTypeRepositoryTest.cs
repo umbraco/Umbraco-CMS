@@ -274,7 +274,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     Assert.AreNotEqual(propertyType.Key, Guid.Empty);
                 }
 
-                TestHelper.AssertPropertyValuesAreEqual(fetched, contentType, ignoreProperties: new[] { "DefaultTemplate", "AllowedTemplates", "UpdateDate" });
+                TestHelper.AssertPropertyValuesAreEqual(fetched, contentType, ignoreProperties: new[] { "DefaultTemplate", "AllowedTemplates", "UpdateDate", "HistoryCleanup" });
             }
         }
 
@@ -379,6 +379,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 //// Alias = display.Alias,
                 Path = display.Path,
                 //// AdditionalData = display.AdditionalData,
+                HistoryCleanup = display.HistoryCleanup,
 
                 // ContentTypeBasic
                 Alias = display.Alias,

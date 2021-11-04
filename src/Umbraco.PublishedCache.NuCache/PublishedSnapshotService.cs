@@ -46,7 +46,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IContentCacheDataSerializerFactory _contentCacheDataSerializerFactory;
         private readonly ContentDataSerializer _contentDataSerializer;
         private readonly NuCacheSettings _config;
 
@@ -93,7 +92,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             IPublishedModelFactory publishedModelFactory,
             IHostingEnvironment hostingEnvironment,
             IOptions<NuCacheSettings> config,
-            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory,
             ContentDataSerializer contentDataSerializer)
         {
             _options = options;
@@ -111,7 +109,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-            _contentCacheDataSerializerFactory = contentCacheDataSerializerFactory;
             _contentDataSerializer = contentDataSerializer;
             _config = config.Value;
             _publishedModelFactory = publishedModelFactory;

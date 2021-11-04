@@ -36,7 +36,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         private readonly ISystemClock _systemClock;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
         private readonly IBasicAuthService _basicAuthService;
-        private readonly IOptionsMonitor<BasicAuthSettings> _optionsSnapshot;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigureBackOfficeCookieOptions"/> class.

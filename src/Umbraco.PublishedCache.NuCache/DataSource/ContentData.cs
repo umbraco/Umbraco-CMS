@@ -8,19 +8,38 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
     /// </summary>
     public class ContentData
     {
-        public string Name { get; set; }
-        public string UrlSegment { get; set; }
-        public int VersionId { get; set; }
-        public DateTime VersionDate { get; set; }
-        public int WriterId { get; set; }
-        public int? TemplateId { get; set; }
-        public bool Published { get; set; }
+        [Obsolete("Use ctor with all params, as the pros should be immutable")]
+        public ContentData()
+        {
 
-        public IDictionary<string, PropertyData[]> Properties { get; set; }
+        }
+
+        public ContentData(string name, string urlSegment, int versionId, DateTime versionDate, int writerId, int? templateId, bool published, IDictionary<string, PropertyData[]> properties, IReadOnlyDictionary<string, CultureVariation> cultureInfos)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            UrlSegment = urlSegment;
+            VersionId = versionId;
+            VersionDate = versionDate;
+            WriterId = writerId;
+            TemplateId = templateId;
+            Published = published;
+            Properties = properties ?? throw new ArgumentNullException(nameof(properties));
+            CultureInfos = cultureInfos;
+        }
+
+        public string Name { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
+        public string UrlSegment { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
+        public int VersionId { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
+        public DateTime VersionDate { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
+        public int WriterId { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
+        public int? TemplateId { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
+        public bool Published { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
+
+        public IDictionary<string, PropertyData[]> Properties { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
 
         /// <summary>
         /// The collection of language Id to name for the content item
         /// </summary>
-        public IReadOnlyDictionary<string, CultureVariation> CultureInfos { get; set; }
+        public IReadOnlyDictionary<string, CultureVariation> CultureInfos { get; [Obsolete("Do not change this, use ctor with params and have this object immutable.")] set; }
     }
 }
