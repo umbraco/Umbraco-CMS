@@ -163,12 +163,6 @@ namespace Umbraco.Web.Models.Mapping
         {
             MapTypeToDisplayBase<MemberTypeDisplay, MemberPropertyTypeDisplay>(source, target);
 
-            var standardGroup = target.Groups.FirstOrDefault(x => x.Alias == Constants.Conventions.Member.StandardPropertiesGroupAlias);
-            if (standardGroup != null)
-            {
-                standardGroup.Inherited = true;
-            }
-
             //map the MemberCanEditProperty,MemberCanViewProperty,IsSensitiveData
             foreach (var propertyType in source.PropertyTypes)
             {

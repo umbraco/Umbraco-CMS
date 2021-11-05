@@ -82,12 +82,9 @@ namespace Umbraco.Web.Models.Mapping
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = source.ContentType.Name;
             target.CreateDate = source.CreateDate;
-            target.Email = source.Email;
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
             target.Key = source.Key;
-            target.MemberProviderFieldMapping = GetMemberProviderFieldMapping();
-            target.MembershipScenario = GetMembershipScenario();
             target.Name = source.Name;
             target.Owner = _commonMapper.GetOwner(source, context);
             target.ParentId = source.ParentId;
@@ -98,7 +95,13 @@ namespace Umbraco.Web.Models.Mapping
             target.TreeNodeUrl = _commonMapper.GetMemberTreeNodeUrl(source);
             target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
             target.UpdateDate = source.UpdateDate;
+
+            // Membership
+            target.MembershipScenario = GetMembershipScenario();
+            target.MemberProviderFieldMapping = GetMemberProviderFieldMapping();
             target.Username = source.Username;
+            target.Email = source.Email;
+            target.MembershipProperties = _tabsAndPropertiesMapper.MapMembershipProperties(source, context);
         }
 
         // Umbraco.Code.MapAll -Trashed -Edited -Updater -Alias -VariesByCulture
