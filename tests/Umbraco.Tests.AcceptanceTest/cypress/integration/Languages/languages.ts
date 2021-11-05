@@ -15,8 +15,8 @@ context('Languages', () => {
         cy.umbracoCreateLanguage(language2, true, '1');
         cy.umbracoSection('settings');
 
-        cy.get('.umb-tree').should('be.visible');
         // Enter language tree and select the language we just created
+        cy.get('.umb-tree').should('be.visible');
         cy.umbracoTreeItem('settings', ['Languages']).click();
 
         // Assert there are 3 languages
