@@ -449,7 +449,7 @@
     <key alias="assignDomain">Gweinyddu enwau gwesteia</key>
     <key alias="closeThisWindow">Cau'r ffenestr yma</key>
     <key alias="confirmdelete">Ydych chi'n sicr eich bod eisiau dileu</key>
-    <key alias="confirmdeleteXofX">Wyt ti'n siŵr fod ti eisiau dileu %0% yn seiliedig ar %1%</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Wyt ti'n siŵr fod ti eisiau dileu <b>%0%</b> yn seiliedig ar <b>%1%</b>]]></key>
 
     <key alias="confirmdisable">Ydych chi'n sicr eich bod eisiau analluogi</key>
 

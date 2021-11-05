@@ -23,28 +23,28 @@ namespace Umbraco.Cms.Infrastructure.Search
         }
 
         /// <inheritdoc />
-        public IEnumerable<string> GetBackOfficeFields() => _backOfficeFields;
+        public virtual IEnumerable<string> GetBackOfficeFields() => _backOfficeFields;
 
         /// <inheritdoc />
-        public IEnumerable<string> GetBackOfficeMembersFields() => _backOfficeMembersFields;
+        public virtual IEnumerable<string> GetBackOfficeMembersFields() => _backOfficeMembersFields;
 
         /// <inheritdoc />
-        public IEnumerable<string> GetBackOfficeMediaFields() => _backOfficeMediaFields;
+        public virtual IEnumerable<string> GetBackOfficeMediaFields() => _backOfficeMediaFields;
 
         /// <inheritdoc />
-        public IEnumerable<string> GetBackOfficeDocumentFields() => Enumerable.Empty<string>();
+        public virtual IEnumerable<string> GetBackOfficeDocumentFields() => Enumerable.Empty<string>();
 
         /// <inheritdoc />
-        public ISet<string> GetBackOfficeFieldsToLoad() => _backOfficeFieldsToLoad;
+        public virtual ISet<string> GetBackOfficeFieldsToLoad() => _backOfficeFieldsToLoad;
 
         /// <inheritdoc />
-        public ISet<string> GetBackOfficeMembersFieldsToLoad() => _backOfficeMembersFieldsToLoad;
+        public virtual ISet<string> GetBackOfficeMembersFieldsToLoad() => _backOfficeMembersFieldsToLoad;
 
         /// <inheritdoc />
-        public ISet<string> GetBackOfficeMediaFieldsToLoad() => _backOfficeMediaFieldsToLoad;
+        public virtual ISet<string> GetBackOfficeMediaFieldsToLoad() => _backOfficeMediaFieldsToLoad;
 
         /// <inheritdoc />
-        public ISet<string> GetBackOfficeDocumentFieldsToLoad()
+        public virtual ISet<string> GetBackOfficeDocumentFieldsToLoad()
         {
             var fields = _backOfficeDocumentFieldsToLoad;
 

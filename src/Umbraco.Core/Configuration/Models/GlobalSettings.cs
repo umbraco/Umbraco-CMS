@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const bool StaticDisableElectionForSingleServer = false;
         internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
         internal const string StaticSqlWriteLockTimeOut = "00:00:05";
+        internal const bool StaticSanitizeTinyMce = false;
 
         /// <summary>
         /// Gets or sets a value for the reserved URLs.
@@ -161,6 +162,11 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets a value indicating whether there is a physical pickup directory configured.
         /// </summary>
         public bool IsPickupDirectoryLocationConfigured => !string.IsNullOrWhiteSpace(Smtp?.PickupDirectoryLocation);
+
+        /// Gets a value indicating whether TinyMCE scripting sanitization should be applied
+        /// </summary>
+        [DefaultValue(StaticSanitizeTinyMce)]
+        public bool SanitizeTinyMce => StaticSanitizeTinyMce;
 
         /// <summary>
         /// An int value representing the time in milliseconds to lock the database for a write operation
