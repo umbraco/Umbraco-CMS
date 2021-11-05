@@ -24,7 +24,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _dictionarySourceLazy;
 
         private readonly Lazy<IDictionary<CultureInfo, Lazy<IDictionary<string, string>>>> _noAreaDictionarySourceLazy;
-        private readonly char[] _splitter = new[] {'/'};
 
         /// <summary>
         /// Initializes with a file sources instance
@@ -164,7 +163,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (string.IsNullOrEmpty(key))
                 return string.Empty;
 
-            var keyParts = key.Split(_splitter, StringSplitOptions.RemoveEmptyEntries);
+            var keyParts = key.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
             var area = keyParts.Length > 1 ? keyParts[0] : null;
             var alias = keyParts.Length > 1 ? keyParts[1] : keyParts[0];
             return Localize(area, alias, culture, tokens);
