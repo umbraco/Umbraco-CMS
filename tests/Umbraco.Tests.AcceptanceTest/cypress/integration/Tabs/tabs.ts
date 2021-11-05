@@ -19,9 +19,9 @@ import {
 
       function OpenDocTypeFolder(){
           cy.umbracoSection('settings');
-          cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
-          cy.get('.umb-tree-item__inner > .umb-tree-item__arrow').eq(0).click();
-          cy.get('.umb-tree-item__inner > .umb-tree-item__label').contains(tabsDocTypeName).click();
+          cy.get('.umb-box-content').should('be.visible');
+          cy.get('.umb-tree-root').contains("Settings").should('be.visible');
+          cy.umbracoTreeItem('settings', ["Document Types", tabsDocTypeName]).click();
       }
 
       function CreateDocWithTabAndNavigate(){
