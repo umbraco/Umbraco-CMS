@@ -173,7 +173,7 @@ context('Routing', () => {
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').should('be.visible');
-        cy.get('.umb-list').contains("Swedish").click();
+        cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Assert
@@ -254,7 +254,7 @@ context('Routing', () => {
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         //Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').should('be.visible');
-        cy.get('.umb-list').contains("Swedish").click();
+        cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Publish Grandchild
@@ -262,7 +262,7 @@ context('Routing', () => {
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').should('be.visible');
-        cy.get('.umb-list').contains("Swedish").click();
+        cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Assert
@@ -348,7 +348,7 @@ context('Routing', () => {
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').should('be.visible');
-        cy.get('.umb-list').contains("Swedish").click();
+        cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Publish Grandchild
@@ -356,8 +356,7 @@ context('Routing', () => {
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
         cy.get('.umb-list').should('be.visible');
-        cy.get('.umb-list').contains("Swedish").click();
-        cy.get('.umb-list').contains("Danish").click();
+        cy.get('.checkbox').click({multiple : true});
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Assert
