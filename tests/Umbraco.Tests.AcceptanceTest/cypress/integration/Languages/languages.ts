@@ -15,6 +15,7 @@ context('Languages', () => {
         cy.umbracoCreateLanguage(language2, true, '1');
         cy.umbracoSection('settings');
 
+        cy.get('.umb-tree').should('be.visible');
         // Enter language tree and select the language we just created
         cy.umbracoTreeItem('settings', ['Languages']).click();
 
@@ -28,11 +29,11 @@ context('Languages', () => {
         cy.umbracoButtonByLabelKey('contentTypeEditor_yesDelete').click();
 
         // Assert there is only 2 language
-        cy.get('tbody > tr').should('have.length', 3);        
+        cy.get('tbody > tr').should('have.length', 2);
 
         // Cleanup
         cy.umbracoEnsureLanguageNotExists(language1);
         cy.umbracoEnsureLanguageNotExists(language2);
     });
 
-}); 
+});
