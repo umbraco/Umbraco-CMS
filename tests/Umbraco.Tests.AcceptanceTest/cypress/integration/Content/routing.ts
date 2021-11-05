@@ -172,7 +172,7 @@ context('Routing', () => {
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-overlay-container').should('be.visible');
+        cy.get('.umb-list').should('be.visible');
         cy.get('.umb-list').contains("Swedish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
@@ -253,7 +253,7 @@ context('Routing', () => {
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         //Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-overlay-container').should('be.visible');
+        cy.get('.umb-list').should('be.visible');
         cy.get('.umb-list').contains("Swedish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
@@ -261,7 +261,7 @@ context('Routing', () => {
         cy.umbracoTreeItem("content", [nodeName, childNodeName, grandChildNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-overlay-container').should('be.visible');
+        cy.get('.umb-list').should('be.visible');
         cy.get('.umb-list').contains("Swedish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
@@ -347,7 +347,7 @@ context('Routing', () => {
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-overlay-container').should('be.visible');
+        cy.get('.umb-list').should('be.visible');
         cy.get('.umb-list').contains("Swedish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
@@ -355,7 +355,7 @@ context('Routing', () => {
         cy.umbracoTreeItem("content", [nodeName, childNodeName, grandChildNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-overlay-container').should('be.visible');
+        cy.get('.umb-list').should('be.visible');
         cy.get('.umb-list').contains("Swedish").click();
         cy.get('.umb-list').contains("Danish").click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
