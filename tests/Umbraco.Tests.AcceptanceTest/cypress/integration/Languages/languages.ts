@@ -16,19 +16,18 @@ context('Languages', () => {
         cy.umbracoSection('settings');
 
         // Enter language tree and select the language we just created
+        cy.get('.umb-box-content').should('be.visible');
         cy.get('.umb-tree').should('be.visible');
         cy.umbracoTreeItem('settings', ['Languages']).click();
 
         // Assert there are 3 languages
         cy.get('tbody > tr').should('have.length', 3);
 
-        // Delete the Danish language
-        cy.get('tr').contains('Danish').parents('tr').within(() => {
-            cy.get('umb-button[label-key="general_delete"]').click()
-        });
+        // Delete UK Language
+        cy.get('umb-button[label-key="general_delete"]').last().click();
         cy.umbracoButtonByLabelKey('contentTypeEditor_yesDelete').click();
 
-        // Assert there is only 2 language
+        // Assert there is only 2 languages
         cy.get('tbody > tr').should('have.length', 2);
 
         // Cleanup
