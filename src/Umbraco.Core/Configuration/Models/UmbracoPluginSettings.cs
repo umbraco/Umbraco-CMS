@@ -11,8 +11,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigPlugins)]
     public class UmbracoPluginSettings
     {
-        
-
         /// <summary>
         /// Gets or sets the allowed file extensions (including the period ".") that should be accessible from the browser.
         /// </summary>
@@ -25,7 +23,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
             ".jpg", ".jpeg", ".gif", ".png", ".svg", // images
             ".eot", ".ttf", ".woff", // fonts
             ".xml", ".json", ".config", // configurations
-            ".lic" // license
+            ".lic", // license
+            ".map" // js map files
         });
     }
 }
