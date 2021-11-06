@@ -613,11 +613,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     else
                     {
                         model.Notifications.Add(new BackOfficeNotification(
-                            _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
-                            _localizedTextService.Localize("media", "disallowedFileType"),
+                            _localizedTextService.Localize("speechBubbles","operationFailedHeader"),
+                            _localizedTextService.Localize("media","disallowedFileType"),
                             NotificationStyle.Warning));
                     }
-                }else
+                }
+                else
                 {
                     model.Notifications.Add(new BackOfficeNotification(
                         _localizedTextService.Localize("speechBubbles", "operationFailedHeader"),
@@ -626,8 +627,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
 
             }
-
-
 
             return model;
 
