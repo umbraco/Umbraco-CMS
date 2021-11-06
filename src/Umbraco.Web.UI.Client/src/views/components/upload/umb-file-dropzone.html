@@ -40,29 +40,38 @@
         <!-- List of uploading/uploaded files  -->
         <ul class="file-list" ng-show="queue.length > 0 || processed.length > 0 || filesHolder.length > 0">
 
+
+          <li class="file" ng-if="totalMessages > 1">
+              <div class="file-description">
+                <!-- Okay all -->
+                <button class="btn btn-primary ok-all" type="button" ng-click="dismissAllMessages()">
+                  <localize key="general_ok">Ok</localize> (<localize key="general_all">All</localize>)
+                </button>
+              </div>
+            </li>
+
             <li class="file" ng-repeat="file in processed track by file.key">
 
-              <div class="file-description">
-                <div>
-                  <span>{{ file.name }}</span>
-                  <span ng-if="file.messages.length > 0 || file.$error" class="file-messages">
-                    <span class="errorMessage color-red" ng-repeat="message in file.messages">{{message.header}}: {{message.message}}</span>
-                    <span ng-if="file.$error === 'pattern'" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
-                    <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red"><localize key="media_maxFileSize"></localize> "{{maxFileSize}}"</span>
+                <div class="file-description">
+                  <div>
+                    <span>{{ file.name }}</span>
+                    <span ng-if="file.messages.length > 0 || file.$error" class="file-messages">
+                      <span class="errorMessage color-red" ng-repeat="message in file.messages">{{message.header}}: {{message.message}}</span>
+                      <span ng-if="file.$error === 'pattern'" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
+                      <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red"><localize key="media_maxFileSize"></localize> "{{maxFileSize}}"</span>
+                    </span>
+                  </div>
+
+                  <!-- upload success -->
+                  <span ng-if="file.messages.length === 0">
+                    <umb-icon icon="icon-check" class="icon color-green"></umb-icon>
                   </span>
+
+                  <!-- requires user input -->
+                  <button class="btn btn-primary" type="button" ng-click="dismissMessages(file)" ng-if="file.messages.length > 0">
+                    <localize key="general_ok">Ok</localize>
+                  </button>
                 </div>
-
-                <!-- upload success -->
-                <span ng-if="file.messages.length === 0">
-                  <umb-icon icon="icon-check" class="icon color-green"></umb-icon>
-                </span>
-
-                <!-- requires user input -->
-                <button class="btn btn-primary" type="button" ng-click="dismissMessages(file)" ng-if="file.messages.length > 0">
-                  <localize key="general_ok">Ok</localize>
-                </button>
-              </div>              
-
             </li>
 
             <li class="file" ng-if="currentFile">

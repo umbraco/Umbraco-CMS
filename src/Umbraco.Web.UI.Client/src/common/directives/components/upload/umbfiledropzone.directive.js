@@ -31,7 +31,7 @@ angular.module("umbraco.directives")
                     propertyAlias: '@',
                     accept: '@',
                     maxFileSize: '@',
-
+ 
                     compact: '@',
                     hideDropzone: '@',
                     acceptedMediatypes: '=',
@@ -45,6 +45,7 @@ angular.module("umbraco.directives")
                     scope.totalQueued = 0;
                     scope.currentFile = undefined;
                     scope.processed = [];
+                    scope.totalMessages = 0;
 
                     function _filterFile(file) {
                         var ignoreFileNames = ['Thumbs.db'];
@@ -90,12 +91,12 @@ angular.module("umbraco.directives")
                     }
 
                     function _processQueueItems() {
-                        // if we have processed all files, either by successfull
+                        // if we have processed all files, either by successful
                         // upload, or attending to all messages, we deem the
                         // action complete, else continue processing files
+                        scope.totalMessages = scope.processed.filter(e => e.messages.length > 0).length;
                         if (scope.totalQueued === scope.processed.length) {
-                            var incomplete = scope.processed.filter(e => e.messages.length > 0).length;
-                            if (incomplete === 0) {
+                          if (scope.totalMessages === 0) {
                                 if (scope.filesUploaded) {
                                     //queue is empty, trigger the done action
                                     scope.filesUploaded(scope.done);
@@ -132,25 +133,25 @@ angular.module("umbraco.directives")
                                   // calculate progress in percentage
                                   var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
                                   // set percentage property on file
-                                  scope.currentFile.uploadProgress = progressPercentage;
+                                  file.uploadProgress = progressPercentage;
                                 }
                             })
                             .success(function (data, status, headers, config) {
                                 // Set server messages
                                 file.messages = data.notifications;
                                 scope.processed.push(file);
-                                scope.currentFile = undefined;
                                 //after processing, test if everything is done
+                                scope.currentFile = undefined;
                                 _processQueueItems();
                             })
                             .error(function(evt, status, headers, config) {
                                 //if the service returns a detailed error
                                 if (evt.InnerException) {
-                                    file.serverErrorMessage = evt.InnerException.ExceptionMessage;
+                                    file.messages.push({ message: evt.InnerException.ExceptionMessage, type: "Error" });
                                     //Check if its the common "too large file" exception
                                     if (evt.InnerException.StackTrace &&
                                         evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
-                                        file.messages.push({message: "File too large to upload", type: "Error"});
+                                        file.messages.push({ message: "File too large to upload", type: "Error" });
                                     }
                                 } else if (evt.Message) {
                                     file.messages.push({message: evt.Message, type: "Error"});
@@ -229,6 +230,13 @@ angular.module("umbraco.directives")
                     scope.dismissMessages = function (file) {
                         file.messages = [];
                         _processQueueItems();
+                    }
+
+                    scope.dismissAllMessages = function () {
+                      Utilities.forEach(scope.processed, file => {
+                        file.messages = [];
+                      });
+                      _processQueueItems();
                     }
 
                     scope.handleFiles = function(files, event, invalidFiles) {
