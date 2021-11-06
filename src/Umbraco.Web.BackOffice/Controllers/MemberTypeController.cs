@@ -182,6 +182,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Returns all member types
         /// </summary>
+        [Obsolete("Use MemberTypeQueryController.GetAllTypes instead as it only requires AuthorizationPolicies.TreeAccessMembersOrMemberTypes and not both this and AuthorizationPolicies.TreeAccessMemberTypes")]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMembersOrMemberTypes)]
         public IEnumerable<ContentTypeBasic> GetAllTypes()
         {

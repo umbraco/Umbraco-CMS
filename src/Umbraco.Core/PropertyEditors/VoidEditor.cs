@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Serialization;
@@ -16,8 +16,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
     [HideFromTypeFinder]
     public class VoidEditor : DataEditor
     {
-        private readonly IJsonSerializer _jsonSerializer;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="VoidEditor"/> class.
         /// </summary>

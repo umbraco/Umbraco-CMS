@@ -28,12 +28,12 @@
                             <p ng-bind="a11yInfo" role="alert"></p>
                             <ul class="umb-card-grid -three-in-row">
                                 <li ng-repeat="availableItem in macros | orderBy:'name' | filter:model.searchTerm">
-                                    <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}" ng-click="selectMacro(availableItem)">
+                                  <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}" ng-click="selectMacro(availableItem)">
                                         <span>
                                             <umb-icon icon="icon-settings-alt"></umb-icon>
                                             {{availableItem.name}}
                                         </span>
-                                    </button>
+                                  </button>
                                 </li>
                             </ul>
 

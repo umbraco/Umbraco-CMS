@@ -200,6 +200,10 @@
                 }
             }));
 
+            evts.push(eventsService.on("rte.shortcut.saveAndPublish", function () {
+                $scope.saveAndPublish();
+            }));
+
             evts.push(eventsService.on("content.saved", function () {
                 // Clear out localstorage keys that start with tinymce__
                 // When we save/perist a content node

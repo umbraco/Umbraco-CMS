@@ -531,18 +531,20 @@ namespace Umbraco.Cms.Core.Services.Implement
         public IEnumerable<IContent> GetAncestors(IContent content)
         {
             //null check otherwise we get exceptions
-            if (content.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IContent>();
-
-            var rootId = Cms.Core.Constants.System.RootString;
-            var ids = content.Path.Split(Constants.CharArrays.Comma)
-                .Where(x => x != rootId && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(s =>
-                    int.Parse(s, CultureInfo.InvariantCulture)).ToArray();
-            if (ids.Any() == false)
-                return new List<IContent>();
-
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            if (content.Path.IsNullOrWhiteSpace())
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.ContentTree);
+                return Enumerable.Empty<IContent>();
+            }
+
+            var ids = content.GetAncestorIds().ToArray();
+            if (ids.Any() == false)
+            {
+                return new List<IContent>();
+            }
+
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
                 return _documentRepository.GetMany(ids);
             }
         }
