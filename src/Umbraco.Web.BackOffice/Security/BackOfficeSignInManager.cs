@@ -78,6 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 if (shouldSignIn == false)
                 {
                     Logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.LoginProvider, user.Id);
+                    return SignInResult.NotAllowed;
                 }
             }
 
