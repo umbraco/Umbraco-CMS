@@ -25,8 +25,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.10" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.11" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.11" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -34,9 +34,9 @@
       <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
       <PackageReference Include="NETStandard.Library" Version="2.0.3" />
       <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
-      <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.3" />
-      <PackageReference Include="Smidge.Nuglify" Version="4.0.0" />
-      <PackageReference Include="Smidge.InMemory" Version="4.0.0" />
+      <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.4" />
+      <PackageReference Include="Smidge.Nuglify" Version="4.0.2" />
+      <PackageReference Include="Smidge.InMemory" Version="4.0.2" />
       <PackageReference Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
       <PackageReference Include="Umbraco.Code" Version="1.2.0">
         <PrivateAssets>all</PrivateAssets>
@@ -48,5 +48,4 @@
             <_Parameter1>Umbraco.Tests.UnitTests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
-
 </Project>

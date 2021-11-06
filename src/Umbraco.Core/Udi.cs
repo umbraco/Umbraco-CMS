@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Linq;
 
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core
 
         public int CompareTo(Udi other)
         {
-            return string.Compare(UriValue.ToString(), other.UriValue.ToString(), StringComparison.InvariantCultureIgnoreCase);
+            return string.Compare(UriValue.ToString(), other.UriValue.ToString(), StringComparison.OrdinalIgnoreCase);
         }
 
         public override string ToString()

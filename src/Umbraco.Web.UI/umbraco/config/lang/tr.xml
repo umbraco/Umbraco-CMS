@@ -17,10 +17,10 @@
     <key alias="delete">Sil</key>
     <key alias="disable">Devre Dışı Bırak</key>
     <key alias="editSettings">Ayarları düzenle</key>
-    <key alias="emptyrecyclebin">Geri dönüşüm kutusunu boşalt</key>
+    <key alias="emptyRecycleBin">Geri dönüşüm kutusunu boşalt</key>
     <key alias="enable">Etkinleştir</key>
     <key alias="exportDocumentType">Belge Türünü Dışa Aktar</key>
-    <key alias="importdocumenttype">Belge Türünü İçe Aktar</key>
+    <key alias="importDocumentType">Belge Türünü İçe Aktar</key>
     <key alias="importPackage">Paketi İçe Aktar</key>
     <key alias="liveEdit">Kanvas'ta Düzenle</key>
     <key alias="logout">Çıkış</key>
@@ -291,7 +291,7 @@
     <key alias="nodeIsInTrash">Bu öğe Geri Dönüşüm Kutusu'nda</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">'%0%' den yeni bir İçerik Şablonu oluşturun</key>
+    <key alias="createBlueprintFrom"><![CDATA[<em>%0%</em> den yeni bir İçerik Şablonu oluşturun]]></key>
     <key alias="blankBlueprint">Boş</key>
     <key alias="selectBlueprint">Bir İçerik Şablonu Seçin</key>
     <key alias="createdBlueprintHeading">İçerik Şablonu oluşturuldu</key>
@@ -790,7 +790,6 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Yükleyici veritabanına bağlanamıyor.</key>
-    <key alias="databaseErrorWebConfig">web.config dosyası kaydedilemedi. Lütfen bağlantı dizesini manuel olarak değiştirin.</key>
     <key alias="databaseFound">​​Veritabanınız bulundu ve tanımlandı</key>
     <key alias="databaseHeader">Veritabanı yapılandırması</key>
     <key alias="databaseInstall">
@@ -799,14 +798,6 @@
     ]]>
     </key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% artık veritabanınıza kopyalandı. Devam etmek için <strong>İleri</strong>'ye basın.]]></key>
-    <key alias="databaseNotFound">
-      ​​<![CDATA[<p> Veritabanı bulunamadı! Lütfen "web.config" dosyasının "bağlantı dizesindeki" bilgilerin doğru olup olmadığını kontrol edin. </p>
-              <p> Devam etmek için lütfen "web.config" dosyasını düzenleyin (Visual Studio veya favori metin düzenleyicinizi kullanarak), en alta kaydırın, veritabanınız için "UmbracoDbDSN" adlı anahtara bağlantı dizesini ekleyin ve dosyayı kaydedin. </p>
-              <p>
-              <strong> Yeniden dene </strong> düğmesini tıklayın.
-              bitti. <br /> <a href=https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-                                                        Web.config'i düzenleme hakkında daha fazla bilgi burada. </a> </p>]]>
-    </key>
     <key alias="databaseText">
       <![CDATA[Bu adımı tamamlamak için, veritabanı sunucunuzla ilgili bazı bilgileri bilmeniz gerekir ("bağlantı dizesi"). <br />
         Lütfen gerekirse ISS'niz ile iletişime geçin.
@@ -831,7 +822,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong> Varsayılan kullanıcının şifresi kurulumdan bu yana başarıyla değiştirildi! </strong> </p> <p> Başka işlem yapılmasına gerek yok. Devam etmek için <strong> İleri </strong> 'yi tıklayın.]]></key>
     <key alias="defaultUserPasswordChanged">Şifre değiştirildi!</key>
     <key alias="greatStart">Harika bir başlangıç ​​yapın, tanıtım videolarımızı izleyin</key>
-    <key alias="licenseText">Sonraki düğmeye tıklayarak (veya web.config'deki umbracoConfigurationStatus'u değiştirerek), bu yazılımın lisansını aşağıdaki kutuda belirtildiği şekilde kabul etmiş olursunuz. Bu Umbraco dağıtımının iki farklı lisanstan oluştuğuna dikkat edin, çerçeve için açık kaynak MIT lisansı ve kullanıcı arayüzünü kapsayan ücretsiz Umbraco lisansı.</key>
     <key alias="None">Henüz yüklenmedi.</key>
     <key alias="permissionsAffectedFolders">Etkilenen dosyalar ve klasörler</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Umbraco için izinlerin ayarlanmasıyla ilgili daha fazla bilgiyi burada bulabilirsiniz</key>
@@ -914,10 +904,6 @@ Runway'i kurdunuz, öyleyse neden yeni web sitenizin nasıl göründüğüne bak
 Ödüllü topluluğumuzdan yardım alın, belgelere göz atın veya basit bir sitenin nasıl oluşturulacağı, paketlerin nasıl kullanılacağı ve Umbraco terminolojisine yönelik hızlı bir kılavuzla ilgili bazı ücretsiz videolar izleyin]]>
     </key>
     <key alias="theEndHeader">Umbraco %0% yüklendi ve kullanıma hazır</key>
-    <key alias="theEndInstallFailed">
-      <![CDATA[Kurulumu bitirmek için yapmanız gerekenler
-        <strong> /web.config dosyasını </strong> manuel olarak düzenleyin ve alttaki AppSetting anahtarını <strong> UmbracoConfigurationStatus </strong> <strong> '%0%' </strong> değerine güncelleyin.]]>
-    </key>
     <key alias="theEndInstallSuccess">
       <![CDATA[Aşağıdaki "Umbraco'yu Başlat" düğmesini tıklayarak <strong> anında başlayabilirsiniz </strong>. <br /> <strong> Umbraco'da yeniyseniz </strong>,
 başlangıç ​​sayfalarımızda birçok kaynak bulabilirsiniz.]]>
@@ -2070,8 +2056,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="httpsCheckExpiringCertificate">Web sitenizin SSL sertifikasının süresi %0% gün içinde doluyor.</key>
     <key alias="healthCheckInvalidUrl">URL %0% - '%1%' pinglenirken hata oluştu</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Şu anda HTTPS şemasını kullanarak siteyi %0% görüntülüyorsunuz.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'Umbraco.Core.Https' web.config dosyanızda 'false' olarak ayarlandı. Bu siteye HTTPS şemasını kullanarak eriştiğinizde, bu 'doğru' olarak ayarlanmalıdır.</key>
-    <key alias="httpsCheckConfigurationCheckResult">appSetting 'Umbraco.Core.Https' web.config dosyanızda '%0%' olarak ayarlandı, çerezleriniz%1% güvenli olarak işaretlendi.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Hata ayıklama derleme modu devre dışı.</key>
     <key alias="compilationDebugCheckErrorMessage">Hata ayıklama derleme modu şu anda etkin. Yayınlanmadan önce bu ayarı devre dışı bırakmanız önerilir.</key>
@@ -2094,10 +2078,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   	-->
     <key alias="excessiveHeadersFound">​​<![CDATA[Web sitesi teknolojisi hakkında bilgi veren şu başlıklar bulundu: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">​​Web sitesi teknolojisi hakkında bilgi veren hiçbir başlık bulunamadı.</key>
-    <key alias="smtpMailSettingsNotFound">​​Web.config dosyasında system.net/mailsettings bulunamadı.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">Web.config dosyası system.net/mailsettings bölümünde, ana bilgisayar yapılandırılmamış.</key>
     <key alias="smtpMailSettingsConnectionSuccess">SMTP ayarları doğru yapılandırıldı ve hizmet beklendiği gibi çalışıyor.</key>
-    <key alias="smtpMailSettingsConnectionFail">'%0%' ana bilgisayarı ve '%1%' bağlantı noktası ile yapılandırılan SMTP sunucusuna ulaşılamadı. Lütfen Web.config dosyasındaki system.net/mailsettings içindeki SMTP ayarlarının doğruluğunu kontrol edin.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Bildirim e-postası <strong>%0%</strong> olarak ayarlandı]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Bildirim e-postası hâlâ varsayılan değer olan <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>%0% tarihinde %1% ile çalıştırılan planlanmış Umbraco Sağlık Kontrollerinin sonuçları aşağıdaki gibidir: </p>%2%</body></html>]]></key>
@@ -2267,7 +2248,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="tooltipForPropertyActionsMenuClose">Özellik Eylemlerini Kapat</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Bekle</key>
     <key alias="refreshStatus">Durumu yenile</key>
     <key alias="memoryCache">Bellek Önbelleği</key>
     <key alias="memoryCacheDescription">

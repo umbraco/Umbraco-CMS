@@ -14,9 +14,9 @@
     <key alias="createPackage">パッケージの作成</key>
     <key alias="delete">削除</key>
     <key alias="disable">無効</key>
-    <key alias="emptyrecyclebin">ごみ箱を空にする</key>
+    <key alias="emptyRecycleBin">ごみ箱を空にする</key>
     <key alias="exportDocumentType">ドキュメントタイプの書出</key>
-    <key alias="importdocumenttype">ドキュメントタイプの読込</key>
+    <key alias="importDocumentType">ドキュメントタイプの読込</key>
     <key alias="importPackage">パッケージの読み込み</key>
     <key alias="liveEdit">ライブ編集</key>
     <key alias="logout">ログアウト</key>
@@ -461,19 +461,12 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">インストーラーはデータベースに接続できませんでした。</key>
-    <key alias="databaseErrorWebConfig">web.configファイルを保存できませんでした。接続文字列を手作業で編集してください。</key>
     <key alias="databaseFound">データベースが見つかりました。識別子: </key>
     <key alias="databaseHeader">データベースの設定</key>
     <key alias="databaseInstall"><![CDATA[
       <strong>インストール</strong>ボタンを押すと Umbraco %0% のデータベースへインストールします
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% をデータベースにコピーします。<strong>次へ</strong>を押して続行してください。]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>データベースを見つけられません！"web.config"ファイルの中の"接続文字列"を確認してください。</p>
-              <p>続行するには"web.config"ファイルを編集(Visual Studioないし使い慣れたテキストエディタで)し、下の方にスクロールし、"umbracoDbDSN"という名前のキーでデータベースの接続文字列を追加して保存します。</p>
-              <p>
-              <strong>再施行</strong>ボタンをクリックして
-              続けます。<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-			              より詳細にはこちらの web.config を編集します。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[このステップを完了するには、データベースサーバー(の"接続文字列")について把握していなければなりません。<br />
         必要ならISPに連絡するなどしてみてください。
         もしローカルのパソコンないしサーバーへインストールするのなら、システム管理者に情報を確認してください。]]></key>
@@ -492,7 +485,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>インストール後にデフォルトユーザーのパスワードが変更されています！</strong></p><p>これ以上のアクションは必要ありません。<strong>次へ</strong>をクリックして続行してください。]]></key>
     <key alias="defaultUserPasswordChanged">パスワードは変更されました！</key>
     <key alias="greatStart">始めに、ビデオによる解説を見ましょう</key>
-    <key alias="licenseText">次へボタンをクリック(またはweb.configのumbracoConfigurationStatusを編集)すると、あなたはここに示されるこのソフトウェアのライセンスを承諾したと見做されます。注意として、UmbracoはMITライセンスをフレームワークへ、フリーウェアライセンスをUIへ、それぞれ異なる2つのライセンスを採用しています。</key>
     <key alias="None">まだインストールは完了していません。</key>
     <key alias="permissionsAffectedFolders">影響するファイルとフォルダ</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Umbracoに必要なアクセス権の設定についての詳細はこちらをどうぞ</key>
@@ -555,8 +547,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="theEndFurtherHelp"><![CDATA[<h3>追加の情報と手助け</h3>
 我々の認めるコミュニティから手助けを得られるでしょう。どうしたら簡単なサイトを構築できるか、どうしたらパッケージを使えるかについてのビデオや文書、またUmbracoの用語のクイックガイドも見る事ができます。]]></key>
     <key alias="theEndHeader">Umbraco %0% のインストールは完了、準備が整いました</key>
-    <key alias="theEndInstallFailed"><![CDATA[インストールを終えた後、もし必要ならば
-        <strong>/web.config file</strong>を手作業で編集し、<strong>'%0%'</strong>の下にある<strong>umbracoConfigurationStatus</strong>キーを設定してください。]]></key>
     <key alias="theEndInstallSuccess"><![CDATA["Umbracoを始める"ボタンをクリックして<strong>今すぐ開始</strong>できます。<br />もし<strong>Umbracoの初心者</strong>なら、
 私たちの初心者向けのたくさんの情報を参考にしてください。]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Umbracoの開始</h3>

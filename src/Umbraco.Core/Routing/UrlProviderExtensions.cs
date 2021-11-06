@@ -15,11 +15,11 @@ namespace Umbraco.Extensions
     public static class UrlProviderExtensions
     {
         /// <summary>
-        /// Gets the URLs of the content item.
+        ///     Gets the URLs of the content item.
         /// </summary>
         /// <remarks>
-        /// <para>Use when displaying URLs. If errors occur when generating the URLs, they will show in the list.</para>
-        /// <para>Contains all the URLs that we can figure out (based upon domains, etc).</para>
+        ///     <para>Use when displaying URLs. If errors occur when generating the URLs, they will show in the list.</para>
+        ///     <para>Contains all the URLs that we can figure out (based upon domains, etc).</para>
         /// </remarks>
         public static async Task<IEnumerable<UrlInfo>> GetContentUrlsAsync(
             this IContent content,
@@ -33,16 +33,55 @@ namespace Umbraco.Extensions
             UriUtility uriUtility,
             IPublishedUrlProvider publishedUrlProvider)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content));
-            if (publishedRouter == null) throw new ArgumentNullException(nameof(publishedRouter));
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
-            if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
-            if (textService == null) throw new ArgumentNullException(nameof(textService));
-            if (contentService == null) throw new ArgumentNullException(nameof(contentService));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (publishedUrlProvider == null) throw new ArgumentNullException(nameof(publishedUrlProvider));
-            if (uriUtility == null) throw new ArgumentNullException(nameof(uriUtility));
-            if (variationContextAccessor == null) throw new ArgumentNullException(nameof(variationContextAccessor));
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            if (publishedRouter == null)
+            {
+                throw new ArgumentNullException(nameof(publishedRouter));
+            }
+
+            if (umbracoContext == null)
+            {
+                throw new ArgumentNullException(nameof(umbracoContext));
+            }
+
+            if (localizationService == null)
+            {
+                throw new ArgumentNullException(nameof(localizationService));
+            }
+
+            if (textService == null)
+            {
+                throw new ArgumentNullException(nameof(textService));
+            }
+
+            if (contentService == null)
+            {
+                throw new ArgumentNullException(nameof(contentService));
+            }
+
+            if (logger == null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+
+            if (publishedUrlProvider == null)
+            {
+                throw new ArgumentNullException(nameof(publishedUrlProvider));
+            }
+
+            if (uriUtility == null)
+            {
+                throw new ArgumentNullException(nameof(uriUtility));
+            }
+
+            if (variationContextAccessor == null)
+            {
+                throw new ArgumentNullException(nameof(variationContextAccessor));
+            }
 
             var result = new List<UrlInfo>();
 
@@ -68,7 +107,9 @@ namespace Umbraco.Extensions
 
             // get all URLs for all cultures
             // in a HashSet, so de-duplicates too
-            foreach (UrlInfo cultureUrl in await GetContentUrlsByCultureAsync(content, cultures, publishedRouter, umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility, publishedUrlProvider))
+            foreach (UrlInfo cultureUrl in await GetContentUrlsByCultureAsync(content, cultures, publishedRouter,
+                umbracoContext, contentService, textService, variationContextAccessor, logger, uriUtility,
+                publishedUrlProvider))
             {
                 urls.Add(cultureUrl);
             }
@@ -79,15 +120,25 @@ namespace Umbraco.Extensions
                 // in some cases there will be the same URL for multiple cultures:
                 // * The entire branch is invariant
                 // * If there are less domain/cultures assigned to the branch than the number of cultures/languages installed
-                foreach (UrlInfo dUrl in urlGroup.DistinctBy(x => x.Text.ToUpperInvariant()).OrderBy(x => x.Text).ThenBy(x => x.Culture))
+
+                if (urlGroup.Key)
                 {
-                    result.Add(dUrl);
+                    result.AddRange(urlGroup.DistinctBy(x => x.Text.ToUpperInvariant())
+                        .OrderBy(x => x.Text).ThenBy(x => x.Culture));
                 }
+                else
+                {
+                    result.AddRange(urlGroup);
+                }
+
+
+
             }
 
             // get the 'other' URLs - ie not what you'd get with GetUrl() but URLs that would route to the document, nevertheless.
             // for these 'other' URLs, we don't check whether they are routable, collide, anything - we just report them.
-            foreach (var otherUrl in publishedUrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Text).ThenBy(x => x.Culture))
+            foreach (UrlInfo otherUrl in publishedUrlProvider.GetOtherUrls(content.Id).OrderBy(x => x.Text)
+                .ThenBy(x => x.Culture))
             {
                 // avoid duplicates
                 if (urls.Add(otherUrl))
@@ -100,7 +151,7 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Tries to return a <see cref="UrlInfo"/> for each culture for the content while detecting collisions/errors
+        ///     Tries to return a <see cref="UrlInfo" /> for each culture for the content while detecting collisions/errors
         /// </summary>
         private static async Task<IEnumerable<UrlInfo>> GetContentUrlsByCultureAsync(
             IContent content,
@@ -151,7 +202,8 @@ namespace Umbraco.Extensions
                     // got a URL, deal with collisions, add URL
                     default:
                         // detect collisions, etc
-                        Attempt<UrlInfo> hasCollision = await DetectCollisionAsync(logger, content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility);
+                        Attempt<UrlInfo> hasCollision = await DetectCollisionAsync(logger, content, url, culture,
+                            umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility);
                         if (hasCollision)
                         {
                             result.Add(hasCollision.Result);
@@ -168,7 +220,8 @@ namespace Umbraco.Extensions
             return result;
         }
 
-        private static UrlInfo HandleCouldNotGetUrl(IContent content, string culture, IContentService contentService, ILocalizedTextService textService)
+        private static UrlInfo HandleCouldNotGetUrl(IContent content, string culture, IContentService contentService,
+            ILocalizedTextService textService)
         {
             // document has a published version yet its URL is "#" => a parent must be
             // unpublished, walk up the tree until we find it, and report.
@@ -176,27 +229,31 @@ namespace Umbraco.Extensions
             do
             {
                 parent = parent.ParentId > 0 ? contentService.GetParent(parent) : null;
-            }
-            while (parent != null && parent.Published && (!parent.ContentType.VariesByCulture() || parent.IsCulturePublished(culture)));
+            } while (parent != null && parent.Published &&
+                     (!parent.ContentType.VariesByCulture() || parent.IsCulturePublished(culture)));
 
             if (parent == null)
             {
                 // oops, internal error
                 return UrlInfo.Message(textService.Localize("content", "parentNotPublishedAnomaly"), culture);
             }
-            else if (!parent.Published)
+
+            if (!parent.Published)
             {
                 // totally not published
-                return UrlInfo.Message(textService.Localize("content", "parentNotPublished", new[] { parent.Name }), culture);
+                return UrlInfo.Message(textService.Localize("content", "parentNotPublished", new[] { parent.Name }),
+                    culture);
             }
-            else
-            {
-                // culture not published
-                return UrlInfo.Message(textService.Localize("content", "parentCultureNotPublished", new[] {parent.Name}), culture);
-            }
+
+            // culture not published
+            return UrlInfo.Message(textService.Localize("content", "parentCultureNotPublished", new[] { parent.Name }),
+                culture);
         }
 
-        private static async Task<Attempt<UrlInfo>> DetectCollisionAsync(ILogger logger, IContent content, string url, string culture, IUmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, IVariationContextAccessor variationContextAccessor, UriUtility uriUtility)
+        private static async Task<Attempt<UrlInfo>> DetectCollisionAsync(ILogger logger, IContent content, string url,
+            string culture, IUmbracoContext umbracoContext, IPublishedRouter publishedRouter,
+            ILocalizedTextService textService, IVariationContextAccessor variationContextAccessor,
+            UriUtility uriUtility)
         {
             // test for collisions on the 'main' URL
             var uri = new Uri(url.TrimEnd(Constants.CharArrays.ForwardSlash), UriKind.RelativeOrAbsolute);
@@ -207,11 +264,13 @@ namespace Umbraco.Extensions
 
             uri = uriUtility.UriToUmbraco(uri);
             IPublishedRequestBuilder builder = await publishedRouter.CreateRequestAsync(uri);
-            IPublishedRequest pcr = await publishedRouter.RouteRequestAsync(builder, new RouteRequestOptions(RouteDirection.Outbound));
+            IPublishedRequest pcr =
+                await publishedRouter.RouteRequestAsync(builder, new RouteRequestOptions(RouteDirection.Outbound));
 
             if (!pcr.HasPublishedContent())
             {
-                var logMsg = nameof(DetectCollisionAsync) + " did not resolve a content item for original url: {Url}, translated to {TranslatedUrl} and culture: {Culture}";
+                var logMsg = nameof(DetectCollisionAsync) +
+                             " did not resolve a content item for original url: {Url}, translated to {TranslatedUrl} and culture: {Culture}";
                 if (pcr.IgnorePublishedContentCollisions)
                 {
                     logger.LogDebug(logMsg, url, uri, culture);
@@ -243,14 +302,7 @@ namespace Umbraco.Extensions
                 l.Reverse();
                 var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
 
-                 var urlInfo = UrlInfo.Message(textService.Localize("content", "routeError", new[] { s }), culture);
-                return Attempt.Succeed(urlInfo);
-            }
-
-            // collisions with a different culture of the same content can never be routed.
-            if (!culture.InvariantEquals(pcr.Culture))
-            {
-                var urlInfo = UrlInfo.Message(textService.Localize("content", "routeErrorCannotRoute"), culture);
+                var urlInfo = UrlInfo.Message(textService.Localize("content", "routeError", new[] { s }), culture);
                 return Attempt.Succeed(urlInfo);
             }
 

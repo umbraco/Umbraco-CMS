@@ -123,10 +123,6 @@ namespace Umbraco.Extensions
                 config,
                 profiler);
 
-            // adds the umbraco startup filter which will call UseUmbraco early on before
-            // other start filters are applied (depending on the ordering of IStartupFilters in DI).
-            services.AddTransient<IStartupFilter, UmbracoApplicationServicesCapture>();
-
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
         }
 
@@ -180,6 +176,7 @@ namespace Umbraco.Extensions
             builder.Services.AddHostedService<HealthCheckNotifier>();
             builder.Services.AddHostedService<KeepAlive>();
             builder.Services.AddHostedService<LogScrubber>();
+            builder.Services.AddHostedService<ContentVersionCleanup>();
             builder.Services.AddHostedService<ScheduledPublishing>();
             builder.Services.AddHostedService<TempFileCleanup>();
             builder.Services.AddHostedService<InstructionProcessTask>();

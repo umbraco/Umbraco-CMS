@@ -280,6 +280,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.GetAllTypes())
                         },
                         {
+                            "memberTypeQueryApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberTypeQueryController>(
+                                controller => controller.GetAllTypes())
+                        },
+                        {
                             "memberGroupApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MemberGroupController>(
                                 controller => controller.GetAllGroups())
                         },
@@ -409,6 +413,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"showAllowSegmentationForDocumentTypes", false},
                         {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
                         {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
+                        {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce}
                     }
                 },
                 {

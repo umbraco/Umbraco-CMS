@@ -398,7 +398,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public ActionResult<IDictionary<string, ContentItemDisplay>> GetEmptyByAliases(ContentTypesByAliases contentTypesByAliases)
         {
-            // It's important to do this operation within a scope to reduce the amount of readlock queries. 
+            // It's important to do this operation within a scope to reduce the amount of readlock queries.
             using var scope = _scopeProvider.CreateScope(autoComplete: true);
             var contentTypes = contentTypesByAliases.ContentTypeAliases.Select(alias => _contentTypeService.Get(alias));
             return GetEmpties(contentTypes, contentTypesByAliases.ParentId).ToDictionary(x => x.ContentTypeAlias);
@@ -879,7 +879,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
                     {
-                        var publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
+                        PublishResult publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
+                        // Add warnings if domains are not set up correctly
+                        AddDomainWarnings(publishStatus.Content, successfulCultures, globalNotifications);
                         AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
                     }
                     break;
@@ -896,6 +898,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         }
 
                         var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
+                        AddDomainWarnings(publishStatus, successfulCultures, globalNotifications);
                         AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                     }
                     break;
@@ -1412,6 +1415,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent, culturesToPublish, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
                 successfulCultures = culturesToPublish;
+
                 return publishStatus;
             }
             else
@@ -1422,6 +1426,73 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                 successfulCultures = Array.Empty<string>();
                 return publishStatus;
+            }
+        }
+
+        private void AddDomainWarnings(IEnumerable<PublishResult> publishResults, string[] culturesPublished,
+            SimpleNotificationModel globalNotifications)
+        {
+            foreach (PublishResult publishResult in publishResults)
+            {
+                AddDomainWarnings(publishResult.Content, culturesPublished, globalNotifications);
+            }
+        }
+
+        /// <summary>
+        /// Verifies that there's an appropriate domain setup for the published cultures
+        /// </summary>
+        /// <remarks>
+        /// Adds a warning and logs a message if a node varies by culture, there's at least 1 culture already published,
+        /// and there's no domain added for the published cultures
+        /// </remarks>
+        /// <param name="persistedContent"></param>
+        /// <param name="culturesPublished"></param>
+        /// <param name="globalNotifications"></param>
+        internal void AddDomainWarnings(IContent persistedContent, string[] culturesPublished, SimpleNotificationModel globalNotifications)
+        {
+            // Don't try to verify if no cultures were published
+            if (culturesPublished is null)
+            {
+                return;
+            }
+
+            var publishedCultures = GetPublishedCulturesFromAncestors(persistedContent).ToList();
+            // If only a single culture is published we shouldn't have any routing issues
+            if (publishedCultures.Count < 2)
+            {
+                return;
+            }
+
+            // If more than a single culture is published we need to verify that there's a domain registered for each published culture
+            var assignedDomains = _domainService.GetAssignedDomains(persistedContent.Id, true).ToHashSet();
+            // We also have to check all of the ancestors, if any of those has the appropriate culture assigned we don't need to warn
+            foreach (var ancestorID in persistedContent.GetAncestorIds())
+            {
+                assignedDomains.UnionWith(_domainService.GetAssignedDomains(ancestorID, true));
+            }
+
+            // No domains at all, add a warning, to add domains.
+            if (assignedDomains.Count == 0)
+            {
+                globalNotifications.AddWarningNotification(
+                    _localizedTextService.Localize("auditTrails", "publish"),
+                    _localizedTextService.Localize("speechBubbles", "publishWithNoDomains"));
+
+                _logger.LogWarning("The root node {RootNodeName} was published with multiple cultures, but no domains are configured, this will cause routing and caching issues, please register domains for: {Cultures}",
+                    persistedContent.Name, string.Join(", ", publishedCultures));
+                return;
+            }
+
+            // If there is some domains, verify that there's a domain for each of the published cultures
+            foreach (var culture in culturesPublished
+                .Where(culture => assignedDomains.Any(x => x.LanguageIsoCode.Equals(culture, StringComparison.OrdinalIgnoreCase)) is false))
+            {
+                globalNotifications.AddWarningNotification(
+                    _localizedTextService.Localize("auditTrails", "publish"),
+                    _localizedTextService.Localize("speechBubbles", "publishWithMissingDomain", new []{culture}));
+
+                _logger.LogWarning("The root node {RootNodeName} was published in culture {Culture}, but there's no domain configured for it, this will cause routing and caching issues, please register a domain for it",
+                    persistedContent.Name, culture);
             }
         }
 
@@ -1512,6 +1583,27 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return true;
         }
 
+        private IEnumerable<string> GetPublishedCulturesFromAncestors(IContent content)
+        {
+            if (content.ParentId == -1)
+            {
+                return content.PublishedCultures;
+            }
+
+            HashSet<string> publishedCultures = new ();
+            publishedCultures.UnionWith(content.PublishedCultures);
+
+            IEnumerable<int> ancestorIds = content.GetAncestorIds();
+
+            foreach (var id in ancestorIds)
+            {
+                IEnumerable<string> cultures = _contentService.GetById(id).PublishedCultures;
+                publishedCultures.UnionWith(cultures);
+            }
+
+            return publishedCultures;
+
+        }
         /// <summary>
         /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
         /// </summary>

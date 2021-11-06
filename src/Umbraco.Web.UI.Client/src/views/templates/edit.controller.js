@@ -559,13 +559,13 @@
                 }
             });
 
-            localizationService.localize("template_mastertemplate").then(function (value) {
-                var title = value;
-                var masterTemplate = {
-                    title: title,
-                    availableItems: availableMasterTemplates,
-                    submit: function (model) {
-                        var template = model.selectedItem;
+            localizationService.localize("template_mastertemplate").then(title => {
+                const editor = {
+                    title,
+                    filterCssClass: 'not-allowed',
+                    filter: item => !availableMasterTemplates.some(template => template.id == item.id),                    
+                    submit: model => {
+                        var template = model.selection[0];
                         if (template && template.alias) {
                             vm.template.masterTemplateAlias = template.alias;
                             setLayout(template.alias + ".cshtml");
@@ -575,14 +575,10 @@
                         }
                         editorService.close();
                     },
-                    close: function (oldModel) {
-                        // close dialog
-                        editorService.close();
-                        // focus editor
-                        vm.editor.focus();
-                    }
-                };
-                editorService.itemPicker(masterTemplate);
+                    close: () => editorService.close()
+                }
+
+                editorService.templatePicker(editor);
             });
 
         }

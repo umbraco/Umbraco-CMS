@@ -1,13 +1,18 @@
 function imageFilePickerController($scope, editorService) {
+    var vm = this;
+    vm.model = $scope.model;
 
-    $scope.add = function() {
+    vm.add = add;
+    vm.remove = remove;
+
+    function add() {
         var mediaPickerOptions = {
             view: "mediapicker",
             multiPicker: false,
             disableFolderSelect: true,
             onlyImages: true,
             submit: function (model) {
-                $scope.model.value = model.selection[0].image;
+                vm.model.value = model.selection[0].image;
 
                 editorService.close();
             },
@@ -18,8 +23,8 @@ function imageFilePickerController($scope, editorService) {
         editorService.mediaPicker(mediaPickerOptions);
     };
 
-    $scope.remove = function () {
-        $scope.model.value = null;
+    function remove() {
+        vm.model.value = null;
     };
 
 }

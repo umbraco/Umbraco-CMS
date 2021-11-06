@@ -16,10 +16,10 @@
     <key alias="createGroup">Vytvořit skupinu</key>
     <key alias="delete">Odstranit</key>
     <key alias="disable">Deaktivovat</key>
-    <key alias="emptyrecyclebin">Vyprázdnit koš</key>
+    <key alias="emptyRecycleBin">Vyprázdnit koš</key>
     <key alias="enable">Aktivovat</key>
     <key alias="exportDocumentType">Exportovat typ dokumentu</key>
-    <key alias="importdocumenttype">Importovat typ dokumentu</key>
+    <key alias="importDocumentType">Importovat typ dokumentu</key>
     <key alias="importPackage">Importovat balíček</key>
     <key alias="liveEdit">Editovat na stránce</key>
     <key alias="logout">Odhlásit</key>
@@ -283,7 +283,7 @@
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Vytvořit novou šablonu obsahu z '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Vytvořit novou šablonu obsahu z <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Prázdná</key>
     <key alias="selectBlueprint">Vybrat obsahovou šablonu</key>
     <key alias="createdBlueprintHeading">Šablona obsahu byla vytvořena</key>
@@ -765,21 +765,12 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Instalátor se nemůže připojit k databázi.</key>
-    <key alias="databaseErrorWebConfig">Nelze uložit soubor web.config. Modifikujte, prosím, připojovací řetězec manuálně.</key>
     <key alias="databaseFound">Vyše databáze byla nalezena a je identifikována jako</key>
     <key alias="databaseHeader">Nastavení databáze</key>
     <key alias="databaseInstall"><![CDATA[
       Stiskněte tlačítko <strong>instalovat</strong>, abyste nainstalovali Umbraco %0% databázi
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% bylo zkopírováno do Vaši databáze. Stiskněte <strong>následující</strong> pro pokračování.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databáze nenalezena! Zkontrolujte, prosím, že informace v "připojovacím řetězci" souboru "web.config" jsou správné.</p>
-              <p>Pro pokračování otevřete, prosím, soubor "web.config" (za pužití Visual Studia nebo Vašeho oblíbeného tedtového editoru), přejděte na jeho konec, přidejte připojovací řetězec pro Vaši databázi v klíčí nazvaném "umbracoDbDSN" a soubor uložte. </p>
-              <p>
-              Klikněte na tlačítko <strong>zopakovat</strong>, až budete hotovi.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-                          Další informace o editování souboru web.config zde</a>.</p>]]></key>
-    <key alias="databaseText"><![CDATA[Pro dokončení tohoto kroku potřebujete znát některé informace týkající se Vašeho databázového serveru ("připojovací řetězec").<br />
-        Pokud je to nezbytné, kontaktujte vašeho poskytovatele hostingu.
-        Jestliže instalujete na místní počítač nebo server, budete potřebovat informace od Vašeho systémového administrátora.]]></key>
     <key alias="databaseUpgrade"><![CDATA[
       <p>
       Stiskněte tlačítko <strong>povýšit</strong> pro povýšení Vaší databáze na Umbraco %0%</p>
@@ -794,7 +785,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Heslo výchozího uživatele bylo úspěšně změněno od doby instalace!</strong></p><p>Netřeba nic dalšího dělat. Klikněte na <b>Následující</b> pro pokračování.]]></key>
     <key alias="defaultUserPasswordChanged">Heslo je změněno!</key>
     <key alias="greatStart">Mějte skvělý start, sledujte naše uváděcí videa</key>
-    <key alias="licenseText">Kliknutím na tlačítko následující (nebo modifikováním umbracoConfigurationStatus v souboru web.config) přijímáte licenci tohoto software tak, jak je uvedena v poli níže. Upozorňujeme, že tato distribuce Umbraca se skládá ze dvou různých licencí, open source MIT licence pro framework a Umbraco freeware licence, která pokrývá UI.</key>
     <key alias="None">Není nainstalováno.</key>
     <key alias="permissionsAffectedFolders">Dotčené soubory a složky</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Další informace o nastavování oprávnění pro Umbraco zde</key>
@@ -854,7 +844,6 @@
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Další pomoc a informace</h3>
     Abyste získali pomoc od naší oceňované komunity, projděte si dokumentaci, nebo si pusťte některá videa zdarma o tom, jak vytvořit jednoduchý web, jak používat balíčky a rychlý úvod do terminologie umbraca]]></key>
     <key alias="theEndHeader">Umbraco %0% je nainstalováno a připraveno k použití</key>
-    <key alias="theEndInstallFailed"><![CDATA[Pro dokončení instalace budete muset ručně změnit <strong>soubor /web.config</strong> a upravit klíč AppSetting <strong>umbracoConfigurationStatus</strong> dole na hodnotu <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Můžete <strong>ihned začít</strong> kliknutím na tlačítko "Spustit Umbraco" níže. <br />Jestliže <strong>je pro Vás Umbraco nové</strong>,
     spoustu zdrojů naleznete na naších stránkách "začínáme".]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Spustit Umbraco</h3>
@@ -1938,8 +1927,6 @@
     <key alias="httpsCheckExpiringCertificate">Platnost certifikátu SSL vašeho webu vyprší za %0% dní.</key>
     <key alias="healthCheckInvalidUrl">Chyba při pingování adresy URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Aktuálně prohlížíte web pomocí schématu HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">AppSetting 'Umbraco.Core.UseHttps' je v souboru web.config nastaven na 'false'. Jakmile vstoupíte na tento web pomocí schématu HTTPS, mělo by být nastaveno na 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">AppSetting 'Umbraco.Core.UseHttps' je v souboru web.config nastaven na '%0%', vaše cookies %1% jsou označeny jako zabezpečené.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Režim kompilace ladění je zakázán.</key>
     <key alias="compilationDebugCheckErrorMessage">Režim ladění je aktuálně povolen. Před spuštěním webu se doporučuje toto nastavení deaktivovat.</key>
@@ -1962,10 +1949,7 @@
     -->
     <key alias="excessiveHeadersFound"><![CDATA[Byly nalezeny následující záhlaví odhalující informace o technologii webových stránek: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Nebyly nalezeny žádné hlavičky odhalující informace o technologii webových stránek.</key>
-    <key alias="smtpMailSettingsNotFound">V souboru Web.config nelze najít system.net/mailsettings.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">V části system.net/mailsettings v souboru web.config není hostitel nakonfigurován.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Nastavení SMTP jsou správně nakonfigurována a služba funguje jak má.</key>
-    <key alias="smtpMailSettingsConnectionFail">Server SMTP konfigurovaný s hostitelem '%0%' a portem '%1%' nelze nalézt. Zkontrolujte prosím, zda jsou nastavení SMTP v souboru Web.config a v sekci system.net/mailsettings správná.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[E-mail s upozorněním byl nastaven na <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[E-mail s oznámením je stále nastaven na výchozí hodnotu <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Výsledky plánovaných kontrol Umbraco Health Checks provedených na %0% v %1% jsou následující:</p>%2%</body></html>]]></key>
@@ -2118,7 +2102,6 @@
     <key alias="tooltipForPropertyActionsMenu">Otevřít akce vlastností</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Čekejte</key>
     <key alias="refreshStatus">Stav obnovení</key>
     <key alias="memoryCache">Cache paměť</key>
     <key alias="memoryCacheDescription">

@@ -380,7 +380,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         });
     }
 
-    $scope.delete = function () {
+    $scope.delete = function (numberOfItems, totalItems) {
 
         const dialog = {
             view: "views/propertyeditors/listview/overlays/delete.html",
@@ -394,7 +394,9 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             },
             close: function () {
                 overlayService.close();
-            }
+            },
+            numberOfItems: numberOfItems,
+            totalItems: totalItems
         };
 
         localizationService.localize("general_delete").then(value => {

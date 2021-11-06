@@ -13,9 +13,9 @@
     <key alias="createPackage">Criar Pacote</key>
     <key alias="delete">Remover</key>
     <key alias="disable">Desabilitar</key>
-    <key alias="emptyrecyclebin">Esvaziar Lixeira</key>
+    <key alias="emptyRecycleBin">Esvaziar Lixeira</key>
     <key alias="exportDocumentType">Exportar Tipo de Documento</key>
-    <key alias="importdocumenttype">Importar Tipo de Documento</key>
+    <key alias="importDocumentType">Importar Tipo de Documento</key>
     <key alias="importPackage">Importar Pacote</key>
     <key alias="liveEdit">Editar na Tela</key>
     <key alias="logout">Sair</key>
@@ -344,15 +344,10 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">O instalador não pôde conectar-se ao banco de dados.</key>
-    <key alias="databaseErrorWebConfig">Não foi possível salvar o arquivo web.config. Favor modificar a linha de conexão manualmente.</key>
     <key alias="databaseFound">Seu banco de dados foi encontrado e identificado como</key>
     <key alias="databaseHeader">Configuração do Banco de Dados</key>
     <key alias="databaseInstall"><![CDATA[Pressione o botão <strong>instalar</strong> para instalar o banco de dados do Umbraco %0%]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% agora foi copiado para seu banco de dados. Pressione <strong>Próximo</strong> para prosseguir.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Banco de dados não encontrado! Favor checar se a informação no "connection string" do "web.config" esteja correta. </p>
-<p>Para prosseguir, favor editar o arquivo "web.config" (usando Visual Studio ou seu editor de texto favorito), role até embaixo, adicione a connection string para seu banco de dados com a chave de nome "UmbracoDbDSN" e salve o arquivo </p>
-<p>Clique o botão <strong>tentar novamente</strong> quando terminar. <br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-			              Mais informações em como editar o web.config aqui</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[Para completar este passo, você deve saber algumas informações relativas ao seu servidor de banco de dados ("connection string"). <br /> Favor contatar seu provedor de internet ou hospedagem web se necessário. Se você estiver instalando em uma máquina ou servidor local é possível que você precise dessas informações por um administrador de sistema.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>
       Pressione o botão <strong>atualizar</strong> para atualizar seu banco de dados para Umbraco %0%</p>
@@ -367,7 +362,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>A senha do usuário padrão foi alterada com sucesso desde a instalação!</strong></p><p>Nenhuma ação posterior é necessária. Clique <strong>Próximo</strong> para prosseguir.]]></key>
     <key alias="defaultUserPasswordChanged">Senha foi alterada!</key>
     <key alias="greatStart">Comece com o pé direito, assista nossos vídeos introdutórios</key>
-    <key alias="licenseText">Ao clicar no próximo botão (ou modificando o UmbracoConfigurationStatus no web.config), você aceita a licença deste software cmo especificado na caixa abaixo. Note que esta distribuição de Umbraco consiste em duas licenças diferentes, a licença aberta MIT para a framework e a licença de software livre (freeware) Umbraco que cobre o UI.</key>
     <key alias="None">Nenhum instalado ainda.</key>
     <key alias="permissionsAffectedFolders">Pastas e arquivos afetados</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Mais informações em como configurar permissões para Umbraco aqui</key>
@@ -421,7 +415,6 @@ Você instalou Runway, então por que não ver como é seu novo website.]]></key
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Ajuda adicional e informações</h3>
 Consiga ajuda de nossa comunidade ganhadora de prêmios, navegue a documentação e assista alguns vídeos grátis sobre como construir um site simples, como usar pacotes e um guia prático sobre a terminologia Umbraco]]></key>
     <key alias="theEndHeader">Umbraco %0% está instalado e pronto para uso</key>
-    <key alias="theEndInstallFailed"><![CDATA[Para finalizar a instalação você necessita mudar o arquivo <strong>web.config</strong> e atualizar a chave AppSettings <strong>UmbracoConfigurationStatus</strong> no final para <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Você pode <strong>iniciar instantâneamente</strong> clicando em "Lançar Umbraco" abaixo. <br/> Se você é <strong>novo com Umbraco</strong> você pode encontrar vários recursos em nossa página para iniciantes.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lançar Umbraco</h3>
 Para gerenciar seu website, simplesmente abra a área administrativa do Umbraco para começar adicionando conteúdo, atualizando modelos e stylesheets e adicionando nova funcionalidade]]></key>
