@@ -17,7 +17,9 @@ context('Languages', () => {
 
         // Enter language tree and select the language we just created
         cy.get('.umb-box-content').should('be.visible');
-        cy.get('.umb-tree').should('be.visible');
+        cy.get('.umb-tree-root').contains("Settings").should('be.visible');
+        // We have to wait in case the execution is slow, otherwise we'll try and click the item before it appears in the UI
+        cy.get('.umb-tree-item__inner').should('exist', {timeout: 10000});
         cy.umbracoTreeItem('settings', ['Languages']).click();
 
         // Assert there are 3 languages
