@@ -14,15 +14,14 @@ import {
       });
 
       afterEach(() =>  {
-          cy.umbracoEnsureDocumentTypeNameNotExists(tabsDocTypeName)
+          cy.umbracoEnsureDocumentTypeNameNotExists(tabsDocTypeName);
+          cy.umbracoEnsureTemplateNameNotExists(tabsDocTypeName);
       });
 
       function OpenDocTypeFolder(){
           cy.umbracoSection('settings');
-          cy.get('.umb-box-content').should('be.visible');
-          cy.get('.umb-tree-root').contains("Settings").should('be.visible');
           // We have to wait in case the execution is slow, otherwise we'll try and click the item before it appears in the UI
-          cy.get('.umb-tree-item__inner').should('exist', {timeout: 10000});
+          cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
           cy.umbracoTreeItem('settings', ["Document Types", tabsDocTypeName]).click();
       }
 
