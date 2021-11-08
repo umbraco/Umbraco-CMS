@@ -53,29 +53,21 @@ namespace Umbraco.Web.Models.Mapping
 
             var resolved = base.Map(source, context);
 
-            if (provider.IsUmbracoMembershipProvider() == false)
+            // IMember.IsLockedOut can't be set to true, so make it readonly when that's the case (you can only unlock)
+            var isLockedOutPropertyAlias = Constants.Conventions.Member.IsLockedOut;
+            if (provider.IsUmbracoMembershipProvider() &&
+                provider is IUmbracoMemberTypeMembershipProvider umbracoProvider)
             {
-                // it's a generic provider so update the locked out property based on our known constant alias
-                var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
-                if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
-                {
-                    isLockedOutProperty.View = "readonlyvalue";
-                    isLockedOutProperty.Value = _localizedTextService.Localize("general", "no");
-                }
-            }
-            else
-            {
-                var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
-
                 // This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
                 // if we just had all of the membership provider fields on the member table :(
                 // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
-                var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
-                if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
-                {
-                    isLockedOutProperty.View = "readonlyvalue";
-                    isLockedOutProperty.Value = _localizedTextService.Localize("general", "no");
-                }
+                isLockedOutPropertyAlias = umbracoProvider.LockPropertyTypeAlias;
+            }
+
+            var isLockedOutProperty = resolved.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == isLockedOutPropertyAlias);
+            if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
+            {
+                isLockedOutProperty.Readonly = true;
             }
 
             return resolved;
