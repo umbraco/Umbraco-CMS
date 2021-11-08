@@ -203,8 +203,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     {
                         return await LinkUser(autoLinkUser, loginInfo);
                     }
-
-                    return await LinkUser(autoLinkUser, loginInfo);
                 }
                 else
                 {
