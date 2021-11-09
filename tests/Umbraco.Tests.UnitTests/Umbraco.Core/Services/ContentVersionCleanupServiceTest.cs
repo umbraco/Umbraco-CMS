@@ -15,16 +15,9 @@ using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Tests.Services
 {
-    /// <remarks>
-    /// v9 -> Tests.UnitTests
-    /// Sut here is ContentService, but in v9 should be a new class
-    /// </remarks>
     [TestFixture]
     internal class ContentVersionCleanupServiceTest
     {
- /// <remarks>
-        /// For v9 this just needs a rewrite, no static events, no service location etc
-        /// </remarks>
         [Test]
         [AutoMoqData]
         public void PerformContentVersionCleanup_Always_RespectsDeleteRevisionsCancellation(
@@ -54,9 +47,6 @@ namespace Umbraco.Tests.Services
             });
         }
 
-        /// <remarks>
-        /// For v9 this just needs a rewrite, no static events, no service location etc
-        /// </remarks>
         [Test]
         [AutoMoqData]
         public void PerformContentVersionCleanup_Always_FiresDeletedVersionsForEachDeletedVersion(
