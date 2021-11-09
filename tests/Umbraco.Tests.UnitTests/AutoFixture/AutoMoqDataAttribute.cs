@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
                         .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()));
 
-                    fixture.Customize(new AutoMoqCustomization());
+                    fixture.Customize(new AutoMoqCustomization(){ConfigureMembers = true});
 
                     // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
                     fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc => cc.FromFactory(() => Mock.Of<IUserLockoutStore<BackOfficeIdentityUser>>()));
