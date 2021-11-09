@@ -74,6 +74,8 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
                         u => u.FromFactory(
                             () => new UmbracoVersion()));
 
+                    fixture.Customize<HostingSettings>(x =>
+                        x.With(settings => settings.ApplicationVirtualPath, string.Empty));
                     fixture.Customize<BackOfficeAreaRoutes>(u => u.FromFactory(
                         () => new BackOfficeAreaRoutes(
                             Options.Create(new GlobalSettings()),
