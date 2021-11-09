@@ -6,6 +6,9 @@ using System.Reflection;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Web.Cache
 {
@@ -66,10 +69,9 @@ namespace Umbraco.Web.Cache
             using (_umbracoContextFactory.EnsureUmbracoContext())
             {
                 // When it comes to content types types, a change to any single one will trigger a reload of the content and media caches.
-                // As far as I (AB) can tell, there's no type specific logic here, they all clear caches for all content types, and trigger a reload of all content and media.
-                // We also have events registered for Changed and Saved, which do the same thing, so really only need one of these.
-                // Hence if we have more than one document or media types, we can and should only handle one of the events for one, to avoid repeated cache reloads.
-                foreach (var e in GetReducedEventList(events))
+                // We can reduce the impact of that by grouping the events to invoke just one per type, providing a collection of the individual arguments.
+                var groupedEvents = GetGroupedEventList(events);
+                foreach (var e in groupedEvents)
                 {
                     var handler = FindHandler(e);
                     if (handler == null)
@@ -86,47 +88,77 @@ namespace Umbraco.Web.Cache
         }
 
         // Internal for tests
-        internal static IEnumerable<IEventDefinition> GetReducedEventList(IEnumerable<IEventDefinition> events)
+        internal static IEnumerable<IEventDefinition> GetGroupedEventList(IEnumerable<IEventDefinition> events)
         {
-            var reducedEvents = new List<IEventDefinition>();
+            var groupedEvents = new List<IEventDefinition>();
 
-            var gotDoumentType = false;
-            var gotMediaType = false;
-            var gotMemberType = false;
+            var grouped = events.GroupBy(x => x.GetType());
 
-            foreach (var evt in events)
+            foreach (var group in grouped)
             {
-                if (evt.Sender.ToString().Contains(nameof(Core.Services.Implement.ContentTypeService)))
+                if (group.Key == typeof(EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>))
                 {
-                    if (gotDoumentType == false)
-                    {
-                        reducedEvents.Add(evt);
-                        gotDoumentType = true;
-                    }
+                    GroupSaveEvents<IContentTypeService, IContentType>(groupedEvents, group);
                 }
-                else if (evt.Sender.ToString().Contains(nameof(Core.Services.Implement.MediaTypeService)))
+                else if (group.Key == typeof(EventDefinition<IContentTypeService, ContentTypeChange<IContentType>.EventArgs>))
                 {
-                    if (gotMediaType == false)
-                    {
-                        reducedEvents.Add(evt);
-                        gotMediaType = true;
-                    }
+                    GroupChangeEvents<IContentTypeService, IContentType>(groupedEvents, group);
                 }
-                else if (evt.Sender.ToString().Contains(nameof(Core.Services.Implement.MemberTypeService)))
+                else if (group.Key == typeof(EventDefinition<IMediaTypeService, SaveEventArgs<IMediaType>>))
                 {
-                    if (gotMemberType == false)
-                    {
-                        reducedEvents.Add(evt);
-                        gotMemberType = true;
-                    }
+                    GroupSaveEvents<IMediaTypeService, IMediaType>(groupedEvents, group);
+                }
+                else if (group.Key == typeof(EventDefinition<IMediaTypeService, ContentTypeChange<IMediaType>.EventArgs>))
+                {
+                    GroupChangeEvents<IMediaTypeService, IMediaType>(groupedEvents, group);
+                }
+                else if (group.Key == typeof(EventDefinition<IMemberTypeService, SaveEventArgs<IMemberType>>))
+                {
+                    GroupSaveEvents<IMemberTypeService, IMemberType>(groupedEvents, group);
+                }
+                else if (group.Key == typeof(EventDefinition<IMemberTypeService, ContentTypeChange<IMemberType>.EventArgs>))
+                {
+                    GroupChangeEvents<IMemberTypeService, IMemberType>(groupedEvents, group);
                 }
                 else
                 {
-                    reducedEvents.Add(evt);
+                    groupedEvents.AddRange(group);
                 }
             }
 
-            return reducedEvents;
+            return groupedEvents;
+        }
+
+        private static void GroupSaveEvents<TService, TType>(List<IEventDefinition> groupedEvents, IGrouping<Type, IEventDefinition> group)
+            where TService : IContentTypeBaseService
+            where TType : IContentTypeBase
+        {
+            var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
+
+            foreach (var groupedGroup in groupedGroups)
+            {
+                groupedEvents.Add(new EventDefinition<TService, SaveEventArgs<TType>>(
+                    null,
+                    (TService)groupedGroup.Key.Sender,
+                    new SaveEventArgs<TType>(groupedGroup.SelectMany(x => ((SaveEventArgs<TType>)x.Args).SavedEntities)),
+                    groupedGroup.Key.EventName));
+            }
+        }
+
+        private static void GroupChangeEvents<TService, TType>(List<IEventDefinition> groupedEvents, IGrouping<Type, IEventDefinition> group)
+            where TService : IContentTypeBaseService
+            where TType : class, IContentTypeComposition
+        {
+            var groupedGroups = group.GroupBy(x => (x.EventName, x.Sender));
+
+            foreach (var groupedGroup in groupedGroups)
+            {
+                groupedEvents.Add(new EventDefinition<TService, ContentTypeChange<TType>.EventArgs>(
+                    null,
+                    (TService)groupedGroup.Key.Sender,
+                    new ContentTypeChange<TType>.EventArgs(groupedGroup.SelectMany(x => ((ContentTypeChange<TType>.EventArgs)x.Args).Changes)),
+                    groupedGroup.Key.EventName));
+            }
         }
     }
 }
