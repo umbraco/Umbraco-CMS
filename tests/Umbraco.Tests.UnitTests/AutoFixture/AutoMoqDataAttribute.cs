@@ -21,10 +21,12 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
 {
+
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
     public class AutoMoqDataAttribute : AutoDataAttribute
     {
@@ -40,6 +42,7 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
 
         internal static class AutoMockCustomizations
         {
+
             public static IFixture Default => new Fixture().Customize(new UmbracoCustomization());
 
             private class UmbracoCustomization : ICustomization
@@ -58,7 +61,7 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
                         .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()));
 
-                    fixture.Customize(new AutoMoqCustomization());
+                    fixture.Customize(new AutoMoqCustomization(){ConfigureMembers = true});
 
                     // When requesting an IUserStore ensure we actually uses a IUserLockoutStore
                     fixture.Customize<IUserStore<BackOfficeIdentityUser>>(cc => cc.FromFactory(() => Mock.Of<IUserLockoutStore<BackOfficeIdentityUser>>()));
@@ -71,6 +74,8 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
                         u => u.FromFactory(
                             () => new UmbracoVersion()));
 
+                    fixture.Customize<HostingSettings>(x =>
+                        x.With(settings => settings.ApplicationVirtualPath, string.Empty));
                     fixture.Customize<BackOfficeAreaRoutes>(u => u.FromFactory(
                         () => new BackOfficeAreaRoutes(
                             Options.Create(new GlobalSettings()),
@@ -84,12 +89,18 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
                             Mock.Of<IHostingEnvironment>(x => x.ToAbsolute(It.IsAny<string>()) == "/umbraco" && x.ApplicationVirtualPath == string.Empty),
                             Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
 
-                    var connectionStrings = new ConnectionStrings();
-                    fixture.Customize<ConnectionStrings>(x => x.FromFactory(() => connectionStrings));
+                    var configConnectionString = new ConfigConnectionString("ss",
+                        "Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\Umbraco.mdf;Integrated Security=True");
+                    fixture.Customize<ConfigConnectionString>(x => x.FromFactory(() => configConnectionString));
+
 
                     var httpContextAccessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
                     fixture.Customize<HttpContext>(x => x.FromFactory(() => httpContextAccessor.HttpContext));
                     fixture.Customize<IHttpContextAccessor>(x => x.FromFactory(() => httpContextAccessor));
+
+                    fixture.Customize<WebRoutingSettings>(x => x.With(settings => settings.UmbracoApplicationUrl, "http://localhost:5000"));
+
+                    fixture.Behaviors.Add(new OmitOnRecursionBehavior());
                 }
             }
         }
