@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
         /// [Frozen] can be used to ensure the same variable is injected and available as parameter for the test
         /// </summary>
         public InlineAutoMoqDataAttribute(params object[] arguments)
-            : base(() => AutoMoqDataAttribute.AutoMockCustomizations.Default, arguments)
+            : base(UmbracoAutoMoqFixtureFactory.CreateDefaultFixture, arguments)
         {
         }
     }
