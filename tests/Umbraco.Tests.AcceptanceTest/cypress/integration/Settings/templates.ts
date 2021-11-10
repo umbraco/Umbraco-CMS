@@ -70,6 +70,7 @@ context('Templates', () => {
         // Edit
         cy.get('.ace_content').type(edit);
         cy.get('.ace_content').contains(edit);
+        cy.wait(1000);
 
         // Navigate away
         cy.umbracoSection('content');
@@ -104,6 +105,7 @@ context('Templates', () => {
         // Edit
         cy.get('.ace_content').type(edit);
         cy.get('.ace_content').contains(edit);
+        cy.wait(1000);
 
         // Navigate away
         cy.umbracoSection('content');
