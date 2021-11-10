@@ -122,7 +122,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                 new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>> {
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
+                        {
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
@@ -146,7 +147,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                 new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>> {
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
+                        {
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
@@ -171,7 +173,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                 new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>> {
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
+                        {
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
@@ -196,7 +199,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                 new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>> {
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
+                        {
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
@@ -220,7 +224,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                 new Dictionary<CultureInfo, Lazy<IDictionary<string, IDictionary<string, string>>>>
                 {
                     {
-                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>                        {
+                        culture, new Lazy<IDictionary<string, IDictionary<string, string>>>(() => new Dictionary<string, IDictionary<string, string>>
+                        {
                             {
                                 "testArea", new Dictionary<string, string>
                                 {
