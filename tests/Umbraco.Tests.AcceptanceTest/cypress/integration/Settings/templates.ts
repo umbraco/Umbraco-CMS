@@ -70,7 +70,7 @@ context('Templates', () => {
         // Edit
         cy.get('.ace_content').type(edit);
         cy.get('.ace_content').contains(edit);
-        cy.wait(1000); // Really don't like these waits, but we have to ensure we're not going to fast here
+        cy.wait(5000); // Really don't like these waits, but we have to ensure we're not going to fast here
 
         // Navigate away
         cy.umbracoSection('content');
@@ -105,7 +105,7 @@ context('Templates', () => {
         // Edit
         cy.get('.ace_content').type(edit);
         cy.get('.ace_content').contains(edit);
-        cy.wait(1000); // Really don't like these waits, but we have to ensure we're not going to fast here
+        cy.wait(5000); // Really don't like these waits, but we have to ensure we're not going to fast here
 
         // Navigate away
         cy.umbracoSection('content');
