@@ -88,8 +88,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ImageCropMode = ImageCropMode.Max,
                 CacheBusterValue = rnd
             });
-
-            return new RedirectResult(imageUrl, false);
+            if (Url.IsLocalUrl(imageUrl))
+            {
+                return new LocalRedirectResult(imageUrl, false);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         /// <summary>
