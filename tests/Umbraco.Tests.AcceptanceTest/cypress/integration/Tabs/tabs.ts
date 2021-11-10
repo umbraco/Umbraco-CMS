@@ -99,8 +99,6 @@ import {
         cy.umbracoButtonByLabelKey('buttons_save').click();
         //Assert
         cy.get('[title="aTab 1"]').should('not.exist');
-        //Clean
-        cy.umbracoEnsureDocumentTypeNameNotExists(tabsDocTypeName);
       });
 
       it('Delete property in tab', () => {

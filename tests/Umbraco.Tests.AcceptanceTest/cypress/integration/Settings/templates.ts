@@ -102,6 +102,7 @@ context('Templates', () => {
         cy.umbracoTreeItem("settings", ["Templates", name]).click();
         // Edit
         cy.get('.ace_text-input').type(edit, {force:true} );
+        cy.get('.ace_content').contains(edit);
 
         // Navigate away
         cy.umbracoSection('content');
