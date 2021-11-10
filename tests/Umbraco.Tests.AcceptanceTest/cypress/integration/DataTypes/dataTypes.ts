@@ -26,6 +26,12 @@ context('DataTypes', () => {
 
         //umbracoMakeDocTypeWithDataTypeAndContent(name, alias, pickerDataType);
         cy.umbracoCreateDocTypeWithContent(name, alias, pickerDataType);
+        //Editing template with some content
+        cy.editTemplate(name, '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ApprovedColourTest>' +
+          '\n@{' +
+          '\n    Layout = null;' +
+          '\n}' +
+          '\n<p style="color:@Model.UmbracoTest">Lorem ipsum dolor sit amet</p>');
 
         // Act
         // Enter content
@@ -36,12 +42,6 @@ context('DataTypes', () => {
         //Save
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         cy.umbracoSuccessNotification().should('be.visible');
-        //Editing template with some content
-        cy.editTemplate(name, '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ApprovedColourTest>' +
-            '\n@{' +
-            '\n    Layout = null;' +
-            '\n}' +
-            '\n<p style="color:@Model.UmbracoTest">Lorem ipsum dolor sit amet</p>');
 
         //Assert
         const expected = `<p style="color:000000" > Lorem ipsum dolor sit amet </p>`;
