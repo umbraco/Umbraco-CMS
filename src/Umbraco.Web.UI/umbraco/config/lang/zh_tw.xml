@@ -14,9 +14,9 @@
     <key alias="createPackage">創建擴展包</key>
     <key alias="delete">刪除</key>
     <key alias="disable">禁用</key>
-    <key alias="emptyrecyclebin">清空回收站</key>
+    <key alias="emptyRecycleBin">清空回收站</key>
     <key alias="exportDocumentType">匯出文檔類型</key>
-    <key alias="importdocumenttype">導入文檔類型</key>
+    <key alias="importDocumentType">導入文檔類型</key>
     <key alias="importPackage">導入擴展包</key>
     <key alias="liveEdit">即時編輯模式</key>
     <key alias="logout">退出</key>
@@ -475,19 +475,12 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">無法連接到資料庫。</key>
-    <key alias="databaseErrorWebConfig">無法保存web.config檔，請手工修改。</key>
     <key alias="databaseFound">發現資料庫</key>
     <key alias="databaseHeader">資料庫配置</key>
     <key alias="databaseInstall"><![CDATA[
       請按 <strong>安裝</strong> 按鈕來安裝Umbraco資料庫 %0%
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% 已經複製到您的資料庫了。請按<strong>下一步</strong>繼續。]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>沒有找到資料庫！請確認檔案"web.config"中的字串"connection string"是否正確。</p>
-              <p>請編輯檔案"web.config" (例如使用Visual Studio或您喜歡的編輯器)，移動到檔案底部，並在名稱為"UmbracoDbDSN"的字串中設定資料庫連結資訊，並存檔。</p>
-              <p>
-              點選<strong>重試</strong>按鈕當上述步驟完成。<br />
-              <a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-			              在此查詢更多編輯web.config的資訊。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[要完成此步驟，您必須瞭解連結資料庫伺服器的重要資訊("connection string")。<br />
         若需要時，請聯繫您的網路公司。如果您在本地機器或伺服器安裝的話，您也許需要聯絡系統管理者。]]></key>
     <key alias="databaseUpgrade"><![CDATA[
@@ -504,7 +497,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>安裝後預設使用者的密碼已經成功修改！</strong></p><p>不需更多的操作步驟。點選<b>下一步</b>繼續。]]></key>
     <key alias="defaultUserPasswordChanged">密碼已更改</key>
     <key alias="greatStart">作為入門者，從視頻教程開始吧！</key>
-    <key alias="licenseText">點擊下一步 (或在Web.config中自行修改UmbracoConfigurationStatus)，意味著您接受上述授權合約。</key>
     <key alias="None">安裝失敗。</key>
     <key alias="permissionsAffectedFolders">受影響的檔和資料夾</key>
     <key alias="permissionsAffectedFoldersMoreInfo">此處查看更多資訊</key>
@@ -567,7 +559,6 @@
     <key alias="theEndFurtherHelp"><![CDATA[<h3>更多的幫忙與資訊</h3>
 從我們獲獎的社群得到幫助，瀏覽文件，或觀看免費影片來瞭解如何輕鬆架設網站，如何使用插件，和瞭解Umbraco項目名稱的快速上手指引。]]></key>
     <key alias="theEndHeader">系統 %0% 安裝完畢</key>
-    <key alias="theEndInstallFailed"><![CDATA[欲完成安裝，您會需要手動修改<strong>/web.config 檔案</strong>並且更新AppSetting中的字串<strong>UmbracoConfigurationStatus</strong> 內容為 <strong>'%0%'</strong>。]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[您可以點選下方按鈕「啟動Umbraco」來獲得<strong>快速開始指引</strong>。<br />如果您是<strong>Umbraco的新成員</strong>，
 您可以在其中找到相當多的資源。]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>啟動Umbraco</h3>
@@ -1134,8 +1125,6 @@
     <key alias="httpsCheckInvalidCertificate">憑證驗證錯誤：%0%</key>
     <key alias="healthCheckInvalidUrl">網址探查錯誤：%0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">您目前使用HTTPS瀏覽本站：%0%</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">在您的web.config檔案中，appSetting的Umbraco.Core.UseHttps是設為false。當您開始使用HTTPS時，應將其改為 true。</key>
-    <key alias="httpsCheckConfigurationCheckResult">在您的web.config檔案中，appSetting的Umbraco.Core.UseHttps是設為 %0%，您的cookies %0% 標成安全。</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">偵錯編輯模式關閉。</key>
     <key alias="compilationDebugCheckErrorMessage">偵錯編輯模式目前已開啟。上線前建議將其關閉。</key>
@@ -1155,10 +1144,7 @@
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[在標頭中有找到揭露網站技術的資訊：<strong>%0%</strong>。]]></key>
     <key alias="excessiveHeadersNotFound">在標頭中沒有找到揭露網站技術的資訊。</key>
-    <key alias="smtpMailSettingsNotFound">在 Web.config 檔案中，找不到 system.net/mailsettings。</key>
-    <key alias="smtpMailSettingsHostNotConfigured">在 Web.config 檔案中的 system.net/mailsettings，沒有設定 host 。</key>
     <key alias="smtpMailSettingsConnectionSuccess">SMTP設定正確，而且服務正常運作。</key>
-    <key alias="smtpMailSettingsConnectionFail">SMTP伺服器 %0% : %1% 無法連接。請確認在Web.config 檔案中 system.net/mailsettings 設定正確。</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[提醒郵件已經設為 <strong>%0%</strong>。]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[提醒郵件仍為預設值<strong>%0%</strong>。]]></key>
   </area>

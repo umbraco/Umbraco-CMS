@@ -43,6 +43,7 @@
     <Content Remove="umbraco/Data/**" />
     <Content Remove="umbraco/logs/**" />
     <Content Remove="umbraco/mediacache/**" />
+    <Content Remove="umbraco\UmbracoWebsite\NotFound.cshtml" />
     <Content Remove="wwwroot/Web.config" />
   </ItemGroup>
 
@@ -66,7 +67,7 @@
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.11" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

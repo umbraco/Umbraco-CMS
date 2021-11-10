@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -33,6 +34,8 @@ namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
         /// <param name="culture"></param>
         /// <param name="query"></param>
         /// <returns></returns>
+        ///
+        [AllowHttpJsonConfigration]
         public IEnumerable<TagModel> GetTags(string tagGroup, string culture, string query = null)
         {
             if (culture == string.Empty) culture = null;

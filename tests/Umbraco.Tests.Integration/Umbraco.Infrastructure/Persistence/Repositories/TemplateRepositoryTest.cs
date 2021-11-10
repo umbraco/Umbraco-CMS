@@ -38,10 +38,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
         private FileSystems FileSystems => GetRequiredService<FileSystems>();
+        private IViewHelper ViewHelper => GetRequiredService<IViewHelper>();
 
         private ITemplateRepository CreateRepository(IScopeProvider provider) =>
-            new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper);
-
+            new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper, ViewHelper);
+        
         [Test]
         public void Can_Instantiate_Repository()
         {
@@ -90,16 +91,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
                 {
-                    Content = ViewHelper.GetDefaultFileContent()
+                    Content = "mock-content"
                 };
                 repository.Save(template);
 
                 // Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
-                Assert.AreEqual(
-                    @"@usingUmbraco.Cms.Web.Common.PublishedModels;@inheritsUmbraco.Cms.Web.Common.Views.UmbracoViewPage@{Layout=null;}".StripWhitespace(),
-                    template.Content.StripWhitespace());
+                Assert.AreEqual("mock-content", template.Content.StripWhitespace());
             }
         }
 
@@ -144,13 +143,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
                 {
-                    Content = ViewHelper.GetDefaultFileContent()
+                    Content = "mock-content"
                 };
                 repository.Save(template);
 
                 var template2 = new Template(ShortStringHelper, "test", "test")
                 {
-                    Content = ViewHelper.GetDefaultFileContent()
+                    Content = "mock-content"
                 };
                 repository.Save(template2);
 
@@ -172,13 +171,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
                 {
-                    Content = ViewHelper.GetDefaultFileContent()
+                    Content = "mock-content"
                 };
                 repository.Save(template);
 
                 var template2 = new Template(ShortStringHelper, "test1", "test1")
                 {
-                    Content = ViewHelper.GetDefaultFileContent()
+                    Content = "mock-content"
                 };
                 repository.Save(template2);
 
@@ -205,7 +204,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 var template = new Template(ShortStringHelper, "test", "test")
                 {
-                    Content = ViewHelper.GetDefaultFileContent()
+                    Content = "mock-content"
                 };
                 repository.Save(template);
 
@@ -216,7 +215,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Assert
                 Assert.That(FileSystems.MvcViewsFileSystem.FileExists("test.cshtml"), Is.True);
-                Assert.That(updated.Content, Is.EqualTo(ViewHelper.GetDefaultFileContent() + "<html></html>"));
+                Assert.That(updated.Content, Is.EqualTo("mock-content" + "<html></html>"));
             }
         }
 
@@ -232,7 +231,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 var template = new Template(ShortStringHelper, "test", "test")
                 {
-                    Content = ViewHelper.GetDefaultFileContent()
+                    Content = "mock-content"
                 };
                 repository.Save(template);
 

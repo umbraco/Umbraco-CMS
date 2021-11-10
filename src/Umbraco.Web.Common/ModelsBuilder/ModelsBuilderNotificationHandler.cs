@@ -26,15 +26,17 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private readonly ModelsBuilderSettings _config;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IModelsBuilderDashboardProvider _modelsBuilderDashboardProvider;
+        private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
         public ModelsBuilderNotificationHandler(
             IOptions<ModelsBuilderSettings> config,
             IShortStringHelper shortStringHelper,
-            IModelsBuilderDashboardProvider modelsBuilderDashboardProvider)
+            IModelsBuilderDashboardProvider modelsBuilderDashboardProvider, IDefaultViewContentProvider defaultViewContentProvider)
         {
             _config = config.Value;
             _shortStringHelper = shortStringHelper;
             _modelsBuilderDashboardProvider = modelsBuilderDashboardProvider;
+            _defaultViewContentProvider = defaultViewContentProvider;
         }
 
         /// <summary>
@@ -123,7 +125,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
                     // we do not support configuring this at the moment, so just let Umbraco use its default value
                     // var modelNamespaceAlias = ...;
-                    var markup = ViewHelper.GetDefaultFileContent(
+                    var markup = _defaultViewContentProvider.GetDefaultFileContent(
                         modelClassName: className,
                         modelNamespace: modelNamespace/*,
                         modelNamespaceAlias: modelNamespaceAlias*/);
