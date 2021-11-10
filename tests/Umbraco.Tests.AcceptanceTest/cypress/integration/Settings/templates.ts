@@ -69,8 +69,8 @@ context('Templates', () => {
         cy.umbracoTreeItem("settings", ["Templates", name]).click();
         // Edit
         cy.get('.ace_content').type(edit);
-        cy.get('.ace_content').contains(edit);
-        cy.wait(5000); // Really don't like these waits, but we have to ensure we're not going to fast here
+        cy.get('.ace_content').contains(edit).should('be.visible');
+        cy.get('.btn-success').should('be.visible')
 
         // Navigate away
         cy.umbracoSection('content');
@@ -104,8 +104,8 @@ context('Templates', () => {
         cy.umbracoTreeItem("settings", ["Templates", name]).click();
         // Edit
         cy.get('.ace_content').type(edit);
-        cy.get('.ace_content').contains(edit);
-        cy.wait(5000); // Really don't like these waits, but we have to ensure we're not going to fast here
+        cy.get('.ace_content').contains(edit).should('be.visible');
+        cy.get('.btn-success').should('be.visible')
 
         // Navigate away
         cy.umbracoSection('content');
