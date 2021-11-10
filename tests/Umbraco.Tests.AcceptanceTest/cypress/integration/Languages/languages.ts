@@ -16,7 +16,7 @@ context('Languages', () => {
         //Enter settings section and wait for everything to load
         cy.umbracoSection('settings');
         cy.get('.umb-box-content').should('be.visible');
-        cy.get('.umb-tree-root').contains("Settings").should('be.visible');
+        cy.get('li .umb-tree-root:contains("Settings")').should("be.visible");
 
         // Enter language tree and select the language we just created
         cy.umbracoTreeItem('settings', ['Languages']).click();
