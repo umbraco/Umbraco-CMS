@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Data.Common;
 using Microsoft.Extensions.Configuration;
@@ -139,7 +142,7 @@ namespace Umbraco.Extensions
         {
             if ((builder.TryGetValue("Data Source", out var dataSourceValue) || builder.TryGetValue("DataSource", out dataSourceValue)) &&
                 dataSourceValue is string dataSource &&
-                dataSource.EndsWith(".sdf", StringComparison.OrdinalIgnoreCase) == true)
+                dataSource.EndsWith(".sdf", StringComparison.OrdinalIgnoreCase))
             {
                 return Cms.Core.Constants.DbProviderNames.SqlCe;
             }
