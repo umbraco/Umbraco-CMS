@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IFactory> factory,
             [Frozen] Mock<IScope> scope,
             Mock<IDocumentVersionRepository> documentVersionRepository,
-            List<TestHistoricContentVersionMeta> someHistoricVersions,
+            List<TestContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentService sut)
         {
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IFactory> factory,
             [Frozen] Mock<IScope> scope,
             Mock<IDocumentVersionRepository> documentVersionRepository,
-            List<TestHistoricContentVersionMeta> someHistoricVersions,
+            List<TestContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentService sut)
         {
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IFactory> factory,
             [Frozen] Mock<IScope> scope,
             Mock<IDocumentVersionRepository> documentVersionRepository,
-            List<TestHistoricContentVersionMeta> someHistoricVersions,
+            List<TestContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentService sut)
         {
@@ -156,7 +156,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IScope> scope,
             Mock<IDocumentVersionRepository> documentVersionRepository,
             Mock<IContentVersionCleanupPolicy> cleanupPolicy,
-            List<TestHistoricContentVersionMeta> someHistoricVersions,
+            List<TestContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentService sut)
         {
@@ -171,8 +171,8 @@ namespace Umbraco.Tests.Services
 
             scope.Setup(x => x.Events).Returns(new PassThroughEventDispatcher());
 
-            cleanupPolicy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<TestHistoricContentVersionMeta>>()))
-                .Returns<DateTime, IEnumerable<TestHistoricContentVersionMeta>>((_, items) => items.Take(1));
+            cleanupPolicy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<TestContentVersionMeta>>()))
+                .Returns<DateTime, IEnumerable<TestContentVersionMeta>>((_, items) => items.Take(1));
 
             // Wire up service locator
             Current.Factory = factory.Object;
@@ -198,7 +198,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IScope> scope,
             Mock<IDocumentVersionRepository> documentVersionRepository,
             Mock<IContentVersionCleanupPolicy> cleanupPolicy,
-            List<TestHistoricContentVersionMeta> someHistoricVersions,
+            List<TestContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentService sut)
         {
@@ -215,8 +215,8 @@ namespace Umbraco.Tests.Services
 
             var filteredSet = someHistoricVersions.Take(1);
 
-            cleanupPolicy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<TestHistoricContentVersionMeta>>()))
-                .Returns<DateTime, IEnumerable<TestHistoricContentVersionMeta>>((_, items) => filteredSet);
+            cleanupPolicy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<TestContentVersionMeta>>()))
+                .Returns<DateTime, IEnumerable<TestContentVersionMeta>>((_, items) => filteredSet);
 
             // Wire up service locator
             Current.Factory = factory.Object;
@@ -243,9 +243,9 @@ namespace Umbraco.Tests.Services
              * cleanupPolicy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<TestHistoricContentVersionMeta>>()))
              *    .Returns<DateTime, IEnumerable<TestHistoricContentVersionMeta>>((date, items) => items);
              */
-            public IEnumerable<HistoricContentVersionMeta> Apply(
+            public IEnumerable<ContentVersionMeta> Apply(
                 DateTime asAtDate,
-                IEnumerable<HistoricContentVersionMeta> items
+                IEnumerable<ContentVersionMeta> items
             ) => items;
         }
 
@@ -255,10 +255,31 @@ namespace Umbraco.Tests.Services
         ///
         /// <para>Inheritance solves this so that we get values for test data without a specimen builder</para>
         /// </remarks>
-        public class TestHistoricContentVersionMeta : HistoricContentVersionMeta
+        public class TestContentVersionMeta : ContentVersionMeta
         {
-            public TestHistoricContentVersionMeta(int contentId, int contentTypeId, int versionId, DateTime versionDate)
-                : base(contentId, contentTypeId, versionId, versionDate) { }
+            public TestContentVersionMeta(
+                int contentId,
+                int contentTypeId,
+                int versionId,
+                int userId,
+                DateTime versionDate,
+                bool currentPublishedVersion,
+                bool currentDraftVersion,
+                bool preventCleanup,
+                string username)
+            : base(
+                contentId,
+                contentTypeId,
+                versionId,
+                userId,
+                versionDate,
+                currentPublishedVersion,
+                currentDraftVersion,
+                preventCleanup,
+                username
+            )
+            {
+            }
         }
     }
 }

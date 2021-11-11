@@ -181,7 +181,7 @@
     <Compile Include="Persistence\Dtos\ConstraintPerTableDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCleanupPolicyDto.cs" />
     <Compile Include="Persistence\Dtos\DefaultConstraintPerColumnDto.cs" />
-    <Compile Include="Models\HistoricContentVersionMeta.cs" />
+    <Compile Include="Models\ContentVersionMeta.cs" />
     <Compile Include="Persistence\Dtos\UserNotificationDto.cs" />
     <Compile Include="Persistence\Repositories\IDocumentVersionRepository.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />

@@ -2399,6 +2399,32 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
+        public PagedResult<ContentVersionMeta> GetPagedContentVersions(
+            int contentId,
+            int pageNumber = 1,
+            int pageSize = 10,
+            string culture = null)
+        {
+            if (!string.IsNullOrEmpty(culture))
+            {
+                if (!_allLangs.Value.TryGetValue(culture, out _))
+                {
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                }
+            }
+
+            // NOTE: v9 - don't service locate
+            var contentVersionService = Current.Factory.GetInstance<IContentVersionService>();
+
+            var results =  contentVersionService.GetPagedContentVersions(contentId, pageNumber - 1, pageSize, out var totalRecords, culture);
+
+            return new PagedResult<ContentVersionMeta>(totalRecords, pageNumber, pageSize)
+            {
+                Items = results
+            };
+        }
+
+        [HttpGet]
         public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string culture = null)
         {
             var rollbackVersions = new List<RollbackVersion>();

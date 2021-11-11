@@ -3227,17 +3227,34 @@ namespace Umbraco.Core.Services.Implement
         /// In v9 this can live in another class as we publish the notifications via IEventAggregator.
         /// But for v8 must be here for access to the static events.
         /// </remarks>
-        public IReadOnlyCollection<HistoricContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate)
+        public IReadOnlyCollection<ContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate)
         {
             return CleanupDocumentVersions(asAtDate);
             // Media - ignored
             // Members - ignored
         }
 
+        /// <inheritdoc />
+        public IEnumerable<ContentVersionMeta> GetPagedContentVersions(int contentId, long pageIndex, int pageSize, out long totalRecords, string culture = null)
+        {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            // NOTE: v9 - don't service locate
+            var documentVersionRepository = Composing.Current.Factory.GetInstance<IDocumentVersionRepository>();
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var languageId = _languageRepository.GetIdByIsoCode(culture, throwOnNotFound: true);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return documentVersionRepository.GetPagedItemsByContentId(contentId, pageIndex, pageSize, out totalRecords, languageId);
+            }
+        }
+
         /// <remarks>
         /// v9 - move to another class
         /// </remarks>
-        private IReadOnlyCollection<HistoricContentVersionMeta> CleanupDocumentVersions(DateTime asAtDate)
+        private IReadOnlyCollection<ContentVersionMeta> CleanupDocumentVersions(DateTime asAtDate)
         {
             // NOTE: v9 - don't service locate
             var documentVersionRepository = Composing.Current.Factory.GetInstance<IDocumentVersionRepository>();
@@ -3245,7 +3262,7 @@ namespace Umbraco.Core.Services.Implement
             // NOTE: v9 - don't service locate
             var cleanupPolicy = Composing.Current.Factory.GetInstance<IContentVersionCleanupPolicy>();
 
-            List<HistoricContentVersionMeta> versionsToDelete;
+            List<ContentVersionMeta> versionsToDelete;
 
             /* Why so many scopes?
              *
@@ -3278,7 +3295,7 @@ namespace Umbraco.Core.Services.Implement
                 var allHistoricVersions = documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
 
                 Logger.Debug<ContentService>("Discovered {count} candidate(s) for ContentVersion cleanup.", allHistoricVersions.Count);
-                versionsToDelete = new List<HistoricContentVersionMeta>(allHistoricVersions.Count);
+                versionsToDelete = new List<ContentVersionMeta>(allHistoricVersions.Count);
 
                 var filteredContentVersions = cleanupPolicy.Apply(asAtDate, allHistoricVersions);
 
@@ -3299,7 +3316,7 @@ namespace Umbraco.Core.Services.Implement
             if (!versionsToDelete.Any())
             {
                 Logger.Debug<ContentService>("No remaining ContentVersions for cleanup.", versionsToDelete.Count);
-                return Array.Empty<HistoricContentVersionMeta>();
+                return Array.Empty<ContentVersionMeta>();
             }
 
             Logger.Debug<ContentService>("Removing {count} ContentVersion(s).", versionsToDelete.Count);

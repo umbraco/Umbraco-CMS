@@ -9,6 +9,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Removes historic content versions according to a policy.
         /// </summary>
-        IReadOnlyCollection<HistoricContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate);
+        IReadOnlyCollection<ContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate);
+
+        /// <summary>
+        /// Gets paginated content versions for given content id paginated.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="culture"/> is invalid.</exception>
+        IEnumerable<ContentVersionMeta> GetPagedContentVersions(int contentId, long pageIndex, int pageSize, out long totalRecords, string culture = null);
     }
 }

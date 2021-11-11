@@ -23,10 +23,10 @@ namespace Umbraco.Tests.Services
         {
             var versionId = 0;
 
-            var historicItems = new List<HistoricContentVersionMeta>
+            var historicItems = new List<ContentVersionMeta>
             {
-                new HistoricContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
-                new HistoricContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+                new ContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
 
             globalSettings.Setup(x => x.ContentVersionCleanupPolicyGlobalSettings)
@@ -51,10 +51,10 @@ namespace Umbraco.Tests.Services
         {
             var versionId = 0;
 
-            var historicItems = new List<HistoricContentVersionMeta>
+            var historicItems = new List<ContentVersionMeta>
             {
-                new HistoricContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
-                new HistoricContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+                new ContentVersionMeta(versionId: ++versionId, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
 
             globalSettings.Setup(x => x.ContentVersionCleanupPolicyGlobalSettings)
@@ -77,19 +77,19 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IContentSection> globalSettings,
             DefaultContentVersionCleanupPolicy sut)
         {
-            var historicItems = new List<HistoricContentVersionMeta>
+            var historicItems = new List<ContentVersionMeta>
             {
-                new HistoricContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-3)),
-                new HistoricContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-2)),
-                new HistoricContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
 
-                new HistoricContentVersionMeta(versionId: 4, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddDays(-1).AddHours(-3)),
-                new HistoricContentVersionMeta(versionId: 5, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddDays(-1).AddHours(-2)),
-                new HistoricContentVersionMeta(versionId: 6, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddDays(-1).AddHours(-1)),
+                new ContentVersionMeta(versionId: 4, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 5, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 6, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-1), false, false, false, null),
                 // another content
-                new HistoricContentVersionMeta(versionId: 7, contentId: 2, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-3)),
-                new HistoricContentVersionMeta(versionId: 8, contentId: 2, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-2)),
-                new HistoricContentVersionMeta(versionId: 9, contentId: 2, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: 7, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 8, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 9, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
 
             globalSettings.Setup(x => x.ContentVersionCleanupPolicyGlobalSettings)
@@ -118,15 +118,15 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IContentSection> globalSettings,
             DefaultContentVersionCleanupPolicy sut)
         {
-            var historicItems = new List<HistoricContentVersionMeta>
+            var historicItems = new List<ContentVersionMeta>
             {
-                new HistoricContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-3)),
-                new HistoricContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-2)),
-                new HistoricContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
                 // another content & type
-                new HistoricContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-3)),
-                new HistoricContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-2)),
-                new HistoricContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
 
             globalSettings.Setup(x => x.ContentVersionCleanupPolicyGlobalSettings)
@@ -152,15 +152,15 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IContentSection> globalSettings,
             DefaultContentVersionCleanupPolicy sut)
         {
-            var historicItems = new List<HistoricContentVersionMeta>
+            var historicItems = new List<ContentVersionMeta>
             {
-                new HistoricContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-3)),
-                new HistoricContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-2)),
-                new HistoricContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
                 // another content & type
-                new HistoricContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-3)),
-                new HistoricContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-2)),
-                new HistoricContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
 
             globalSettings.Setup(x => x.ContentVersionCleanupPolicyGlobalSettings)
@@ -186,15 +186,15 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IContentSection> globalSettings,
             DefaultContentVersionCleanupPolicy sut)
         {
-            var historicItems = new List<HistoricContentVersionMeta>
+            var historicItems = new List<ContentVersionMeta>
             {
-                new HistoricContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-3)),
-                new HistoricContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-2)),
-                new HistoricContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
                 // another content & type
-                new HistoricContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-3)),
-                new HistoricContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-2)),
-                new HistoricContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, versionDate: DateTime.Today.AddHours(-1)),
+                new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
 
             globalSettings.Setup(x => x.ContentVersionCleanupPolicyGlobalSettings)

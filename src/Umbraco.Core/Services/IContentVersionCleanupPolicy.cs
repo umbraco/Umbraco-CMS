@@ -12,6 +12,6 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Filters a set of candidates historic content versions for cleanup according to policy settings.
         /// </summary>
-        IEnumerable<HistoricContentVersionMeta> Apply(DateTime asAtDate, IEnumerable<HistoricContentVersionMeta> items);
+        IEnumerable<ContentVersionMeta> Apply(DateTime asAtDate, IEnumerable<ContentVersionMeta> items);
     }
 }
