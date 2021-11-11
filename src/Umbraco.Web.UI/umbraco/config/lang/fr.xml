@@ -1962,7 +1962,14 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="httpsCheckExpiringCertificate">Le certificat SSL de votre site web va expirer dans %0% jours.</key>
     <key alias="healthCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Vous êtes actuellement %0% à voir le site via le schéma HTTPS.</key>
-    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckConfigurationRectifyNotPossible">
+      L'appSetting 'Umbraco:CMS:Global:UseHttps' se trouve à 'false' dans votre fichier appSettings.json.
+      Une fois que vous aurez accès à ce site via le schema HTTPS, il faudra la mettre à 'true'.
+    </key>
+    <key alias="httpsCheckConfigurationCheckResult">
+      L'appSetting 'Umbraco:CMS:Global:UseHttps' se trouve à '%0%' dans votre fichier
+      appSettings.json, vos cookies sont %1% marqués comme 'secured'.
+    </key>   <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Le mode de compilation Debug est désactivé.</key>
     <key alias="compilationDebugCheckErrorMessage">Le mode de compilation Debug est actuellement activé. Il est recommandé de désactiver ce paramètre avant la mise en ligne.</key>
     <!-- The following keys get these tokens passed in:
