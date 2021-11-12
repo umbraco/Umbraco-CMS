@@ -145,7 +145,7 @@ namespace Umbraco.Web.Editors
         /// <returns>A <see cref="HttpResponseMessage"/> containing the persisted relation type's ID.</returns>
         public HttpResponseMessage PostCreate(RelationTypeSave relationType)
         {
-            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(true), relationType.IsBidirectional, relationType.ChildObjectType, relationType.ParentObjectType);
+            var relationTypePersisted = new RelationType(relationType.Name, relationType.Name.ToSafeAlias(true), relationType.IsBidirectional, relationType.ParentObjectType, relationType.ChildObjectType);
 
             try
             {
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
+                Logger.Error<string>(GetType(), ex, "Error creating relation type with {Name}", relationType.Name);
                 return Request.CreateNotificationValidationErrorResponse("Error creating relation type.");
             }
         }
@@ -186,7 +186,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error(GetType(), ex, "Error saving relation type with {Id}", relationType.Id);
+                Logger.Error<object>(GetType(), ex, "Error saving relation type with {Id}", relationType.Id);
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Something went wrong when saving the relation type"));
             }
         }

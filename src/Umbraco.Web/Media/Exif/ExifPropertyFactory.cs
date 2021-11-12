@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Media.Exif
 {
@@ -44,7 +45,7 @@ namespace Umbraco.Web.Media.Exif
                     return new ExifDateTime(ExifTag.DateTime, ExifBitConverter.ToDateTime(value));
                 else if (tag == 0x9c9b || tag == 0x9c9c ||  // Windows tags
                     tag == 0x9c9d || tag == 0x9c9e || tag == 0x9c9f)
-                    return new WindowsByteString(etag, Encoding.Unicode.GetString(value).TrimEnd('\0'));
+                    return new WindowsByteString(etag, Encoding.Unicode.GetString(value).TrimEnd(Constants.CharArrays.NullTerminator));
             }
             else if (ifd == IFD.EXIF)
             {
@@ -75,7 +76,7 @@ namespace Umbraco.Web.Media.Exif
                             hasenc = false;
                     }
 
-                    string val = (hasenc ? enc.GetString(value, 8, value.Length - 8) : enc.GetString(value)).Trim('\0');
+                    string val = (hasenc ? enc.GetString(value, 8, value.Length - 8) : enc.GetString(value)).Trim(Constants.CharArrays.NullTerminator);
 
                     return new ExifEncodedString(ExifTag.UserComment, val, enc);
                 }

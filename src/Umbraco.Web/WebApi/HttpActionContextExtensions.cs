@@ -89,7 +89,9 @@ namespace Umbraco.Web.WebApi
                         throw x.Exception;
                     }
                     result = x.ConfigureAwait(false).GetAwaiter().GetResult();
-                });
+                },
+                // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                TaskScheduler.Default);
             task.Wait();
 
             if (result == null)

@@ -253,7 +253,7 @@ namespace Umbraco.Core
             {
                 builder.Append(String.Format("{0}={1}&", HttpUtility.UrlEncode(i.Key), i.Value == null ? string.Empty : HttpUtility.UrlEncode(i.Value.ToString())));
             }
-            return builder.ToString().TrimEnd('&');
+            return builder.ToString().TrimEnd(Constants.CharArrays.Ampersand);
         }
 
         /// <summary>The get entry ignore case.</summary>

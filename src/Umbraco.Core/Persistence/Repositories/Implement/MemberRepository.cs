@@ -245,8 +245,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             entity.AddingEntity();
 
-            var member = (Member) entity;
-
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
@@ -304,7 +302,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
-            member.VersionId = contentVersionDto.Id;
+            entity.VersionId = contentVersionDto.Id;
 
             // persist the member dto
             dto.NodeId = nodeDto.NodeId;
@@ -321,9 +319,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.ContentType.Variations, member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            InsertPropertyValues(entity, 0, out _, out _);
 
             SetEntityTags(entity, _tagRepository);
 
@@ -336,10 +332,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IMember entity)
         {
-            var member = (Member) entity;
-
             // update
-            member.UpdatingEntity();
+            entity.UpdatingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
@@ -385,27 +379,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (changedCols.Count > 0)
                 Database.Update(dto, changedCols);
 
-            // Replace the property data
-            // Lookup the data to update with a UPDLOCK (using ForUpdate()) this is because we have another method that doesn't take an explicit WriteLock
-            // in SetLastLogin which is called very often and we want to avoid the lock timeout for the explicit lock table but we still need to ensure atomic
-            // operations between that method and this one. 
-
-            var propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId).ForUpdate();
-            var existingPropData = Database.Fetch<PropertyDataDto>(propDataSql).ToDictionary(x => x.PropertyTypeId);
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.ContentType.Variations, member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-            {
-                // Check if this already exists and update, else insert a new one
-                if (existingPropData.TryGetValue(propertyDataDto.PropertyTypeId, out var propData))
-                {
-                    propertyDataDto.Id = propData.Id;
-                    Database.Update(propertyDataDto);
-                }
-                else
-                {
-                    Database.Insert(propertyDataDto);
-                }
-            }   
+            ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
             SetEntityTags(entity, _tagRepository);
 
@@ -457,15 +431,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var matchedMembers = Get(query).ToArray();
 
             var membersInGroup = new List<IMember>();
+
             //then we need to filter the matched members that are in the role
-            //since the max sql params are 2100 on sql server, we'll reduce that to be safe for potentially other servers and run the queries in batches
-            var inGroups = matchedMembers.InGroupsOf(1000);
-            foreach (var batch in inGroups)
+            foreach (var group in matchedMembers.Select(x => x.Id).InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                var memberIdBatch = batch.Select(x => x.Id);
                 var sql = Sql().SelectAll().From<Member2MemberGroupDto>()
                     .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id)
-                    .Where("Member IN (@memberIds)", new { memberIds = memberIdBatch });
+                    .WhereIn<Member2MemberGroupDto>(dto => dto.Member, group);
+
                 var memberIdsInGroup = Database.Fetch<Member2MemberGroupDto>(sql)
                     .Select(x => x.Member).ToArray();
 
@@ -560,7 +533,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var sqlSelectTemplateVersion = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin2", s => s
                .Select<ContentVersionDto>(x => x.Id)
-               .From<ContentVersionDto>()               
+               .From<ContentVersionDto>()
                .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
                .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
@@ -632,7 +605,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
                         content[i] = (Member) cached;

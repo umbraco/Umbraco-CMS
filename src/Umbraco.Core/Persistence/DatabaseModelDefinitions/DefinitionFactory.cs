@@ -160,10 +160,18 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 
             if (string.IsNullOrEmpty(attribute.ForColumns) == false)
             {
-                var columns = attribute.ForColumns.Split(',').Select(p => p.Trim());
+                var columns = attribute.ForColumns.Split(Constants.CharArrays.Comma).Select(p => p.Trim());
                 foreach (var column in columns)
                 {
                     definition.Columns.Add(new IndexColumnDefinition {Name = column, Direction = Direction.Ascending});
+                }
+            }
+            if (string.IsNullOrEmpty(attribute.IncludeColumns) == false)
+            {
+                var columns = attribute.IncludeColumns.Split(',').Select(p => p.Trim());
+                foreach (var column in columns)
+                {
+                    definition.IncludeColumns.Add(new IndexColumnDefinition { Name = column, Direction = Direction.Ascending });
                 }
             }
             return definition;

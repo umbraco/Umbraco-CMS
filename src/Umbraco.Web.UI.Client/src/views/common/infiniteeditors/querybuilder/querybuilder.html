@@ -69,7 +69,7 @@
                                                 show-caret="true">
                                     </umb-button>
 
-                                    <umb-dropdown ng-if="vm.propertyFilterOpen[$index]" on-close="console.log(1);vm.propertyFilterOpen[$index] = false">
+                                    <umb-dropdown ng-if="vm.propertyFilterOpen[$index]" on-close="vm.propertyFilterOpen[$index] = false">
                                         <umb-dropdown-item ng-repeat="property in vm.properties">
                                             <button type="button" class="btn-reset" ng-click="vm.setFilterProperty(filter, property); vm.propertyFilterOpen[$parent.$parent.$index] = false;">
                                                 {{property.name}}
@@ -113,11 +113,11 @@
                                 </span>
 
                                 <button type="button" class="btn-reset" ng-click="vm.addFilter(vm.query)">
-                                    <i class="icon-add" aria-hidden="true"></i>
+                                    <umb-icon icon="icon-add"></umb-icon>
                                 </button>
 
                                 <button type="button" class="btn-reset" ng-click="vm.trashFilter(vm.query, filter)">
-                                    <i class="icon-trash" aria-hidden="true"></i>
+                                    <umb-icon icon="icon-trash"></umb-icon>
                                 </button>
 
                             </div>
@@ -159,7 +159,7 @@
 
                         <ul class="nav unstyled">
                             <li ng-repeat="item in model.result.sampleResults">
-                                <i class="icon {{item.icon}} turquoise-d1" aria-hidden="true"></i> {{item.name}}
+                                <umb-icon icon="{{item.icon}}" class="icon turquoise-d1"></umb-icon> {{item.name}}
                             </li>
                         </ul>
 

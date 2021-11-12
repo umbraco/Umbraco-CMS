@@ -25,6 +25,26 @@
             public const string DataType = "icon-autofill";
 
             /// <summary>
+            /// System dictionary icon
+            /// </summary>
+            public const string Dictionary = "icon-book-alt";
+
+            /// <summary>
+            /// System generic folder icon
+            /// </summary>
+            public const string Folder = "icon-folder";
+
+            /// <summary>
+            /// System language icon
+            /// </summary>
+            public const string Language = "icon-globe";
+
+            /// <summary>
+            /// System logviewer icon
+            /// </summary>
+            public const string LogViewer = "icon-box-alt";
+
+            /// <summary>
             /// System list view icon
             /// </summary>
             public const string ListView = "icon-thumbnail-list";
@@ -38,6 +58,26 @@
             /// System media file icon
             /// </summary>
             public const string MediaFile = "icon-document";
+
+            /// <summary>
+            /// System media video icon
+            /// </summary>
+            public const string MediaVideo = "icon-video";
+
+            /// <summary>
+            /// System media audio icon
+            /// </summary>
+            public const string MediaAudio = "icon-sound-waves";
+
+            /// <summary>
+            /// System media article icon
+            /// </summary>
+            public const string MediaArticle = "icon-article";
+
+            /// <summary>
+            /// System media vector icon
+            /// </summary>
+            public const string MediaVectorGraphics = "icon-picture";
 
             /// <summary>
             /// System media folder icon
@@ -68,6 +108,11 @@
             /// System member type icon
             /// </summary>
             public const string MemberType = "icon-users";
+
+            /// <summary>
+            /// System packages icon
+            /// </summary>
+            public const string Packages = "icon-box";
 
             /// <summary>
             /// System property editor icon

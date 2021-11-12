@@ -12,7 +12,7 @@
     <div ng-controller="My.TableController as vm">
         
         <umb-table
-            ng-if="items"
+            ng-if="vm.items"
             items="vm.items"
             item-properties="vm.options.includeProperties"
             allow-select-all="vm.allowSelectAll"

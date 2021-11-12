@@ -134,7 +134,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (objectTypes.Any())
             {
-                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", new { objectTypes = objectTypes });
+                sql = sql.WhereIn<NodeDto>(dto => dto.NodeObjectType, objectTypes);
             }
 
             return Database.Fetch<string>(sql);
@@ -173,7 +173,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoNode.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -228,7 +228,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (string.IsNullOrWhiteSpace(entity.Alias))
             {
                 var ex = new Exception($"ContentType '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
-                Logger.Error<ContentTypeRepository>("ContentType '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.", entity.Name);
+                Logger.Error<ContentTypeRepository,string>("ContentType '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.", entity.Name);
                 throw ex;
             }
 
@@ -236,6 +236,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             PersistNewBaseContentType(entity);
             PersistTemplates(entity, false);
+            PersistHistoryCleanup(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -289,8 +290,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             PersistUpdatedBaseContentType(entity);
             PersistTemplates(entity, true);
+            PersistHistoryCleanup(entity);
 
             entity.ResetDirtyProperties();
+        }
+
+        private void PersistHistoryCleanup(IContentType entity)
+        {
+            ContentVersionCleanupPolicyDto dto = new ContentVersionCleanupPolicyDto()
+            {
+                ContentTypeId = entity.Id,
+                Updated = DateTime.Now,
+                PreventCleanup = entity.HistoryCleanup.PreventCleanup,
+                KeepAllVersionsNewerThanDays = entity.HistoryCleanup.KeepAllVersionsNewerThanDays,
+                KeepLatestVersionPerDayForDays = entity.HistoryCleanup.KeepLatestVersionPerDayForDays,
+            };
+            Database.InsertOrUpdate(dto);
         }
     }
 }

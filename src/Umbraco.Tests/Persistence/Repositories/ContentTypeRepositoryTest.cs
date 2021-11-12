@@ -14,6 +14,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Models.ContentEditing;
+using Content = Umbraco.Core.Models.Content;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -303,7 +304,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Assert.AreNotEqual(propertyType.Key, Guid.Empty);
                 }
 
-                TestHelper.AssertPropertyValuesAreEqual(fetched, contentType, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new [] { "DefaultTemplate", "AllowedTemplates", "UpdateDate" });
+                TestHelper.AssertPropertyValuesAreEqual(fetched, contentType, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new [] { "DefaultTemplate", "AllowedTemplates", "UpdateDate", "HistoryCleanup" });
             }
         }
 
@@ -348,6 +349,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.Path.Contains(","), Is.True);
                 Assert.That(contentType.SortOrder, Is.GreaterThan(0));
 
+
                 Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
                 var groupId = contentType.PropertyGroups.ElementAt(0).Id;
 
@@ -355,6 +357,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("gen", propertyTypes[0].Alias); // just to be sure
                 Assert.IsNull(propertyTypes[0].PropertyGroupId);
                 Assert.IsTrue(propertyTypes.Skip(1).All((x => x.PropertyGroupId.Value == groupId)));
+                Assert.That(propertyTypes.Single(x=> x.Alias == "title").LabelOnTop, Is.True);
             }
 
         }
@@ -377,7 +380,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Description = "Optional Subtitle",
                     Mandatory = false,
                     SortOrder = 1,
-                    DataTypeId = -88
+                    DataTypeId = -88,
+                    LabelOnTop = true
                 });
                 repository.Save(contentType);
 
@@ -389,6 +393,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dirty, Is.False);
                 Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
+                Assert.That(contentType.PropertyTypes.Single(x => x.Alias == "subtitle").LabelOnTop, Is.True);
+
             }
 
 
@@ -409,6 +415,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //Alias = display.Alias,
                 Path = display.Path,
                 //AdditionalData = display.AdditionalData,
+                HistoryCleanup = display.HistoryCleanup,
 
                 // ContentTypeBasic
                 Alias = display.Alias,
@@ -428,9 +435,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Inherited = x.Inherited,
                     Id = x.Id,
-                    Properties = x.Properties,
+                    Key = x.Key,
+                    Type = x.Type,
+                    Name = x.Name,
+                    Alias = x.Alias,
                     SortOrder = x.SortOrder,
-                    Name = x.Name
+                    Properties = x.Properties
                 }).ToArray()
             };
         }
@@ -467,7 +477,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                             Pattern = ""
                         },
                         SortOrder = 1,
-                        DataTypeId = -88
+                        DataTypeId = -88,
+                        LabelOnTop = true
                     }
                 });
 
@@ -476,6 +487,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // just making sure
                 Assert.AreEqual(mapped.Thumbnail, "Doc2.png");
                 Assert.IsTrue(mapped.PropertyTypes.Any(x => x.Alias == "subtitle"));
+                Assert.IsTrue(mapped.PropertyTypes.Single(x => x.Alias == "subtitle").LabelOnTop);
 
                 repository.Save(mapped);
 
@@ -490,6 +502,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dirty, Is.False);
                 Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
                 Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
+
+                Assert.That(contentType.PropertyTypes.Single(x => x.Alias == "subtitle").LabelOnTop, Is.True);
+
                 foreach (var propertyType in contentType.PropertyTypes)
                 {
                     Assert.IsTrue(propertyType.HasIdentity);
@@ -994,6 +1009,88 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(result, Is.False);
                 Assert.That(result2, Is.True);
+            }
+        }
+
+        [Test]
+        public void Can_Update_Variation_Of_Element_Type_Property()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                ContentTypeRepository repository;
+                var contentRepository = CreateRepository((IScopeAccessor) provider, out repository);
+
+                // Create elementType
+                var elementType = new ContentType(-1)
+                {
+                    Alias = "elementType",
+                    Name = "Element type",
+                    Description = "Element type to use as compositions",
+                    Icon = ".sprTreeDoc3",
+                    Thumbnail = "doc.png",
+                    SortOrder = 1,
+                    CreatorId = 0,
+                    Trashed = false,
+                    IsElement = true,
+                    Variations = ContentVariation.Nothing
+                };
+
+                var contentCollection = new PropertyTypeCollection(true);
+                contentCollection.Add(new PropertyType("test", ValueStorageType.Ntext)
+                {
+                    Alias = "title",
+                    Name = "Title",
+                    Description = "",
+                    Mandatory = false,
+                    SortOrder = 1,
+                    DataTypeId = Constants.DataTypes.Textbox,
+                    LabelOnTop = true,
+                    Variations = ContentVariation.Nothing
+                });
+                elementType.PropertyGroups.Add(new PropertyGroup(contentCollection) {Name = "Content", SortOrder = 1});
+                elementType.ResetDirtyProperties(false);
+                elementType.SetDefaultTemplate(new Template("ElementType", "elementType"));
+                repository.Save(elementType);
+
+                // Create the basic "home" doc type that uses element type as comp
+                var docType = new ContentType(-1)
+                {
+                    Alias = "home",
+                    Name = "Home",
+                    Description = "Home containing elementType",
+                    Icon = ".sprTreeDoc3",
+                    Thumbnail = "doc.png",
+                    SortOrder = 1,
+                    CreatorId = 0,
+                    Trashed = false,
+                    Variations = ContentVariation.Nothing
+                };
+                var comp = new List<IContentTypeComposition>();
+                comp.Add(elementType);
+                docType.ContentTypeComposition = comp;
+                repository.Save(docType);
+
+                // Create "home" content
+                var content = new Content("Home", -1, docType){Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0};
+                object obj = new {title = "test title"};
+                content.PropertyValues(obj);
+                content.ResetDirtyProperties(false);
+                contentRepository.Save(content);
+
+                // Update variation on element type
+                elementType.Variations = ContentVariation.Culture;
+                elementType.PropertyTypes.First().Variations = ContentVariation.Culture;
+                repository.Save(elementType);
+
+                // Update variation on doc type
+                docType.Variations = ContentVariation.Culture;
+                repository.Save(docType);
+
+                // Re fetch renewedContent and make sure that the culture has been set.
+                var renewedContent = ServiceContext.ContentService.GetById(content.Id);
+                var hasCulture = renewedContent.Properties["title"].Values.First().Culture != null;
+                Assert.That(hasCulture, Is.True);
             }
         }
 

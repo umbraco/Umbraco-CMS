@@ -117,10 +117,10 @@ namespace Umbraco.Core.Models
         void RemovePropertyType(string propertyTypeAlias);
 
         /// <summary>
-        /// Removes a PropertyGroup from the current ContentType
+        /// Removes a property group from the current content type.
         /// </summary>
-        /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup"/> to remove</param>
-        void RemovePropertyGroup(string propertyGroupName);
+        /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup" /> to remove</param>
+        void RemovePropertyGroup(string propertyGroupName); // TODO Rename to propertyGroupAlias
 
         /// <summary>
         /// Checks whether a PropertyType with a given alias already exists
@@ -130,12 +130,26 @@ namespace Umbraco.Core.Models
         bool PropertyTypeExists(string propertyTypeAlias);
 
         /// <summary>
-        /// Adds a PropertyType to a specific PropertyGroup
+        /// Adds the property type to the specified property group (creates a new group if not found).
         /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
-        /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
-        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
+        /// <param name="propertyType">The property type to add.</param>
+        /// <param name="propertyGroupName">The name of the property group to add the property type to.</param>
+        /// <returns>
+        /// Returns <c>true</c> if the property type was added; otherwise, <c>false</c>.
+        /// </returns>
+        [Obsolete("Use AddPropertyType(propertyType, groupAlias, groupName) instead to explicitly set the alias of the group (note the slighty different parameter order).")]
         bool AddPropertyType(PropertyType propertyType, string propertyGroupName);
+
+        /// <summary>
+        /// Adds the property type to the specified property group (creates a new group if not found and a name is specified).
+        /// </summary>
+        /// <param name="propertyType">The property type to add.</param>
+        /// <param name="groupAlias">The alias of the property group to add the property type to.</param>
+        /// <param name="groupName">The name of the property group to create when not found.</param>
+        /// <returns>
+        /// Returns <c>true</c> if the property type was added; otherwise, <c>false</c>.
+        /// </returns>
+        bool AddPropertyType(PropertyType propertyType, string groupAlias, string groupName); // TODO Make groupName optional (add null as default value) after removing obsolete overload
 
         /// <summary>
         /// Adds a PropertyType, which does not belong to a PropertyGroup.
@@ -145,12 +159,30 @@ namespace Umbraco.Core.Models
         bool AddPropertyType(PropertyType propertyType);
 
         /// <summary>
-        /// Adds a PropertyGroup.
-        /// This method will also check if a group already exists with the same name and link it to the parent.
+        /// Adds a property group with the alias based on the specified <paramref name="groupName" />.
         /// </summary>
-        /// <param name="groupName">Name of the PropertyGroup to add</param>
-        /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
+        /// <param name="groupName">Name of the group.</param>
+        /// <returns>
+        /// Returns <c>true</c> if a property group with specified <paramref name="groupName" /> was added; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// This method will also check if a group already exists with the same alias.
+        /// </remarks>
+        [Obsolete("Use AddPropertyGroup(alias, name) instead to explicitly set the alias (note the slighty different parameter order).")]
         bool AddPropertyGroup(string groupName);
+
+        /// <summary>
+        /// Adds a property group with the specified <paramref name="name" /> and <paramref name="alias" />.
+        /// </summary>
+        /// <param name="alias">The alias.</param>
+        /// <param name="name">Name of the group.</param>
+        /// <returns>
+        /// Returns <c>true</c> if a property group with specified <paramref name="alias" /> was added; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// This method will also check if a group already exists with the same alias.
+        /// </remarks>
+        bool AddPropertyGroup(string alias, string name);
 
         /// <summary>
         /// Moves a PropertyType to a specified PropertyGroup
@@ -158,7 +190,7 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
         /// <param name="propertyGroupName">Name of the PropertyGroup to move the PropertyType to</param>
         /// <returns></returns>
-        bool MovePropertyType(string propertyTypeAlias, string propertyGroupName);
+        bool MovePropertyType(string propertyTypeAlias, string propertyGroupName); // TODO Rename to propertyGroupAlias
 
         /// <summary>
         /// Gets an <see cref="ISimpleContentType"/> corresponding to this content type.

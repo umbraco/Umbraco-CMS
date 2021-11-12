@@ -110,7 +110,7 @@ namespace Umbraco.Web.Models.Trees
 
                 //absolute path with or without tilde
                 if (Icon.StartsWith("~") || Icon.StartsWith("/"))
-                    return IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
+                    return IOHelper.ResolveUrl("~" + Icon.TrimStart(Constants.CharArrays.Tilde));
 
                 //legacy icon path
                 return string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);

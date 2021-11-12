@@ -1,4 +1,4 @@
-function multiUrlPickerController($scope, angularHelper, localizationService, entityResource, iconHelper, editorService) {
+function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService) {
 
     var vm = {
         labels: {
@@ -16,8 +16,6 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         $scope.model.value = [];
     }
 
-    var currentForm = angularHelper.getCurrentForm($scope);
-
     $scope.sortableOptions = {
         axis: "y",
         containment: "parent",
@@ -27,16 +25,16 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         scroll: true,
         zIndex: 6000,
         update: function () {
-            currentForm.$setDirty();
+            setDirty();
         }
     };
 
-    $scope.model.value.forEach(function (link) {
+    $scope.model.value.forEach(link => {
         link.icon = iconHelper.convertFromLegacyIcon(link.icon);
         $scope.renderModel.push(link);
     });
 
-    $scope.$on("formSubmitting", function () {
+    $scope.$on("formSubmitting", () => {
         $scope.model.value = $scope.renderModel;
     });
 
@@ -60,13 +58,15 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
             $scope.sortableOptions.disabled = $scope.renderModel.length === 1;
+            //Update value
+            $scope.model.value = $scope.renderModel;
         }
     );
 
     $scope.remove = function ($index) {
         $scope.renderModel.splice($index, 1);
 
-        currentForm.$setDirty();
+        setDirty();
     };
 
     $scope.openLinkPicker = function (link, $index) {
@@ -78,12 +78,13 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             target: link.target
         } : null;
 
-        var linkPicker = {
+        const linkPicker = {
             currentTarget: target,
             dataTypeKey: $scope.model.dataTypeKey,
             ignoreUserStartNodes : ($scope.model.config && $scope.model.config.ignoreUserStartNodes) ? $scope.model.config.ignoreUserStartNodes : "0",
             hideAnchor: $scope.model.config && $scope.model.config.hideAnchor ? true : false,
-            submit: function (model) {
+            size: $scope.model.config.overlaySize,
+            submit: model => {
                 if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed
                     if (model.target.anchor && model.target.anchor[0] !== '?' && model.target.anchor[0] !== '#') {
@@ -107,12 +108,14 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                     }
 
                     if (link.udi) {
-                        var entityType = model.target.isMedia ? "Media" : "Document";
+                        const entityType = model.target.isMedia ? "Media" : "Document";
 
-                        entityResource.getById(link.udi, entityType).then(function (data) {
+                        entityResource.getById(link.udi, entityType).then(data => {
+
                             link.icon = iconHelper.convertFromLegacyIcon(data.icon);
                             link.published = (data.metaData && data.metaData.IsPublished === false && entityType === "Document") ? false : true;
                             link.trashed = data.trashed;
+
                             if (link.trashed) {
                                 item.url = vm.labels.general_recycleBin;
                             }
@@ -122,20 +125,28 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                         link.published = true;
                     }
 
-                    currentForm.$setDirty();
+                    setDirty();
                 }
                 editorService.close();
             },
-            close: function () {
+            close: () => {
                 editorService.close();
             }
         };
+
         editorService.linkPicker(linkPicker);
     };
 
+    function setDirty() {
+        if ($scope.multiUrlPickerForm) {
+            $scope.multiUrlPickerForm.modelValue.$setDirty();
+        }
+    }
+
     function init() {
+
         localizationService.localizeMany(["general_recycleBin"])
-            .then(function (data) {
+            .then(data => {
                 vm.labels.general_recycleBin = data[0];
             });
 
@@ -145,11 +156,11 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
             $scope.model.config.minNumber = 1;
         }
 
-        _.each($scope.model.value, function (item){
+        _.each($scope.model.value, function (item) {
             // we must reload the "document" link URLs to match the current editor culture
             if (item.udi && item.udi.indexOf("/document/") > 0) {
                 item.url = null;
-                entityResource.getUrlByUdi(item.udi).then(function (data) {
+                entityResource.getUrlByUdi(item.udi).then(data => {
                     item.url = data;
                 });
             }

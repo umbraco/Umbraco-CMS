@@ -20,7 +20,7 @@
                         <div class="umb-forms-settings form-horizontal">
 
                             <p>
-                                <localize key="grid_addGridLayoutDetail"/>
+                                <localize key="grid_addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</localize>
                             </p>
 
                             <umb-control-group label="@general_name">
@@ -34,49 +34,47 @@
                                     <div class="tr">
 
                                         <button type="button" class="btn-reset td uSky-templates-column"
-                                           ng-class="{last:$last, selected:section==currentSection}"
+                                           ng-class="{last: $last, selected: section == currentSection}"
                                            ng-repeat="section in currentLayout.sections"
-                                           ng-click="configureSection(section, currentLayout)"
-                                           ng-style="{width: percentage(section.grid) +'%'}">
+                                           ng-click="vm.configureSection(section, currentLayout)"
+                                           ng-style="{width: vm.percentage(section.grid) +'%'}">
                                            <span class="sr-only">
-                                            <localize key="grid_editGridLayout">Edit grid layout</localize>
-                                        </span>
+                                                <localize key="grid_editGridLayout">Edit grid layout</localize>
+                                           </span>
                                         </button>
 
                                         <button type="button" class="btn-reset td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
-                                           ng-click="configureSection(undefined, currentLayout)"
-                                           ng-style="{width: percentage(availableLayoutSpace) + '%'}">
-                                            <i class="icon icon-add" aria-hidden="true"></i>
+                                                ng-click="vm.configureSection(null, currentLayout)"
+                                                ng-style="{width: vm.percentage(availableLayoutSpace) + '%'}">
+                                            <umb-icon icon="icon-add" class="icon"></umb-icon>
                                             <span class="sr-only">
                                                 <localize key="grid_addGridLayout">Add grid layout</localize>
                                             </span>
-                                        </a>
+                                        </button>
 
                                     </div>
                                 </div>
                             </div>
 
-                            <div ng-if="currentSection != null" style="padding-bottom: 50px;">
+                            <div ng-if="currentSection" style="padding-bottom: 50px;">
 
                                 <umb-control-group label="@general_width">
                                     <div class="grid-size-scaler">
-                                        <button type="button" class="btn-link" ng-click="scaleDown(currentSection)">
-                                            <i class="icon icon-remove" aria-hidden="true"></i>
+                                        <button type="button" class="btn-link" ng-click="vm.scaleDown(currentSection)">
+                                            <umb-icon icon="icon-remove" class="icon"></umb-icon>
                                         </button>
                                         <span>{{currentSection.grid}}</span>
-                                        <button type="button" class="btn-link"
-                                                ng-click="scaleUp(currentSection, availableLayoutSpace)">
-                                            <i class="icon icon-add" aria-hidden="true"></i>
+                                        <button type="button" class="btn-link" ng-click="vm.scaleUp(currentSection, availableLayoutSpace)">
+                                            <umb-icon icon="icon-add" class="icon"></umb-icon>
                                         </button>
                                     </div>
                                 </umb-control-group>
 
                                 <umb-control-group hide-label="true">
-                                    <i class="icon-delete red" aria-hidden="true"></i>
+                                    <umb-icon icon="icon-delete" class="red"></umb-icon>
                                     <button type="button" class="btn btn-small btn-link"
-                                            ng-click="deleteSection(currentSection, currentLayout)">
-                                        <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete
-                                        </localize>
+                                            ng-click="vm.deleteSection(currentSection, currentLayout)">
+                                        <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
                                     </button>
                                 </umb-control-group>
 
@@ -85,7 +83,7 @@
                                     <umb-toggle
                                         class="umb-toggle-group-item__toggle"
                                         checked="currentSection.allowAll"
-                                        on-click="toggleAllowed(currentSection)"
+                                        on-click="vm.toggleAllowed(currentSection)"
                                         show-labels="true"
                                         label-position="right"
                                         label-off="Allow all row configurations"
@@ -99,36 +97,36 @@
                                         <div class="control-group uSky-templates-rows">
                                             <ul class="unstyled">
 
-                                                <li ng-repeat="row in rows track by $id(row)">
+                                                <li ng-repeat="row in currentSection.rows track by $id(row)">
 
                                                     <div class="flex">
 
-                                                        <umb-checkbox model="row.allowed"
+                                                        <umb-checkbox model="row.selected"
                                                                       input-id="rowconfig-{{$index}}"
-                                                                      on-change="selectRow(currentSection, row)">
+                                                                      on-change="vm.selectRow(currentSection, row)">
                                                         </umb-checkbox>
 
-                                                        <div
-                                                            ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)"
-                                                            class="flex flex-auto cursor-pointer">
+                                                        <button type="button"
+                                                                class="btn-reset flex flex-auto tl"
+                                                                ng-click="row.selected = !row.selected; vm.selectRow(currentSection, row)">
 
-                                                            <div class="preview-rows columns" style="margin-top: auto;">
-                                                                <div class="preview-row">
-                                                                    <div class="preview-col"
-                                                                         ng-class="{last:$last}"
-                                                                         ng-repeat="area in row.areas"
-                                                                         ng-style="{width: percentage(area.grid) + '%'}">
+                                                            <span class="preview-rows columns" style="margin-top: auto;">
+                                                                <span class="preview-row">
+                                                                    <span class="preview-col"
+                                                                          ng-class="{last:$last}"
+                                                                          ng-repeat="area in row.areas"
+                                                                          ng-style="{width: vm.percentage(area.grid) + '%'}">
 
-                                                                        <div class="preview-cell"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                                        <span class="preview-cell"></span>
+                                                                    </span>
+                                                                </span>
+                                                            </span>
 
-                                                            <div>
-                                                                {{row.name}}<br/>
+                                                            <span>
+                                                                {{row.name}}<br />
                                                                 <small>{{row.areas.length}} cells</small>
-                                                            </div>
-                                                        </div>
+                                                            </span>
+                                                        </button>
 
                                                     </div>
 
@@ -153,13 +151,13 @@
                         button-style="link"
                         label-key="general_close"
                         shortcut="esc"
-                        action="close()">
+                        action="vm.close()">
                     </umb-button>
                     <umb-button
                         type="button"
                         button-style="success"
                         label-key="general_submit"
-                        action="submit()">
+                        action="vm.submit()">
                     </umb-button>
                 </umb-editor-footer-content-right>
             </umb-editor-footer>

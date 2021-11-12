@@ -97,7 +97,7 @@ namespace Umbraco.Web.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1 => this.Value<string>(""prop1"");
+		public virtual string Prop1 => this.Value<string>(""prop1"");
 	}
 }
 ";
@@ -212,7 +212,7 @@ namespace Umbraco.Web.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[ImplementPropertyType(""foo"")]
-		public global::System.Collections.Generic.IEnumerable<global::Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::Foo>>(""foo"");
+		public virtual global::System.Collections.Generic.IEnumerable<global::Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::Foo>>(""foo"");
 	}
 }
 ";

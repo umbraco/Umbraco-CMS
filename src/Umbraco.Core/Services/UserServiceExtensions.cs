@@ -10,7 +10,7 @@ namespace Umbraco.Core.Services
     {
         public static EntityPermission GetPermissions(this IUserService userService, IUser user, string path)
         {
-            var ids = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var ids = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.TryConvertTo<int>())
                 .Where(x => x.Success)
                 .Select(x => x.Result)

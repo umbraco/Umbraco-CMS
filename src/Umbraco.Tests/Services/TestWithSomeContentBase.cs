@@ -41,6 +41,9 @@ namespace Umbraco.Tests.Services
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
             ServiceContext.ContentService.Save(subpage2, 0);
 
+            Content subpage3 = MockedContent.CreateSimpleContent(contentType, "Text Page 3", textpage.Id);
+            ServiceContext.ContentService.Save(subpage3, 0);
+
             //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1064
             Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             trashed.Trashed = true;

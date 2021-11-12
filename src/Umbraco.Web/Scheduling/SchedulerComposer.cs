@@ -12,6 +12,6 @@ namespace Umbraco.Web.Scheduling
     /// the task correctly instead of killing it completely when the app domain shuts down.
     /// </remarks>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-    internal sealed class SchedulerComposer : ComponentComposer<SchedulerComponent>, ICoreComposer
+    public sealed class SchedulerComposer : ComponentComposer<SchedulerComponent>, ICoreComposer
     { }
 }

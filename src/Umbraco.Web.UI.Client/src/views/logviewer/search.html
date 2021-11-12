@@ -48,6 +48,29 @@
                                             </label>
                                         </div>
                                     </umb-dropdown-item>
+
+                                    <!-- Select all log level filters -->
+                                    <umb-dropdown-item>
+                                        <umb-button action="vm.selectAllLogLevelFilters()"
+                                                    label="Select all"
+                                                    label-key="logViewer_selectAllLogLevelFilters"
+                                                    type="button"
+                                                    button-style="link"
+                                                    size="xs">
+                                        </umb-button>
+                                    </umb-dropdown-item>
+
+                                    <!-- Deselect all log level filters -->
+                                    <umb-dropdown-item>
+                                        <umb-button action="vm.deselectAllLogLevelFilters()"
+                                                    label="Deselect all"
+                                                    label-key="logViewer_deselectAllLogLevelFilters"
+                                                    type="button"
+                                                    button-style="link"
+                                                    size="xs">
+                                        </umb-button>
+                                    </umb-dropdown-item>
+
                                 </umb-dropdown>
                             </div>
 
@@ -56,7 +79,7 @@
                             <!-- Polling Button -->
                             <umb-button-group default-button="vm.polling.defaultButton"
                                               sub-buttons="vm.polling.subButtons"
-                                              icon="{{ vm.polling.defaultButton.icon }}"
+                                              icon="{{vm.polling.defaultButton.icon}}"
                                               direction="down"
                                               float="right">
                             </umb-button-group>
@@ -68,18 +91,18 @@
 
                                 <!-- Save Search & Clear Search icon buttons -->
                                 <button type="button" class="btn-reset save-search" ng-show="vm.checkForSavedSearch()" ng-click="vm.addToSavedSearches()">
-                                    <umb-icon icon="icon-rate" class="icon-rate"></umb-icon>
+                                    <umb-icon icon="icon-rate"></umb-icon>
                                     <localize class="sr-only" key="logViewer_saveSearch">Save Search</localize>
                                 </button>
                                 <button type="button" class="btn-reset filter-search" ng-show="vm.logOptions.filterExpression" ng-click="vm.resetSearch()">
-                                    <umb-icon icon="icon-wrong" class="icon-wrong"></umb-icon>
+                                    <umb-icon icon="icon-wrong"></umb-icon>
                                     <localize class="sr-only" key="logViewer_filterSearch">Filter Search</localize>
                                 </button>
 
                                 <!-- Saved Searches -->
                                 <button type="button" class="umb-variant-switcher__toggle" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
                                     <localize key="logViewer_savedSearches">Saved Searches</localize>
-                                    <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand {{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}"></umb-icon>
+                                    <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand"></umb-icon>
                                 </button>
 
                                 <!-- Saved Searches Dropdown -->
@@ -90,7 +113,7 @@
                                             <span>{{search.query}}</span>
                                         </button>
                                         <button type="button" class="btn-reset" style="width: auto;" ng-click="vm.deleteSavedSearch(search)" localize="title" title="@logViewer_deleteThisSearch">
-                                            <umb-icon icon="icon-trash" class="icon-trash text-error"></umb-icon>
+                                            <umb-icon icon="icon-trash" class="text-error"></umb-icon>
                                         </button>
                                     </umb-dropdown-item>
                                 </umb-dropdown>
@@ -129,21 +152,21 @@
 
                         <table class="table table-hover" style="table-layout: fixed;" ng-if="vm.logItems.totalItems > 0">
                             <thead>
-                                <tr>
-                                    <th style="width: 22ch;" ng-click="vm.toggleOrderBy()">
-                                        Timestamp
-                                        <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
-                                    </th>
-                                    <th style="width: 12ch;">Level</th>
-                                    <th style="width: 14ch;">Machine</th>
-                                    <th>Message</th>
-                                </tr>
+                            <tr>
+                                <th ng-click="vm.toggleOrderBy()" style="width: 22ch">
+                                    <localize key="logViewer_timestamp">Timestamp</localize>
+                                    <umb-icon icon="{{vm.logOptions.orderDirection === 'Descending' ? 'icon-navigation-down' : 'icon-navigation-up'}}" class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</umb-icon>
+                                </th>
+                                <th style="width: 12ch"><localize key="logViewer_level">Level</localize></th>
+                                <th style="width: 14ch"><localize key="logViewer_machine">Machine</localize></th>
+                                <th><localize key="logViewer_message">Message</localize></th>
+                            </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open" style="vertical-align: top;">
+                                <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open">
                                     <td>{{ log.Timestamp | date:'medium' }}</td>
                                     <td><umb-badge size="s" color="{{ log.logTypeColor }}">{{ log.Level }}</umb-badge></td>
-                                    <td><small>{{ log.Properties.MachineName.Value }}</small></td>
+                                    <td>{{ log.Properties.MachineName.Value }}</td>
                                     <td style="word-break: break-word;">{{ log.RenderedMessage }}</td>
                                 </tr>
 
@@ -158,7 +181,7 @@
                                         <table class="table">
                                             <tbody>
                                                 <tr>
-                                                    <th>Timestamp</th>
+                                                    <th style="width:38.5ch">Timestamp</th>
                                                     <td>{{log.Timestamp}}</td>
                                                 </tr>
                                                 <tr>
@@ -168,29 +191,41 @@
                                                 <tr ng-repeat="(key, val) in log.Properties">
                                                     <th>{{key}}</th>
                                                     <td ng-switch on="key">
-                                                        <a ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Request ID">{{val.Value}} <i class="icon-search"></i></a>
-                                                        <a ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Namespace">{{val.Value}} <i class="icon-search"></i></a>
-                                                        <a ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Machine Name">{{val.Value}} <i class="icon-search"></i></a>
-                                                        <a ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" title="Open">{{val.Value}} <i class="icon-link"></i></a>
+                                                        <button type="button" class="btn-reset" ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithRequestId" aria-describedby="{{key}}">
+                                                            {{val.Value}} <umb-icon icon="icon-search" aria-hidden="true"></umb-icon> 
+                                                        </button>
+                                                        <button type="button" class="btn-reset" ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithNamespace" aria-describedby="{{key}}">
+                                                            {{val.Value}} <umb-icon icon="icon-search" aria-hidden="true"></umb-icon>
+                                                        </button>
+                                                        <button type="button" class="btn-reset" ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" localize="title" title="@logViewer_findLogsWithMachineName" aria-describedby="{{key}}">
+                                                            {{val.Value}} <umb-icon icon="icon-search"></umb-icon>
+                                                        </button>
+                                                        <a class="btn-reset" ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" localize="title" title="@logViewer_Open" aria-describedby="{{key}}">
+                                                            {{val.Value}} <umb-icon icon="icon-link"></umb-icon>
+                                                        </a>
                                                         <span ng-switch-default>{{val.Value}}</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
 
-                                        <div style="padding:0 0 20px;text-align:right;">
-                                            <div class="btn-group">
-                                                <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" ng-href="" ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
-                                                    <i class="icon-search"></i> <localize key="general_search">Search</localize>
-                                                    <span class="caret"></span>
-                                                </a>
+                                        <div class="btn-group" style="margin-bottom:20px" deep-blur="log.searchDropdownOpen = !log.searchDropdownOpen">
+                                            <button type="button"
+                                                    class="btn btn-info dropdown-toggle"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="{{log.searchDropdownOpen === undefined ? false : log.searchDropdownOpen}}"
+                                                    ng-click="log.searchDropdownOpen = !log.searchDropdownOpen">
+                                                <umb-icon icon="icon-search" class="icon-search"></umb-icon>
+                                                <localize key="general_search">Search</localize>
+                                                <span class="caret" aria-hidden="true"></span>
+                                            </button>
 
-                                                <umb-dropdown ng-if="log.searchDropdownOpen" on-close="log.searchDropdownOpen = false">
-                                                    <umb-dropdown-item>
-                                                        <a ng-href="https://www.google.com/search?q={{ log.RenderedMessage }}" target="_blank" title="Search this message with Google">
-                                                            <img src="https://www.google.com/favicon.ico" width="16" height="16" /> Search With Google
-                                                        </a>
-                                                    </umb-dropdown-item>
+                                            <umb-dropdown ng-if="log.searchDropdownOpen" on-close="log.searchDropdownOpen = false">
+                                                <umb-dropdown-item>
+                                                    <a ng-href="https://www.google.com/search?q={{ log.RenderedMessage }}" href="" target="_blank" rel="noopener" localize="title" title="@logViewer_searchThisMessageWithGoogle">
+                                                        <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="" /> <localize key="logViewer_searchWithGoogle">Search With Google</localize>
+                                                    </a>
+                                                </umb-dropdown-item>
 
                                                     <umb-dropdown-item>
                                                         <a ng-href="https://www.bing.com/search?q={{ log.RenderedMessage }}" target="_blank" title="Search this message with Bing">
@@ -224,7 +259,6 @@
                                                 </umb-dropdown>
                                             </div>
                                         </div>
-
                                     </td>
                                 </tr>
                             </tbody>

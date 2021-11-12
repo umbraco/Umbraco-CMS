@@ -6,7 +6,7 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Logging
 {
-    internal sealed class WebProfilerComponent : IComponent
+    public sealed class WebProfilerComponent : IComponent
     {
         private readonly WebProfiler _profiler;
         private readonly bool _profile;

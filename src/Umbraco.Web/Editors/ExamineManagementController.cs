@@ -25,7 +25,6 @@ namespace Umbraco.Web.Editors
         private readonly IAppPolicyCache _runtimeCache;
         private readonly IndexRebuilder _indexRebuilder;
 
-
         public ExamineManagementController(IExamineManager examineManager, ILogger logger,
             AppCaches appCaches,
             IndexRebuilder indexRebuilder)
@@ -79,13 +78,10 @@ namespace Umbraco.Web.Editors
                 {
                     Id = x.Id,
                     Score = x.Score,
-                    //order the values by key
-                    Values = new Dictionary<string, string>(x.Values.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => y.Value))
+                    Values = x.AllValues.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => y.Value)
                 })
             };
         }
-
-
 
         /// <summary>
         /// Check if the index has been rebuilt
@@ -113,7 +109,6 @@ namespace Umbraco.Web.Editors
             return found != null
                 ? null
                 : CreateModel(index);
-
         }
 
         /// <summary>
@@ -131,7 +126,7 @@ namespace Umbraco.Web.Editors
             if (!validate.IsSuccessStatusCode)
                 return validate;
 
-            _logger.Info<ExamineManagementController>("Rebuilding index '{IndexName}'", indexName);
+            _logger.Info<ExamineManagementController, string>("Rebuilding index '{IndexName}'", indexName);
 
             //remove it in case there's a handler there already
             index.IndexOperationComplete -= Indexer_IndexOperationComplete;
@@ -167,8 +162,6 @@ namespace Umbraco.Web.Editors
             }
         }
 
-
-
         private ExamineIndexModel CreateModel(IIndex index)
         {
             var indexName = index.Name;
@@ -182,11 +175,13 @@ namespace Umbraco.Web.Editors
             }
 
             var isHealth = indexDiag.IsHealthy();
+
             var properties = new Dictionary<string, object>
             {
                 [nameof(IIndexDiagnostics.DocumentCount)] = indexDiag.DocumentCount,
                 [nameof(IIndexDiagnostics.FieldCount)] = indexDiag.FieldCount,
             };
+
             foreach (var p in indexDiag.Metadata)
                 properties[p.Key] = p.Value;
 
@@ -197,7 +192,6 @@ namespace Umbraco.Web.Editors
                 ProviderProperties = properties,
                 CanRebuild = _indexRebuilder.CanRebuild(index)
             };
-
 
             return indexerModel;
         }
@@ -210,7 +204,6 @@ namespace Umbraco.Web.Editors
                 searcher = index.GetSearcher();
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-
 
             //if we didn't find anything try to find it by an explicitly declared searcher
             if (_examineManager.TryGetSearcher(searcherName, out searcher))
@@ -253,7 +246,7 @@ namespace Umbraco.Web.Editors
         {
             var indexer = (IIndex)sender;
 
-            _logger.Debug<ExamineManagementController>("Logging operation completed for index {IndexName}", indexer.Name);
+            _logger.Debug<ExamineManagementController, string>("Logging operation completed for index {IndexName}", indexer.Name);
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;

@@ -37,8 +37,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<IRedirectUrl> PerformGetAll(params Guid[] ids)
         {
-            if (ids.Length > 2000)
-                throw new NotSupportedException("This repository does not support more than 2000 ids.");
+            if (ids.Length > Constants.Sql.MaxParameterCount)
+                throw new NotSupportedException($"This repository does not support more than {Constants.Sql.MaxParameterCount} ids.");
+
             var sql = GetBaseQuery(false).WhereIn<RedirectUrlDto>(x => x.Id, ids);
             var dtos = Database.Fetch<RedirectUrlDto>(sql);
             return dtos.WhereNotNull().Select(Map);
@@ -164,6 +165,23 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             var dtos = Database.Fetch<RedirectUrlDto>(sql);
             var dto = dtos.FirstOrDefault();
+            return dto == null ? null : Map(dto);
+        }
+
+        public IRedirectUrl GetMostRecentUrl(string url, string culture)
+        {
+            if (string.IsNullOrWhiteSpace(culture)) return GetMostRecentUrl(url);
+            var urlHash = url.GenerateHash<SHA1>();
+            var sql = GetBaseQuery(false)
+                .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash &&
+                    (x.Culture == culture.ToLower() || x.Culture == string.Empty))
+                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
+            var dtos = Database.Fetch<RedirectUrlDto>(sql);
+            var dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
+
+            if (dto == null)
+                dto = dtos.FirstOrDefault(f => f.Culture == string.Empty);
+
             return dto == null ? null : Map(dto);
         }
 

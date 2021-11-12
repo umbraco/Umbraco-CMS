@@ -127,6 +127,21 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve url for id:' + id);
         },
 
+        getUrlsByUdis: function(udis, culture) {
+          var query = "culture=" + (culture || "");
+
+          return umbRequestHelper.resourcePromise(
+             $http.post(
+                 umbRequestHelper.getApiUrl(
+                     "entityApiBaseUrl",
+                     "GetUrlsByUdis",
+                     query),
+                 {
+                     udis: udis
+                 }),
+             'Failed to retrieve url map for udis ' + udis);
+        },
+
         getUrlByUdi: function (udi, culture) {
 
             if (!udi) {
@@ -439,7 +454,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct
@@ -512,7 +527,7 @@ function entityResource($q, $http, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct

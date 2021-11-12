@@ -22,6 +22,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("notifications", IsRequired = true)]
         internal NotificationsElement Notifications => (NotificationsElement) base["notifications"];
 
+        [ConfigurationProperty("contentVersionCleanupPolicyGlobalSettings", IsRequired = false)]
+        internal ContentVersionCleanupPolicyGlobalSettingsElement ContentVersionCleanupPolicyGlobalSettingsElement => (ContentVersionCleanupPolicyGlobalSettingsElement) this["contentVersionCleanupPolicyGlobalSettings"];
+
         [ConfigurationProperty("PreviewBadge")]
         internal InnerTextConfigurationElement<string> PreviewBadge => GetOptionalTextElement("PreviewBadge", DefaultPreviewBadge);
 
@@ -29,16 +32,19 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         internal InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors => GetOptionalTextElement("MacroErrors", MacroErrorBehaviour.Inline);
 
         [ConfigurationProperty("disallowedUploadFiles")]
-        internal CommaDelimitedConfigurationElement DisallowedUploadFiles => GetOptionalDelimitedElement("disallowedUploadFiles", new[] {"ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd"});
+        internal CommaDelimitedConfigurationElement DisallowedUploadFiles => GetOptionalDelimitedElement("disallowedUploadFiles", new[] {"ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd", "xamlx"});
 
         [ConfigurationProperty("allowedUploadFiles")]
         internal CommaDelimitedConfigurationElement AllowedUploadFiles => GetOptionalDelimitedElement("allowedUploadFiles", new string[0]);
-        
+
         [ConfigurationProperty("showDeprecatedPropertyEditors")]
         internal InnerTextConfigurationElement<bool> ShowDeprecatedPropertyEditors => GetOptionalTextElement("showDeprecatedPropertyEditors", false);
 
         [ConfigurationProperty("loginBackgroundImage")]
         internal InnerTextConfigurationElement<string> LoginBackgroundImage => GetOptionalTextElement("loginBackgroundImage", string.Empty);
+
+        [ConfigurationProperty("loginLogoImage")]
+        internal InnerTextConfigurationElement<string> LoginLogoImage => GetOptionalTextElement("loginLogoImage", "assets/img/application/umbraco_logo_white.svg");
 
         string IContentSection.NotificationEmailAddress => Notifications.NotificationEmailAddress;
 
@@ -58,8 +64,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IEnumerable<string> IContentSection.AllowedUploadFiles => AllowedUploadFiles;
 
+        IContentVersionCleanupPolicyGlobalSettings IContentSection.ContentVersionCleanupPolicyGlobalSettings => ContentVersionCleanupPolicyGlobalSettingsElement;
+
         bool IContentSection.ShowDeprecatedPropertyEditors => ShowDeprecatedPropertyEditors;
 
         string IContentSection.LoginBackgroundImage => LoginBackgroundImage;
+
+        string IContentSection.LoginLogoImage => LoginLogoImage;
     }
 }

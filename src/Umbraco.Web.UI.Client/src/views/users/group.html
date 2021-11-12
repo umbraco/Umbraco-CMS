@@ -35,7 +35,7 @@
                                                           icon="section.icon"
                                                           name="section.name"
                                                           allow-remove="true"
-                                                          on-remove="vm.removeSelectedItem($index, vm.userGroup.sections)">
+                                                          on-remove="vm.removeSection($index)">
                                         </umb-node-preview>
 
                                         <button type="button"
@@ -115,7 +115,7 @@
                                                           name="node.name"
                                                           permissions="node.allowedPermissions"
                                                           allow-remove="true"
-                                                          on-remove="vm.removeSelectedItem($index, vm.userGroup.assignedPermissions)"
+                                                          on-remove="vm.removeAssignedPermissions($index)"
                                                           allow-edit="true"
                                                           on-edit="vm.setPermissionsForNode(node)">
                                         </umb-node-preview>
@@ -143,7 +143,7 @@
                                                       name="user.name"
                                                       avatars="user.avatars"
                                                       allow-remove="true"
-                                                      on-remove="vm.removeSelectedItem($index, vm.userGroup.users)">
+                                                      on-remove="vm.removeUser($index)">
                                     </umb-user-preview>
 
                                     <button type="button"

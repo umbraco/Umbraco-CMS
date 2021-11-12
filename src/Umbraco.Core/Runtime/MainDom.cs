@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -18,7 +19,7 @@ namespace Umbraco.Core.Runtime
     /// <para>When an AppDomain starts, it tries to acquire the main domain status.</para>
     /// <para>When an AppDomain stops (eg the application is restarting) it should release the main domain status.</para>
     /// </remarks>
-    internal class MainDom : IMainDom, IRegisteredObject, IDisposable
+    public class MainDom : IMainDom, IRegisteredObject, IDisposable
     {
         #region Vars
 
@@ -37,6 +38,9 @@ namespace Umbraco.Core.Runtime
         private readonly List<KeyValuePair<int, Action>> _callbacks = new List<KeyValuePair<int, Action>>();
 
         private const int LockTimeoutMilliseconds = 40000; // 40 seconds
+
+        private Task _listenTask;
+        private Task _listenCompleteTask;
 
         #endregion
 
@@ -97,14 +101,14 @@ namespace Umbraco.Core.Runtime
 
             lock (_locko)
             {
-                _logger.Debug<MainDom>("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
+                _logger.Debug<MainDom, string, string>("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
 
                 try
                 {
-                    _logger.Info<MainDom>("Stopping ({SignalSource})", source);
+                    _logger.Info<MainDom, string>("Stopping ({SignalSource})", source);
                     foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                     {
                         try
@@ -118,14 +122,14 @@ namespace Umbraco.Core.Runtime
                         }
                     }
                         
-                    _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
+                    _logger.Debug<MainDom, string>("Stopped ({SignalSource})", source);
                 }
                 finally
                 {
                     // in any case...
                     _isMainDom = false;
                     _mainDomLock.Dispose();
-                    _logger.Info<MainDom>("Released ({SignalSource})", source);
+                    _logger.Info<MainDom, string>("Released ({SignalSource})", source);
                 }
 
             }
@@ -144,8 +148,16 @@ namespace Umbraco.Core.Runtime
 
             _logger.Info<MainDom>("Acquiring.");
 
-            // Get the lock 
-            var acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
+            // Get the lock
+            var acquired = false;
+            try
+            {
+                acquired = _mainDomLock.AcquireLockAsync(LockTimeoutMilliseconds).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error<MainDom>(ex, "Error while acquiring");
+            }
 
             if (!acquired)
             {
@@ -164,7 +176,20 @@ namespace Umbraco.Core.Runtime
             try
             {
                 // Listen for the signal from another AppDomain coming online to release the lock
-                _mainDomLock.ListenAsync().ContinueWith(_ => OnSignal("signal"));
+                _listenTask = _mainDomLock.ListenAsync();
+                _listenCompleteTask = _listenTask.ContinueWith(t =>
+                {
+                    if (_listenTask.Exception != null)
+                    {
+                        _logger.Warn<MainDom>("Listening task completed with {TaskStatus}, Exception: {Exception}", _listenTask.Status, _listenTask.Exception);
+                    }
+                    else
+                    {
+                        _logger.Debug<MainDom>("Listening task completed with {TaskStatus}", _listenTask.Status);
+                    }
+
+                    OnSignal("signal");
+                }, TaskScheduler.Default); // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
             }
             catch (OperationCanceledException ex)
             {

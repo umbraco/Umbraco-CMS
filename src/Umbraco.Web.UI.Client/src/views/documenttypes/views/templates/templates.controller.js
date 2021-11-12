@@ -9,7 +9,7 @@
 (function () {
     'use strict';
 
-    function TemplatesController($scope, entityResource, contentTypeHelper, templateResource, contentTypeResource, $routeParams) {
+    function TemplatesController($scope, entityResource, contentTypeHelper, contentTypeResource, editorService, $routeParams) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -22,6 +22,7 @@
         vm.isElement = $scope.model.isElement;
 
         vm.createTemplate = createTemplate;
+        vm.openTemplatePicker = openTemplatePicker;
 
         /* ---------- INIT ---------- */
 
@@ -79,6 +80,29 @@
             });
 
             vm.canCreateTemplate = existingTemplate ? false : true;
+        }
+
+        function openTemplatePicker() {
+            const editor = {
+                title: "Choose template",
+                filterCssClass: 'not-allowed',
+                multiPicker: true,
+                filter: item => {
+                    return !vm.availableTemplates.some(template => template.id == item.id) ||
+                        $scope.model.allowedTemplates.some(template => template.id == item.id);
+                },
+                submit: model => {
+                    model.selection.forEach(item => {
+                        $scope.model.allowedTemplates.push(item);
+                    });
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
+                }
+            }
+
+            editorService.templatePicker(editor);
         }
 
         var unbindWatcher = $scope.$watch("model.isElement",

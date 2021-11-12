@@ -79,24 +79,26 @@ namespace Umbraco.Core.Diagnostics
 
         private static bool Write(SafeHandle fileHandle, Option options, bool withException = false)
         {
-            var currentProcess = Process.GetCurrentProcess();
-            var currentProcessHandle = currentProcess.Handle;
-            var currentProcessId = (uint)currentProcess.Id;
+            using (var currentProcess = Process.GetCurrentProcess())
+            {
+                var currentProcessHandle = currentProcess.Handle;
+                var currentProcessId = (uint)currentProcess.Id;
 
-            MiniDumpExceptionInformation exp;
+                MiniDumpExceptionInformation exp;
 
-            exp.ThreadId = GetCurrentThreadId();
-            exp.ClientPointers = false;
-            exp.ExceptionPointers = IntPtr.Zero;
+                exp.ThreadId = GetCurrentThreadId();
+                exp.ClientPointers = false;
+                exp.ExceptionPointers = IntPtr.Zero;
 
-            if (withException)
-                exp.ExceptionPointers = Marshal.GetExceptionPointers();
+                if (withException)
+                    exp.ExceptionPointers = Marshal.GetExceptionPointers();
 
-            var bRet = exp.ExceptionPointers == IntPtr.Zero
-                ? MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint) options, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero)
-                : MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint) options, ref exp, IntPtr.Zero, IntPtr.Zero);
+                var bRet = exp.ExceptionPointers == IntPtr.Zero
+                    ? MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint)options, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero)
+                    : MiniDumpWriteDump(currentProcessHandle, currentProcessId, fileHandle, (uint)options, ref exp, IntPtr.Zero, IntPtr.Zero);
 
-            return bRet;
+                return bRet;
+            }
         }
 
         public static bool Dump(Option options = Option.WithFullMemory, bool withException = false)

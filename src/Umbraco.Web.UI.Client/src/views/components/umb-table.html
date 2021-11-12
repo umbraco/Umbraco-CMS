@@ -11,11 +11,9 @@
 
                 </div>
                 <div class="umb-table-cell umb-table__name">
-                    <button
-                        type="button"
-                        class="umb-table-head__link sortable"
-                        ng-click="vm.sort('Name', true, true)"
-                        prevent-default>
+                    <button type="button"
+                            class="umb-table-head__link sortable"
+                            ng-click="vm.sort('Name', true, true)">
                         <localize key="general_name">Name</localize>
                         <i class="umb-table-head__icon icon" aria-hidden="true" ng-class="{'icon-navigation-up': vm.isSortDirection('Name', 'asc'), 'icon-navigation-down': vm.isSortDirection('Name', 'desc')}"></i>
                     </button>
@@ -24,11 +22,10 @@
                     <localize key="general_status">Status</localize>
                 </div>
                 <div class="umb-table-cell" ng-repeat="column in vm.itemProperties track by column.alias">
-                    <button
-                        type="button"
-                        class="umb-table-head__link"
-                        ng-click="vm.sort(column.alias, column.allowSorting, column.isSystem)"
-                        ng-class="{'sortable':column.allowSorting}" prevent-default>
+                    <button type="button"
+                            class="umb-table-head__link"
+                            ng-click="vm.sort(column.alias, column.allowSorting, column.isSystem)"
+                            ng-class="{'sortable':column.allowSorting}">
                         <span ng-bind="column.header"></span>
                         <i class="umb-table-head__icon icon" aria-hidden="true" ng-class="{'icon-navigation-up': vm.isSortDirection(column.alias, 'asc'), 'icon-navigation-down': vm.isSortDirection(column.alias, 'desc')}"></i>
                     </button>
@@ -39,15 +36,16 @@
         <div class="umb-table-body">
             <div class="umb-table-row -selectable umb-outline"
                  ng-repeat="item in vm.items track by $index"
+                 ng-init="item.icon = vm.getIcon(item)"
                  ng-class="{'-selected':item.selected, '-light':!item.published && item.updater != null}"
                  ng-click="vm.selectItem(item, $index, $event)">
 
                 <div class="umb-table-cell">
-                    <i class="umb-table-body__icon umb-table-body__fileicon {{item.icon}}" aria-hidden="true" ng-class="vm.getIcon(item)"></i>
-                    <i class="umb-table-body__icon umb-table-body__checkicon icon-check" aria-hidden="true"></i>
+                    <umb-icon icon="{{item.icon}}" class="umb-table-body__icon umb-table-body__fileicon" ng-if="!item.selected"></umb-icon>
+                    <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon" ng-if="item.selected"></umb-icon>
                 </div>
                 <div class="umb-table-cell umb-table__name">
-                    <a title="{{ item.name }}" class="umb-table-body__link"
+                    <a title="{{item.name}}" class="umb-table-body__link"
                        ng-href="{{'#' + item.editPath}}"
                        ng-click="vm.clickItem(item, $event)"
                        ng-bind="item.name">
@@ -66,7 +64,7 @@
                         </div>
 
                         <em ng-show="column.isSensitive" class="muted">
-                            <localize key="content_isSensitiveValue_short"></localize>
+                            <localize key="content_isSensitiveValue_short">This value is hidden.</localize>
                         </em>
 
                     </span>
