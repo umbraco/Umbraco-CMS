@@ -2262,11 +2262,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
     <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco.Core.UseHttps' is set to 'false' in
-      your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.
+    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco:CMS:Global:UseHttps' is set to 'false' in
+      your appSettings.json file. Once you access this site using the HTTPS scheme, that should be set to 'true'.
     </key>
-    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco.Core.UseHttps' is set to '%0%' in your
-      web.config file, your cookies are %1% marked as secure.
+    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco:CMS:Global:UseHttps' is set to '%0%' in your
+      appSettings.json file, your cookies are %1% marked as secure.
     </key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
