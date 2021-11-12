@@ -530,6 +530,8 @@
     <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
     <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
+    <key alias="deleteLayout">You are deleting the layout</key>
+    <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
