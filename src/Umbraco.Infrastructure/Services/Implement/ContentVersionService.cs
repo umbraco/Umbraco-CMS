@@ -41,11 +41,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         ///     In v9 this can live in another class as we publish the notifications via IEventAggregator.
         ///     But for v8 must be here for access to the static events.
         /// </remarks>
-        public IReadOnlyCollection<HistoricContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate) =>
-            CleanupDocumentVersions(asAtDate);
+        public IReadOnlyCollection<HistoricContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate)
+        {
+            // Media - ignored
+            // Members - ignored
+            return CleanupDocumentVersions(asAtDate);
+        }
 
-        // Media - ignored
-        // Members - ignored
+
         /// <remarks>
         ///     v9 - move to another class
         /// </remarks>
