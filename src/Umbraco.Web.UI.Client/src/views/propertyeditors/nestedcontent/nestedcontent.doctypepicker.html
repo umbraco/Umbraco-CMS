@@ -1,4 +1,4 @@
-﻿<div id="{{model.alias}}" class="umb-nested-content__doctypepicker" ng-controller="Umbraco.PropertyEditors.NestedContent.DocTypePickerController">
+<div id="{{model.alias}}" class="umb-nested-content__doctypepicker" ng-controller="Umbraco.PropertyEditors.NestedContent.DocTypePickerController">
     <div>
         <table class="table table-striped">
             <thead>
@@ -10,7 +10,11 @@
                     <th>
                         <localize key="general_group">Group</localize>
                     </th>
-                    <th>
+                    <th ng-class="{'w-100':expandTemplate}">
+                        <button type="button" class="pull-right p0 btn btn-link" ng-click="expandTemplate = !expandTemplate"
+                                ng-class="{'fa-flip-horizontal': !expandTemplate}">
+                          <umb-icon icon="icon-tab-key"></umb-icon>
+                        </button>
                         <localize key="template_template">Template</localize>
                     </th>
                     <th></th>

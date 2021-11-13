@@ -1,4 +1,4 @@
-﻿angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.DocTypePickerController", [
+angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.DocTypePickerController", [
 
     "$scope",
     "Umbraco.PropertyEditors.NestedContent.Resources",
@@ -10,6 +10,7 @@
         var selectElementTypeModalTitle = "";
 
         $scope.elemTypeTabs = [];
+        $scope.expandTemplate = false;
 
 
         init();
