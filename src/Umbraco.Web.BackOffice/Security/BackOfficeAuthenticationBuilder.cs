@@ -62,7 +62,11 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         {
             public void PostConfigure(string name, TOptions options)
             {
-                options.SignInScheme = Constants.Security.BackOfficeExternalAuthenticationType;
+                // ensure logic only applies to backoffice authentication schemes
+                if (name.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix))
+                {
+                    options.SignInScheme = Constants.Security.BackOfficeExternalAuthenticationType;
+                }
             }
         }
     }
