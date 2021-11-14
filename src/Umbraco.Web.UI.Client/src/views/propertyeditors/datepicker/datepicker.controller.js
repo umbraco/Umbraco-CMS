@@ -50,6 +50,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         // date picker config
         $scope.datePickerConfig = {
             enableTime: $scope.model.config.pickTime,
+            noCalendar: !$scope.model.config.pickDate,
             dateFormat: dateFormat,
             time_24hr: true
         };
