@@ -5,6 +5,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Scoping;
@@ -109,6 +110,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             MapTemplates(contentTypes);
             MapComposition(contentTypes);
             MapGroupsAndProperties(contentTypes);
+            MapHistoryCleanup(contentTypes);
 
             // finalize
             foreach (var contentType in contentTypes.Values)
@@ -117,6 +119,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             return contentTypes.Values;
+        }
+
+        private void MapHistoryCleanup(Dictionary<int, IContentTypeComposition> contentTypes)
+        {
+            // get templates
+            var sql1 = Sql()
+                .Select<ContentVersionCleanupPolicyDto>()
+                .From<ContentVersionCleanupPolicyDto>()
+                .OrderBy<ContentVersionCleanupPolicyDto>(x => x.ContentTypeId);
+
+            var contentVersionCleanupPolicyDtos = Database.Fetch<ContentVersionCleanupPolicyDto>(sql1);
+
+            var contentVersionCleanupPolicyDictionary =
+                contentVersionCleanupPolicyDtos.ToDictionary(x => x.ContentTypeId);
+            foreach (var c in contentTypes.Values)
+            {
+                if (!(c is ContentType contentType)) continue;
+
+                var historyCleanup = new HistoryCleanup();
+
+                if (contentVersionCleanupPolicyDictionary.TryGetValue(contentType.Id, out var versionCleanup))
+                {
+                    historyCleanup.PreventCleanup = versionCleanup.PreventCleanup;
+                    historyCleanup.KeepAllVersionsNewerThanDays = versionCleanup.KeepAllVersionsNewerThanDays;
+                    historyCleanup.KeepLatestVersionPerDayForDays = versionCleanup.KeepLatestVersionPerDayForDays;
+                }
+
+                contentType.HistoryCleanup = historyCleanup;
+            }
         }
 
         private void MapTemplates(Dictionary<int, IContentTypeComposition> contentTypes)
@@ -145,7 +176,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     templateDtoIx++;
                     if (!templates.TryGetValue(allowedDto.TemplateNodeId, out var template)) continue;
                     allowedTemplates.Add(template);
-                    
+
                     if (allowedDto.IsDefault)
                         defaultTemplateId = template.Id;
                 }

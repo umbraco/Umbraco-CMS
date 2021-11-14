@@ -11,6 +11,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_15_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_17_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_18_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -211,6 +212,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
 
             //FINAL
+            To<AddContentVersionCleanupFeature>("{8BAF5E6C-DCB7-41AE-824F-4215AE4F1F98}");
         }
     }
 }

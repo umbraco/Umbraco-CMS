@@ -2,6 +2,7 @@
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {
@@ -19,6 +20,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentType.SortOrder = 1;
             contentType.CreatorId = 0;
             contentType.Trashed = false;
+            contentType.HistoryCleanup = new HistoryCleanup();
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
@@ -121,7 +123,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 Thumbnail = "doc.png",
                 SortOrder = 1,
                 CreatorId = 0,
-                Trashed = false
+                Trashed = false,
+                HistoryCleanup = new HistoryCleanup()
             };
 
             var metaCollection = new PropertyTypeCollection(true);
@@ -216,6 +219,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentType.SortOrder = 1;
             contentType.CreatorId = 0;
             contentType.Trashed = false;
+            contentType.Key = Guid.NewGuid();
 
             var contentCollection = new PropertyTypeCollection(true);
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext) { Alias = RandomAlias("title", randomizeAliases), Name = "Title", Description = "",  Mandatory = false, SortOrder = 1, DataTypeId = -88, LabelOnTop = true });

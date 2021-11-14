@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Models.ContentEditing;
 
 namespace Umbraco.Core.Models
 {
@@ -17,6 +18,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         IEnumerable<ITemplate> AllowedTemplates { get; set; }
 
+        /// <summary>
+        /// Gets or Sets the history cleanup configuration
+        /// </summary>
+        HistoryCleanup HistoryCleanup { get; set; }
         /// <summary>
         /// Determines if AllowedTemplates contains templateId
         /// </summary>
