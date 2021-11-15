@@ -17,11 +17,11 @@
     <key alias="defaultValue">Значение по умолчанию</key>
     <key alias="delete">Удалить</key>
     <key alias="disable">Отключить</key>
-    <key alias="emptyrecyclebin">Очистить корзину</key>
+    <key alias="emptyRecycleBin">Очистить корзину</key>
     <key alias="enable">Включить</key>
     <key alias="export">Экспорт</key>
     <key alias="exportDocumentType">Экспортировать</key>
-    <key alias="importdocumenttype">Импортировать</key>
+    <key alias="importDocumentType">Импортировать</key>
     <key alias="importPackage">Импортировать пакет</key>
     <key alias="liveEdit">Править на месте</key>
     <key alias="logout">Выйти</key>
@@ -95,7 +95,7 @@
     <key alias="atViewingFor">Наблюдать за</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Создать новый шаблон содержимого из '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Создать новый шаблон содержимого из <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Пустой</key>
     <key alias="selectBlueprint">Выбрать шаблон содержимого</key>
     <key alias="createdBlueprintHeading">Шаблон содержимого создан</key>
@@ -427,7 +427,6 @@
   </area>
   <area alias="errorHandling">
     <key alias="errorButDataWasSaved">Ваши данные сохранены, но для того, чтобы опубликовать этот документ, Вы должны сначала исправить следующие ошибки:</key>
-    <key alias="errorChangingProviderPassword">Текущий провайдер ролей пользователей не поддерживает изменение пароля (необходимо свойству EnablePasswordRetrieval в файле web.config присвоить значение true)</key>
     <key alias="errorExistsWithoutTab">%0% уже существует</key>
     <key alias="errorHeader">Обнаружены следующие ошибки:</key>
     <key alias="errorHeaderWithoutTab">Обнаружены следующие ошибки:</key>
@@ -661,8 +660,6 @@
     <key alias="httpsCheckValidCertificate">Сертификат Вашего веб-сайта отмечен как проверенный.</key>
     <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Сейчас Вы %0% просматриваете сайт, используя протокол HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">Параметр 'Umbraco.Core.UseHttps' в секции 'appSetting' установлен в 'false' в файле web.config. Если Вам необходим доступ к сайту по протоколу HTTPS, нужно установить данный параметр в 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">Параметр 'Umbraco.Core.UseHttps' в секции 'appSetting' в файле установлен в '%0%', значения cookies %1% маркированы как безопасные.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Режим компиляции с отладкой выключен.</key>
     <key alias="compilationDebugCheckErrorMessage">Режим компиляции с отладкой сейчас включен. Рекомендуется выключить перед размещением сайта в сети.</key>
@@ -688,10 +685,7 @@
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[Обнаружены следующие заголовки, позволяющие выяснить базовую технологию сайта: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Заголовки, позволяющие выяснить базовую технологию сайта, не обнаружены.</key>
-    <key alias="smtpMailSettingsNotFound">В файле Web.config, не обнаружено параметров работы с отправкой электронной почты (секция 'system.net/mailsettings').</key>
-    <key alias="smtpMailSettingsHostNotConfigured">В файле Web.config в секции 'system.net/mailsettings' не обнаружены настройки почтового хоста.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Параметры отправки электронной почты (SMTP) настроены корректно, сервис работает как ожидается.</key>
-    <key alias="smtpMailSettingsConnectionFail">Сервер SMTP сконфигурирован на использование хоста '%0%' на порту '%1%', который в настоящее время недоступен. Пожалуйста, убедитесь, что настройки SMTP в файле Web.config в секции 'system.net/mailsettings' верны.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Адрес для отправки уведомлений установлен в <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Адрес для отправки уведомлений все еще установлен в значение по-умолчанию <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Зафиксированы следующие результаты автоматической проверки состояния Umbraco по расписанию, запущенной на %0% в %1%:</p>%2%</body></html>]]></key>
@@ -705,18 +699,12 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Программа установки не может установить подключение к базе данных.</key>
-    <key alias="databaseErrorWebConfig">Невозможно сохранить изменения в файл web.config. Пожалуйста, вручную измените настройки строки подключения к базе данных.</key>
     <key alias="databaseFound">База данных обнаружена и идентифицирована как</key>
     <key alias="databaseHeader">Конфигурация базы данных</key>
     <key alias="databaseInstall"><![CDATA[
 		Нажмите кнопку <strong>Установить</strong> чтобы установить базу данных Umbraco %0%
 		]]></key>
     <key alias="databaseInstallDone"><![CDATA[Ваша База данных сконфигурирована для работы Umbraco %0%. Нажмите кнопку <strong>Далее</strong> для продолжения.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>База данных не найдена! Пожалуйста, проверьте настройки строки подключения ("connection string") в файле конфигурации "web.config"</p>
-		<p>Для настройки откройте файл "web.config" с помощью любого текстового редактора и добавьте нужную информацию в строку подключения (параметр "UmbracoDbDSN"),
-		затем сохраните файл.</p>
-		<p>Нажмите кнопку "Повторить" когда все будет готово<br />
-		<a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Более подробно о внесении изменений в файл "web.config" рассказано здесь</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[Для завершения данного шага Вам нужно располагать некоторой информацией о Вашем сервере базы данных
 		(строка подключения "connection string")<br />
 		Пожалуйста, свяжитесь с Вашим хостинг-провайдером, если есть необходимость, а если устанавливаете на локальную рабочую станцию или сервер, то получите информацию у Вашего системного администратора.]]></key>
@@ -734,7 +722,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Пароль пользователя по-умолчанию успешно изменен в процессе установки!</strong></p><p>Нет надобности в каких-либо дальнейших действиях. Нажмите кнопку <strong>Далее</strong> для продолжения.]]></key>
     <key alias="defaultUserPasswordChanged">Пароль изменен!</key>
     <key alias="greatStart">Для начального обзора возможностей системы рекомендуем посмотреть ознакомительные видеоматериалы</key>
-    <key alias="licenseText"><![CDATA[Нажимая кнопку <strong>Далее</strong> (или модифицируя вручную ключ "UmbracoConfigurationStatus" в файле "web.config"), Вы принимаете лицензионное соглашение для данного программного обеспечения, расположенное ниже. Пожалуйста, обратите внимание, что установочный пакет Umbraco отвечает двум различным типам лицензий: лицензии MIT на программные продукты с открытым исходным кодом в части ядра системы и свободной лицензии Umbraco в части пользовательского интерфейса.]]></key>
     <key alias="None">Система не установлена.</key>
     <key alias="permissionsAffectedFolders">Затронутые файлы и папки</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Более подробно об установке разрешений для Umbraco рассказано здесь</key>
@@ -797,8 +784,6 @@
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Дальнейшее изучение и помощь</h3>
 		Получайте помощь от нашего замечательного сообщества пользователей, изучайте документацию или просматривайте наши свободно распространяемые видео-материалы о том, как создать собственный несложный сайт, как использовать расширения и пакеты, а также краткое руководство по терминологии Umbraco.]]></key>
     <key alias="theEndHeader">Система Umbraco %0% установлена и готова к работе</key>
-    <key alias="theEndInstallFailed"><![CDATA[Для завершения процесса установки Вам необходимо
-		вручную модифицировать файл <strong>web.config</strong> и изменить значение ключа <strong>UmbracoConfigurationStatus</strong> в секции <strong>AppSetting</strong>, установив его равным <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Вы можете начать работу <strong>прямо сейчас</strong>,
 		воспользовавшись ссылкой "Начать работу с Umbraco". <br />Если Вы <strong>новичок в мире Umbraco</strong>, Вы сможете найти много полезных ссылок на ресурсы на странице "Начало работы".]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Начните работу с Umbraco</h3>

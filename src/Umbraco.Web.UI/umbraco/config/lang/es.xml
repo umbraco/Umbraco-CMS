@@ -15,10 +15,10 @@
     <key alias="createGroup">Crear grupo</key>
     <key alias="delete">Borrar</key>
     <key alias="disable">Deshabilitar</key>
-    <key alias="emptyrecyclebin">Vaciar Papelera</key>
+    <key alias="emptyRecycleBin">Vaciar Papelera</key>
     <key alias="enable">Activar</key>
     <key alias="exportDocumentType">Exportar Documento (tipo)</key>
-    <key alias="importdocumenttype">Importar Documento (tipo)</key>
+    <key alias="importDocumentType">Importar Documento (tipo)</key>
     <key alias="importPackage">Importar Paquete</key>
     <key alias="liveEdit">Editar en vivo</key>
     <key alias="logout">Cerrar sesión</key>
@@ -194,7 +194,7 @@
     <key alias="contentRoot">Raíz de contenido</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Crear nueva Plantilla de Contenido desde '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Crear nueva Plantilla de Contenido desde <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Vacía</key>
     <key alias="selectBlueprint">Seleccionar Plantilla de Contenido</key>
     <key alias="createdBlueprintHeading">Plantilla de Contenido creada</key>
@@ -592,12 +592,10 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">El instalador no puede conectar con la base de datos.</key>
-    <key alias="databaseErrorWebConfig">No se ha podido guardar el archivo Web.config. Por favor, modifica la cadena de conexión manualmente.</key>
     <key alias="databaseFound">Tu base de datos ha sido encontrada y ha sido identificada como</key>
     <key alias="databaseHeader">Configuración de la base de datos</key>
     <key alias="databaseInstall"><![CDATA[Pulsa el botón <strong> instalar </ strong> para instalar %0% la base de datos de Umbraco]]></key>
     <key alias="databaseInstallDone"><![CDATA[Se ha copiado Umbraco %0% a la base de datos. Pulsa <strong>Próximo</strong> para continuar]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>¡No se ha encontrado ninguna base de datos! Mira si la información en la cadena de conexión del “web.config” es correcta.</p> <p>Para continuar, edita el "web.config" (bien sea usando Visual Studio o tu editor de texto preferido), ve al final del archivo y añade la cadena de conexión para la base de datos con el nombre (key) "umbracoDbDSN" y guarda el archivo. </p> <p>Pincha en <strong>reintentar</strong> cuando hayas terminado.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Pincha aquí para mayor información de como editar el web.config (en inglés)</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Para completar este paso, debes conocer la información correspondiente a tu servidor de base de datos ("cadena de conexión").<br /> Por favor, contacta con tu ISP si es necesario. Si estás realizando la instalación en una máquina o servidor local, quizás necesites información de tu administrador de sistemas.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Pincha en <strong>actualizar</strong> para actualizar la base de datos a Umbraco %0%</p> <p> Ningún contenido será borrado de la base de datos y seguirá funcionando después de la actualización </p> ]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[La base de datos ha sido actualizada a la versión 0%.<br />Pincha en <strong>Próximo</strong> para continuar. ]]></key>
@@ -607,7 +605,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>¡La contraseña del usuario por defecto ha sido cambiada desde que se instaló!</strong></p><p>No hay que realizar ninguna tarea más. Pulsa <strong>Siguiente</strong> para proseguir.]]></key>
     <key alias="defaultUserPasswordChanged">¡La contraseña se ha cambiado!</key>
     <key alias="greatStart">Ten un buen comienzo, visita nuestros videos de introducción</key>
-    <key alias="licenseText">Pulsando el botón de Siguiente (o modificando el UmbracoConfigurationStatus en el web.config), aceptar la licencia de este software tal y como se especifica en el cuadro de debajo. Ten en cuenta que esta distribución de Umbraco consta de dos licencias diferentes, la licencia open source MIT para el framework y la licencia Umbraco freeware que cubre la IU.</key>
     <key alias="None">No ha sido instalado.</key>
     <key alias="permissionsAffectedFolders">Archivos y directorios afectados</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Mas información en configurar los permisos para Umbraco aquí</key>
@@ -641,7 +638,6 @@
     <key alias="theEndBrowseSite"><![CDATA[<h3>Navega a tu nuevo sitio</h3> Has instalado Runway, por qué no ves el aspecto de tu nuevo sitio web.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Más ayuda e información</h3> Consigue ayuda de nuestra premiada comunidad, navega por la documentación o mira algunos videos gratuitos de cómo crear un sitio sencillo, cómo utilizar los paquetes y una guía rápida de la terminología de Umbraco]]></key>
     <key alias="theEndHeader">Umbraco %0% ha sido instalado y está listo para ser usado</key>
-    <key alias="theEndInstallFailed"><![CDATA[Para completar la instalación, necesitaras editar de forma manual el <strong>archivo /web.config</strong> y actualizar la clave del AppSetting <strong>UmbracoConfigurationStatus</strong> del final al valor <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Puedes <strong>empezar inmediatamente</strong> pulsando el botón "Lanzar Umbraco" de debajo. <br />Si eres <strong>nuevo con Umbraco</strong>, puedes encontrar cantidad de recursos en nuestras páginas de cómo empezar.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lanzar Umbraco</h3> Para administrar tu sitio web, simplemente abre el backoffice de Umbraco y empieza a añadir contenido, a actualizar plantillas y hojas de estilo o a añadir nueva funcionalidad]]></key>
     <key alias="Unavailable">No se ha podido establecer la conexión con la base de datos</key>
@@ -1507,8 +1503,6 @@
     <key alias="httpsCheckExpiringCertificate">El certificado SSL de tu sitio caducará en %0% días.</key>
     <key alias="healthCheckInvalidUrl">Error haciendo ping a la URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Actualmente estás %0% viendo el sitio usando el esquema HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">El appSetting 'Umbraco.Core.UseHttps' está configurado como 'false' en tu archivo web.config. Una vez que accedes al sitio usando HTTPS, debería ser configurado como 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">Ele appSetting 'Umbraco.Core.UseHttps' está configurado como '%0%' en tu archivo web.config, tus cookies son %1% marcadas como seguras.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Modo Debug en compilación está desactivado.</key>
     <key alias="compilationDebugCheckErrorMessage">Modo Debug en compilación está activado. Se recomienda desactivarlo antes de publicar el sitio.</key>
@@ -1528,10 +1522,7 @@
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No se ha encontrado ninguna cabecera que revele información sobre la tecnología del sitio.</key>
-    <key alias="smtpMailSettingsNotFound">No se encontró system.net/mailsettings en Web.config.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">En la sección system.net/mailsettings section de web.config, el host no está configurado.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Los valores SMTP están configurados correctamente y el servicio opera con normalidad.</key>
-    <key alias="smtpMailSettingsConnectionFail">El servidor SMTP configurado con host '%0%' y puerto '%1%' no se pudo alcanzar. Por favor revisa que la configuración en la sección system.net/mailsettings del archivo Web.config es correcta.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Email de notificación has sido configurado como <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[El email de notificación está todavía configurado en tuvalor por defecto: <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Los resultados de los Chequeos de Salud de Umbraco programados para ejecutarse el %0% a las %1% son:</p>%2%</body></html>]]></key>

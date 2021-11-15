@@ -119,10 +119,10 @@
         npm cache clean --force >> $log 2>&1
         $error.Clear() # that one can fail 'cos security bug - ignore
 
-        Write-Output "### npm install" >> $log 2>&1
-        npm install >> $log 2>&1
+        Write-Output "### npm ci" >> $log 2>&1
+        npm ci >> $log 2>&1
         Write-Output ">> $? $($error.Count)" >> $log 2>&1
-        # Don't really care about the messages from npm install making us think there are errors
+        # Don't really care about the messages from npm ci making us think there are errors
         $error.Clear()
 
         Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
@@ -265,7 +265,7 @@
 
     # beware of the weird double \\ at the end of paths
     # see http://edgylogic.com/blog/powershell-and-external-commands-done-right/
-    &$this.BuildEnv.VisualStudio.MsBuild "$($this.SolutionRoot)\src\Umbraco.Tests\Umbraco.Tests.csproj" `
+    &$this.BuildEnv.VisualStudio.MsBuild "$($this.SolutionRoot)\tests\Umbraco.Tests\Umbraco.Tests.csproj" `
       /p:WarningLevel=0 `
       /p:Configuration=$buildConfiguration `
       /p:Platform=AnyCPU `
@@ -489,7 +489,7 @@
     cd $src\Umbraco.Web.UI.Docs
 
     "Generating the docs and waiting before executing the next commands"
-	& npm install
+	  & npm ci
     & npx gulp docs
 
     Pop-Location

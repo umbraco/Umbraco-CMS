@@ -1,0 +1,21 @@
+{
+  "name": "acceptancetest",
+  "private": true,
+  "scripts": {
+    "postinstall": "node postinstall.js",
+    "config": "node config.js",
+    "test": "npx cypress run",
+    "ui": "npx cypress open"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.2",
+    "cypress": "^8.7.0",
+    "del": "^6.0.0",
+    "ncp": "^2.0.0",
+    "prompt": "^1.2.0",
+    "umbraco-cypress-testhelpers": "^1.0.0-beta-60"
+  },
+  "dependencies": {
+    "typescript": "^3.9.2"
+  }
+}

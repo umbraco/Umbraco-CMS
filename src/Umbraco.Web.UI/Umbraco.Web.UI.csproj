@@ -43,6 +43,7 @@
     <Content Remove="umbraco/Data/**" />
     <Content Remove="umbraco/logs/**" />
     <Content Remove="umbraco/mediacache/**" />
+    <Content Remove="umbraco\UmbracoWebsite\NotFound.cshtml" />
     <Content Remove="wwwroot/Web.config" />
   </ItemGroup>
 
@@ -66,7 +67,7 @@
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.11" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -108,7 +109,8 @@
 
   </Target>
   <Target Name="BelleBuild">
-<!--    <Exec WorkingDirectory="$(ProjectDir)/../../src/Umbraco.Web.UI.Client/" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;{ npm install ; npm run build }'" />-->
+    <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm ci" />
+    <Exec WorkingDirectory="$(ProjectDir)/../Umbraco.Web.UI.Client/" Command="npm run build:skip-tests" />
   </Target>
   <Target Name="JsonSchemaBuild">
 <!--    <Exec WorkingDirectory="$(ProjectDir)/../../" Command="powershell -ExecutionPolicy RemoteSigned -Command '&amp;dotnet run &#45;&#45;project $pwd/src/JsonSchema/JsonSchema.csproj -c Release &#45;&#45; &#45;&#45;outputFile $pwd/src/Umbraco.Web.UI/$(JsonSchemaPath)'" />-->

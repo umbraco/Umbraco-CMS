@@ -1,8 +1,12 @@
 using System;
+using System.ComponentModel;
 using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Cms.Core.PublishedCache.Internal
 {
+
+    // TODO: Only used in unit tests, needs to be moved to test project
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class InternalPublishedSnapshot : IPublishedSnapshot
     {
         public InternalPublishedContentCache InnerContentCache { get; } = new InternalPublishedContentCache();
