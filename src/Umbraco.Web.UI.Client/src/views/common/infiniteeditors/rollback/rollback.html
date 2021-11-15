@@ -23,7 +23,7 @@
                         <small>
                             <localize 
                                 key="rollback_pagination"
-                                tokens="[(vm.pageNumber * vm.pageSize - vm.pageSize) + 1, vm.pageNumber * vm.pageSize, vm.totalItems]"
+                                tokens="[vm.paginationCount.from, vm.paginationCount.to, vm.paginationCount.total]"
                                 watch-tokens="true">
                             </localize>
                         </small>

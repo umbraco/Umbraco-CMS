@@ -12,6 +12,7 @@
         vm.close = close;
         vm.pinVersion = pinVersion;
         vm.goToPage = goToPage;
+        vm.paginationCount = { from: 0, to: 0, total: 0 };
 
         //////////
 
@@ -119,6 +120,14 @@
                 .then(function (data) {
                     vm.totalPages = data.totalPages;
                     vm.totalItems = data.totalItems;
+
+                    const possibleTotalItems = vm.pageNumber * vm.pageSize;
+
+                    vm.paginationCount = {
+                        from: (vm.pageNumber * vm.pageSize - vm.pageSize) + 1,
+                        to: vm.totalItems < possibleTotalItems ? vm.totalItems : possibleTotalItems,
+                        total: vm.totalItems
+                    };
 
                     // get current backoffice user and format dates
                     userService.getCurrentUser().then(function (currentUser) {
