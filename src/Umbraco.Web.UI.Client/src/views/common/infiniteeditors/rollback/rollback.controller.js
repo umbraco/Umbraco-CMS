@@ -74,6 +74,12 @@
 
         function changeVersion(version) {
 
+            const canRollback = !version.currentDraftVersion && !version.currentPublishedVersion;
+
+            if (canRollback === false) {
+                return;
+            }
+
             if (vm.previousVersion && version && vm.previousVersion.versionId === version.versionId) {
                 vm.previousVersion = null;
                 vm.diff = null;
