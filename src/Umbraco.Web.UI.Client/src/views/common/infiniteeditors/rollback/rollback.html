@@ -23,7 +23,7 @@
                         <small>
                             <localize 
                                 key="rollback_pagination"
-                                tokens="[(vm.currentPage * vm.itemsPerPage - vm.itemsPerPage) + 1, vm.currentPage * vm.itemsPerPage, vm.itemsPerPage * vm.totalPages]"
+                                tokens="[(vm.pageNumber * vm.pageSize - vm.pageSize) + 1, vm.pageNumber * vm.pageSize, vm.totalItems]"
                                 watch-tokens="true">
                             </localize>
                         </small>
@@ -75,7 +75,7 @@
 
                         <umb-pagination
                             ng-if="vm.totalPages > 0 && !vm.loading"
-                            page-number="vm.currentPage"
+                            page-number="vm.pageNumber"
                             total-pages="vm.totalPages"
                             on-change="vm.goToPage(pageNumber)">
                         </umb-pagination>

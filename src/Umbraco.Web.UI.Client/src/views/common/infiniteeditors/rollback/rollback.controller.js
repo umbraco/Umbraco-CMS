@@ -24,10 +24,10 @@
             vm.rollbackButtonDisabled = true;
             vm.labels = {};
 
-            // TODO: implement
-            vm.itemsPerPage = 10;
-            vm.totalPages = 10;
-            vm.currentPage = 1;
+            vm.pageSize = 15;
+            vm.pageNumber = 1;
+            vm.totalPages = 1;
+            vm.totalItems = 0;
 
             // find the current version for invariant nodes
             if($scope.model.node.variants.length === 1) {
@@ -68,6 +68,7 @@
 
         function changeLanguage(language) {
             vm.currentVersion = language;
+            vm.pageNumber = 1;
             getVersions();
         }
 
@@ -108,13 +109,16 @@
             const nodeId = $scope.model.node.id;
             const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
-            return contentResource.getRollbackVersions(nodeId, culture)
+            return contentResource.getPagedRollbackVersions(nodeId, vm.pageNumber, vm.pageSize, culture)
                 .then(function (data) {
+                    vm.totalPages = data.totalPages;
+                    vm.totalItems = data.totalItems;
+
                     // get current backoffice user and format dates
                     userService.getCurrentUser().then(function (currentUser) {
-                        vm.previousVersions = data.map(version => {
+                        vm.previousVersions = data.items.map(version => {
                             var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
-                            version.displayValue = timestampFormatted + ' - ' + version.versionAuthorName;
+                            version.displayValue = timestampFormatted + ' - ' + version.username;
                             return version;
                         });
                     });
@@ -225,9 +229,9 @@
             event.stopPropagation();
         }
 
-        // TODO: implement
         function goToPage (pageNumber) {
-            console.log('PAGE NUMBER', pageNumber);
+            vm.pageNumber = pageNumber;
+            getVersions();
         }
 
         onInit();
