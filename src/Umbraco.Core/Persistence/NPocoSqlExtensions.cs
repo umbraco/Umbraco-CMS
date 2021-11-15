@@ -315,7 +315,7 @@ namespace Umbraco.Core.Persistence
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
                 : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
-            return sql.OrderBy(columns.Select(x => x + " DESC"));
+            return sql.OrderBy(columns.Select(x => (x + " DESC")).ToArray());
         }
 
         /// <summary>

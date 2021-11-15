@@ -194,6 +194,16 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf());
                 .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias");
         }
 
+        [Test]
+        public void OrderByDescendingTests()
+        {
+            var sql = Sql()
+                .Select("*")
+                .From<Dto1>()
+                .OrderByDescending<Dto1>(x => x.Value, x => x.Name);
+            Assert.AreEqual("SELECT * FROM [dto1] ORDER BY [dto1].[value] DESC, [dto1].[name] DESC".NoCrLf(), sql.SQL.NoCrLf());
+        }
+
         [TableName("dto1")]
         [PrimaryKey("id", AutoIncrement = false)]
         [ExplicitColumns]
