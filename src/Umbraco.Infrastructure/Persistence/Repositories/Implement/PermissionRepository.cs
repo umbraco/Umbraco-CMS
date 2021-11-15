@@ -55,8 +55,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 {
                     Sql<ISqlContext> sql = Sql()
                         .SelectAll()
-                        .From<UserGroup2NodePermissionDto>()
-                        .Where<UserGroup2NodePermissionDto>(dto => group.Contains(dto.UserGroupId));
+                        .From<UserGroup2NodeDto>()
+                        .LeftJoin<UserGroup2NodePermissionDto>().On<UserGroup2NodeDto, UserGroup2NodePermissionDto>(
+                            (left, right) => left.NodeId == right.NodeId && left.UserGroupId == right.UserGroupId)
+                        .Where<UserGroup2NodeDto>(dto => group.Contains(dto.UserGroupId));
 
                     List<UserGroup2NodePermissionDto> permissions =
                         AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
@@ -73,8 +75,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 {
                     Sql<ISqlContext> sql = Sql()
                         .SelectAll()
-                        .From<UserGroup2NodePermissionDto>()
-                        .Where<UserGroup2NodePermissionDto>(dto =>
+                        .From<UserGroup2NodeDto>()
+                        .LeftJoin<UserGroup2NodePermissionDto>().On<UserGroup2NodeDto, UserGroup2NodePermissionDto>(
+                            (left, right) => left.NodeId == right.NodeId && left.UserGroupId == right.UserGroupId)
+                        .Where<UserGroup2NodeDto>(dto =>
                             groupIds.Contains(dto.UserGroupId) && group.Contains(dto.NodeId));
 
                     List<UserGroup2NodePermissionDto> permissions =
@@ -98,9 +102,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             Sql<ISqlContext> sql = Sql()
                 .SelectAll()
-                .From<UserGroup2NodePermissionDto>()
-                .Where<UserGroup2NodePermissionDto>(dto => entityIds.Contains(dto.NodeId))
-                .OrderBy<UserGroup2NodePermissionDto>(dto => dto.NodeId);
+                .From<UserGroup2NodeDto>()
+                .LeftJoin<UserGroup2NodePermissionDto>()
+                .On<UserGroup2NodeDto, UserGroup2NodePermissionDto>((left, right) =>
+                    left.NodeId == right.NodeId && left.UserGroupId == right.UserGroupId)
+                .Where<UserGroup2NodeDto>(dto => entityIds.Contains(dto.NodeId))
+                .OrderBy<UserGroup2NodeDto>(dto => dto.NodeId);
 
             List<UserGroup2NodePermissionDto> result = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
             return ConvertToPermissionList(result);
@@ -115,9 +122,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             Sql<ISqlContext> sql = Sql()
                 .SelectAll()
-                .From<UserGroup2NodePermissionDto>()
-                .Where<UserGroup2NodePermissionDto>(dto => dto.NodeId == entityId)
-                .OrderBy<UserGroup2NodePermissionDto>(dto => dto.NodeId);
+                .From<UserGroup2NodeDto>()
+                .LeftJoin<UserGroup2NodePermissionDto>()
+                .On<UserGroup2NodeDto, UserGroup2NodePermissionDto>((left, right) =>
+                    left.NodeId == right.NodeId && left.UserGroupId == right.UserGroupId)
+                .Where<UserGroup2NodeDto>(dto => dto.NodeId == entityId)
+                .OrderBy<UserGroup2NodeDto>(dto => dto.NodeId);
+
 
             List<UserGroup2NodePermissionDto> result = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
             return ConvertToPermissionList(result);
@@ -127,7 +138,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         ///     Assigns the same permission set for a single group to any number of entities
         /// </summary>
         /// <param name="groupId"></param>
-        /// <param name="permissions"></param>
+        /// <param name="permissions">The permissions to assign or null to remove the connection between group and entityIds</param>
         /// <param name="entityIds"></param>
         /// <remarks>
         ///     This will first clear the permissions for this user and entities and recreate them
@@ -141,26 +152,34 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             IUmbracoDatabase db = AmbientScope.Database;
 
-            var sql =
-                "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)";
             foreach (IEnumerable<int> group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                db.Execute(sql, new { groupId, nodeIds = group });
+                db.Execute(@"DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@nodeIds);
+                                DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)",
+                    new { groupId, nodeIds = group });
             }
 
-            var toInsert = new List<UserGroup2NodePermissionDto>();
-            foreach (var p in permissions)
+
+            if (permissions is not null)
             {
+                var toInsert = new List<UserGroup2NodeDto>();
+                var toInsertPermissions = new List<UserGroup2NodePermissionDto>();
+
                 foreach (var e in entityIds)
                 {
-                    toInsert.Add(new UserGroup2NodePermissionDto
+                    toInsert.Add(new UserGroup2NodeDto() { NodeId = e, UserGroupId = groupId });
+                    foreach (var p in permissions)
                     {
-                        NodeId = e, Permission = p.ToString(CultureInfo.InvariantCulture), UserGroupId = groupId
-                    });
+                        toInsertPermissions.Add(new UserGroup2NodePermissionDto
+                        {
+                            NodeId = e, Permission = p.ToString(CultureInfo.InvariantCulture), UserGroupId = groupId
+                        });
+                    }
                 }
-            }
 
-            db.BulkInsertRecords(toInsert);
+                db.BulkInsertRecords(toInsert);
+                db.BulkInsertRecords(toInsertPermissions);
+            }
         }
 
         /// <summary>
@@ -173,10 +192,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             IUmbracoDatabase db = AmbientScope.Database;
 
+
+
             var sql =
-                "DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds)";
+                @"DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds;
+                 DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@entityIds);";
+
             db.Execute(sql,
                 new { groupId, permission = permission.ToString(CultureInfo.InvariantCulture), entityIds });
+
+            UserGroup2NodeDto[] actionsPermissions = entityIds.Select(id => new UserGroup2NodeDto
+            {
+                NodeId = id, UserGroupId = groupId
+            }).ToArray();
 
             UserGroup2NodePermissionDto[] actions = entityIds.Select(id => new UserGroup2NodePermissionDto
             {
@@ -184,6 +212,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }).ToArray();
 
             db.BulkInsertRecords(actions);
+            db.BulkInsertRecords(actionsPermissions);
         }
 
         /// <summary>
@@ -198,7 +227,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var groupIdsA = groupIds.ToArray();
 
             const string sql =
-                "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId AND permission = @permission AND userGroupId in (@groupIds)";
+                @"DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId AND userGroupId in (@groupIds);
+                  DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId AND permission = @permission AND userGroupId in (@groupIds);";
             db.Execute(sql,
                 new
                 {
@@ -207,12 +237,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     groupIds = groupIdsA
                 });
 
-            UserGroup2NodePermissionDto[] actions = groupIdsA.Select(id => new UserGroup2NodePermissionDto
+            UserGroup2NodePermissionDto[] actionsPermissions = groupIdsA.Select(id => new UserGroup2NodePermissionDto
             {
                 NodeId = entity.Id, Permission = permission.ToString(CultureInfo.InvariantCulture), UserGroupId = id
             }).ToArray();
 
+            UserGroup2NodeDto[] actions = groupIdsA.Select(id => new UserGroup2NodeDto
+            {
+                NodeId = entity.Id, UserGroupId = id
+            }).ToArray();
+
             db.BulkInsertRecords(actions);
+            db.BulkInsertRecords(actionsPermissions);
+
+
         }
 
         /// <summary>
@@ -227,15 +265,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             IUmbracoDatabase db = AmbientScope.Database;
 
-            const string sql = "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId";
+            const string sql = @"DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId;
+                                 DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId;";
             db.Execute(sql, new { nodeId = permissionSet.EntityId });
 
-            var toInsert = new List<UserGroup2NodePermissionDto>();
+            var toInsert = new List<UserGroup2NodeDto>();
+            var toInsertPermissions = new List<UserGroup2NodePermissionDto>();
             foreach (EntityPermission entityPermission in permissionSet.PermissionsSet)
             {
+                toInsert.Add(new UserGroup2NodeDto
+                {
+                    NodeId = permissionSet.EntityId,
+                    UserGroupId = entityPermission.UserGroupId
+                });
                 foreach (var permission in entityPermission.AssignedPermissions)
                 {
-                    toInsert.Add(new UserGroup2NodePermissionDto
+                    toInsertPermissions.Add(new UserGroup2NodePermissionDto
                     {
                         NodeId = permissionSet.EntityId,
                         Permission = permission,
@@ -245,6 +290,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             db.BulkInsertRecords(toInsert);
+            db.BulkInsertRecords(toInsertPermissions);
         }
 
         /// <summary>
@@ -282,7 +328,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 foreach (IGrouping<int, UserGroup2NodePermissionDto> permission in userGroupPermissions)
                 {
                     var perms = permission.Select(x => x.Permission).Distinct().ToArray();
-                    permissions.Add(new EntityPermission(permission.Key, np.Key, perms));
+
+                    // perms can contain null if there is no permissions assigned, but the node is chosen in the UI.
+                    permissions.Add(new EntityPermission(permission.Key, np.Key,
+                        perms.Where(x => x is not null).ToArray()));
                 }
             }
 

@@ -14,6 +14,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_1_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
@@ -263,6 +264,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 
             // TO 9.1.0
             To<AddContentVersionCleanupFeature>("{8BAF5E6C-DCB7-41AE-824F-4215AE4F1F98}");
+
+            // TO 9.2.0
+            To<AddUserGroup2NodeTable>("{0571C395-8F0B-44E9-8E3F-47BDD08D817B}");
         }
     }
 }
