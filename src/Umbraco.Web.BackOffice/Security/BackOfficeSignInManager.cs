@@ -194,14 +194,14 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     }
 
                     var shouldLinkUser = autoLinkOptions.OnExternalLogin == null || autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
-                    if (shouldLinkUser == false)
+                    if (shouldLinkUser)
                     {
-                        LogFailedExternalLogin(loginInfo, autoLinkUser);
-                        return ExternalLoginSignInResult.NotAllowed;
+                        return await LinkUser(autoLinkUser, loginInfo);
                     }
                     else
                     {
-                        return await LinkUser(autoLinkUser, loginInfo);
+                        LogFailedExternalLogin(loginInfo, autoLinkUser);
+                        return ExternalLoginSignInResult.NotAllowed;
                     }
                 }
                 else
@@ -236,14 +236,14 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     else
                     {
                         var shouldLinkUser = autoLinkOptions.OnExternalLogin == null || autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
-                        if (shouldLinkUser == false)
+                        if (shouldLinkUser)
                         {
-                            LogFailedExternalLogin(loginInfo, autoLinkUser);
-                            return ExternalLoginSignInResult.NotAllowed;
+                            return await LinkUser(autoLinkUser, loginInfo);
                         }
                         else
                         {
-                            return await LinkUser(autoLinkUser, loginInfo);
+                            LogFailedExternalLogin(loginInfo, autoLinkUser);
+                            return ExternalLoginSignInResult.NotAllowed;
                         }
                     }
                 }
