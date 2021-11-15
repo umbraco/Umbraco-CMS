@@ -77,8 +77,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 var shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
                 if (shouldSignIn == false)
                 {
-                    Logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.LoginProvider, user.Id);
-                    return SignInResult.NotAllowed;
+                    LogFailedExternalLogin(loginInfo, user);
+                    return ExternalLoginSignInResult.NotAllowed;
                 }
             }
 
@@ -196,8 +196,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     var shouldSignIn = autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
                     if (shouldSignIn == false)
                     {
-                        Logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.LoginProvider, autoLinkUser.Id);
-                        return SignInResult.NotAllowed;
+                        LogFailedExternalLogin(loginInfo, autoLinkUser);
+                        return ExternalLoginSignInResult.NotAllowed;
                     }
                     else
                     {
@@ -238,8 +238,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                         var shouldSignIn = autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
                         if (shouldSignIn == false)
                         {
-                            Logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.LoginProvider, autoLinkUser.Id);
-                            return SignInResult.NotAllowed;
+                            LogFailedExternalLogin(loginInfo, autoLinkUser);
+                            return ExternalLoginSignInResult.NotAllowed;
                         }
                         else
                         {
@@ -283,5 +283,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 return AutoLinkSignInResult.FailedLinkingUser(errors);
             }
         }
+
+        private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, BackOfficeIdentityUser user) =>
+            Logger.LogWarning("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.LoginProvider, user.Id);
     }
 }

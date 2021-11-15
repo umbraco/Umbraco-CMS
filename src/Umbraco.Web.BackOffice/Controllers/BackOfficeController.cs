@@ -517,6 +517,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 // Failed only occurs when the user does not exist
                 errors.Add("The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account, the provider must be linked from the back office.");
             }
+            else if (result == ExternalLoginSignInResult.NotAllowed)
+            {
+                // This occurs when the external provider has approved the login but custom logic in OnExternalLogin has denined it.
+                errors.Add($"The user {loginInfo.Principal.Identity.Name} for the external provider {loginInfo.ProviderDisplayName} has not been accepted and cannot sign in.");
+            }
             else if (result == AutoLinkSignInResult.FailedNotLinked)
             {
                 errors.Add("The requested provider (" + loginInfo.LoginProvider + ") has not been linked to an account, the provider must be linked from the back office.");
