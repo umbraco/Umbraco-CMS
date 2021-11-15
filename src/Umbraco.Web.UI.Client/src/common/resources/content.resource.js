@@ -1380,6 +1380,40 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 ),
                 "Failed to remove public access for content item with id " + contentId
             );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#contentVersionPreventCleanup
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Enables or disabled clean up of a version
+          *
+          * ##usage
+          * <pre>
+          * contentResource.contentVersionPreventCleanup(contentId, versionId, preventCleanup)
+          *    .then(function() {
+          *        // do your thing
+          *    });
+          * </pre>
+          *
+          * @param {Int} contentId Id of node
+          * @param {Int} versionId Id of version
+          * @param {Int} preventCleanup Boolean to toggle clean up prevention
+          *
+          */
+        contentVersionPreventCleanup: function (contentId, versionId, preventCleanup) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSetContentVersionPreventCleanup", {
+                        contentId: contentId,
+                        versionId: versionId,
+                        preventCleanup: preventCleanup
+                    })
+                ),
+                "Failed to toggle prevent cleanup of version with id " + versionId
+            );
         }
     };
 }

@@ -1533,6 +1533,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="scheduleErrReleaseDate3">Cannot schedule the document for publishing since the required '%0%' has a publish date later than a non mandatory language</key>
     <key alias="scheduleErrExpireDate1">The expire date cannot be in the past</key>
     <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
+    <key alias="preventCleanupEnableError">An error occurred while enabling version cleanup for %0%</key>
+    <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
+
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>

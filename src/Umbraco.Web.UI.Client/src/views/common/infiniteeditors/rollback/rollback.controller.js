@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function RollbackController($scope, $timeout, contentResource, localizationService, assetsService, dateHelper, userService) {
+    function RollbackController($scope, contentResource, localizationService, assetsService, dateHelper, userService, notificationsService) {
 
         var vm = this;
 
@@ -217,14 +217,30 @@
             }
         }
 
-        // TODO: implement
         function pinVersion (version, event) {
+            if (!version) {
+                return;
+            }
+
             version.pinningState = 'busy';
 
-            $timeout(() => {
-                version.pinningState = 'init';
-                version.isPinned = !version.isPinned;
-            }, 2000);
+            const nodeId = $scope.model.node.id;
+            const versionId = version.versionId;
+            const preventCleanup = !version.preventCleanup;
+
+            contentResource.contentVersionPreventCleanup(nodeId, versionId, preventCleanup)
+                .then(() => {
+                    version.pinningState = 'success';
+                    version.preventCleanup = preventCleanup;
+                }, () => {
+                    version.pinningState = 'error';
+
+                    const localizationKey = preventCleanup ? 'speechBubbles_preventCleanupEnableError' : 'speechBubbles_preventCleanupDisableError';
+
+                    localizationService.localize(localizationKey).then(value => {
+                        notificationsService.error(value);
+                    });
+                });
 
             event.stopPropagation();
         }
