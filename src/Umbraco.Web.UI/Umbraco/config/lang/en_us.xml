@@ -1397,6 +1397,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="selectVersion">Select version</key>
     <key alias="view">View</key>
     <key alias="pagination"><![CDATA[Showing version %0% to %1% of %2% versions]]></key>
+    <key alias="versions">Versions</key>
+    <key alias="currentDraftVersion">Current draft version</key>
+    <key alias="currentPublishedVersion">Current published version</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Edit script file</key>
@@ -1535,7 +1538,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
     <key alias="preventCleanupEnableError">An error occurred while enabling version cleanup for %0%</key>
     <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
-
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>

@@ -19,7 +19,7 @@
             <div class="main-content">
 
                 <umb-box class="side-panel">
-                    <umb-box-header title="Versions">
+                    <umb-box-header title-key="rollback_versions">
                         <small>
                             <localize 
                                 key="rollback_pagination"
@@ -55,7 +55,15 @@
                                         ng-class="{'-selectable': !version.currentDraftVersion && !version.currentPublishedVersion,'-selected': version.versionId === vm.previousVersion.versionId }"
                                         ng-click="vm.changeVersion(version)">
                                         <div class="umb-table-cell dn"></div>
-                                        <div class="umb-table-cell black">{{ version.displayValue }}</div>
+                                        <div class="umb-table-cell black">
+                                            <div class="flex flex-column">
+                                                <div>{{ version.displayValue }}</div>
+                                                <div>
+                                                    <small ng-if="version.currentPublishedVersion"><localize key="rollback_currentPublishedVersion">Current version</localize></small>
+                                                    <small ng-if="version.currentDraftVersion"><localize key="rollback_currentDraftVersion">Current version</localize></small>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="umb-table-cell umb-table-cell--auto-width">
                                             <umb-button 
                                                 style="margin-left: auto;"
