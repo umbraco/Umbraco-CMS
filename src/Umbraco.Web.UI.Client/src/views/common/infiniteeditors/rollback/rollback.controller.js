@@ -109,7 +109,7 @@
             const nodeId = $scope.model.node.id;
             const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
 
-            return contentResource.getPagedRollbackVersions(nodeId, vm.pageNumber, vm.pageSize, culture)
+            return contentResource.getPagedContentVersions(nodeId, vm.pageNumber, vm.pageSize, culture)
                 .then(function (data) {
                     vm.totalPages = data.totalPages;
                     vm.totalItems = data.totalItems;

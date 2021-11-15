@@ -1139,43 +1139,6 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
           * @ngdoc method
-          * @name umbraco.resources.contentResource#getPagedRollbackVersions
-          * @methodOf umbraco.resources.contentResource
-          *
-          * @description
-          * Returns a paged array of previous version id's, given a node id, pageNumber, pageSize and a culture
-          *
-          * ##usage
-          * <pre>
-          * contentResource.getPagedRollbackVersions(id, pageNumber, pageSize, culture)
-          *    .then(function(versions) {
-          *        alert('its here!');
-          *    });
-          * </pre>
-          *
-          * @param {Int} id Id of node
-          * @param {Int} pageNumber page number
-          * @param {Int} pageSize page size 
-          * @param {Int} culture if provided, the results will be for this specific culture/variant
-          * @returns {Promise} resourcePromise object containing the versions
-          *
-          */
-        getPagedRollbackVersions: function (contentId, pageNumber, pageSize, culture) {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetPagedContentVersions", {
-                        contentId: contentId,
-                        pageNumber: pageNumber,
-                        pageSize: pageSize,
-                        culture: culture
-                    })
-                ),
-                "Failed to get rollback versions for content item with id " + contentId
-            );
-        },
-
-        /**
-          * @ngdoc method
           * @name umbraco.resources.contentResource#getRollbackVersions
           * @methodOf umbraco.resources.contentResource
           *
@@ -1379,6 +1342,43 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     })
                 ),
                 "Failed to remove public access for content item with id " + contentId
+            );
+        },
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.contentResource#getPagedContentVersions
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Returns a paged array of previous version id's, given a node id, pageNumber, pageSize and a culture
+          *
+          * ##usage
+          * <pre>
+          * contentResource.getPagedContentVersions(id, pageNumber, pageSize, culture)
+          *    .then(function(versions) {
+          *        alert('its here!');
+          *    });
+          * </pre>
+          *
+          * @param {Int} id Id of node
+          * @param {Int} pageNumber page number
+          * @param {Int} pageSize page size 
+          * @param {Int} culture if provided, the results will be for this specific culture/variant
+          * @returns {Promise} resourcePromise object containing the versions
+          *
+          */
+        getPagedContentVersions: function (contentId, pageNumber, pageSize, culture) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "GetPagedContentVersions", {
+                        contentId: contentId,
+                        pageNumber: pageNumber,
+                        pageSize: pageSize,
+                        culture: culture
+                    })
+                ),
+                "Failed to get versions for content item with id " + contentId
             );
         },
 
