@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Core.Routing
             var count = 0;
             foreach (var c in path)
             {
-                if (c == Constants.CharArrays.ForwardSlash && ++count >= 3)
+                if (Array.FindIndex(Constants.CharArrays.ForwardSlash, x => x == c) != -1 && ++count >= 3)
                 {
                     return true;					
                 }
