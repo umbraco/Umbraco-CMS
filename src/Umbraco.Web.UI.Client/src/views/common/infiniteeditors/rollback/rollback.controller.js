@@ -114,7 +114,7 @@
         function getVersions() {
 
             const nodeId = $scope.model.node.id;
-            const culture = $scope.model.node.variants.length > 1 ? vm.currentVersion.language.culture : null;
+            const culture = vm.currentVersion.language ? vm.currentVersion.language.culture : null;
 
             return contentResource.getPagedContentVersions(nodeId, vm.pageNumber, vm.pageSize, culture)
                 .then(function (data) {
