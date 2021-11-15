@@ -57,11 +57,16 @@ context('Routing', () => {
 
     beforeEach(() => {
         cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'));
+        // Ensure cleaned before tests run
+        cy.deleteAllContent();
+        cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
         cy.umbracoEnsureLanguageNotExists(danishCulture);
         cy.umbracoEnsureLanguageNotExists(swedishCulture);
     });
 
     afterEach(() => {
+        // Cleanup after tests
+        cy.deleteAllContent();
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
         cy.umbracoEnsureLanguageNotExists(danishCulture);
         cy.umbracoEnsureLanguageNotExists(swedishCulture);
@@ -74,9 +79,6 @@ context('Routing', () => {
             .withAllowAsRoot(true)
             .withAllowCultureVariation(true)
             .build();
-
-        cy.deleteAllContent();
-        cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
 
         saveNewLanguages();
 
@@ -129,9 +131,6 @@ context('Routing', () => {
             .withAllowCultureVariation(true)
             .build();
 
-        cy.deleteAllContent();
-        cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
-
         saveNewLanguages();
 
         cy.saveDocumentType(rootDocType).then((generatedRootDocType) => {
@@ -173,7 +172,8 @@ context('Routing', () => {
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-list').contains("Swedish").click();
+        cy.get('.umb-list').should('be.visible');
+        cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Assert
@@ -188,9 +188,6 @@ context('Routing', () => {
             .withAllowAsRoot(true)
             .withAllowCultureVariation(true)
             .build();
-
-        cy.deleteAllContent();
-        cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
 
         saveNewLanguages();
 
@@ -256,14 +253,16 @@ context('Routing', () => {
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         //Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-list').contains("Swedish").click();
+        cy.get('.umb-list').should('be.visible');
+        cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Publish Grandchild
         cy.umbracoTreeItem("content", [nodeName, childNodeName, grandChildNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-list').contains("Swedish").click();
+        cy.get('.umb-list').should('be.visible');
+        cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Assert
@@ -278,9 +277,6 @@ context('Routing', () => {
             .withAllowAsRoot(true)
             .withAllowCultureVariation(true)
             .build();
-
-        cy.deleteAllContent();
-        cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);
 
         saveNewLanguages();
 
@@ -351,15 +347,16 @@ context('Routing', () => {
         cy.umbracoTreeItem("content", [nodeName, childNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-list').contains("Swedish").click();
+        cy.get('.umb-list').should('be.visible');
+        cy.get('.checkbox').last().click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Publish Grandchild
         cy.umbracoTreeItem("content", [nodeName, childNodeName, grandChildNodeName]).click();
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();
         // Pop-up with what cultures you want to publish shows, click it
-        cy.get('.umb-list').contains("Swedish").click();
-        cy.get('.umb-list').contains("Danish").click();
+        cy.get('.umb-list').should('be.visible');
+        cy.get('.checkbox').click({multiple : true});
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').last().click();
 
         // Assert

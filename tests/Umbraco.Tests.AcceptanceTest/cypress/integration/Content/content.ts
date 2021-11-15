@@ -353,7 +353,7 @@ context('Content', () => {
 
         cy.get('.umb-editor-footer-content__right-side > [button-style="success"] > .umb-button > .btn-success').click();
 
-        cy.reload();
+        refreshContentTree();
 
         // Assert
         cy.get('.history').find('.umb-badge').contains('Save').should('be.visible');
