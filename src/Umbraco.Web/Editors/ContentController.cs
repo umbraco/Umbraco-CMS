@@ -2399,7 +2399,7 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public PagedResult<ContentVersionMeta> GetPagedContentVersions(
+        public PagedResult<ContentVersionMetaViewModel> GetPagedContentVersions(
             int contentId,
             int pageNumber = 1,
             int pageSize = 10,
@@ -2418,9 +2418,9 @@ namespace Umbraco.Web.Editors
 
             var results =  contentVersionService.GetPagedContentVersions(contentId, pageNumber - 1, pageSize, out var totalRecords, culture);
 
-            return new PagedResult<ContentVersionMeta>(totalRecords, pageNumber, pageSize)
+            return new PagedResult<ContentVersionMetaViewModel>(totalRecords, pageNumber, pageSize)
             {
-                Items = results
+                Items = results.Select(x => new ContentVersionMetaViewModel(x))
             };
         }
         

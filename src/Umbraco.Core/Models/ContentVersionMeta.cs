@@ -40,6 +40,6 @@ namespace Umbraco.Core.Models
             Username = username;
         }
 
-        public override string ToString() => $"HistoricContentVersionMeta(versionId: {VersionId}, versionDate: {VersionDate:s}";
+        public override string ToString() => $"ContentVersionMeta(versionId: {VersionId}, versionDate: {VersionDate:s}";
     }
 }
