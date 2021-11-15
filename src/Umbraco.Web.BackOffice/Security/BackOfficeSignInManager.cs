@@ -193,8 +193,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                         return AutoLinkSignInResult.FailedException(ex.Message);
                     }
 
-                    var shouldSignIn = autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
-                    if (shouldSignIn == false)
+                    var shouldLinkUser = autoLinkOptions.OnExternalLogin == null || autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
+                    if (shouldLinkUser == false)
                     {
                         LogFailedExternalLogin(loginInfo, autoLinkUser);
                         return ExternalLoginSignInResult.NotAllowed;
@@ -235,8 +235,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     }
                     else
                     {
-                        var shouldSignIn = autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
-                        if (shouldSignIn == false)
+                        var shouldLinkUser = autoLinkOptions.OnExternalLogin == null || autoLinkOptions.OnExternalLogin(autoLinkUser, loginInfo);
+                        if (shouldLinkUser == false)
                         {
                             LogFailedExternalLogin(loginInfo, autoLinkUser);
                             return ExternalLoginSignInResult.NotAllowed;
