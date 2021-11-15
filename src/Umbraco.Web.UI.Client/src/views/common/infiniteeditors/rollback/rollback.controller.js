@@ -95,7 +95,7 @@
                     .then(function(data) {
                         vm.previousVersion = data;
                         vm.previousVersion.versionId = version.versionId;
-                        vm.previousVersion.displayValue = version.displayValue;
+                        vm.previousVersion.displayValue = version.displayValue + ' - ' + version.username;
                         createDiff(vm.currentVersion, vm.previousVersion);
 
                         vm.loadingDiff = false;
@@ -124,7 +124,7 @@
                     userService.getCurrentUser().then(function (currentUser) {
                         vm.previousVersions = data.items.map(version => {
                             var timestampFormatted = dateHelper.getLocalDate(version.versionDate, currentUser.locale, 'LLL');
-                            version.displayValue = timestampFormatted + ' - ' + version.username;
+                            version.displayValue = timestampFormatted;
                             return version;
                         });
                     });

@@ -58,9 +58,10 @@
                                         <div class="umb-table-cell black">
                                             <div class="flex flex-column">
                                                 <div>{{ version.displayValue }}</div>
-                                                <div>
-                                                    <small ng-if="version.currentPublishedVersion"><localize key="rollback_currentPublishedVersion">Current version</localize></small>
-                                                    <small ng-if="version.currentDraftVersion"><localize key="rollback_currentDraftVersion">Current version</localize></small>
+                                                <div class="version-details">{{version.username}}</div>
+                                                <div class="version-details">
+                                                    <localize ng-if="version.currentPublishedVersion" key="rollback_currentPublishedVersion">Current version</localize>
+                                                    <localize ng-if="version.currentDraftVersion key="rollback_currentDraftVersion">Current version</localize>
                                                 </div>
                                             </div>
                                         </div>
@@ -72,7 +73,7 @@
                                                 size="xxs"
                                                 state="version.pinningState"
                                                 action="vm.pinVersion(version, $event)"
-                                                label="{{ version.preventCleanup ? 'Unpin' : 'Pin' }}">
+                                                label="{{ version.preventCleanup ? 'Enable cleanup' : 'Prevent cleanup' }}">
                                             </umb-button>
                                         </div>
                                     </div>
