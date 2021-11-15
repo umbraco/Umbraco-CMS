@@ -3261,9 +3261,15 @@ namespace Umbraco.Core.Services.Implement
             {
                 documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);
 
-                //var version = documentVersionRepository.Get(versionId);
+                var version = documentVersionRepository.Get(versionId);
 
-                //TODO: Audit log message(s)
+                var auditType = preventCleanup
+                    ? AuditType.ContentVersionPreventCleanup
+                    : AuditType.ContentVersionEnableCleanup;
+
+                var message = $"set preventCleanup = '{preventCleanup}' for version '{versionId}'";
+
+                Audit(auditType, userId, version.ContentId, message, $"{version.VersionDate}");
             }
         }
 
