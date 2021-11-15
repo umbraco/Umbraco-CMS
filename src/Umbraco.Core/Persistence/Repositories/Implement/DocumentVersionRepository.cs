@@ -138,5 +138,45 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 _scopeAccessor.AmbientScope.Database.Execute(query);
             }
         }
+
+        /// <inheritdoc />
+        public void SetPreventCleanup(int versionId, bool preventCleanup)
+        {
+            var query = _scopeAccessor.AmbientScope.SqlContext.Sql()
+                .Update<ContentVersionDto>(x => x.Set(y => y.PreventCleanup, preventCleanup))
+                .Where<ContentVersionDto>(x => x.Id == versionId);
+
+            _scopeAccessor.AmbientScope.Database.Execute(query);
+        }
+
+        /// <inheritdoc />
+        public ContentVersionMeta Get(int versionId)
+        {
+            var query = _scopeAccessor.AmbientScope.SqlContext.Sql();
+
+            query.Select(@"umbracoDocument.nodeId as contentId,
+                           umbracoContent.contentTypeId as contentTypeId,
+                           umbracoContentVersion.id as versionId,
+                           umbracoContentVersion.userId as userId,
+                           umbracoContentVersion.versionDate as versionDate,
+                           umbracoDocumentVersion.published as currentPublishedVersion,
+                           umbracoContentVersion.[current] as currentDraftVersion,
+                           umbracoContentVersion.preventCleanup as preventCleanup,
+                           umbracoUser.userName as username")
+                .From<DocumentDto>()
+                .InnerJoin<ContentDto>()
+                    .On<DocumentDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentVersionDto>()
+                    .On<ContentDto, ContentVersionDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<DocumentVersionDto>()
+                    .On<ContentVersionDto, DocumentVersionDto>(left => left.Id, right => right.Id)
+                .LeftJoin<UserDto>()
+                    .On<UserDto, ContentVersionDto>(left => left.Id, right => right.UserId)
+                .LeftJoin<ContentVersionCultureVariationDto>()
+                    .On<ContentVersionCultureVariationDto, ContentVersionDto>(left => left.VersionId, right => right.Id)
+                .Where<ContentVersionDto>(x => x.Id == versionId);
+
+            return _scopeAccessor.AmbientScope.Database.Single<ContentVersionMeta>(query);
+        }
     }
 }

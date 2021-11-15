@@ -3251,6 +3251,22 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        /// <inheritdoc />
+        public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = -1)
+        {
+            // NOTE: v9 - don't service locate
+            var documentVersionRepository = Composing.Current.Factory.GetInstance<IDocumentVersionRepository>();
+
+            using (ScopeProvider.CreateScope(autoComplete: true))
+            {
+                documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);
+
+                //var version = documentVersionRepository.Get(versionId);
+
+                //TODO: Audit log message(s)
+            }
+        }
+
         /// <remarks>
         /// v9 - move to another class
         /// </remarks>

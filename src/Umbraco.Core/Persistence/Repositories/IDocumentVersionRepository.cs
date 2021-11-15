@@ -24,5 +24,15 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Deletes multiple content versions by ID.
         /// </summary>
         void DeleteVersions(IEnumerable<int> versionIds);
+
+        /// <summary>
+        /// Updates the prevent cleanup flag on a content version.
+        /// </summary>
+        void SetPreventCleanup(int versionId, bool preventCleanup);
+
+        /// <summary>
+        /// Gets the content version metadata for a specific version.
+        /// </summary>
+        ContentVersionMeta Get(int versionId);
     }
 }

@@ -2423,6 +2423,24 @@ namespace Umbraco.Web.Editors
                 Items = results
             };
         }
+        
+        [HttpPost]
+        [EnsureUserPermissionForContent("contentId", ActionUpdate.ActionLetter)]
+        public HttpResponseMessage PostSetContentVersionPreventCleanup(int contentId, int versionId, bool preventCleanup)
+        {
+            var content = Services.ContentService.GetVersion(versionId);
+            if (content == null || content.Id != contentId)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            // NOTE: v9 - don't service locate
+            var contentVersionService = Current.Factory.GetInstance<IContentVersionService>();
+
+            contentVersionService.SetPreventCleanup(versionId, preventCleanup, Security.GetUserId().ResultOr(0));
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
 
         [HttpGet]
         public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string culture = null)
@@ -2511,6 +2529,7 @@ namespace Umbraco.Web.Editors
 
             return Request.CreateValidationErrorResponse(notificationModel);
         }
+
 
         [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
         [HttpGet]
