@@ -594,8 +594,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     documentVersionDto.Published = true; // now published
                     contentVersionDto.Current = false; // no more current
-                    contentVersionDto.PreventCleanup = version.PreventCleanup; // published version retains current drafts prevent cleanup flag
                 }
+
+                // Ensure existing version retains current preventCleanup flag (both saving and publishing).
+                contentVersionDto.PreventCleanup = version.PreventCleanup; 
+
                 Database.Update(contentVersionDto);
                 Database.Update(documentVersionDto);
 
