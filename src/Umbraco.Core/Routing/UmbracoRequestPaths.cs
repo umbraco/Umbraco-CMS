@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Routing
         private readonly string _apiMvcPath;
         private readonly string _installPath;
         private readonly string _appPath;
-        private readonly List<string> _defaultUmbPaths;
+        private readonly HashSet<string> _defaultUmbPaths;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRequestPaths"/> class.
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Routing
                 .EnsureStartsWith('/').TrimStart(_appPath.EnsureStartsWith('/')).EnsureStartsWith('/');
 
             _mvcArea = globalSettings.Value.GetUmbracoMvcArea(hostingEnvironment);
-            _defaultUmbPaths = new List<string> { "/" + _mvcArea, "/" + _mvcArea + "/" };
+            _defaultUmbPaths = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase) { "/" + _mvcArea, "/" + _mvcArea + "/" };
             _backOfficeMvcPath = "/" + _mvcArea + "/BackOffice/";
             _previewMvcPath = "/" + _mvcArea + "/Preview/";
             _surfaceMvcPath = "/" + _mvcArea + "/Surface/";
@@ -84,21 +84,19 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             // if its the normal /umbraco path
-            if (_defaultUmbPaths.Any(x => urlPath.InvariantEquals(x)))
+            if (_defaultUmbPaths.Contains(urlPath))
             {
                 return true;
             }
 
             // check for special back office paths
-            if (urlPath.InvariantStartsWith(_backOfficeMvcPath)
-                || urlPath.InvariantStartsWith(_previewMvcPath))
+            if (urlPath.InvariantStartsWith(_backOfficeMvcPath) || urlPath.InvariantStartsWith(_previewMvcPath))
             {
                 return true;
             }
 
             // check for special front-end paths
-            if (urlPath.InvariantStartsWith(_surfaceMvcPath)
-                || urlPath.InvariantStartsWith(_apiMvcPath))
+            if (urlPath.InvariantStartsWith(_surfaceMvcPath) || urlPath.InvariantStartsWith(_apiMvcPath))
             {
                 return false;
             }
@@ -108,7 +106,7 @@ namespace Umbraco.Cms.Core.Routing
             // Umbraco/MYPLUGINAREA/MYCONTROLLERNAME/{action}/{id}
             // so if the path contains at a minimum 3 parts: Umbraco + MYPLUGINAREA + MYCONTROLLERNAME then we will have to assume it is a
             // plugin controller for the front-end.
-            if (urlPath.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries).Length >= 3)
+            if (IsPluginControllerRoute(urlPath))
             {
                 return false;
             }
@@ -129,6 +127,22 @@ namespace Umbraco.Cms.Core.Routing
         {
             var ext = Path.GetExtension(absPath);
             return !ext.IsNullOrWhiteSpace();
+        }
+		
+        /// <summary>
+        /// Checks if the path is from a PluginController route.
+        /// </summary>
+        private bool IsPluginControllerRoute(string path)
+        {
+            var count = 0;
+            foreach (var c in path)
+            {
+                if (c == Constants.CharArrays.ForwardSlash && ++count >= 3)
+                {
+                    return true;					
+                }
+            }
+			return false;
         }
     }
 }
