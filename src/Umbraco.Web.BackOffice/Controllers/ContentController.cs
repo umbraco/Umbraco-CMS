@@ -2508,7 +2508,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ActionResult<PagedResult<ContentVersionMetaViewModel>> GetPagedContentVersions(
+        [JsonCamelCaseFormatter]
+        public IActionResult GetPagedContentVersions(
             int contentId,
             int pageNumber = 1,
             int pageSize = 10,
@@ -2522,27 +2523,35 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            var results =  _contentVersionService.GetPagedContentVersions(contentId, pageNumber - 1, pageSize, out var totalRecords, culture);
+            IEnumerable<ContentVersionMeta> results = _contentVersionService.GetPagedContentVersions(
+                contentId,
+                pageNumber - 1,
+                pageSize,
+                out var totalRecords,
+                culture);
 
-            return new PagedResult<ContentVersionMetaViewModel>(totalRecords, pageNumber, pageSize)
+            var model = new PagedResult<ContentVersionMeta>(totalRecords, pageNumber, pageSize)
             {
-                Items = results.Select(x => new ContentVersionMetaViewModel(x))
+                Items = results
             };
+
+            return Ok(model);
         }
 
         [HttpPost]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionAdministrationById)]
         public IActionResult PostSetContentVersionPreventCleanup(int contentId, int versionId, bool preventCleanup)
         {
-            var content = _contentService.GetVersion(versionId);
+            IContent content = _contentService.GetVersion(versionId);
+
             if (content == null || content.Id != contentId)
             {
-
                 return NotFound();
             }
+
             _contentVersionService.SetPreventCleanup(versionId, preventCleanup, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpGet]
