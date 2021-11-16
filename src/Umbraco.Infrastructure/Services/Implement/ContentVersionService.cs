@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IScopeProvider _scopeProvider;
         private readonly IEventMessagesFactory _eventMessagesFactory;
         private readonly IAuditRepository _auditRepository;
+        private readonly ILanguageRepository _languageRepository;
 
         public ContentVersionService(
             ILogger<ContentVersionService> logger,
@@ -26,7 +27,8 @@ namespace Umbraco.Cms.Core.Services.Implement
             IContentVersionCleanupPolicy contentVersionCleanupPolicy,
             IScopeProvider scopeProvider,
             IEventMessagesFactory eventMessagesFactory,
-            IAuditRepository auditRepository)
+            IAuditRepository auditRepository,
+            ILanguageRepository languageRepository)
         {
             _logger = logger;
             _documentVersionRepository = documentVersionRepository;
@@ -34,27 +36,20 @@ namespace Umbraco.Cms.Core.Services.Implement
             _scopeProvider = scopeProvider;
             _eventMessagesFactory = eventMessagesFactory;
             _auditRepository = auditRepository;
+            _languageRepository = languageRepository;
         }
 
         /// <inheritdoc />
-        /// <remarks>
-        ///     In v9 this can live in another class as we publish the notifications via IEventAggregator.
-        ///     But for v8 must be here for access to the static events.
-        /// </remarks>
-        public IReadOnlyCollection<HistoricContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate)
+        public IReadOnlyCollection<ContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate)
         {
             // Media - ignored
             // Members - ignored
             return CleanupDocumentVersions(asAtDate);
         }
 
-
-        /// <remarks>
-        ///     v9 - move to another class
-        /// </remarks>
-        private IReadOnlyCollection<HistoricContentVersionMeta> CleanupDocumentVersions(DateTime asAtDate)
+        private IReadOnlyCollection<ContentVersionMeta> CleanupDocumentVersions(DateTime asAtDate)
         {
-            List<HistoricContentVersionMeta> versionsToDelete;
+            List<ContentVersionMeta> versionsToDelete;
 
             /* Why so many scopes?
              *
@@ -87,7 +82,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var allHistoricVersions = _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
 
                 _logger.LogDebug("Discovered {count} candidate(s) for ContentVersion cleanup", allHistoricVersions.Count);
-                versionsToDelete = new List<HistoricContentVersionMeta>(allHistoricVersions.Count);
+                versionsToDelete = new List<ContentVersionMeta>(allHistoricVersions.Count);
 
                 var filteredContentVersions = _contentVersionCleanupPolicy.Apply(asAtDate, allHistoricVersions);
 
@@ -108,7 +103,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (!versionsToDelete.Any())
             {
                 _logger.LogDebug("No remaining ContentVersions for cleanup", versionsToDelete.Count);
-                return Array.Empty<HistoricContentVersionMeta>();
+                return Array.Empty<ContentVersionMeta>();
             }
 
             _logger.LogDebug("Removing {count} ContentVersion(s)", versionsToDelete.Count);
@@ -139,6 +134,38 @@ namespace Umbraco.Cms.Core.Services.Implement
             return versionsToDelete;
         }
 
+        /// <inheritdoc />
+        public IEnumerable<ContentVersionMeta> GetPagedContentVersions(int contentId, long pageIndex, int pageSize, out long totalRecords, string culture = null)
+        {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            {
+                var languageId = _languageRepository.GetIdByIsoCode(culture, throwOnNotFound: true);
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentVersionRepository.GetPagedItemsByContentId(contentId, pageIndex, pageSize, out totalRecords, languageId);
+            }
+        }
+
+        /// <inheritdoc />
+        public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = -1)
+        {
+            using (_scopeProvider.CreateScope(autoComplete: true))
+            {
+                _documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);
+
+                var version = _documentVersionRepository.Get(versionId);
+
+                var auditType = preventCleanup
+                    ? AuditType.ContentVersionPreventCleanup
+                    : AuditType.ContentVersionEnableCleanup;
+
+                var message = $"set preventCleanup = '{preventCleanup}' for version '{versionId}'";
+
+                Audit(auditType, userId, version.ContentId, message, $"{version.VersionDate}");
+            }
+        }
         private void Audit(AuditType type, int userId, int objectId, string message = null, string parameters = null) =>
             _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message,
                 parameters));

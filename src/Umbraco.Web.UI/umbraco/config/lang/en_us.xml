@@ -171,6 +171,8 @@
     <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
     <key alias="sort">Sort child items performed by user</key>
     <key alias="custom">%0%</key>
+    <key alias="contentversionpreventcleanup">Cleanup disabled for version: %0%</key>
+    <key alias="contentversionenablecleanup">Cleanup enabled for version: %0%</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
     <key alias="smallPublishVariant">Publish</key>
@@ -185,6 +187,8 @@
     <key alias="smallSendToPublishVariant">Send To Publish</key>
     <key alias="smallSort">Sort</key>
     <key alias="smallCustom">Custom</key>
+    <key alias="smallContentVersionPreventCleanup">Save</key>
+    <key alias="smallContentVersionEnableCleanup">Save</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
   <area alias="codefile">
@@ -1460,6 +1464,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
     <key alias="view">View</key>
+    <key alias="pagination"><![CDATA[Showing version %0% to %1% of %2% versions]]></key>
+    <key alias="versions">Versions</key>
+    <key alias="currentDraftVersion">Current draft version</key>
+    <key alias="currentPublishedVersion">Current published version</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Edit script file</key>
@@ -1615,6 +1623,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="publishWithMissingDomain">There is no domain configured for %0%, please contact an administrator, see
       log for more information
     </key>
+    <key alias="preventCleanupEnableError">An error occurred while enabling version cleanup for %0%</key>
+    <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>
