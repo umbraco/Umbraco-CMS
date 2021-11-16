@@ -1,7 +1,7 @@
-﻿namespace Umbraco.Web.Routing
+namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Provides a method to try to find and assign an Umbraco document to a <c>PublishedContentRequest</c>
+    /// Provides a method to try to find and assign an Umbraco document to a <c>PublishedRequest</c>
     /// when everything else has failed.
     /// </summary>
     /// <remarks>Identical to <see cref="IContentFinder"/> but required in order to differentiate them in ioc.</remarks>

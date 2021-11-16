@@ -5,6 +5,7 @@ using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
@@ -35,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (ids.Any())
             {
-                sql.Where("umbracoAccess.id IN (@ids)", new { ids });
+                sql.WhereIn<AccessDto>(x => x.Id, ids);
             }
 
             sql.OrderBy<AccessDto>(x => x.NodeId);
@@ -65,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoAccess.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Access}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()

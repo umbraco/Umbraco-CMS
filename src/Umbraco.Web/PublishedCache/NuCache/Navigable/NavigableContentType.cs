@@ -22,10 +22,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
         // changes, but they are replaced by a new instance, so our map here will clean itself automatically and
         // we don't have to manage cache - ConditionalWeakTable does not prevent keys from being GCed
 
-        private static readonly ConditionalWeakTable<PublishedContentType, NavigableContentType> TypesMap
-             = new ConditionalWeakTable<PublishedContentType,NavigableContentType>();
+        private static readonly ConditionalWeakTable<IPublishedContentType, NavigableContentType> TypesMap
+             = new ConditionalWeakTable<IPublishedContentType,NavigableContentType>();
 
-        public static NavigableContentType GetContentType(PublishedContentType contentType)
+        public static NavigableContentType GetContentType(IPublishedContentType contentType)
         {
             return TypesMap.GetOrCreateValue(contentType).EnsureInitialized(contentType);
         }
@@ -49,7 +49,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
                     };
         }
 
-        private NavigableContentType EnsureInitialized(PublishedContentType contentType)
+        private NavigableContentType EnsureInitialized(IPublishedContentType contentType)
         {
             lock (_locko)
             {

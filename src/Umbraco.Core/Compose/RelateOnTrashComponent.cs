@@ -18,11 +18,16 @@ namespace Umbraco.Core.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            ContentService.Moved -= ContentService_Moved;
+            ContentService.Trashed -= ContentService_Trashed;
+            MediaService.Moved -= MediaService_Moved;
+            MediaService.Trashed -= MediaService_Trashed;
+        }
 
         private static void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
         {
-            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinContent.ToInvariantString())))
+            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinContentString)))
             {
                 var relationService = Current.Services.RelationService;
                 const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
@@ -37,7 +42,7 @@ namespace Umbraco.Core.Compose
 
         private static void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e)
         {
-            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinMedia.ToInvariantString())))
+            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinMediaString)))
             {
                 var relationService = Current.Services.RelationService;
                 const string relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
@@ -63,7 +68,7 @@ namespace Umbraco.Core.Compose
                 var documentObjectType = Constants.ObjectTypes.Document;
                 const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName;
 
-                relationType = new RelationType(documentObjectType, documentObjectType, relationTypeAlias, relationTypeName);
+                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType, documentObjectType);
                 relationService.Save(relationType);
             }
 
@@ -88,7 +93,8 @@ namespace Umbraco.Core.Compose
                         item.Entity.Id,
                         ObjectTypes.GetName(UmbracoObjectTypes.Document),
                         string.Format(textService.Localize(
-                                "recycleBin/contentTrashed"),
+                                "recycleBin","contentTrashed"),
+
                             item.Entity.Id, originalParentId));
                 }
             }
@@ -106,7 +112,7 @@ namespace Umbraco.Core.Compose
             {
                 var documentObjectType = Constants.ObjectTypes.Document;
                 const string relationTypeName = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName;
-                relationType = new RelationType(documentObjectType, documentObjectType, relationTypeAlias, relationTypeName);
+                relationType = new RelationType(relationTypeName, relationTypeAlias, false, documentObjectType, documentObjectType);
                 relationService.Save(relationType);
             }
             foreach (var item in e.MoveInfoCollection)
@@ -127,7 +133,7 @@ namespace Umbraco.Core.Compose
                         item.Entity.Id,
                         ObjectTypes.GetName(UmbracoObjectTypes.Media),
                         string.Format(textService.Localize(
-                               "recycleBin/mediaTrashed"),
+                               "recycleBin", "mediaTrashed"),
                             item.Entity.Id, originalParentId));
                 }
             }

@@ -12,7 +12,7 @@ namespace Umbraco.Web.Media.Exif
         public ExifBitConverter(ByteOrder from, ByteOrder to)
             : base(from, to)
         {
-            ;
+
         }
         #endregion
 

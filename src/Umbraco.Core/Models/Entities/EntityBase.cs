@@ -81,37 +81,7 @@ namespace Umbraco.Core.Models.Entities
             _key = Guid.Empty;
             _hasIdentity = false;
         }
-
-        /// <summary>
-        /// Updates the entity when it is being saved for the first time.
-        /// </summary>
-        internal virtual void AddingEntity()
-        {
-            var now = DateTime.Now;
-
-            // set the create and update dates, if not already set
-            if (IsPropertyDirty("CreateDate") == false || _createDate == default)
-                CreateDate = now;
-            if (IsPropertyDirty("UpdateDate") == false || _updateDate == default)
-                UpdateDate = now;
-        }
-
-        /// <summary>
-        /// Updates the entity when it is being saved.
-        /// </summary>
-        internal virtual void UpdatingEntity()
-        {
-            var now = DateTime.Now;
-
-            // just in case
-            if (_createDate == default)
-                CreateDate = now;
-
-            // set the update date if not already set
-            if (IsPropertyDirty("UpdateDate") == false || _updateDate == default)
-                UpdateDate = now;
-        }
-
+        
         public virtual bool Equals(EntityBase other)
         {
             return other != null && (ReferenceEquals(this, other) || SameIdentityAs(other));

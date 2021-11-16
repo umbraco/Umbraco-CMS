@@ -4,10 +4,8 @@
     /// Represents a core <see cref="IComposer"/>.
     /// </summary>
     /// <remarks>
-    /// <para>All core composers are required by (compose before) all user composers,
-    /// and require (compose after) all runtime composers.</para>
+    /// <para>Core composers compose after the initial composer, and before user composers.</para>
     /// </remarks>
-    [ComposeAfter(typeof(IRuntimeComposer))]
     public interface ICoreComposer : IComposer
     { }
 }

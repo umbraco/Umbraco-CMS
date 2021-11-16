@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using AutoMapper;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors.Binders
 {
@@ -17,7 +13,6 @@ namespace Umbraco.Web.Editors.Binders
     /// </summary>
     internal class MediaItemBinder : IModelBinder
     {
-        private readonly ContentModelBinderHelper _modelBinderHelper;
         private readonly ServiceContext _services;
 
         public MediaItemBinder() : this(Current.Services)
@@ -27,7 +22,6 @@ namespace Umbraco.Web.Editors.Binders
         public MediaItemBinder(ServiceContext services)
         {
             _services = services;
-            _modelBinderHelper = new ContentModelBinderHelper();
         }
 
         /// <summary>
@@ -38,7 +32,7 @@ namespace Umbraco.Web.Editors.Binders
         /// <returns></returns>
         public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
-            var model = _modelBinderHelper.BindModelFromMultipartRequest<MediaItemSave>(actionContext, bindingContext);
+            var model = ContentModelBinderHelper.BindModelFromMultipartRequest<MediaItemSave>(actionContext, bindingContext);
             if (model == null) return false;
 
             model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
@@ -46,9 +40,9 @@ namespace Umbraco.Web.Editors.Binders
             //create the dto from the persisted model
             if (model.PersistedContent != null)
             {
-                model.PropertyCollectionDto = Mapper.Map<IMedia, ContentPropertyCollectionDto>(model.PersistedContent);
+                model.PropertyCollectionDto = Current.Mapper.Map<IMedia, ContentPropertyCollectionDto>(model.PersistedContent);
                 //now map all of the saved values to the dto
-                _modelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
+                ContentModelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
             }
 
             model.Name = model.Name.Trim();

@@ -19,6 +19,7 @@
             $scope.hasError = false;
 
             $scope.internal = function ($event) {
+                
                 $scope.currentEditLink = null;
 
                 var contentPicker = {
@@ -41,6 +42,7 @@
             };
 
             $scope.selectInternal = function ($event, link) {
+                
                 $scope.currentEditLink = link;
 
                 var contentPicker = {
@@ -78,7 +80,7 @@
             };
 
             $scope.add = function ($event) {
-				if (!angular.isArray($scope.model.value)) {
+				if (!Utilities.isArray($scope.model.value)) {
                   $scope.model.value = [];
 				}
 				

@@ -7,7 +7,11 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents a slider editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.Slider, "Slider", "slider", Icon = "icon-navigation-horizontal")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.Slider,
+        "Slider",
+        "slider",
+        Icon = "icon-navigation-horizontal")]
     public class SliderPropertyEditor : DataEditor
     {
         /// <summary>

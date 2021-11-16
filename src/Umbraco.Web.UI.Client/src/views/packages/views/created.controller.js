@@ -15,7 +15,7 @@
 
             packageResource.getAllCreated().then(createdPackages => {
                 vm.createdPackages = createdPackages;
-            }, angular.noop);
+            }, Utilities.noop);
 
         }
 
@@ -28,6 +28,7 @@
                 view: "views/packages/overlays/delete.html",
                 package: createdPackage,
                 submitButtonLabelKey: "contentTypeEditor_yesDelete",
+                submitButtonStyle:"danger",
                 submit: function (model) {
                     performDelete(index, createdPackage);
                     overlayService.close();

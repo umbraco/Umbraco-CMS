@@ -1,4 +1,4 @@
-function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelper, localizationService, overlayService) {
+function ExamineManagementController($http, $q, $timeout, umbRequestHelper, localizationService, overlayService, editorService) {
 
     var vm = this;
 
@@ -9,7 +9,9 @@ function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelp
     vm.selectedIndex = null;
     vm.selectedSearcher = null;
     vm.searchResults = null;
+    vm.showSearchResultFields = [];
 
+    vm.showSelectFieldsDialog = showSelectFieldsDialog;
     vm.showSearchResultDialog = showSearchResultDialog;
     vm.showIndexInfo = showIndexInfo;
     vm.showSearcherInfo = showSearcherInfo;
@@ -20,25 +22,65 @@ function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelp
     vm.nextSearchResultPage = nextSearchResultPage;
     vm.prevSearchResultPage = prevSearchResultPage;
     vm.goToPageSearchResultPage = goToPageSearchResultPage;
+    vm.goToResult = goToResult;
 
     vm.infoOverlay = null;
 
-    function showSearchResultDialog(values) {
+    function showSelectFieldsDialog() {
         if (vm.searchResults) {
 
-            localizationService.localize("examineManagement_fieldValues").then(function (value) {
+            // build list of available fields
+            var availableFields = [];
+            vm.searchResults.results.map(r => Object.keys(r.values).map(key => {
+                if (availableFields.indexOf(key) == -1 && key != "__NodeId" && key != "nodeName") {
+                    availableFields.push(key);
+                }
+            }));
 
-                vm.searchResults.overlay = {
-                    title: value,
-                    searchResultValues: values,
-                    view: "views/dashboard/settings/examinemanagementresults.html",
-                    close: function () {
-                        vm.searchResults.overlay = null;
-                    }
-                };
+            availableFields.sort();
+
+            editorService.open({
+                title: "Fields",
+                availableFields: availableFields,
+                fieldIsSelected: function(key) {
+                    return vm.showSearchResultFields.indexOf(key) > -1;
+                },
+                toggleField: vm.toggleField,
+                size: "small",
+                view: "views/dashboard/settings/examinemanagementfields.html",
+                close: function () {
+                    editorService.close();
+                }
             });
         }
     }
+
+    function showSearchResultDialog(values) {
+        if (vm.searchResults) {
+            localizationService.localize("examineManagement_fieldValues").then(function (value) {
+                editorService.open({
+                    title: value,
+                    searchResultValues: values,
+                    size: "medium",
+                    view: "views/dashboard/settings/examinemanagementresults.html",
+                    close: function () {
+                        editorService.close();
+                    }
+                });
+            });
+        }
+    }
+
+    vm.toggleField = function(key) {
+        if (vm.showSearchResultFields.indexOf(key) > -1) {
+            vm.showSearchResultFields = vm.showSearchResultFields.filter(field => field != key);
+        }
+        else {
+            vm.showSearchResultFields.push(key);
+        }
+
+        vm.showSearchResultFields.sort();
+    };
 
     function nextSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
@@ -49,6 +91,45 @@ function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelp
     function goToPageSearchResultPage(pageNumber) {
         search(vm.selectedIndex ? vm.selectedIndex : vm.selectedSearcher, null, pageNumber);
     }
+
+    function goToResult(result, event) {
+        if (!result.editUrl) {
+            return;
+        }
+        // targeting a new tab/window?
+        if (event.ctrlKey ||
+                event.shiftKey ||
+                event.metaKey || // apple
+                (event.button && event.button === 1) // middle click, >IE9 + everyone else
+        ) {
+            // yes, let the link open itself
+            return;
+        }
+
+        const editor = {
+            id: result.editId,
+            submit: function (model) {
+                editorService.close();
+            },
+            close: function () {
+                editorService.close();
+            }
+        };
+        switch (result.editSection) {
+            case "content":
+                editorService.contentEditor(editor);
+                break;
+            case "media":
+                editorService.mediaEditor(editor);
+                break;
+            case "member":
+                editorService.memberEditor(editor);
+                break;
+        }
+
+        event.stopPropagation();
+        event.preventDefault();
+    } 
 
     function setViewState(state) {
         vm.searchResults = null;
@@ -125,6 +206,23 @@ function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelp
                 vm.searchResults.pageNumber = pageNumber ? pageNumber : 1;
                 //20 is page size
                 vm.searchResults.totalPages = Math.ceil(vm.searchResults.totalRecords / 20);
+                // add URLs to edit well known entities
+                _.each(vm.searchResults.results, function (result) {
+                    var section = result.values["__IndexType"][0];
+                    switch (section) {
+                        case "content":
+                        case "media":
+                            result.editUrl = "/" + section + "/" + section + "/edit/" + result.values["__NodeId"][0];
+                            result.editId = result.values["__NodeId"][0];
+                            result.editSection = section;
+                            break;
+                        case "member":
+                            result.editUrl = "/member/member/edit/" + result.values["__Key"][0];
+                            result.editId = result.values["__Key"][0];
+                            result.editSection = section;
+                            break;
+                    }
+                });
             });
     }
 
@@ -142,6 +240,7 @@ function ExamineManagementController($scope, $http, $q, $timeout, umbRequestHelp
             view: "views/dashboard/settings/overlays/examinemanagement.rebuild.html",
             index: index,
             submitButtonLabelKey: "general_ok",
+            submitButtonStyle :"danger",
             submit: function (model) {
                 performRebuild(model.index);
                 overlayService.close();

@@ -10,10 +10,11 @@
     <RootNamespace>Umbraco.Core</RootNamespace>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
+    <AdditionalFileItemNames>$(AdditionalFileItemNames);Content</AdditionalFileItemNames>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG</DefineConstants>
@@ -23,7 +24,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -55,7 +56,27 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <Version>1.0.0-beta2-19324-01</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="SecurityCodeScan">
+      <Version>3.3.0</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Serilog.Sinks.Async">
+      <Version>1.5.0</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog.Sinks.Map">
+      <Version>1.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="Umbraco.Code">
+      <Version>1.0.5</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Web" Version="2.0.0" />
@@ -73,28 +94,28 @@
     <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="Serilog">
-      <Version>2.8.0</Version>
+      <Version>2.10.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Enrichers.Process">
-      <Version>2.0.1</Version>
+      <Version>2.0.2</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Enrichers.Thread">
-      <Version>3.0.0</Version>
+      <Version>3.1.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Filters.Expressions">
-      <Version>2.0.0</Version>
+      <Version>2.1.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Formatting.Compact">
-      <Version>1.0.0</Version>
+      <Version>1.1.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Formatting.Compact.Reader">
-      <Version>1.0.3</Version>
+      <Version>1.0.5</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Settings.AppSettings">
       <Version>2.2.2</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Sinks.File">
-      <Version>4.0.0</Version>
+      <Version>4.1.0</Version>
     </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
@@ -107,7 +128,100 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
-    <Compile Include="AsyncLock.cs" />
+    <Compile Include="Collections\StackQueue.cs" />
+    <Compile Include="Configuration\ICoreDebug.cs" />
+    <Compile Include="Configuration\UmbracoSettings\ContentVersionCleanupPolicyGlobalSettingsElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IContentVersionCleanupPolicyGlobalSettings.cs" />
+    <Compile Include="Constants-CharArrays.cs" />
+    <Compile Include="Collections\EventClearingObservableCollection.cs" />
+    <Compile Include="Constants-Sql.cs" />
+    <Compile Include="Constants-SqlTemplates.cs" />
+    <Compile Include="Events\UnattendedInstallEventArgs.cs" />
+    <Compile Include="Logging\ILogger2.cs" />
+    <Compile Include="Logging\Logger2Extensions.cs" />
+    <Compile Include="Dashboards\ContentDashboardSettings.cs" />
+    <Compile Include="Dashboards\IContentDashboardSettings.cs" />
+    <Compile Include="Exceptions\UnattendedInstallException.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_15_0\AddCmsContentNuByteColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_15_0\UpdateCmsPropertyGroupIdSeed.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_15_0\UpgradedIncludeIndexes.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_10_0\AddPropertyTypeLabelOnTopColumn.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_17_0\AddPropertyTypeGroupColumns.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_18_0\AddContentVersionCleanupFeature.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_9_0\ExternalLoginTableUserData.cs" />
+    <Compile Include="Models\Blocks\BlockEditorDataConverter.cs" />
+    <Compile Include="Models\Blocks\BlockEditorData.cs" />
+    <Compile Include="Models\Blocks\BlockItemData.cs" />
+    <Compile Include="Models\Blocks\BlockListLayoutItem.cs" />
+    <Compile Include="Models\Blocks\BlockListEditorDataConverter.cs" />
+    <Compile Include="Models\Blocks\BlockValue.cs" />
+    <Compile Include="Models\Blocks\ContentAndSettingsReference.cs" />
+    <Compile Include="Models\Blocks\IBlockReference.cs" />
+    <Compile Include="Models\ContentDataIntegrityReport.cs" />
+    <Compile Include="Models\ContentDataIntegrityReportEntry.cs" />
+    <Compile Include="Models\ContentDataIntegrityReportOptions.cs" />
+    <Compile Include="Models\ContentEditing\HistoryCleanup.cs" />
+    <Compile Include="Models\ContentVersionCleanupPolicySettings.cs" />
+    <Compile Include="Models\Identity\ExternalLogin.cs" />
+    <Compile Include="Models\Identity\IExternalLogin.cs" />
+    <Compile Include="Models\IconModel.cs" />
+    <Compile Include="Models\InstallLog.cs" />
+    <Compile Include="Models\IReadOnlyContentBase.cs" />
+    <Compile Include="Models\MediaWithCrops.cs" />
+    <Compile Include="Models\PropertyGroupType.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentTypeExtensions.cs" />
+    <Compile Include="Models\ReadOnlyContentBaseAdapter.cs" />
+    <Compile Include="Models\RelationTypeExtensions.cs" />
+    <Compile Include="Persistence\Dtos\AxisDefintionDto.cs" />
+    <Compile Include="Persistence\Dtos\ColumnInSchemaDto.cs" />
+    <Compile Include="Persistence\Dtos\ConstraintPerColumnDto.cs" />
+    <Compile Include="Persistence\Dtos\ConstraintPerTableDto.cs" />
+    <Compile Include="Persistence\Dtos\ContentVersionCleanupPolicyDto.cs" />
+    <Compile Include="Persistence\Dtos\DefaultConstraintPerColumnDto.cs" />
+    <Compile Include="Models\HistoricContentVersionMeta.cs" />
+    <Compile Include="Persistence\Dtos\UserNotificationDto.cs" />
+    <Compile Include="Persistence\Repositories\IDocumentVersionRepository.cs" />
+    <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
+    <Compile Include="Persistence\Repositories\Implement\DocumentVersionRepository.cs" />
+    <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />
+    <Compile Include="Persistence\SqlCeImageMapper.cs" />
+    <Compile Include="Persistence\Dtos\DefinedIndexDto.cs" />
+    <Compile Include="PropertyEditors\IPropertyCacheCompressionOptions.cs" />
+    <Compile Include="PropertyEditors\NoopPropertyCacheCompressionOptions.cs" />
+    <Compile Include="PropertyEditors\PropertyCacheCompression.cs" />
+    <Compile Include="PropertyEditors\IPropertyCacheCompression.cs" />
+    <Compile Include="PropertyEditors\UnPublishedContentPropertyCacheCompressionOptions.cs" />
+    <Compile Include="Serialization\AutoInterningStringConverter.cs" />
+    <Compile Include="Serialization\AutoInterningStringKeyCaseInsensitiveDictionaryConverter.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerConfiguration.cs" />
+    <Compile Include="PropertyEditors\ComplexPropertyEditorContentEventHandler.cs" />
+    <Compile Include="Services\IContentVersionCleanupPolicy.cs" />
+    <Compile Include="Services\IContentVersionService.cs" />
+    <Compile Include="Services\IIconService.cs" />
+    <Compile Include="Services\Implement\DefaultContentVersionCleanupPolicy.cs" />
+    <Compile Include="Services\Implement\InstallationService.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\AddMainDomLock.cs" />
+    <Compile Include="Models\Blocks\BlockListItem.cs" />
+    <Compile Include="Models\Blocks\BlockListModel.cs" />
+    <Compile Include="Models\UpgradeResult.cs" />
+    <Compile Include="Persistence\Repositories\Implement\UpgradeCheckRepository.cs" />
+    <Compile Include="Persistence\Repositories\IUpgradeCheckRepository.cs" />
+    <Compile Include="Models\IImageUrlGenerator.cs" />
+    <Compile Include="Models\ImageUrlGenerationOptions.cs" />
+    <Compile Include="Runtime\IMainDomLock.cs" />
+    <Compile Include="Runtime\MainDomSemaphoreLock.cs" />
+    <Compile Include="Runtime\SqlMainDomLock.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\MissingContentVersionsIndexes.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_7_0\MissingDictionaryIndex.cs" />
+    <Compile Include="Services\IInstallationService.cs" />
+    <Compile Include="Services\IUpgradeService.cs" />
+    <Compile Include="Sync\ISyncBootStateAccessor.cs" />
+    <Compile Include="Sync\NonRuntimeLevelBootStateAccessor.cs" />
+    <Compile Include="Sync\SyncBootState.cs" />
+    <Compile Include="SystemLock.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="AttemptOfTResult.cs" />
     <Compile Include="AttemptOfTResultTStatus.cs" />
@@ -161,6 +275,7 @@
     <Compile Include="Composing\ComponentComposer.cs" />
     <Compile Include="Composing\Composers.cs" />
     <Compile Include="Composing\Composition.cs" />
+    <Compile Include="Composing\SetCollectionBuilderBase.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\DisableAttribute.cs" />
     <Compile Include="Composing\DisableComposerAttribute.cs" />
@@ -168,7 +283,6 @@
     <Compile Include="Composing\EnableComposerAttribute.cs" />
     <Compile Include="Composing\IComposer.cs" />
     <Compile Include="Composing\ICoreComposer.cs" />
-    <Compile Include="Composing\IRuntimeComposer.cs" />
     <Compile Include="Composing\IComponent.cs" />
     <Compile Include="Composing\IUserComposer.cs" />
     <Compile Include="Compose\ManifestWatcherComposer.cs" />
@@ -189,6 +303,7 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
+    <Compile Include="Exceptions\PanicException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
     <Compile Include="Composing\Current.cs" />
@@ -208,12 +323,79 @@
     <Compile Include="Composing\TypeHelper.cs" />
     <Compile Include="Composing\TypeLoader.cs" />
     <Compile Include="IO\MediaPathSchemes\UniqueMediaPathScheme.cs" />
+    <Compile Include="Logging\Viewer\LogTimePeriod.cs" />
+    <Compile Include="Manifest\IManifestFilter.cs" />
+    <Compile Include="Manifest\ManifestFilterCollection.cs" />
+    <Compile Include="Manifest\ManifestFilterCollectionBuilder.cs" />
+    <Compile Include="Mapping\MapperContext.cs" />
+    <Compile Include="Migrations\Upgrade\Common\DeleteKeysAndIndexes.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\AddPackagesSectionAccess.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ContentPickerPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DecimalPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\IPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ListViewPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\MediaPickerPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\MarkdownEditorPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\NestedContentPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorCollection.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorCollectionBuilder.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorComposer.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DefaultPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RenamingPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\RichTextPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\DropDownFlexiblePreValueMigrator.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MergeDateAndDateTimePropertyEditor.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\AddNewRelationTypes.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\UpdateRelationTypeTable.cs" />
+    <Compile Include="Models\Editors\UmbracoEntityReference.cs" />
+    <Compile Include="Models\ContentEditing\ContentAppBadge.cs" />
+    <Compile Include="Models\ContentEditing\ContentAppBadgeType.cs" />
+    <Compile Include="Models\Entities\EntityExtensions.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueMigratorBase.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\PreValueDto.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigrationBase.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\RenameMediaVersionTable.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\ValueListPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypes\UmbracoSliderPreValueMigrator.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_6_0\AddPropertyTypeValidationMessageColumns.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_1_0\FixContentNuCascade.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_1_0\RenameUserLoginDtoDateIndex.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_1\ChangeNuCacheJsonFormat.cs" />
+    <Compile Include="Mapping\MapDefinitionCollection.cs" />
+    <Compile Include="Mapping\MapDefinitionCollectionBuilder.cs" />
+    <Compile Include="Mapping\IMapDefinition.cs" />
+    <Compile Include="Mapping\UmbracoMapper.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_1_0\ConvertTinyMceAndGridMediaUrlsToLocalLink.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\FixLanguageIsoCodeLength.cs" />
+    <Compile Include="Models\CultureImpact.cs" />
+    <Compile Include="Models\Entities\IMediaEntitySlim.cs" />
+    <Compile Include="Models\Entities\IMemberEntitySlim.cs" />
+    <Compile Include="Models\Entities\MediaEntitySlim.cs" />
+    <Compile Include="Models\PagedResult.cs" />
+    <Compile Include="Models\Entities\MemberEntitySlim.cs" />
+    <Compile Include="Models\MediaTypeExtensions.cs" />
     <Compile Include="Models\PublishedContent\ILivePublishedModelFactory.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedContentType.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedPropertyType.cs" />
+    <Compile Include="PropertyEditors\ConfigurationFieldsExtensions.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollection.cs" />
+    <Compile Include="PropertyEditors\DataValueReferenceFactoryCollectionBuilder.cs" />
+    <Compile Include="PropertyEditors\IDataValueReference.cs" />
+    <Compile Include="PropertyEditors\IDataValueReferenceFactory.cs" />
+    <Compile Include="PropertyEditors\IDataEditorWithMediaPath.cs" />
+    <Compile Include="PropertyEditors\IIgnoreUserStartNodesConfig.cs" />
+    <Compile Include="PublishedContentExtensions.cs" />
+    <Compile Include="Models\PublishedContent\UrlMode.cs" />
+    <Compile Include="Persistence\Dtos\PropertyTypeCommonDto.cs" />
+    <Compile Include="Persistence\Repositories\Implement\ContentTypeCommonRepository.cs" />
+    <Compile Include="Persistence\Repositories\IContentTypeCommonRepository.cs" />
+    <Compile Include="Persistence\Repositories\Implement\LanguageRepositoryExtensions.cs" />
     <Compile Include="PropertyEditors\DateTimeConfiguration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameLabelAndRichTextPropertyEditorAliases.cs" />
     <Compile Include="PublishedModelFactoryExtensions.cs" />
+    <Compile Include="Services\DateTypeServiceExtensions.cs" />
     <Compile Include="Services\PropertyValidationService.cs" />
+    <Compile Include="Composing\TypeCollectionBuilderBase.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Composing\WeightAttribute.cs" />
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
@@ -272,6 +454,7 @@
     <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IKeepAliveSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\LoggingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
@@ -281,6 +464,7 @@
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\KeepAliveElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Constants-Applications.cs" />
     <Compile Include="Constants-Conventions.cs" />
@@ -319,7 +503,7 @@
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
-    <Compile Include="IMainDom.cs" />
+    <Compile Include="Runtime\IMainDom.cs" />
     <Compile Include="IO\IFileSystems.cs" />
     <Compile Include="IO\IMediaFileSystem.cs" />
     <Compile Include="GuidUtils.cs" />
@@ -363,23 +547,6 @@
     <Compile Include="Migrations\PostMigrations\IPublishedSnapshotRebuilder.cs" />
     <Compile Include="Migrations\PostMigrations\PublishedSnapshotRebuilder.cs" />
     <Compile Include="Migrations\PostMigrations\RebuildPublishedSnapshot.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_12_0\IncreaseLanguageIsoCodeColumnLength.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_12_0\RenameTrueFalseField.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_12_0\SetDefaultTagsStorageType.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_12_0\UpdateUmbracoConsent.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_14_0\UpdateMemberGroupPickerData.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_8_0\AddIndexToPropertyTypeAliasColumn.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_8_0\AddInstructionCountColumn.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_8_0\AddMediaVersionTable.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_8_0\AddTourDataUserColumn.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_8_0\AddUserLoginTable.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_9_0\AddIsSensitiveMemberTypeColumn.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_0_0\AddUserLoginDtoDateIndex.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\ConvertRelatedLinksToMultiUrlPicker.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddContentTypeIsElementColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddLogTableColumns.cs" />
@@ -392,14 +559,13 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropTaskTables.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropTemplateDesignColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropXmlTables.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_0_0\FixLockTablePrimaryKey.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MakeRedirectUrlVariant.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\MakeTagsVariant.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorVariantsModel.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_0_0\RadioAndCheckboxAndDropdownPropertyEditorsMigration.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\RadioAndCheckboxPropertyEditorsMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\RenameUmbracoDomainsTable.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TablesForScheduledPublishing.cs" />
@@ -409,6 +575,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdateDefaultMandatoryLanguage.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UpdatePickerIntegerValuesToUdi.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\UserForeignKeys.cs" />
+    <Compile Include="Migrations\Upgrade\Common\CreateKeysAndIndexes.cs" />
     <Compile Include="Models\AuditEntry.cs" />
     <Compile Include="Models\Consent.cs" />
     <Compile Include="Models\ConsentExtensions.cs" />
@@ -437,7 +604,7 @@
     <Compile Include="Models\IAuditItem.cs" />
     <Compile Include="Models\IConsent.cs" />
     <Compile Include="Models\ISimpleContentType.cs" />
-    <Compile Include="Models\Identity\IdentityMapperProfile.cs" />
+    <Compile Include="Models\Identity\IdentityMapDefinition.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
     <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\NotificationEmailBodyParams.cs" />
@@ -530,7 +697,7 @@
     <Compile Include="RuntimeLevelReason.cs" />
     <Compile Include="RuntimeOptions.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
-    <Compile Include="Runtime\CoreRuntimeComponent.cs" />
+    <Compile Include="Runtime\CoreInitialComponent.cs" />
     <Compile Include="CustomBooleanTypeConverter.cs" />
     <Compile Include="Migrations\Expressions\Common\ExecutableBuilder.cs" />
     <Compile Include="Migrations\Expressions\Common\IExecutableBuilder.cs" />
@@ -619,7 +786,6 @@
     <Compile Include="Exceptions\ArgumentNullOrEmptyException.cs" />
     <Compile Include="Exceptions\AuthorizationException.cs" />
     <Compile Include="Exceptions\BootFailedException.cs" />
-    <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="Exceptions\DataOperationException.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="Composing\LightInject\LightInjectException.cs" />
@@ -668,7 +834,7 @@
     <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\VoidProfiler.cs" />
     <Compile Include="Macros\MacroErrorBehaviour.cs" />
-    <Compile Include="MainDom.cs" />
+    <Compile Include="Runtime\MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
     <Compile Include="Manifest\ManifestWatcher.cs" />
@@ -681,7 +847,6 @@
     <Compile Include="Migrations\MigrationPlan.cs" />
     <Compile Include="Migrations\NoopMigration.cs" />
     <Compile Include="Migrations\Upgrade\UmbracoPlan.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_0_0\AddLockTable.cs" />
     <Compile Include="Migrations\Upgrade\Upgrader.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DropMigrationsTable.cs" />
     <Compile Include="Models\AuditItem.cs" />
@@ -788,7 +953,7 @@
     <Compile Include="Models\Packaging\InstallationSummary.cs" />
     <Compile Include="Models\Packaging\PackageAction.cs" />
     <Compile Include="Models\Packaging\PreInstallWarnings.cs" />
-    <Compile Include="Models\PagedResult.cs" />
+    <Compile Include="Models\PagedResultOfT.cs" />
     <Compile Include="Models\PartialView.cs" />
     <Compile Include="Models\PartialViewType.cs" />
     <Compile Include="Models\Property.cs" />
@@ -851,8 +1016,7 @@
     <Compile Include="Persistence\Dtos\MacroPropertyDto.cs" />
     <Compile Include="Persistence\Dtos\Member2MemberGroupDto.cs" />
     <Compile Include="Persistence\Dtos\MemberDto.cs" />
-    <Compile Include="Persistence\Dtos\MemberTypeDto.cs" />
-    <Compile Include="Persistence\Dtos\MemberTypeReadOnlyDto.cs" />
+    <Compile Include="Persistence\Dtos\MemberPropertyTypeDto.cs" />
     <Compile Include="Persistence\Dtos\NodeDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyDataDto.cs" />
     <Compile Include="Persistence\Dtos\PropertyTypeDto.cs" />
@@ -934,7 +1098,6 @@
     <Compile Include="Persistence\DatabaseModelDefinitions\ModificationType.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\SystemMethods.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\TableDefinition.cs" />
-    <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
     <Compile Include="Persistence\DbCommandExtensions.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />
@@ -947,7 +1110,6 @@
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Factories\ContentBaseFactory.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
-    <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
@@ -983,7 +1145,6 @@
     <Compile Include="Persistence\Mappers\DictionaryMapper.cs" />
     <Compile Include="Persistence\Mappers\DictionaryTranslationMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
-    <Compile Include="Persistence\Mappers\DtoMapModel.cs" />
     <Compile Include="Persistence\Mappers\ExternalLoginMapper.cs" />
     <Compile Include="Persistence\Mappers\IMapperCollection.cs" />
     <Compile Include="Persistence\Mappers\LanguageMapper.cs" />
@@ -1009,7 +1170,6 @@
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Mappers\UserMapper.cs" />
     <Compile Include="Persistence\Mappers\UserSectionMapper.cs" />
-    <Compile Include="Migrations\DataLossException.cs" />
     <Compile Include="Migrations\IMigration.cs" />
     <Compile Include="Migrations\IMigrationContext.cs" />
     <Compile Include="Migrations\IMigrationExpression.cs" />
@@ -1118,30 +1278,7 @@
     <Compile Include="Migrations\Expressions\Update\UpdateDataBuilder.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddContentNuTable.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddLockObjects.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_5_0\AddRedirectUrlTable.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\VariantsMigration.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorXmlColumns.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_5_5\UpdateAllowedMediaTypesAtRoot.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_5_0\RemoveStylesheetDataAndTablesAgain.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_5_0\UpdateUniqueIndexOnPropertyData.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\AddIndexesToUmbracoRelationTables.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\AddIndexToCmsMemberLoginName.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\AddIndexToUmbracoNodePath.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\AddIndexToUser2NodePermission.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\AddLockObjects.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\AddLockTable.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\AddMacroUniqueIdColumn.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\AddRelationTypeUniqueIdColumn.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\NormalizeTemplateGuids.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\ReduceLoginNameColumnsSize.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\RemovePropertyDataIdIndex.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_6_0\RemoveUmbracoDeployTables.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_7_0\AddIndexToDictionaryKeyColumn.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_7_0\AddUserGroupTables.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_7_0\AddUserStartNodeTable.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_7_0\EnsureContentTemplatePermissions.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_7_0\ReduceDictionaryKeyColumnsSize.cs" />
-    <Compile Include="Migrations\Upgrade\V_7_7_0\UpdateUserTables.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\ContentVariationMigration.cs" />
     <Compile Include="Persistence\NPocoDatabaseExtensions-Bulk.cs" />
     <Compile Include="Persistence\NPocoDatabaseExtensions.cs" />
@@ -1311,7 +1448,7 @@
     <Compile Include="ReflectionUtilities.cs" />
     <Compile Include="RuntimeLevel.cs" />
     <Compile Include="RuntimeState.cs" />
-    <Compile Include="Runtime\CoreRuntimeComposer.cs" />
+    <Compile Include="Runtime\CoreInitialComposer.cs" />
     <Compile Include="SafeCallContext.cs" />
     <Compile Include="Scoping\IInstanceIdentifiable.cs" />
     <Compile Include="Scoping\IScope.cs" />
@@ -1378,6 +1515,7 @@
     <Compile Include="Services\Implement\ConsentService.cs" />
     <Compile Include="Services\Implement\ContentService.cs" />
     <Compile Include="Services\ContentServiceExtensions.cs" />
+    <Compile Include="Services\MediaServiceExtensions.cs" />
     <Compile Include="Services\Implement\ContentTypeService.cs" />
     <Compile Include="Services\Implement\ContentTypeServiceBase.cs" />
     <Compile Include="Services\Implement\ContentTypeServiceBaseOfTItemTService.cs" />
@@ -1494,12 +1632,13 @@
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Udi.cs" />
     <Compile Include="UdiDefinitionAttribute.cs" />
-    <Compile Include="UdiEntityType.cs" />
+    <Compile Include="Contants-UdiEntityType.cs" />
     <Compile Include="UdiGetterExtensions.cs" />
     <Compile Include="UdiRange.cs" />
     <Compile Include="UdiType.cs" />
     <Compile Include="UdiTypeConverter.cs" />
     <Compile Include="UpgradeableReadLock.cs" />
+    <Compile Include="UpgradeService.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="VersionExtensions.cs" />
     <Compile Include="WaitHandleExtensions.cs" />

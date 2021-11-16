@@ -9,16 +9,16 @@
 (function () {
     "use strict";
 
-    function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper) {
+    function ListViewGridLayoutController($scope, mediaHelper, $location, listViewHelper, mediaTypeHelper) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
 
         vm.nodeId = $scope.contentId;
-        // Use whitelist of allowed file types if provided
+        // Use list of allowed file types if provided
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
         if (vm.acceptedFileTypes === '') {
-            // If not provided, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
+            // If not provided, we pass in a disallowed list by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
             vm.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
         }
 
@@ -117,7 +117,7 @@
         }
 
         function goToItem(item, $event, $index) {
-            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
+            listViewHelper.editItem(item, $scope);
         }
 
         activate();

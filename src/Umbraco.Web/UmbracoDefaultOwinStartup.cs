@@ -4,6 +4,7 @@ using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web;
@@ -28,6 +29,7 @@ namespace Umbraco.Web
         protected IUmbracoSettingsSection UmbracoSettings => Current.Configs.Settings();
         protected IRuntimeState RuntimeState => Core.Composing.Current.RuntimeState;
         protected ServiceContext Services => Current.Services;
+        protected UmbracoMapper Mapper => Current.Mapper;
 
         /// <summary>
         /// Main startup method
@@ -66,6 +68,9 @@ namespace Umbraco.Web
             // Configure OWIN for authentication.
             ConfigureUmbracoAuthentication(app);
 
+            // must come after all authentication
+            app.UseUmbracoBackOfficeExternalLoginErrors();
+
             app
                 .UseSignalR(GlobalSettings)
                 .FinalizeMiddlewareConfiguration();
@@ -80,6 +85,7 @@ namespace Umbraco.Web
             // (EXPERT: an overload accepts a custom BackOfficeUserStore implementation)
             app.ConfigureUserManagerForUmbracoBackOffice(
                 Services,
+                Mapper,
                 UmbracoSettings.Content,
                 GlobalSettings,
                 Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider().AsUmbracoMembershipProvider());
@@ -96,6 +102,7 @@ namespace Umbraco.Web
             app
                 .UseUmbracoBackOfficeCookieAuthentication(UmbracoContextAccessor, RuntimeState, Services.UserService, GlobalSettings, UmbracoSettings.Security, PipelineStage.Authenticate)
                 .UseUmbracoBackOfficeExternalCookieAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, PipelineStage.Authenticate)
+                // TODO: this would be considered a breaking change but this must come after all authentication so should be moved within ConfigureMiddleware
                 .UseUmbracoPreviewAuthentication(UmbracoContextAccessor, RuntimeState, GlobalSettings, UmbracoSettings.Security, PipelineStage.Authorize);
         }
 

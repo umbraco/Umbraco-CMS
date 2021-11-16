@@ -1,4 +1,6 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
@@ -17,11 +19,18 @@ namespace Umbraco.Web.Runtime
         private readonly UmbracoApplicationBase _umbracoApplication;
         private IProfiler _webProfiler;
 
+        [Obsolete("Use the ctor with all parameters instead")]
+        public WebRuntime(UmbracoApplicationBase umbracoApplication)
+            : this(umbracoApplication, null, null)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRuntime"/> class.
         /// </summary>
         /// <param name="umbracoApplication"></param>
-        public WebRuntime(UmbracoApplicationBase umbracoApplication)
+        public WebRuntime(UmbracoApplicationBase umbracoApplication, ILogger logger, IMainDom mainDom)
+            : base(logger, mainDom)
         {
             _umbracoApplication = umbracoApplication;
         }
@@ -45,12 +54,16 @@ namespace Umbraco.Web.Runtime
 
             var factory = base.Boot(register);
 
-            // now (and only now) is the time to switch over to perWebRequest scopes.
-            // up until that point we may not have a request, and scoped services would
-            // fail to resolve - but we run Initialize within a factory scope - and then,
-            // here, we switch the factory to bind scopes to requests
-            factory.EnablePerWebRequestScope();
-
+            // factory can be null if part of the boot process fails
+            if (factory != null)
+            {
+                // now (and only now) is the time to switch over to perWebRequest scopes.
+                // up until that point we may not have a request, and scoped services would
+                // fail to resolve - but we run Initialize within a factory scope - and then,
+                // here, we switch the factory to bind scopes to requests
+                factory.EnablePerWebRequestScope();
+            }
+            
             return factory;
         }
 

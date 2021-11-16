@@ -1,93 +1,16 @@
 ﻿using System;
 using System.Threading;
 using Umbraco.Core;
-using Umbraco.Core.Compose;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Sync;
 using Umbraco.Examine;
-using Umbraco.Web.Cache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
-using Umbraco.Web.Search;
-using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Compose
 {
-    /// <summary>
-    /// Ensures that servers are automatically registered in the database, when using the database server registrar.
-    /// </summary>
-    /// <remarks>
-    /// <para>At the moment servers are automatically registered upon first request and then on every
-    /// request but not more than once per (configurable) period. This really is "for information & debug" purposes so
-    /// we can look at the table and see what servers are registered - but the info is not used anywhere.</para>
-    /// <para>Should we actually want to use this, we would need a better and more deterministic way of figuring
-    /// out the "server address" ie the address to which server-to-server requests should be sent - because it
-    /// probably is not the "current request address" - especially in multi-domains configurations.</para>
-    /// </remarks>
-    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
-
-    // during Initialize / Startup, we end up checking Examine, which needs to be initialized beforehand
-    // TODO: should not be a strong dependency on "examine" but on an "indexing component"
-    [ComposeAfter(typeof(ExamineComposer))]
-
-    public sealed class DatabaseServerRegistrarAndMessengerComposer : ComponentComposer<DatabaseServerRegistrarAndMessengerComponent>, ICoreComposer
-    {
-        public override void Compose(Composition composition)
-        {
-            base.Compose(composition);
-
-            composition.SetServerMessenger(factory =>
-            {
-                var runtime = factory.GetInstance<IRuntimeState>();
-                var databaseFactory = factory.GetInstance<IUmbracoDatabaseFactory>();
-                var globalSettings = factory.GetInstance<IGlobalSettings>();
-                var proflog = factory.GetInstance<IProfilingLogger>();
-                var scopeProvider = factory.GetInstance<IScopeProvider>();
-                var sqlContext = factory.GetInstance<ISqlContext>();
-                var logger = factory.GetInstance<ILogger>();
-                var indexRebuilder = factory.GetInstance<IndexRebuilder>();
-
-                return new BatchedDatabaseServerMessenger(
-                    runtime, databaseFactory, scopeProvider, sqlContext, proflog, globalSettings,
-                    true,
-                    //Default options for web including the required callbacks to build caches
-                    new DatabaseServerMessengerOptions
-                    {
-                        //These callbacks will be executed if the server has not been synced
-                        // (i.e. it is a new server or the lastsynced.txt file has been removed)
-                        InitializingCallbacks = new Action[]
-                        {
-                            //rebuild the xml cache file if the server is not synced
-                            () =>
-                            {
-                                // rebuild the published snapshot caches entirely, if the server is not synced
-                                // this is equivalent to DistributedCache RefreshAll... but local only
-                                // (we really should have a way to reuse RefreshAll... locally)
-                                // note: refresh all content & media caches does refresh content types too
-                                var svc = Current.PublishedSnapshotService;
-                                svc.Notify(new[] { new DomainCacheRefresher.JsonPayload(0, DomainChangeTypes.RefreshAll) });
-                                svc.Notify(new[] { new ContentCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _, out _);
-                                svc.Notify(new[] { new MediaCacheRefresher.JsonPayload(0, TreeChangeTypes.RefreshAll) }, out _);
-                            },
-
-                            //rebuild indexes if the server is not synced
-                            // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
-                            // indexes then they can adjust this logic themselves.
-                            () =>
-                            {
-                                ExamineComponent.RebuildIndexes(indexRebuilder, logger, false, 5000);
-                            }
-                        }
-                    });
-            });
-        }
-    }
 
     public sealed class DatabaseServerRegistrarAndMessengerComponent : IComponent
     {
@@ -101,14 +24,17 @@ namespace Umbraco.Web.Compose
         private readonly BackgroundTaskRunner<IBackgroundTask> _processTaskRunner;
         private bool _started;
         private IBackgroundTask[] _tasks;
-        private IndexRebuilder _indexRebuilder;
 
-        public DatabaseServerRegistrarAndMessengerComponent(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IndexRebuilder indexRebuilder)
+        public DatabaseServerRegistrarAndMessengerComponent(
+            IRuntimeState runtime,
+            IServerRegistrar serverRegistrar,
+            IServerMessenger serverMessenger,
+            IServerRegistrationService registrationService,
+            ILogger logger)
         {
             _runtime = runtime;
             _logger = logger;
             _registrationService = registrationService;
-            _indexRebuilder = indexRebuilder;
 
             // create task runner for DatabaseServerRegistrar
             _registrar = serverRegistrar as DatabaseServerRegistrar;
@@ -128,17 +54,23 @@ namespace Umbraco.Web.Compose
         }
 
         public void Initialize()
-        { 
+        {
             //We will start the whole process when a successful request is made
             if (_registrar != null || _messenger != null)
+            {
                 UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
-
-            // must come last, as it references some _variables
-            _messenger?.Startup();
+                UmbracoModule.EndRequest += UmbracoModule_EndRequest;
+            }
         }
 
         public void Terminate()
         { }
+
+        private void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
+        {
+            // will clear the batch - will remain in HttpContext though - that's ok
+            _messenger?.FlushBatch();
+        }
 
         /// <summary>
         /// Handle when a request is made
@@ -232,7 +164,7 @@ namespace Umbraco.Web.Compose
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<InstructionProcessTask>("Failed (will repeat).", e);
+                    _logger.Error<InstructionProcessTask>(e, "Failed (will repeat).");
                 }
                 return true; // repeat
             }

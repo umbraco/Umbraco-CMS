@@ -1,4 +1,10 @@
-function multiUrlPickerController($scope, angularHelper, localizationService, entityResource, iconHelper, editorService) {
+function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService) {
+
+    var vm = {
+        labels: {
+            general_recycleBin: ""
+        }
+    };
 
     $scope.renderModel = [];
 
@@ -10,24 +16,25 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         $scope.model.value = [];
     }
 
-    var currentForm = angularHelper.getCurrentForm($scope);
-
     $scope.sortableOptions = {
+        axis: "y",
+        containment: "parent",
         distance: 10,
+        opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000,
         update: function () {
-            currentForm.$setDirty();
+            setDirty();
         }
     };
 
-    $scope.model.value.forEach(function (link) {
+    $scope.model.value.forEach(link => {
         link.icon = iconHelper.convertFromLegacyIcon(link.icon);
         $scope.renderModel.push(link);
     });
 
-    $scope.$on("formSubmitting", function () {
+    $scope.$on("formSubmitting", () => {
         $scope.model.value = $scope.renderModel;
     });
 
@@ -51,49 +58,46 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                 $scope.multiUrlPickerForm.maxCount.$setValidity("maxCount", true);
             }
             $scope.sortableOptions.disabled = $scope.renderModel.length === 1;
+            //Update value
+            $scope.model.value = $scope.renderModel;
         }
     );
 
     $scope.remove = function ($index) {
         $scope.renderModel.splice($index, 1);
 
-        currentForm.$setDirty();
+        setDirty();
     };
 
     $scope.openLinkPicker = function (link, $index) {
         var target = link ? {
             name: link.name,
             anchor: link.queryString,
-            // the linkPicker breaks if it get an udi for media
-            udi: link.isMedia ? null : link.udi,
+            udi: link.udi,
             url: link.url,
             target: link.target
         } : null;
 
-        var linkPicker = {
+        const linkPicker = {
             currentTarget: target,
-            submit: function (model) {
+            dataTypeKey: $scope.model.dataTypeKey,
+            ignoreUserStartNodes : ($scope.model.config && $scope.model.config.ignoreUserStartNodes) ? $scope.model.config.ignoreUserStartNodes : "0",
+            hideAnchor: $scope.model.config && $scope.model.config.hideAnchor ? true : false,
+            size: $scope.model.config.overlaySize,
+            submit: model => {
                 if (model.target.url || model.target.anchor) {
                     // if an anchor exists, check that it is appropriately prefixed
                     if (model.target.anchor && model.target.anchor[0] !== '?' && model.target.anchor[0] !== '#') {
                         model.target.anchor = (model.target.anchor.indexOf('=') === -1 ? '#' : '?') + model.target.anchor;
                     }
                     if (link) {
-                        if (link.isMedia && link.url === model.target.url) {
-                            // we can assume the existing media item is changed and no new file has been selected
-                            // so we don't need to update the udi and isMedia fields
-                        } else {
-                            link.udi = model.target.udi;
-                            link.isMedia = model.target.isMedia;
-                        }
-
+                        link.udi = model.target.udi;
                         link.name = model.target.name || model.target.url || model.target.anchor;
                         link.queryString = model.target.anchor;
                         link.target = model.target.target;
                         link.url = model.target.url;
                     } else {
                         link = {
-                            isMedia: model.target.isMedia,
                             name: model.target.name || model.target.url || model.target.anchor,
                             queryString: model.target.anchor,
                             target: model.target.target,
@@ -104,14 +108,16 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                     }
 
                     if (link.udi) {
-                        var entityType = link.isMedia ? "media" : "document";
+                        const entityType = model.target.isMedia ? "Media" : "Document";
 
-                        entityResource.getById(link.udi, entityType).then(function (data) {
+                        entityResource.getById(link.udi, entityType).then(data => {
+
                             link.icon = iconHelper.convertFromLegacyIcon(data.icon);
                             link.published = (data.metaData && data.metaData.IsPublished === false && entityType === "Document") ? false : true;
                             link.trashed = data.trashed;
+
                             if (link.trashed) {
-                                item.url = localizationService.dictionary.general_recycleBin;
+                                item.url = vm.labels.general_recycleBin;
                             }
                         });
                     } else {
@@ -119,16 +125,49 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                         link.published = true;
                     }
 
-                    currentForm.$setDirty();
+                    setDirty();
                 }
                 editorService.close();
             },
-            close: function () {
+            close: () => {
                 editorService.close();
             }
         };
+
         editorService.linkPicker(linkPicker);
     };
+
+    function setDirty() {
+        if ($scope.multiUrlPickerForm) {
+            $scope.multiUrlPickerForm.modelValue.$setDirty();
+        }
+    }
+
+    function init() {
+
+        localizationService.localizeMany(["general_recycleBin"])
+            .then(data => {
+                vm.labels.general_recycleBin = data[0];
+            });
+
+        // if the property is mandatory, set the minCount config to 1 (unless of course it is set to something already),
+        // that way the minCount/maxCount validation handles the mandatory as well
+        if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
+            $scope.model.config.minNumber = 1;
+        }
+
+        _.each($scope.model.value, function (item) {
+            // we must reload the "document" link URLs to match the current editor culture
+            if (item.udi && item.udi.indexOf("/document/") > 0) {
+                item.url = null;
+                entityResource.getUrlByUdi(item.udi).then(data => {
+                    item.url = data;
+                });
+            }
+        });
+    }
+
+    init();
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.MultiUrlPickerController", multiUrlPickerController);

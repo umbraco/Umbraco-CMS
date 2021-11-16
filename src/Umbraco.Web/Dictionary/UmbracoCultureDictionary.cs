@@ -122,7 +122,20 @@ namespace Umbraco.Web.Dictionary
                 //ensure it's stored/retrieved from request cache
                 //NOTE: This is no longer necessary since these are cached at the runtime level, but we can leave it here for now.
                 return _requestCache.GetCacheItem<ILanguage>(typeof (DefaultCultureDictionary).Name + "Culture" + Culture.Name,
-                    () => _localizationService.GetLanguageByIsoCode(Culture.Name));
+                    () => {
+                        // find a language that matches the current culture or any of its parent cultures
+                        var culture = Culture;
+                        while(culture != CultureInfo.InvariantCulture)
+                        {
+                            var language = _localizationService.GetLanguageByIsoCode(culture.Name);
+                            if(language != null)
+                            {
+                                return language;
+                            }
+                            culture = culture.Parent;
+                        }
+                        return null;
+                    });
             }
         }
     }

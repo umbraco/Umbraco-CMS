@@ -31,7 +31,9 @@ namespace Umbraco.Core.Security
 
         public bool VerifyPassword(string password, string hashedPassword)
         {
-            if (string.IsNullOrWhiteSpace(hashedPassword)) throw new ArgumentException("Value cannot be null or whitespace.", "hashedPassword");
+            if (string.IsNullOrWhiteSpace(hashedPassword))
+                return false;
+
             return CheckPassword(password, hashedPassword);
         }
 
@@ -701,44 +703,46 @@ namespace Umbraco.Core.Security
 
             if (PasswordFormat == MembershipPasswordFormat.Hashed)
             {
-                var hashAlgorithm = GetHashAlgorithm(pass);
-                var algorithm = hashAlgorithm as KeyedHashAlgorithm;
-                if (algorithm != null)
+                using (var hashAlgorithm = GetHashAlgorithm(pass))
                 {
-                    var keyedHashAlgorithm = algorithm;
-                    if (keyedHashAlgorithm.Key.Length == saltBytes.Length)
+                    var algorithm = hashAlgorithm as KeyedHashAlgorithm;
+                    if (algorithm != null)
                     {
-                        //if the salt bytes is the required key length for the algorithm, use it as-is
-                        keyedHashAlgorithm.Key = saltBytes;
-                    }
-                    else if (keyedHashAlgorithm.Key.Length < saltBytes.Length)
-                    {
-                        //if the salt bytes is too long for the required key length for the algorithm, reduce it
-                        var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
-                        Buffer.BlockCopy(saltBytes, 0, numArray2, 0, numArray2.Length);
-                        keyedHashAlgorithm.Key = numArray2;
+                        var keyedHashAlgorithm = algorithm;
+                        if (keyedHashAlgorithm.Key.Length == saltBytes.Length)
+                        {
+                            //if the salt bytes is the required key length for the algorithm, use it as-is
+                            keyedHashAlgorithm.Key = saltBytes;
+                        }
+                        else if (keyedHashAlgorithm.Key.Length < saltBytes.Length)
+                        {
+                            //if the salt bytes is too long for the required key length for the algorithm, reduce it
+                            var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
+                            Buffer.BlockCopy(saltBytes, 0, numArray2, 0, numArray2.Length);
+                            keyedHashAlgorithm.Key = numArray2;
+                        }
+                        else
+                        {
+                            //if the salt bytes is too short for the required key length for the algorithm, extend it
+                            var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
+                            var dstOffset = 0;
+                            while (dstOffset < numArray2.Length)
+                            {
+                                var count = Math.Min(saltBytes.Length, numArray2.Length - dstOffset);
+                                Buffer.BlockCopy(saltBytes, 0, numArray2, dstOffset, count);
+                                dstOffset += count;
+                            }
+                            keyedHashAlgorithm.Key = numArray2;
+                        }
+                        inArray = keyedHashAlgorithm.ComputeHash(bytes);
                     }
                     else
                     {
-                        //if the salt bytes is too short for the required key length for the algorithm, extend it
-                        var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
-                        var dstOffset = 0;
-                        while (dstOffset < numArray2.Length)
-                        {
-                            var count = Math.Min(saltBytes.Length, numArray2.Length - dstOffset);
-                            Buffer.BlockCopy(saltBytes, 0, numArray2, dstOffset, count);
-                            dstOffset += count;
-                        }
-                        keyedHashAlgorithm.Key = numArray2;
+                        var buffer = new byte[saltBytes.Length + bytes.Length];
+                        Buffer.BlockCopy(saltBytes, 0, buffer, 0, saltBytes.Length);
+                        Buffer.BlockCopy(bytes, 0, buffer, saltBytes.Length, bytes.Length);
+                        inArray = hashAlgorithm.ComputeHash(buffer);
                     }
-                    inArray = keyedHashAlgorithm.ComputeHash(bytes);
-                }
-                else
-                {
-                    var buffer = new byte[saltBytes.Length + bytes.Length];
-                    Buffer.BlockCopy(saltBytes, 0, buffer, 0, saltBytes.Length);
-                    Buffer.BlockCopy(bytes, 0, buffer, saltBytes.Length, bytes.Length);
-                    inArray = hashAlgorithm.ComputeHash(buffer);
                 }
             }
             else
@@ -848,7 +852,9 @@ namespace Umbraco.Core.Security
         protected internal static string GenerateSalt()
         {
             var numArray = new byte[16];
-            new RNGCryptoServiceProvider().GetBytes(numArray);
+            using (var rng = new RNGCryptoServiceProvider()) {
+                rng.GetBytes(numArray);
+            }
             return Convert.ToBase64String(numArray);
         }
 

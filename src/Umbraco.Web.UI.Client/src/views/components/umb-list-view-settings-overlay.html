@@ -1,0 +1,38 @@
+<umb-editor-view>
+    <umb-editor-header 
+        name="model.title" 
+        name-locked="true" 
+        hide-alias="true" 
+        hide-description="model.hideDescription" 
+        hide-icon="model.hideIcon">
+    </umb-editor-header>
+    <umb-editor-container class="umb-list-view-settings__overlay">
+       <form name="listViewSettingsForm" novalidate val-form-manager>
+           <umb-box>
+               <umb-box-content>
+                    <!-- list view settings -->
+                    <umb-property property="preValue" ng-repeat="preValue in model.dataType.preValues">
+                        <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
+                    </umb-property>
+               </umb-box-content>
+           </umb-box>
+        </form>
+    </umb-editor-container>
+    <umb-editor-footer>
+        <umb-editor-footer-content-right>
+            <umb-button 
+                type="button" 
+                button-style="link" 
+                label-key="general_close"
+                shortcut="esc"
+                action="model.close()">
+            </umb-button>
+            <umb-button
+                type="button"               
+                button-style="success" 
+                label-key="buttons_saveListView" 
+                action="model.submit(model)">                
+            </umb-button>            
+        </umb-editor-footer-content-right>
+    </umb-editor-footer>
+</umb-editor-view>

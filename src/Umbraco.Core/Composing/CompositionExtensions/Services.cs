@@ -31,7 +31,12 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IDomainService, DomainService>();
             composition.RegisterUnique<IAuditService, AuditService>();
             composition.RegisterUnique<ITagService, TagService>();
-            composition.RegisterUnique<IContentService, ContentService>();
+
+            composition.RegisterUnique<ContentService>();
+            composition.RegisterUnique<IContentService>(factory => factory.GetInstance<ContentService>());
+            composition.RegisterUnique<IContentVersionService>(factory => factory.GetInstance<ContentService>());
+            composition.RegisterUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
+
             composition.RegisterUnique<IUserService, UserService>();
             composition.RegisterUnique<IMemberService, MemberService>();
             composition.RegisterUnique<IMediaService, MediaService>();
@@ -52,6 +57,7 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             composition.RegisterUnique<IExternalLoginService, ExternalLoginService>();
             composition.RegisterUnique<IRedirectUrlService, RedirectUrlService>();
             composition.RegisterUnique<IConsentService, ConsentService>();
+            composition.RegisterUnique<IEmailSender, EmailSender>();
             composition.Register<LocalizedTextServiceFileSources>(SourcesFactory);
             composition.RegisterUnique<ILocalizedTextService>(factory => new LocalizedTextService(
                 factory.GetInstance<Lazy<LocalizedTextServiceFileSources>>(),
@@ -96,9 +102,8 @@ namespace Umbraco.Core.Composing.CompositionExtensions
             var pluginLangFolders = appPlugins.Exists == false
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
                 : appPlugins.GetDirectories()
-                    .SelectMany(x => x.GetDirectories("Lang"))
+                    .SelectMany(x => x.GetDirectories("Lang", SearchOption.AllDirectories))
                     .SelectMany(x => x.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
-                    .Where(x => Path.GetFileNameWithoutExtension(x.FullName).Length == 5)
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, false));
 
             //user defined langs that overwrite the default, these should not be used by plugin creators
@@ -106,7 +111,6 @@ namespace Umbraco.Core.Composing.CompositionExtensions
                 ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
                 : configLangFolder
                     .GetFiles("*.user.xml", SearchOption.TopDirectoryOnly)
-                    .Where(x => Path.GetFileNameWithoutExtension(x.FullName).Length == 10)
                     .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
 
             return new LocalizedTextServiceFileSources(

@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -12,16 +13,16 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(IDictionaryTranslation))]
     public sealed class DictionaryTranslationMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public DictionaryTranslationMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        protected override void DefineMaps()
         {
-            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Id, dto => dto.PrimaryKey);
-            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Language, dto => dto.LanguageId);
-            CacheMap<DictionaryTranslation, LanguageTextDto>(src => src.Value, dto => dto.Value);
+            DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Id), nameof(LanguageTextDto.PrimaryKey));
+            DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Key), nameof(LanguageTextDto.UniqueId));
+            DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Language), nameof(LanguageTextDto.LanguageId));
+            DefineMap<DictionaryTranslation, LanguageTextDto>(nameof(DictionaryTranslation.Value), nameof(LanguageTextDto.Value));
         }
     }
 }

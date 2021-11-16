@@ -12,7 +12,7 @@
         </thead>
         <tbody ui-sortable="sortableOptions" ng-model="model.value">
             <tr ng-repeat="link in model.value" data-link="{{link.link}}" ng-class="{ 'unsortable': model.value.length <= 1 }">
-                <td class="col-sort"><i class="icon icon-navigation handle" ng-show="canSort()"></i></td>
+                <td class="col-sort"><umb-icon icon="icon-navigation" class="icon handle" ng-show="canSort()"></umb-icon></td>
                 <td class="col-caption">
                     <span ng-show="!link.edit">{{link.caption}}</span>
                     <div class="control-wrapper">
@@ -21,20 +21,20 @@
                 </td>
                 <td class="col-link">
                     <div ng-show="!link.edit">
-                        <i class="icon {{link.internalIcon}}" ng-show="link.internalIcon"></i>
-                        <a href="{{link.link}}" target="_blank" ng-show="!link.isInternal">{{link.link}}</a>
-                        <a href="#/content/content/edit/{{link.internal}}" target="_blank" ng-show="link.isInternal" ng-bind="link.internalName"></a>
+                        <umb-icon icon="{{link.internalIcon}}" class="icon" ng-show="link.internalIcon"></umb-icon>
+                        <a href="{{link.link}}" target="_blank" rel="noopener" ng-show="!link.isInternal">{{link.link}}</a>
+                        <a href="#/content/content/edit/{{link.internal}}" target="_blank" rel="noopener" ng-show="link.isInternal" ng-bind="link.internalName"></a>
                     </div>
                     <div ng-show="link.edit">
                         <div ng-show="!link.isInternal">
-                                <div class="control-wrapper">
-                                    <input type="text" ng-model="link.link" />
-                                </div>
-                                <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
+                            <div class="control-wrapper">
+                                <input type="text" ng-model="link.link" />
                             </div>
+                            <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
+                        </div>
 
                         <div ng-show="link.isInternal">
-                            <i class="icon {{link.internalIcon}}" ng-show="link.internalIcon"></i>
+                            <umb-icon icon="{{link.internalIcon}}" class="icon" ng-show="link.internalIcon"></umb-icon>
                             <span ng-bind="link.internalName"></span> <a href="#" ng-click="selectInternal($event,link)"><localize key="choose">Choose</localize></a><br />
                             <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_enterExternal">enter external link</localize></a>
                         </div>
@@ -73,7 +73,7 @@
                     </div>
 
                     <div ng-show="!addExternal">
-                        <i class="icon {{newInternalIcon}}" ng-show="newInternalIcon"></i>
+                        <umb-icon icon="{{newInternalIcon}}" class="icon" ng-show="newInternalIcon"></umb-icon>
                         <span ng-bind="newInternalName"></span> <a href="#" ng-click="internal($event)"><localize key="choose">Choose</localize></a><br />
                         <localize key="or">or</localize> <a href="#" ng-click="switch($event)"><localize key="relatedlinks_enterExternal">enter external link</localize></a>
                     </div>

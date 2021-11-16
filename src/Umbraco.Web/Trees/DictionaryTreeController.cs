@@ -58,7 +58,7 @@ namespace Umbraco.Web.Trees
 
             Func<IDictionaryItem, string> ItemSort() => item => item.ItemKey;
 
-            if (id == Constants.System.Root.ToInvariantString())
+            if (id == Constants.System.RootString)
             {
                 nodes.AddRange(
                     Services.LocalizationService.GetRootDictionaryItems().OrderBy(ItemSort()).Select(
@@ -67,12 +67,12 @@ namespace Umbraco.Web.Trees
                             id,
                             queryStrings,
                             x.ItemKey,
-                            "icon-book-alt",
+                            Constants.Icons.Dictionary,
                             Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
             else
             {
-                // maybe we should use the guid as url param to avoid the extra call for getting dictionary item
+                // maybe we should use the guid as URL param to avoid the extra call for getting dictionary item
                 var parentDictionary = Services.LocalizationService.GetDictionaryItemById(intId.Result);
                 if (parentDictionary == null)
                     return nodes;
@@ -83,7 +83,7 @@ namespace Umbraco.Web.Trees
                         id,
                         queryStrings,
                         x.ItemKey,
-                        "icon-book-alt",
+                        Constants.Icons.Dictionary,
                         Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
 
@@ -104,7 +104,7 @@ namespace Umbraco.Web.Trees
 
             menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
 
-            if (id != Constants.System.Root.ToInvariantString())
+            if (id != Constants.System.RootString)
                 menu.Items.Add<ActionDelete>(Services.TextService, true, opensDialog: true);
 
             menu.Items.Add(new RefreshNode(Services.TextService, true));

@@ -1,0 +1,43 @@
+<div class="form-horizontal" ng-controller="Umbraco.Editors.Member.Apps.ContentController as vm">
+
+    <umb-editor-tab-bar ng-if="vm.tabs.length > 0">
+        <umb-tabs-nav tabs="vm.tabs" on-tab-change="vm.setActiveTab(tab)"></umb-tabs-nav>
+    </umb-editor-tab-bar>
+
+    <umb-box ng-repeat="tab in vm.tabs track by tab.key" ng-show="tab.alias === vm.activeTabAlias && tab.properties.length > 0">
+        <umb-box-content data-element="tab-content-{{tab.alias}}">
+            <umb-property
+                data-element="property-{{property.alias}}"
+                ng-repeat="property in tab.properties track by property.alias"
+                property="property">
+
+                    <umb-property-editor model="property"></umb-property-editor>
+
+            </umb-property>
+        </umb-box-content>
+    </umb-box>
+
+    <div 
+    class="umb-group-panel"
+    data-element="group-{{group.alias}}"
+    ng-repeat="group in content.tabs"
+    ng-if="group.type === 0"
+    ng-show="group.parentAlias === vm.activeTabAlias || vm.tabs.length === 0">
+
+        <div class="umb-group-panel__header">
+            <div>{{ group.label }}</div>
+        </div>
+
+        <div class="umb-group-panel__content" data-element="tab-content-{{group.type === 0 ? group.parentAlias : group.alias}}">
+            <umb-property 
+                data-element="property-{{group.alias}}" 
+                ng-repeat="property in group.properties | filter:vm.hideSystemProperties track by property.alias" 
+                property="property">
+
+                <umb-property-editor model="property"></umb-property-editor>
+            </umb-property>
+        </div>
+
+    </div>
+
+</div>

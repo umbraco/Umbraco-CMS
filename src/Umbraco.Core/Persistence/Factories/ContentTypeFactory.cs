@@ -67,16 +67,28 @@ namespace Umbraco.Core.Persistence.Factories
 
         public static IMemberType BuildMemberTypeEntity(ContentTypeDto dto)
         {
-            throw new NotImplementedException();
+            var contentType = new MemberType(dto.NodeDto.ParentId);
+            try
+            {
+                contentType.DisableChangeTracking();
+                BuildCommonEntity(contentType, dto, false);
+                contentType.ResetDirtyProperties(false);
+            }
+            finally
+            {
+                contentType.EnableChangeTracking();
+            }
+
+            return contentType;
         }
 
-        public static IEnumerable<MemberTypeDto> BuildMemberTypeDtos(IMemberType entity)
+        public static IEnumerable<MemberPropertyTypeDto> BuildMemberPropertyTypeDtos(IMemberType entity)
         {
             var memberType = entity as MemberType;
             if (memberType == null || memberType.PropertyTypes.Any() == false)
-                return Enumerable.Empty<MemberTypeDto>();
+                return Enumerable.Empty<MemberPropertyTypeDto>();
 
-            var dtos = memberType.PropertyTypes.Select(x => new MemberTypeDto
+            var dtos = memberType.PropertyTypes.Select(x => new MemberPropertyTypeDto
             {
                 NodeId = entity.Id,
                 PropertyTypeId = x.Id,
@@ -91,7 +103,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Common
 
-        private static void BuildCommonEntity(ContentTypeBase entity, ContentTypeDto dto)
+        private static void BuildCommonEntity(ContentTypeBase entity, ContentTypeDto dto, bool setVariations = true)
         {
             entity.Id = dto.NodeDto.NodeId;
             entity.Key = dto.NodeDto.UniqueId;
@@ -102,6 +114,7 @@ namespace Umbraco.Core.Persistence.Factories
             entity.SortOrder = dto.NodeDto.SortOrder;
             entity.Description = dto.Description;
             entity.CreateDate = dto.NodeDto.CreateDate;
+            entity.UpdateDate = dto.NodeDto.CreateDate;
             entity.Path = dto.NodeDto.Path;
             entity.Level = dto.NodeDto.Level;
             entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
@@ -109,7 +122,9 @@ namespace Umbraco.Core.Persistence.Factories
             entity.IsContainer = dto.IsContainer;
             entity.IsElement = dto.IsElement;
             entity.Trashed = dto.NodeDto.Trashed;
-            entity.Variations = (ContentVariation) dto.Variations;
+
+            if (setVariations)
+                entity.Variations = (ContentVariation) dto.Variations;
         }
 
         public static ContentTypeDto BuildContentTypeDto(IContentTypeBase entity)

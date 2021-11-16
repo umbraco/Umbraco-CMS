@@ -1,9 +1,15 @@
-<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditorController" class="usky-grid usky-grid-configuration">
-    <div style="max-width: 600px">
+<div ng-controller="Umbraco.PropertyEditors.GridPrevalueEditorController as vm" class="usky-grid usky-grid-configuration">
+    <div class="grid-layout">
         <div class="control-group uSky-templates">
 
-            <h4><localize key="grid_gridLayouts" /></h4>
-            <p><localize key="grid_gridLayoutsDetail" /></p>
+            <h4>
+                <localize key="grid_gridLayouts">
+                    Grid Layouts
+                </localize>
+            </h4>
+            <p>
+                <localize key="grid_gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</localize>
+            </p>
 
             <ul class="unstyled"
                 ui-sortable
@@ -11,43 +17,45 @@
 
                 <li ng-repeat="template in model.value.templates" class="clearfix">
 
-                    <div ng-click="configureTemplate(template)"
-                         class="preview-rows layout" style="margin-top: 5px; margin-bottom: 20px; float:left">
+                    <button type="button" ng-click="vm.configureTemplate(template)" class="btn-reset preview-rows layout">
 
-                        <div class="preview-row">
-                            <div class="preview-col"
+                        <span class="preview-row">
+                            <span class="preview-col"
                                  ng-class="{last:$last}"
-                                 ng-repeat="section in template.sections | filter:zeroWidthFilter"
-                                 ng-style="{width: percentage(section.grid) + '%', height: '60px', 'max-width': '100%'}">
-                                <div class="preview-cell"></div>
-                            </div>
-                        </div>
-                    </div>
+                                 ng-repeat="section in template.sections | filter: vm.zeroWidthFilter"
+                                 ng-style="{width: vm.percentage(section.grid) + '%', height: '60px', 'max-width': '100%'}">
+                                <span class="preview-cell"></span>
+                            </span>
+                        </span>
+                    </button>
 
                     <div>
-                        {{template.name}} <br />
-                        <i class="icon-delete red"></i>
-                        <a class="btn btn-small btn-link"
-                           href
-                           ng-click="deleteTemplate($index)"><localize key="general_delete" /></a>
+                        <p>{{template.name}}</p>
+                        <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteTemplate(template, $index, $event)">
+                            <umb-icon icon="icon-delete" class="red"></umb-icon>
+                            <localize key="general_delete">Delete</localize>
+                        </button>
                     </div>
 
                 </li>
             </ul>
 
-            <button class="btn btn-small"
-                    prevent-default
-                    ng-click="configureTemplate()">
-                <i class="icon-add"></i> <localize key="grid_addGridLayout" />
+            <button type="button" class="btn btn-small btn-info" ng-click="vm.configureTemplate()">
+                <umb-icon icon="icon-add"></umb-icon>
+                <localize key="grid_addGridLayout">Add Grid Layout</localize>
             </button>
         </div>
     </div>
-    <div style="max-width: 600px">
+    <div class="grid-layout">
 
         <div class="control-group uSky-templates">
 
-            <h4><localize key="grid_rowConfigurations" /></h4>
-            <p><localize key="grid_rowConfigurationsDetail" /></p>
+            <h4>
+                <localize key="grid_rowConfigurations">Row Configurations</localize>
+            </h4>
+            <p>
+                <localize key="grid_rowConfigurationsDetail">Rows are predefined cells arranged horizontally</localize>
+            </p>
 
             <div class="control-group uSky-templates-rows">
                 <ul class="unstyled"
@@ -56,35 +64,35 @@
 
                     <li ng-repeat="layout in model.value.layouts" class="clearfix">
 
-                        <div ng-click="configureLayout(layout)"
-                             class="preview-rows columns" style="margin-top: 5px; margin-bottom: 25px; float:left">
+                        <button type="button" ng-click="vm.configureLayout(layout)" class="btn-reset preview-rows columns">
 
-                            <div class="preview-row">
-                                <div class="preview-col"
+                            <span class="preview-row">
+                                <span class="preview-col"
                                      ng-class="{last:$last}"
-                                     ng-repeat="area in layout.areas | filter:zeroWidthFilter"
-                                     ng-style="{width: percentage(area.grid) + '%', 'max-width': '100%'}">
+                                     ng-repeat="area in layout.areas | filter: vm.zeroWidthFilter"
+                                     ng-style="{width: vm.percentage(area.grid) + '%', 'max-width': '100%'}">
 
-                                    <div class="preview-cell">
-                                        <p style="font-size: 6px; line-height: 8px; text-align: center" ng-show="area.maxItems > 0">{{area.maxItems}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    <span class="preview-cell">
+                                        <span ng-show="area.maxItems > 0">{{area.maxItems}}</span>
+                                    </span>
+                                </span>
+                            </span>
+                        </button>
 
                         <div>
-                            {{layout.label || layout.name}}<br />
-                            <i class="icon-delete red"></i>
-                            <a class="btn btn-small btn-link" href ng-click="deleteLayout($index)">
-                                <localize key="general_delete" />
-                            </a>
+                            <p>{{layout.label || layout.name}}</p>
+                            <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteLayout(layout, $index, $event)">
+                                <umb-icon icon="icon-delete" class="red"></umb-icon>
+                                <localize key="general_delete">Delete</localize>
+                            </button>
                         </div>
 
                     </li>
                 </ul>
 
-                <button class="btn btn-small" prevent-default ng-click="configureLayout()">
-                    <i class="icon-add"></i> <localize key="grid_addRowConfiguration" />
+                <button type="button" class="btn btn-small btn-info" ng-click="vm.configureLayout()">
+                    <umb-icon icon="icon-add"></umb-icon>
+                    <localize key="grid_addRowConfiguration">Add row configuration</localize>
                 </button>
 
             </div>
@@ -93,7 +101,7 @@
     </div>
 
 
-    <div style="max-width: 600px">
+    <div class="grid-layout">
 
         <umb-control-group label="@grid_columns"
                            description="@grid_columnsDetails">
@@ -108,22 +116,20 @@
                 ng-model="model.value.config">
 
                 <li ng-repeat="configValue in model.value.config">
-                    <i class="icon icon-navigation handle"></i>
-
-                    <a href="#" prevent-default ng-click="removeConfigValue(model.value.config, $index)">
-                        <i class="icon icon-delete red"></i>
-                        {{configValue.label}}
-                    </a>
+                    <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
+                    <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.config, $index)">
+                        <umb-icon icon="icon-delete" class="icon red"></umb-icon>
+                    </button>
+                    <span>{{configValue.label}}</span>
                 </li>
             </ul>
 
             <ul class="unstyled list-icons">
                 <li>
-                    <i class="icon icon-settings-alt-2 turquoise"></i>
-
-                    <a href="#" ng-click="editConfig()" prevent-default>
-                        <localize key="general_edit" />
-                    </a>
+                    <button type="button" ng-click="vm.editConfig()" class="btn-link">
+                        <umb-icon icon="icon-settings-alt-2" class="icon turquoise"></umb-icon>
+                        <localize key="general_edit">Edit</localize>
+                    </button>
                 </li>
             </ul>
         </umb-control-group>
@@ -137,22 +143,20 @@
                 ng-model="model.value.styles">
 
                 <li ng-repeat="style in model.value.styles">
-                    <i class="icon icon-navigation handle"></i>
-
-                    <a href="#" prevent-default ng-click="removeConfigValue(model.value.styles, $index)">
-                        <i class="icon icon-delete red"></i>
-                        {{style.label}}
-                    </a>
-
+                    <umb-icon icon="icon-navigation" class="icon handle"></umb-icon>
+                    <button type="button" class="btn-link" ng-click="vm.removeConfigValue(model.value.styles, $index)">
+                        <umb-icon icon="icon-delete" class="icon red"></umb-icon>
+                    </button>
+                    <span>{{style.label}}</span>
                 </li>
             </ul>
 
             <ul class="unstyled list-icons">
                 <li>
-                    <i class="icon icon-settings-alt-2 turquoise"></i>
-                    <a href="#" ng-click="editStyles()" prevent-default>
-                        <localize key="general_edit" />
-                    </a>
+                    <button type="button" ng-click="vm.editStyles()" class="btn-link">
+                        <umb-icon icon="icon-settings-alt-2" class="icon turquoise"></umb-icon>
+                        <localize key="general_edit">Edit</localize>
+                    </button>
                 </li>
             </ul>
         </umb-control-group>

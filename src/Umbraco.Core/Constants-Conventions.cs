@@ -92,10 +92,10 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string Extension = "umbracoExtension";
 
-				/// <summary>
-				/// The default height/width of an image file if the size can't be determined from the metadata
-				/// </summary>
-				public const int DefaultSize = 200;
+                /// <summary>
+                /// The default height/width of an image file if the size can't be determined from the metadata
+                /// </summary>
+                public const int DefaultSize = 200;
             }
 
             /// <summary>
@@ -117,6 +117,46 @@ namespace Umbraco.Core
                 /// MediaType alias for an image.
                 /// </summary>
                 public const string Image = "Image";
+
+                /// <summary>
+                /// MediaType name for a video.
+                /// </summary>
+                public const string Video = "Video";
+
+                /// <summary>
+                /// MediaType name for an audio.
+                /// </summary>
+                public const string Audio = "Audio";
+
+                /// <summary>
+                /// MediaType name for an article.
+                /// </summary>
+                public const string Article = "Article";
+
+                /// <summary>
+                /// MediaType name for vector graphics.
+                /// </summary>
+                public const string VectorGraphics = "VectorGraphics";
+
+                /// <summary>
+                /// MediaType alias for a video.
+                /// </summary>
+                public const string VideoAlias = "umbracoMediaVideo";
+
+                /// <summary>
+                /// MediaType alias for an audio.
+                /// </summary>
+                public const string AudioAlias = "umbracoMediaAudio";
+
+                /// <summary>
+                /// MediaType alias for an article.
+                /// </summary>
+                public const string ArticleAlias = "umbracoMediaArticle";
+
+                /// <summary>
+                /// MediaType alias for vector graphics.
+                /// </summary>
+                public const string VectorGraphicsAlias = "umbracoMediaVectorGraphics";
 
                 /// <summary>
                 /// MediaType alias indicating allowing auto-selection.
@@ -209,71 +249,77 @@ namespace Umbraco.Core
                 public static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
                 {
                     return new Dictionary<string, PropertyType>
+                    {
                         {
+                            Comments,
+                            new PropertyType(PropertyEditors.Aliases.TextArea, ValueStorageType.Ntext, true, Comments)
                             {
-                                Comments,
-                                new PropertyType(PropertyEditors.Aliases.TextArea, ValueStorageType.Ntext, true, Comments)
-                                    {
-                                        Name = CommentsLabel
-                                    }
-                            },
-                            {
-                                FailedPasswordAttempts,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Integer, true, FailedPasswordAttempts)
-                                    {
-                                        Name = FailedPasswordAttemptsLabel
-                                    }
-                            },
-                            {
-                                IsApproved,
-                                new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsApproved)
-                                    {
-                                        Name = IsApprovedLabel
-                                    }
-                            },
-                            {
-                                IsLockedOut,
-                                new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsLockedOut)
-                                    {
-                                        Name = IsLockedOutLabel
-                                    }
-                            },
-                            {
-                                LastLockoutDate,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLockoutDate)
-                                    {
-                                        Name = LastLockoutDateLabel
-                                    }
-                            },
-                            {
-                                LastLoginDate,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLoginDate)
-                                    {
-                                        Name = LastLoginDateLabel
-                                    }
-                            },
-                            {
-                                LastPasswordChangeDate,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastPasswordChangeDate)
-                                    {
-                                        Name = LastPasswordChangeDateLabel
-                                    }
-                            },
-                            {
-                                PasswordAnswer,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordAnswer)
-                                    {
-                                        Name = PasswordAnswerLabel
-                                    }
-                            },
-                            {
-                                PasswordQuestion,
-                                new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordQuestion)
-                                    {
-                                        Name = PasswordQuestionLabel
-                                    }
+                                Name = CommentsLabel
                             }
-                        };
+                        },
+                        {
+                            FailedPasswordAttempts,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Integer, true, FailedPasswordAttempts)
+                            {
+                                Name = FailedPasswordAttemptsLabel,
+                                DataTypeId = Constants.DataTypes.LabelInt
+                            }
+                        },
+                        {
+                            IsApproved,
+                            new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsApproved)
+                            {
+                                Name = IsApprovedLabel
+                            }
+                        },
+                        {
+                            IsLockedOut,
+                            new PropertyType(PropertyEditors.Aliases.Boolean, ValueStorageType.Integer, true, IsLockedOut)
+                            {
+                                Name = IsLockedOutLabel
+                            }
+                        },
+                        {
+                            LastLockoutDate,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLockoutDate)
+                            {
+                                Name = LastLockoutDateLabel,
+                                DataTypeId = Constants.DataTypes.LabelDateTime
+                            }
+                        },
+                        {
+                            LastLoginDate,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastLoginDate)
+                            {
+                                Name = LastLoginDateLabel,
+                                DataTypeId = Constants.DataTypes.LabelDateTime
+                            }
+                        },
+                        {
+                            LastPasswordChangeDate,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Date, true, LastPasswordChangeDate)
+                            {
+                                Name = LastPasswordChangeDateLabel,
+                                DataTypeId = Constants.DataTypes.LabelDateTime
+                            }
+                        },
+                        {
+                            PasswordAnswer,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordAnswer)
+                            {
+                                Name = PasswordAnswerLabel,
+                                DataTypeId = Constants.DataTypes.LabelString
+                            }
+                        },
+                        {
+                            PasswordQuestion,
+                            new PropertyType(PropertyEditors.Aliases.Label, ValueStorageType.Nvarchar, true, PasswordQuestion)
+                            {
+                                Name = PasswordQuestionLabel,
+                                DataTypeId = Constants.DataTypes.LabelString
+                            }
+                        }
+                    };
                 }
             }
 
@@ -309,34 +355,65 @@ namespace Umbraco.Core
             public static class RelationTypes
             {
                 /// <summary>
-                /// ContentType name for default relation type "Relate Document On Copy".
+                /// Name for default relation type "Related Media".
+                /// </summary>
+                public const string RelatedMediaName = "Related Media";
+
+                /// <summary>
+                /// Alias for default relation type "Related Media"
+                /// </summary>
+                public const string RelatedMediaAlias = "umbMedia";
+
+                /// <summary>
+                /// Name for default relation type "Related Document".
+                /// </summary>
+                public const string RelatedDocumentName = "Related Document";
+
+                /// <summary>
+                /// Alias for default relation type "Related Document"
+                /// </summary>
+                public const string RelatedDocumentAlias = "umbDocument";
+
+                /// <summary>
+                /// Name for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyName = "Relate Document On Copy";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Document On Copy".
+                /// Alias for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyAlias = "relateDocumentOnCopy";
 
                 /// <summary>
-                /// ContentType name for default relation type "Relate Parent Document On Delete".
+                /// Name for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteName = "Relate Parent Document On Delete";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Parent Document On Delete".
+                /// Alias for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
 
                 /// <summary>
-                /// ContentType name for default relation type "Relate Parent Media Folder On Delete".
+                /// Name for default relation type "Relate Parent Media Folder On Delete".
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteName = "Relate Parent Media Folder On Delete";
 
                 /// <summary>
-                /// ContentType alias for default relation type "Relate Parent Media Folder On Delete".
+                /// Alias for default relation type "Relate Parent Media Folder On Delete".
                 /// </summary>
                 public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
+
+                /// <summary>
+                /// Returns the types of relations that are automatically tracked
+                /// </summary>
+                /// <remarks>
+                /// Developers should not manually use these relation types since they will all be cleared whenever an entity
+                /// (content, media or member) is saved since they are auto-populated based on property values.
+                /// </remarks>
+                public static string[] AutomaticRelationTypes = new[] { RelatedMediaAlias, RelatedDocumentAlias };
+
+                //TODO: return a list of built in types so we can use that to prevent deletion in the uI
             }
         }
     }

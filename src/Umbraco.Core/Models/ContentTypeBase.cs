@@ -95,6 +95,21 @@ namespace Umbraco.Core.Models
 
         protected void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            //enable this to detect duplicate property aliases. We do want this, however making this change in a
+            //patch release might be a little dangerous
+
+            ////detect if there are any duplicate aliases - this cannot be allowed
+            //if (e.Action == NotifyCollectionChangedAction.Add
+            //    || e.Action == NotifyCollectionChangedAction.Replace)
+            //{
+            //    var allAliases = _noGroupPropertyTypes.Concat(PropertyGroups.SelectMany(x => x.PropertyTypes)).Select(x => x.Alias);
+            //    if (allAliases.HasDuplicates(false))
+            //    {
+            //        var newAliases = string.Join(", ", e.NewItems.Cast<PropertyType>().Select(x => x.Alias));
+            //        throw new InvalidOperationException($"Other property types already exist with the aliases: {newAliases}");
+            //    }   
+            //}
+
             OnPropertyChanged(nameof(PropertyTypes));
         }
 
@@ -210,9 +225,7 @@ namespace Umbraco.Core.Models
             return Variations.ValidateVariation(culture, segment, false, true, false);
         }
 
-        /// <summary>
-        /// List of PropertyGroups available on this ContentType
-        /// </summary>
+        /// <inheritdoc />
         /// <remarks>
         /// <para>A PropertyGroup corresponds to a Tab in the UI</para>
         /// <para>Marked DoNotClone because we will manually deal with cloning and the event handlers</para>
@@ -230,9 +243,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets all property types, across all property groups.
-        /// </summary>
+        /// <inheritdoc />
         [IgnoreDataMember]
         [DoNotClone]
         public IEnumerable<PropertyType> PropertyTypes
@@ -243,12 +254,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets or sets the property types that are not in a group.
-        /// </summary>
-        /// <remarks>
-        /// Marked DoNotClone because we will manually deal with cloning and the event handlers
-        /// </remarks>
+        /// <inheritdoc />
         [DoNotClone]
         public IEnumerable<PropertyType> NoGroupPropertyTypes
         {
@@ -256,7 +262,10 @@ namespace Umbraco.Core.Models
             set
             {
                 if (_noGroupPropertyTypes != null)
-                    _noGroupPropertyTypes.CollectionChanged -= PropertyTypesChanged;
+                {
+                    _noGroupPropertyTypes.ClearCollectionChangedEvents();
+                }
+
                 _noGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, value);
                 _noGroupPropertyTypes.CollectionChanged += PropertyTypesChanged;
                 PropertyTypesChanged(_noGroupPropertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -288,21 +297,19 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if a PropertyType with the passed in alias exists, otherwise <c>False</c></returns>
         public abstract bool PropertyTypeExists(string propertyTypeAlias);
 
-        /// <summary>
-        /// Adds a PropertyGroup.
-        /// This method will also check if a group already exists with the same name and link it to the parent.
-        /// </summary>
-        /// <param name="groupName">Name of the PropertyGroup to add</param>
-        /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
+        /// <inheritdoc />
+        [Obsolete("Use AddPropertyGroup(name, alias) instead to explicitly set the alias.")]
         public abstract bool AddPropertyGroup(string groupName);
 
-        /// <summary>
-        /// Adds a PropertyType to a specific PropertyGroup
-        /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
-        /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
-        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
+        /// <inheritdoc />
+        public abstract bool AddPropertyGroup(string alias, string name);
+
+        /// <inheritdoc />
+        [Obsolete("Use AddPropertyType(propertyType, groupAlias, groupName) instead to explicitly set the alias of the group (note the slighty different parameter order).")]
         public abstract bool AddPropertyType(PropertyType propertyType, string propertyGroupName);
+
+        /// <inheritdoc />
+        public abstract bool AddPropertyType(PropertyType propertyType, string groupAlias, string groupName);
 
         /// <summary>
         /// Adds a PropertyType, which does not belong to a PropertyGroup.
@@ -330,18 +337,20 @@ namespace Umbraco.Core.Models
         /// "generic properties" ie does not have a tab anymore.</remarks>
         public bool MovePropertyType(string propertyTypeAlias, string propertyGroupName)
         {
-            // note: not dealing with alias casing at all here?
-
             // get property, ensure it exists
             var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
             if (propertyType == null) return false;
 
             // get new group, if required, and ensure it exists
-            var newPropertyGroup = propertyGroupName == null
-                ? null
-                : PropertyGroups.FirstOrDefault(x => x.Name == propertyGroupName);
-            if (propertyGroupName != null && newPropertyGroup == null) return false;
+            PropertyGroup newPropertyGroup = null;
+            if (propertyGroupName != null)
+            {
+                var index = PropertyGroups.IndexOfKey(propertyGroupName);
+                if (index == -1) return false;
 
+                newPropertyGroup = PropertyGroups[index];
+            }
+            
             // get old group
             var oldPropertyGroup = PropertyGroups.FirstOrDefault(x =>
                 x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
@@ -394,18 +403,21 @@ namespace Umbraco.Core.Models
         public void RemovePropertyGroup(string propertyGroupName)
         {
             // if no group exists with that name, do nothing
-            var group = PropertyGroups[propertyGroupName];
-            if (group == null) return;
+            var index = PropertyGroups.IndexOfKey(propertyGroupName);
+            if (index == -1) return;
 
-            // re-assign the group's properties to no group
+            var group = PropertyGroups[index];
+
+            // first remove the group
+            PropertyGroups.Remove(group);
+
+            // Then re-assign the group's properties to no group
             foreach (var property in group.PropertyTypes)
             {
                 property.PropertyGroupId = null;
                 _noGroupPropertyTypes.Add(property);
             }
 
-            // actually remove the group
-            PropertyGroups.RemoveItem(propertyGroupName);
             OnPropertyChanged(nameof(PropertyGroups));
         }
 
@@ -473,14 +485,14 @@ namespace Umbraco.Core.Models
                 // its ignored from the auto-clone process because its return values are unions, not raw and
                 // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
 
-                clonedEntity._noGroupPropertyTypes.CollectionChanged -= PropertyTypesChanged;                    //clear this event handler if any
+                clonedEntity._noGroupPropertyTypes.ClearCollectionChangedEvents();                    //clear this event handler if any
                 clonedEntity._noGroupPropertyTypes = (PropertyTypeCollection) _noGroupPropertyTypes.DeepClone(); //manually deep clone
                 clonedEntity._noGroupPropertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;              //re-assign correct event handler
             }
 
             if (clonedEntity._propertyGroups != null)
             {
-                clonedEntity._propertyGroups.CollectionChanged -= PropertyGroupsChanged;              //clear this event handler if any
+                clonedEntity._propertyGroups.ClearCollectionChangedEvents();              //clear this event handler if any
                 clonedEntity._propertyGroups = (PropertyGroupCollection) _propertyGroups.DeepClone(); //manually deep clone
                 clonedEntity._propertyGroups.CollectionChanged += clonedEntity.PropertyGroupsChanged;        //re-assign correct event handler
             }

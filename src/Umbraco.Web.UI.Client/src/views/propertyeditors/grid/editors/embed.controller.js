@@ -3,8 +3,12 @@ angular.module("umbraco")
     function ($scope, $timeout, $sce, editorService) {
 
         function onInit() {
-            $scope.trustedValue = null;
-            $scope.trustedValue = $sce.trustAsHtml($scope.control.value);
+
+            $scope.control.icon = $scope.control.icon || 'icon-movie-alt';
+
+            var embedPreview = Utilities.isObject($scope.control.value) && $scope.control.value.preview ? $scope.control.value.preview : $scope.control.value;
+
+            $scope.trustedValue = embedPreview ? $sce.trustAsHtml(embedPreview) : null;
 
             if(!$scope.control.value) {
                 $timeout(function(){
@@ -15,11 +19,26 @@ angular.module("umbraco")
             }
         }
 
-    	$scope.setEmbed = function(){
+        $scope.setEmbed = function () {
+
+            var modify = Utilities.isObject($scope.control.value) ? $scope.control.value : null;
+
             var embed = {
-                submit: function(model) {
-                    $scope.control.value = model.embed.preview;
-                    $scope.trustedValue = $sce.trustAsHtml(model.embed.preview);
+                modify: modify,
+                submit: function (model) {
+
+                    var embed = {
+                        constrain: model.embed.constrain,
+                        height: model.embed.height,
+                        width: model.embed.width,
+                        url: model.embed.url,
+                        info: model.embed.info,
+                        preview: model.embed.preview
+                    };
+
+                    $scope.control.value = embed;
+                    $scope.trustedValue = $sce.trustAsHtml(embed.preview);
+
                     editorService.close();
                 },
                 close: function() {

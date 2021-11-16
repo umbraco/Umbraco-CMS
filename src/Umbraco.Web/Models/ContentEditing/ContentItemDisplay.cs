@@ -108,6 +108,12 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "treeNodeUrl")]
         public string TreeNodeUrl { get; set; }
 
+        [DataMember(Name = "contentTypeId")]
+        public int ContentTypeId { get; set; }
+
+        [DataMember(Name = "contentTypeKey")]
+        public Guid ContentTypeKey { get; set; }
+
         [DataMember(Name = "contentTypeAlias", IsRequired = true)]
         [Required(AllowEmptyStrings = false)]
         public string ContentTypeAlias { get; set; }

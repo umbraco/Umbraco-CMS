@@ -28,7 +28,7 @@ namespace Umbraco.Web.PropertyEditors
             Layouts = new[]
             {
                 new Layout { Name = "List", Icon = "icon-list", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/list/list.html" },
-                new Layout { Name = "grid", Icon = "icon-thumbnails-small", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/grid/grid.html" }
+                new Layout { Name = "Grid", Icon = "icon-thumbnails-small", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/grid/grid.html" }
             };
 
             IncludeProperties = new []
@@ -60,8 +60,17 @@ namespace Umbraco.Web.PropertyEditors
             Description = "The bulk actions that are allowed from the list view")]
         public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // TODO: managing defaults?
 
+        [ConfigurationField("icon", "Content app icon", "views/propertyeditors/listview/icon.prevalues.html", Description = "The icon of the listview content app")]
+        public string Icon { get; set; }
+
         [ConfigurationField("tabName", "Content app name", "textstring", Description = "The name of the listview content app (default if empty: 'Child Items')")]
         public string TabName { get; set; }
+
+        [ConfigurationField("showContentFirst", "Show Content App First", "boolean", Description = "Enable this to show the content app by default instead of the list view app")]
+        public bool ShowContentFirst { get; set; }
+
+        [ConfigurationField("useInfiniteEditor", "Edit in Infinite Editor", "boolean", Description = "Enable this to use infinite editing to edit the content of the list view")]
+        public bool UseInfiniteEditor { get; set; }
 
         public class Property
         {
@@ -70,6 +79,9 @@ namespace Umbraco.Web.PropertyEditors
 
             [JsonProperty("header")]
             public string Header { get; set; }
+
+            [JsonProperty("nameTemplate")]
+            public string Template { get; set; }
 
             [JsonProperty("isSystem")]
             public int IsSystem { get; set; } // TODO: bool

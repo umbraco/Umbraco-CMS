@@ -23,29 +23,34 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
         }
 
-        public override bool IsConverter(PublishedPropertyType propertyType)
+        public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.ContentPicker);
 
-        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof (IPublishedContent);
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Elements;
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
 
-            var attemptConvertInt = source.TryConvertTo<int>();
-            if (attemptConvertInt.Success)
-                return attemptConvertInt.Result;
+            //Don't attempt to convert to int for UDI
+            if(!(source is string) || source is string strSource && !string.IsNullOrWhiteSpace(strSource) && !strSource.StartsWith("umb"))
+            {
+                 var attemptConvertInt = source.TryConvertTo<int>();
+                    if (attemptConvertInt.Success)
+                        return attemptConvertInt.Result;
+            }
+
             var attemptConvertUdi = source.TryConvertTo<Udi>();
             if (attemptConvertUdi.Success)
                 return attemptConvertUdi.Result;
             return null;
         }
 
-        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             if (inter == null)
                 return null;
@@ -65,7 +70,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     if (udi == null)
                         return null;
                     content = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(udi.Guid);
-                    if (content != null && content.ItemType == PublishedItemType.Content)
+                    if (content != null && content.ContentType.ItemType == PublishedItemType.Content)
                         return content;
                 }
             }
@@ -73,7 +78,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return inter;
         }
 
-        public override object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
+        public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             if (inter == null) return null;
             return inter.ToString();

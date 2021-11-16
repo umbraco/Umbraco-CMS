@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -7,12 +8,13 @@ namespace Umbraco.Core.Models.PublishedContent
     /// Provides a base class for <c>IPublishedProperty</c> implementations which converts and caches
     /// the value source to the actual value to use when rendering content.
     /// </summary>
+    [DebuggerDisplay("{Alias} ({PropertyType?.EditorAlias})")]
     internal abstract class PublishedPropertyBase : IPublishedProperty
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedPropertyBase"/> class.
         /// </summary>
-        protected PublishedPropertyBase(PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel)
+        protected PublishedPropertyBase(IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel)
         {
             PropertyType = propertyType ?? throw new ArgumentNullException(nameof(propertyType));
             ReferenceCacheLevel = referenceCacheLevel;
@@ -42,7 +44,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets the property type.
         /// </summary>
-        public PublishedPropertyType PropertyType { get; }
+        public IPublishedPropertyType PropertyType { get; }
 
         /// <summary>
         /// Gets the property reference cache level.

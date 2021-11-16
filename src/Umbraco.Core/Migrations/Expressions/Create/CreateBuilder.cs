@@ -83,17 +83,25 @@ namespace Umbraco.Core.Migrations.Expressions.Create
         }
 
         /// <inheritdoc />
-        public ICreateConstraintOnTableBuilder PrimaryKey()
+        public ICreateConstraintOnTableBuilder PrimaryKey() => PrimaryKey(true);
+
+        /// <inheritdoc />
+        public ICreateConstraintOnTableBuilder PrimaryKey(bool clustered)
         {
             var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey);
+            expression.Constraint.IsPrimaryKeyClustered = clustered;
             return new CreateConstraintBuilder(expression);
         }
 
         /// <inheritdoc />
-        public ICreateConstraintOnTableBuilder PrimaryKey(string primaryKeyName)
+        public ICreateConstraintOnTableBuilder PrimaryKey(string primaryKeyName) => PrimaryKey(primaryKeyName, true);
+
+        /// <inheritdoc />
+        public ICreateConstraintOnTableBuilder PrimaryKey(string primaryKeyName, bool clustered)
         {
             var expression = new CreateConstraintExpression(_context, ConstraintType.PrimaryKey);
             expression.Constraint.ConstraintName = primaryKeyName;
+            expression.Constraint.IsPrimaryKeyClustered = clustered;
             return new CreateConstraintBuilder(expression);
         }
 

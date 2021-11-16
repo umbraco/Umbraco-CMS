@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var field = _mapper.Map(SqlSyntax, m.Member.Name, true);
+                    var field = _mapper.Map(m.Member.Name);
                     if (field.IsNullOrWhiteSpace())
                         throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}.");
                     return field;
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.Querying
                 //don't execute if compiled
                 if (Visited == false)
                 {
-                    var field = _mapper.Map(SqlSyntax, m.Member.Name, true);
+                    var field = _mapper.Map(m.Member.Name);
                     if (field.IsNullOrWhiteSpace())
                         throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}.");
                     return field;
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Querying
                 if (Visited == false)
                 {
                     var subMapper = _mappers[m.Expression.Type]; // throws if not found
-                    var field = subMapper.Map(SqlSyntax, m.Member.Name, true);
+                    var field = subMapper.Map(m.Member.Name);
                     if (field.IsNullOrWhiteSpace())
                         throw new InvalidOperationException($"The mapper returned an empty field for the member name: {m.Member.Name} for type: {m.Expression.Type}");
                     return field;
@@ -85,6 +85,17 @@ namespace Umbraco.Core.Persistence.Querying
             // I'm just unsure right now due to time constraints how to make it correct. It won't matter right now and has been working already with this bug but I've
             // only just discovered what it is actually doing.
 
+            // TODO
+            // in most cases we want to convert the value to a plain object,
+            // but for in some rare cases, we may want to do it differently,
+            // for instance a Models.AuditType (an enum) may in some cases
+            // need to be converted to its string value.
+            // but - we cannot have specific code here, really - and how would
+            // we configure this? is it even possible?
+            /*
+            var toString = typeof(object).GetMethod("ToString");
+            var member = Expression.Call(m, toString);
+            */
             var member = Expression.Convert(m, typeof(object));
             var lambda = Expression.Lambda<Func<object>>(member);
             var getter = lambda.Compile();

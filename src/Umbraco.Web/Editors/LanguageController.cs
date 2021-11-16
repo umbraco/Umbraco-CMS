@@ -3,9 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
@@ -101,17 +99,28 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
 
             // this is prone to race conditions but the service will not let us proceed anyways
-            var existing = Services.LocalizationService.GetLanguageByIsoCode(language.IsoCode);
+            var existingByCulture = Services.LocalizationService.GetLanguageByIsoCode(language.IsoCode);
 
-            if (existing != null && language.Id != existing.Id)
+            // the localization service might return the generic language even when queried for specific ones (e.g. "da" when queried for "da-DK")
+            // - we need to handle that explicitly
+            if (existingByCulture?.IsoCode != language.IsoCode)
+            {
+                existingByCulture = null;
+            }
+
+            if (existingByCulture != null && language.Id != existingByCulture.Id)
             {
                 //someone is trying to create a language that already exist
                 ModelState.AddModelError("IsoCode", "The language " + language.IsoCode + " already exists");
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
-            if (existing == null)
+            var existingById = language.Id != default ? Services.LocalizationService.GetLanguageById(language.Id) : null;
+
+            if (existingById == null)
             {
+                //Creating a new lang...
+
                 CultureInfo culture;
                 try
                 {
@@ -136,38 +145,39 @@ namespace Umbraco.Web.Editors
                 return Mapper.Map<Language>(newLang);
             }
 
-            existing.IsMandatory = language.IsMandatory;
+            existingById.IsMandatory = language.IsMandatory;
 
             // note that the service will prevent the default language from being "un-defaulted"
             // but does not hurt to test here - though the UI should prevent it too
-            if (existing.IsDefault && !language.IsDefault)
+            if (existingById.IsDefault && !language.IsDefault)
             {
                 ModelState.AddModelError("IsDefault", "Cannot un-default the default language.");
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
-            existing.IsDefault = language.IsDefault;
-            existing.FallbackLanguageId = language.FallbackLanguageId;
+            existingById.IsDefault = language.IsDefault;
+            existingById.FallbackLanguageId = language.FallbackLanguageId;
+            existingById.IsoCode = language.IsoCode;
 
             // modifying an existing language can create a fallback, verify
             // note that the service will check again, dealing with race conditions
-            if (existing.FallbackLanguageId.HasValue)
+            if (existingById.FallbackLanguageId.HasValue)
             {
                 var languages = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);
-                if (!languages.ContainsKey(existing.FallbackLanguageId.Value))
+                if (!languages.ContainsKey(existingById.FallbackLanguageId.Value))
                 {
                     ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
                 }
-                if (CreatesCycle(existing, languages))
+                if (CreatesCycle(existingById, languages))
                 {
-                    ModelState.AddModelError("FallbackLanguage", $"The selected fall back language {languages[existing.FallbackLanguageId.Value].IsoCode} would create a circular path.");
+                    ModelState.AddModelError("FallbackLanguage", $"The selected fall back language {languages[existingById.FallbackLanguageId.Value].IsoCode} would create a circular path.");
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
                 }
             }
 
-            Services.LocalizationService.Save(existing);
-            return Mapper.Map<Language>(existing);
+            Services.LocalizationService.Save(existingById);
+            return Mapper.Map<Language>(existingById);
         }
 
         // see LocalizationService

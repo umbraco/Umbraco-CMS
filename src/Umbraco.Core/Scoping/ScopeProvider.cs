@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Runtime.Remoting.Messaging;
 using System.Web;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -22,13 +24,15 @@ namespace Umbraco.Core.Scoping
     internal class ScopeProvider : IScopeProvider, IScopeAccessor
     {
         private readonly ILogger _logger;
+        private readonly ICoreDebug _coreDebug;
         private readonly FileSystems _fileSystems;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ILogger logger)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, ILogger logger, ICoreDebug coreDebug)
         {
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
             _logger = logger;
+            _coreDebug = coreDebug;
 
             // take control of the FileSystems
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
@@ -117,7 +121,7 @@ namespace Umbraco.Core.Scoping
                 }
 
                 // hard to inject into a static method :(
-                Current.Logger.Warn<ScopeProvider>("Missed {TypeName} Object {ObjectKey}", typeof(T).Name, objectKey.ToString("N").Substring(0, 8));
+                Current.Logger.Warn<ScopeProvider, string, string>("Missed {TypeName} Object {ObjectKey}", typeof(T).Name, objectKey.ToString("N").Substring(0, 8));
 #if DEBUG_SCOPES
                 //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
@@ -240,6 +244,9 @@ namespace Umbraco.Core.Scoping
                 var value = GetHttpContextObject<ScopeContext>(ContextItemKey, false);
                 return value ?? GetCallContextObject<ScopeContext>(ContextItemKey);
             }
+
+            [Obsolete("This setter is not used and will be removed in future versions")]
+            [EditorBrowsable(EditorBrowsableState.Never)]
             set
             {
                 // clear both
@@ -323,7 +330,7 @@ namespace Umbraco.Core.Scoping
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null)
         {
-            return new Scope(this, _logger, _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
+            return new Scope(this, _logger, _fileSystems, true, null, _coreDebug, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
         }
 
         /// <inheritdoc />
@@ -379,13 +386,13 @@ namespace Umbraco.Core.Scoping
             {
                 var ambientContext = AmbientContext;
                 var newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _logger, _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
+                var scope = new Scope(this, _logger, _fileSystems, false, newContext, _coreDebug, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
                 // assign only if scope creation did not throw!
                 SetAmbient(scope, newContext ?? ambientContext);
                 return scope;
             }
 
-            var nested = new Scope(this, _logger, _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(this, _logger, _fileSystems, ambientScope, _coreDebug, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
             SetAmbient(nested, AmbientContext);
             return nested;
         }

@@ -6,7 +6,7 @@ var gulp = require('gulp');
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
-gulp.task('views', function () {
+function views() {
 
     var stream = new MergeStream();
 
@@ -22,4 +22,7 @@ gulp.task('views', function () {
     });
 
     return stream;
-});
+};
+
+module.exports = { views: views };
+

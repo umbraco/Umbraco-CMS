@@ -1,18 +1,17 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class DictionaryTranslationMapperTest
+    public class DictionaryTranslationMapperTest : MapperTestBase
     {
         [Test]
         public void Can_Map_Key_Property()
         {
 
             // Act
-            string column = new DictionaryTranslationMapper().Map(new SqlCeSyntaxProvider(), "Key");
+            string column = new DictionaryTranslationMapper(MockSqlContext(), CreateMaps()).Map("Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsLanguageText].[UniqueId]"));
@@ -23,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryTranslationMapper().Map(new SqlCeSyntaxProvider(), "Language");
+            string column = new DictionaryTranslationMapper(MockSqlContext(), CreateMaps()).Map("Language");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsLanguageText].[languageId]"));
@@ -34,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DictionaryTranslationMapper().Map(new SqlCeSyntaxProvider(), "Value");
+            string column = new DictionaryTranslationMapper(MockSqlContext(), CreateMaps()).Map("Value");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsLanguageText].[value]"));

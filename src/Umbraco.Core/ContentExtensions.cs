@@ -7,11 +7,13 @@ using System.Web;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NPoco.Expressions;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
@@ -22,6 +24,8 @@ namespace Umbraco.Core
         // this ain't pretty
         private static IMediaFileSystem _mediaFileSystem;
         private static IMediaFileSystem MediaFileSystem => _mediaFileSystem ?? (_mediaFileSystem = Current.MediaFileSystem);
+        private static readonly PropertyEditorCollection _propertyEditors;
+        private static PropertyEditorCollection PropertyEditors = _propertyEditors ?? (_propertyEditors = Current.PropertyEditors);
 
         #region IContent
 
@@ -52,9 +56,22 @@ namespace Umbraco.Core
             return ContentStatus.Unpublished;
         }
 
-        
-        
+
+
         #endregion
+
+        internal static bool IsMoving(this IContentBase entity)
+        {
+            // Check if this entity is being moved as a descendant as part of a bulk moving operations.
+            // When this occurs, only Path + Level + UpdateDate are being changed. In this case we can bypass a lot of the below
+            // operations which will make this whole operation go much faster. When moving we don't need to create
+            // new versions, etc... because we cannot roll this operation back anyways. 
+            var isMoving = entity.IsPropertyDirty(nameof(entity.Path))
+                           && entity.IsPropertyDirty(nameof(entity.Level))
+                           && entity.IsPropertyDirty(nameof(entity.UpdateDate));
+
+            return isMoving;
+        }
 
         /// <summary>
         /// Removes characters that are not valid XML characters from all entity properties
@@ -103,6 +120,15 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Returns all properties based on the editorAlias
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="editorAlias"></param>
+        /// <returns></returns>
+        public static IEnumerable<Property> GetPropertiesByEditor(this IContentBase content, string editorAlias)
+            => content.Properties.Where(x => x.PropertyType.PropertyEditorAlias == editorAlias);
+
+        /// <summary>
         /// Returns properties that do not belong to a group
         /// </summary>
         /// <param name="content"></param>
@@ -134,9 +160,14 @@ namespace Umbraco.Core
         /// <summary>
         /// Sets the posted file value of a property.
         /// </summary>
-        /// <remarks>This really is for FileUpload fields only, and should be obsoleted. For anything else,
-        /// you need to store the file by yourself using Store and then figure out
-        /// how to deal with auto-fill properties (if any) and thumbnails (if any) by yourself.</remarks>
+        public static void SetValue(this IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, HttpPostedFileBase postedFile, string culture = null, string segment = null)
+        {
+            content.SetValue(contentTypeBaseServiceProvider, propertyTypeAlias, postedFile.FileName, postedFile.InputStream, culture, segment);
+        }
+
+        /// <summary>
+        /// Sets the posted file value of a property.
+        /// </summary>
         public static void SetValue(this IContentBase content, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
             if (filename == null || filestream == null) return;
@@ -156,14 +187,12 @@ namespace Umbraco.Core
             // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
             // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
             string oldpath = null;
-            if (property.GetValue(culture, segment) is string svalue)
+            var value = property.GetValue(culture, segment);
+
+            if (PropertyEditors.TryGet(propertyTypeAlias, out var editor)
+                && editor is IDataEditorWithMediaPath dataEditor)
             {
-                if (svalue.DetectIsJson())
-                {
-                    // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
-                    var jObject = JsonConvert.DeserializeObject<JObject>(svalue);
-                    svalue = jObject != null ? jObject.GetValueAsString("src") : svalue;
-                }
+                var svalue = dataEditor.GetMediaPath(value);
                 oldpath = MediaFileSystem.GetRelativePath(svalue);
             }
 

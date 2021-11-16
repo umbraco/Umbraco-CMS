@@ -1,17 +1,17 @@
 (function () {
     "use strict";
 
-    function ListViewListLayoutController($scope, listViewHelper, $location, mediaHelper, mediaTypeHelper) {
+    function ListViewListLayoutController($scope, listViewHelper, mediaHelper, mediaTypeHelper, urlHelper) {
 
         var vm = this;
         var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
 
         vm.nodeId = $scope.contentId;
 
-        // Use whitelist of allowed file types if provided
+        // Use list of allowed file types if provided
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
         if (vm.acceptedFileTypes === '') {
-            // If not provided, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
+            // If not provided, we pass in a disallowed list by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
             vm.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
         }
 
@@ -40,8 +40,8 @@
             }
         }
 
-        function selectAll($event) {
-            listViewHelper.selectAllItems($scope.items, $scope.selection, $event);
+        function selectAll() {
+            listViewHelper.selectAllItemsToggle($scope.items, $scope.selection);
         }
 
         function isSelectedAll() {
@@ -53,9 +53,8 @@
         }
 
         function clickItem(item) {
-            // if item.id is 2147483647 (int.MaxValue) use item.key
-            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + (item.id === 2147483647 ? item.key : item.id));
-                }
+            listViewHelper.editItem(item, $scope);
+        }
 
         function isSortDirection(col, direction) {
             return listViewHelper.setSortingDirection(col, direction, $scope.options);
@@ -87,23 +86,18 @@
         }
 
         function markAsSensitive() {
-            angular.forEach($scope.options.includeProperties, function (option) {
+            $scope.options.includeProperties.forEach(function (option) {
                 option.isSensitive = false;
 
-                angular.forEach($scope.items,
-                    function (item) {
-
-                        angular.forEach(item.properties,
-                            function (property) {
-
-                                if (option.alias === property.alias) {
-                                    option.isSensitive = property.isSensitive;
-                                }
-
-                            });
-
+                if ($scope.items && $scope.items.length) {
+                    $scope.items.forEach(function (item) {
+                        item.properties.forEach(function (property) {
+                            if (option.alias === property.alias) {
+                                option.isSensitive = property.isSensitive;
+                            }
+                         });
                     });
-
+                }
             });
         }
 

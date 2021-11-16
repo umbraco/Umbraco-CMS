@@ -12,6 +12,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
 
@@ -124,31 +125,94 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                return RequiresExecution(null)
-              //the user UI
-                ? "user"
-              //the continue install UI
-              : "continueinstall";
+                return ShowView()
+                    // the user UI
+                    ? "user"
+                    // continue install UI
+                    : "continueinstall";
             }
+        }
+
+        private InstallState GetInstallState()
+        {
+            var installState = InstallState.Unknown;
+
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
+
+            var hasVersion = !_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace();
+            if (hasVersion)
+            {
+                installState = InstallState.HasVersion;
+            }
+
+            var hasConnString = databaseSettings != null && _databaseBuilder.IsDatabaseConfigured;
+            if (hasConnString)
+            {
+                installState = (installState | InstallState.HasConnectionString) & ~InstallState.Unknown;
+            }
+
+            var connStringConfigured = hasConnString ? _databaseBuilder.IsConnectionStringConfigured(databaseSettings) : false;
+            if (connStringConfigured)
+            {
+                installState = (installState | InstallState.ConnectionStringConfigured) & ~InstallState.Unknown;
+            }
+
+            var canConnect = connStringConfigured ? DbConnectionExtensions.IsConnectionAvailable(databaseSettings.ConnectionString, databaseSettings.ProviderName) : false;
+            if (canConnect)
+            {
+                installState = (installState | InstallState.CanConnect) & ~InstallState.Unknown;
+            }
+
+            var umbracoInstalled = canConnect ? _databaseBuilder.IsUmbracoInstalled() : false;
+            if (umbracoInstalled)
+            {
+                installState = (installState | InstallState.UmbracoInstalled) & ~InstallState.Unknown;
+            }
+
+            var hasNonDefaultUser = umbracoInstalled ? _databaseBuilder.HasSomeNonDefaultUser() : false;
+            if (hasNonDefaultUser)
+            {
+                installState = (installState | InstallState.HasNonDefaultUser) & ~InstallState.Unknown;
+            }
+
+            return installState;
+        }
+
+        private bool ShowView()
+        {
+            var installState = GetInstallState();
+
+            return installState.HasFlag(InstallState.Unknown)
+                || !installState.HasFlag(InstallState.UmbracoInstalled);
         }
 
         public override bool RequiresExecution(UserModel model)
         {
-            //now we have to check if this is really a new install, the db might be configured and might contain data
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
+            var installState = GetInstallState();
 
-            //if there's already a version then there should def be a user but in some cases someone may have
-            // left a version number in there but cleared out their db conn string, in that case, it's really a new install.
-            if (_globalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false && databaseSettings != null) return false;
+            if (installState.HasFlag(InstallState.Unknown))
+            {
+                // In this one case when it's a brand new install and nothing has been configured, make sure the
+                // back office cookie is cleared so there's no old cookies lying around causing problems
+                _http.ExpireCookie(Current.Configs.Settings().Security.AuthCookieName);
+            }
 
-            if (_databaseBuilder.IsConnectionStringConfigured(databaseSettings) && _databaseBuilder.IsDatabaseConfigured)
-                return _databaseBuilder.HasSomeNonDefaultUser() == false;
+            return installState.HasFlag(InstallState.Unknown)
+                || !installState.HasFlag(InstallState.HasNonDefaultUser);
+        }
 
-            // In this one case when it's a brand new install and nothing has been configured, make sure the
-            // back office cookie is cleared so there's no old cookies lying around causing problems
-            _http.ExpireCookie(Current.Configs.Settings().Security.AuthCookieName);
-
-                return true;
+        [Flags]
+        private enum InstallState : short
+        {
+            // This is an easy way to avoid 0 enum assignment and not worry about
+            // manual calcs. https://www.codeproject.com/Articles/396851/Ending-the-Great-Debate-on-Enum-Flags
+            Unknown = 1,
+            HasVersion = 1 << 1,
+            HasConnectionString = 1 << 2,
+            ConnectionStringConfigured = 1 << 3,
+            CanConnect = 1 << 4,
+            UmbracoInstalled = 1 << 5,
+            HasNonDefaultUser = 1 << 6
         }
     }
 }

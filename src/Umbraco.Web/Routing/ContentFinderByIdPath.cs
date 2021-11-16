@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Logging;
+using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -25,9 +25,9 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public bool TryFindContent(PublishedRequest frequest)
         {
@@ -49,8 +49,8 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-                    _logger.Debug<ContentFinderByIdPath>("Id={NodeId}", nodeId);
-                    node = frequest.UmbracoContext.ContentCache.GetById(nodeId);
+                    _logger.Debug<ContentFinderByIdPath,int>("Id={NodeId}", nodeId);
+                    node = frequest.UmbracoContext.Content.GetById(nodeId);
 
                     if (node != null)
                     {
@@ -62,7 +62,7 @@ namespace Umbraco.Web.Routing
                         }
 
                         frequest.PublishedContent = node;
-                        _logger.Debug<ContentFinderByIdPath>("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
+                        _logger.Debug<ContentFinderByIdPath,int>("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
                     }
                     else
                     {

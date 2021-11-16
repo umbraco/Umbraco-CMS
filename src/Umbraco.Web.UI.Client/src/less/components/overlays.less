@@ -2,9 +2,14 @@
     position: fixed;
     overflow: hidden;
     background: @white;
-    z-index: @zindexUmbOverlay;
+    z-index: 7501;
     animation: fadeIn 0.2s;
     box-shadow: 0 10px 50px rgba(0,0,0,0.1), 0 6px 20px rgba(0,0,0,0.16);
+    text-align: left;
+
+    .scoped-view{
+        display: none;
+    }
 }
 
 .umb-overlay__form {
@@ -15,61 +20,81 @@
 }
 
 .umb-overlay .umb-overlay-header {
-    //background: @gray-10;
-    border-bottom: 1px solid @purple-l3;
-    //background: @blueExtraDark;
-    //color:@u-white;
-    padding: 10px;
+    border-bottom: 1px solid @gray-9;
     margin-top: 0;
     flex-grow: 0;
     flex-shrink: 0;
+    padding: 30px 30px 0;
 }
 
+.umb-overlay__section-header {
+    width: 100%;
+    margin-top:30px;
+    margin-bottom: 20px;
 
-.umb-overlay .umb-overlay__title {
-    font-size: @fontSizeLarge;
+    h5 {
+        display: inline;
+        font-size: 16px;
+        line-height: 16px;
+        font-weight: bold;
+    }
+
+    button {
+        display: inline;
+        float: right;
+        background-color: transparent;
+        border:none;
+        &:hover {
+            color: @ui-option-type-hover;
+        }
+    }
+}
+
+.umb-overlay__title {
+    font-size: 16px;
     color: @black;
+    line-height: 16px;
     font-weight: bold;
-    margin: 7px 0;
+    margin: 5px 0;
 }
 
-.umb-overlay .umb-overlay__subtitle {
+.umb-overlay__subtitle {
     font-size: @fontSizeSmall;
     color: @gray-3;
     margin: 0;
 }
 
-.umb-overlay .umb-overlay-container {
+.umb-overlay-container {
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: auto;
-    overflow-y: auto;
-    overflow-x: hidden;
     position: relative;
-    height: auto;
+    padding: 20px 30px;
+    background: @white;
+    max-height: calc(100vh - 170px);
+    overflow-y: auto;
 }
 
-.umb-overlay .umb-overlay-drawer {
+.umb-overlay-drawer {
     flex-grow: 0;
     flex-shrink: 0;
-    flex-basis: 31px;
-    padding: 10px 20px;
+    flex-basis: 33px;
+    padding: 8px 20px;
     margin: 0;
-
-    background: @gray-10;
-    border-top: 1px solid @purple-l3;
+    background: @white;
+    border-top: 1px solid @gray-9;
 }
 
-.umb-overlay .umb-overlay-drawer.-auto-height {
+.umb-overlay-drawer.-auto-height {
     flex-basis: auto;
 }
 
-.umb-overlay .umb-overlay-drawer .umb-overlay-drawer__align-right {
+.umb-overlay-drawer .umb-overlay-drawer__align-right {
     display: flex;
     justify-content: flex-end;
 }
 
-.umb-overlay .umb-overlay-drawer .umb-overlay-drawer-content .dropdown-menu {
+.umb-overlay-drawer .umb-overlay-drawer-content .dropdown-menu {
     right: 0;
     left: auto;
 }
@@ -81,7 +106,6 @@
     height: auto;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, 0);
     transform: translate(-50%, -50%);
     border-radius: @baseBorderRadius;
 }
@@ -89,46 +113,40 @@
 .umb-overlay.umb-overlay-center .umb-overlay-header {
     border: none;
     background: transparent;
-    padding: 20px 20px 0 20px;
-}
-
-.umb-overlay.umb-overlay-center .umb-overlay__form {
-    max-height: 80vh;
-}
-
-.umb-overlay.umb-overlay-center .umb-overlay-container {
-    padding: 20px;
+    padding: 30px 30px 0;
 }
 
 .umb-overlay.umb-overlay-center .umb-overlay-drawer {
     border: none;
     background: transparent;
-    padding: 0 20px 20px 20px;
+    padding: 0 30px 20px;
 }
 
 /* ---------- OVERLAY TARGET ---------- */
 .umb-overlay.umb-overlay-target {
     width: 400px;
-    height: 400px;
+    max-height: 100vh;
     box-sizing: border-box;
+    visibility: hidden;
     border-radius: @baseBorderRadius;
+
+    &.umb-overlay--small {
+        width: 420px;
+    }
+
+    &.umb-overlay--medium {
+        width: 520px;
+    }
 }
 
 .umb-overlay.umb-overlay-target .umb-overlay-header {
     border: none;
     background: transparent;
-    padding: 20px 20px 0 20px;
-    text-align: center;
-}
-
-.umb-overlay.umb-overlay-target .umb-overlay-container {
-    padding: 20px;
 }
 
 .umb-overlay.umb-overlay-target .umb-overlay-drawer {
     border: none;
     background: transparent;
-    padding: 0 20px 20px 20px;
 }
 
 /* ---------- OVERLAY RIGHT ---------- */
@@ -139,16 +157,15 @@
     bottom: 0;
     border: none;
     box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
+    
+    .umb-drawer-is-visible & {
+        right:400px;
+    }
 }
 
 .umb-overlay.umb-overlay-right .umb-overlay-header {
-    flex-basis: 100px;
-    padding: 20px;
+    flex-basis: 70px;
     box-sizing: border-box;
-}
-
-.umb-overlay.umb-overlay-right .umb-overlay-container {
-    padding: 20px;
 }
 
 // reset the top position to 0 because we are in a asbolute container and want to 
@@ -175,12 +192,8 @@
 
 .umb-overlay.umb-overlay-left .umb-overlay-header {
     flex-basis: 100px;
-    padding: 20px;
+    padding: 30px 30px 0;
     box-sizing: border-box;
-}
-
-.umb-overlay.umb-overlay-left .umb-overlay-container {
-    padding: 20px;
 }
 
 @media (max-width: 767px) {
@@ -223,12 +236,12 @@
 }
 
 .umb-overlay__item-details-title {
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0;
+    font-size: 15px;
 }
 
 .umb-overlay__item-details-description {
-    margin-top: 10px;
+    margin: 10px 0 0;
     font-size: 12px;
 }
 
@@ -249,4 +262,15 @@
 .umb-overlay .form-horizontal .controls,
 .form-horizontal .umb-overlay .controls {
     margin-left: 0 !important;
+}
+
+.umb-overlay .text-error {
+    color: @formErrorText;
+}
+.umb-overlay .text-warning {
+    color: @formWarningText;
+}
+
+.umb-overlay .text-success {
+    color: @formSuccessText;
 }

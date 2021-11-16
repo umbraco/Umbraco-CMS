@@ -15,6 +15,6 @@ var app = angular.module('umbraco', [
     //'ngMessages',
     'tmh.dynamicLocale',
     //'ngFileUpload',
-    //'LocalStorageModule',
+    'LocalStorageModule'
     //'chart.js'
 ]);

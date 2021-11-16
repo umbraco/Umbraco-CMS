@@ -26,6 +26,8 @@ namespace Umbraco.Core
                 public const string Content = TableNamePrefix + "Content";
                 public const string ContentVersion = TableNamePrefix + "ContentVersion";
                 public const string ContentVersionCultureVariation = TableNamePrefix + "ContentVersionCultureVariation";
+                public const string ContentVersionCleanupPolicy = TableNamePrefix + "ContentVersionCleanupPolicy";
+
                 public const string Document = TableNamePrefix + "Document";
                 public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
                 public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
@@ -57,7 +59,7 @@ namespace Umbraco.Core
                 public const string MacroProperty = /*TableNamePrefix*/ "cms" + "MacroProperty";
 
                 public const string Member = /*TableNamePrefix*/ "cms" + "Member";
-                public const string MemberType = /*TableNamePrefix*/ "cms" + "MemberType";
+                public const string MemberPropertyType = /*TableNamePrefix*/ "cms" + "MemberType";
                 public const string Member2MemberGroup = /*TableNamePrefix*/ "cms" + "Member2MemberGroup";
 
                 public const string Access = TableNamePrefix + "Access";
@@ -69,7 +71,7 @@ namespace Umbraco.Core
 
                 public const string Tag = /*TableNamePrefix*/ "cms" + "Tags";
                 public const string TagRelationship = /*TableNamePrefix*/ "cms" + "TagRelationship";
-                
+
                 public const string KeyValue = TableNamePrefix + "KeyValue";
 
                 public const string AuditEntry = TableNamePrefix + "Audit";

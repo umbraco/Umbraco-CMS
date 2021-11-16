@@ -16,15 +16,17 @@ function RelationTypeCreateController($scope, $location, relationTypeResource, n
     init();
 
     function init() {
-        relationTypeResource.getRelationObjectTypes().then(function (data) {
-            vm.objectTypes = data;
-        }, function (err) {
-            notificationsService.error("Could not load form.")
-        })
+        $scope.$emit("$changeTitle", "");
+        relationTypeResource.getRelationObjectTypes().then(function(data) {
+                vm.objectTypes = data;
+            },
+            function(err) {
+                notificationsService.error("Could not load form.");
+            });
     }
 
     function createRelationType() {
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createRelationTypeForm, statusMessage: "Creating relation type..." })) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: $scope.createRelationTypeForm, statusMessage: "Creating relation type..." })) {
             var node = $scope.currentNode;
 
             relationTypeResource.create(vm.relationType).then(function (data) {
@@ -34,11 +36,12 @@ function RelationTypeCreateController($scope, $location, relationTypeResource, n
                 var currentPath = node.path ? node.path : "-1";
                 navigationService.syncTree({ tree: "relationTypes", path: currentPath + "," + data, forceReload: true, activate: true });
 
-                formHelper.resetForm({ scope: $scope });
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createRelationTypeForm });
 
                 var currentSection = appState.getSectionState("currentSection");
                 $location.path("/" + currentSection + "/relationTypes/edit/" + data);
             }, function (err) {
+                formHelper.resetForm({ scope: $scope, formCtrl: $scope.createRelationTypeForm, hasErrors: true });
                 if (err.data && err.data.message) {
                     notificationsService.error(err.data.message);
                     navigationService.hideMenu();
@@ -46,6 +49,10 @@ function RelationTypeCreateController($scope, $location, relationTypeResource, n
             });
         }
     }
+
+    $scope.close = function () {
+        navigationService.hideDialog(true);
+    };
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.RelationTypes.CreateController", RelationTypeCreateController);

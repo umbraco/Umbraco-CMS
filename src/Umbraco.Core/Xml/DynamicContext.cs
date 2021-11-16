@@ -236,7 +236,7 @@ namespace Umbraco.Core.Xml
                 _name = name;
                 _value = value;
 
-                if (value is String)
+                if (value is string)
                     _type = XPathResultType.String;
                 else if (value is bool)
                     _type = XPathResultType.Boolean;

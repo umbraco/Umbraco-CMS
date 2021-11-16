@@ -17,12 +17,12 @@
 
         <umb-empty-state ng-if="!items && options.filter.length > 0"
                          position="center">
-            <localize key="general_searchNoResult"></localize>
+            <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
         </umb-empty-state>
 
         <umb-empty-state ng-if="!items && options.filter.length == 0 && vm.isRecycleBin"
                          position="center">
-            <localize key="general_recycleBinEmpty"></localize>
+            <localize key="general_recycleBinEmpty">Your recycle bin is empty</localize>
         </umb-empty-state>
 
     </div>
@@ -52,7 +52,9 @@
         <umb-media-grid items="vm.itemsWithoutFolders"
                         on-details-hover="vm.hoverMediaItemDetails"
                         on-click="vm.selectItem"
-                        on-click-name="vm.goToItem">
+                        on-click-name="vm.goToItem"
+                        allow-open-folder="true"
+                        allow-open-file="true">
         </umb-media-grid>
 
         <umb-tooltip ng-if="vm.mediaDetailsTooltip.show"
@@ -67,12 +69,12 @@
 
         <umb-empty-state ng-if="vm.itemsWithoutFolders.length === 0 && folders.length === 0 && options.filter.length == 0 && vm.isRecycleBin"
                          position="center">
-            <localize key="general_recycleBinEmpty"></localize>
+            <localize key="general_recycleBinEmpty">Your recycle bin is empty</localize>
         </umb-empty-state>
 
         <umb-empty-state ng-if="vm.itemsWithoutFolders.length === 0 && folders.length === 0 && options.filter.length > 0"
                          position="center">
-            <localize key="general_searchNoResult"></localize>
+            <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
         </umb-empty-state>
 
     </div>

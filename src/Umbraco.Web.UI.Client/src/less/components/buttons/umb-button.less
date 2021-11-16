@@ -1,10 +1,7 @@
 .umb-button {
    position: relative;
    display: inline-block;
-}
-
- .umb-button__button:focus {
-   outline: none;
+   margin-left: 5px;
 }
 
 .umb-button__button {
@@ -34,6 +31,11 @@
    margin-left: 5px;
 }
 
+.umb-button__button[disabled] .umb-button__caret {
+    border-top-color: @gray-7;
+    border-bottom-color: @gray-7;
+}
+
 .umb-button__progress {
    position: absolute;
    left: 50%;
@@ -59,6 +61,11 @@
 .umb-button__progress.-white {
    border-color: rgba(255, 255, 255, 0.4);
    border-left-color: @white;
+}
+
+.umb-button__progress.-black {
+   border-color: rgba(255, 255, 255, 0.4);
+   border-left-color: @black;
 }
 
 .umb-button__success,

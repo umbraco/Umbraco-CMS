@@ -35,6 +35,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 using Umbraco.Web.Actions;
 
 namespace Umbraco.Tests.Web.Controllers
@@ -77,6 +78,19 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = new Mock<IEntityService>();
             entityService.Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, It.IsAny<int[]>()))
                 .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = $"-1,{x}", Id = x }).ToList());
+            entityService.Setup(x => x.GetKey(It.IsAny<int>(), UmbracoObjectTypes.DataType))
+                .Returns((int id, UmbracoObjectTypes objType) =>
+                {
+                    switch (id)
+                    {
+                        case Constants.DataTypes.Textbox:
+                            return Attempt.Succeed(Constants.DataTypes.Guids.TextstringGuid);
+                        case Constants.DataTypes.RichtextEditor:
+                            return Attempt.Succeed(Constants.DataTypes.Guids.RichtextEditorGuid);
+                    }
+                    return Attempt.Fail<Guid>();
+                });
+
 
             var dataTypeService = new Mock<IDataTypeService>();
             dataTypeService.Setup(service => service.GetDataType(It.IsAny<int>()))
@@ -255,7 +269,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -288,7 +303,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -329,7 +345,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -375,7 +392,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -413,7 +431,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -457,7 +476,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -476,7 +496,7 @@ namespace Umbraco.Tests.Web.Controllers
             var display = JsonConvert.DeserializeObject<ContentItemDisplay>(response.Item2);
             Assert.AreEqual(2, display.Errors.Count());
             Assert.IsTrue(display.Errors.ContainsKey("Variants[0].Name"));
-            Assert.IsTrue(display.Errors.ContainsKey("_content_variant_en-US_"));
+            Assert.IsTrue(display.Errors.ContainsKey("_content_variant_en-US_null_"));
         }
 
         // TODO: There are SOOOOO many more tests we should write - a lot of them to do with validation

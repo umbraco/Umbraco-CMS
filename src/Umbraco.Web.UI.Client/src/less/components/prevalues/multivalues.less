@@ -1,12 +1,12 @@
 ﻿.umb-prevalues-multivalues {
-    width: 400px;
+    width: 425px;
     max-width: 100%;
 
     .umb-overlay & {
         width: 500px;
     }
 
-    p{
+    p {
         margin: 7px 0;
     }
 }
@@ -23,42 +23,45 @@
     align-items: center;
 }
 
-.umb-prevalues-multivalues__add  {
+.umb-prevalues-multivalues__add {
     display: flex;
-}
 
-.umb-prevalues-multivalues__add input {
-    width: 320px;
-}
+    input {
+        display: flex;
+        width: 320px;
+    }
 
-.umb-prevalues-multivalues__add input {
-    display: flex;
-}
-
-.umb-prevalues-multivalues__add button {
-    margin: 0 6px 0 0;
-    margin-left: auto;
+    button {
+        margin: 0 6px 0 0;
+        margin-left: auto;
+    }
 }
 
 .umb-prevalues-multivalues__listitem {
     display: flex;
     padding: 6px;
     margin: 10px 0px !important;
-    background: #F3F3F5;
-    cursor: move;
-}
+    background: @gray-10;
 
-.umb-prevalues-multivalues__listitem i {
-    display: flex;
-    align-items: center;
-    margin-right: 5px
-}
+    &.ui-sortable-handle,
+    .ui-sortable-handle,
+    .handle {
+        cursor: move;
+    }
 
-.umb-prevalues-multivalues__listitem a {
-    cursor: pointer;
-    margin-left: auto;
-}
+    .umb-icon,
+    i.icon {
+        display: flex;
+        align-self: center;
+        margin-right: 5px;
+    }
 
-.umb-prevalues-multivalues__listitem input {
-    width: 295px;
+    a {
+        cursor: pointer;
+        margin-left: auto;
+    }
+
+    input {
+        width: 295px;
+    }
 }

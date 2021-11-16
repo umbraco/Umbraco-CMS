@@ -6,6 +6,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Web.JavaScript;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.Controllers
@@ -35,6 +36,7 @@ namespace Umbraco.Web.Install.Controllers
         }
 
         [HttpGet]
+        [StatusCodeResult(System.Net.HttpStatusCode.ServiceUnavailable)]
         public ActionResult Index()
         {
             if (_runtime.Level == RuntimeLevel.Run)
@@ -59,11 +61,11 @@ namespace Umbraco.Web.Install.Controllers
                 }
             }
 
-            // gen the install base url
-            ViewBag.InstallApiBaseUrl = Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup");
+            // gen the install base URL
+            ViewData.SetInstallApiBaseUrl(Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup"));
 
             // get the base umbraco folder
-            ViewBag.UmbracoBaseFolder = IOHelper.ResolveUrl(SystemDirectories.Umbraco);
+            ViewData.SetUmbracoBaseFolder(IOHelper.ResolveUrl(SystemDirectories.Umbraco));
 
             _installHelper.InstallStatus(false, "");
 

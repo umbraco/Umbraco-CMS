@@ -1,12 +1,20 @@
+@checkboxWidth: 15px;
+@checkboxHeight: 15px;
+
 .umb-checkbox-list {
   list-style: none;
   margin-left: 0;
+  margin-top: 6px;
 }
 
 .umb-checkbox-list__item {
   display: flex;
   align-items: center;
   margin-bottom: 2px;
+}
+
+.umb-checkbox-list li:first-child {
+    font-weight: bold;
 }
 
 .umb-checkbox-list__item:last-child {
@@ -29,11 +37,23 @@
   align-items: center;
   flex: 0 0 30px;
   margin-right: 5px;
+  position: relative;
 }
 
 .umb-checkbox-list__item-icon {
   margin-right: 5px;
   font-size: 16px;
+}
+
+.umb-checkbox-list__item-icon-wrapper {
+  position: relative;
+
+  .umb-button__progress {
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    margin-top: -8px;
+  }
 }
 
 .umb-checkbox-list__item-text {

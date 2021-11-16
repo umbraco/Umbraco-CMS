@@ -70,50 +70,128 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ValidateVariationTests()
         {
-            void Assert4A(ContentVariation v, string c, string s, bool xx)
-            {
-                Assert4B(v, c, s, xx, xx, xx, xx);
-            }
 
-            void Assert4B(ContentVariation v, string c, string s, bool ew, bool nn, bool en, bool nw)
-            {
-                Assert.AreEqual(ew, v.ValidateVariation(c, s, true, true, false));
-                Assert.AreEqual(nn, v.ValidateVariation(c, s, false, false, false));
-                Assert.AreEqual(en, v.ValidateVariation(c, s, true, false, false));
-                Assert.AreEqual(nw, v.ValidateVariation(c, s, false, true, false));
-            }
+            // All tests:
+            // 1. if exact is set to true: culture cannot be null when the ContentVariation.Culture flag is set
+            // 2. if wildcards is set to false: fail when "*" is passed in as either culture or segment.
+            // 3. ContentVariation flag is ignored when wildcards are used.
+            // 4. Empty string is considered the same as null            
 
-            // always support invariant,neutral
+            #region Nothing
+
             Assert4A(ContentVariation.Nothing, null, null, true);
-
-            // never support culture and/or segment
-            Assert4A(ContentVariation.Nothing, "culture", null, false);
+            Assert4A(ContentVariation.Nothing, null, "", true);
+            Assert4B(ContentVariation.Nothing, null, "*", true, false, false, true);
             Assert4A(ContentVariation.Nothing, null, "segment", false);
+            Assert4A(ContentVariation.Nothing, "", null, true);
+            Assert4A(ContentVariation.Nothing, "", "", true);
+            Assert4B(ContentVariation.Nothing, "", "*", true, false, false, true);
+            Assert4A(ContentVariation.Nothing, "", "segment", false);
+            Assert4B(ContentVariation.Nothing, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.Nothing, "*", "", true, false, false, true);
+            Assert4B(ContentVariation.Nothing, "*", "*", true, false, false, true);
+            Assert4A(ContentVariation.Nothing, "*", "segment", false);
+            Assert4A(ContentVariation.Nothing, "culture", null, false);
+            Assert4A(ContentVariation.Nothing, "culture", "", false);
+            Assert4A(ContentVariation.Nothing, "culture", "*", false);
             Assert4A(ContentVariation.Nothing, "culture", "segment", false);
 
-            // support '*' only when wildcards are supported
-            Assert4B(ContentVariation.Nothing, "*", null, true, false, false, true);
-            Assert4B(ContentVariation.Nothing, null, "*", true, false, false, true);
-            Assert4B(ContentVariation.Nothing, "*", "*", true, false, false, true);
+            #endregion
 
+            #region Culture
 
-            // support invariant if not exact
             Assert4B(ContentVariation.Culture, null, null, false, true, false, true);
-
-            // support invariant if not exact, '*' when wildcards are supported
-            Assert4B(ContentVariation.Culture, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.Culture, null, "", false, true, false, true);
             Assert4B(ContentVariation.Culture, null, "*", false, false, false, true);
-            Assert4B(ContentVariation.Culture, "*", "*", true, false, false, true);
-
-            // never support segment
             Assert4A(ContentVariation.Culture, null, "segment", false);
-            Assert4A(ContentVariation.Culture, "culture", "segment", false);
+            Assert4B(ContentVariation.Culture, "", null, false, true, false, true);
+            Assert4B(ContentVariation.Culture, "", "", false, true, false, true);
+            Assert4B(ContentVariation.Culture, "", "*", false, false, false, true);
+            Assert4A(ContentVariation.Culture, "", "segment", false);
+            Assert4B(ContentVariation.Culture, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.Culture, "*", "", true, false, false, true);
+            Assert4B(ContentVariation.Culture, "*", "*", true, false, false, true);
             Assert4A(ContentVariation.Culture, "*", "segment", false);
-
-            Assert4B(ContentVariation.Culture, null, "*", false, false, false, true);
+            Assert4A(ContentVariation.Culture, "culture", null, true);
+            Assert4A(ContentVariation.Culture, "culture", "", true);
             Assert4B(ContentVariation.Culture, "culture", "*", true, false, false, true);
+            Assert4A(ContentVariation.Culture, "culture", "segment", false);
 
-            // could do the same with .Segment, and .CultureAndSegment
+            #endregion
+
+            #region Segment
+
+            Assert4B(ContentVariation.Segment, null, null, true, true, true, true);
+            Assert4B(ContentVariation.Segment, null, "", true, true, true, true);
+            Assert4B(ContentVariation.Segment, null, "*", true, false, false, true);
+            Assert4A(ContentVariation.Segment, null, "segment", true);
+            Assert4B(ContentVariation.Segment, "", null, true, true, true, true);
+            Assert4B(ContentVariation.Segment, "", "", true, true, true, true);
+            Assert4B(ContentVariation.Segment, "", "*", true, false, false, true);
+            Assert4A(ContentVariation.Segment, "", "segment", true);
+            Assert4B(ContentVariation.Segment, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.Segment, "*", "", true, false, false, true);
+            Assert4B(ContentVariation.Segment, "*", "*", true, false, false, true);
+            Assert4B(ContentVariation.Segment, "*", "segment", true, false, false, true);
+            Assert4A(ContentVariation.Segment, "culture", null, false);
+            Assert4A(ContentVariation.Segment, "culture", "", false);
+            Assert4A(ContentVariation.Segment, "culture", "*", false);
+            Assert4A(ContentVariation.Segment, "culture", "segment", false);
+
+            #endregion
+
+            #region CultureAndSegment
+            
+            Assert4B(ContentVariation.CultureAndSegment, null, null, false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, null, "", false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, null, "*", false, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, null, "segment", false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "", null, false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "", "", false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "", "*", false, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "", "segment", false, true, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "*", null, true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "*", "", true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "*", "*", true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "*", "segment", true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "culture", null, true, true, true, true);
+            Assert4B(ContentVariation.CultureAndSegment, "culture", "", true, true, true, true);
+            Assert4B(ContentVariation.CultureAndSegment, "culture", "*", true, false, false, true);
+            Assert4B(ContentVariation.CultureAndSegment, "culture", "segment", true, true, true, true);
+
+            #endregion
+        }
+
+        /// <summary>
+        /// Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation(ContentVariation, string, string, bool, bool, bool)"/> 
+        /// </summary>
+        /// <param name="variation"></param>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <param name="exactAndWildcards">Validate using Exact + Wildcards flags</param>
+        /// <param name="nonExactAndNoWildcards">Validate using non Exact + no Wildcard flags</param>
+        /// <param name="exactAndNoWildcards">Validate using Exact + no Wildcard flags</param>
+        /// <param name="nonExactAndWildcards">Validate using non Exact + Wildcard flags</param>
+        private static void Assert4B(ContentVariation variation, string culture, string segment,
+            bool exactAndWildcards, bool nonExactAndNoWildcards, bool exactAndNoWildcards, bool nonExactAndWildcards)
+        {
+            Assert.AreEqual(exactAndWildcards, variation.ValidateVariation(culture, segment, true, true, false));
+            Assert.AreEqual(nonExactAndNoWildcards, variation.ValidateVariation(culture, segment, false, false, false));
+            Assert.AreEqual(exactAndNoWildcards, variation.ValidateVariation(culture, segment, true, false, false));
+            Assert.AreEqual(nonExactAndWildcards, variation.ValidateVariation(culture, segment, false, true, false));
+        }
+
+        /// <summary>
+        /// Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation(ContentVariation, string, string, bool, bool, bool)"/>
+        /// where expectedResult matches all combinations of Exact + Wildcard
+        /// </summary>
+        /// <param name="variation"></param>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <param name="expectedResult"></param>
+        private static void Assert4A(ContentVariation variation, string culture, string segment, bool expectedResult)
+        {
+            Assert4B(variation, culture, segment, expectedResult, expectedResult, expectedResult, expectedResult);
         }
 
         [Test]
@@ -275,7 +353,7 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
-            Assert.IsTrue(content.PublishCulture());
+            Assert.IsTrue(content.PublishCulture(CultureImpact.All));
             Assert.AreEqual("a", content.GetValue("prop"));
             Assert.AreEqual("a", content.GetValue("prop", published: true));
 
@@ -305,9 +383,9 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
-            Assert.IsFalse(content.PublishCulture(langFr)); // no name
+            Assert.IsFalse(content.PublishCulture(CultureImpact.Explicit(langFr, false))); // no name
             content.SetCultureName("name-fr", langFr);
-            Assert.IsTrue(content.PublishCulture(langFr));
+            Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false)));
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -321,7 +399,7 @@ namespace Umbraco.Tests.Models
             Assert.IsNull(content.GetValue("prop", langFr, published: true));
 
             // can publish all
-            Assert.IsTrue(content.PublishCulture("*"));
+            Assert.IsTrue(content.PublishCulture(CultureImpact.All));
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -331,14 +409,14 @@ namespace Umbraco.Tests.Models
             content.UnpublishCulture(langFr);
             Assert.AreEqual("c", content.GetValue("prop", langFr));
             Assert.IsNull(content.GetValue("prop", langFr, published: true));
-            content.PublishCulture(langFr);
+            Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false)));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
             Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
 
             content.UnpublishCulture(); // clears invariant props if any
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
-            content.PublishCulture(); // publishes invariant props if any
+            Assert.IsTrue(content.PublishCulture(CultureImpact.All)); // publishes invariant props if any
             Assert.IsNull(content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
 
@@ -364,7 +442,10 @@ namespace Umbraco.Tests.Models
         [Test]
         public void ContentPublishValuesWithMixedPropertyTypeVariations()
         {
-            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
+            var propertyValidationService = new PropertyValidationService(
+                Current.Factory.GetInstance<PropertyEditorCollection>(),
+                Current.Factory.GetInstance<ServiceContext>().DataTypeService,
+                Current.Factory.GetInstance<ServiceContext>().TextService);
             const string langFr = "fr-FR";
 
             // content type varies by Culture
@@ -384,15 +465,20 @@ namespace Umbraco.Tests.Models
 
             content.SetCultureName("hello", langFr);
 
-            Assert.IsTrue(content.PublishCulture(langFr)); // succeeds because names are ok (not validating properties here)
-            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop1 is mandatory
+            //for this test we'll make the french culture the default one - this is needed for publishing invariant property values
+            var langFrImpact = CultureImpact.Explicit(langFr, true);
+
+            Assert.IsTrue(content.PublishCulture(langFrImpact)); // succeeds because names are ok (not validating properties here)
+            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact));// fails because prop1 is mandatory
 
             content.SetValue("prop1", "a", langFr);
-            Assert.IsTrue(content.PublishCulture(langFr)); // succeeds because names are ok (not validating properties here)
-            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// fails because prop2 is mandatory and invariant
+            Assert.IsTrue(content.PublishCulture(langFrImpact)); // succeeds because names are ok (not validating properties here)
+            // fails because prop2 is mandatory and invariant and the item isn't published.
+            // Invariant is validated against the default language except when there isn't a published version, in that case it's always validated.
+            Assert.IsFalse(propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact));
             content.SetValue("prop2", "x");
-            Assert.IsTrue(content.PublishCulture(langFr)); // still ok...
-            Assert.IsTrue(propertyValidationService.IsPropertyDataValid(content, out _, langFr));// now it's ok
+            Assert.IsTrue(content.PublishCulture(langFrImpact)); // still ok...
+            Assert.IsTrue(propertyValidationService.IsPropertyDataValid(content, out _, langFrImpact));// now it's ok
 
             Assert.AreEqual("a", content.GetValue("prop1", langFr, published: true));
             Assert.AreEqual("x", content.GetValue("prop2", published: true));
@@ -423,12 +509,12 @@ namespace Umbraco.Tests.Models
             content.SetValue("prop", "a-es", langEs);
 
             // cannot publish without a name
-            Assert.IsFalse(content.PublishCulture(langFr));
+            Assert.IsFalse(content.PublishCulture(CultureImpact.Explicit(langFr, false)));
 
             // works with a name
             // and then FR is available, and published
             content.SetCultureName("name-fr", langFr);
-            Assert.IsTrue(content.PublishCulture(langFr));
+            Assert.IsTrue(content.PublishCulture(CultureImpact.Explicit(langFr, false)));
 
             // now UK is available too
             content.SetCultureName("name-uk", langUk);
@@ -491,7 +577,10 @@ namespace Umbraco.Tests.Models
             prop.SetValue("a");
             Assert.AreEqual("a", prop.GetValue());
             Assert.IsNull(prop.GetValue(published: true));
-            var propertyValidationService = new PropertyValidationService(Current.Factory.GetInstance<PropertyEditorCollection>(), Current.Factory.GetInstance<ServiceContext>().DataTypeService);
+            var propertyValidationService = new PropertyValidationService(
+                Current.Factory.GetInstance<PropertyEditorCollection>(),
+                Current.Factory.GetInstance<ServiceContext>().DataTypeService,
+                Current.Factory.GetInstance<ServiceContext>().TextService);
 
             Assert.IsTrue(propertyValidationService.IsPropertyValid(prop));
 

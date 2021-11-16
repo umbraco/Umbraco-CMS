@@ -11,7 +11,7 @@ We’re usually able to handle small PRs pretty quickly. A community volunteer w
 
 ### Up for grabs
 
-Umbraco HQ will regularly mark newly created issues on the issue tracker with the `Up for grabs` tag. This means that the proposed changes are wanted in Umbraco but the HQ does not have the time to make them at this time. These issues are usually small enough to fit in the "Small PRs" category and we encourage anyone to pick them up and help out.  
+Umbraco HQ will regularly mark newly created issues on the issue tracker with the `Up for grabs` tag. This means that the proposed changes are wanted in Umbraco but the HQ does not have the time to make them at this time. We encourage anyone to pick them up and help out.
 
 If you do start working on something, make sure to leave a small comment on the issue saying something like: "I'm working on this". That way other people stumbling upon the issue know they don't need to pick it up, someone already has.
 
@@ -24,10 +24,12 @@ Please make sure to describe your idea in an issue, it helps to put in mockup sc
 
 If the change makes sense for HQ to include in Umbraco CMS we will leave you some feedback on how we’d like to see it being implemented. 
 
-If a larger pull request is encouraged by Umbraco HQ, the process will be similar to what is described in the [small PRs process](#small-prs) above, we’ll get feedback to you within 14 days. Finalizing and merging the PR might take longer though as it will likely need to be picked up by the development team to make sure everything is in order. We’ll keep you posted on the progress.
+If a larger pull request is encouraged by Umbraco HQ, the process will be similar to what is described in the [small PRs process](#small-prs) above, we strive to feedback within 14 days. Finalizing and merging the PR might take longer though as it will likely need to be picked up by the development team to make sure everything is in order. We’ll keep you posted on the progress.
+
+It is highly recommended that you speak to the HQ before making large, complex changes. 
 
 ### Pull request or package?
 
-If it doesn’t fit in CMS right now, we will likely encourage you to make it into a package instead. A package is a great way to check out popularity of a feature, learn how people use it, validate good usability and to fix bugs.  
+If it doesn’t fit in CMS right now, we will likely encourage you to make it into a package instead. A package is a great way to check out popularity of a feature, learn how people use it, validate good usability and fix bugs.  
 
 Eventually, a package could "graduate" to be included in the CMS.  

@@ -11,19 +11,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         public override void Migrate()
         {
             AddColumn<RedirectUrlDto>("culture");
-
-            Delete.Index("IX_umbracoRedirectUrl").OnTable(Constants.DatabaseSchema.Tables.RedirectUrl).Do();
-            Create.Index("IX_umbracoRedirectUrl").OnTable(Constants.DatabaseSchema.Tables.RedirectUrl)
-                .OnColumn("urlHash")
-                .Ascending()
-                .OnColumn("contentKey")
-                .Ascending()
-                .OnColumn("culture")
-                .Ascending()
-                .OnColumn("createDateUtc")
-                .Ascending()
-                .WithOptions().Unique()
-                .Do();
         }
     }
 }

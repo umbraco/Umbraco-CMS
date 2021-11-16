@@ -1,12 +1,8 @@
 ﻿using System.Net.Http;
-using System.Security.Claims;
 using System.Security.Principal;
 using System.ServiceModel.Channels;
 using System.Threading;
 using System.Web;
-using AutoMapper;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Security

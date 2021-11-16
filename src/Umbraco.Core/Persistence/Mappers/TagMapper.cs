@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -12,18 +13,16 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(ITag))]
     public sealed class TagMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public TagMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
+        protected override void DefineMaps()
         {
-            if (PropertyInfoCache.IsEmpty == false) return;
-
-            CacheMap<Tag, TagDto>(src => src.Id, dto => dto.Id);
-            CacheMap<Tag, TagDto>(src => src.Text, dto => dto.Text);
-            CacheMap<Tag, TagDto>(src => src.Group, dto => dto.Group);
-            CacheMap<Tag, TagDto>(src => src.LanguageId, dto => dto.LanguageId);
+            DefineMap<Tag, TagDto>(nameof(Tag.Id), nameof(TagDto.Id));
+            DefineMap<Tag, TagDto>(nameof(Tag.Text), nameof(TagDto.Text));
+            DefineMap<Tag, TagDto>(nameof(Tag.Group), nameof(TagDto.Group));
+            DefineMap<Tag, TagDto>(nameof(Tag.LanguageId), nameof(TagDto.LanguageId));
         }
     }
 }

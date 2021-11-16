@@ -37,7 +37,7 @@ namespace Umbraco.Core.Persistence.Dtos
         /// </remarks>
         [Column("lastValidatedUtc")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Index(IndexTypes.NonClustered, Name = "IX_userLoginDto_lastValidatedUtc")]
+        [Index(IndexTypes.NonClustered, Name = "IX_umbracoUserLogin_lastValidatedUtc")]
         public DateTime LastValidatedUtc { get; set; }
 
         /// <summary>

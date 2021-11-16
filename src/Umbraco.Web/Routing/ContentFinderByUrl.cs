@@ -1,14 +1,14 @@
-﻿using Umbraco.Core.Logging;
+using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Provides an implementation of <see cref="IContentFinder"/> that handles page nice urls.
+    /// Provides an implementation of <see cref="IContentFinder"/> that handles page nice URLs.
     /// </summary>
     /// <remarks>
-    /// <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice url of a document.</para>
+    /// <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice URL of a document.</para>
     /// </remarks>
     public class ContentFinderByUrl : IContentFinder
     {
@@ -20,15 +20,15 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         public virtual bool TryFindContent(PublishedRequest frequest)
         {
             string route;
             if (frequest.HasDomain)
-                route = frequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
+                route = frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded());
             else
                 route = frequest.Uri.GetAbsolutePathDecoded();
 
@@ -37,7 +37,7 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find an Umbraco document for a <c>PublishedContentRequest</c> and a route.
+        /// Tries to find an Umbraco document for a <c>PublishedRequest</c> and a route.
         /// </summary>
         /// <param name="docreq">The document request.</param>
         /// <param name="route">The route.</param>
@@ -46,13 +46,13 @@ namespace Umbraco.Web.Routing
         {
             if (docreq == null) throw new System.ArgumentNullException(nameof(docreq));
 
-            Logger.Debug<ContentFinderByUrl>("Test route {Route}", route);
+            Logger.Debug<ContentFinderByUrl, string>("Test route {Route}", route);
 
-            var node = docreq.UmbracoContext.ContentCache.GetByRoute(docreq.UmbracoContext.InPreviewMode, route, culture: docreq.Culture?.Name);
+            var node = docreq.UmbracoContext.Content.GetByRoute(docreq.UmbracoContext.InPreviewMode, route, culture: docreq.Culture?.Name);
             if (node != null)
             {
                 docreq.PublishedContent = node;
-                Logger.Debug<ContentFinderByUrl>("Got content, id={NodeId}", node.Id);
+                Logger.Debug<ContentFinderByUrl,int>("Got content, id={NodeId}", node.Id);
             }
             else
             {

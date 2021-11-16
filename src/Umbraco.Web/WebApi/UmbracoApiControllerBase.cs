@@ -7,6 +7,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
@@ -39,13 +40,28 @@ namespace Umbraco.Web.WebApi
                 Current.Factory.GetInstance<AppCaches>(),
                 Current.Factory.GetInstance<IProfilingLogger>(),
                 Current.Factory.GetInstance<IRuntimeState>(),
-                Current.Factory.GetInstance<UmbracoHelper>()
+                Current.Factory.GetInstance<UmbracoHelper>(),
+                Current.Factory.GetInstance<UmbracoMapper>()
             )
         { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoApiControllerBase"/> class with all its dependencies.
         /// </summary>
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper, UmbracoMapper umbracoMapper)
+        {
+            UmbracoContextAccessor = umbracoContextAccessor;
+            GlobalSettings = globalSettings;
+            SqlContext = sqlContext;
+            Services = services;
+            AppCaches = appCaches;
+            Logger = logger;
+            RuntimeState = runtimeState;
+            Umbraco = umbracoHelper;
+            Mapper = umbracoMapper;
+        }
+
+        [Obsolete("This constructor is obsolete since it doesn't inject the UmbracoMapper. The UmbracoMapper will be resolved from the service locator Current.Mapper, which is not good for testability. Inject the UmbracoMapper using full constructor injection instead.")]
         protected UmbracoApiControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
         {
             UmbracoContextAccessor = umbracoContextAccessor;
@@ -56,6 +72,9 @@ namespace Umbraco.Web.WebApi
             Logger = logger;
             RuntimeState = runtimeState;
             Umbraco = umbracoHelper;
+
+            // not good for testability, hence the obsolete.
+            Mapper = Current.Mapper;
         }
 
         /// <summary>
@@ -106,7 +125,7 @@ namespace Umbraco.Web.WebApi
         internal IRuntimeState RuntimeState { get; }
 
         /// <summary>
-        /// Gets the application url.
+        /// Gets the application URL.
         /// </summary>
         protected Uri ApplicationUrl => RuntimeState.ApplicationUrl;
 
@@ -119,6 +138,11 @@ namespace Umbraco.Web.WebApi
         /// Gets the Umbraco helper.
         /// </summary>
         public UmbracoHelper Umbraco { get; }
+
+        /// <summary>
+        /// Gets the mapper.
+        /// </summary>
+        public UmbracoMapper Mapper { get; }
 
         /// <summary>
         /// Gets the web security helper.

@@ -9,7 +9,7 @@ namespace Umbraco.Tests.Routing
     {
 
         /// <summary>
-        /// Return the route data for the url based on a mocked context
+        /// Return the route data for the URL based on a mocked context
         /// </summary>
         /// <param name="routes"></param>
         /// <param name="requestUrl"></param>
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Routing
         }
 
         /// <summary>
-        /// Get the route data based on the url and http context
+        /// Get the route data based on the URL and HTTP context
         /// </summary>
         /// <param name="routes"></param>
         /// <param name="httpContext"></param>

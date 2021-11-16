@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
+
     internal class LogScrubber : RecurringTaskBase
     {
         private readonly IRuntimeState _runtime;
@@ -72,8 +70,7 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, going down
             }
 
-            // running on a background task, and Log.CleanLogs uses the old SqlHelper,
-            // better wrap in a scope and ensure it's all cleaned up and nothing leaks
+            // Ensure we use an explicit scope since we are running on a background thread.
             using (var scope = _scopeProvider.CreateScope())
             using (_logger.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {

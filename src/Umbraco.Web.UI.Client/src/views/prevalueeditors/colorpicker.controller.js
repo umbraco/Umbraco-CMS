@@ -7,7 +7,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.ColorPickerControl
         };
 
         //map the user config
-        angular.extend(config, $scope.model.config);
+        Utilities.extend(config, $scope.model.config);
 
         //map back to the model
         $scope.model.config = config;
@@ -19,7 +19,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.ColorPickerControl
         // Make an array from the dictionary
         var items = [];
 
-        if (angular.isArray($scope.model.prevalues)) {
+        if (Utilities.isArray($scope.model.prevalues)) {
 
             for (var i in $scope.model.prevalues) {
                 var oldValue = $scope.model.prevalues[i];

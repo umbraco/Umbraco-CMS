@@ -354,7 +354,7 @@ namespace Umbraco.Tests.Composing
                 var col2 = factory.GetInstance<TestCollection>();
                 AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
 
-                AssertSameCollection(col1, col2);
+                AssertSameCollection(factory, col1, col2);
             }
 
         }
@@ -413,11 +413,11 @@ namespace Umbraco.Tests.Composing
             {
                 col1A = factory.GetInstance<TestCollection>();
                 col1B = factory.GetInstance<TestCollection>();
-            }
 
-            AssertCollection(col1A, typeof(Resolved1), typeof(Resolved2));
-            AssertCollection(col1B, typeof(Resolved1), typeof(Resolved2));
-            AssertSameCollection(col1A, col1B);
+                AssertCollection(col1A, typeof(Resolved1), typeof(Resolved2));
+                AssertCollection(col1B, typeof(Resolved1), typeof(Resolved2));
+                AssertSameCollection(factory, col1A, col1B);
+            }
 
             TestCollection col2;
 
@@ -442,6 +442,19 @@ namespace Umbraco.Tests.Composing
             AssertCollection(col, typeof(Resolved2), typeof(Resolved1));
         }
 
+        [Test]
+        public void WeightedBuilderSetWeight()
+        {
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilderWeighted>()
+                .Add<Resolved1>()
+                .Add<Resolved2>();
+            builder.SetWeight<Resolved1>(10);
+
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
+            AssertCollection(col, typeof(Resolved1), typeof(Resolved2));
+        }
+
         #region Assertions
 
         private static void AssertCollection(IEnumerable<Resolved> col, params Type[] expected)
@@ -452,7 +465,7 @@ namespace Umbraco.Tests.Composing
                 Assert.IsInstanceOf(expected[i], colA[i]);
         }
 
-        private static void AssertSameCollection(IEnumerable<Resolved> col1, IEnumerable<Resolved> col2)
+        private static void AssertSameCollection(IFactory factory, IEnumerable<Resolved> col1, IEnumerable<Resolved> col2)
         {
             Assert.AreSame(col1, col2);
 
@@ -460,8 +473,19 @@ namespace Umbraco.Tests.Composing
             var col2A = col2.ToArray();
 
             Assert.AreEqual(col1A.Length, col2A.Length);
+
+            // Ensure each item in each collection is the same but also
+            // resolve each item from the factory to ensure it's also the same since
+            // it should have the same lifespan.
             for (var i = 0; i < col1A.Length; i++)
+            {
                 Assert.AreSame(col1A[i], col2A[i]);
+
+                var itemA = factory.GetInstance(col1A[i].GetType());
+                var itemB = factory.GetInstance(col2A[i].GetType());
+
+                Assert.AreSame(itemA, itemB);
+            }
         }
 
         private static void AssertNotSameCollection(IEnumerable<Resolved> col1, IEnumerable<Resolved> col2)
@@ -472,8 +496,11 @@ namespace Umbraco.Tests.Composing
             var col2A = col2.ToArray();
 
             Assert.AreEqual(col1A.Length, col2A.Length);
+
             for (var i = 0; i < col1A.Length; i++)
+            {
                 Assert.AreNotSame(col1A[i], col2A[i]);
+            }   
         }
 
         #endregion

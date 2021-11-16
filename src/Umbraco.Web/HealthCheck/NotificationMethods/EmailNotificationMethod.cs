@@ -20,7 +20,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
 
         public EmailNotificationMethod(ILocalizedTextService textService, IRuntimeState runtimeState, ILogger logger)
         {
-            var recipientEmail = Settings["recipientEmail"]?.Value;
+            var recipientEmail = Settings?["recipientEmail"]?.Value;
             if (string.IsNullOrWhiteSpace(recipientEmail))
             {
                 Enabled = false;
@@ -48,7 +48,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
                 return;
             }
 
-            var message = _textService.Localize("healthcheck/scheduledHealthCheckEmailBody", new[]
+            var message = _textService.Localize("healthcheck", "scheduledHealthCheckEmailBody", new[]
             {
                 DateTime.Now.ToShortDateString(),
                 DateTime.Now.ToShortTimeString(),
@@ -59,7 +59,7 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             // you can identify the site that these results are for.
             var host = _runtimeState.ApplicationUrl;
 
-            var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject", new[] { host.ToString() });
+            var subject = _textService.Localize("healthcheck", "scheduledHealthCheckEmailSubject", new[] { host.ToString() });
 
             var mailSender = new EmailSender();
             using (var mailMessage = CreateMailMessage(subject, message))

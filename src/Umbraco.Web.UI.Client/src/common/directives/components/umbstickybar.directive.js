@@ -4,7 +4,7 @@
 @restrict A
 
 @description
-Use this directive make an element sticky and follow the page when scrolling.
+Use this directive make an element sticky and follow the page when scrolling. `umb-sticky-bar--active` class is applied when the element is stuck
 
 <h3>Markup example</h3>
 <pre>
@@ -12,143 +12,77 @@ Use this directive make an element sticky and follow the page when scrolling.
 
         <div
            class="my-sticky-bar"
-           umb-sticky-bar
-           scrollable-container=".container">
+           umb-sticky-bar>
         </div>
 
     </div>
 </pre>
 
-<h3>CSS example</h3>
-<pre>
-    .my-sticky-bar {
-        padding: 15px 0;
-        background: #000000;
-        position: relative;
-        top: 0;
-    }
-
-    .my-sticky-bar.-umb-sticky-bar {
-        top: 100px;
-    }
-</pre>
-
-@param {string} scrollableContainer Set the class (".element") or the id ("#element") of the scrollable container element.
 **/
 
 (function () {
     'use strict';
 
-    function StickyBarDirective($rootScope) {
+    function StickyBarDirective() {
+
+        let headerObserver;
+
+        /**
+        Toggle `umb-sticky-bar--active` class on the sticky-bar element
+        **/
+        const setClass = (addClass, current) => current.classList.toggle('umb-sticky-bar--active', addClass);                    
+
+        /**
+        Inserts two elements in the umbStickyBar parent element
+        These are used by the IntersectionObserve to calculate scroll position
+        **/
+        const addSentinel = current => {
+            const sentinel = document.createElement('div');
+            sentinel.classList.add('umb-sticky-sentinel', '-top');
+            current.parentElement.prepend(sentinel);
+        };
+
+        /**
+        Calls into setClass when the header sentinel enters/exits the top of the container
+        Container is the parent element of the umbStickyBar element
+        **/
+        const observeHeader = (current, container) => {
+            headerObserver = new IntersectionObserver((records, observer) => {
+                let [target, rootBounds] = [records[0].boundingClientRect, records[0].rootBounds];
+
+                if (rootBounds && target) {
+                    if (target.bottom < rootBounds.top) {
+                        setClass(true, current);
+                    }
+
+                    if (target.bottom >= rootBounds.top && target.bottom < rootBounds.bottom) {
+                        setClass(false, current);
+                    }
+                }
+            }, {
+                threshold: [0],
+                root: container
+            });
+
+            headerObserver.observe(current.parentElement.querySelector('.umb-sticky-sentinel.-top'));
+        };
 
         function link(scope, el, attr, ctrl) {
 
-            var bar = $(el);
-            var scrollableContainer = null;
-            var clonedBar = null;
-            var cloneIsMade = false;
+            let current = el[0];
+            let container = current.closest('.umb-editor-container') || current.closest('.umb-dashboard');
 
-            function activate() {
-
-                if (bar.parents(".umb-property").length > 1) {
-                    bar.addClass("nested");
-                    return;
-                }
-
-                if (attr.scrollableContainer) {
-                    scrollableContainer = $(attr.scrollableContainer);
-                } else {
-                    scrollableContainer = $(window);
-                }
-
-                scrollableContainer.on('scroll.umbStickyBar', determineVisibility).trigger("scroll");
-                $(window).on('resize.umbStickyBar', determineVisibility);
-
-                scope.$on('$destroy', function () {
-                    scrollableContainer.off('.umbStickyBar');
-                    $(window).off('.umbStickyBar');
-                });
-
+            if (container) {
+                addSentinel(current);
+                observeHeader(current, container);
             }
 
-            function determineVisibility() {
-
-                var barTop = bar[0].offsetTop;
-                var scrollTop = scrollableContainer.scrollTop();
-
-                if (scrollTop > barTop) {
-
-                    if (!cloneIsMade) {
-
-                        createClone();
-
-                        clonedBar.css({
-                            'visibility': 'visible'
-                        });
-
-                    } else {
-
-                        calculateSize();
-
-                    }
-
-                } else {
-
-                    if (cloneIsMade) {
-
-                        //remove cloned element (switched places with original on creation)
-                        bar.remove();
-                        bar = clonedBar;
-                        clonedBar = null;
-
-                        bar.removeClass('-umb-sticky-bar');
-                        bar.css({
-                            position: 'relative',
-                            'width': 'auto',
-                            'height': 'auto',
-                            'z-index': 'auto',
-                            'visibility': 'visible'
-                        });
-
-                        cloneIsMade = false;
-
-                    }
-
-                }
-
-            }
-
-            function calculateSize() {
-                var width = bar.innerWidth();
-                clonedBar.css({
-                    width: width
-                });
-            }
-
-            function createClone() {
-                //switch place with cloned element, to keep binding intact
-                clonedBar = bar;
-                bar = clonedBar.clone();
-                clonedBar.after(bar);
-                clonedBar.addClass('-umb-sticky-bar');
-                clonedBar.css({
-                    'position': 'fixed',
-                    // if you change this z-index value, make sure the sticky editor sub headers do not 
-                    // clash with umb-dropdown (e.g. the content actions dropdown in content list view)
-                    'z-index': 99, 
-                    'visibility': 'hidden'
-                });
-
-                cloneIsMade = true;
-                calculateSize();
-
-            }
-
-            activate();
-
+            scope.$on('$destroy', () => {
+                headerObserver.disconnect();
+            });
         }
 
-        var directive = {
+        const directive = {
             restrict: 'A',
             link: link
         };

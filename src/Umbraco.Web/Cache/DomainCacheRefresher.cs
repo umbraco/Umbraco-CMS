@@ -47,25 +47,13 @@ namespace Umbraco.Web.Cache
         // these events should never trigger
         // everything should be PAYLOAD/JSON
 
-        public override void RefreshAll()
-        {
-            throw new NotSupportedException();
-        }
+        public override void RefreshAll() => throw new NotSupportedException();
 
-        public override void Refresh(int id)
-        {
-            throw new NotSupportedException();
-        }
+        public override void Refresh(int id) => throw new NotSupportedException();
 
-        public override void Refresh(Guid id)
-        {
-            throw new NotSupportedException();
-        }
+        public override void Refresh(Guid id) => throw new NotSupportedException();
 
-        public override void Remove(int id)
-        {
-            throw new NotSupportedException();
-        }
+        public override void Remove(int id) => throw new NotSupportedException();
 
         #endregion
 

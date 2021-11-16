@@ -90,21 +90,8 @@ namespace Umbraco.Core.Packaging
 
         public InstallationSummary InstallPackageData(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId)
         {
-            var installationSummary = new InstallationSummary
-            {
-                DataTypesInstalled = _packageDataInstallation.ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
-                LanguagesInstalled = _packageDataInstallation.ImportLanguages(compiledPackage.Languages, userId),
-                DictionaryItemsInstalled = _packageDataInstallation.ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
-                MacrosInstalled = _packageDataInstallation.ImportMacros(compiledPackage.Macros, userId),
-                TemplatesInstalled = _packageDataInstallation.ImportTemplates(compiledPackage.Templates.ToList(), userId),
-                DocumentTypesInstalled = _packageDataInstallation.ImportDocumentTypes(compiledPackage.DocumentTypes, userId)
-            };
+            var installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
 
-            //we need a reference to the imported doc types to continue
-            var importedDocTypes = installationSummary.DocumentTypesInstalled.ToDictionary(x => x.Alias, x => x);
-
-            installationSummary.StylesheetsInstalled = _packageDataInstallation.ImportStylesheets(compiledPackage.Stylesheets, userId);
-            installationSummary.ContentInstalled = _packageDataInstallation.ImportContent(compiledPackage.Documents, importedDocTypes, userId);
             installationSummary.Actions = CompiledPackageXmlParser.GetPackageActions(XElement.Parse(compiledPackage.Actions), compiledPackage.Name);
             installationSummary.MetaData = compiledPackage;
             installationSummary.FilesInstalled = packageDefinition.Files;

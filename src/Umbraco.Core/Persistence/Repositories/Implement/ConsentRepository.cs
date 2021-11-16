@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         protected override void PersistNewItem(IConsent entity)
         {
-            ((EntityBase) entity).AddingEntity();
+            entity.AddingEntity();
 
             var dto = ConsentFactory.BuildDto(entity);
             Database.Insert(dto);
@@ -80,13 +80,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <inheritdoc />
         protected override void PersistUpdatedItem(IConsent entity)
         {
-            ((EntityBase) entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             var dto = ConsentFactory.BuildDto(entity);
             Database.Update(dto);
             entity.ResetDirtyProperties();
 
-            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IConsent>(entity.Id));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IConsent, int>(entity.Id));
         }
 
         /// <inheritdoc />

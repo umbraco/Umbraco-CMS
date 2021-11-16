@@ -9,6 +9,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.JavaScript;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -52,6 +53,39 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(_textpage.Id, rurl.ContentId);
             }
         }
+
+        [Test]
+        public void CanSaveAndGetWithCulture()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var culture = "en";
+            using (var scope = provider.CreateScope())
+            {
+                var repo = CreateRepository(provider);
+                var rurl = new RedirectUrl
+                {
+                    ContentKey = _textpage.Key,
+                    Url = "blah",
+                    Culture = culture
+                };
+                repo.Save(rurl);
+                scope.Complete();
+
+                Assert.AreNotEqual(0, rurl.Id);
+            }
+
+            using (var scope = provider.CreateScope())
+            {
+                var repo = CreateRepository(provider);
+                var rurl = repo.GetMostRecentUrl("blah");
+                scope.Complete();
+
+                Assert.IsNotNull(rurl);
+                Assert.AreEqual(_textpage.Id, rurl.ContentId);
+                Assert.AreEqual(culture, rurl.Culture);
+            }
+        }
+
 
         [Test]
         public void CanSaveAndGetMostRecent()
@@ -100,6 +134,59 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(_otherpage.Id, rurl.ContentId);
             }
         }
+
+        [Test]
+        public void CanSaveAndGetMostRecentForCulture()
+        {
+            var provider = TestObjects.GetScopeProvider(Logger);
+            var cultureA = "en";
+            var cultureB = "de";
+            Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
+
+            using (var scope = provider.CreateScope())
+            {
+                var repo = CreateRepository(provider);
+                var rurl = new RedirectUrl
+                {
+                    ContentKey = _textpage.Key,
+                    Url = "blah",
+                    Culture = cultureA
+                };
+                repo.Save(rurl);
+                scope.Complete();
+
+                Assert.AreNotEqual(0, rurl.Id);
+
+                // FIXME: too fast = same date = key violation?
+                // and... can that happen in real life?
+                // we don't really *care* about the IX, only supposed to make things faster...
+                // BUT in realife we AddOrUpdate in a trx so it should be safe, always
+
+                rurl = new RedirectUrl
+                {
+                    ContentKey = _otherpage.Key,
+                    Url = "blah",
+                    CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1), // ensure time difference
+                    Culture = cultureB
+                };
+                repo.Save(rurl);
+                scope.Complete();
+
+                Assert.AreNotEqual(0, rurl.Id);
+            }
+
+            using (var scope = provider.CreateScope())
+            {
+                var repo = CreateRepository(provider);
+                var rurl = repo.GetMostRecentUrl("blah", cultureA);
+                scope.Complete();
+
+                Assert.IsNotNull(rurl);
+                Assert.AreEqual(_textpage.Id, rurl.ContentId);
+                Assert.AreEqual(cultureA, rurl.Culture);
+            }
+        }
+
 
         [Test]
         public void CanSaveAndGetByContent()

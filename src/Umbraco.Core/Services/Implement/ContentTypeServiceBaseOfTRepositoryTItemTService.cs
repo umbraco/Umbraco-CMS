@@ -67,7 +67,8 @@ namespace Umbraco.Core.Services.Implement
 
             var compositionAliases = compositionContentType.CompositionAliases();
             var compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
-            var propertyTypeAliases = compositionContentType.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).ToArray();
+            var propertyTypeAliases = compositionContentType.PropertyTypes.Select(x => x.Alias).ToArray();
+            var propertyGroupAliases = compositionContentType.PropertyGroups.ToDictionary(x => x.Alias, x => x.Type, StringComparer.InvariantCultureIgnoreCase);
             var indirectReferences = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == compositionContentType.Id));
             var comparer = new DelegateEqualityComparer<IContentTypeComposition>((x, y) => x.Id == y.Id, x => x.Id);
             var dependencies = new HashSet<IContentTypeComposition>(compositions, comparer);
@@ -96,15 +97,22 @@ namespace Umbraco.Core.Services.Implement
                     stack.Push(c);
             }
 
+            var duplicatePropertyTypeAliases = new List<string>();
+            var invalidPropertyGroupAliases = new List<string>();
+
             foreach (var dependency in dependencies)
             {
                 if (dependency.Id == compositionContentType.Id) continue;
                 var contentTypeDependency = allContentTypes.FirstOrDefault(x => x.Alias.Equals(dependency.Alias, StringComparison.InvariantCultureIgnoreCase));
                 if (contentTypeDependency == null) continue;
-                var intersect = contentTypeDependency.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(propertyTypeAliases).ToArray();
-                if (intersect.Length == 0) continue;
 
-                throw new InvalidCompositionException(compositionContentType.Alias, intersect.ToArray());
+                duplicatePropertyTypeAliases.AddRange(contentTypeDependency.PropertyTypes.Select(x => x.Alias).Intersect(propertyTypeAliases, StringComparer.InvariantCultureIgnoreCase));
+                invalidPropertyGroupAliases.AddRange(contentTypeDependency.PropertyGroups.Where(x => propertyGroupAliases.TryGetValue(x.Alias, out var type) && type != x.Type).Select(x => x.Alias));
+            }
+
+            if (duplicatePropertyTypeAliases.Count > 0 || invalidPropertyGroupAliases.Count > 0)
+            {
+                throw new InvalidCompositionException(compositionContentType.Alias, null, duplicatePropertyTypeAliases.Distinct().ToArray(), invalidPropertyGroupAliases.Distinct().ToArray());
             }
         }
 
@@ -252,12 +260,12 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IEnumerable<TItem> GetAll(params Guid[] ids)
+        public IEnumerable<TItem> GetAll(IEnumerable<Guid> ids)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(ReadLockIds);
-                return Repository.GetMany(ids);
+                return Repository.GetMany(ids.ToArray());
             }
         }
 
@@ -321,6 +329,15 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public bool HasContainerInPath(params int[] ids)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                // can use same repo for both content and media
+                return Repository.HasContainerInPath(ids);
+            }
+        }
+
         public IEnumerable<TItem> GetDescendants(int id, bool andSelf)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -372,6 +389,15 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        public bool HasContentNodes(int id)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(ReadLockIds);
+                return Repository.HasContentNodes(id);
+            }
+        }
+
         #endregion
 
         #region Save
@@ -389,6 +415,11 @@ namespace Umbraco.Core.Services.Implement
 
                 if (string.IsNullOrWhiteSpace(item.Name))
                     throw new ArgumentException("Cannot save item with empty name.");
+
+                if (item.Name != null && item.Name.Length > 255)
+                {
+                    throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+                }
 
                 scope.WriteLock(WriteLockIds);
 
@@ -488,6 +519,16 @@ namespace Umbraco.Core.Services.Implement
 
                 // delete content
                 DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
+                
+                // Next find all other document types that have a reference to this content type
+                var referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes.Any(p=>p.Id.Value==item.Id));
+                foreach (var reference in referenceToAllowedContentTypes)
+                {                                        
+                    reference.AllowedContentTypes = reference.AllowedContentTypes.Where(p => p.Id.Value != item.Id);                   
+                    var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
+                    // Fire change event
+                    OnChanged(scope, changedRef.ToEventArgs());                  
+                }
 
                 // finally delete the content type
                 // - recursively deletes all descendants
@@ -495,7 +536,7 @@ namespace Umbraco.Core.Services.Implement
                 //  (contents of any descendant type have been deleted but
                 //   contents of any composed (impacted) type remain but
                 //   need to have their property data cleared)
-                Repository.Delete(item);
+                Repository.Delete(item);                               
 
                 //...
                 var changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
@@ -590,10 +631,9 @@ namespace Umbraco.Core.Services.Implement
         public TItem Copy(TItem original, string alias, string name, TItem parent)
         {
             if (original == null) throw new ArgumentNullException(nameof(original));
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
-
-            if (parent != null && parent.HasIdentity == false)
-                throw new InvalidOperationException("Parent must have an identity.");
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
+            if (parent != null && parent.HasIdentity == false) throw new InvalidOperationException("Parent must have an identity.");
 
             // this is illegal
             //var originalb = (ContentTypeCompositionBase)original;
@@ -847,7 +887,7 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<EntityContainer> GetContainers(TItem item)
         {
-            var ancestorIds = item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();

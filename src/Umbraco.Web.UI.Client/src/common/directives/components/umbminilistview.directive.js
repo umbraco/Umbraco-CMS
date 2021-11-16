@@ -58,10 +58,15 @@
                 
                 entityResource.getPagedChildren(miniListView.node.id, scope.entityType, miniListView.pagination)
                     .then(function (data) {
-
+                        if (!data.items) {
+                            data.items = [];
+                        }
+                        if (scope.onItemsLoaded) {
+                            scope.onItemsLoaded({items: data.items});
+                        }
                         // update children
                         miniListView.children = data.items;
-                        _.each(miniListView.children, function(c) {
+                        miniListView.children.forEach(c => {
                             // child allowed by default
                             c.allowed = true;
  
@@ -71,15 +76,14 @@
                             }
                             // set published state for content
                             if (c.metaData) {
-                                c.hasChildren = c.metaData.HasChildren;
+                                c.hasChildren = c.metaData.hasChildren;
                                 if(scope.entityType === "Document") {
                                     c.published = c.metaData.IsPublished;
                                 }
                             }
                              
-                            // filter items if there is a filter and it's not advanced
-                            // ** ignores advanced filter at the moment
-                            if (scope.entityTypeFilter && !scope.entityTypeFilter.filterAdvanced) {
+                            // filter items if there is a filter and it's not advanced (advanced filtering is handled below)
+                            if (scope.entityTypeFilter && scope.entityTypeFilter.filter && !scope.entityTypeFilter.filterAdvanced) {
                                 var a = scope.entityTypeFilter.filter.toLowerCase().replace(/\s/g, '').split(',');
                                 var found = a.indexOf(c.metaData.ContentTypeAlias.toLowerCase()) >= 0;
                                 
@@ -88,6 +92,16 @@
                                 }
                             }
                         });
+
+                        // advanced item filtering is handled here
+                        if (scope.entityTypeFilter && scope.entityTypeFilter.filter && scope.entityTypeFilter.filterAdvanced) {
+                            var filtered = Utilities.isFunction(scope.entityTypeFilter.filter)
+                                ? _.filter(miniListView.children, scope.entityTypeFilter.filter)
+                                : _.where(miniListView.children, scope.entityTypeFilter.filter);
+                            
+                            filtered.forEach(node => node.allowed = false);
+                        }
+
                         // update pagination
                         miniListView.pagination.totalItems = data.totalItems;
                         miniListView.pagination.totalPages = data.totalPages;
@@ -121,11 +135,11 @@
                 var found = false;
                 scope.listViewAnimation = "out";
 
-                angular.forEach(miniListViewsHistory, function(historyItem, index){
+                Utilities.forEach(miniListViewsHistory, (historyItem, index) => {
                     // We need to make sure we can compare the two id's. 
                     // Some id's are integers and others are strings.
                     // Members have string ids like "all-members".
-                    if(historyItem.node.id.toString() === ancestor.id.toString()) {
+                    if (historyItem.node.id.toString() === ancestor.id.toString()) {
                         // load the list view from history
                         scope.miniListViews = [];
                         scope.miniListViews.push(historyItem);
@@ -135,7 +149,7 @@
                     }
                 });
 
-                if(!found) {
+                if (!found) {
                     // if we can't find the view in the history - close the list view
                     scope.exitMiniListView();
                 }
@@ -147,7 +161,7 @@
 
             scope.showBackButton = function() {
                 // don't show the back button if the start node is a list view
-                if(scope.node.metaData && scope.node.metaData.IsContainer || scope.node.isContainer) {
+                if (scope.node.metaData && scope.node.metaData.IsContainer || scope.node.isContainer) {
                     return false;
                 } else {
                     return true;
@@ -164,7 +178,7 @@
 
             function makeBreadcrumb() {
                 scope.breadcrumb = [];
-                angular.forEach(miniListViewsHistory, function(historyItem){
+                Utilities.forEach(miniListViewsHistory, historyItem => {
                     scope.breadcrumb.push(historyItem.node);
                 });
             }
@@ -200,6 +214,7 @@
                 startNodeId: "=",
                 onSelect: "&",
                 onClose: "&",
+                onItemsLoaded: "&",
                 entityTypeFilter: "="
             },
             link: link

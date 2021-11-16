@@ -22,47 +22,58 @@
  */
 
 angular.module('umbraco.services')
-.factory('localizationService', function ($http, $q, eventsService, $window, $filter, userService) {
+.factory('localizationService', function ($http, $q, eventsService) {
 
     // TODO: This should be injected as server vars
     var url = "LocalizedText";
     var resourceFileLoadStatus = "none";
     var resourceLoadingPromise = [];
 
-    function _lookup(value, tokens, dictionary) {
+    // array to hold the localized resource string entries
+    var innerDictionary = [];
+
+    function _lookup(alias, tokens, dictionary, fallbackValue) {
 
         //strip the key identifier if its there
-        if (value && value[0] === "@") {
-            value = value.substring(1);
+        if (alias && alias[0] === "@") {
+            alias = alias.substring(1);
         }
 
+        var underscoreIndex = alias.indexOf("_");
         //if no area specified, add general_
-        if (value && value.indexOf("_") < 0) {
-            value = "general_" + value;
+        if (alias && underscoreIndex < 0) {
+            alias = "general_" + alias;
+            underscoreIndex = alias.indexOf("_");
         }
 
-        var entry = dictionary[value];
-        if (entry) {
-            if (tokens) {
-                for (var i = 0; i < tokens.length; i++) {
-                    entry = entry.replace("%" + i + "%", tokens[i]);
-                }
+        var areaAlias = alias.substring(0, underscoreIndex);
+        var valueAlias = alias.substring(underscoreIndex + 1);
+
+        var areaEntry = dictionary[areaAlias];
+        if (areaEntry) {
+            var valueEntry = areaEntry[valueAlias];
+            if (valueEntry) {
+                return service.tokenReplace(valueEntry, tokens);
             }
-            return entry;
         }
-        return "[" + value + "]";
+
+        if (fallbackValue) return fallbackValue;
+
+        return "[" + alias + "]";
     }
 
     var service = {
-        // array to hold the localized resource string entries
-        dictionary: [],
+
 
         // loads the language resource file from the server
         initLocalizedResources: function () {
+
+            // TODO: This promise handling is super ugly, we should just be returnning the promise from $http and returning inner values.
+
             var deferred = $q.defer();
 
             if (resourceFileLoadStatus === "loaded") {
-                deferred.resolve(service.dictionary);
+                deferred.resolve(innerDictionary);
                 return deferred.promise;
             }
 
@@ -82,7 +93,7 @@ angular.module('umbraco.services')
             $http({ method: "GET", url: url, cache: false })
                 .then(function (response) {
                     resourceFileLoadStatus = "loaded";
-                    service.dictionary = response.data;
+                    innerDictionary = response.data;
 
                     eventsService.emit("localizationService.updated", response.data);
 
@@ -109,7 +120,7 @@ angular.module('umbraco.services')
          * @description
          * Helper to tokenize and compile a localization string
          * @param {String} value the value to tokenize
-         * @param {Object} scope the $scope object 
+         * @param {Object} scope the $scope object
          * @returns {String} tokenized resource string
          */
         tokenize: function (value, scope) {
@@ -128,6 +139,28 @@ angular.module('umbraco.services')
             return value;
         },
 
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.localizationService#tokenReplace
+         * @methodOf umbraco.services.localizationService
+         *
+         * @description
+         * Helper to replace tokens
+         * @param {String} value the text-string to manipulate
+         * @param {Array} tekens An array of tokens values
+         * @returns {String} Replaced test-string
+         */
+        tokenReplace: function (text, tokens) {
+            if (tokens) {
+                for (var i = 0; i < tokens.length; i++) {
+                    text = text.replace("%" + i + "%", _.escape(tokens[i]));
+                }
+            }
+            return text;
+        },
+
+
         /**
          * @ngdoc method
          * @name umbraco.services.localizationService#localize
@@ -135,19 +168,21 @@ angular.module('umbraco.services')
          *
          * @description
          * Checks the dictionary for a localized resource string
-         * @param {String} value the area/key to localize in the format of 'section_key' 
+         * @param {String} value the area/key to localize in the format of 'section_key'
          * alternatively if no section is set such as 'key' then we assume the key is to be looked in
          * the 'general' section
-         * 
+         *
          * @param {Array} tokens if specified this array will be sent as parameter values
          * This replaces %0% and %1% etc in the dictionary key value with the passed in strings
-         * 
+         *
+         * @param {String} fallbackValue if specified this string will be returned if no matching
+         * entry was found in the dictionary
+         *
          * @returns {String} localized resource string
          */
-        localize: function (value, tokens) {
+        localize: function (value, tokens, fallbackValue) {
             return service.initLocalizedResources().then(function (dic) {
-                var val = _lookup(value, tokens, dic);
-                return val;
+                    return _lookup(value, tokens, dic, fallbackValue);
             });
         },
 
@@ -159,7 +194,7 @@ angular.module('umbraco.services')
          * @description
          * Checks the dictionary for multipe localized resource strings at once, preventing the need for nested promises
          * with localizationService.localize
-         * 
+         *
          * ##Usage
          * <pre>
          * localizationService.localizeMany(["speechBubbles_templateErrorHeader", "speechBubbles_templateErrorText"]).then(function(data){
@@ -168,11 +203,11 @@ angular.module('umbraco.services')
          *      notificationService.error(header, message);
          * });
          * </pre>
-         * 
-         * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key' 
+         *
+         * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key'
          * alternatively if no section is set such as 'key' then we assume the key is to be looked in
          * the 'general' section
-         * 
+         *
          * @returns {Array} An array of localized resource string in the same order
          */
         localizeMany: function(keys) {
@@ -199,18 +234,18 @@ angular.module('umbraco.services')
          * @description
          * Checks the dictionary for multipe localized resource strings at once & concats them to a single string
          * Which was not possible with localizationSerivce.localize() due to returning a promise
-         * 
+         *
          * ##Usage
          * <pre>
          * localizationService.concat(["speechBubbles_templateErrorHeader", "speechBubbles_templateErrorText"]).then(function(data){
          *      var combinedText = data;
          * });
          * </pre>
-         * 
-         * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key' 
+         *
+         * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key'
          * alternatively if no section is set such as 'key' then we assume the key is to be looked in
          * the 'general' section
-         * 
+         *
          * @returns {String} An concatenated string of localized resource string passed into the function in the same order
          */
         concat: function(keys) {
@@ -228,8 +263,8 @@ angular.module('umbraco.services')
                     //Build a concat string by looping over the array of resolved promises/translations
                     var returnValue = "";
 
-                    for(var i = 0; i < localizedValues.length; i++){
-                        returnValue += localizedValues[i];
+                    for(var j = 0; j < localizedValues.length; j++){
+                        returnValue += localizedValues[j];
                     }
 
                     return returnValue;
@@ -245,7 +280,7 @@ angular.module('umbraco.services')
          * @description
          * Checks the dictionary for multipe localized resource strings at once & formats a tokenized message
          * Which was not possible with localizationSerivce.localize() due to returning a promise
-         * 
+         *
          * ##Usage
          * <pre>
          * localizationService.format(["template_insert", "template_insertSections"], "%0% %1%").then(function(data){
@@ -253,14 +288,14 @@ angular.module('umbraco.services')
          *      var formattedResult = data;
          * });
          * </pre>
-         * 
-         * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key' 
+         *
+         * @param {Array} keys is an array of strings of the area/key to localize in the format of 'section_key'
          * alternatively if no section is set such as 'key' then we assume the key is to be looked in
          * the 'general' section
-         * 
+         *
          * @param {String} message is the string you wish to replace containing tokens in the format of %0% and %1%
          * with the localized resource strings
-         * 
+         *
          * @returns {String} An concatenated string of localized resource string passed into the function in the same order
          */
         format: function(keys, message){
@@ -276,11 +311,11 @@ angular.module('umbraco.services')
                 return $q.all(promises).then(function(localizedValues){
 
                     //Replace {0} and {1} etc in message with the localized values
-                    for(var i = 0; i < localizedValues.length; i++){
-                        var token = "%" + i + "%";
+                    for(var j = 0; j < localizedValues.length; j++){
+                        var token = "%" + j + "%";
                         var regex = new RegExp(token, "g");
 
-                        message = message.replace(regex, localizedValues[i]);
+                        message = message.replace(regex, localizedValues[j]);
                     }
 
                     return message;
@@ -295,6 +330,7 @@ angular.module('umbraco.services')
         resourceFileLoadStatus = "none";
         resourceLoadingPromise = [];
     });
+
 
     // return the local instance when called
     return service;

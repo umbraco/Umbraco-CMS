@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -14,11 +15,11 @@ namespace Umbraco.Tests.Persistence
         public void ReadLockNonExisting()
         {
             var provider = TestObjects.GetScopeProvider(Logger);
-            Assert.Throws<Exception>(() =>
+            Assert.Throws<ArgumentException>(() =>
             {
-                using (var scope = provider.CreateScope())
+                using (var scope = (Scope)provider.CreateScope())
                 {
-                    scope.ReadLock(-666);
+                    scope.EagerReadLock(-666);
                     scope.Complete();
                 }
             });
@@ -28,9 +29,9 @@ namespace Umbraco.Tests.Persistence
         public void ReadLockExisting()
         {
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = (Scope)provider.CreateScope())
             {
-                scope.ReadLock(Constants.Locks.Servers);
+                scope.EagerReadLock(Constants.Locks.Servers);
                 scope.Complete();
             }
         }
@@ -39,11 +40,11 @@ namespace Umbraco.Tests.Persistence
         public void WriteLockNonExisting()
         {
             var provider = TestObjects.GetScopeProvider(Logger);
-            Assert.Throws<Exception>(() =>
+            Assert.Throws<ArgumentException>(() =>
             {
-                using (var scope = provider.CreateScope())
+                using (var scope = (Scope)provider.CreateScope())
                 {
-                    scope.WriteLock(-666);
+                    scope.EagerWriteLock(-666);
                     scope.Complete();
                 }
             });
@@ -53,9 +54,9 @@ namespace Umbraco.Tests.Persistence
         public void WriteLockExisting()
         {
             var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
+            using (var scope = (Scope)provider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.Servers);
+                scope.EagerWriteLock(Constants.Locks.Servers);
                 scope.Complete();
             }
         }

@@ -2,7 +2,7 @@
  * @ngdoc service
  * @name umbraco.services.searchService
  *
- *  
+ *
  * @description
  * Service for handling the main application search, can currently search content, media and members
  *
@@ -12,17 +12,17 @@
  *
  * <pre>
  *      searchService.searchMembers({term: 'bob'}).then(function(results){
- *          angular.forEach(results, function(result){
+ *          results.forEach(function(result){
  *                  //returns:
  *                  {name: "name", id: 1234, menuUrl: "url", editorPath: "url", metaData: {}, subtitle: "/path/etc" }
- *           })          
- *           var result = 
- *       }) 
- * </pre> 
+ *           })
+ *           var result =
+ *       })
+ * </pre>
  */
 angular.module('umbraco.services')
-    .factory('searchService', function ($q, $log, entityResource, contentResource, umbRequestHelper, $injector, searchResultFormatter) {
-
+    .factory('searchService', function (entityResource, $injector, searchResultFormatter) {
+        
         return {
 
             /**
@@ -42,12 +42,11 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Member", args.searchFrom).then(function (data) {
-                    _.each(data, function (item) {
-                        searchResultFormatter.configureMemberResult(item);
+                return entityResource.search(args.term, "Member", args.searchFrom)
+                    .then(data => {
+                        data.forEach(item => searchResultFormatter.configureMemberResult(item));
+                        return data;
                     });
-                    return data;
-                });
             },
 
             /**
@@ -67,12 +66,12 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Document", args.searchFrom, args.canceler).then(function (data) {
-                    _.each(data, function (item) {
-                        searchResultFormatter.configureContentResult(item);
+                return entityResource.search(args.term, "Document", args.searchFrom, args.canceler, args.dataTypeKey)
+                    .then(data => {
+                        data.forEach(item => searchResultFormatter.configureContentResult(item));
+                        return data;
                     });
-                    return data;
-                });
+                
             },
 
             /**
@@ -92,12 +91,11 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.search(args.term, "Media", args.searchFrom).then(function (data) {
-                    _.each(data, function (item) {
-                        searchResultFormatter.configureMediaResult(item);
+                return entityResource.search(args.term, "Media", args.searchFrom, args.canceler, args.dataTypeKey)
+                    .then(data => {
+                        data.forEach(item => searchResultFormatter.configureMediaResult(item));
+                        return data;
                     });
-                    return data;
-                });
             },
 
             /**
@@ -117,12 +115,10 @@ angular.module('umbraco.services')
                     throw "args.term is required";
                 }
 
-                return entityResource.searchAll(args.term, args.canceler).then(function (data) {
-
-                    _.each(data, function (resultByType) {
-
+                return entityResource.searchAll(args.term, args.canceler).then(data => {
+                    Object.values(data).forEach(resultByType => {
                         //we need to format the search result data to include things like the subtitle, urls, etc...
-                        // this is done with registered angular services as part of the SearchableTreeAttribute, if that 
+                        // this is done with registered angular services as part of the SearchableTreeAttribute, if that
                         // is not found, than we format with the default formatter
                         var formatterMethod = searchResultFormatter.configureDefaultResult;
                         //check if a custom formatter is specified...
@@ -140,20 +136,18 @@ angular.module('umbraco.services')
                             }
                         }
                         //now apply the formatter for each result
-                        _.each(resultByType.results, function (item) {
+                        resultByType.results.forEach(item => {
                             formatterMethod.apply(this, [item, resultByType.treeAlias, resultByType.appAlias]);
                         });
-                        
+
                     });
 
                     return data;
                 });
-
             },
 
             // TODO: This doesn't do anything!
             setCurrent: function (sectionAlias) {
-
                 var currentSection = sectionAlias;
             }
         };

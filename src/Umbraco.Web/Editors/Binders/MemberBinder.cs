@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
@@ -21,7 +20,6 @@ namespace Umbraco.Web.Editors.Binders
     /// </summary>
     internal class MemberBinder : IModelBinder
     {
-        private readonly ContentModelBinderHelper _modelBinderHelper;
         private readonly ServiceContext _services;
 
         public MemberBinder() : this(Current.Services)
@@ -31,7 +29,6 @@ namespace Umbraco.Web.Editors.Binders
         public MemberBinder(ServiceContext services)
         {
             _services = services;
-            _modelBinderHelper = new ContentModelBinderHelper();
         }
 
         /// <summary>
@@ -42,7 +39,7 @@ namespace Umbraco.Web.Editors.Binders
         /// <returns></returns>
         public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
-            var model = _modelBinderHelper.BindModelFromMultipartRequest<MemberSave>(actionContext, bindingContext);
+            var model = ContentModelBinderHelper.BindModelFromMultipartRequest<MemberSave>(actionContext, bindingContext);
             if (model == null) return false;
 
             model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
@@ -50,9 +47,9 @@ namespace Umbraco.Web.Editors.Binders
             //create the dto from the persisted model
             if (model.PersistedContent != null)
             {
-                model.PropertyCollectionDto = Mapper.Map<IMember, ContentPropertyCollectionDto>(model.PersistedContent);
+                model.PropertyCollectionDto = Current.Mapper.Map<IMember, ContentPropertyCollectionDto>(model.PersistedContent);
                 //now map all of the saved values to the dto
-                _modelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
+                ContentModelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
             }
 
             model.Name = model.Name.Trim();
@@ -106,7 +103,7 @@ namespace Umbraco.Web.Editors.Binders
                     //}
                     //member.Key = convertResult.Result;
 
-                    var member = Mapper.Map<MembershipUser, IMember>(membershipUser);
+                    var member = Current.Mapper.Map<MembershipUser, IMember>(membershipUser);
 
                     return member;
             }

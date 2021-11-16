@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using System;
 using System.Linq;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -17,10 +18,14 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Invalid_Category()
         {
-            var validator = new ContentValueSetValidator(false, true, Mock.Of<IPublicAccessService>());
+            var validator = new ContentValueSetValidator(
+                false,
+                true,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>());
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
-            Assert.AreEqual(ValueSetValidationResult.Valid, result);            
+            Assert.AreEqual(ValueSetValidationResult.Valid, result);
 
             result = validator.Validate(ValueSet.FromObject("777", IndexTypes.Media, new { hello = "world", path = "-1,555" }));
             Assert.AreEqual(ValueSetValidationResult.Valid, result);
@@ -33,7 +38,11 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Must_Have_Path()
         {
-            var validator = new ContentValueSetValidator(false, true, Mock.Of<IPublicAccessService>());
+            var validator = new ContentValueSetValidator(
+                false,
+                true,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>());
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world" }));
             Assert.AreEqual(ValueSetValidationResult.Failed, result);
@@ -45,7 +54,12 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Parent_Id()
         {
-            var validator = new ContentValueSetValidator(false, true, Mock.Of<IPublicAccessService>(), 555);
+            var validator = new ContentValueSetValidator(
+                false,
+                true,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>(),
+                555);
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
             Assert.AreEqual(ValueSetValidationResult.Filtered, result);
@@ -63,7 +77,9 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Inclusion_Field_List()
         {
-            var validator = new ValueSetValidator(null, null,
+            var validator = new ValueSetValidator(
+                null,
+                null,
                 new[] { "hello", "world" },
                 null);
 
@@ -79,7 +95,9 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Exclusion_Field_List()
         {
-            var validator = new ValueSetValidator(null, null,
+            var validator = new ValueSetValidator(
+                null,
+                null,
                 null,
                 new[] { "hello", "world" });
 
@@ -95,7 +113,9 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Inclusion_Exclusion_Field_List()
         {
-            var validator = new ValueSetValidator(null, null,
+            var validator = new ValueSetValidator(
+                null,
+                null,
                 new[] { "hello", "world" },
                 new[] { "world" });
 
@@ -111,7 +131,11 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Inclusion_Type_List()
         {
-            var validator = new ContentValueSetValidator(false, true, Mock.Of<IPublicAccessService>(),
+            var validator = new ContentValueSetValidator(
+                false,
+                true,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>(),
                 includeItemTypes: new List<string> { "include-content" });
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, "test-content", new { hello = "world", path = "-1,555" }));
@@ -127,7 +151,11 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Exclusion_Type_List()
         {
-            var validator = new ContentValueSetValidator(false, true, Mock.Of<IPublicAccessService>(),
+            var validator = new ContentValueSetValidator(
+                false,
+                true,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>(),
                 excludeItemTypes: new List<string> { "exclude-content" });
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, "test-content", new { hello = "world", path = "-1,555" }));
@@ -143,7 +171,11 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Inclusion_Exclusion_Type_List()
         {
-            var validator = new ContentValueSetValidator(false, true, Mock.Of<IPublicAccessService>(),
+            var validator = new ContentValueSetValidator(
+                false,
+                true,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>(),
                 includeItemTypes: new List<string> { "include-content", "exclude-content" },
                 excludeItemTypes: new List<string> { "exclude-content" });
 
@@ -163,7 +195,11 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Recycle_Bin_Content()
         {
-            var validator = new ContentValueSetValidator(true, false, Mock.Of<IPublicAccessService>());
+            var validator = new ContentValueSetValidator(
+                true,
+                false,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>());
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,-20,555" }));
             Assert.AreEqual(ValueSetValidationResult.Failed, result);
@@ -187,7 +223,11 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Recycle_Bin_Media()
         {
-            var validator = new ContentValueSetValidator(true, false, Mock.Of<IPublicAccessService>());
+            var validator = new ContentValueSetValidator(
+                true,
+                false,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>());
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Media, new { hello = "world", path = "-1,-21,555" }));
             Assert.AreEqual(ValueSetValidationResult.Filtered, result);
@@ -203,7 +243,11 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Published_Only()
         {
-            var validator = new ContentValueSetValidator(true, true, Mock.Of<IPublicAccessService>());
+            var validator = new ContentValueSetValidator(
+                true,
+                true,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>());
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
             Assert.AreEqual(ValueSetValidationResult.Failed, result);
@@ -230,7 +274,10 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Published_Only_With_Variants()
         {
-            var validator = new ContentValueSetValidator(true, true, Mock.Of<IPublicAccessService>());
+            var validator = new ContentValueSetValidator(true,
+                true,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IScopeProvider>());
 
             var result = validator.Validate(new ValueSet("555", IndexTypes.Content,
                 new Dictionary<string, object>
@@ -288,7 +335,11 @@ namespace Umbraco.Tests.UmbracoExamine
                 .Returns(Attempt.Succeed(new PublicAccessEntry(Guid.NewGuid(), 555, 444, 333, Enumerable.Empty<PublicAccessRule>())));
             publicAccessService.Setup(x => x.IsProtected("-1,777"))
                 .Returns(Attempt.Fail<PublicAccessEntry>());
-            var validator = new ContentValueSetValidator(false, false, publicAccessService.Object);
+            var validator = new ContentValueSetValidator(
+                false,
+                false,
+                publicAccessService.Object,
+                Mock.Of<IScopeProvider>());
 
             var result = validator.Validate(ValueSet.FromObject("555", IndexTypes.Content, new { hello = "world", path = "-1,555" }));
             Assert.AreEqual(ValueSetValidationResult.Filtered, result);

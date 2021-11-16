@@ -15,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -173,7 +174,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected virtual TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            var rootNodeAsString = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
+            var rootNodeAsString = Constants.System.RootString;
             var currApp = queryStrings.GetValue<string>(TreeQueryStringParameters.Application);
 
             var node = new TreeNode(
@@ -249,7 +250,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url + UDI
+        /// Helper method to create tree nodes and automatically generate the json URL + UDI
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="entityObjectType"></param>
@@ -264,11 +265,12 @@ namespace Umbraco.Web.Trees
             treeNode.Path = entity.Path;
             treeNode.Udi = Udi.Create(ObjectTypes.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
+            treeNode.Trashed = entity.Trashed;
             return treeNode;
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url + UDI
+        /// Helper method to create tree nodes and automatically generate the json URL + UDI
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="entityObjectType"></param>
@@ -287,7 +289,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
+        /// Helper method to create tree nodes and automatically generate the json URL
         /// </summary>
         /// <param name="id"></param>
         /// <param name="parentId"></param>
@@ -304,7 +306,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url
+        /// Helper method to create tree nodes and automatically generate the json URL
         /// </summary>
         /// <param name="id"></param>
         /// <param name="parentId"></param>
@@ -323,7 +325,7 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
-        /// Helper method to create tree nodes and automatically generate the json url + UDI
+        /// Helper method to create tree nodes and automatically generate the json URL + UDI
         /// </summary>
         /// <param name="id"></param>
         /// <param name="parentId"></param>
@@ -366,7 +368,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected bool IsDialog(FormDataCollection queryStrings)
         {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IsDialog);
+            return queryStrings.GetValue<string>(TreeQueryStringParameters.Use) == "dialog";
         }
 
         /// <summary>

@@ -12,17 +12,17 @@ namespace Umbraco.Tests.Testing
         /// <remarks>
         /// <para>Default is false.</para>
         /// <para>This is for tests that inherited from TestWithApplicationBase.</para>
-        /// <para>Implies AutoMapper = true (, ResetPluginManager = false).</para>
+        /// <para>Implies Mapper = true (, ResetPluginManager = false).</para>
         /// </remarks>
         public bool WithApplication { get => _withApplication.ValueOrDefault(false); set => _withApplication.Set(value); }
         private readonly Settable<bool> _withApplication = new Settable<bool>();
 
         /// <summary>
-        /// Gets or sets a value indicating whether to compose and initialize AutoMapper.
+        /// Gets or sets a value indicating whether to compose and initialize the mapper.
         /// </summary>
         /// <remarks>Default is false unless WithApplication is true, in which case default is true.</remarks>
-        public bool AutoMapper { get => _autoMapper.ValueOrDefault(WithApplication); set => _autoMapper.Set(value); }
-        private readonly Settable<bool> _autoMapper = new Settable<bool>();
+        public bool Mapper { get => _mapper.ValueOrDefault(WithApplication); set => _mapper.Set(value); }
+        private readonly Settable<bool> _mapper = new Settable<bool>();
 
         // FIXME: to be completed
         /// <summary>
@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Testing
 
             base.Merge(other);
 
-            _autoMapper.Set(attr._autoMapper);
+            _mapper.Set(attr._mapper);
             _publishedRepositoryEvents.Set(attr._publishedRepositoryEvents);
             _logger.Set(attr._logger);
             _database.Set(attr._database);

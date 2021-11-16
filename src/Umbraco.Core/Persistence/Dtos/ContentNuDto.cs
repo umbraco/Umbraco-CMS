@@ -1,4 +1,5 @@
-﻿using NPoco;
+﻿using System.Data;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
@@ -10,7 +11,7 @@ namespace Umbraco.Core.Persistence.Dtos
     {
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsContentNu", OnColumns = "nodeId, published")]
-        [ForeignKey(typeof(ContentDto), Column = "nodeId")]
+        [ForeignKey(typeof(ContentDto), Column = "nodeId", OnDelete = Rule.Cascade)]
         public int NodeId { get; set; }
 
         [Column("published")]
@@ -24,9 +25,16 @@ namespace Umbraco.Core.Persistence.Dtos
         /// </remarks>
         [Column("data")]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public string Data { get; set; }
 
         [Column("rv")]
         public long Rv { get; set; }
+
+        [Column("dataRaw")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public byte[] RawData { get; set; }
+
+       
     }
 }

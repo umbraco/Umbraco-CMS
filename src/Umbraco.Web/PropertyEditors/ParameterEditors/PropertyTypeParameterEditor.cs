@@ -3,7 +3,11 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [DataEditor("propertyTypePicker", EditorType.MacroParameter, "Property Type Picker", "entitypicker")]
+    [DataEditor(
+        "propertyTypePicker",
+        EditorType.MacroParameter,
+        "Property Type Picker",
+        "entitypicker")]
     public class PropertyTypeParameterEditor : DataEditor
     {
         public PropertyTypeParameterEditor(ILogger logger)

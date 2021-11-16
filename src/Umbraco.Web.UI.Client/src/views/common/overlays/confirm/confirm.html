@@ -1,0 +1,13 @@
+﻿<div>
+
+    <p ng-bind-html="model.content"></p>
+
+    <div ng-if="model.confirmMessage"
+         class="umb-alert mb2"
+         ng-class="{ 'umb-alert--warning': model.confirmMessageStyle === 'warning',
+                     'umb-alert--danger': model.confirmMessageStyle === 'danger',
+                     'umb-alert--info': model.confirmMessageStyle === 'info'}"
+         ng-bind-html="model.confirmMessage">
+    </div>
+
+</div>

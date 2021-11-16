@@ -42,9 +42,9 @@ namespace Umbraco.Tests.Cache.PublishedCache
         protected override void Initialize()
         {
             base.Initialize();
-            var type = new AutoPublishedContentType(22, "myType", new PublishedPropertyType[] { });
-            var image = new AutoPublishedContentType(23, "Image", new PublishedPropertyType[] { });
-            var testMediaType = new AutoPublishedContentType(24, "TestMediaType", new PublishedPropertyType[] { });
+            var type = new AutoPublishedContentType(Guid.NewGuid(), 22, "myType", new PublishedPropertyType[] { });
+            var image = new AutoPublishedContentType(Guid.NewGuid(), 23, "Image", new PublishedPropertyType[] { });
+            var testMediaType = new AutoPublishedContentType(Guid.NewGuid(), 24, "TestMediaType", new PublishedPropertyType[] { });
             _mediaTypes = new Dictionary<string, PublishedContentType>
             {
                 { type.Alias, type },
@@ -323,8 +323,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 // no xpath
                 null,
                 // not from examine
-                false,
-                _umbracoContextAccessor),
+                false),
             //callback to get the children
             (dd, n) => children,
             // callback to get a property
@@ -334,8 +333,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             // no xpath
             null,
             // not from examine
-            false,
-            _umbracoContextAccessor);
+            false);
             return dicDoc;
         }
 

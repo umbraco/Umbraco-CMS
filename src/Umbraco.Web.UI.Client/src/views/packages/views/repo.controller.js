@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesRepoController($scope, $route, $location, $timeout, ourPackageRepositoryResource, $q, packageResource, localStorageService, localizationService) {
+    function PackagesRepoController($scope, $timeout, ourPackageRepositoryResource, $q, packageResource, localStorageService, localizationService) {
 
         var vm = this;
 
@@ -34,7 +34,9 @@
 
         var labels = {};
 
-        var currSort = "Latest";
+        var defaultSort = "Latest";
+        var currSort = defaultSort;
+
         //used to cancel any request in progress if another one needs to take it's place
         var canceler = null;
 
@@ -73,7 +75,9 @@
             $q.all([
                 ourPackageRepositoryResource.getCategories()
                     .then(function (cats) {
-                        vm.categories = cats;
+                        vm.categories = cats.filter(function (cat) {
+                            return cat.name !== "Umbraco Pro";
+                        });
                     }),
                 ourPackageRepositoryResource.getPopular(8)
                     .then(function (pack) {
@@ -92,24 +96,30 @@
         }
 
         function selectCategory(selectedCategory, categories) {
-            var reset = false;
+
             for (var i = 0; i < categories.length; i++) {
                 var category = categories[i];
-                if (category.name === selectedCategory.name && category.active === true) {
+                if (category.name === selectedCategory.name) {
                     //it's already selected, let's unselect to show all again
-                    reset = true;
+                    if (category.active === true) {
+                        category.active = false;
+                    }
+                    else {
+                        category.active = true;
+                    }
                 }
-                category.active = false;
+                else {
+                    category.active = false;
+                }
             }
 
             vm.loading = true;
             vm.searchQuery = "";
-            var searchCategory = selectedCategory.name;
-            if (reset === true) {
-                searchCategory = "";
-            }
 
-            currSort = "Latest";
+            var reset = selectedCategory.active === false;
+            var searchCategory = reset ? "" : selectedCategory.name;
+
+            currSort = defaultSort;
 
             $q.all([
                 ourPackageRepositoryResource.getPopular(8, searchCategory)
@@ -122,10 +132,9 @@
                         vm.pagination.totalPages = Math.ceil(pack.total / vm.pagination.pageSize);
                         vm.pagination.pageNumber = 1;
                     })
-            ])
+                ])
                 .then(function () {
                     vm.loading = false;
-                    selectedCategory.active = reset === false;
                 });
         }
 

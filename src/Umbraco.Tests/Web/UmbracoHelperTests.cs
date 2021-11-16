@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Text;
+using Examine.LuceneEngine;
+using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Standard;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -13,18 +16,19 @@ using Umbraco.Web;
 
 namespace Umbraco.Tests.Web
 {
+
     [TestFixture]
     public class UmbracoHelperTests
-    {   
+    {
 
         [TearDown]
         public void TearDown()
         {
             Current.Reset();
         }
-        
 
-        
+
+
         // ------- Int32 conversion tests
         [Test]
         public static void Converting_Boxed_34_To_An_Int_Returns_34()

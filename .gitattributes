@@ -13,7 +13,7 @@
 *.png 	binary
 *.gif 	binary
 
-*.cs text=auto diff=csharp 
+*.cs text=auto diff=csharp
 *.vb text=auto
 *.c text=auto
 *.cpp text=auto
@@ -41,9 +41,13 @@
 *.fs text=auto
 *.fsx text=auto
 *.hs text=auto
+*.json text=auto
+*.xml text=auto
 
-*.csproj text=auto merge=union 
-*.vbproj text=auto merge=union 
-*.fsproj text=auto merge=union 
-*.dbproj text=auto merge=union 
-*.sln text=auto eol=crlf merge=union 
+*.csproj text=auto merge=union
+*.vbproj text=auto merge=union
+*.fsproj text=auto merge=union
+*.dbproj text=auto merge=union
+*.sln text=auto eol=crlf merge=union
+
+*.gitattributes text=auto

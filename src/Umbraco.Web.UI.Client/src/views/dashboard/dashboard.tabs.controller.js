@@ -22,7 +22,7 @@ function startUpVideosDashboardController($scope, dashboardResource) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function startUpDynamicContentController($timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
+function startUpDynamicContentController($q, $timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
     var vm = this;
     var evts = [];
 
@@ -70,7 +70,7 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
             {
                 title: "Umbraco.TV - Learn from the source!",
                 description: "Umbraco.TV will help you go from zero to Umbraco hero at a pace that suits you. Our easy to follow online training videos will give you the fundamental knowledge to start building awesome Umbraco websites.",
-                img: "views/dashboard/default/umbracotv.jpg",
+                img: "views/dashboard/default/umbracotv.png",
                 url: "https://umbraco.tv/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=tv",
                 altText: "Umbraco.TV - Hours of Umbraco Video Tutorials",
                 buttonText: "Visit Umbraco.TV"
@@ -78,7 +78,7 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
             {
                 title: "Our Umbraco - The Friendliest Community",
                 description: "Our Umbraco - the official community site is your one stop for everything Umbraco. Whether you need a question answered or looking for cool plugins, the world's best and friendliest community is just a click away.",
-                img: "views/dashboard/default/ourumbraco.jpg",
+                img: "views/dashboard/default/ourumbraco.png",
                 url: "https://our.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our",
                 altText: "Our Umbraco",
                 buttonText: "Visit Our Umbraco"
@@ -88,9 +88,9 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
 
     evts.push(eventsService.on("appState.tour.complete", function (name, completedTour) {
         $timeout(function(){
-            angular.forEach(vm.tours, function (tourGroup) {
-                angular.forEach(tourGroup, function (tour) {
-                    if(tour.alias === completedTour.alias) {
+            Utilities.forEach(vm.tours, tourGroup => {
+                Utilities.forEach(tourGroup, tour => {
+                    if (tour.alias === completedTour.alias) {
                         tour.completed = true;
                     }
                 });
@@ -100,27 +100,24 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
 
     //proxy remote css through the local server
     assetsService.loadCss(dashboardResource.getRemoteDashboardCssUrl("content"), $scope);
-    dashboardResource.getRemoteDashboardContent("content").then(
-        function (data) {
 
-            vm.loading = false;
+    dashboardResource.getRemoteDashboardContent("content").then(data => {
 
-            //test if we have received valid data
-            //we capture it like this, so we avoid UI errors - which automatically triggers ui based on http response code
-            if (data && data.sections) {
-                vm.dashboard = data;
-            } else{
-                vm.showDefault = true;
-            }
+        vm.loading = false;
 
-        },
-
-        function (exception) {
-            console.error(exception);
-            vm.loading = false;
+        //test if we have received valid data
+        //we capture it like this, so we avoid UI errors - which automatically triggers ui based on http response code
+        if (data && data.sections) {
+            vm.dashboard = data;
+        } else {
             vm.showDefault = true;
-        });
-
+        }
+    },
+    function (exception) {
+        console.error(exception);
+        vm.loading = false;
+        vm.showDefault = true;
+    });
 
     onInit();
 
@@ -220,7 +217,7 @@ function startupLatestEditsController($scope) {
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupLatestEditsController", startupLatestEditsController);
 
-function MediaFolderBrowserDashboardController($rootScope, $scope, $location, contentTypeResource, userService) {
+function MediaFolderBrowserDashboardController($scope, $routeParams, $location, contentTypeResource, userService) {
 
     var currentUser = {};
 
@@ -251,6 +248,8 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, $location, co
                         view: dt.view
                     };
 
+                    // tell the list view to list content at root
+                    $routeParams.id = -1;
             });
 
         } else if (currentUser.startMediaIds.length > 0){

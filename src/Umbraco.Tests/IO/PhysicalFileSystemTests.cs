@@ -101,7 +101,7 @@ namespace Umbraco.Tests.IO
             Assert.AreEqual(Path.Combine(basePath, @"foo\bar.tmp"), path);
 
             // that path is invalid as it would be outside the root directory
-            Assert.Throws<FileSecurityException>(() => _fileSystem.GetFullPath("../../foo.tmp"));
+            Assert.Throws<UnauthorizedAccessException>(() => _fileSystem.GetFullPath("../../foo.tmp"));
 
             // a very long path, which ends up being very long, works
             path = Repeat("bah/bah/", 50);

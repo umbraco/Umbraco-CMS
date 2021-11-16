@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -12,29 +13,18 @@ namespace Umbraco.Core.Persistence.Mappers
     [MapperFor(typeof(UserGroup))]
     public sealed class UserGroupMapper : BaseMapper
     {
-        private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
+        public UserGroupMapper(Lazy<ISqlContext> sqlContext, ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> maps)
+            : base(sqlContext, maps)
+        { }
 
-        //NOTE: its an internal class but the ctor must be public since we're using Activator.CreateInstance to create it
-        // otherwise that would fail because there is no public constructor.
-        public UserGroupMapper()
+        protected override void DefineMaps()
         {
-            BuildMap();
+            DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Id), nameof(UserGroupDto.Id));
+            DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Alias), nameof(UserGroupDto.Alias));
+            DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Name), nameof(UserGroupDto.Name));
+            DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.Icon), nameof(UserGroupDto.Icon));
+            DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.StartContentId), nameof(UserGroupDto.StartContentId));
+            DefineMap<UserGroup, UserGroupDto>(nameof(UserGroup.StartMediaId), nameof(UserGroupDto.StartMediaId));
         }
-
-        #region Overrides of BaseMapper
-
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
-
-        protected override void BuildMap()
-        {
-            CacheMap<UserGroup, UserGroupDto>(src => src.Id, dto => dto.Id);
-            CacheMap<UserGroup, UserGroupDto>(src => src.Alias, dto => dto.Alias);
-            CacheMap<UserGroup, UserGroupDto>(src => src.Name, dto => dto.Name);
-            CacheMap<UserGroup, UserGroupDto>(src => src.Icon, dto => dto.Icon);
-            CacheMap<UserGroup, UserGroupDto>(src => src.StartContentId, dto => dto.StartContentId);
-            CacheMap<UserGroup, UserGroupDto>(src => src.StartMediaId, dto => dto.StartMediaId);
-        }
-
-        #endregion
     }
 }

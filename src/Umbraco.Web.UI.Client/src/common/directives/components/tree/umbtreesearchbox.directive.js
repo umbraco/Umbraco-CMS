@@ -5,15 +5,18 @@
 * @element ANY
 * @restrict E
 **/
-function treeSearchBox(localizationService, searchService, $q) {
+function treeSearchBox($q, searchService) {
     return {
         scope: {
             searchFromId: "@",
             searchFromName: "@",
             showSearch: "@",
             section: "@",
+            datatypeKey: "@",
             hideSearchCallback: "=",
-            searchCallback: "="
+            searchCallback: "=",
+            inputId: "@",
+            autoFocus: "="
         },
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
@@ -21,14 +24,11 @@ function treeSearchBox(localizationService, searchService, $q) {
         link: function (scope, element, attrs, ctrl) {
 
             scope.term = "";
+
             scope.hideSearch = function() {
                 scope.term = "";
                 scope.hideSearchCallback();
             };
-
-            localizationService.localize("general_typeToSearch").then(function (value) {
-                scope.searchPlaceholderText = value;
-            });
 
             if (!scope.showSearch) {
                 scope.showSearch = "false";
@@ -60,11 +60,19 @@ function treeSearchBox(localizationService, searchService, $q) {
                         searchArgs["searchFrom"] = scope.searchFromId;
                     }
 
+                    //append dataTypeId value if there is one
+                    if (scope.datatypeKey) {
+                        searchArgs["dataTypeKey"] = scope.datatypeKey;
+                    }
+
                     searcher(searchArgs).then(function (data) {
                         scope.searchCallback(data);
                         //set back to null so it can be re-created
                         canceler = null;
                     });
+                }
+                else {
+                    scope.hideSearch();
                 }
             }
 

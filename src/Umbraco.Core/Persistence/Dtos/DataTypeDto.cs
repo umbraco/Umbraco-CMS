@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public string Configuration { get; set; }
 
         [ResultColumn]
-        [Reference(ReferenceType.OneToOne, ColumnName = "DataTypeId")]
+        [Reference(ReferenceType.OneToOne, ColumnName = "NodeId")]
         public NodeDto NodeDto { get; set; }
     }
 }

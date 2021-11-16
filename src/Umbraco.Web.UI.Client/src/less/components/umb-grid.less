@@ -128,9 +128,10 @@
     position: relative;
     margin-bottom: 40px;
     padding-top: 10px;
+    border: 1px solid @grayLighter;
 
     &:hover {
-        background-color: @grayLighter;
+        border-color: @grayLight;
     }
 
     &[ng-click],
@@ -161,15 +162,18 @@
 }
 
 .umb-grid .umb-row .umb-cell-placeholder {
-    min-height: 130px;
-    background-color: @gray-10;
-    border-width: 2px;
+    display: block;
+    width: 100%;
+    min-height: 88px;
+    border-width: 1px;
     border-style: dashed;
-    border-color: @gray-8;
+    border-color: @ui-action-discreet-border;
+    color: @ui-action-discreet-type;
     transition: border-color 100ms linear;
 
     &:hover {
-        border-color: @blueMid;
+        border-color: @ui-action-discreet-border-hover;
+        color: @ui-action-discreet-type-hover;
         cursor: pointer;
     }
 }
@@ -207,9 +211,9 @@
 }
 
 .umb-grid .cell-tools-add {
-    color: @ui-action-type;
+    color: @ui-action-discreet-type;
     &:focus, &:hover {
-        color: @ui-action-type-hover;
+        color: @ui-action-discreet-type-hover;
         text-decoration: none;
     }
 }
@@ -219,16 +223,19 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: @ui-action-type;
+    color: @ui-action-discreet-type;
 }
 
 .umb-grid .cell-tools-add.-bar {
     display: block;
-    background: @gray-10;
+    width: calc(100% - 20px);
     text-align: center;
     padding: 5px;
-    border: 1px dashed @gray-7;
+    border: 1px dashed @ui-action-discreet-border;
     margin: 10px;
+    &:focus, &:hover {
+        border-color: @ui-action-discreet-border-hover;
+    }
 }
 
 
@@ -249,7 +256,6 @@
 
 .umb-grid .cell-tools-edit {
     display: inline-block;
-    color: @white;
 }
 
 .umb-grid .drop-overlay {
@@ -386,7 +392,7 @@
 // EDITOR PLACEHOLDER
 // -------------------------
 .umb-grid .umb-editor-placeholder {
-    min-height: 65px;
+    min-height: 110px;
     padding: 20px;
     padding-bottom: 30px;
     position: relative;
@@ -394,47 +400,42 @@
     border: 4px dashed @gray-8;
     text-align: center;
     text-align: -moz-center;
-    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.umb-grid .umb-editor-placeholder i {
+.umb-grid .umb-editor-placeholder .icon {
     color: @gray-8;
     font-size: 85px;
-    line-height: 85px;
+    line-height: 1;
     display: block;
-    margin-bottom: 10px;
+    margin: 10px auto;
 }
 
+.umb-grid .umb-editor-preview {
+    position: relative;
+    width: 100%;
 
+    .umb-editor-preview-overlay {
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+}
 
 // Active states
 // -------------------------
 
 // Row states
 .umb-grid .umb-row.-active {
-    background-color: @ui-action-type;
+    border-color: @ui-action-type;
 
     .umb-row-title-bar {
         cursor: move;
-    }
-
-    .row-tool,
-    .umb-row-title {
-        color: @white;
-    }
-
-    .umb-grid-has-config {
-        color: fade(@white, 66);
-    }
-
-    .umb-cell {
-        .umb-grid-has-config {
-            color: fade(@black, 44);
-        }
-    }
-
-    .umb-cell .umb-cell-content {
-        border-color: transparent;
     }
 }
 
@@ -450,21 +451,6 @@
         color: @gray-3;
     }
 
-    .row-tool {
-        color: fade(@black, 23);
-    }
-
-    .umb-grid-has-config {
-        color: fade(@black, 44);
-    }
-
-    .umb-cell-content.-placeholder {
-        border-color: @gray-8;
-
-        &:hover {
-            border-color: fade(@gray, 44);
-        }
-    }
 }
 
 
@@ -490,9 +476,19 @@
     }
 }
 
+// Control states 
+.umb-grid-media--controls {
+    display:none;
+    position: absolute;
+    top:0.5rem;
+    right:0.5rem;    
+}
 
-
-
+.umb-grid .umb-row .umb-control.-active {
+    .umb-grid-media--controls {
+        display:flex;
+    }
+}
 
 // Title bar and tools
 .umb-grid .umb-row-title-bar {
@@ -569,18 +565,16 @@
 // ICONS
 // -------------------------
 .umb-grid .iconBox {
-    padding: 4px 6px;
-    display: inline-block;
-    cursor: pointer;
+    padding: 6px;
+    display: flex;
     border-radius: 200px;
-    background: @gray-10;
-    border: 1px solid @gray-7;
-    margin: 2px;
+    border: 1px solid @ui-action-discreet-border;
+    margin: 0 auto;
 
     &:hover, &:hover * {
-        background: @ui-action-type-hover !important;
+        background: @ui-action-discreet-type-hover !important;
         color: @white !important;
-        border-color: @ui-action-type-hover !important;
+        border-color: @ui-action-discreet-border-hover !important;
         text-decoration: none;
     }
 }
@@ -602,10 +596,8 @@
 
 .umb-grid .iconBox.selected {
     -webkit-appearance: none;
-    background-image: linear-gradient(to bottom,#e6e6e6,#bfbfbf);
+    background-image: linear-gradient(to bottom,@gray-9,@gray-7);
     background-repeat: repeat-x;
-    zoom: 1;
-    border-color: #bfbfbf #bfbfbf #999;
     border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15),0 1px 2px rgba(0,0,0,0.05);
     border-radius: 3px;
@@ -613,9 +605,10 @@
 }
 
 .umb-grid .iconBox i {
-    font-size: 16px !important;
-    color: @gray-3 ;
+    color: @gray-3;
     display: block;
+    font-size: 16px;
+    line-height: inherit;
 }
 
 .umb-grid .help-text {
@@ -625,8 +618,6 @@
     display: inline-block;
     clear: both;
 }
-
-
 
 // TINYMCE EDITOR
 // -------------------------
@@ -643,6 +634,10 @@
         padding-bottom: 8px;
         padding-left: 6px;
         line-height: inherit;
+
+        .mce-caret {
+            margin-top: 6px;
+        }
     }
 
     &:not(.mce-menubtn) {
@@ -653,9 +648,12 @@
 }
 
 .umb-grid .mce-toolbar {
-    border-bottom: 1px solid @gray-8;
-    background-color: rgba(250, 250, 250, 1);
+    border-bottom: 1px solid @gray-7;
+    background-color: @white;
     display: none;
+
+    left: 0;
+    right: 0;
 }
 
 .umb-grid .umb-control.-active .mce-toolbar {
@@ -668,6 +666,13 @@
 
 .umb-grid .mceContentBody {
     overflow-y: hidden!important;
+}
+
+// had to overwrite defaults from TinyMCE, needed for buttons panel to float to new line in narrow space.
+.umb-grid .mce-container > div {
+    white-space: normal;
+    left:0;
+    right:0;
 }
 
 
@@ -754,9 +759,19 @@
     margin-right: 5px;
     position: relative;
     cursor: pointer;
-    display:inline-block;
+    display: inline-block;
 }
 
+.umb-grid .cell-tools,
+.umb-grid .umb-control-tool {
+    .btn-icon {
+        padding: 0;
+    }
+}
+
+.umb-grid .umb-control-tool .btn-icon {
+    color: @white;
+}
 
 
 // Template
@@ -823,8 +838,8 @@
             position: absolute;
             width: 100%;
             left: 0;
-            bottom: -25px;
             padding-top: 15px;
+            top: 15px;
         }
 
         .help-text {
@@ -1009,8 +1024,6 @@
     color: @gray-6;
     display: block;
 }
-
-
 
 // Configuration specific styles
 // -------------------------

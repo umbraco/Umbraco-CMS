@@ -4,8 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Filters;
-using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -30,14 +28,19 @@ namespace Umbraco.Web.Editors
 
             //authorize that the user has access to save this user group
             var authHelper = new UserGroupEditorAuthorizationHelper(
-                Services.UserService, Services.ContentService, Services.MediaService, Services.EntityService);
+                Services.UserService,
+                Services.ContentService,
+                Services.MediaService,
+                Services.EntityService,
+                AppCaches);
 
             var isAuthorized = authHelper.AuthorizeGroupAccess(Security.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
 
             //if sections were added we need to check that the current user has access to that section
-            isAuthorized = authHelper.AuthorizeSectionChanges(Security.CurrentUser,
+            isAuthorized = authHelper.AuthorizeSectionChanges(
+                Security.CurrentUser,
                 userGroupSave.PersistedUserGroup.AllowedSections,
                 userGroupSave.Sections);
             if (isAuthorized == false)
@@ -52,13 +55,11 @@ namespace Umbraco.Web.Editors
             if (isAuthorized == false)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
 
-            //current user needs to be added to a new group if not an admin (possibly only if no other users are added?) to avoid a 401
-            if(!Security.CurrentUser.IsAdmin() && (userGroupSave.Id == null || Convert.ToInt32(userGroupSave.Id) >= 0)/* && !userGroupSave.Users.Any() */)
-            {
-                var userIds = userGroupSave.Users.ToList();
-                userIds.Add(Security.CurrentUser.Id);
-                userGroupSave.Users = userIds;
-            }
+            //need to ensure current user is in a group if not an admin to avoid a 401
+            EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
+
+            //map the model to the persisted instance
+            Mapper.Map(userGroupSave, userGroupSave.PersistedUserGroup);
 
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
@@ -85,8 +86,25 @@ namespace Umbraco.Web.Editors
 
             var display = Mapper.Map<UserGroupDisplay>(userGroupSave.PersistedUserGroup);
 
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserGroupSaved"));
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", "operationSavedHeader"), Services.TextService.Localize("speechBubbles", "editUserGroupSaved"));
             return display;
+        }
+
+        private void EnsureNonAdminUserIsInSavedUserGroup(UserGroupSave userGroupSave)
+        {
+            if (Security.CurrentUser.IsAdmin())
+            {
+                return;
+            }
+
+            var userIds = userGroupSave.Users.ToList();
+            if (userIds.Contains(Security.CurrentUser.Id))
+            {
+                return;
+            }
+
+            userIds.Add(Security.CurrentUser.Id);
+            userGroupSave.Users = userIds;
         }
 
         /// <summary>
@@ -104,7 +122,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<UserGroupBasic> GetUserGroups(bool onlyCurrentUserGroups = true)
         {
-            var allGroups = Mapper.Map<IEnumerable<IUserGroup>, IEnumerable<UserGroupBasic>>(Services.UserService.GetAllUserGroups())
+            var allGroups = Mapper.MapEnumerable<IUserGroup, UserGroupBasic>(Services.UserService.GetAllUserGroups())
                 .ToList();
 
             var isAdmin = Security.CurrentUser.IsAdmin();
@@ -144,8 +162,8 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostDeleteUserGroups([FromUri] int[] userGroupIds)
         {
             var userGroups = Services.UserService.GetAllUserGroups(userGroupIds)
-                //never delete the admin group or translators group
-                .Where(x => x.Alias != Constants.Security.AdminGroupAlias && x.Alias != Constants.Security.TranslatorGroupAlias)
+                //never delete the admin group, sensitive data or translators group
+                .Where(x => !x.IsSystemUserGroup())
                 .ToArray();
             foreach (var userGroup in userGroups)
             {
@@ -153,9 +171,9 @@ namespace Umbraco.Web.Editors
             }
             if (userGroups.Length > 1)
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
+                    Services.TextService.Localize("speechBubbles", "deleteUserGroupsSuccess", new[] {userGroups.Length.ToString()}));
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/deleteUserGroupSuccess", new[] {userGroups[0].Name}));
+                Services.TextService.Localize("speechBubbles", "deleteUserGroupSuccess", new[] {userGroups[0].Name}));
         }
     }
 }

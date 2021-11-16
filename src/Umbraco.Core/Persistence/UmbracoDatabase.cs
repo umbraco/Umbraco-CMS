@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Core.Persistence
 {
+
     /// <summary>
     /// Extends NPoco Database for Umbraco.
     /// </summary>
@@ -20,9 +21,6 @@ namespace Umbraco.Core.Persistence
     /// </remarks>
     public class UmbracoDatabase : Database, IUmbracoDatabase
     {
-        // Umbraco's default isolation level is RepeatableRead
-        private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
-
         private readonly ILogger _logger;
         private readonly RetryPolicy _connectionRetryPolicy;
         private readonly RetryPolicy _commandRetryPolicy;
@@ -38,15 +36,13 @@ namespace Umbraco.Core.Persistence
         /// <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
         /// </remarks>
         public UmbracoDatabase(string connectionString, ISqlContext sqlContext, DbProviderFactory provider, ILogger logger, RetryPolicy connectionRetryPolicy = null, RetryPolicy commandRetryPolicy = null)
-            : base(connectionString, sqlContext.DatabaseType, provider, DefaultIsolationLevel)
+            : base(connectionString, sqlContext.DatabaseType, provider, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
-
             _logger = logger;
             _connectionRetryPolicy = connectionRetryPolicy;
             _commandRetryPolicy = commandRetryPolicy;
-
-            EnableSqlTrace = EnableSqlTraceDefault;
+            Init();
         }
 
         /// <summary>
@@ -54,12 +50,21 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <remarks>Internal for unit tests only.</remarks>
         internal UmbracoDatabase(DbConnection connection, ISqlContext sqlContext, ILogger logger)
-            : base(connection, sqlContext.DatabaseType, DefaultIsolationLevel)
+            : base(connection, sqlContext.DatabaseType, sqlContext.SqlSyntax.DefaultIsolationLevel)
         {
             SqlContext = sqlContext;
             _logger = logger;
+            Init();
+        }
 
+        private void Init()
+        {
             EnableSqlTrace = EnableSqlTraceDefault;
+            NPocoDatabaseExtensions.ConfigureNPocoBulkExtensions();
+            if (SqlContext.DatabaseType == DatabaseType.SQLCe)
+            {
+                Mappers.Add(new SqlCeImageMapper());
+            }
         }
 
         #endregion
@@ -202,10 +207,10 @@ namespace Umbraco.Core.Persistence
 
         protected override void OnException(Exception ex)
         {
-            _logger.Error<UmbracoDatabase>(ex, "Exception ({InstanceId}).", InstanceId);
-            _logger.Debug<UmbracoDatabase>("At:\r\n{StackTrace}", Environment.StackTrace);
+            _logger.Error<UmbracoDatabase, string>(ex, "Exception ({InstanceId}).", InstanceId);
+            _logger.Debug<UmbracoDatabase, string>("At:\r\n{StackTrace}", Environment.StackTrace);
             if (EnableSqlTrace == false)
-                _logger.Debug<UmbracoDatabase>("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
+                _logger.Debug<UmbracoDatabase, string>("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
             base.OnException(ex);
         }
 
@@ -218,7 +223,7 @@ namespace Umbraco.Core.Persistence
                 cmd.CommandTimeout = cmd.Connection.ConnectionTimeout;
 
             if (EnableSqlTrace)
-                _logger.Debug<UmbracoDatabase>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
+                _logger.Debug<UmbracoDatabase, string>("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)
@@ -256,5 +261,6 @@ namespace Umbraco.Core.Persistence
         }
 
         #endregion
+
     }
 }

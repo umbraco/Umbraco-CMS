@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -7,7 +7,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Routing
 {
     /// <summary>
-    /// Provides an implementation of <see cref="IContentFinder"/> that handles page url rewrites
+    /// Provides an implementation of <see cref="IContentFinder"/> that handles page URL rewrites
     /// that are stored when moving, saving, or deleting a node.
     /// </summary>
     /// <remarks>
@@ -25,37 +25,39 @@ namespace Umbraco.Web.Routing
         }
 
         /// <summary>
-        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// Tries to find and assign an Umbraco document to a <c>PublishedRequest</c>.
         /// </summary>
-        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <param name="frequest">The <c>PublishedRequest</c>.</param>
         /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
         /// <remarks>Optionally, can also assign the template or anything else on the document request, although that is not required.</remarks>
         public bool TryFindContent(PublishedRequest frequest)
         {
             var route = frequest.HasDomain
-                ? frequest.Domain.ContentId + DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded())
+                ? frequest.Domain.ContentId + DomainUtilities.PathRelativeToDomain(frequest.Domain.Uri, frequest.Uri.GetAbsolutePathDecoded())
                 : frequest.Uri.GetAbsolutePathDecoded();
 
-            var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route);
+
+
+            var redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(route, frequest.Culture.Name);
 
             if (redirectUrl == null)
             {
-                _logger.Debug<ContentFinderByRedirectUrl>("No match for route: {Route}", route);
+                _logger.Debug<ContentFinderByRedirectUrl, string>("No match for route: {Route}", route);
                 return false;
             }
 
-            var content = frequest.UmbracoContext.ContentCache.GetById(redirectUrl.ContentId);
-            var url = content == null ? "#" : content.GetUrl(redirectUrl.Culture);
+            var content = frequest.UmbracoContext.Content.GetById(redirectUrl.ContentId);
+            var url = content == null ? "#" : content.Url(redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
-                _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} which has no url.", route, redirectUrl.ContentId);
+                _logger.Debug<ContentFinderByRedirectUrl, string, int>("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
                 return false;
             }
 
-            // Appending any querystring from the incoming request to the redirect url.
+            // Appending any querystring from the incoming request to the redirect URL
             url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
 
-            _logger.Debug<ContentFinderByRedirectUrl>("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
+            _logger.Debug<ContentFinderByRedirectUrl, string, int, string>("Route {Route} matches content {ContentId} with url '{Url}', redirecting.", route, content.Id, url);
             frequest.SetRedirectPermanent(url);
 
 

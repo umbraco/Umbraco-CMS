@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
@@ -23,28 +25,28 @@ namespace Umbraco.Core
         /// <returns></returns>
         ///  <remarks>
         ///  There are some special routes we need to check to properly determine this:
-        /// 
+        ///
         ///      If any route has an extension in the path like .aspx = back office
-        /// 
+        ///
         ///      These are def back office:
         ///          /Umbraco/BackOffice     = back office
         ///          /Umbraco/Preview        = back office
         ///      If it's not any of the above, and there's no extension then we cannot determine if it's back office or front-end
         ///      so we can only assume that it is not back office. This will occur if people use an UmbracoApiController for the backoffice
         ///      but do not inherit from UmbracoAuthorizedApiController and do not use [IsBackOffice] attribute.
-        /// 
+        ///
         ///      These are def front-end:
         ///          /Umbraco/Surface        = front-end
         ///          /Umbraco/Api            = front-end
         ///      But if we've got this far we'll just have to assume it's front-end anyways.
-        /// 
+        ///
         ///  </remarks>
         internal static bool IsBackOfficeRequest(this Uri url, string applicationPath, IGlobalSettings globalSettings)
         {
             applicationPath = applicationPath ?? string.Empty;
 
-            var fullUrlPath = url.AbsolutePath.TrimStart(new[] {'/'});
-            var appPath = applicationPath.TrimStart(new[] {'/'});
+            var fullUrlPath = url.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash);
+            var appPath = applicationPath.TrimStart(Constants.CharArrays.ForwardSlash);
             var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
 
             //check if this is in the umbraco back office
@@ -93,7 +95,7 @@ namespace Umbraco.Core
             // Umbraco/MYPLUGINAREA/MYCONTROLLERNAME/{action}/{id}
             // so if the path contains at a minimum 3 parts: Umbraco + MYPLUGINAREA + MYCONTROLLERNAME then we will have to assume it is a
             // plugin controller for the front-end.
-            if (urlPath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries).Length >= 3)
+            if (urlPath.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries).Length >= 3)
             {
                 return false;
             }
@@ -137,6 +139,14 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Non Client Side request Extensions <see cref="IsClientSideRequest"/>
+        /// </summary>
+        internal readonly static HashSet<string> NonClientSideRequestExtensions = new (5, StringComparer.InvariantCultureIgnoreCase)
+        {
+            ".aspx", ".ashx", ".asmx", ".axd", ".svc"
+        };
+
+        /// <summary>
         /// This is a performance tweak to check if this not an ASP.Net server file
         /// .Net will pass these requests through to the module when in integrated mode.
         /// We want to ignore all of these requests immediately.
@@ -149,12 +159,11 @@ namespace Umbraco.Core
             {
                 var ext = Path.GetExtension(url.LocalPath);
                 if (ext.IsNullOrWhiteSpace()) return false;
-                var toInclude = new[] {".aspx", ".ashx", ".asmx", ".axd", ".svc"};
-                return toInclude.Any(ext.InvariantEquals) == false;
+                return !NonClientSideRequestExtensions.Contains(ext);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Current.Logger.Error(typeof(UriExtensions), ex, "Failed to determine if request was client side");
+                Current.Logger.Debug<string>(typeof(UriExtensions), "Failed to determine if request was client side (invalid chars in path \"{Path}\"?)", url.LocalPath);
                 return false;
             }
         }

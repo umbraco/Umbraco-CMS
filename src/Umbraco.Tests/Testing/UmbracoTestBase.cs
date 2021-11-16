@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using AutoMapper;
 using Examine;
 using Moq;
 using NUnit.Framework;
@@ -37,10 +36,14 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Trees;
 using Umbraco.Core.Composing.CompositionExtensions;
+using Umbraco.Core.Mapping;
 using Umbraco.Web.Composing.CompositionExtensions;
 using Umbraco.Web.Sections;
 using Current = Umbraco.Core.Composing.Current;
 using FileSystems = Umbraco.Core.IO.FileSystems;
+using Umbraco.Web.Templates;
+using Umbraco.Web.PropertyEditors;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Testing
 {
@@ -108,6 +111,8 @@ namespace Umbraco.Tests.Testing
 
         protected IMapperCollection Mappers => Factory.GetInstance<IMapperCollection>();
 
+        protected UmbracoMapper Mapper => Factory.GetInstance<UmbracoMapper>();
+
         #endregion
 
         #region Setup
@@ -148,7 +153,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void Compose()
         {
-            ComposeAutoMapper(Options.AutoMapper);
+            ComposeMapper(Options.Mapper);
             ComposeDatabase(Options.Database);
             ComposeApplication(Options.WithApplication);
 
@@ -165,7 +170,6 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void Initialize()
         {
-            InitializeAutoMapper(Options.AutoMapper);
             InitializeApplication(Options.WithApplication);
         }
 
@@ -214,6 +218,9 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             Composition.RegisterUnique<IPublishedRouter, PublishedRouter>();
             Composition.WithCollectionBuilder<ContentFinderCollectionBuilder>();
+
+            Composition.DataValueReferenceFactories();
+
             Composition.RegisterUnique<IContentLastChanceFinder, TestLastChanceFinder>();
             Composition.RegisterUnique<IVariationContextAccessor, TestVariationContextAccessor>();
             Composition.RegisterUnique<IPublishedSnapshotAccessor, TestPublishedSnapshotAccessor>();
@@ -229,6 +236,11 @@ namespace Umbraco.Tests.Testing
                 .Append<TranslationSection>();
             Composition.RegisterUnique<ISectionService, SectionService>();
 
+            Composition.RegisterUnique<HtmlLocalLinkParser>();
+            Composition.RegisterUnique<HtmlUrlParser>();
+            Composition.RegisterUnique<HtmlImageSourceParser>();
+            Composition.RegisterUnique<RichTextEditorPastedImages>();
+
         }
 
         protected virtual void ComposeMisc()
@@ -237,6 +249,7 @@ namespace Umbraco.Tests.Testing
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
             Composition.RegisterUnique(f => runtimeStateMock.Object);
+            Composition.Register(_ => Mock.Of<IImageUrlGenerator>());
 
             // ah...
             Composition.WithCollectionBuilder<ActionCollectionBuilder>();
@@ -247,9 +260,14 @@ namespace Umbraco.Tests.Testing
 
             // register empty content apps collection
             Composition.WithCollectionBuilder<ContentAppFactoryCollectionBuilder>();
+
+            // manifest
+            Composition.ManifestValueValidators();
+            Composition.ManifestFilters();
+
         }
 
-        protected virtual void ComposeAutoMapper(bool configure)
+        protected virtual void ComposeMapper(bool configure)
         {
             if (configure == false) return;
 
@@ -342,7 +360,7 @@ namespace Umbraco.Tests.Testing
             Composition.RegisterUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(
                 Constants.System.UmbracoConnectionName,
                 Logger,
-                new Lazy<IMapperCollection>(Mock.Of<IMapperCollection>)));
+                new Lazy<IMapperCollection>(f.GetInstance<IMapperCollection>)));
             Composition.RegisterUnique(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Composition.WithCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
@@ -370,18 +388,6 @@ namespace Umbraco.Tests.Testing
         #endregion
 
         #region Initialize
-
-        protected virtual void InitializeAutoMapper(bool configure)
-        {
-            if (configure == false) return;
-
-            Mapper.Initialize(configuration =>
-            {
-                var profiles = Factory.GetAllInstances<Profile>();
-                foreach (var profile in profiles)
-                    configuration.AddProfile(profile);
-            });
-        }
 
         protected virtual void InitializeApplication(bool withApplication)
         {
@@ -429,8 +435,6 @@ namespace Umbraco.Tests.Testing
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath();
             SettingsForTests.Reset(); // FIXME: should it be optional?
-
-            Mapper.Reset();
 
             // clear static events
             DocumentRepository.ClearScopeEvents();

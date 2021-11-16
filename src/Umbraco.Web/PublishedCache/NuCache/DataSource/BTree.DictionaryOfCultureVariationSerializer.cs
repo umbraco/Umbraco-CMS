@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using CSharpTest.Net.Serialization;
 using Umbraco.Core;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
+    /// <summary>
+    /// Serializes/Deserializes culture variant data as a dictionary for BTree
+    /// </summary>
     internal class DictionaryOfCultureVariationSerializer : SerializerBase, ISerializer<IReadOnlyDictionary<string, CultureVariation>>
     {
         public IReadOnlyDictionary<string, CultureVariation> ReadFrom(Stream stream)
@@ -14,11 +18,16 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             if (pcount == 0) return Empty;
 
             // read each variation
-            var dict = new Dictionary<string, CultureVariation>();
+            var dict = new Dictionary<string, CultureVariation>(StringComparer.InvariantCultureIgnoreCase);
             for (var i = 0; i < pcount; i++)
             {
-                var languageId = PrimitiveSerializer.String.ReadFrom(stream);
-                var cultureVariation = new CultureVariation { Name = ReadStringObject(stream), Date = ReadDateTime(stream) };
+                var languageId = string.Intern(PrimitiveSerializer.String.ReadFrom(stream));
+                var cultureVariation = new CultureVariation
+                {
+                    Name = ReadStringObject(stream),
+                    UrlSegment = ReadStringObject(stream),
+                    Date = ReadDateTime(stream)
+                };
                 dict[languageId] = cultureVariation;
             }
             return dict;
@@ -40,6 +49,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                 PrimitiveSerializer.String.WriteTo(culture, stream); // should never be null
                 WriteObject(variation.Name, stream); // write an object in case it's null (though... should not happen)
+                WriteObject(variation.UrlSegment, stream); // write an object in case it's null (though... should not happen)
                 PrimitiveSerializer.DateTime.WriteTo(variation.Date, stream);
             }
         }

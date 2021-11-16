@@ -20,12 +20,12 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         protected IPublishedModelFactory PublishedModelFactory { get; }
 
-        public static bool IsNested(PublishedPropertyType publishedProperty)
+        public static bool IsNested(IPublishedPropertyType publishedProperty)
         {
             return publishedProperty.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.NestedContent);
         }
 
-        public static bool IsNestedSingle(PublishedPropertyType publishedProperty)
+        public static bool IsNestedSingle(IPublishedPropertyType publishedProperty)
         {
             if (!IsNested(publishedProperty))
                 return false;
@@ -34,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return config.MinItems == 1 && config.MaxItems == 1;
         }
 
-        public static bool IsNestedMany(PublishedPropertyType publishedProperty)
+        public static bool IsNestedMany(IPublishedPropertyType publishedProperty)
         {
             return IsNested(publishedProperty) && !IsNestedSingle(publishedProperty);
         }

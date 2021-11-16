@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -15,7 +14,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -55,11 +53,13 @@ namespace Umbraco.Web.Editors
         /// be looked up via the db, they need to be passed in.
         /// </param>
         /// <param name="contentTypeId"></param>
+        /// <param name="isElement">Whether the composite content types should be applicable for an element type</param>
         /// <returns></returns>
         protected IEnumerable<Tuple<EntityBasic, bool>> PerformGetAvailableCompositeContentTypes(int contentTypeId,
             UmbracoObjectTypes type,
             string[] filterContentTypes,
-            string[] filterPropertyTypes)
+            string[] filterPropertyTypes,
+            bool isElement)
         {
             IContentTypeComposition source = null;
 
@@ -100,7 +100,7 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
+            var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes, isElement);
 
 
 
@@ -256,7 +256,7 @@ namespace Umbraco.Web.Editors
             var exists = allAliases.InvariantContains(contentTypeSave.Alias);
             if (exists && (ctId == 0 || !ct.Alias.InvariantEquals(contentTypeSave.Alias)))
             {
-                ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype/aliasAlreadyExists"));
+                ModelState.AddModelError("Alias", Services.TextService.Localize("editcontenttype", "aliasAlreadyExists"));
             }
 
             // execute the external validators
@@ -306,9 +306,12 @@ namespace Umbraco.Web.Editors
                 //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
                 //always filter these 0 types out
                 var allowItselfAsChild = false;
+                var allowIfselfAsChildSortOrder = -1;
                 if (contentTypeSave.AllowedContentTypes != null)
                 {
+                    allowIfselfAsChildSortOrder = contentTypeSave.AllowedContentTypes.IndexOf(0);
                     allowItselfAsChild = contentTypeSave.AllowedContentTypes.Any(x => x == 0);
+
                     contentTypeSave.AllowedContentTypes = contentTypeSave.AllowedContentTypes.Where(x => x > 0).ToList();
                 }
 
@@ -337,10 +340,12 @@ namespace Umbraco.Web.Editors
                 saveContentType(newCt);
 
                 //we need to save it twice to allow itself under itself.
-                if (allowItselfAsChild)
+                if (allowItselfAsChild && newCt != null)
                 {
-                    //NOTE: This will throw if the composition isn't right... but it shouldn't be at this stage
-                    newCt.AddContentType(newCt);
+                    newCt.AllowedContentTypes =
+                        newCt.AllowedContentTypes.Union(
+                            new []{ new ContentTypeSort(newCt.Id, allowIfselfAsChildSortOrder) }
+                        );
                     saveContentType(newCt);
                 }
                 return newCt;
@@ -383,7 +388,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy", "notAllowedByPath"), "");
                     return Request.CreateValidationErrorResponse(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -427,7 +432,7 @@ namespace Umbraco.Web.Editors
                     return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
                 case MoveOperationStatusType.FailedNotAllowedByPath:
                     var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy", "notAllowedByPath"), "");
                     return Request.CreateValidationErrorResponse(notificationModel);
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -449,10 +454,12 @@ namespace Umbraco.Web.Editors
             var validateAttempt = service.ValidateComposition(composition);
             if (validateAttempt == false)
             {
-                //if it's not successful then we need to return some model state for the property aliases that
-                // are duplicated
-                var invalidPropertyAliases = validateAttempt.Result.Distinct();
-                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidPropertyAliases);
+                // if it's not successful then we need to return some model state for the property type and property group
+                // aliases that are duplicated
+                var duplicatePropertyTypeAliases = validateAttempt.Result.Distinct();
+                var invalidPropertyGroupAliases = (validateAttempt.Exception as InvalidCompositionException)?.PropertyGroupAliases ?? Array.Empty<string>();
+
+                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, duplicatePropertyTypeAliases, invalidPropertyGroupAliases);
 
                 var display = Mapper.Map<TContentTypeDisplay>(composition);
                 //map the 'save' data on top
@@ -467,20 +474,32 @@ namespace Umbraco.Web.Editors
         /// Adds errors to the model state if any invalid aliases are found then throws an error response if there are errors
         /// </summary>
         /// <param name="contentTypeSave"></param>
-        /// <param name="invalidPropertyAliases"></param>
+        /// <param name="duplicatePropertyTypeAliases"></param>
+        /// <param name="invalidPropertyGroupAliases"></param>
         /// <returns></returns>
-        private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(TContentTypeSave contentTypeSave, IEnumerable<string> invalidPropertyAliases)
+        private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(TContentTypeSave contentTypeSave, IEnumerable<string> duplicatePropertyTypeAliases, IEnumerable<string> invalidPropertyGroupAliases)
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
         {
-            foreach (var propertyAlias in invalidPropertyAliases)
+            foreach (var propertyTypeAlias in duplicatePropertyTypeAliases)
             {
-                //find the property relating to these
-                var prop = contentTypeSave.Groups.SelectMany(x => x.Properties).Single(x => x.Alias == propertyAlias);
-                var group = contentTypeSave.Groups.Single(x => x.Properties.Contains(prop));
+                // Find the property type relating to these
+                var property = contentTypeSave.Groups.SelectMany(x => x.Properties).Single(x => x.Alias == propertyTypeAlias);
+                var group = contentTypeSave.Groups.Single(x => x.Properties.Contains(property));
+                var propertyIndex = group.Properties.IndexOf(property);
+                var groupIndex = contentTypeSave.Groups.IndexOf(group);
 
-                var key = string.Format("Groups[{0}].Properties[{1}].Alias", group.SortOrder, prop.SortOrder);
-                ModelState.AddModelError(key, "Duplicate property aliases not allowed between compositions");
+                var key = $"Groups[{groupIndex}].Properties[{propertyIndex}].Alias";
+                ModelState.AddModelError(key, "Duplicate property aliases aren't allowed between compositions");
+            }
+
+            foreach (var propertyGroupAlias in invalidPropertyGroupAliases)
+            {
+                // Find the property group relating to these
+                var group = contentTypeSave.Groups.Single(x => x.Alias == propertyGroupAlias);
+                var groupIndex = contentTypeSave.Groups.IndexOf(group);
+                var key = $"Groups[{groupIndex}].Name";
+                ModelState.AddModelError(key, "Different group types aren't allowed between compositions");
             }
         }
 
@@ -502,17 +521,17 @@ namespace Umbraco.Web.Editors
             where TPropertyType : PropertyTypeBasic
         {
             InvalidCompositionException invalidCompositionException = null;
-            if (ex is AutoMapperMappingException && ex.InnerException is InvalidCompositionException)
-            {
-                invalidCompositionException = (InvalidCompositionException)ex.InnerException;
-            }
-            else if (ex.InnerException is InvalidCompositionException)
+            if (ex is InvalidCompositionException)
             {
                 invalidCompositionException = (InvalidCompositionException)ex;
             }
+            else if (ex.InnerException is InvalidCompositionException)
+            {
+                invalidCompositionException = (InvalidCompositionException)ex.InnerException;
+            }
             if (invalidCompositionException != null)
             {
-                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidCompositionException.PropertyTypeAliases);
+                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidCompositionException.PropertyTypeAliases, invalidCompositionException.PropertyGroupAliases);
                 return CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
             }
             return null;

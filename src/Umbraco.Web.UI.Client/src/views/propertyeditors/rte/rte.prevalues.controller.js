@@ -3,7 +3,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         var cfg = tinyMceService.defaultPrevalues();
 
         if($scope.model.value){
-            if(angular.isString($scope.model.value)){
+            if(Utilities.isString($scope.model.value)){
                 $scope.model.value = cfg;
             }
         }else{
@@ -29,24 +29,32 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             // extend commands with properties for font-icon and if it is a custom command
             $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands, function (obj) {
                 var icon = getFontIcon(obj.alias);
-                return angular.extend(obj, {
+
+                var objCmd = Utilities.extend(obj, {
                     fontIcon: icon.name,
-                    isCustom: icon.isCustom
+                    isCustom: icon.isCustom,
+                    selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0,
+                    icon: "mce-ico " + (icon.isCustom ? ' mce-i-custom ' : ' mce-i-') + icon.name
                 });
+
+                return objCmd;
             });
         });
 
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
+            
+            // if the CSS directory changes, previously assigned stylesheets are retained, but will not be visible
+            // and will throw a 404 when loading the RTE. Remove them here. Still needs to be saved...
+            let cssPath = Umbraco.Sys.ServerVariables.umbracoSettings.cssPath;
+            $scope.model.value.stylesheets = $scope.model.value.stylesheets
+                .filter(sheet => sheet.startsWith(cssPath));
+            
+            $scope.stylesheets.forEach(stylesheet => {
+                // support both current format (full stylesheet path) and legacy format (stylesheet name only) 
+                stylesheet.selected = $scope.model.value.stylesheets.indexOf(stylesheet.path) >= 0 ||$scope.model.value.stylesheets.indexOf(stylesheet.name) >= 0;
+            });
         });
-
-        $scope.selected = function(cmd, alias, lookup){
-            if (lookup && angular.isArray(lookup)) {
-                cmd.selected = lookup.indexOf(alias) >= 0;
-                return cmd.selected;
-            }
-            return false;
-        };
 
         $scope.selectCommand = function(command){
             var index = $scope.model.value.toolbar.indexOf(command.alias);
@@ -60,11 +68,16 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
         $scope.selectStylesheet = function (css) {
 
-            var index = $scope.model.value.stylesheets.indexOf(css.name);
+            // find out if the stylesheet is already selected; first look for the full stylesheet path (current format)
+            var index = $scope.model.value.stylesheets.indexOf(css.path);
+            if (index === -1) {
+                // ... then look for the stylesheet name (legacy format)
+                index = $scope.model.value.stylesheets.indexOf(css.name);
+            }
 
-            if(css.selected && index === -1){
-                $scope.model.value.stylesheets.push(css.name);
-            }else if(index >= 0){
+            if(index === -1){
+                $scope.model.value.stylesheets.push(css.path);
+            }else{
                 $scope.model.value.stylesheets.splice(index, 1);
             }
         };

@@ -45,7 +45,7 @@ Use this directive to construct a title. Recommended to use it inside an {@link 
 (function(){
     'use strict';
 
-    function BoxHeaderDirective() {
+    function BoxHeaderDirective(localizationService) {
 
         var directive = {
             restrict: 'E',
@@ -57,6 +57,26 @@ Use this directive to construct a title. Recommended to use it inside an {@link 
                 title: "@?",
                 descriptionKey: "@?",
                 description: "@?"
+            },
+            link: function (scope) {
+
+                scope.titleLabel = scope.title;
+
+                if (scope.titleKey) {
+                    localizationService.localize(scope.titleKey, [], scope.title).then((data) => {
+                        scope.titleLabel = data;
+                    });
+
+                }
+
+                scope.descriptionLabel = scope.description;
+
+                if (scope.descriptionKey) {
+                    localizationService.localize(scope.descriptionKey, [], scope.description).then((data) => {
+                        scope.descriptionLabel = data;
+                    });
+
+                }
             }
         };
 

@@ -5,6 +5,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Services;
@@ -15,7 +16,7 @@ namespace Umbraco.Tests.Routing
     [TestFixture]
     public class UrlsWithNestedDomains : UrlRoutingTestBase
     {
-        // in the case of nested domains more than 1 url may resolve to a document
+        // in the case of nested domains more than 1 URL may resolve to a document
         // but only one route can be cached - the 'canonical' route ie the route
         // using the closest domain to the node - here we test that if we request
         // a non-canonical route, it is not cached / the cache is not polluted
@@ -39,20 +40,20 @@ namespace Umbraco.Tests.Routing
 
             const string url = "http://domain1.com/1001-1/1001-1-1";
 
-            // get the nice url for 100111
+            // get the nice URL for 100111
             var umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings, urlProviders: new []
             {
                 new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
-            Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, true));
+            Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, UrlMode.Absolute));
 
             // check that the proper route has been cached
-            var cache = umbracoContext.ContentCache as PublishedContentCache;
+            var cache = umbracoContext.Content as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
             Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]);
 
-            // route a rogue url
+            // route a rogue URL
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual("10011/1001-1-1", cachedRoutes[100111]); // no
             //Assert.AreEqual("1001/1001-1/1001-1-1", cachedRoutes[100111]); // yes
 
-            // what's the nice url now?
+            // what's the nice URL now?
             Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111)); // good
             //Assert.AreEqual("http://domain1.com/1001-1/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, true)); // bad
         }

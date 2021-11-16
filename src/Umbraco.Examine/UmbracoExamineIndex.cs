@@ -24,14 +24,14 @@ namespace Umbraco.Examine
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
         // context because they will fork a thread/task/whatever which should *not* capture our
-        // call context (and the database it can contain)! ideally we should be able to override
-        // SafelyProcessQueueItems but that's not possible in the current version of Examine.
-
+        // call context (and the database it can contain)!
+        
         /// <summary>
         /// Used to store the path of a content object
         /// </summary>
         public const string IndexPathFieldName = SpecialFieldPrefix + "Path";
         public const string NodeKeyFieldName = SpecialFieldPrefix + "Key";
+        public const string UmbracoFileFieldName = "umbracoFileSrc";
         public const string IconFieldName = SpecialFieldPrefix + "Icon";
         public const string PublishedFieldName = SpecialFieldPrefix + "Published";
 
@@ -98,10 +98,15 @@ namespace Umbraco.Examine
         {
             if (CanInitialize())
             {
-                using (new SafeCallContext())
-                {
-                    base.PerformDeleteFromIndex(itemIds, onComplete);
-                }
+                base.PerformDeleteFromIndex(itemIds, onComplete);
+            }
+        }
+
+        protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
+        {
+            if (CanInitialize())
+            {
+                base.PerformIndexItems(values, onComplete);
             }
         }
 
@@ -158,7 +163,7 @@ namespace Umbraco.Examine
         /// </summary>
         protected override void AddDocument(Document doc, ValueSet valueSet, IndexWriter writer)
         {
-            ProfilingLogger.Debug(GetType(),
+            ProfilingLogger.Debug<string,string,string>(GetType(),
                 "Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
                 valueSet.Id,
                 valueSet.Category,

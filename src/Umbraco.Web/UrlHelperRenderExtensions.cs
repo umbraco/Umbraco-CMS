@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -19,11 +18,14 @@ namespace Umbraco.Web
     /// </summary>
     public static class UrlHelperRenderExtensions
     {
+        private static readonly IHtmlString EmptyHtmlString = new HtmlString(string.Empty);
+
+        private static IHtmlString CreateHtmlString(string value, bool htmlEncode) => htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(value)) : new HtmlString(value);
 
         #region GetCropUrl
 
         /// <summary>
-        /// Gets the ImageProcessor Url of a media item by the crop alias (using default media item property alias of "umbracoFile")
+        /// Gets the ImageProcessor URL of a media item by the crop alias (using default media item property alias of "umbracoFile")
         /// </summary>
         /// <param name="urlHelper"></param>
         /// <param name="mediaItem">
@@ -39,12 +41,24 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string cropAlias, bool htmlEncode = true)
         {
+            if (mediaItem == null) return EmptyHtmlString;
+
             var url = mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+
+            return CreateHtmlString(url, htmlEncode);
+        }
+
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, MediaWithCrops mediaWithCrops, string cropAlias, bool htmlEncode = true)
+        {
+            if (mediaWithCrops == null) return EmptyHtmlString;
+
+            var url = mediaWithCrops.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
+
+            return CreateHtmlString(url, htmlEncode);
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
         /// </summary>
         /// <param name="urlHelper"></param>
         /// <param name="mediaItem">
@@ -61,16 +75,28 @@ namespace Umbraco.Web
         /// set to false if using the result of this method for CSS.
         /// </param>
         /// <returns>
-        /// The ImageProcessor.Web Url.
+        /// The ImageProcessor.Web URL.
         /// </returns>
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias, bool htmlEncode = true)
         {
+            if (mediaItem == null) return EmptyHtmlString;
+
             var url = mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+
+            return CreateHtmlString(url, htmlEncode);
+        }
+
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper, MediaWithCrops mediaWithCrops, string propertyAlias, string cropAlias, bool htmlEncode = true)
+        {
+            if (mediaWithCrops == null) return EmptyHtmlString;
+
+            var url = mediaWithCrops.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
+
+            return CreateHtmlString(url, htmlEncode);
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the image path.
+        /// Gets the ImageProcessor URL from the image path.
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -144,17 +170,42 @@ namespace Umbraco.Web
             bool upScale = true,
             bool htmlEncode = true)
         {
-            var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
-                upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            if (mediaItem == null) return EmptyHtmlString;
+
+            var url = mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
+
+            return CreateHtmlString(url, htmlEncode);
+        }
+
+        public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
+            MediaWithCrops mediaWithCrops,
+            int? width = null,
+            int? height = null,
+            string propertyAlias = Umbraco.Core.Constants.Conventions.Media.File,
+            string cropAlias = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = false,
+            bool cacheBuster = true,
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true,
+            bool htmlEncode = true)
+        {
+            if (mediaWithCrops == null) return EmptyHtmlString;
+
+            var url = mediaWithCrops.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
+
+            return CreateHtmlString(url, htmlEncode);
         }
 
         /// <summary>
-        /// Gets the ImageProcessor Url from the image path.
+        /// Gets the ImageProcessor URL from the image path.
         /// </summary>
         /// <param name="imageUrl">
-        /// The image url.
+        /// The image URL.
         /// </param>
         /// <param name="width">
         /// The width of the output image.
@@ -225,11 +276,20 @@ namespace Umbraco.Web
             bool upScale = true,
             bool htmlEncode = true)
         {
-            var url = imageUrl.GetCropUrl(width, height, imageCropperValue, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
-                upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            var url = imageUrl.GetCropUrl(width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
+
+            return CreateHtmlString(url, htmlEncode);
         }
+
+        // TODO: enable again in v9 and make sure to document that `@Url.GetCropUrl(Model.Property, cropAlias: "Featured")` needs to be updated - see https://github.com/umbraco/Umbraco-CMS/pull/10527 for alternatives
+        // public static IHtmlString GetCropUrl(this UrlHelper urlHelper, ImageCropperValue imageCropperValue, string cropAlias, bool htmlEncode = true)
+        // {
+        //     if (imageCropperValue == null || string.IsNullOrEmpty(imageCropperValue.Src)) return EmptyHtmlString;
+        //
+        //     var url = imageCropperValue.Src.GetCropUrl(imageCropperValue, cropAlias: cropAlias, useCropDimensions: true);
+        //
+        //     return CreateHtmlString(url, htmlEncode);
+        // }
 
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
             ImageCropperValue imageCropperValue,
@@ -247,11 +307,11 @@ namespace Umbraco.Web
             bool upScale = true,
             bool htmlEncode = true)
         {
-            var imageUrl = imageCropperValue.Src;
-            var url = imageUrl.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
-                upScale);
-            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+            if (imageCropperValue == null || string.IsNullOrEmpty(imageCropperValue.Src)) return EmptyHtmlString;
+
+            var url = imageCropperValue.Src.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
+
+            return CreateHtmlString(url, htmlEncode);
         }
 
         #endregion
@@ -292,8 +352,10 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string SurfaceAction(this UrlHelper url, string action, string controllerName, string area, object additionalRouteVals)
         {
-            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
 
             var encryptedRoute = CreateEncryptedRouteString(controllerName, action, area, additionalRouteVals);
 
@@ -323,7 +385,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string SurfaceAction(this UrlHelper url, string action, Type surfaceType, object additionalRouteVals)
         {
-            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
             if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
 
             var area = "";
@@ -372,25 +435,6 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Generates a Absolute Media Item URL based on the current context
-        /// </summary>
-        /// <param name="urlHelper"></param>
-        /// <param name="mediaItem"></param>
-        /// <returns></returns>
-        public static string GetAbsoluteMediaUrl(this UrlHelper urlHelper, IPublishedContent mediaItem)
-        {
-            if (urlHelper == null) throw new ArgumentNullException("urlHelper");
-            if (mediaItem == null) throw new ArgumentNullException("mediaItem");
-
-            if (urlHelper.RequestContext.HttpContext.Request.Url != null)
-            {
-                var requestUrl = urlHelper.RequestContext.HttpContext.Request.Url.GetLeftPart(UriPartial.Authority);
-                return string.Format("{0}{1}", requestUrl, mediaItem.Url);
-            }
-            return null;
-        }
-
-        /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
         /// </summary>
@@ -401,8 +445,10 @@ namespace Umbraco.Web
         /// <returns></returns>
         internal static string CreateEncryptedRouteString(string controllerName, string controllerAction, string area, object additionalRouteVals = null)
         {
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
-            if (string.IsNullOrEmpty(controllerAction)) throw new ArgumentNullOrEmptyException(nameof(controllerAction));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentException("Value can't be empty.", nameof(controllerName));
+            if (controllerAction == null) throw new ArgumentNullException(nameof(controllerAction));
+            if (string.IsNullOrEmpty(controllerAction)) throw new ArgumentException("Value can't be empty.", nameof(controllerAction));
             if (area == null) throw new ArgumentNullException(nameof(area));
 
             //need to create a params string as Base64 to put into our hidden field to use during the routes

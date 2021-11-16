@@ -88,7 +88,7 @@ namespace Umbraco.Core.Services.Implement
                                         }
                                         catch (CultureNotFoundException)
                                         {
-                                            Current.Logger.Warn<LocalizedTextServiceFileSources>("The culture {CultureValue} found in the file {CultureFile} is not a valid culture", cultureVal, fileInfo.FullName);
+                                            Current.Logger.Warn<LocalizedTextServiceFileSources, string, string>("The culture {CultureValue} found in the file {CultureFile} is not a valid culture", cultureVal, fileInfo.FullName);
                                             //If the culture in the file is invalid, we'll just hope the file name is a valid culture below, otherwise
                                             // an exception will be thrown.
                                         }
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (fileSourceFolder.Exists == false)
             {
-                Current.Logger.Warn<LocalizedTextServiceFileSources>("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
+                Current.Logger.Warn<LocalizedTextServiceFileSources, string>("The folder does not exist: {FileSourceFolder}, therefore no sources will be discovered", fileSourceFolder.FullName);
             }
             else
             {
@@ -184,8 +184,12 @@ namespace Umbraco.Core.Services.Implement
                 //now load in supplementary
                 var found = _supplementFileSources.Where(x =>
                 {
-                    var fileName = Path.GetFileName(x.File.FullName);
-                    return fileName.InvariantStartsWith(culture.Name) && fileName.InvariantEndsWith(".xml");
+                    var extension = Path.GetExtension(x.File.FullName);
+                    var fileCultureName = Path.GetFileNameWithoutExtension(x.File.FullName).Replace("_", "-").Replace(".user", "");
+                    return extension.InvariantEquals(".xml") && (
+                        fileCultureName.InvariantEquals(culture.Name)
+                        || fileCultureName.InvariantEquals(culture.TwoLetterISOLanguageName)
+                    );
                 });
 
                 foreach (var supplementaryFile in found)
@@ -199,11 +203,11 @@ namespace Umbraco.Core.Services.Implement
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<LocalizedTextServiceFileSources>(ex, "Could not load file into XML {File}", supplementaryFile.File.FullName);
+                            _logger.Error<LocalizedTextServiceFileSources,string>(ex, "Could not load file into XML {File}", supplementaryFile.File.FullName);
                             continue;
                         }
 
-                        if (xChildDoc.Root == null) continue;
+                        if (xChildDoc.Root == null || xChildDoc.Root.Name != "language") continue;
                         foreach (var xArea in xChildDoc.Root.Elements("area")
                             .Where(x => ((string)x.Attribute("alias")).IsNullOrWhiteSpace() == false))
                         {

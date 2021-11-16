@@ -44,7 +44,7 @@
                 var headers = config.headers ? config.headers : {};
 
                 //Here we'll check if we should ignore the error (either based on the original header set or the request configuration)
-                if (headers["x-umb-ignore-error"] === "ignore" || config.umbIgnoreErrors === true || (angular.isArray(config.umbIgnoreStatus) && config.umbIgnoreStatus.indexOf(rejection.status) !== -1)) {
+                if (headers["x-umb-ignore-error"] === "ignore" || config.umbIgnoreErrors === true || (Utilities.isArray(config.umbIgnoreStatus) && config.umbIgnoreStatus.indexOf(rejection.status) !== -1)) {
                     //exit/ignore
                     return $q.reject(rejection);
                 }
@@ -59,20 +59,27 @@
                 }
 
                 //A 401 means that the user is not logged in
-                if (rejection.status === 401 && !rejection.config.url.endsWith("umbraco/backoffice/UmbracoApi/Authentication/GetCurrentUser")) {
+                if (rejection.status === 401) {
+                    //avoid an infinite loop
+                    var umbRequestHelper = $injector.get('umbRequestHelper');
+                    var getCurrentUserPath = umbRequestHelper.getApiUrl("authenticationApiBaseUrl", "GetCurrentUser");
+                    if (!rejection.config.url.endsWith(getCurrentUserPath)) {
 
-                    var userService = $injector.get('userService'); // see above
+                        var userService = $injector.get('userService'); // see above
 
-                    //Associate the user name with the retry to ensure we retry for the right user
-                    return userService.getCurrentUser()
-                        .then(function (user) {
-                            var userName = user ? user.name : null;
-                            //The request bounced because it was not authorized - add a new request to the retry queue
-                            return requestRetryQueue.pushRetryFn('unauthorized-server', userName, function retryRequest() {
-                                // We must use $injector to get the $http service to prevent circular dependency
-                                return $injector.get('$http')(rejection.config);
+                        //Associate the user name with the retry to ensure we retry for the right user
+                        return userService.getCurrentUser()
+                            .then(function(user) {
+                                var userName = user ? user.name : null;
+                                //The request bounced because it was not authorized - add a new request to the retry queue
+                                return requestRetryQueue.pushRetryFn('unauthorized-server',
+                                    userName,
+                                    function retryRequest() {
+                                        // We must use $injector to get the $http service to prevent circular dependency
+                                        return $injector.get('$http')(rejection.config);
+                                    });
                             });
-                        });
+                    }
                 }
                 else if (rejection.status === 404) {
 

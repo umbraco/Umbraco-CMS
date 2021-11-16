@@ -1,9 +1,14 @@
-﻿using Umbraco.Core.Composing;
+﻿using System;
+using System.Collections.Concurrent;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    public class MapperCollectionBuilder : LazyCollectionBuilderBase<MapperCollectionBuilder, MapperCollection, BaseMapper>
+    public class MapperCollectionBuilder : SetCollectionBuilderBase<MapperCollectionBuilder, MapperCollection, BaseMapper>
     {
+        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _maps
+            = new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
+
         protected override MapperCollectionBuilder This => this;
 
         public override void RegisterWith(IRegister register)
@@ -17,6 +22,11 @@ namespace Umbraco.Core.Persistence.Mappers
             // - service IMapperCollection, returns MappersCollectionBuilder's collection
 
             register.Register<IMapperCollection>(factory => factory.GetInstance<MapperCollection>());
+        }
+
+        protected override BaseMapper CreateItem(IFactory factory, Type itemType)
+        {
+            return (BaseMapper) factory.CreateInstance(itemType, _maps);
         }
 
         public MapperCollectionBuilder AddCoreMappers()

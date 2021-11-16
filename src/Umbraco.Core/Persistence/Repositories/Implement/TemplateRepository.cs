@@ -116,7 +116,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return Constants.DatabaseSchema.Tables.Node + ".id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -215,7 +215,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //Save updated entity to db
 
             template.UpdateDate = DateTime.Now;
-            ;
             var dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
 
             Database.Update(dto.NodeDto);
@@ -303,12 +302,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where("umbracoNode." + SqlContext.SqlSyntax.GetQuotedColumnName("id") + " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
                     new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});
 
-            var childIds = Database.Fetch<dynamic>(childIdsSql)
+            var childIds = Database.Fetch<AxisDefintionDto>(childIdsSql)
                 .Select(x => new EntitySlim
                 {
-                    Id = x.nodeId,
-                    ParentId = x.parentID,
-                    Name = x.alias
+                    Id = x.NodeId,
+                    ParentId = x.ParentId,
+                    Name = x.Alias
                 });
             return childIds;
         }

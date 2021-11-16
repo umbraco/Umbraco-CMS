@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Web.Composing;
+using System.ComponentModel;
 
 namespace Umbraco.Web
 {
@@ -25,35 +26,36 @@ namespace Umbraco.Web
     public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
         private readonly IUmbracoDatabaseFactory _databaseFactory;
+        private readonly Lazy<SyncBootState> _syncBootState;
+
+        [Obsolete("This overload should not be used, enableDistCalls has no effect")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public BatchedDatabaseServerMessenger(
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings, bool enableDistCalls, DatabaseServerMessengerOptions options)
+            : this(runtime, databaseFactory, scopeProvider, sqlContext, proflog, globalSettings, options)
+        { }
 
         public BatchedDatabaseServerMessenger(
-            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings,
-            bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(runtime, scopeProvider, sqlContext, proflog, globalSettings, enableDistCalls, options)
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, IProfilingLogger proflog, IGlobalSettings globalSettings, DatabaseServerMessengerOptions options)
+            : base(runtime, scopeProvider, sqlContext, proflog, globalSettings, true, options)
         {
             _databaseFactory = databaseFactory;
-        }
-
-        // invoked by DatabaseServerRegistrarAndMessengerComponent
-        internal void Startup()
-        {
-            UmbracoModule.EndRequest += UmbracoModule_EndRequest;
-
-            if (_databaseFactory.CanConnect == false)
+            _syncBootState = new Lazy<SyncBootState>(() =>
             {
-                Logger.Warn<BatchedDatabaseServerMessenger>("Cannot connect to the database, distributed calls will not be enabled for this server.");
-            }
-            else
-            {
-                Boot();
-            }
+                if (_databaseFactory.CanConnect == false)
+                {
+                    Logger.Warn<BatchedDatabaseServerMessenger>("Cannot connect to the database, distributed calls will not be enabled for this server.");
+                    return SyncBootState.Unknown;
+                }
+                else
+                {
+                    return base.GetSyncBootState();
+                }
+            });
         }
 
-        private void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
-        {
-            // will clear the batch - will remain in HttpContext though - that's ok
-            FlushBatch();
-        }
+        // override to deal with database connectivity
+        public override SyncBootState GetSyncBootState() => _syncBootState.Value;
 
         protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {

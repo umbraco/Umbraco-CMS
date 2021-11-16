@@ -1,0 +1,42 @@
+*:focus {
+    outline-color: @ui-outline;
+}
+
+.umb-outline {
+    &:focus {
+        outline:none;
+        .tabbing-active &::after {
+            content: '';
+            position: absolute;
+            z-index: 10000;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-radius: 3px;
+            box-shadow: 0 0 2px 0px @ui-outline, inset 0 0 2px 2px @ui-outline;
+            pointer-events: none;
+        }
+    }
+
+    &.umb-outline--surrounding {
+        &:focus {
+            .tabbing-active &::after {
+                top: -6px;
+                bottom: -6px;
+                left: -6px;
+                right: -6px;
+                border-radius: 9px;
+            }
+        }
+    }
+
+    &.umb-outline--thin {
+        &:focus {
+            .tabbing-active &::after {
+                box-shadow: 0 0 2px @ui-outline, inset 0 0 2px 1px @ui-outline;
+            }
+        }
+    }
+    
+}

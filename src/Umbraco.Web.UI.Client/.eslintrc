@@ -8,7 +8,7 @@
     },
 
     "parserOptions": {
-        "ecmaVersion": 6
+        "ecmaVersion": 2018
     },
 
     "globals": {
@@ -19,10 +19,10 @@
         "tinyMCE": false,
         "FileReader": false,
         "Umbraco": false,
+        "Utilities": false,
         "window": false,
         "LazyLoad": false,
         "ActiveXObject": false,
         "Bloodhound": false
     }
-
 }

@@ -8,14 +8,14 @@
             // do weird things like updating and config values
             // so we want to ensure we start from a fresh every
             // time, we'll just sync the value back when we need to
-            $scope.model = angular.copy($scope.ngModel);
+            $scope.model = Utilities.copy($scope.ngModel);
             $scope.nodeContext = $scope.model;
 
             // Find the selected tab
-            var selectedTab = $scope.model.tabs[0];
+            var selectedTab = $scope.model.variants[0].tabs[0];
 
             if ($scope.tabAlias) {
-                angular.forEach($scope.model.tabs, function (tab) {
+                Utilities.forEach($scope.model.variants[0].tabs, tab => {
                     if (tab.alias.toLowerCase() === $scope.tabAlias.toLowerCase()) {
                         selectedTab = tab;
                         return;
@@ -33,22 +33,22 @@
                     $scope.$broadcast("formSubmitting", { scope: $scope });
 
                     // Sync the values back
-                    angular.forEach($scope.ngModel.tabs, function (tab) {
+                    Utilities.forEach($scope.ngModel.variants[0].tabs, tab => {
                         if (tab.alias.toLowerCase() === selectedTab.alias.toLowerCase()) {
 
-                            var localPropsMap = selectedTab.properties.reduce(function (map, obj) {
+                            var localPropsMap = selectedTab.properties.reduce((map, obj) => {
                                 map[obj.alias] = obj;
                                 return map;
                             }, {});
 
-                            angular.forEach(tab.properties, function (prop) {
+                            Utilities.forEach(tab.properties, prop => {
                                 if (localPropsMap.hasOwnProperty(prop.alias)) {
                                     prop.value = localPropsMap[prop.alias].value;
                                 }
                             });
-
                         }
                     });
+                    
                 }
             });
 

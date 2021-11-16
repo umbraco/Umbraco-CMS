@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
-using System.Web.Http.Controllers;
 using System.Web.Mvc;
-using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -24,15 +25,15 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors.Filters;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using ActionFilterAttribute = System.Web.Http.Filters.ActionFilterAttribute;
 using Constants = Umbraco.Core.Constants;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Task = System.Threading.Tasks.Task;
@@ -51,7 +52,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns a list of the sizes of gravatar urls for the user or null if the gravatar server cannot be reached
+        /// Returns a list of the sizes of gravatar URLs for the user or null if the gravatar server cannot be reached
         /// </summary>
         /// <returns></returns>
         public string[] GetCurrentUserAvatarUrls()
@@ -65,6 +66,7 @@ namespace Umbraco.Web.Editors
 
         [AppendUserModifiedHeader("id")]
         [FileUploadCleanupFilter(false)]
+        [AdminUsersAuthorize]
         public async Task<HttpResponseMessage> PostSetAvatar(int id)
         {
             return await PostSetAvatarInternal(Request, Services.UserService, AppCaches.RuntimeCache, id);
@@ -101,14 +103,14 @@ namespace Umbraco.Web.Editors
 
             //get the file info
             var file = result.FileData[0];
-            var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
+            var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
             if (Current.Configs.Settings().Content.DisallowedUploadFiles.Contains(ext) == false)
             {
                 //generate a path of known data, we don't want this path to be guessable
-                user.Avatar = "UserAvatars/" + (user.Id + safeFileName).ToSHA1() + "." + ext;
+                user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
 
                 using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                 {
@@ -128,6 +130,7 @@ namespace Umbraco.Web.Editors
         }
 
         [AppendUserModifiedHeader("id")]
+        [AdminUsersAuthorize]
         public HttpResponseMessage PostClearAvatar(int id)
         {
             var found = Services.UserService.GetUserById(id);
@@ -166,6 +169,7 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
+        [AdminUsersAuthorize]
         public UserDisplay GetById(int id)
         {
             var user = Services.UserService.GetUserById(id);
@@ -174,6 +178,33 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             var result = Mapper.Map<IUser, UserDisplay>(user);
+            return result;
+        }
+
+        /// <summary>
+        /// Get users by integer ids
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [AdminUsersAuthorize]
+        public IEnumerable<UserDisplay> GetByIds([FromJsonPath]int[] ids)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (ids.Length == 0)
+                return Enumerable.Empty<UserDisplay>();
+
+            var users = Services.UserService.GetUsersById(ids);
+            if (users == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var result = Mapper.MapEnumerable<IUser, UserDisplay>(users);
             return result;
         }
 
@@ -239,7 +270,7 @@ namespace Umbraco.Web.Editors
 
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
-                Items = Mapper.Map<IEnumerable<UserBasic>>(result),
+                Items = Mapper.MapEnumerable<IUser, UserBasic>(result),
                 UserStates = Services.UserService.GetUserStates()
             };
 
@@ -273,7 +304,7 @@ namespace Umbraco.Web.Editors
             CheckUniqueEmail(userSave.Email, null);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService, AppCaches);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -345,12 +376,6 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
 
-            if (EmailSender.CanSendRequiredEmail == false)
-            {
-                throw new HttpResponseException(
-                    Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
-            }
-
             IUser user;
             if (Current.Configs.Settings().Security.UsernameIsEmail)
             {
@@ -360,12 +385,20 @@ namespace Umbraco.Web.Editors
             else
             {
                 //first validate the username if we're showing it
-                user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
+                user = CheckUniqueUsername(userSave.Username, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
             }
-            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default(DateTime) || u.EmailConfirmedDate.HasValue);
+            user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+
+            var userMgr = TryGetOwinContext().Result.GetBackOfficeUserManager();
+            
+            if (!EmailSender.CanSendRequiredEmail && !userMgr.HasSendingUserInviteEventHandler)
+            {
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse("No Email server is configured"));
+            }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService, AppCaches);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -396,16 +429,48 @@ namespace Umbraco.Web.Editors
             //ensure the invited date is set
             user.InvitedDate = DateTime.Now;
 
-            //Save the updated user
+            //Save the updated user (which will process the user groups too)
             Services.UserService.Save(user);
             var display = Mapper.Map<UserDisplay>(user);
 
-            //send the email
+            var inviteArgs = new UserInviteEventArgs(
+                Request.TryGetHttpContext().Result.GetCurrentRequestIpAddress(),
+                performingUser: Security.GetUserId().Result,
+                userSave,
+                user);
 
-            await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);
+            try
+            {
+                userMgr.RaiseSendingUserInvite(inviteArgs);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error<UsersController>(ex, "An error occurred in a custom event handler while inviting the user");
+                throw new HttpResponseException(
+                    Request.CreateNotificationValidationErrorResponse($"An error occurred inviting the user (check logs for more info): {ex.Message}"));
+            }
 
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/resendInviteHeader"), Services.TextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
+            // If the event is handled then no need to send the email
+            if (inviteArgs.InviteHandled)
+            {
+                // if no user result was created then map the minimum args manually for the UI
+                if (!inviteArgs.ShowUserResult)
+                {
+                    display = new UserDisplay
+                    {
+                        Name = userSave.Name,
+                        Email = userSave.Email,
+                        Username = userSave.Username
+                    };
+                }                
+            }
+            else
+            {
+                //send the email
+                await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);                
+            }
 
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", "resendInviteHeader"), Services.TextService.Localize("speechBubbles", "resendInviteSuccess", new[] { user.Name }));
             return display;
         }
 
@@ -450,7 +515,7 @@ namespace Umbraco.Web.Editors
                 WebUtility.UrlEncode("|"),
                 token.ToUrlBase64());
 
-            // Get an mvc helper to get the url
+            // Get an mvc helper to get the URL
             var http = EnsureHttpContext();
             var urlHelper = new UrlHelper(http.Request.RequestContext);
             var action = urlHelper.Action("VerifyInvite", "BackOffice",
@@ -464,10 +529,10 @@ namespace Umbraco.Web.Editors
             var applicationUri = RuntimeState.ApplicationUrl;
             var inviteUri = new Uri(applicationUri, action);
 
-            var emailSubject = Services.TextService.Localize("user/inviteEmailCopySubject",
+            var emailSubject = Services.TextService.Localize("user", "inviteEmailCopySubject",
                 //Ensure the culture of the found user is used for the email!
                 UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings));
-            var emailBody = Services.TextService.Localize("user/inviteEmailCopyFormat",
+            var emailBody = Services.TextService.Localize("user", "inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
                 UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
                 new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
@@ -490,9 +555,9 @@ namespace Umbraco.Web.Editors
         /// <param name="userSave"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
-        public async Task<UserDisplay> PostSaveUser(UserSave userSave)
+        public UserDisplay PostSaveUser(UserSave userSave)
         {
-            if (userSave == null) throw new ArgumentNullException("userSave");
+            if (userSave == null) throw new ArgumentNullException(nameof(userSave));
 
             if (ModelState.IsValid == false)
             {
@@ -508,7 +573,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService);
+            var authHelper = new UserEditorAuthorizationHelper(Services.ContentService, Services.MediaService, Services.UserService, Services.EntityService, AppCaches);
             var canSaveUser = authHelper.IsAuthorized(Security.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
@@ -516,6 +581,14 @@ namespace Umbraco.Web.Editors
             }
 
             var hasErrors = false;
+
+            // we need to check if there's any Deny Local login providers present, if so we need to ensure that the user's email address cannot be changed
+            var owinContext = Request.TryGetOwinContext().Result;
+            var hasDenyLocalLogin = owinContext.Authentication.HasDenyLocalLogin();
+            if (hasDenyLocalLogin)
+            {
+                userSave.Email = found.Email; // it cannot change, this would only happen if people are mucking around with the request
+            }
 
             var existing = Services.UserService.GetByEmail(userSave.Email);
             if (existing != null && existing.Id != userSave.Id)
@@ -544,34 +617,12 @@ namespace Umbraco.Web.Editors
                 hasErrors = true;
             }
 
-            // if the found user has his email for username, we want to keep this synced when changing the email.
+            // if the found user has their email for username, we want to keep this synced when changing the email.
             // we have already cross-checked above that the email isn't colliding with anything, so we can safely assign it here.
             if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
-            }
-
-            if (userSave.ChangePassword != null)
-            {
-                var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
-
-                //this will change the password and raise appropriate events
-                var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, userSave.ChangePassword, UserManager);
-                if (passwordChangeResult.Success)
-                {
-                    //need to re-get the user
-                    found = Services.UserService.GetUserById(intId.Result);
-                }
-                else
-                {
-                    hasErrors = true;
-
-                    foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
-                    {
-                        ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
-                    }
-                }
-            }
+            }          
 
             if (hasErrors)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
@@ -583,14 +634,68 @@ namespace Umbraco.Web.Editors
 
             var display = Mapper.Map<UserDisplay>(user);
 
-            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/operationSavedHeader"), Services.TextService.Localize("speechBubbles/editUserSaved"));
+            // determine if the user has changed their own language;
+            var userHasChangedOwnLanguage =
+                user.Id == Security.CurrentUser.Id && Security.CurrentUser.Language != user.Language;
+
+            var textToLocaliseAlias = userHasChangedOwnLanguage ? "operationSavedHeaderReloadUser" : "operationSavedHeader";
+            var culture = userHasChangedOwnLanguage
+                ? CultureInfo.GetCultureInfo(user.Language)
+                : Thread.CurrentThread.CurrentUICulture;
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", textToLocaliseAlias, culture), Services.TextService.Localize("speechBubbles","editUserSaved", culture));
             return display;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="changingPasswordModel"></param>
+        /// <returns></returns>
+        public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
+        {
+            changingPasswordModel = changingPasswordModel ?? throw new ArgumentNullException(nameof(changingPasswordModel));            
+
+            if (ModelState.IsValid == false)
+            {
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+            }
+
+            var intId = changingPasswordModel.Id.TryConvertTo<int>();
+            if (intId.Success == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var found = Services.UserService.GetUserById(intId.Result);
+            if (found == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var passwordChanger = new PasswordChanger(Logger, Services.UserService, UmbracoContext.HttpContext);
+            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(Security.CurrentUser, found, changingPasswordModel, UserManager);
+
+            if (passwordChangeResult.Success)
+            {
+                var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
+                result.AddSuccessNotification(Services.TextService.Localize("general", "success"), Services.TextService.Localize("user", "passwordChangedGeneric"));
+                return result;
+            }
+
+            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            {
+                ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
+            }
+
+            throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+        }
+
 
         /// <summary>
         /// Disables the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
+        [AdminUsersAuthorize("userIds")]
         public HttpResponseMessage PostDisableUsers([FromUri]int[] userIds)
         {
             var tryGetCurrentUserId = Security.GetUserId();
@@ -611,17 +716,18 @@ namespace Umbraco.Web.Editors
             if (users.Length > 1)
             {
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/disableUsersSuccess", new[] {userIds.Length.ToString()}));
+                    Services.TextService.Localize("speechBubbles", "disableUsersSuccess", new[] {userIds.Length.ToString()}));
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/disableUserSuccess", new[] { users[0].Name }));
+                Services.TextService.Localize("speechBubbles", "disableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
         /// Enables the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
+        [AdminUsersAuthorize("userIds")]
         public HttpResponseMessage PostEnableUsers([FromUri]int[] userIds)
         {
             var users = Services.UserService.GetUsersById(userIds).ToArray();
@@ -634,17 +740,18 @@ namespace Umbraco.Web.Editors
             if (users.Length > 1)
             {
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/enableUsersSuccess", new[] { userIds.Length.ToString() }));
+                    Services.TextService.Localize("speechBubbles", "enableUsersSuccess", new[] { userIds.Length.ToString() }));
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/enableUserSuccess", new[] { users[0].Name }));
+                Services.TextService.Localize("speechBubbles", "enableUserSuccess", new[] { users[0].Name }));
         }
 
         /// <summary>
         /// Unlocks the users with the given user ids
         /// </summary>
         /// <param name="userIds"></param>
+        [AdminUsersAuthorize("userIds")]
         public async Task<HttpResponseMessage> PostUnlockUsers([FromUri]int[] userIds)
         {
             if (userIds.Length <= 0)
@@ -660,7 +767,7 @@ namespace Umbraco.Web.Editors
                 }
                 var user = await UserManager.FindByIdAsync(userIds[0]);
                 return Request.CreateNotificationSuccessResponse(
-                    Services.TextService.Localize("speechBubbles/unlockUserSuccess", new[] { user.Name }));
+                    Services.TextService.Localize("speechBubbles", "unlockUserSuccess", new[] { user.Name }));
             }
 
             foreach (var u in userIds)
@@ -674,9 +781,10 @@ namespace Umbraco.Web.Editors
             }
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/unlockUsersSuccess", new[] { userIds.Length.ToString() }));
+                Services.TextService.Localize("speechBubbles", "unlockUsersSuccess", new[] { userIds.Length.ToString() }));
         }
 
+        [AdminUsersAuthorize("userIds")]
         public HttpResponseMessage PostSetUserGroupsOnUsers([FromUri]string[] userGroupAliases, [FromUri]int[] userIds)
         {
             var users = Services.UserService.GetUsersById(userIds).ToArray();
@@ -691,7 +799,7 @@ namespace Umbraco.Web.Editors
             }
             Services.UserService.Save(users);
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/setUserGroupOnUsersSuccess"));
+                Services.TextService.Localize("speechBubbles", "setUserGroupOnUsersSuccess"));
         }
 
         /// <summary>
@@ -702,7 +810,8 @@ namespace Umbraco.Web.Editors
         /// Limited to users that haven't logged in to avoid issues with related records constrained
         /// with a foreign key on the user Id
         /// </remarks>
-        public async Task<HttpResponseMessage> PostDeleteNonLoggedInUser(int id)
+        [AdminUsersAuthorize]
+        public HttpResponseMessage PostDeleteNonLoggedInUser(int id)
         {
             var user = Services.UserService.GetUserById(id);
             if (user == null)
@@ -721,7 +830,7 @@ namespace Umbraco.Web.Editors
             Services.UserService.Delete(user, true);
 
             return Request.CreateNotificationSuccessResponse(
-                Services.TextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));
+                Services.TextService.Localize("speechBubbles", "deleteUserSuccess", new[] { userName }));
         }
 
         public class PagedUserResult : PagedResult<UserBasic>

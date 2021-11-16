@@ -1,4 +1,4 @@
-﻿function sliderController($scope, angularHelper) {
+﻿function sliderController($scope) {
 
     let sliderRef = null;
 
@@ -14,7 +14,13 @@
 
     function setModelValue(values) {
         $scope.model.value = values ? values.toString() : null;
-        angularHelper.getCurrentForm($scope).$setDirty();
+        setDirty();
+    }
+
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
     }
 
     $scope.setup = function(slider) {
@@ -26,10 +32,6 @@
     };
 
     function init() {
-
-        // convert to array
-        $scope.sliderValue = $scope.model.value ? $scope.model.value.split(',') : null;
-
         configureDefaults();
 
         // format config to fit slider plugin
@@ -39,6 +41,22 @@
         const min = $scope.model.config.minVal ? [$scope.model.config.minVal] : [$scope.model.config.minVal];
         const max = $scope.model.config.maxVal ? [$scope.model.config.maxVal] : [$scope.model.config.maxVal];
 
+        // set model.value to the default value if it's not set (but don't trigger setDirty, just silently update with the default value)
+        if (!$scope.model.value) {
+            $scope.model.value = start.toString();
+        }
+
+        // convert to array - exiting value can be a number if switching from numeric/decimal property editor
+        $scope.sliderValue = $scope.model.value
+            ? Utilities.isString($scope.model.value) || Utilities.isNumber($scope.model.value)
+                    ? $scope.model.value.toString().split(',')
+                    : null
+            : null;
+        
+        // don't render values with decimal places if the step increment in a whole number
+        var stepDecimalPlaces = $scope.model.config.step % 1 == 0
+            ? 0
+            : _.last($scope.model.config.step.toString().replace(",", ".").split(".")).length;
         // setup default
         $scope.sliderOptions = {
             "start": start,
@@ -46,10 +64,10 @@
             "tooltips": tooltips,
             "format": {
                 to: function (value) {
-                    return Math.round(value);
+                    return value.toFixed(stepDecimalPlaces);
                 },
                 from: function (value) {
-                    return Math.round(value);
+                    return Number(value);
                 }
             },
             "range": {

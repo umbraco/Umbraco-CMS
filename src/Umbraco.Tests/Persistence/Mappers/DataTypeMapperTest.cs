@@ -6,14 +6,14 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Tests.Persistence.Mappers
 {
     [TestFixture]
-    public class DataTypeMapperTest
+    public class DataTypeMapperTest : MapperTestBase
     {
         [Test]
         public void Can_Map_Id_Property()
         {
 
             // Act
-            string column = new DataTypeMapper().Map(new SqlCeSyntaxProvider(), "Id");
+            string column = new DataTypeMapper(MockSqlContext(), CreateMaps()).Map("Id");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DataTypeMapper().Map(new SqlCeSyntaxProvider(), "Key");
+            string column = new DataTypeMapper(MockSqlContext(), CreateMaps()).Map("Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[umbracoNode].[uniqueId]"));
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DataTypeMapper().Map(new SqlCeSyntaxProvider(), "DatabaseType");
+            string column = new DataTypeMapper(MockSqlContext(), CreateMaps()).Map("DatabaseType");
 
             // Assert
             Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[dbType]"));
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         {
 
             // Act
-            string column = new DataTypeMapper().Map(new SqlCeSyntaxProvider(), "EditorAlias");
+            string column = new DataTypeMapper(MockSqlContext(), CreateMaps()).Map("EditorAlias");
 
             // Assert
             Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.DataType}].[propertyEditorAlias]"));

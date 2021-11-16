@@ -112,6 +112,21 @@ namespace Umbraco.Web.Security
                     return SignInStatus.LockedOut;
                 }
 
+                // We need to verify that the user belongs to one or more groups that define content and media start nodes.
+                // To do so we have to create the user claims identity and validate the calculated start nodes.
+                var userIdentity = await CreateUserIdentityAsync(user);
+                if (userIdentity is UmbracoBackOfficeIdentity backOfficeIdentity)
+                {
+                    if (backOfficeIdentity.StartContentNodes.Length == 0 || backOfficeIdentity.StartMediaNodes.Length == 0)
+                    {
+                        _logger.WriteCore(TraceEventType.Information, 0,
+                            $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}, no content and/or media start nodes could be found for any of the user's groups", null, null);
+
+                        // We will say its a sucessful login which it is, but they have no node access
+                        return SignInStatus.Success;
+                    }
+                }
+
                 await UserManager.ResetAccessFailedCountAsync(user.Id);
                 return await SignInOrTwoFactor(user, isPersistent);
             }
@@ -227,7 +242,7 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Get the user id that has been verified already or -1.
+        /// Get the user id that has been verified already or int.MinValue if the user has not been verified yet
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -240,7 +255,7 @@ namespace Umbraco.Web.Security
             {
                 return ConvertIdFromString(result.Identity.GetUserId());
             }
-            return -1;
+            return int.MinValue;
         }
 
         /// <summary>
@@ -269,12 +284,12 @@ namespace Umbraco.Web.Security
         /// This is implemented because we cannot override GetVerifiedUserIdAsync and instead we have to shadow it
         /// so due to this and because we are using an INT as the TKey and not an object, it can never be null. Adding to that
         /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
-        /// all of this code to check for -1 instead.
+        /// all of this code to check for int.MinValue
         /// </remarks>
         public override async Task<SignInStatus> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberBrowser)
         {
             var userId = await GetVerifiedUserIdAsync();
-            if (userId == -1)
+            if (userId == int.MinValue)
             {
                 return SignInStatus.Failure;
             }
@@ -306,12 +321,12 @@ namespace Umbraco.Web.Security
         /// This is implemented because we cannot override GetVerifiedUserIdAsync and instead we have to shadow it
         /// so due to this and because we are using an INT as the TKey and not an object, it can never be null. Adding to that
         /// the default(int) value returned by the base class is always a valid user (i.e. the admin) so we just have to duplicate
-        /// all of this code to check for -1 instead.
+        /// all of this code to check for int.MinVale instead.
         /// </remarks>
         public override async Task<bool> SendTwoFactorCodeAsync(string provider)
         {
             var userId = await GetVerifiedUserIdAsync();
-            if (userId == -1)
+            if (userId == int.MinValue)
                 return false;
 
             var token = await UserManager.GenerateTwoFactorTokenAsync(userId, provider);

@@ -47,6 +47,9 @@ The sub header is sticky and will follow along down the page when scrolling.
          transclude: true,
          restrict: 'E',
          replace: true,
+         scope: {
+             "appearance": "@?"
+         },
          templateUrl: 'views/components/editor/subheader/umb-editor-sub-header.html'
       };
 

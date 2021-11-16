@@ -6,7 +6,15 @@
  * @description
  * The controller for editing macros parameters
  */
-function MacrosParametersController($scope, editorService, localizationService) {
+function MacrosParametersController($scope, $q, editorService, localizationService, macroResource) {
+
+    const vm = this;
+
+    vm.add = add;
+    vm.edit = edit;
+    vm.remove = remove;
+
+    vm.labels = {};
 
     $scope.sortableOptions = {
         axis: 'y',
@@ -21,17 +29,17 @@ function MacrosParametersController($scope, editorService, localizationService) 
     };
 
 
-    $scope.remove = function (parameter, evt) {
+    function remove(parameter, evt) {
         evt.preventDefault();
 
         $scope.model.macro.parameters = _.without($scope.model.macro.parameters, parameter);
         setDirty();
     }
 
-    $scope.add = function (evt) {
+    function add(evt) {
         evt.preventDefault();
 
-        openOverlay({}, $scope.labels.addParameter, (newParameter) => {
+        openOverlay({}, vm.labels.addParameter, (newParameter) => {
             if (!$scope.model.macro.parameters) {
                 $scope.model.macro.parameters = [];
             }
@@ -40,15 +48,36 @@ function MacrosParametersController($scope, editorService, localizationService) 
         });
     }
 
-    $scope.edit = function (parameter, evt) {
+    function edit(parameter, evt) {
         evt.preventDefault();
 
-        openOverlay(parameter, $scope.labels.editParameter, (newParameter) => {
-            parameter.key = newParameter.key;
-            parameter.label = newParameter.label;
-            parameter.editor = newParameter.editor;
-            setDirty();
+        var promises = [
+            getParameterEditorByAlias(parameter.editor)
+        ];
+
+        $q.all(promises).then(function (values) {
+            parameter.dataTypeName = values[0].name;
+
+            openOverlay(parameter, vm.labels.editParameter, (newParameter) => {
+
+                parameter.key = newParameter.key;
+                parameter.label = newParameter.label;
+                parameter.editor = newParameter.editor;
+                setDirty();
+            });
         });
+    }
+
+    function getParameterEditorByAlias(alias) {
+        var deferred = $q.defer();
+
+        macroResource.getParameterEditorByAlias(alias).then(function (data) {
+            deferred.resolve(data);
+        }, function () {
+            deferred.reject();
+        });
+
+        return deferred.promise;
     }
 
     function openOverlay(parameter, title, onSubmit) {
@@ -56,7 +85,6 @@ function MacrosParametersController($scope, editorService, localizationService) 
         const ruleDialog = {
             title: title,
             parameter: _.clone(parameter),
-            editors : $scope.model.parameterEditors,
             view: "views/macros/infiniteeditors/parameter.html",
             size: "small",
             submit: function (model) {
@@ -69,7 +97,6 @@ function MacrosParametersController($scope, editorService, localizationService) 
         };
 
         editorService.open(ruleDialog);
-
     }
 
     function setDirty() {
@@ -78,10 +105,8 @@ function MacrosParametersController($scope, editorService, localizationService) 
 
     function init() {
         localizationService.localizeMany(["macro_addParameter", "macro_editParameter"]).then(function (data) {
-            $scope.labels = {
-                addParameter: data[0],
-                editParameter: data[1]
-            }
+            vm.labels.addParameter = data[0];
+            vm.labels.editParameter = data[1];
         });
     }
 

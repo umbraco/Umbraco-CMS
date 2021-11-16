@@ -9,19 +9,24 @@
 *  is required because the only way to reset an upload control is to replace it's html.
 **/
 function umbSingleFileUpload($compile) {
+
+    // cause we have the same template twice I choose to extract it to its own variable:
+    var innerTemplate = "<input type='file' umb-file-upload accept='{{acceptFileExt}}'/>";
+
     return {
         restrict: "E",
         scope: {
-            rebuild: "="
+            rebuild: "=",
+            acceptFileExt: "<?"
         },
         replace: true,
-        template: "<div><input type='file' umb-file-upload /></div>",
-        link: function (scope, el, attrs) {
+        template: "<div>"+innerTemplate+"</div>",
+        link: function (scope, el) {
 
             scope.$watch("rebuild", function (newVal, oldVal) {
                 if (newVal && newVal !== oldVal) {
                     //recompile it!
-                    el.html("<input type='file' umb-file-upload />");
+                    el.html(innerTemplate);
                     $compile(el.contents())(scope);
                 }
             });

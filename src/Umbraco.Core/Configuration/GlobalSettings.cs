@@ -4,8 +4,11 @@ using System.Linq;
 using System.Net.Configuration;
 using System.Web;
 using System.Web.Configuration;
+using System.Web.Hosting;
 using System.Xml.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
@@ -17,23 +20,22 @@ namespace Umbraco.Core.Configuration
     /// </summary>
     public class GlobalSettings : IGlobalSettings
     {
+        private string _localTempPath;
 
-        #region Private static fields
-
-        
+        // TODO these should not be static
         private static string _reservedPaths;
         private static string _reservedUrls;
+        private static int _sqlWriteLockTimeOut;
+
         //ensure the built on (non-changeable) reserved paths are there at all times
         internal const string StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
         internal const string StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known,"; //must end with a comma!
-        #endregion
 
         /// <summary>
         /// Used in unit testing to reset all config items that were set with property setters (i.e. did not come from config)
         /// </summary>
         private static void ResetInternal()
         {
-            GlobalSettingsExtensions.Reset();
             _reservedPaths = null;
             _reservedUrls = null;
             HasSmtpServer = null;
@@ -69,9 +71,9 @@ namespace Umbraco.Core.Configuration
         internal static bool? HasSmtpServer { get; set; }
 
         /// <summary>
-        /// Gets the reserved urls from web.config.
+        /// Gets the reserved URLs from web.config.
         /// </summary>
-        /// <value>The reserved urls.</value>
+        /// <value>The reserved URLs.</value>
         public string ReservedUrls
         {
             get
@@ -131,7 +133,7 @@ namespace Umbraco.Core.Configuration
                     : "~/App_Data/umbraco.config";
             }
         }
-        
+
         /// <summary>
         /// Gets the path to umbraco's root directory (/umbraco by default).
         /// </summary>
@@ -143,6 +145,20 @@ namespace Umbraco.Core.Configuration
                 return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.Path)
                     ? IOHelper.ResolveUrl(ConfigurationManager.AppSettings[Constants.AppSettings.Path])
                     : string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets the path to folder containing the icons used in the umbraco backoffice (/umbraco/assets/icons by default).
+        /// </summary>
+        /// <value>The icons path.</value>
+        public string IconsPath
+        {
+            get
+            {
+                return ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.IconsPath)
+                    ? IOHelper.ResolveUrl(Constants.AppSettings.IconsPath)
+                    : $"{Path}/assets/icons";
             }
         }
 
@@ -163,7 +179,7 @@ namespace Umbraco.Core.Configuration
                 SaveSetting(Constants.AppSettings.ConfigurationStatus, value);
             }
         }
-        
+
         /// <summary>
         /// Saves a setting into the configuration file.
         /// </summary>
@@ -206,7 +222,7 @@ namespace Umbraco.Core.Configuration
                 ConfigurationManager.RefreshSection("appSettings");
             }
         }
-              
+
         /// <summary>
         /// Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>
@@ -250,7 +266,7 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
-        
+
         /// <summary>
         /// Returns the number of days that should take place between version checks.
         /// </summary>
@@ -269,7 +285,7 @@ namespace Umbraco.Core.Configuration
                 }
             }
         }
-        
+
         /// <inheritdoc />
         public LocalTempStorage LocalTempStorageLocation
         {
@@ -288,24 +304,42 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
+                if (_localTempPath != null)
+                    return _localTempPath;
+
                 switch (LocalTempStorageLocation)
                 {
                     case LocalTempStorage.AspNetTemp:
-                        return System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
+                        return _localTempPath = System.IO.Path.Combine(HttpRuntime.CodegenDir, "UmbracoData");
+
                     case LocalTempStorage.EnvironmentTemp:
-                        // include the appdomain hash is just a safety check, for example if a website is moved from worker A to worker B and then back
-                        // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
-                        // utilizing an old path - assuming we cannot have SHA1 collisions on AppDomainAppId
-                        var appDomainHash = HttpRuntime.AppDomainAppId.GenerateHash();
-                        return System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", appDomainHash);
+
+                        // environment temp is unique, we need a folder per site
+
+                        // use a hash
+                        // combine site name and application id
+                        //  site name is a Guid on Cloud
+                        //  application id is eg /LM/W3SVC/123456/ROOT
+                        // the combination is unique on one server
+                        // and, if a site moves from worker A to B and then back to A...
+                        //  hopefully it gets a new Guid or new application id?
+
+                        var siteName = HostingEnvironment.SiteName;
+                        var applicationId = HostingEnvironment.ApplicationID; // ie HttpRuntime.AppDomainAppId
+
+                        var hashString = siteName + "::" + applicationId;
+                        var hash = hashString.GenerateHash();
+                        var siteTemp = System.IO.Path.Combine(Environment.ExpandEnvironmentVariables("%temp%"), "UmbracoData", hash);
+
+                        return _localTempPath = siteTemp;
+
                     //case LocalTempStorage.Default:
                     //case LocalTempStorage.Unknown:
                     default:
-                        return IOHelper.MapPath("~/App_Data/TEMP");
+                        return _localTempPath = IOHelper.MapPath("~/App_Data/TEMP");
                 }
             }
         }
-
 
         /// <summary>
         /// Gets the default UI language.
@@ -323,10 +357,10 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Gets a value indicating whether umbraco should hide top level nodes from generated urls.
+        /// Gets a value indicating whether umbraco should hide top level nodes from generated URLs.
         /// </summary>
         /// <value>
-        ///     <c>true</c> if umbraco hides top level nodes from urls; otherwise, <c>false</c>.
+        ///     <c>true</c> if umbraco hides top level nodes from URLs; otherwise, <c>false</c>.
         /// </value>
         public bool HideTopLevelNodeFromPath
         {
@@ -359,6 +393,70 @@ namespace Umbraco.Core.Configuration
                     return false;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns true if TinyMCE scripting sanitization should be applied
+        /// </summary>
+        /// <remarks>
+        /// The default value is false
+        /// </remarks>
+        public bool SanitizeTinyMce
+        {
+            get
+            {
+                try
+                {
+                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.SanitizeTinyMce]);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// An int value representing the time in milliseconds to lock the database for a write operation
+        /// </summary>
+        /// <remarks>
+        /// The default value is 5000 milliseconds
+        /// </remarks>
+        /// <value>The timeout in milliseconds.</value>
+        public int SqlWriteLockTimeOut
+        {
+            get
+            {
+                if (_sqlWriteLockTimeOut != default) return _sqlWriteLockTimeOut;
+
+                var timeOut = GetSqlWriteLockTimeoutFromConfigFile(Current.Logger);
+
+                _sqlWriteLockTimeOut = timeOut;
+                return _sqlWriteLockTimeOut;
+            }
+        }
+
+        internal static int GetSqlWriteLockTimeoutFromConfigFile(ILogger logger)
+        {
+            var timeOut = 5000; // 5 seconds
+            var appSettingSqlWriteLockTimeOut = ConfigurationManager.AppSettings[Constants.AppSettings.SqlWriteLockTimeOut];
+            if (int.TryParse(appSettingSqlWriteLockTimeOut, out var configuredTimeOut))
+            {
+                // Only apply this setting if it's not excessively high or low
+                const int minimumTimeOut = 100;
+                const int maximumTimeOut = 20000;
+                if (configuredTimeOut >= minimumTimeOut && configuredTimeOut <= maximumTimeOut) // between 0.1 and 20 seconds
+                {
+                    timeOut = configuredTimeOut;
+                }
+                else
+                {
+                    logger.Warn<GlobalSettings>(
+                        $"The `{Constants.AppSettings.SqlWriteLockTimeOut}` setting in web.config is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms, defaulting back to {timeOut}");
+                }
+            }
+
+            return timeOut;
         }
     }
 }

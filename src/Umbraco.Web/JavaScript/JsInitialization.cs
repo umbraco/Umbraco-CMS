@@ -131,6 +131,17 @@ namespace Umbraco.Web.JavaScript
             return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
         }
 
+        internal static IEnumerable<string> GetTinyMceInitialization()
+        {
+            var resources = JsonConvert.DeserializeObject<JArray>(Resources.TinyMceInitialize);
+            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
+        }
+
+        internal static IEnumerable<string> OptimizeTinyMceScriptFiles(HttpContextBase httpContext)
+        {
+            return OptimizeScriptFiles(httpContext, GetTinyMceInitialization());
+        }
+
         /// <summary>
         /// Parses the JsResources.Main and replaces the replacement tokens accordingly.
         /// </summary>

@@ -9,32 +9,29 @@
             hide-icon="true"
             hide-description="true">
         </umb-editor-header>
-        
+
         <umb-editor-container>
-            
+
             <umb-load-indicator
                 ng-if="vm.loading">
             </umb-load-indicator>
 
             <umb-box>
                 <umb-box-content>
-                    <div class="form-search" style="margin-bottom: 15px;">
-                        <i class="icon-search"></i>
-                        <input type="text"
-                            ng-model="vm.usersOptions.filter"
-                            ng-change="vm.searchUsers()"
-                            class="umb-search-field search-query input-block-level -full-width-input"
-                            localize="placeholder"
-                            placeholder="@placeholders_filter"
-                            umb-auto-focus
-                            revent-enter-submit
-                            no-dirty-check />
-                    </div>
+                    <umb-search-filter
+                        input-id="userpicker-search"
+                        model="vm.usersOptions.filter"
+                        label-key="placeholders_filter"
+                        text="Type to filter..."
+                        css-class="w-100 mb-15"
+                        auto-focus="true">
+                    </umb-search-filter>
+
                     <div class="umb-user-picker-item-list">
-                        <a href="" class="umb-user-picker-list-item" ng-repeat="user in vm.users" ng-click="vm.selectUser(user)">
+                        <button type="button" class="btn-reset umb-user-picker-list-item" ng-repeat="user in vm.users | filter:vm.usersOptions.filter" ng-click="vm.selectUser(user)">
                             <div class="umb-user-picker-list-item__avatar">
                                 <umb-checkmark
-                                    class="umb-user-picker-list-item__checkmark" 
+                                    class="umb-user-picker-list-item__checkmark"
                                     ng-if="user.selected"
                                     checked="user.selected">
                                 </umb-checkmark>
@@ -52,9 +49,9 @@
                                     <span ng-repeat="userGroup in user.userGroups">{{ userGroup.name }}<span ng-if="!$last">, </span></span>
                                 </div>
                             </div>
-                        </a>
+                        </button>
                     </div>
-            
+
                     <div class="flex justify-center">
                         <umb-pagination
                             ng-if="vm.usersOptions.totalPages"
@@ -78,7 +75,9 @@
                     action="vm.close()">
                 </umb-button>
                 <umb-button
+                    ng-if="vm.multiPicker"
                     type="button"
+                    disabled="model.selection.length === 0"
                     button-style="success"
                     label-key="general_submit"
                     action="vm.submit(model)">

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Web;
 using Microsoft.Owin;
 using Moq;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Security
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, globalSettings),
-                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(),globalSettings,
+                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(), Enumerable.Empty<IMediaUrlProvider>(), globalSettings,
                 new TestVariationContextAccessor());
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
@@ -53,7 +54,7 @@ namespace Umbraco.Tests.Security
                 Mock.Of<HttpContextBase>(),
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, globalSettings),
-                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(), globalSettings,
+                TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(), Enumerable.Empty<IMediaUrlProvider>(), globalSettings,
                 new TestVariationContextAccessor());
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);

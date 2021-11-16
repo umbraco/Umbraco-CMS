@@ -10,6 +10,20 @@ namespace Umbraco.Core
     ///</summary>
     public static class EnumerableExtensions
     {
+        internal static bool IsCollectionEmpty<T>(this IReadOnlyCollection<T> list) => list == null || list.Count == 0;
+
+        internal static bool HasDuplicates<T>(this IEnumerable<T> items, bool includeNull)
+        {
+            var hs = new HashSet<T>();
+            foreach (var item in items)
+            {
+                if ((item != null || includeNull) && !hs.Add(item))
+                    return true;
+            }
+            return false;
+        }
+
+
         /// <summary>
         /// Wraps this object instance into an IEnumerable{T} consisting of a single item.
         /// </summary>
@@ -100,7 +114,6 @@ namespace Umbraco.Core
             }
         }
 
-        
         /// <summary>
         /// Returns true if all items in the other collection exist in this collection
         /// </summary>

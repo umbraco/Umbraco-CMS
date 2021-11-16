@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Collections;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -15,46 +13,104 @@ namespace Umbraco.Core.Services
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizedTextService _textService;
 
-        public PropertyValidationService(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService)
+        public PropertyValidationService(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService)
         {
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
+            _textService = textService;
         }
 
         //TODO: Remove this method in favor of the overload specifying all dependencies
         public PropertyValidationService()
-            : this(Current.PropertyEditors, Current.Services.DataTypeService)
+            : this(Current.PropertyEditors, Current.Services.DataTypeService, Current.Services.TextService)
         {
+        }
+
+        public IEnumerable<ValidationResult> ValidatePropertyValue(
+           PropertyType propertyType,
+           object postedValue)
+        {
+            if (propertyType is null) throw new ArgumentNullException(nameof(propertyType));
+            var dataType = _dataTypeService.GetDataType(propertyType.DataTypeId);
+            if (dataType == null) throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
+
+            var editor = _propertyEditors[propertyType.PropertyEditorAlias];
+            if (editor == null) throw new InvalidOperationException("No property editor found by alias " + propertyType.PropertyEditorAlias);
+
+            return ValidatePropertyValue(_textService, editor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage);
+        }
+
+        internal static IEnumerable<ValidationResult> ValidatePropertyValue(
+            ILocalizedTextService textService,
+            IDataEditor editor,
+            IDataType dataType,
+            object postedValue,
+            bool isRequired,
+            string validationRegExp,
+            string isRequiredMessage,
+            string validationRegExpMessage)
+        {
+            // Retrieve default messages used for required and regex validatation.  We'll replace these
+            // if set with custom ones if they've been provided for a given property.
+            var requiredDefaultMessages = new[]
+                {
+                    textService.Localize("validation", "invalidNull"),
+                    textService.Localize("validation", "invalidEmpty")
+                };
+            var formatDefaultMessages = new[]
+                {
+                    textService.Localize("validation", "invalidPattern"),
+                };
+
+            var valueEditor = editor.GetValueEditor(dataType.Configuration);
+            foreach (var validationResult in valueEditor.Validate(postedValue, isRequired, validationRegExp))
+            {
+                // If we've got custom error messages, we'll replace the default ones that will have been applied in the call to Validate().
+                if (isRequired && !string.IsNullOrWhiteSpace(isRequiredMessage) && requiredDefaultMessages.Contains(validationResult.ErrorMessage, StringComparer.OrdinalIgnoreCase))
+                {
+                    validationResult.ErrorMessage = isRequiredMessage;
+                }
+                if (!string.IsNullOrWhiteSpace(validationRegExp) && !string.IsNullOrWhiteSpace(validationRegExpMessage) && formatDefaultMessages.Contains(validationResult.ErrorMessage, StringComparer.OrdinalIgnoreCase))
+                {
+                    validationResult.ErrorMessage = validationRegExpMessage;
+                }
+                yield return validationResult;
+            }
         }
 
         /// <summary>
         /// Validates the content item's properties pass validation rules
         /// </summary>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
-        public bool IsPropertyDataValid(IContentBase content, out Property[] invalidProperties, string culture = "*")
+        public bool IsPropertyDataValid(IContent content, out Property[] invalidProperties, CultureImpact impact)
         {
             // select invalid properties
             invalidProperties = content.Properties.Where(x =>
             {
-                // if culture is null, we validate invariant properties only
-                // if culture is '*' we validate both variant and invariant properties, automatically
-                // if culture is specific eg 'en-US' we both too, but explicitly
+                var propertyTypeVaries = x.PropertyType.VariesByCulture();
 
-                var varies = x.PropertyType.VariesByCulture();
+                // impacts invariant = validate invariant property, invariant culture
+                if (impact.ImpactsOnlyInvariantCulture)
+                    return !(propertyTypeVaries || IsPropertyValid(x, null));
 
-                if (culture == null)
-                    return !(varies || IsPropertyValid(x, null)); // validate invariant property, invariant culture
+                // impacts all = validate property, all cultures (incl. invariant)
+                if (impact.ImpactsAllCultures)
+                    return !IsPropertyValid(x);
 
-                if (culture == "*")
-                    return !IsPropertyValid(x, culture); // validate property, all cultures
+                // impacts explicit culture = validate variant property, explicit culture
+                if (propertyTypeVaries)
+                    return !IsPropertyValid(x, impact.Culture);
 
-                return varies
-                    ? !IsPropertyValid(x, culture) // validate variant property, explicit culture
-                    : !IsPropertyValid(x, null); // validate invariant property, explicit culture
-            })
-                .ToArray();
+                // and, for explicit culture, we may also have to validate invariant property, invariant culture
+                // if either
+                // - it is impacted (default culture), or
+                // - there is no published version of the content - maybe non-default culture, but no published version
+
+                var alsoInvariant = impact.ImpactsAlsoInvariantProperties || !content.Published;
+                return alsoInvariant && !IsPropertyValid(x, null);
+
+            }).ToArray();
 
             return invalidProperties.Length == 0;
         }
@@ -127,6 +183,12 @@ namespace Umbraco.Core.Services
         private bool IsPropertyValueValid(PropertyType propertyType, object value)
         {
             var editor = _propertyEditors[propertyType.PropertyEditorAlias];
+            if (editor == null)
+            {
+                // nothing much we can do validation wise if the property editor has been removed.
+                // the property will be displayed as a label, so flagging it as invalid would be pointless.
+                return true;
+            }
             var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).Configuration;
             var valueEditor = editor.GetValueEditor(configuration);
             return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp).Any();

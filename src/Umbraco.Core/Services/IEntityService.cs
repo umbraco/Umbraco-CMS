@@ -18,24 +18,8 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets an entity.
         /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get(int id, bool full);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
         /// <param name="key">The unique key of the entity.</param>
         IEntitySlim Get(Guid key);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="key">The unique key of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get(Guid key, bool full);
 
         /// <summary>
         /// Gets an entity.
@@ -43,64 +27,28 @@ namespace Umbraco.Core.Services
         /// <param name="id">The identifier of the entity.</param>
         /// <param name="objectType">The object type of the entity.</param>
         IEntitySlim Get(int id, UmbracoObjectTypes objectType);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="objectType">The object type of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get(int id, UmbracoObjectTypes objectType, bool full);
-
+        
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <param name="key">The unique key of the entity.</param>
         /// <param name="objectType">The object type of the entity.</param>
         IEntitySlim Get(Guid key, UmbracoObjectTypes objectType);
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <param name="key">The unique key of the entity.</param>
-        /// <param name="objectType">The object type of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get(Guid key, UmbracoObjectTypes objectType, bool full);
-
+        
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
         /// <param name="id">The identifier of the entity.</param>
         IEntitySlim Get<T>(int id) where T : IUmbracoEntity;
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
-        /// <param name="id">The identifier of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get<T>(int id, bool full) where T : IUmbracoEntity;
-
+        
         /// <summary>
         /// Gets an entity.
         /// </summary>
         /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
         /// <param name="key">The unique key of the entity.</param>
         IEntitySlim Get<T>(Guid key) where T : IUmbracoEntity;
-
-        /// <summary>
-        /// Gets an entity.
-        /// </summary>
-        /// <typeparam name="T">The type used to determine the object type of the entity.</typeparam>
-        /// <param name="key">The unique key of the entity.</param>
-        /// <param name="full">A value indicating whether to load a light entity, or the full entity.</param>
-        /// <remarks>Returns either a <see cref="IEntitySlim"/>, or an actual entity, depending on <paramref name="full"/>.</remarks>
-        IUmbracoEntity Get<T>(Guid key, bool full) where T : IUmbracoEntity;
-
+        
         /// <summary>
         /// Determines whether an entity exists.
         /// </summary>

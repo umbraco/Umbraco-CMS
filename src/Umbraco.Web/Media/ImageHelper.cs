@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Media.Exif;
 
 namespace Umbraco.Web.Media
@@ -28,9 +18,9 @@ namespace Umbraco.Web.Media
         /// use potentially large amounts of memory.</remarks>
         public static Size GetDimensions(Stream stream)
         {   
+            //Try to load with exif
             try
             {
-                //Try to load with exif
                 var jpgInfo = ImageFile.FromStream(stream);
 
                 if (jpgInfo != null
@@ -45,11 +35,17 @@ namespace Umbraco.Web.Media
                         return new Size(width, height);
                     }
                 }
+            }
+            catch
+            {
+                //We will just swallow, just means we can't read exif data, we don't want to log an error either
+            }
 
-                //we have no choice but to try to read in via GDI
+            //we have no choice but to try to read in via GDI
+            try
+            {
                 using (var image = Image.FromStream(stream))
                 {
-
                     var fileWidth = image.Width;
                     var fileHeight = image.Height;
                     return new Size(fileWidth, fileHeight);
@@ -57,13 +53,10 @@ namespace Umbraco.Web.Media
             }
             catch (Exception)
             {
-                //We will just swallow, just means we can't read exif data, we don't want to log an error either
-                return new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);
+                //We will just swallow, just means we can't read via GDI, we don't want to log an error either
             }
-            
+
+            return new Size(Constants.Conventions.Media.DefaultSize, Constants.Conventions.Media.DefaultSize);            
         }
-
-        
-
     }
 }

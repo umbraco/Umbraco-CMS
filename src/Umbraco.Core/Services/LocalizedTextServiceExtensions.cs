@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -12,10 +13,112 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class LocalizedTextServiceExtensions
     {
-        public static string Localize(this ILocalizedTextService manager, string area, string key)
+        // TODO: Remove these extension methods checking for ILocalizedTextService2 in v9 when these interfaces merge
+
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture)
         {
-            var fullKey = string.Join("/", area, key);
+            if(manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, culture);
+            }
+            var fullKey = alias;
+            if (area != null)
+            {
+                fullKey = string.Concat(area, "/", alias);
+            }
+#pragma warning disable CS0618 // Type or member is obsolete
+            return manager.Localize(fullKey, culture);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        public static string Localize(this ILocalizedTextService manager, string area, string alias)
+        {
+            if (manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, Thread.CurrentThread.CurrentUICulture);
+            }
+            var fullKey = alias;
+            if (area != null)
+            {
+                fullKey = string.Concat(area, "/", alias);
+            }
+#pragma warning disable CS0618 // Type or member is obsolete
             return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        /// <summary>
+        /// Localize using the current thread culture
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, string[] tokens)
+        {
+            if (manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, Thread.CurrentThread.CurrentUICulture, ConvertToDictionaryVars(tokens));
+            }
+            var fullKey = alias;
+            if (area != null)
+            {
+                fullKey = string.Concat(area, "/", alias);
+            }
+#pragma warning disable CS0618 // Type or member is obsolete
+            return manager.Localize(fullKey, Thread.CurrentThread.CurrentUICulture, tokens);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        /// <summary>
+        /// Localize a key without any variables
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
+        /// <param name="culture"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture, string[] tokens)
+        {
+            if (manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, culture, ConvertToDictionaryVars(tokens));
+            }
+            var fullKey = alias;
+            if (area != null)
+            {
+                fullKey = string.Concat(area, "/", alias);
+            }
+#pragma warning disable CS0618 // Type or member is obsolete
+            return manager.Localize(fullKey, culture, ConvertToDictionaryVars(tokens));
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        /// <summary>
+        /// Localize a key without any variables
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="area"></param>
+        /// <param name="alias"></param>
+        /// <param name="culture"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public static string Localize(this ILocalizedTextService manager, string area, string alias, CultureInfo culture, IDictionary<string, string> tokens)
+        {
+            if (manager is ILocalizedTextService2 manager2)
+            {
+                return manager2.Localize(area, alias, culture, tokens);
+            }
+            var fullKey = alias;
+            if (area != null)
+            {
+                fullKey = string.Concat(area, "/", alias);
+            }
+#pragma warning disable CS0618 // Type or member is obsolete
+            return manager.Localize(fullKey, culture, tokens);
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         /// <summary>
@@ -25,6 +128,7 @@ namespace Umbraco.Core.Services
         /// <param name="key"></param>
         /// <param name="tokens"></param>
         /// <returns></returns>
+        [Obsolete("Use the overload specifying an area and alias instead of key")]
         public static string Localize(this ILocalizedTextService manager, string key, string[] tokens)
         {
             return manager.Localize(key, Thread.CurrentThread.CurrentUICulture, tokens);
@@ -37,6 +141,7 @@ namespace Umbraco.Core.Services
         /// <param name="key"></param>
         /// <param name="tokens"></param>
         /// <returns></returns>
+        [Obsolete("Use the overload specifying an area and alias instead of key")]
         public static string Localize(this ILocalizedTextService manager, string key, IDictionary<string, string> tokens = null)
         {
             return manager.Localize(key, Thread.CurrentThread.CurrentUICulture, tokens);
@@ -50,6 +155,7 @@ namespace Umbraco.Core.Services
         /// <param name="culture"></param>
         /// <param name="tokens"></param>
         /// <returns></returns>
+        [Obsolete("Use the overload specifying an area and alias instead of key")]
         public static string Localize(this ILocalizedTextService manager, string key, CultureInfo culture, string[] tokens)
         {
             return manager.Localize(key, culture, ConvertToDictionaryVars(tokens));
@@ -83,10 +189,10 @@ namespace Umbraco.Core.Services
         internal static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text)
         {
             var cultureDictionary = CultureDictionary;
-            return UmbracoDictionaryTranslate(text, cultureDictionary);
+            return manager.UmbracoDictionaryTranslate(text, cultureDictionary);
         }
 
-        private static string UmbracoDictionaryTranslate(string text, ICultureDictionary cultureDictionary)
+        private static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text, ICultureDictionary cultureDictionary)
         {
             if (text == null)
                 return null;
@@ -95,7 +201,14 @@ namespace Umbraco.Core.Services
                 return text;
 
             text = text.Substring(1);
-            return cultureDictionary[text].IfNullOrWhiteSpace(text);
+            var value = cultureDictionary[text];
+            if (value.IsNullOrWhiteSpace() == false)
+            {
+                return value;
+            }
+
+            value = manager.Localize(text.Replace('_', '/'));
+            return value.StartsWith("[") ? text : value;
         }
 
         private static ICultureDictionary CultureDictionary

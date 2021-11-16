@@ -4,7 +4,7 @@
     "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
   },
   {
-    "name": "Find all logs that has an exception property (Warning, Error & Critical with Exceptions)",
+    "name": "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
     "query": "Has(@Exception)"
   },
   {

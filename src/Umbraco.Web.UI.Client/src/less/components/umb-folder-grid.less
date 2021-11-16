@@ -27,7 +27,12 @@
 
 .umb-folder-grid__folder.-selected {
     color:@ui-selected-type;
-    
+    &:hover {
+        color:@ui-selected-type-hover;
+    }
+}
+
+.umb-folder-grid__folder.-selected, .umb-folder-grid__folder:hover {
     &::before {
         content: "";
         position: absolute;
@@ -41,9 +46,15 @@
         box-shadow: 0 0 4px 0 darken(@ui-selected-border, 20), inset 0 0 2px 0 darken(@ui-selected-border, 20);
         pointer-events: none;
     }
-    
-    &:hover {
-        color:@ui-selected-type-hover;
+}
+.umb-folder-grid__folder:hover {
+    &::before {
+        opacity: .33;
+    }
+}
+.umb-folder-grid__folder.-selected:hover {
+    &::before {
+        opacity: .75;
     }
 }
 

@@ -15,6 +15,8 @@
       vm.focusLayoutName = false;
 
       vm.layoutsSortableOptions = {
+         axis: "y",
+         containment: "parent",
          distance: 10,
          tolerance: "pointer",
          opacity: 0.7,
@@ -29,12 +31,6 @@
       vm.removeLayout = removeLayout;
       vm.openIconPicker = openIconPicker;
 
-      function activate() {
-
-
-
-      }
-
       function addLayout() {
 
          vm.focusLayoutName = false;
@@ -47,7 +43,6 @@
          };
 
          $scope.model.value.push(layout);
-
       }
 
       function showPrompt(layout) {
@@ -62,13 +57,18 @@
          $scope.model.value.splice($index, 1);
       }
 
-      function openIconPicker(layout) {
+       function openIconPicker(layout) {
             var iconPicker = {
-                submit: function(model) {
-                    if (model.color) {
-                        layout.icon = model.icon + " " + model.color;
-                    } else {
-                        layout.icon = model.icon;
+                icon: layout.icon.split(' ')[0],
+                color: layout.icon.split(' ')[1],
+                size: "medium",
+                submit: function (model) {
+                    if (model.icon) {
+                        if (model.color) {
+                            layout.icon = model.icon + " " + model.color;
+                        } else {
+                            layout.icon = model.icon;
+                        }
                     }
                     vm.focusLayoutName = true;
                     editorService.close();
@@ -79,8 +79,6 @@
             };
             editorService.iconPicker(iconPicker);
         }
-
-      activate();
 
    }
 

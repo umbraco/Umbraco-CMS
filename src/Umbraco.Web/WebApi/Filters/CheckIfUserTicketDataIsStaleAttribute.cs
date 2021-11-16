@@ -4,14 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Security;
+using Umbraco.Core.Mapping;
 using UserExtensions = Umbraco.Core.Models.UserExtensions;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -26,6 +25,9 @@ namespace Umbraco.Web.WebApi.Filters
     /// </remarks>
     public sealed class CheckIfUserTicketDataIsStaleAttribute : ActionFilterAttribute
     {
+        // this is an attribute - no choice
+        private UmbracoMapper Mapper => Current.Mapper;
+
         public override async Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
         {
             await CheckStaleData(actionContext);
@@ -83,12 +85,12 @@ namespace Umbraco.Web.WebApi.Filters
                 () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
                 () =>
                 {
-                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, Current.Services.EntityService);
+                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, Current.Services.EntityService, Current.AppCaches);
                     return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
                 },
                 () =>
                 {
-                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, Current.Services.EntityService);
+                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, Current.Services.EntityService, Current.AppCaches);
                     return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
                 }
             };

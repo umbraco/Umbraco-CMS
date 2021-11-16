@@ -9,21 +9,25 @@
 (function () {
     "use strict";
 
-    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, 
-        dataTypeResource, editorState, contentEditingHelper, formHelper, 
-        navigationService, iconHelper, contentTypeHelper, notificationsService, 
-        $filter, $q, localizationService, overlayHelper, eventsService, angularHelper) {
+    function MediaTypesEditController($scope, $routeParams, $q,
+        mediaTypeResource, editorState, contentEditingHelper, 
+        navigationService, iconHelper, contentTypeHelper, notificationsService,
+        localizationService, overlayHelper, eventsService, angularHelper) {
 
         var vm = this;
         var evts = [];
         var mediaTypeId = $routeParams.id;
         var create = $routeParams.create;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var mediaTypeIcon = "";
 
         vm.save = save;
         vm.close = close;
 
         vm.currentNode = null;
+        vm.header = {};
+        vm.header.editorfor = "content_mediatype";
+        vm.header.setPageTitle = true;
         vm.contentType = {};
         vm.page = {};
         vm.page.loading = false;
@@ -36,7 +40,7 @@
 
         function onInit() {
             // get init values from model when in infinite mode
-            if(infiniteMode) {
+            if (infiniteMode) {
                 mediaTypeId = $scope.model.id;
                 create = $scope.model.create;
                 vm.saveButtonKey = "buttons_saveAndClose";
@@ -81,8 +85,7 @@
                     "name": vm.labels.design,
                     "alias": "design",
                     "icon": "icon-document-dashed-line",
-                    "view": "views/mediatypes/views/design/design.html",
-                    "active": true
+                    "view": "views/mediatypes/views/design/design.html"
                 },
                 {
                     "name": vm.labels.listview,
@@ -153,7 +156,30 @@
                     ]
                 }
             ];
+
+            initializeActiveNavigationPanel();
         });
+
+        function initializeActiveNavigationPanel() {
+            // Initialise first loaded page based on page route paramater
+            // i.e. ?view=design|listview|permissions
+            var initialViewSetFromRouteParams = false;
+            var view = $routeParams.view;
+            if (view) {
+                var viewPath = "views/mediatypes/views/" + view + "/" + view + ".html";
+                for (var i = 0; i < vm.page.navigation.length; i++) {
+                    if (vm.page.navigation[i].view === viewPath) {
+                        vm.page.navigation[i].active = true;
+                        initialViewSetFromRouteParams = true;
+                        break;
+                    }
+                }
+            }
+
+            if (initialViewSetFromRouteParams === false) {
+                vm.page.navigation[0].active = true;
+            }
+        }
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
             vm.page.modelsBuilder = result;
@@ -164,7 +190,6 @@
                     hotKeyWhenHidden: true,
                     labelKey: vm.saveButtonKey,
                     letter: "S",
-                    type: "submit",
                     handler: function () { vm.save(); }
                 };
                 vm.page.subButtons = [{
@@ -223,6 +248,7 @@
         });
 
         if (create) {
+            
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
@@ -256,7 +282,7 @@
         function save() {
 
             // only save if there is no overlays open
-            if(overlayHelper.getNumberOfOverlays() === 0) {
+            if (overlayHelper.getNumberOfOverlays() === 0) {
 
                 var deferred = $q.defer();
 
@@ -269,42 +295,9 @@
                     saveMethod: mediaTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,
-                    //We do not redirect on failure for doc types - this is because it is not possible to actually save the doc
-                    // type when server side validation fails - as opposed to content where we are capable of saving the content
-                    // item if server side validation fails
-                    redirectOnFailure: false,
-                    // we need to rebind... the IDs that have been created!
-                    rebindCallback: function (origContentType, savedContentType) {
-                        vm.contentType.id = savedContentType.id;
-                        vm.contentType.groups.forEach(function (group) {
-                            if (!group.name) return;
-
-                            var k = 0;
-                            while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
-                                k++;
-                            if (k == savedContentType.groups.length) {
-                                group.id = 0;
-                                return;
-                            }
-
-                            var savedGroup = savedContentType.groups[k];
-                            if (!group.id) group.id = savedGroup.id;
-
-                            group.properties.forEach(function (property) {
-                                if (property.id || !property.alias) return;
-
-                                k = 0;
-                                while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
-                                    k++;
-                                if (k == savedGroup.properties.length) {
-                                    property.id = 0;
-                                    return;
-                                }
-
-                                var savedProperty = savedGroup.properties[k];
-                                property.id = savedProperty.id;
-                            });
-                        });
+                    rebindCallback: function (_, savedContentType) {
+                        // we need to rebind... the IDs that have been created!
+                        contentTypeHelper.rebindSavedContentType(vm.contentType, savedContentType);
                     }
                 }).then(function (data) {
                     //success
@@ -317,9 +310,13 @@
                     var args = { mediaType: vm.contentType };
                     eventsService.emit("editors.mediaType.saved", args);
 
+                    if (mediaTypeIcon !== vm.contentType.icon) {
+                        eventsService.emit("editors.tree.icon.changed", args);
+                    }
+
                     vm.page.saveButtonState = "success";
 
-                    if(infiniteMode && $scope.model.submit) {
+                    if (infiniteMode && $scope.model.submit) {
                         $scope.model.submit();
                     }
 
@@ -349,18 +346,6 @@
 
         function init(contentType) {
 
-            // set all tab to inactive
-            if (contentType.groups.length !== 0) {
-                angular.forEach(contentType.groups, function (group) {
-
-                    angular.forEach(group.properties, function (property) {
-                        // get data type details for each property
-                        getDataTypeDetails(property);
-                    });
-
-                });
-            }
-
             // convert icons for content type
             convertLegacyIcons(contentType);
 
@@ -368,6 +353,8 @@
             editorState.set(contentType);
 
             vm.contentType = contentType;
+
+            mediaTypeIcon = contentType.icon;
         }
 
         function convertLegacyIcons(contentType) {
@@ -384,18 +371,6 @@
             contentType.icon = contentTypeArray[0].icon;
         }
 
-        function getDataTypeDetails(property) {
-            if (property.propertyState !== "init") {
-
-                dataTypeResource.getById(property.dataTypeId)
-                    .then(function(dataType) {
-                        property.dataTypeIcon = dataType.icon;
-                        property.dataTypeName = dataType.name;
-                    });
-            }
-        }
-
-
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
             navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function(syncArgs) {
@@ -404,13 +379,17 @@
         }
 
         function close() {
-            if(infiniteMode && $scope.model.close) {
+            if (infiniteMode && $scope.model.close) {
                 $scope.model.close();
             }
         }
 
         evts.push(eventsService.on("app.refreshEditor", function(name, error) {
             loadMediaType();
+        }));
+
+        evts.push(eventsService.on("editors.groupsBuilder.changed", function(name, args) {
+            angularHelper.getCurrentForm($scope).$setDirty();
         }));
 
         //ensure to unregister from all events!

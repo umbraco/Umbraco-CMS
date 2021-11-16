@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -32,12 +34,22 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
-        [DataMember(Name = "sortOrder")]
-        public int SortOrder { get; set; }
+        [DataMember(Name = "key")]
+        public Guid Key { get; set; }
+
+        [DataMember(Name = "type")]
+        public PropertyGroupType Type { get; set; }
 
         [Required]
         [DataMember(Name = "name")]
         public string Name { get; set; }
+
+        [Required]
+        [DataMember(Name = "alias")]
+        public string Alias { get; set; }
+
+        [DataMember(Name = "sortOrder")]
+        public int SortOrder { get; set; }
     }
 
     [DataContract(Name = "propertyGroup", Namespace = "")]
@@ -51,5 +63,11 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "properties")]
         public IEnumerable<TPropertyType> Properties { get; set; }
+    }
+
+    internal static class PropertyGroupBasicExtensions
+    {
+        public static string GetParentAlias(this PropertyGroupBasic propertyGroup)
+            => PropertyGroupExtensions.GetParentAlias(propertyGroup.Alias);
     }
 }

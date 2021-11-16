@@ -10,6 +10,7 @@ using Microsoft.Owin.Security.DataProtection;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -60,6 +61,7 @@ namespace Umbraco.Web.Security
             IEntityService entityService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider,
+            UmbracoMapper mapper,
             IContentSection contentSectionConfig,
             IGlobalSettings globalSettings)
         {
@@ -69,7 +71,7 @@ namespace Umbraco.Web.Security
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
             var manager = new BackOfficeUserManager(
-                new BackOfficeUserStore(userService, memberTypeService, entityService, externalLoginService, globalSettings, membershipProvider));
+                new BackOfficeUserStore(userService, memberTypeService, entityService, externalLoginService, globalSettings, membershipProvider, mapper));
             manager.InitUserManager(manager, membershipProvider, contentSectionConfig, options);
             return manager;
         }
@@ -498,7 +500,7 @@ namespace Umbraco.Web.Security
             var result = await base.SetLockoutEndDateAsync(userId, lockoutEnd);
 
             // The way we unlock is by setting the lockoutEnd date to the current datetime
-            if (result.Succeeded && lockoutEnd >= DateTimeOffset.UtcNow)
+            if (result.Succeeded && lockoutEnd > DateTimeOffset.UtcNow)
             {
                 RaiseAccountLockedEvent(userId);
             }
@@ -608,9 +610,11 @@ namespace Umbraco.Web.Security
             OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
-        internal void RaiseLogoutSuccessEvent(int userId)
+        internal SignOutAuditEventArgs RaiseLogoutSuccessEvent(int userId)
         {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
+            var args = new SignOutAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), affectedUser: userId);
+            OnLogoutSuccess(args);
+            return args;
         }
 
         internal void RaisePasswordChangedEvent(int userId)
@@ -629,6 +633,10 @@ namespace Umbraco.Web.Security
             OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
+        internal void RaiseSendingUserInvite(UserInviteEventArgs args) => OnSendingUserInvite(args);
+        internal bool HasSendingUserInviteEventHandler => SendingUserInvite != null;
+
+        // TODO: Not sure why these are not strongly typed events?? They should be in netcore!
         public static event EventHandler AccountLocked;
         public static event EventHandler AccountUnlocked;
         public static event EventHandler ForgotPasswordRequested;
@@ -641,60 +649,34 @@ namespace Umbraco.Web.Security
         public static event EventHandler PasswordReset;
         public static event EventHandler ResetAccessFailedCount;
 
-        protected virtual void OnAccountLocked(IdentityAuditEventArgs e)
-        {
-            if (AccountLocked != null) AccountLocked(this, e);
-        }
+        /// <summary>
+        /// Raised when a user is invited
+        /// </summary>
+        public static event EventHandler SendingUserInvite; // this event really has nothing to do with the user manager but was the most convenient place to put it
 
-        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e)
-        {
-            if (AccountUnlocked != null) AccountUnlocked(this, e);
-        }
+        protected virtual void OnSendingUserInvite(UserInviteEventArgs e) => SendingUserInvite?.Invoke(this, e);
 
-        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e)
-        {
-            if (ForgotPasswordRequested != null) ForgotPasswordRequested(this, e);
-        }
+        protected virtual void OnAccountLocked(IdentityAuditEventArgs e) => AccountLocked?.Invoke(this, e);
 
-        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e)
-        {
-            if (ForgotPasswordChangedSuccess != null) ForgotPasswordChangedSuccess(this, e);
-        }
+        protected virtual void OnAccountUnlocked(IdentityAuditEventArgs e) => AccountUnlocked?.Invoke(this, e);
 
-        protected virtual void OnLoginFailed(IdentityAuditEventArgs e)
-        {
-            if (LoginFailed != null) LoginFailed(this, e);
-        }
+        protected virtual void OnForgotPasswordRequested(IdentityAuditEventArgs e) => ForgotPasswordRequested?.Invoke(this, e);
 
-        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e)
-        {
-            if (LoginRequiresVerification != null) LoginRequiresVerification(this, e);
-        }
+        protected virtual void OnForgotPasswordChangedSuccess(IdentityAuditEventArgs e) => ForgotPasswordChangedSuccess?.Invoke(this, e);
 
-        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e)
-        {
-            if (LoginSuccess != null) LoginSuccess(this, e);
-        }
+        protected virtual void OnLoginFailed(IdentityAuditEventArgs e) => LoginFailed?.Invoke(this, e);
 
-        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e)
-        {
-            if (LogoutSuccess != null) LogoutSuccess(this, e);
-        }
+        protected virtual void OnLoginRequiresVerification(IdentityAuditEventArgs e) => LoginRequiresVerification?.Invoke(this, e);
 
-        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e)
-        {
-            if (PasswordChanged != null) PasswordChanged(this, e);
-        }
+        protected virtual void OnLoginSuccess(IdentityAuditEventArgs e) => LoginSuccess?.Invoke(this, e);
 
-        protected virtual void OnPasswordReset(IdentityAuditEventArgs e)
-        {
-            if (PasswordReset != null) PasswordReset(this, e);
-        }
+        protected virtual void OnLogoutSuccess(IdentityAuditEventArgs e) => LogoutSuccess?.Invoke(this, e);
 
-        protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e)
-        {
-            if (ResetAccessFailedCount != null) ResetAccessFailedCount(this, e);
-        }
+        protected virtual void OnPasswordChanged(IdentityAuditEventArgs e) => PasswordChanged?.Invoke(this, e);
+
+        protected virtual void OnPasswordReset(IdentityAuditEventArgs e) => PasswordReset?.Invoke(this, e);
+
+        protected virtual void OnResetAccessFailedCount(IdentityAuditEventArgs e) => ResetAccessFailedCount?.Invoke(this, e);
 
         /// <summary>
         /// Returns the current request IP address for logging if there is one

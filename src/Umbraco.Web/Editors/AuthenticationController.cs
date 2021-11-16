@@ -8,18 +8,15 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
-using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -28,23 +25,26 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
+using Umbraco.Web.Editors.Filters;
+using Microsoft.Owin.Security;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [Mvc.PluginController("UmbracoApi")]
     [ValidationFilter]
     [AngularJsonOnlyConfiguration]
     [IsBackOffice]
+    [DisableBrowserCache]
     public class AuthenticationController : UmbracoApiController
     {
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
         public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
-            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
+            : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, Current.Mapper)
         {
         }
 
@@ -67,6 +67,7 @@ namespace Umbraco.Web.Editors
             return provider.GetConfiguration(Services.UserService);
         }
 
+
         /// <summary>
         /// Checks if a valid token is specified for an invited user and if so logs the user in and returns the user object
         /// </summary>
@@ -77,6 +78,7 @@ namespace Umbraco.Web.Editors
         /// This will also update the security stamp for the user so it can only be used once
         /// </remarks>
         [ValidateAngularAntiForgeryToken]
+        [DenyLocalLoginAuthorization]
         public async Task<UserDisplay> PostVerifyInvite([FromUri]int id, [FromUri]string token)
         {
             if (string.IsNullOrWhiteSpace(token))
@@ -112,6 +114,23 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
         {
+            var owinContext = TryGetOwinContext().Result;
+            ExternalSignInAutoLinkOptions autoLinkOptions = null;
+            var authType = owinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == unlinkLoginModel.LoginProvider);
+            if (authType == null)
+            {
+                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", unlinkLoginModel.LoginProvider);
+            }
+            else
+            {
+                autoLinkOptions = authType.GetExternalSignInAutoLinkOptions();
+                if (!autoLinkOptions.AllowManualLinking)
+                {
+                    // If AllowManualLinking is disabled for this provider we cannot unlink
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+            }
+
             var result = await UserManager.RemoveLoginAsync(
                 User.Identity.GetUserId<int>(),
                 new UserLoginInfo(unlinkLoginModel.LoginProvider, unlinkLoginModel.ProviderKey));
@@ -207,7 +226,12 @@ namespace Umbraco.Web.Editors
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
             var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId().ResultOr(0));
-            return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
+            var result = new Dictionary<string, string>();
+            foreach (var l in identityUser.Logins)
+            {
+                result[l.LoginProvider] = l.ProviderKey;
+            }
+            return result;
         }
 
         /// <summary>
@@ -215,6 +239,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public async Task<HttpResponseMessage> PostLogin(LoginModel loginModel)
         {
             var http = EnsureHttpContext();
@@ -288,6 +313,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
+        [DenyLocalLoginAuthorization]
         public async Task<HttpResponseMessage> PostRequestPasswordReset(RequestPasswordResetModel model)
         {
             // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
@@ -311,7 +337,7 @@ namespace Umbraco.Web.Editors
                         new[] { identityUser.UserName, callbackUrl });
 
                     await UserManager.SendEmailAsync(identityUser.Id,
-                        Services.TextService.Localize("login/resetPasswordEmailCopySubject",
+                        Services.TextService.Localize("login", "resetPasswordEmailCopySubject",
                             // Ensure the culture of the found user is used for the email!
                             UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
                         message);
@@ -331,7 +357,7 @@ namespace Umbraco.Web.Editors
         public async Task<IEnumerable<string>> Get2FAProviders()
         {
             var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId < 0)
+            if (userId == int.MinValue)
             {
                 Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -347,7 +373,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId < 0)
+            if (userId == int.MinValue)
             {
                 Logger.Warn<AuthenticationController>("Get2FAProviders :: No verified user found, returning 404");
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -407,19 +433,19 @@ namespace Umbraco.Web.Editors
                 var lockedOut = await UserManager.IsLockedOutAsync(model.UserId);
                 if (lockedOut)
                 {
-                    Logger.Info<AuthenticationController>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
+                    Logger.Info<AuthenticationController,int>("User {UserId} is currently locked out, unlocking and resetting AccessFailedCount", model.UserId);
 
                     //// var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController, int, string>("Could not unlock for user {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
                     }
 
                     var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController,int, string>("Could not reset access failed count {UserId} - error {UnlockError}", model.UserId, unlockResult.Errors.First());
                     }
                 }
 
@@ -473,13 +499,17 @@ namespace Umbraco.Web.Editors
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
-            Logger.Info<AuthenticationController>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, owinContext.Request.RemoteIpAddress);
+            Logger.Info<AuthenticationController, string, string>("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, owinContext.Request.RemoteIpAddress);
 
             if (UserManager != null)
             {
-                var userId = -1;
-                int.TryParse(User.Identity.GetUserId(), out userId);
-                UserManager.RaiseLogoutSuccessEvent(userId);
+                int.TryParse(User.Identity.GetUserId(), out var userId);
+                var args = UserManager.RaiseLogoutSuccessEvent(userId);
+                if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
+                    return Request.CreateResponse(new
+                    {
+                        signOutRedirectUrl = args.SignOutRedirectUrl
+                    });
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);

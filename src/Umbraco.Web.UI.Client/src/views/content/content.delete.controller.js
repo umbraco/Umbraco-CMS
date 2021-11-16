@@ -1,12 +1,12 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.ContentDeleteController
+ * @name Umbraco.Editors.Content.DeleteController
  * @function
  * 
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, overlayService) {
+function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, overlayService, languageResource) {
 
     /**
      * Used to toggle UI elements during delete operations
@@ -58,7 +58,7 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
                 $location.path(location);
             }
 
-            navigationService.hideMenu();
+            $scope.success = true;
         }, function(err) {
 
             toggleDeleting(false);
@@ -67,6 +67,11 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
             if (err.status && err.status >= 500) {
                 // TODO: All YSOD handling should be done with an interceptor
                 overlayService.ysod(err);
+                navigationService.hideDialog();
+            }
+
+            if(err.data && err.data.notifications && err.data.notifications.length > 0) {
+                navigationService.hideDialog();
             }
         });
 
@@ -74,7 +79,11 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
 
     $scope.cancel = function() {
         toggleDeleting(false);
-        navigationService.hideDialog();        
+        $scope.close();
+    };
+
+    $scope.close = function () {
+        navigationService.hideDialog();
     };
 }
 

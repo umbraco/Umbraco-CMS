@@ -11,6 +11,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.PropertyEditors;
@@ -87,6 +88,12 @@ namespace Umbraco.Web.Composing
 
         public static UmbracoHelper UmbracoHelper
             => Factory.GetInstance<UmbracoHelper>();
+        public static IUmbracoComponentRenderer UmbracoComponentRenderer
+            => Factory.GetInstance<IUmbracoComponentRenderer>();
+        public static ITagQuery TagQuery
+            => Factory.GetInstance<ITagQuery>();
+        public static IPublishedContentQuery PublishedContentQuery
+            => Factory.GetInstance<IPublishedContentQuery>();
 
         public static DistributedCache DistributedCache
             => Factory.GetInstance<DistributedCache>();
@@ -99,6 +106,9 @@ namespace Umbraco.Web.Composing
 
         public static UrlProviderCollection UrlProviders
             => Factory.GetInstance<UrlProviderCollection>();
+
+        public static MediaUrlProviderCollection MediaUrlProviders
+            => Factory.GetInstance<MediaUrlProviderCollection>();
 
         public static HealthCheckCollectionBuilder HealthCheckCollectionBuilder
             => Factory.GetInstance<HealthCheckCollectionBuilder>();
@@ -136,6 +146,9 @@ namespace Umbraco.Web.Composing
         public static ISectionService SectionService
             => Factory.GetInstance<ISectionService>();
 
+        public static IIconService IconService
+            => Factory.GetInstance<IIconService>();
+
         #endregion
 
         #region Web Constants
@@ -164,6 +177,8 @@ namespace Umbraco.Web.Composing
 
         // proxy Core for convenience
 
+        public static UmbracoMapper Mapper => CoreCurrent.Mapper;
+
         public static IRuntimeState RuntimeState => CoreCurrent.RuntimeState;
 
         public static TypeLoader TypeLoader => CoreCurrent.TypeLoader;
@@ -175,6 +190,8 @@ namespace Umbraco.Web.Composing
         public static CacheRefresherCollection CacheRefreshers => CoreCurrent.CacheRefreshers;
 
         public static DataEditorCollection DataEditors => CoreCurrent.DataEditors;
+
+        public static DataValueReferenceFactoryCollection DataValueReferenceFactories => CoreCurrent.DataValueReferenceFactories;
 
         public static PropertyEditorCollection PropertyEditors => CoreCurrent.PropertyEditors;
 

@@ -18,6 +18,7 @@
                 config: "<",
                 validation: "<",
                 culture: "<?",
+                inputId: "@?",
                 onValueChanged: "&"
             }
         });
@@ -41,14 +42,15 @@
         vm.removeTag = removeTag;
         vm.showPrompt = showPrompt;
         vm.hidePrompt = hidePrompt;
+        vm.onKeyUpOnTag = onKeyUpOnTag;
 
-        vm.htmlId = "t" + String.CreateGuid();
         vm.isLoading = true;
         vm.tagToAdd = "";
         vm.promptIsVisible = "-1";
         vm.viewModel = [];
 
         function onInit() {
+            vm.inputId = vm.inputId || "t" + String.CreateGuid();
 
             assetsService.loadJs("lib/typeahead.js/typeahead.bundle.min.js").then(function () {
 
@@ -105,7 +107,7 @@
                         minLength: 1
                     };
 
-                    typeahead = $element.find('.tags-' + vm.htmlId).typeahead(opts, sources)
+                    typeahead = $element.find('.tags-' + vm.inputId).typeahead(opts, sources)
                         .bind("typeahead:selected", function (obj, datum, name) {
                             angularHelper.safeApply($rootScope, function () {
                                 addTagInternal(datum["text"]);
@@ -152,12 +154,12 @@
                 tagsHound.clearRemoteCache();
                 tagsHound = null;
             }
-            $element.find('.tags-' + vm.htmlId).typeahead('destroy');
+            $element.find('.tags-' + vm.inputId).typeahead('destroy');
         }
 
         function configureViewModel(isInitLoad) {
             if (vm.value) {
-                if (angular.isString(vm.value) && vm.value.length > 0) {
+                if (Utilities.isString(vm.value) && vm.value.length > 0) {
                     if (vm.config.storageType === "Json") {
                         //json storage
                         vm.viewModel = JSON.parse(vm.value);
@@ -189,7 +191,7 @@
                         }
                     }
                 }
-                else if (angular.isArray(vm.value)) {
+                else if (Utilities.isArray(vm.value)) {
                     vm.viewModel = vm.value;
                 }
             }
@@ -227,7 +229,7 @@
         function addTagOnEnter(e) {
             var code = e.keyCode || e.which;
             if (code == 13) { //Enter keycode
-                if ($element.find('.tags-' + vm.htmlId).parent().find(".tt-menu .tt-cursor").length === 0) {
+                if ($element.find('.tags-' + vm.inputId).parent().find(".tt-menu .tt-cursor").length === 0) {
                     //this is required, otherwise the html form will attempt to submit.
                     e.preventDefault();
                     addTag();
@@ -270,6 +272,12 @@
 
         function hidePrompt() {
             vm.promptIsVisible = "-1";
+        }
+        
+        function onKeyUpOnTag(tag, $event) {
+            if ($event.keyCode === 8 || $event.keyCode === 46) {
+                removeTag(tag);
+            }
         }
         
         // helper method to remove current tags

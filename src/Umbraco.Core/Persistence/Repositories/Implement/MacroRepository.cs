@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IMacro Get(Guid id)
         {
-            var sql = GetBaseQuery().Where("uniqueId=@Id", new { Id = id });
+            var sql = GetBaseQuery().Where<MacroDto>(x => x.UniqueId == id);
             return GetBySql(sql);
         }
 
@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (macroDto == null)
                 return null;
-            
+
             var entity = MacroFactory.BuildEntity(macroDto);
 
             // reset dirty initial properties (U4-1946)
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "cmsMacro.id = @id";
+            return $"{Constants.DatabaseSchema.Tables.Macro}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IMacro entity)
         {
-            ((EntityBase)entity).AddingEntity();
+            entity.AddingEntity();
 
             var dto = MacroFactory.BuildDto(entity);
 
@@ -152,8 +152,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IMacro entity)
         {
-            ((EntityBase)entity).UpdatingEntity();
-;
+            entity.UpdatingEntity();
             var dto = MacroFactory.BuildDto(entity);
 
             Database.Update(dto);

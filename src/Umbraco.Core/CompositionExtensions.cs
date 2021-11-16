@@ -4,6 +4,8 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Viewer;
+using Umbraco.Core.Manifest;
+using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Persistence.Mappers;
@@ -28,6 +30,13 @@ namespace Umbraco.Core
             => composition.WithCollectionBuilder<CacheRefresherCollectionBuilder>();
 
         /// <summary>
+        /// Gets the map definitions collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static MapDefinitionCollectionBuilder MapDefinitions(this Composition composition)
+            => composition.WithCollectionBuilder<MapDefinitionCollectionBuilder>();
+
+        /// <summary>
         /// Gets the mappers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
@@ -49,6 +58,13 @@ namespace Umbraco.Core
             => composition.WithCollectionBuilder<DataEditorCollectionBuilder>();
 
         /// <summary>
+        /// Gets the data value reference factory collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static DataValueReferenceFactoryCollectionBuilder DataValueReferenceFactories(this Composition composition)
+            => composition.WithCollectionBuilder<DataValueReferenceFactoryCollectionBuilder>();
+
+        /// <summary>
         /// Gets the property value converters collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
@@ -56,7 +72,7 @@ namespace Umbraco.Core
             => composition.WithCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
         /// <summary>
-        /// Gets the url segment providers collection builder.
+        /// Gets the URL segment providers collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
         public static UrlSegmentProviderCollectionBuilder UrlSegmentProviders(this Composition composition)
@@ -66,8 +82,15 @@ namespace Umbraco.Core
         /// Gets the validators collection builder.
         /// </summary>
         /// <param name="composition">The composition.</param>
-        internal static ManifestValueValidatorCollectionBuilder Validators(this Composition composition)
+        internal static ManifestValueValidatorCollectionBuilder ManifestValueValidators(this Composition composition)
             => composition.WithCollectionBuilder<ManifestValueValidatorCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the manifest filter collection builder.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        public static ManifestFilterCollectionBuilder ManifestFilters(this Composition composition)
+            => composition.WithCollectionBuilder<ManifestFilterCollectionBuilder>();
 
         /// <summary>
         /// Gets the components collection builder.
@@ -201,6 +224,28 @@ namespace Umbraco.Core
         public static void SetServerMessenger(this Composition composition, IServerMessenger registrar)
         {
             composition.RegisterUnique(_ => registrar);
+        }
+
+        /// <summary>
+        /// Sets the database server messenger options.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        /// <param name="factory">A function creating the options.</param>
+        /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
+        public static void SetDatabaseServerMessengerOptions(this Composition composition, Func<IFactory, DatabaseServerMessengerOptions> factory)
+        {
+            composition.RegisterUnique(factory);
+        }
+
+        /// <summary>
+        /// Sets the database server messenger options.
+        /// </summary>
+        /// <param name="composition">The composition.</param>
+        /// <param name="options">Options.</param>
+        /// <remarks>Use DatabaseServerRegistrarAndMessengerComposer.GetDefaultOptions to get the options that Umbraco would use by default.</remarks>
+        public static void SetDatabaseServerMessengerOptions(this Composition composition, DatabaseServerMessengerOptions options)
+        {
+            composition.RegisterUnique(_ => options);
         }
 
         /// <summary>

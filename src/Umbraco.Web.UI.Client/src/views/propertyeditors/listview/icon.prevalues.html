@@ -1,0 +1,11 @@
+﻿<div ng-controller="Umbraco.PrevalueEditors.IconPickerController">
+    <ng-form data-element="editor-icon" name="iconForm">
+        <button type="button" class="btn-reset umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': model.value==='' || model.value===null}"
+             title="{{model.value}}">
+            <umb-icon icon="{{icon}}" class="{{color}}" ng-if="model.value !== '' && model.value !== null"></umb-icon>
+            <span class="umb-panel-header-icon-text" ng-if="model.value === '' || model.value === null">
+                <localize key="settings_addIcon">Add icon</localize>
+            </span>
+        </button>
+    </ng-form>
+</div>

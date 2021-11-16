@@ -13,12 +13,15 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     public class ConfigurationEditor : IConfigurationEditor
     {
+        private IDictionary<string, object> _defaultConfiguration;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigurationEditor"/> class.
         /// </summary>
         public ConfigurationEditor()
         {
             Fields = new List<ConfigurationField>();
+            _defaultConfiguration = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -61,7 +64,10 @@ namespace Umbraco.Core.PropertyEditors
 
         /// <inheritdoc />
         [JsonProperty("defaultConfig")]
-        public virtual IDictionary<string, object> DefaultConfiguration => new Dictionary<string, object>();
+        public virtual IDictionary<string, object> DefaultConfiguration {
+            get => _defaultConfiguration;
+            internal set => _defaultConfiguration = value;
+        }
 
         /// <inheritdoc />
         public virtual object DefaultConfigurationObject => DefaultConfiguration;

@@ -7,9 +7,13 @@
 * a color will not be set.
 **/
 function hexBgColor() {
-    return {        
+    return {
         restrict: "A",
         link: function (scope, element, attr, formCtrl) {
+
+            function setBackgroundColor(color) {
+                element[0].style.backgroundColor = "#" + color;
+            }
 
             // Only add inline hex background color if defined and not "true".
             if (attr.hexBgInline === undefined || (attr.hexBgInline !== undefined && attr.hexBgInline === "true")) {
@@ -19,25 +23,28 @@ function hexBgColor() {
                     // Set the orig based on the attribute if there is one.
                     origColor = attr.hexBgOrig;
                 }
-            
+
                 attr.$observe("hexBgColor", function (newVal) {
                     if (newVal) {
                         if (!origColor) {
                             // Get the orig color before changing it.
                             origColor = element.css("border-color");
                         }
-                        // Validate it - test with and without the leading hash.
-                        if (/^([0-9a-f]{3}|[0-9a-f]{6})$/i.test(newVal)) {
-                            element.css("background-color", "#" + newVal);
+                        // Is it a regular hex value - (#)AABBCC ?
+                        var match = newVal.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+                        if (match && match.length) {
+                            setBackgroundColor(match[1]);
                             return;
                         }
-                        if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(newVal)) {
-                            element.css("background-color", newVal);
+                        // Is it a hexa value - (#)AABBCCDD ?
+                        match = newVal.match(/^#?([0-9a-f]{4}|[0-9a-f]{8})$/i);
+                        if (match && match.length) {
+                            setBackgroundColor(match[1]);
                             return;
                         }
                     }
 
-                    element.css("background-color", origColor);
+                    setBackgroundColor(origColor);
                 });
             }
         }

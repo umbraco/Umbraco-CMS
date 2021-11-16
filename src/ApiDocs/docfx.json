@@ -2,21 +2,20 @@
   "metadata": [
     {
       "src": [
-        {
+        { 
+          "src": "../",
           "files": [
             "Umbraco.Core/Umbraco.Core.csproj",
             "Umbraco.Web/Umbraco.Web.csproj"
           ],
           "exclude": [
             "**/obj/**",
-            "**/bin/**",
-            "_site/**"
-          ],
-          "cwd": "../src"
+            "**/bin/**"
+          ]
         }
       ],
-      "dest": "../apidocs/api",
-      "filter": "../apidocs/docfx.filter.yml"
+      "dest": "api",
+      "filter": "docfx.filter.yml"
     }
   ],
   "build": {
@@ -35,19 +34,7 @@
           "*.md"
         ],
         "exclude": [
-          "obj/**",
-          "_site/**"
-        ]
-      }
-    ],
-    "resource": [
-      {
-        "files": [
-          "images/**"
-        ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
+          "obj/**"
         ]
       }
     ],
@@ -57,8 +44,7 @@
           "**.md"
         ],
         "exclude": [
-          "obj/**",
-          "_site/**"
+          "obj/**"
         ]
       }
     ],
@@ -67,7 +53,7 @@
       "_enableSearch": true,
       "_disableContribution": false
     },
-    "dest": "_site",
+    "dest": "../../build.tmp/_site",
     "template": [
       "default", "umbracotemplate"
     ]

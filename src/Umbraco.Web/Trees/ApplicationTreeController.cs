@@ -70,8 +70,8 @@ namespace Umbraco.Web.Trees
             {
                 //if there are no trees defined for this section but the section is defined then we can have a simple
                 //full screen section without trees
-                var name = Services.TextService.Localize("sections/" + application);
-                return TreeRootNode.CreateSingleTreeRoot(Constants.System.Root.ToInvariantString(), null, null, name, TreeNodeCollection.Empty, true);
+                var name = Services.TextService.Localize("sections", application);
+                return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
             }
 
             // handle request for a specific tree / or when there is only one tree
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Trees
                         nodes.Add(node);
                 }
 
-                var name = Services.TextService.Localize("sections/" + application);
+                var name = Services.TextService.Localize("sections", application);
 
                 if (nodes.Count > 0)
                 {
@@ -114,7 +114,7 @@ namespace Umbraco.Web.Trees
 
                 // otherwise it's a section with all empty trees, aka a fullscreen section
                 // todo is this true? what if we just failed to TryGetRootNode on all of them? SD: Yes it's true but we should check the result of TryGetRootNode and throw?
-                return TreeRootNode.CreateSingleTreeRoot(Constants.System.Root.ToInvariantString(), null, null, name, TreeNodeCollection.Empty, true);
+                return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
             }
 
             // for many groups
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Trees
                 var name = groupName.IsNullOrWhiteSpace() ? "thirdPartyGroup" : groupName;
 
                 var groupRootNode = TreeRootNode.CreateGroupNode(nodes, application);
-                groupRootNode.Name = Services.TextService.Localize("treeHeaders/" + name);
+                groupRootNode.Name = Services.TextService.Localize("treeHeaders", name);
                 treeRootNodes.Add(groupRootNode);
             }
 
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Trees
             var rootNode = await GetRootNode(tree, querystring);
 
             var sectionRoot = TreeRootNode.CreateSingleTreeRoot(
-                Constants.System.Root.ToInvariantString(),
+                Constants.System.RootString,
                 rootNode.ChildNodesUrl,
                 rootNode.MenuUrl,
                 rootNode.Name,
@@ -205,7 +205,7 @@ namespace Umbraco.Web.Trees
         {
             if (tree == null) throw new ArgumentNullException(nameof(tree));
 
-            var controller = (TreeController) await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
+            var controller = (TreeControllerBase) await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
             var rootNode = controller.GetRootNode(querystring);
             if (rootNode == null)
                 throw new InvalidOperationException($"Failed to get root node for tree \"{tree.TreeAlias}\".");
@@ -226,7 +226,7 @@ namespace Umbraco.Web.Trees
             d["id"] = null;
             var proxyQuerystring = new FormDataCollection(d);
 
-            var controller = (TreeController) await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring);
+            var controller = (TreeControllerBase) await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring);
             return controller.GetNodes(id.ToInvariantString(), querystring);
         }
 

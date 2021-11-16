@@ -25,6 +25,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a value indicating whether the content is published.
         /// </summary>
+        /// <remarks>The <see cref="PublishedVersionId"/> property tells you which version of the content is currently published.</remarks>
         bool Published { get; set; }
 
         PublishedState PublishedState { get; set; }
@@ -32,10 +33,11 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a value indicating whether the content has been edited.
         /// </summary>
+        /// <remarks>Will return `true` once unpublished edits have been made after the version with <see cref="PublishedVersionId"/> has been published.</remarks>
         bool Edited { get; set; }
 
         /// <summary>
-        /// Gets the published version identifier.
+        /// Gets the version identifier for the currently published version of the content.
         /// </summary>
         int PublishedVersionId { get; set; }
 
@@ -129,6 +131,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
-        
+
     }
 }

@@ -54,6 +54,7 @@
 </pre>
 
 @param {boolean} checked Set to <code>true</code> or <code>false</code> to toggle the switch.
+@param {string} inputId Set the <code>id</code> of the toggle.
 @param {callback} onClick The function which should be called when the toggle is clicked.
 @param {string=} showLabels Set to <code>true</code> or <code>false</code> to show a "On" or "Off" label next to the switch.
 @param {string=} labelOn Set a custom label for when the switched is turned on. It will default to "On".
@@ -66,7 +67,7 @@
 (function () {
     'use strict';
 
-    function ToggleDirective(localizationService, eventsService) {
+    function ToggleDirective(localizationService, eventsService, $timeout) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -74,27 +75,40 @@
             scope.displayLabelOff = "";
 
             function onInit() {
+                scope.inputId = scope.inputId || "umb-toggle_" + String.CreateGuid();
+
                 setLabelText();
-                eventsService.emit("toggleValue", { value: scope.checked });
+
+                // Must wait until the current digest cycle is finished before we emit this event on init, 
+                // otherwise other property editors might not yet be ready to receive the event
+                $timeout(function () {
+                    eventsService.emit("toggleValue", { value: scope.checked });
+                }, 100);
             }
 
             function setLabelText() {
-
-                // set default label for "on"
+                
                 if (scope.labelOn) {
                     scope.displayLabelOn = scope.labelOn;
-                } else {
-                    localizationService.localize("general_on").then(function (value) {
-                        scope.displayLabelOn = value;
-                    });
                 }
-
-                // set default label for "Off"
+                
                 if (scope.labelOff) {
                     scope.displayLabelOff = scope.labelOff;
-                } else {
-                    localizationService.localize("general_off").then(function (value) {
-                        scope.displayLabelOff = value;
+                }
+
+                if (scope.displayLabelOn.length === 0 && scope.displayLabelOff.length === 0)
+                {
+                    var labelKeys = [
+                        "general_on",
+                        "general_off"
+                    ];
+
+                    localizationService.localizeMany(labelKeys).then(function (data) {
+                        // Set default label for "On"
+                        scope.displayLabelOn = data[0];
+
+                        // Set default label for "Off"
+                        scope.displayLabelOff = data[1];
                     });
                 }
 
@@ -108,7 +122,6 @@
             };
 
             onInit();
-
         }
 
         var directive = {
@@ -116,8 +129,11 @@
             replace: true,
             templateUrl: 'views/components/buttons/umb-toggle.html',
             scope: {
+                // TODO: This should have required ngModel so we can track and validate user input correctly
+                // https://docs.angularjs.org/api/ng/type/ngModel.NgModelController#custom-control-example
                 checked: "=",
                 disabled: "=",
+                inputId: "@",
                 onClick: "&",
                 labelOn: "@?",
                 labelOff: "@?",
