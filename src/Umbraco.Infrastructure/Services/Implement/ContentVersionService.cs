@@ -151,13 +151,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public void SetPreventCleanup(int versionId, bool preventCleanup, int userId = -1)
         {
-            using (_scopeProvider.CreateScope(autoComplete: true))
+            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
             {
+                scope.WriteLock(Constants.Locks.ContentTree);
                 _documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);
 
-                var version = _documentVersionRepository.Get(versionId);
+                ContentVersionMeta version = _documentVersionRepository.Get(versionId);
 
-                var auditType = preventCleanup
+                AuditType auditType = preventCleanup
                     ? AuditType.ContentVersionPreventCleanup
                     : AuditType.ContentVersionEnableCleanup;
 
@@ -166,6 +167,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 Audit(auditType, userId, version.ContentId, message, $"{version.VersionDate}");
             }
         }
+
         private void Audit(AuditType type, int userId, int objectId, string message = null, string parameters = null) =>
             _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message,
                 parameters));
