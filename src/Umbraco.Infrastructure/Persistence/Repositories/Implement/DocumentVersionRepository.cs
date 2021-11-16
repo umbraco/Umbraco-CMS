@@ -175,8 +175,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     .On<ContentVersionDto, DocumentVersionDto>(left => left.Id, right => right.Id)
                 .LeftJoin<UserDto>()
                     .On<UserDto, ContentVersionDto>(left => left.Id, right => right.UserId)
-                .LeftJoin<ContentVersionCultureVariationDto>()
-                    .On<ContentVersionCultureVariationDto, ContentVersionDto>(left => left.VersionId, right => right.Id)
                 .Where<ContentVersionDto>(x => x.Id == versionId);
 
             return _scopeAccessor.AmbientScope.Database.Single<ContentVersionMeta>(query);
