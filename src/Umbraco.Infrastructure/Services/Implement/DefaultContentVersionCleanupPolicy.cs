@@ -76,7 +76,10 @@ namespace Umbraco.Cms.Infrastructure.Services.Implement
 
                 foreach (var group in grouped)
                 {
-                    yield return group.OrderByDescending(x => x.VersionId).First();
+                    foreach (var version in group.OrderByDescending(x => x.VersionId).Skip(1))
+                    {
+                        yield return version;
+                    }
                 }
             }
         }

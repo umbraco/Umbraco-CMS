@@ -103,10 +103,11 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 5, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 6, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddDays(-1).AddHours(-1), false, false, false, null),
                 // another content
-                new ContentVersionMeta(versionId: 7, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
-                new ContentVersionMeta(versionId: 8, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
-                new ContentVersionMeta(versionId: 9, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+                new ContentVersionMeta(versionId: 7, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 8, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 9, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
+
 
             contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
             {
@@ -126,12 +127,16 @@ namespace Umbraco.Tests.Services
 
             var results = sut.Apply(DateTime.Today, historicItems).ToList();
 
+            // Keep latest per day for 3 days per content type
+            // 2 content types, one of which has 2 days of entries, the other only a single day
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(3, results.Count);
-                Assert.True(results.Exists(x => x.VersionId == 3));
-                Assert.True(results.Exists(x => x.VersionId == 6));
-                Assert.True(results.Exists(x => x.VersionId == 9));
+                Assert.AreEqual(6, results.Count);
+                Assert.AreEqual(4, results.Count(x => x.ContentTypeId == 1));
+                Assert.AreEqual(2, results.Count(x => x.ContentTypeId == 2));
+                Assert.False(results.Any(x => x.VersionId == 9)); // Most recent for content type 2
+                Assert.False(results.Any(x => x.VersionId == 3)); // Most recent for content type 1 today
+                Assert.False(results.Any(x => x.VersionId == 6)); // Most recent for content type 1 yesterday
             });
         }
 
@@ -228,10 +233,14 @@ namespace Umbraco.Tests.Services
                 new ContentVersionMeta(versionId: 1, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
                 new ContentVersionMeta(versionId: 2, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
                 new ContentVersionMeta(versionId: 3, contentId: 1, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+                // another content
+                new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 1, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
                 // another content & type
-                new ContentVersionMeta(versionId: 4, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
-                new ContentVersionMeta(versionId: 5, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
-                new ContentVersionMeta(versionId: 6, contentId: 2, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
+                new ContentVersionMeta(versionId: 7, contentId: 3, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-3), false, false, false, null),
+                new ContentVersionMeta(versionId: 8, contentId: 3, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-2), false, false, false, null),
+                new ContentVersionMeta(versionId: 9, contentId: 3, contentTypeId: 2, -1, versionDate: DateTime.Today.AddHours(-1), false, false, false, null),
             };
 
             contentSettings.Setup(x => x.Value).Returns(new ContentSettings()
@@ -255,10 +264,15 @@ namespace Umbraco.Tests.Services
 
             var results = sut.Apply(DateTime.Today, historicItems).ToList();
 
+            // By default no historic versions are kept
+            // Override policy for content type 2 keeps latest per day for 3 days, no versions retained for content type with id 1
+            // There were 3 entries for content type 2 all on the same day
+            // version id 9 is most recent for content type 2, and should be filtered, all the rest should be present.
             Assert.Multiple(() =>
             {
-                Assert.AreEqual(3, results.Count(x => x.ContentTypeId == 1));
-                Assert.AreEqual(6, results.Single(x => x.ContentTypeId == 2).VersionId);
+                Assert.AreEqual(8, results.Count);
+                Assert.AreEqual(2, results.Count(x => x.ContentTypeId == 2));
+                Assert.False(results.Any(x => x.VersionId == 9));
             });
         }
     }
