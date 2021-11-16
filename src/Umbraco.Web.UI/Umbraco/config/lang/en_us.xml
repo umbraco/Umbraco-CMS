@@ -176,6 +176,8 @@
     <key alias="sendtopublishvariant">Content sent for publishing for languages: %0%</key>
     <key alias="sort">Sort child items performed by user</key>
     <key alias="custom">%0%</key>
+    <key alias="contentversionpreventcleanup">Cleanup disabled for version: %0%</key>
+    <key alias="contentversionenablecleanup">Cleanup enabled for version: %0%</key>
     <key alias="smallCopy">Copy</key>
     <key alias="smallPublish">Publish</key>
     <key alias="smallPublishVariant">Publish</key>
@@ -190,6 +192,8 @@
     <key alias="smallSendToPublishVariant">Send To Publish</key>
     <key alias="smallSort">Sort</key>
     <key alias="smallCustom">Custom</key>
+    <key alias="smallContentVersionPreventCleanup">Save</key>
+    <key alias="smallContentVersionEnableCleanup">Save</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
   <area alias="codefile">
@@ -1396,6 +1400,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
     <key alias="view">View</key>
+    <key alias="pagination"><![CDATA[Showing version %0% to %1% of %2% versions]]></key>
+    <key alias="versions">Versions</key>
+    <key alias="currentDraftVersion">Current draft version</key>
+    <key alias="currentPublishedVersion">Current published version</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Edit script file</key>
@@ -1532,6 +1540,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="scheduleErrReleaseDate3">Cannot schedule the document for publishing since the required '%0%' has a publish date later than a non mandatory language</key>
     <key alias="scheduleErrExpireDate1">The expire date cannot be in the past</key>
     <key alias="scheduleErrExpireDate2">The expire date cannot be before the release date</key>
+    <key alias="preventCleanupEnableError">An error occurred while enabling version cleanup for %0%</key>
+    <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>
@@ -1763,7 +1773,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
-    <key alias="historyCleanupGloballyDisabled">NOTE! The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.</key>
+    <key alias="historyCleanupGloballyDisabled">NOTE! The content version cleanup feature is disabled globally. These settings will not take effect until it is enabled.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

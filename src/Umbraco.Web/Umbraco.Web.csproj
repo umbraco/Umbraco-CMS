@@ -255,6 +255,7 @@
     <Compile Include="Models\AnchorsModel.cs" />
     <Compile Include="Models\ContentEditing\ContentTypesByAliases.cs" />
     <Compile Include="Models\ContentEditing\ContentTypesByKeys.cs" />
+    <Compile Include="Models\ContentEditing\ContentVersionMetaViewModel.cs" />
     <Compile Include="Models\ContentEditing\DataTypeReferences.cs" />
     <Compile Include="Models\ContentEditing\HistoryCleanup.cs" />
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
