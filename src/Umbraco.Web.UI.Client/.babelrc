@@ -12,8 +12,8 @@
             "@babel/plugin-proposal-object-rest-spread",
             {
                 "useBuiltIns": true
-            },
-            "angularjs-annotate"
-        ]
+            }            
+        ],
+        "angularjs-annotate"
     ]
 }
