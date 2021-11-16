@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -14,10 +15,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     {
         private readonly IScopeAccessor _scopeAccessor;
 
-        public DocumentVersionRepository(IScopeAccessor scopeAccessor)
-        {
+        public DocumentVersionRepository(IScopeAccessor scopeAccessor) =>
             _scopeAccessor = scopeAccessor ?? throw new ArgumentNullException(nameof(scopeAccessor));
-        }
 
         /// <inheritdoc />
         /// <remarks>
@@ -27,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </remarks>
         public IReadOnlyCollection<ContentVersionMeta> GetDocumentVersionsEligibleForCleanup()
         {
-            var query = _scopeAccessor.AmbientScope.SqlContext.Sql();
+            Sql<ISqlContext> query = _scopeAccessor.AmbientScope.SqlContext.Sql();
 
             query.Select(@"umbracoDocument.nodeId as contentId,
                            umbracoContent.contentTypeId as contentTypeId,
@@ -57,7 +56,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <inheritdoc />
         public IReadOnlyCollection<ContentVersionCleanupPolicySettings> GetCleanupPolicies()
         {
-            var query = _scopeAccessor.AmbientScope.SqlContext.Sql();
+            Sql<ISqlContext> query = _scopeAccessor.AmbientScope.SqlContext.Sql();
 
             query.Select<ContentVersionCleanupPolicyDto>()
                 .From<ContentVersionCleanupPolicyDto>();
@@ -68,7 +67,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <inheritdoc />
         public IEnumerable<ContentVersionMeta> GetPagedItemsByContentId(int contentId, long pageIndex, int pageSize, out long totalRecords, int? languageId = null)
         {
-            var query = _scopeAccessor.AmbientScope.SqlContext.Sql();
+            Sql<ISqlContext> query = _scopeAccessor.AmbientScope.SqlContext.Sql();
 
             query.Select(@"umbracoDocument.nodeId as contentId,
                            umbracoContent.contentTypeId as contentTypeId,
@@ -99,7 +98,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             query = query.OrderByDescending<ContentVersionDto>(x => x.Id);
 
-            var page = _scopeAccessor.AmbientScope.Database.Page<ContentVersionMeta>(pageIndex + 1, pageSize, query);
+            Page<ContentVersionMeta> page = _scopeAccessor.AmbientScope.Database.Page<ContentVersionMeta>(pageIndex + 1, pageSize, query);
 
             totalRecords = page.TotalItems;
 
@@ -112,15 +111,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </remarks>
         public void DeleteVersions(IEnumerable<int> versionIds)
         {
-            foreach (var group in versionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+            foreach (IEnumerable<int> group in versionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
                 var groupedVersionIds = group.ToList();
 
-                // Note: We had discussed doing this in a single SQL Command.
-                // If you can work out how to make that work with SQL CE, let me know!
-                // Can use test PerformContentVersionCleanup_WithNoKeepPeriods_DeletesEverythingExceptActive to try things out.
+                /* Note: We had discussed doing this in a single SQL Command.
+                *  If you can work out how to make that work with SQL CE, let me know!
+                *  Can use test PerformContentVersionCleanup_WithNoKeepPeriods_DeletesEverythingExceptActive to try things out.
+                */
 
-                var query = _scopeAccessor.AmbientScope.SqlContext.Sql()
+                Sql<ISqlContext> query = _scopeAccessor.AmbientScope.SqlContext.Sql()
                     .Delete<PropertyDataDto>()
                     .WhereIn<PropertyDataDto>(x => x.VersionId, groupedVersionIds);
                 _scopeAccessor.AmbientScope.Database.Execute(query);
@@ -145,7 +145,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <inheritdoc />
         public void SetPreventCleanup(int versionId, bool preventCleanup)
         {
-            var query = _scopeAccessor.AmbientScope.SqlContext.Sql()
+            Sql<ISqlContext> query = _scopeAccessor.AmbientScope.SqlContext.Sql()
                 .Update<ContentVersionDto>(x => x.Set(y => y.PreventCleanup, preventCleanup))
                 .Where<ContentVersionDto>(x => x.Id == versionId);
 
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <inheritdoc />
         public ContentVersionMeta Get(int versionId)
         {
-            var query = _scopeAccessor.AmbientScope.SqlContext.Sql();
+            Sql<ISqlContext> query = _scopeAccessor.AmbientScope.SqlContext.Sql();
 
             query.Select(@"umbracoDocument.nodeId as contentId,
                            umbracoContent.contentTypeId as contentTypeId,
