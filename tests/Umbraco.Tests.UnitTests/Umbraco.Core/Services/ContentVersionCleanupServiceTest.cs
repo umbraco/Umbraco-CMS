@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IScopedNotificationPublisher> eventAggregator,
             [Frozen] Mock<IContentVersionCleanupPolicy> policy,
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
-            List<HistoricContentVersionMeta> someHistoricVersions,
+            List<ContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentVersionService sut)
         {
@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Services
                 .Returns(someHistoricVersions);
 
             // # Act
-            IReadOnlyCollection<HistoricContentVersionMeta> report = sut.PerformContentVersionCleanup(aDateTime);
+            IReadOnlyCollection<ContentVersionMeta> report = sut.PerformContentVersionCleanup(aDateTime);
 
             Assert.Multiple(() =>
             {
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IScopedNotificationPublisher> eventAggregator,
             [Frozen] Mock<IContentVersionCleanupPolicy> policy,
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
-            List<HistoricContentVersionMeta> someHistoricVersions,
+            List<ContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentVersionService sut)
         {
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IScopedNotificationPublisher> eventAggregator,
             [Frozen] Mock<IContentVersionCleanupPolicy> policy,
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
-            List<HistoricContentVersionMeta> someHistoricVersions,
+            List<ContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentVersionService sut)
         {
@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IScopedNotificationPublisher> eventAggregator,
             [Frozen] Mock<IContentVersionCleanupPolicy> policy,
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
-            List<HistoricContentVersionMeta> someHistoricVersions,
+            List<ContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentVersionService sut)
         {
@@ -115,8 +115,8 @@ namespace Umbraco.Tests.Services
                 .Setup(x => x.PublishCancelable(It.IsAny<ICancelableNotification>()))
                 .Returns(false);
 
-            policy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<HistoricContentVersionMeta>>()))
-                .Returns<DateTime, IEnumerable<HistoricContentVersionMeta>>((_, items) => items.Take(1));
+            policy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<ContentVersionMeta>>()))
+                .Returns<DateTime, IEnumerable<ContentVersionMeta>>((_, items) => items.Take(1));
 
             // # Act
             var report = sut.PerformContentVersionCleanup(aDateTime);
@@ -138,7 +138,7 @@ namespace Umbraco.Tests.Services
             [Frozen] Mock<IScopedNotificationPublisher> eventAggregator,
             [Frozen] Mock<IContentVersionCleanupPolicy> policy,
             [Frozen] Mock<IDocumentVersionRepository> documentVersionRepository,
-            List<HistoricContentVersionMeta> someHistoricVersions,
+            List<ContentVersionMeta> someHistoricVersions,
             DateTime aDateTime,
             ContentVersionService sut)
         {
@@ -151,8 +151,8 @@ namespace Umbraco.Tests.Services
 
             var filteredSet = someHistoricVersions.Take(1);
 
-            policy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<HistoricContentVersionMeta>>()))
-                .Returns<DateTime, IEnumerable<HistoricContentVersionMeta>>((_, items) => filteredSet);
+            policy.Setup(x => x.Apply(It.IsAny<DateTime>(), It.IsAny<IEnumerable<ContentVersionMeta>>()))
+                .Returns<DateTime, IEnumerable<ContentVersionMeta>>((_, items) => filteredSet);
 
             // # Act
             var report = sut.PerformContentVersionCleanup(aDateTime);

@@ -630,6 +630,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     documentVersionDto.Published = true; // now published
                     contentVersionDto.Current = false; // no more current
                 }
+
+                // Ensure existing version retains current preventCleanup flag (both saving and publishing).
+                contentVersionDto.PreventCleanup = version.PreventCleanup; 
+
                 Database.Update(contentVersionDto);
                 Database.Update(documentVersionDto);
 
@@ -641,6 +645,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     contentVersionDto.Id = 0; // want a new id
                     contentVersionDto.Current = true; // current version
                     contentVersionDto.Text = entity.Name;
+                    contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag
                     Database.Insert(contentVersionDto);
                     entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
