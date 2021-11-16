@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
+// ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core.Services.Implement
 {
     internal class ContentVersionService : IContentVersionService
@@ -79,18 +80,18 @@ namespace Umbraco.Cms.Core.Services.Implement
              */
             using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
             {
-                var allHistoricVersions = _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
+                IReadOnlyCollection<ContentVersionMeta> allHistoricVersions = _documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
 
                 _logger.LogDebug("Discovered {count} candidate(s) for ContentVersion cleanup", allHistoricVersions.Count);
                 versionsToDelete = new List<ContentVersionMeta>(allHistoricVersions.Count);
 
-                var filteredContentVersions = _contentVersionCleanupPolicy.Apply(asAtDate, allHistoricVersions);
+                IEnumerable<ContentVersionMeta> filteredContentVersions = _contentVersionCleanupPolicy.Apply(asAtDate, allHistoricVersions);
 
-                foreach (var version in filteredContentVersions)
+                foreach (ContentVersionMeta version in filteredContentVersions)
                 {
-                    EventMessages evtMsgs = _eventMessagesFactory.Get();
+                    EventMessages messages = _eventMessagesFactory.Get();
 
-                    if (scope.Notifications.PublishCancelable(new ContentDeletingVersionsNotification(version.ContentId, evtMsgs, version.VersionId)))
+                    if (scope.Notifications.PublishCancelable(new ContentDeletingVersionsNotification(version.ContentId, messages, version.VersionId)))
                     {
                         _logger.LogDebug("Delete cancelled for ContentVersion [{versionId}]", version.VersionId);
                         continue;
@@ -102,13 +103,13 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             if (!versionsToDelete.Any())
             {
-                _logger.LogDebug("No remaining ContentVersions for cleanup", versionsToDelete.Count);
+                _logger.LogDebug("No remaining ContentVersions for cleanup");
                 return Array.Empty<ContentVersionMeta>();
             }
 
             _logger.LogDebug("Removing {count} ContentVersion(s)", versionsToDelete.Count);
 
-            foreach (var group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
+            foreach (IEnumerable<ContentVersionMeta> group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
                 using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
                 {
@@ -116,17 +117,16 @@ namespace Umbraco.Cms.Core.Services.Implement
                     var groupEnumerated = group.ToList();
                     _documentVersionRepository.DeleteVersions(groupEnumerated.Select(x => x.VersionId));
 
-                    foreach (var version in groupEnumerated)
+                    foreach (ContentVersionMeta version in groupEnumerated)
                     {
-                        EventMessages evtMsgs = _eventMessagesFactory.Get();
+                        EventMessages messages = _eventMessagesFactory.Get();
 
-                        scope.Notifications.Publish(
-                            new ContentDeletedVersionsNotification(version.ContentId, evtMsgs, version.VersionId));
+                        scope.Notifications.Publish(new ContentDeletedVersionsNotification(version.ContentId, messages, version.VersionId));
                     }
                 }
             }
 
-            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
+            using (_scopeProvider.CreateScope(autoComplete: true))
             {
                 Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy");
             }
@@ -137,10 +137,17 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public IEnumerable<ContentVersionMeta> GetPagedContentVersions(int contentId, long pageIndex, int pageSize, out long totalRecords, string culture = null)
         {
-            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (pageIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            }
 
-            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            if (pageSize <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
+            }
+
+            using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
             {
                 var languageId = _languageRepository.GetIdByIsoCode(culture, throwOnNotFound: true);
                 scope.ReadLock(Constants.Locks.ContentTree);
@@ -168,8 +175,17 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        private void Audit(AuditType type, int userId, int objectId, string message = null, string parameters = null) =>
-            _auditRepository.Save(new AuditItem(objectId, type, userId, UmbracoObjectTypes.Document.GetName(), message,
-                parameters));
+        private void Audit(AuditType type, int userId, int objectId, string message = null, string parameters = null)
+        {
+            var entry = new AuditItem(
+                objectId,
+                type,
+                userId,
+                UmbracoObjectTypes.Document.GetName(),
+                message,
+                parameters);
+
+            _auditRepository.Save(entry);
+        }
     }
 }
