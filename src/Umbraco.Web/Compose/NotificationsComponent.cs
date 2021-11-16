@@ -257,12 +257,12 @@ namespace Umbraco.Web.Compose
                         siteUri,
                         ((IUser user, NotificationEmailSubjectParams subject) x)
                             => _textService.Localize(
-                                    "notifications/mailSubject",
+                                    "notifications", "mailSubject",
                                     x.user.GetUserCulture(_textService, _globalSettings),
                                     new[] { x.subject.SiteUrl, x.subject.Action, x.subject.ItemName }),
                         ((IUser user, NotificationEmailBodyParams body, bool isHtml) x)
-                            => _textService.Localize(
-                                    x.isHtml ? "notifications/mailBodyHtml" : "notifications/mailBody",
+                            => _textService.Localize("notifications",
+                                    x.isHtml ? "mailBodyHtml" : "mailBody",
                                     x.user.GetUserCulture(_textService, _globalSettings),
                                     new[]
                                     {
@@ -274,7 +274,7 @@ namespace Umbraco.Web.Compose
                                         x.body.ItemId,
                                         //format the summary depending on if it's variant or not
                                         contentVariantGroup.Key == ContentVariation.Culture
-                                            ? (x.isHtml ? _textService.Localize("notifications/mailBodyVariantHtmlSummary", new[]{ x.body.Summary }) : _textService.Localize("notifications/mailBodyVariantSummary", new []{ x.body.Summary }))
+                                            ? (x.isHtml ? _textService.Localize("notifications","mailBodyVariantHtmlSummary", new[]{ x.body.Summary }) : _textService.Localize("notifications","mailBodyVariantSummary", new []{ x.body.Summary }))
                                             : x.body.Summary,
                                         x.body.ItemUrl
                                     }));

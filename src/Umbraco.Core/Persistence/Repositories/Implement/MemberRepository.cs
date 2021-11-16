@@ -431,15 +431,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var matchedMembers = Get(query).ToArray();
 
             var membersInGroup = new List<IMember>();
+
             //then we need to filter the matched members that are in the role
-            //since the max sql params are 2100 on sql server, we'll reduce that to be safe for potentially other servers and run the queries in batches
-            var inGroups = matchedMembers.InGroupsOf(1000);
-            foreach (var batch in inGroups)
+            foreach (var group in matchedMembers.Select(x => x.Id).InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                var memberIdBatch = batch.Select(x => x.Id);
                 var sql = Sql().SelectAll().From<Member2MemberGroupDto>()
                     .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id)
-                    .Where("Member IN (@memberIds)", new { memberIds = memberIdBatch });
+                    .WhereIn<Member2MemberGroupDto>(dto => dto.Member, group);
+
                 var memberIdsInGroup = Database.Fetch<Member2MemberGroupDto>(sql)
                     .Select(x => x.Member).ToArray();
 

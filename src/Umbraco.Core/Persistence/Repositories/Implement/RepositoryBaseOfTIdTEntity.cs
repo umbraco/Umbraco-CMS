@@ -186,17 +186,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // can't query more than 2000 ids at a time... but if someone is really querying 2000+ entities,
             // the additional overhead of fetching them in groups is minimal compared to the lookup time of each group
-            const int maxParams = 2000;
-            if (ids.Length <= maxParams)
+            if (ids.Length <= Constants.Sql.MaxParameterCount)
             {
                 return CachePolicy.GetAll(ids, PerformGetAll);
             }
 
             var entities = new List<TEntity>();
-            foreach (var groupOfIds in ids.InGroupsOf(maxParams))
+            foreach (var group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                entities.AddRange(CachePolicy.GetAll(groupOfIds.ToArray(), PerformGetAll));
+                entities.AddRange(CachePolicy.GetAll(group.ToArray(), PerformGetAll));
             }
+
             return entities;
         }
 

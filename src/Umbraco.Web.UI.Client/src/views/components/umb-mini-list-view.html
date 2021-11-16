@@ -5,14 +5,14 @@
         ng-repeat="miniListView in miniListViews">
 
         <div class="umb-mini-list-view__title">
-            <i class="umb-mini-list-view__title-icon {{ miniListView.node.icon }}" aria-hidden="true"></i>
+            <umb-icon icon="{{miniListView.node.icon}}" class="umb-mini-list-view__title-icon"></umb-icon>
             <h4 class="umb-mini-list-view__title-text">{{ miniListView.node.name }}</h4>
         </div>
 
         <div class="umb-mini-list-view__breadcrumb">
 
             <button type="button" ng-if="showBackButton()" class="btn-reset umb-mini-list-view__back" ng-click="exitMiniListView()">
-                <i class="icon-arrow-left umb-mini-list-view__back-icon" aria-hidden="true"></i>
+                <umb-icon icon="icon-arrow-left" class="umb-mini-list-view__back-icon"></umb-icon>
                 <span class="umb-mini-list-view__back-text"><localize key="general_back">Back</localize></span> /
             </button>
 
@@ -32,19 +32,17 @@
                 <div class="umb-table-row">
                     <div class="umb-table-cell no-display"></div>
                     <div class="umb-table-cell umb-table-cell-padding">
-                        <form class="form-search -no-margin-bottom" novalidate>
-                            <div class="inner-addon left-addon">
-                                <i class="icon icon-search" aria-hidden="true"></i>
-                                <input
-                                    class="form-control search-input"
-                                    type="text"
-                                    localize="placeholder"
-                                    placeholder="@general_typeToSearch"
-                                    ng-model="search"
-                                    ng-change="searchMiniListView(search, miniListView)"
-                                    prevent-enter-submit
-                                    umb-auto-focus
-                                    no-dirty-check>
+                        <form class="flex w-100 -no-margin-bottom" novalidate>
+                            <div class="flex-auto">
+                                <umb-search-filter
+                                    input-id="mini-listview-search"
+                                    model="search"
+                                    label-key="general_typeToSearch"
+                                    text="Type to search..."
+                                    on-change="searchMiniListView(search, miniListView)"
+                                    css-class="w-100 mb-15"
+                                    auto-focus="true">
+                                </umb-search-filter>
                             </div>
                         </form>
                     </div>
@@ -66,9 +64,9 @@
                     ng-class="{'-selected':child.selected, 'not-allowed':!child.allowed}">
                     <div class="umb-table-cell umb-table-cell--auto-width" ng-class="{'umb-table-cell--faded':child.published === false}">
                         <div class="flex items-center">
-                            <umb-icon icon="icon-navigation-right" class="icon-navigation-right umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</umb-icon>
-                            <umb-icon icon="{{child.icon}}" class="umb-table-body__icon umb-table-body__fileicon {{child.icon}}"></umb-icon>
-                            <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon icon-check"></umb-icon>
+                            <umb-icon icon="icon-navigation-right" class="umb-table__row-expand" ng-click="openNode($event, child)" ng-class="{'umb-table__row-expand--hidden': child.metaData.hasChildren !== true}">&nbsp;</umb-icon>
+                            <umb-icon icon="{{child.icon}}" class="umb-table-body__icon umb-table-body__fileicon"></umb-icon>
+                            <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon"></umb-icon>
                         </div>
                     </div>
                     <div class="umb-table-cell black" ng-class="{'umb-table-cell--faded':child.published === false}">{{ child.name }}</div>

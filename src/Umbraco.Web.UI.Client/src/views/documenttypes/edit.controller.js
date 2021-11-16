@@ -22,6 +22,7 @@
         var create = $routeParams.create;
         var noTemplate = $routeParams.notemplate;
         var isElement = $routeParams.iselement;
+        var icon = $routeParams.icon;
         var allowVaryByCulture = $routeParams.culturevary;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var documentTypeIcon = "";
@@ -50,6 +51,7 @@
             "treeHeaders_templates",
             "main_sections",
             "shortcuts_navigateSections",
+            "shortcuts_addTab",
             "shortcuts_addGroup",
             "shortcuts_addProperty",
             "defaultdialogs_selectEditor",
@@ -71,6 +73,7 @@
                 if (create && !documentTypeId) documentTypeId = -1;
                 noTemplate = $scope.model.notemplate || $scope.model.noTemplate;
                 isElement = $scope.model.isElement;
+                icon = $scope.model.icon;
                 allowVaryByCulture = $scope.model.allowVaryByCulture;
                 vm.submitButtonKey = "buttons_saveAndClose";
                 vm.generateModelsKey = "buttons_generateModelsAndClose";
@@ -86,15 +89,16 @@
             // keyboard shortcuts
             vm.labels.sections = values[4];
             vm.labels.navigateSections = values[5];
-            vm.labels.addGroup = values[6];
-            vm.labels.addProperty = values[7];
-            vm.labels.addEditor = values[8];
-            vm.labels.editDataType = values[9];
-            vm.labels.toggleListView = values[10];
-            vm.labels.allowAsRoot = values[11];
-            vm.labels.addChildNode = values[12];
-            vm.labels.addTemplate = values[13];
-            vm.labels.allowCultureVariants = values[14];
+            vm.labels.addTab = values[6]
+            vm.labels.addGroup = values[7];
+            vm.labels.addProperty = values[8];
+            vm.labels.addEditor = values[9];
+            vm.labels.editDataType = values[10];
+            vm.labels.toggleListView = values[11];
+            vm.labels.allowAsRoot = values[12];
+            vm.labels.addChildNode = values[13];
+            vm.labels.addTemplate = values[14];
+            vm.labels.allowCultureVariants = values[15];
 
             vm.page.keyboardShortcutsOverview = [
                 {
@@ -110,6 +114,10 @@
                 {
                     "name": vm.labels.design,
                     "shortcuts": [
+                        {
+                            "description": vm.labels.addTab,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "a" }]
+                        },
                         {
                             "description": vm.labels.addGroup,
                             "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "g" }]
@@ -318,36 +326,14 @@
                     scope: $scope,
                     content: vm.contentType,
                     infiniteMode: infiniteMode,
-                    // we need to rebind... the IDs that have been created!
-                    rebindCallback: function (origContentType, savedContentType) {
-                        vm.contentType.id = savedContentType.id;
-                        vm.contentType.groups.forEach(function (group) {
-                            if (!group.name) return;
-                            var k = 0;
-                            while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
-                                k++;
-                            if (k == savedContentType.groups.length) {
-                                group.id = 0;
-                                return;
-                            }
-                            var savedGroup = savedContentType.groups[k];
-                            if (!group.id) group.id = savedGroup.id;
-
-                            group.properties.forEach(function (property) {
-                                if (property.id || !property.alias) return;
-                                k = 0;
-                                while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
-                                    k++;
-                                if (k == savedGroup.properties.length) {
-                                    property.id = 0;
-                                    return;
-                                }
-                                var savedProperty = savedGroup.properties[k];
-                                property.id = savedProperty.id;
-                            });
-                        });
+                    rebindCallback: function (_, savedContentType) {
+                        // we need to rebind... the IDs that have been created!
+                        contentTypeHelper.rebindSavedContentType(vm.contentType, savedContentType);
                     }
                 }).then(function (data) {
+                    // allow UI to access server validation state
+                    vm.contentType.ModelState = data.ModelState;
+                    
                     //success
                     // we don't need to sync the tree in infinite mode
                     if (!infiniteMode) {
@@ -374,6 +360,8 @@
                 }, function (err) {
                     //error
                     if (err) {
+                        // allow UI to access server validation state
+                        vm.contentType.ModelState = err.data.ModelState;
                         editorState.set($scope.content);
                     }
                     else {
@@ -399,14 +387,22 @@
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
+
             // set isElement checkbox by default
             if (isElement) {
                 contentType.isElement = true;
             }
+
+            // set icon if one is provided
+            if (icon !== null && icon !== undefined) {
+                contentType.icon = icon;
+            }
+
             // set vary by culture checkbox by default
             if (allowVaryByCulture) {
                 contentType.allowCultureVariant = true;
             }
+
             // convert icons for content type
             convertLegacyIcons(contentType);
 

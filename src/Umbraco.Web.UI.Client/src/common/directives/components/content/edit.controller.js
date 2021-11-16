@@ -200,6 +200,10 @@
                 }
             }));
 
+            evts.push(eventsService.on("rte.shortcut.saveAndPublish", function () {
+                $scope.saveAndPublish();
+            }));
+
             evts.push(eventsService.on("content.saved", function () {
                 // Clear out localstorage keys that start with tinymce__
                 // When we save/perist a content node
@@ -223,6 +227,7 @@
             //we are editing so get the content item from the server
             return $scope.getMethod()($scope.contentId)
                 .then(function (data) {
+
                     $scope.content = data;
 
                     appendRuntimeData();
@@ -235,10 +240,7 @@
                     eventsService.emit("content.loaded", { content: $scope.content });
 
                     return $q.resolve($scope.content);
-
-
                 });
-
         }
 
         /**
@@ -281,6 +283,7 @@
             $scope.page.saveButtonStyle = content.trashed || content.isElement || isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
+
             if ($scope.activeApp && !contentAppHelper.isContentBasedApp($scope.activeApp)) {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;

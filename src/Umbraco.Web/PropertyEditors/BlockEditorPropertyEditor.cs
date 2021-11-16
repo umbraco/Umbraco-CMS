@@ -56,6 +56,7 @@ namespace Umbraco.Web.PropertyEditors
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
                 _logger = logger;
+
                 _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, _logger);
                 Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService, contentTypeService));
                 Validators.Add(new MinMaxValidator(_blockEditorValues, textService));
@@ -106,6 +107,7 @@ namespace Umbraco.Web.PropertyEditors
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
+                var valEditors = new Dictionary<int, IDataValueEditor>();
 
                 BlockEditorData blockEditorData;
                 try
@@ -118,7 +120,7 @@ namespace Umbraco.Web.PropertyEditors
                     return string.Empty;
                 }
 
-                if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
+                if (blockEditorData == null)
                     return string.Empty;
 
                 foreach (var row in blockEditorData.BlockValue.ContentData)
@@ -129,10 +131,8 @@ namespace Umbraco.Web.PropertyEditors
                         // - force it to be culture invariant as the block editor can't handle culture variant element properties
                         prop.Value.PropertyType.Variations = ContentVariation.Nothing;
                         var tempProp = new Property(prop.Value.PropertyType);
-
                         tempProp.SetValue(prop.Value.Value);
 
-                        // convert that temp property, and store the converted value
                         var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                         if (propEditor == null)
                         {
@@ -154,8 +154,14 @@ namespace Umbraco.Web.PropertyEditors
                             continue;
                         }
 
-                        var tempConfig = dataType.Configuration;
-                        var valEditor = propEditor.GetValueEditor(tempConfig);
+                        if (!valEditors.TryGetValue(dataType.Id, out var valEditor))
+                        {
+                            var tempConfig = dataType.Configuration;
+                            valEditor = propEditor.GetValueEditor(tempConfig);
+
+                            valEditors.Add(dataType.Id, valEditor);
+                        }
+
                         var convValue = valEditor.ToEditor(tempProp, dataTypeService);
 
                         // update the raw value since this is what will get serialized out
@@ -249,10 +255,10 @@ namespace Umbraco.Web.PropertyEditors
                     || (blockEditorData != null && validationLimit.Min.HasValue && blockEditorData.Layout.Count() < validationLimit.Min))
                 {
                     yield return new ValidationResult(
-                        _textService.Localize("validation/entriesShort", new[]
+                        _textService.Localize("validation", "entriesShort", new[]
                         {
                             validationLimit.Min.ToString(),
-                            (validationLimit.Min - blockEditorData.Layout.Count()).ToString()
+                            (validationLimit.Min - (blockEditorData?.Layout.Count() ?? 0)).ToString()
                         }),
                         new[] { "minCount" });
                 }
@@ -260,7 +266,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (blockEditorData != null && validationLimit.Max.HasValue && blockEditorData.Layout.Count() > validationLimit.Max)
                 {
                     yield return new ValidationResult(
-                        _textService.Localize("validation/entriesExceed", new[]
+                        _textService.Localize("validation", "entriesExceed", new[]
                         {
                             validationLimit.Max.ToString(),
                             (blockEditorData.Layout.Count() - validationLimit.Max).ToString()

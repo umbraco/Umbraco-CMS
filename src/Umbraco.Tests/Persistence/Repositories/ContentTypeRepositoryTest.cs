@@ -304,7 +304,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Assert.AreNotEqual(propertyType.Key, Guid.Empty);
                 }
 
-                TestHelper.AssertPropertyValuesAreEqual(fetched, contentType, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new [] { "DefaultTemplate", "AllowedTemplates", "UpdateDate" });
+                TestHelper.AssertPropertyValuesAreEqual(fetched, contentType, "yyyy-MM-dd HH:mm:ss", ignoreProperties: new [] { "DefaultTemplate", "AllowedTemplates", "UpdateDate", "HistoryCleanup" });
             }
         }
 
@@ -415,6 +415,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //Alias = display.Alias,
                 Path = display.Path,
                 //AdditionalData = display.AdditionalData,
+                HistoryCleanup = display.HistoryCleanup,
 
                 // ContentTypeBasic
                 Alias = display.Alias,
@@ -434,9 +435,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Inherited = x.Inherited,
                     Id = x.Id,
-                    Properties = x.Properties,
+                    Key = x.Key,
+                    Type = x.Type,
+                    Name = x.Name,
+                    Alias = x.Alias,
                     SortOrder = x.SortOrder,
-                    Name = x.Name
+                    Properties = x.Properties
                 }).ToArray()
             };
         }

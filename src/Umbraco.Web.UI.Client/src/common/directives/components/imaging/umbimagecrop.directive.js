@@ -6,7 +6,7 @@
 **/
 angular.module("umbraco.directives")
     .directive('umbImageCrop',
-        function ($timeout, $window, cropperHelper) {
+        function ($timeout, cropperHelper, windowResizeListener) {
 
             const MAX_SCALE = 4;
 
@@ -72,7 +72,7 @@ angular.module("umbraco.directives")
                     };
 
                     function updateSlider() {
-                        if(sliderRef) {
+                        if (sliderRef) {
                             // Update slider range min/max
                             sliderRef.noUiSlider.updateOptions({
                                 "range": {
@@ -102,7 +102,7 @@ angular.module("umbraco.directives")
                         // cross-browser wheel delta
                         var delta = Math.max(-50, Math.min(50, (event.wheelDelta || -event.detail)));
 
-                        if(sliderRef) {
+                        if (sliderRef) {
                             var currentScale =sliderRef.noUiSlider.get();
 
                             var newScale = Math.min(Math.max(currentScale + delta*.001*scope.dimensions.image.ratio, scope.dimensions.scale.min), scope.dimensions.scale.max);
@@ -127,8 +127,8 @@ angular.module("umbraco.directives")
                             'left': (parseInt(scope.dimensions.margin.left, 10)) + 'px'
                         }
                     };
-                    updateStyles();
 
+                    updateStyles();
 
                     //elements
                     var $viewport = element.find(".viewport");
@@ -138,10 +138,10 @@ angular.module("umbraco.directives")
                     $overlay.bind("focus", function () {
                         $overlay.bind("DOMMouseScroll mousewheel onmousewheel", onScroll);
                     });
+
                     $overlay.bind("blur", function () {
                         $overlay.unbind("DOMMouseScroll mousewheel onmousewheel", onScroll);
                     });
-
 
                     //default constraints for drag n drop
                     var constraints = { left: { max: 0, min: 0 }, top: { max: 0, min: 0 } };

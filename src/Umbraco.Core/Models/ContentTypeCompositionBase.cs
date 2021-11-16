@@ -62,15 +62,14 @@ namespace Umbraco.Core.Models
                     propertyType.ResetDirtyProperties(false);
                 }
 
-                return ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups)
+                return PropertyGroups.Union(ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups)
                     .Select(group =>
                     {
                         group = (PropertyGroup) group.DeepClone();
                         foreach (var property in group.PropertyTypes)
                             AcquireProperty(property);
                         return group;
-                    })
-                    .Union(PropertyGroups);
+                    }));
             }
         }
 
@@ -205,29 +204,36 @@ namespace Umbraco.Core.Models
             return CompositionPropertyTypes.Any(x => x.Alias == propertyTypeAlias);
         }
 
-        /// <summary>
-        /// Adds a PropertyGroup.
-        /// </summary>
-        /// <param name="groupName">Name of the PropertyGroup to add</param>
-        /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
+        /// <inheritdoc />
+        [Obsolete("Use AddPropertyGroup(alias, name) instead to explicitly set the alias (note the slighty different parameter order).")]
         public override bool AddPropertyGroup(string groupName)
         {
-            return AddAndReturnPropertyGroup(groupName) != null;
+            return AddAndReturnPropertyGroup(groupName.ToSafeAlias(true), groupName) != null;
         }
 
-        private PropertyGroup AddAndReturnPropertyGroup(string name)
+        /// <inheritdoc />
+        public override bool AddPropertyGroup(string alias, string name)
         {
-            // ensure we don't have it already
-            if (PropertyGroups.Any(x => x.Name == name))
+            return AddAndReturnPropertyGroup(alias, name) != null;
+        }
+
+        private PropertyGroup AddAndReturnPropertyGroup(string alias, string name)
+        {
+            // Ensure we don't have it already
+            if (PropertyGroups.Contains(alias))
                 return null;
 
-            // create the new group
-            var group = new PropertyGroup(SupportsPublishing) { Name = name, SortOrder = 0 };
+            // Add new group
+            var group = new PropertyGroup(SupportsPublishing)
+            {
+                Alias = alias,
+                Name = name
+            };
 
             // check if it is inherited - there might be more than 1 but we want the 1st, to
             // reuse its sort order - if there are more than 1 and they have different sort
             // orders... there isn't much we can do anyways
-            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Name == name);
+            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Alias == alias);
             if (inheritGroup == null)
             {
                 // no, just local, set sort order
@@ -247,24 +253,34 @@ namespace Umbraco.Core.Models
             return group;
         }
 
-        /// <summary>
-        /// Adds a PropertyType to a specific PropertyGroup
-        /// </summary>
-        /// <param name="propertyType"><see cref="PropertyType"/> to add</param>
-        /// <param name="propertyGroupName">Name of the PropertyGroup to add the PropertyType to</param>
-        /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
-        public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
+        /// <inheritdoc />
+        [Obsolete("Use AddPropertyType(propertyType, groupAlias, groupName) instead to explicitly set the alias of the group (note the slighty different parameter order).")]
+        public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName) => AddPropertyType(propertyType, propertyGroupName.ToSafeAlias(true), propertyGroupName);
+
+        /// <inheritdoc />
+        public override bool AddPropertyType(PropertyType propertyType, string groupAlias, string groupName)
         {
             // ensure no duplicate alias - over all composition properties
             if (PropertyTypeExists(propertyType.Alias))
                 return false;
 
             // get and ensure a group local to this content type
-            var group = PropertyGroups.Contains(propertyGroupName)
-                ? PropertyGroups[propertyGroupName]
-                : AddAndReturnPropertyGroup(propertyGroupName);
-            if (group == null)
+            PropertyGroup group;
+            var index = PropertyGroups.IndexOfKey(groupAlias);
+            if (index != -1)
+            {
+                group = PropertyGroups[index];
+            }
+            else if (!string.IsNullOrEmpty(groupName))
+            {
+                group = AddAndReturnPropertyGroup(groupAlias, groupName);
+                if (group == null) return false;
+            }
+            else
+            {
+                // No group name specified, so we can't create a new one and add the property type
                 return false;
+            }
 
             // add property to group
             propertyType.PropertyGroupId = new Lazy<int>(() => group.Id);

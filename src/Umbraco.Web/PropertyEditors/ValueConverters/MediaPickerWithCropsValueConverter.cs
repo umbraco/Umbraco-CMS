@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -14,7 +12,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase
     {
-
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
         public MediaPickerWithCropsValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
@@ -22,98 +19,71 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         }
 
-        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
-
-        /// <summary>
-        /// Enusre this property value convertor is for the New Media Picker with Crops aka MediaPicker 3
-        /// </summary>
         public override bool IsConverter(IPublishedPropertyType propertyType) => propertyType.EditorAlias.Equals(Core.Constants.PropertyEditors.Aliases.MediaPicker3);
 
-        /// <summary>
-        /// Check if the raw JSON value is not an empty array
-        /// </summary>
-        public override bool? IsValue(object value, PropertyValueLevel level) => value?.ToString() != "[]";
-
-        /// <summary>
-        /// What C# model type does the raw JSON return for Models & Views
-        /// </summary>
-        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
+        public override bool? IsValue(object value, PropertyValueLevel level)
         {
-            // Check do we want to return IPublishedContent collection still or a NEW model ?
-            var isMultiple = IsMultipleDataType(propertyType.DataType);
-            return isMultiple
-                    ? typeof(IEnumerable<MediaWithCrops>)
-                    : typeof(MediaWithCrops);
+            var isValue = base.IsValue(value, level);
+            if (isValue != false && level == PropertyValueLevel.Source)
+            {
+                // Empty JSON array is not a value
+                isValue = value?.ToString() != "[]";
+            }
+
+            return isValue;
         }
 
-        public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview) => source?.ToString();
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
+            => IsMultipleDataType(propertyType.DataType)
+                ? typeof(IEnumerable<MediaWithCrops>)
+                : typeof(MediaWithCrops);
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
         public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
-            var mediaItems = new List<MediaWithCrops>();
             var isMultiple = IsMultipleDataType(propertyType.DataType);
-            if (inter == null)
+            if (string.IsNullOrEmpty(inter?.ToString()))
             {
-                return isMultiple ? mediaItems: null;
+                // Short-circuit on empty value
+                return isMultiple ? Enumerable.Empty<MediaWithCrops>() : null;
             }
 
-            var dtos = JsonConvert.DeserializeObject<IEnumerable<MediaWithCropsDto>>(inter.ToString());
+            var mediaItems = new List<MediaWithCrops>();
+            var dtos = MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(inter);
+            var configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
 
-            foreach(var media in dtos)
+            foreach (var dto in dtos)
             {
-                var item = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(media.MediaKey);
-                if (item != null)
+                var mediaItem = _publishedSnapshotAccessor.PublishedSnapshot.Media.GetById(preview, dto.MediaKey);
+                if (mediaItem != null)
                 {
-                    mediaItems.Add(new MediaWithCrops
+                    var localCrops = new ImageCropperValue
                     {
-                        MediaItem = item,
-                        LocalCrops = new ImageCropperValue
-                        {
-                            Crops = media.Crops,
-                            FocalPoint = media.FocalPoint,
-                            Src = item.Url()
-                        }
-                    });
+                        Crops = dto.Crops,
+                        FocalPoint = dto.FocalPoint,
+                        Src = mediaItem.Url()
+                    };
+
+                    localCrops.ApplyConfiguration(configuration);
+
+                    // TODO: This should be optimized/cached, as calling Activator.CreateInstance is slow
+                    var mediaWithCropsType = typeof(MediaWithCrops<>).MakeGenericType(mediaItem.GetType());
+                    var mediaWithCrops = (MediaWithCrops)Activator.CreateInstance(mediaWithCropsType, mediaItem, localCrops);
+
+                    mediaItems.Add(mediaWithCrops);
+
+                    if (!isMultiple)
+                    {
+                        // Short-circuit on single item
+                        break;
+                    }
                 }
             }
 
-            return isMultiple ? mediaItems : FirstOrDefault(mediaItems);
+            return isMultiple ? mediaItems : mediaItems.FirstOrDefault();
         }
 
-        /// <summary>
-        /// Is the media picker configured to pick multiple media items
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <returns></returns>
-        private bool IsMultipleDataType(PublishedDataType dataType)
-        {
-            var config = dataType.ConfigurationAs<MediaPicker3Configuration>();
-            return config.Multiple;
-        }
-
-        private object FirstOrDefault(IList mediaItems)
-        {
-            return mediaItems.Count == 0 ? null : mediaItems[0];
-        }
-
-
-        /// <summary>
-        /// Model/DTO that represents the JSON that the MediaPicker3 stores
-        /// </summary>
-        [DataContract]
-        internal class MediaWithCropsDto
-        {
-            [DataMember(Name = "key")]
-            public Guid Key { get; set; }
-
-            [DataMember(Name = "mediaKey")]
-            public Guid MediaKey { get; set; }
-
-            [DataMember(Name = "crops")]
-            public IEnumerable<ImageCropperValue.ImageCropperCrop> Crops { get; set; }
-
-            [DataMember(Name = "focalPoint")]
-            public ImageCropperValue.ImageCropperFocalPoint FocalPoint { get; set; }
-        }
+        private bool IsMultipleDataType(PublishedDataType dataType) => dataType.ConfigurationAs<MediaPicker3Configuration>().Multiple;
     }
 }

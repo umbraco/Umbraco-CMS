@@ -58,10 +58,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<IDictionaryItem> PerformGetAll(params int[] ids)
         {
-            var sql = GetBaseQuery(false).Where("cmsDictionary.pk > 0");
+            var sql = GetBaseQuery(false).Where<DictionaryDto>(x => x.PrimaryKey > 0);
             if (ids.Any())
             {
-                sql.Where("cmsDictionary.pk in (@ids)", new { /*ids =*/ ids });
+                sql.WhereIn<DictionaryDto>(x => x.PrimaryKey, ids);
             }
 
             return Database
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return "cmsDictionary.pk = @id";
+            return $"{Constants.DatabaseSchema.Tables.DictionaryEntry}.pk = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -260,13 +260,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             Func<Guid[], IEnumerable<IEnumerable<IDictionaryItem>>> getItemsFromParents = guids =>
             {
-                //needs to be in groups of 2000 because we are doing an IN clause and there's a max parameter count that can be used.
-                return guids.InGroupsOf(2000)
-                    .Select(@group =>
+                return guids.InGroupsOf(Constants.Sql.MaxParameterCount)
+                    .Select(group =>
                     {
                         var sqlClause = GetBaseQuery(false)
                             .Where<DictionaryDto>(x => x.Parent != null)
-                            .Where($"{SqlSyntax.GetQuotedColumnName("parent")} IN (@parentIds)", new { parentIds = @group });
+                            .WhereIn<DictionaryDto>(x => x.Parent, group);
 
                         var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query<IDictionaryItem>());
                         var sql = translator.Translate();

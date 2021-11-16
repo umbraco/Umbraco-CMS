@@ -18,7 +18,7 @@ using MapperCollection = Umbraco.Core.Persistence.Mappers.MapperCollection;
 
 namespace Umbraco.Core.Runtime
 {
-    internal class SqlMainDomLock : IMainDomLock
+    public class SqlMainDomLock : IMainDomLock
     {
         private readonly TimeSpan _lockTimeout;
         private string _lockId;
@@ -33,14 +33,14 @@ namespace Umbraco.Core.Runtime
         private object _locker = new object();
         private bool _hasTable = false;
 
-        public SqlMainDomLock(ILogger logger)
+        public SqlMainDomLock(ILogger logger, string connectionStringName = Constants.System.UmbracoConnectionName)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
 
             _dbFactory = new UmbracoDatabaseFactory(
-               Constants.System.UmbracoConnectionName,
+               connectionStringName,
                _logger,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
 

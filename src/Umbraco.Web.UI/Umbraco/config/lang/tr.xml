@@ -108,7 +108,7 @@
     <key alias="inherit">Devral</key>
     <key alias="setLanguage">Kültür</key>
     <key alias="setLanguageHelp">
-      <![CDATA[Geçerli düğümün altındaki düğümler için kültürü ayarlayın, <br /> veya kültürü üst düğümlerden devralın. Ayrıca <br /> 
+      <![CDATA[Geçerli düğümün altındaki düğümler için kültürü ayarlayın, <br /> veya kültürü üst düğümlerden devralın. Ayrıca <br />
         aşağıdaki alan da geçerli değilse geçerli düğüme.]]>
     </key>
     <key alias="setDomains">Alanlar</key>
@@ -189,26 +189,6 @@
     <key alias="smallSort">Sırala</key>
     <key alias="smallCustom">Özel</key>
     <key alias="historyIncludingVariants">Geçmiş (tüm varyantlar)</key>
-  </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Seçilen içeriğin belge türünü değiştirmek için, önce bu konum için geçerli türler listesinden seçin.</key>
-    <key alias="changeDocTypeInstruction2">Ardından, mevcut türden özellik eşlemesini onaylayın ve / veya yenisiyle değiştirin ve Kaydet'i tıklayın.</key>
-    <key alias="contentRepublished">İçerik yeniden yayınlandı.</key>
-    <key alias="currentProperty">Mevcut Mülk</key>
-    <key alias="currentType">Mevcut tür</key>
-    <key alias="docTypeCannotBeChanged">Bu konum için geçerli bir alternatif olmadığından belge türü değiştirilemez. Seçilen içerik öğesinin üst öğesi altında izin verilirse ve mevcut tüm alt içerik öğelerinin onun altında oluşturulmasına izin verilirse bir alternatif geçerli olacaktır.</key>
-    <key alias="docTypeChanged">Doküman Türü Değiştirildi</key>
-    <key alias="mapProperties">Harita Özellikleri</key>
-    <key alias="mapToProperty">Mülke Eşle</key>
-    <key alias="newTemplate">Yeni Şablon</key>
-    <key alias="newType">Yeni Tür</key>
-    <key alias="none">Hiçbiri</key>
-    <key alias="selectedContent">İçerik</key>
-    <key alias="selectNewDocType">Yeni Belge Türünü Seçin</key>
-    <key alias="successMessage">Seçilen içeriğin belge türü başarıyla [yeni tür] olarak değiştirildi ve aşağıdaki özellikler eşlendi:</key>
-    <key alias="to">için</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Bir veya daha fazla özelliğin tanımlanmış birden fazla eşlemesi olduğundan özellik eşlemesi tamamlanamadı.</key>
-    <key alias="validDocTypesNote">Yalnızca mevcut konum için geçerli olan alternatif türler görüntülenir.</key>
   </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">%0% kimliğine sahip ebeveyn altında klasör oluşturulamadı</key>
@@ -329,7 +309,7 @@
     <key alias="nodeIsInTrash">Bu öğe Geri Dönüşüm Kutusu'nda</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">'%0%' den yeni bir İçerik Şablonu oluşturun</key>
+    <key alias="createBlueprintFrom"><![CDATA[<em>%0%</em> den yeni bir İçerik Şablonu oluşturun]]></key>
     <key alias="blankBlueprint">Boş</key>
     <key alias="selectBlueprint">Bir İçerik Şablonu Seçin</key>
     <key alias="createdBlueprintHeading">İçerik Şablonu oluşturuldu</key>
@@ -1099,7 +1079,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 					</tr>
 				</table>
 			</body>
-		</html>              
+		</html>
   ]]>
     </key>
   </area>
@@ -1128,17 +1108,17 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="mailBody">
       <![CDATA[
       Merhaba %0%
- 
+
       Bu, '%1%' görevinin size bildirilmesi için otomatik bir postadır.
       '%2%' sayfasında gerçekleştirildi
       '%3%' kullanıcısı tarafından
- 
+
       Düzenlemek için http://%4%/#/content/content/edit/%5% adresine gidin.
- 
+
       %6%
- 
+
       İyi günler!
- 
+
       Umbraco robotundan teşekkürler
     ]]>
     </key>
@@ -1218,7 +1198,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 					</tr>
 				</table>
 			</body>
-		</html>  
+		</html>
 	]]>
     </key>
     <key alias="mailBodyVariantHtmlSummary">
@@ -1622,9 +1602,9 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     </key>
     <key alias="sectionName">Bölüm Adı</key>
     <key alias="sectionMandatory">Bölüm zorunludur</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Zorunlu ise, alt şablon bir <code>@section</code> tanımı içermelidir, aksi takdirde bir hata gösterilir.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Sorgu oluşturucu</key>
     <key alias="itemsReturned">öğe iade edildi,</key>
     <key alias="copyToClipboard">panoya kopyala</key>
@@ -1845,18 +1825,18 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="mailBody">
       <![CDATA[
       Merhaba %0%
- 
+
       Bu, '%1%' belgesinin size bildirilmesi için otomatik bir postadır.
       %2% tarafından '%5%' e çevrilmesi istendi.
- 
+
       Düzenlemek için http://%3%/translation/details.aspx?id=%4% adresine gidin.
- 
+
       Veya çeviri görevlerinize genel bir bakış için Umbraco'da oturum açın
       http://%3%
- 
-      İyi günler!       
-      
-      Umbraco robotdan teşekkürler    
+
+      İyi günler!
+
+      Umbraco robotdan teşekkürler
       ]]>
     </key>
     <key alias="noTranslators">Çevirmen kullanıcısı bulunamadı. Lütfen çeviriye içerik göndermeye başlamadan önce bir çevirmen kullanıcısı oluşturun</key>
@@ -2097,7 +2077,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
                 <td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
             </tr>
         </table>
-    </body>                           
+    </body>
 </html>]]>
     </key>
     <key alias="invite">Davet Et</key>
@@ -2377,6 +2357,8 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Kaydedilmiş Aramayı Sil</key>
     <key alias="logLevels">Günlük Düzeyleri</key>
+    <key alias="selectAllLogLevelFilters">Hepsini seç</key>
+    <key alias="deselectAllLogLevelFilters">Tüm seçimleri kaldır</key>
     <key alias="savedSearches">Kaydedilmiş Aramalar</key>
     <key alias="saveSearch">Aramayı Kaydet</key>
     <key alias="saveSearchDescription">Arama sorgunuz için kolay bir ad girin</key>
@@ -2417,7 +2399,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="tooltipForPropertyActionsMenuClose">Özellik Eylemlerini Kapat</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Bekle</key>
     <key alias="refreshStatus">Durumu yenile</key>
     <key alias="memoryCache">Bellek Önbelleği</key>
     <key alias="memoryCacheDescription">

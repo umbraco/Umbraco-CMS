@@ -136,25 +136,40 @@
     justify-content: center;
     opacity: .6;
     margin-top: 10px;
+
+    small {
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .umb-icon {
+        font-size: 0.9rem;
+    }
 }
 
-.umb-package-numbers small {
-    padding: 0 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+.umb-package-link {
+    &:hover {
+        .umb-package-numbers {
+            opacity: 1;
 
-.umb-package-numbers i {
-    font-size: 14px;
-}
+            .icon-hearts {
+                color: @red !important;
+            }
+        }
+    }
 
-.umb-package-link:hover .umb-package-numbers {
-    opacity: 1;
-}
+    .umb-package-cloud {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        min-height: 1rem; // ensures vertical space is taken up even if "works on cloud" isn't visible
 
-.umb-package-link:hover .umb-package-numbers .icon-hearts {
-    color: @red !important;
+        .umb-icon {
+            color: @turquoise !important;
+            font-size: 0.9rem;
+        }
+    }
 }
 
 // Version
@@ -172,7 +187,7 @@
 
 .umb-packages-categories {
     display: flex;
-    user-select: center;
+    user-select: none;
     flex-wrap: wrap;
 }
 

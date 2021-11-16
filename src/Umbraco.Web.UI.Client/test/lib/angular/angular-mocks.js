@@ -81,7 +81,7 @@ angular.mock.$Browser = function () {
     self.defer.cancel = function (deferId) {
         var fnIndex;
 
-        angular.forEach(self.deferredFns, function (fn, index) {
+        Utilities.forEach(self.deferredFns, function (fn, index) {
             if (fn.id === deferId) fnIndex = index;
         });
 
@@ -141,7 +141,7 @@ angular.mock.$Browser.prototype = {
       * run all fns in pollFns
       */
     poll: function poll() {
-        angular.forEach(this.pollFns, function (pollFn) {
+        Utilities.forEach(this.pollFns, function (pollFn) {
             pollFn();
         });
     },
@@ -388,9 +388,9 @@ angular.mock.$LogProvider = function () {
          */
         $log.assertEmpty = function () {
             var errors = [];
-            angular.forEach(['error', 'warn', 'info', 'log'], function (logLevel) {
-                angular.forEach($log[logLevel].logs, function (log) {
-                    angular.forEach(log, function (logItem) {
+            Utilities.forEach(['error', 'warn', 'info', 'log'], function (logLevel) {
+                Utilities.forEach($log[logLevel].logs, function (log) {
+                    Utilities.forEach(log, function (logItem) {
                         errors.push('MOCK $log (' + logLevel + '): ' + String(logItem) + '\n' + (logItem.stack || ''));
                     });
                 });
@@ -598,7 +598,7 @@ angular.mock.$LogProvider = function () {
             'setYear', 'toDateString', 'toGMTString', 'toJSON', 'toLocaleFormat', 'toLocaleString',
             'toLocaleTimeString', 'toSource', 'toString', 'toTimeString', 'toUTCString', 'valueOf'];
 
-        angular.forEach(unimplementedMethods, function (methodName) {
+        Utilities.forEach(unimplementedMethods, function (methodName) {
             self[methodName] = function () {
                 throw Error("Method '" + methodName + "' is not implemented in the TzDate mock");
             };
@@ -688,13 +688,13 @@ angular.mock.dump = function (object) {
         if (angular.isElement(object)) {
             object = $(object);
             out = $('<div></div>');
-            angular.forEach(object, function (element) {
+            Utilities.forEach(object, function (element) {
                 out.append($(element).clone());
             });
             out = out.html();
         } else if (Utilities.isArray(object)) {
             out = [];
-            angular.forEach(object, function (o) {
+            Utilities.forEach(object, function (o) {
                 out.push(serialize(o));
             });
             out = '[ ' + out.join(', ') + ' ]';
@@ -1343,13 +1343,13 @@ function createHttpBackendMock($rootScope, $delegate, $browser) {
 
 
     function createShortMethods(prefix) {
-        angular.forEach(['GET', 'DELETE', 'JSONP'], function (method) {
+        Utilities.forEach(['GET', 'DELETE', 'JSONP'], function (method) {
             $httpBackend[prefix + method] = function (url, headers) {
                 return $httpBackend[prefix](method, url, undefined, headers)
             }
         });
 
-        angular.forEach(['PUT', 'POST', 'PATCH'], function (method) {
+        Utilities.forEach(['PUT', 'POST', 'PATCH'], function (method) {
             $httpBackend[prefix + method] = function (url, data, headers) {
                 return $httpBackend[prefix](method, url, data, headers)
             }
@@ -1425,7 +1425,7 @@ function MockXhr() {
         if (header) return header;
 
         header = undefined;
-        angular.forEach(this.$$respHeaders, function (headerVal, headerName) {
+        Utilities.forEach(this.$$respHeaders, function (headerVal, headerName) {
             if (!header && headerName.toLowerCase() == name) header = headerVal;
         });
         return header;
@@ -1434,7 +1434,7 @@ function MockXhr() {
     this.getAllResponseHeaders = function () {
         var lines = [];
 
-        angular.forEach(this.$$respHeaders, function (value, key) {
+        Utilities.forEach(this.$$respHeaders, function (value, key) {
             lines.push(key + ': ' + value);
         });
         return lines.join('\n');
@@ -1723,7 +1723,7 @@ window.jstestdriver && (function (window) {
      */
     window.dump = function () {
         var args = [];
-        angular.forEach(arguments, function (arg) {
+        Utilities.forEach(arguments, function (arg) {
             args.push(angular.mock.dump(arg));
         });
         jstestdriver.console.log.apply(jstestdriver.console, args);
@@ -1757,13 +1757,13 @@ window.jstestdriver && (function (window) {
         angular.mock.clearDataCache();
 
         // clean up jquery's fragment cache
-        angular.forEach(angular.element.fragments, function (val, key) {
+        Utilities.forEach(angular.element.fragments, function (val, key) {
             delete angular.element.fragments[key];
         });
 
         MockXhr.$$lastInstance = null;
 
-        angular.forEach(angular.callbacks, function (val, key) {
+        Utilities.forEach(angular.callbacks, function (val, key) {
             delete angular.callbacks[key];
         });
         angular.callbacks.counter = 0;
@@ -1798,7 +1798,7 @@ window.jstestdriver && (function (window) {
                 throw Error('Injector already created, can not register a module!');
             } else {
                 var modules = currentSpec.$modules || (currentSpec.$modules = []);
-                angular.forEach(moduleFns, function (module) {
+                Utilities.forEach(moduleFns, function (module) {
                     modules.push(module);
                 });
             }

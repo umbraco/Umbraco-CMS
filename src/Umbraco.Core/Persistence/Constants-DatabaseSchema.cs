@@ -26,6 +26,8 @@ namespace Umbraco.Core
                 public const string Content = TableNamePrefix + "Content";
                 public const string ContentVersion = TableNamePrefix + "ContentVersion";
                 public const string ContentVersionCultureVariation = TableNamePrefix + "ContentVersionCultureVariation";
+                public const string ContentVersionCleanupPolicy = TableNamePrefix + "ContentVersionCleanupPolicy";
+
                 public const string Document = TableNamePrefix + "Document";
                 public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
                 public const string DocumentVersion = TableNamePrefix + "DocumentVersion";

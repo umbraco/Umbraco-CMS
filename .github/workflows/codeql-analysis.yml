@@ -56,6 +56,13 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
       with:
-        config-file: ./.github/codeql-config.yml
-
+        config-file: ./.github/config/codeql-config.yml
+        
+  # This job is to prevent the workflow status from showing as failed when all other jobs are skipped - See https://github.community/t/workflow-is-failing-if-no-job-can-be-ran-due-to-condition/16873
+  always_job:
+    name: Always run job
+    runs-on: ubuntu-latest    
+    steps:
+      - name: Always run
+        run: echo "This job is to prevent the workflow status from showing as failed when all other jobs are skipped"
 

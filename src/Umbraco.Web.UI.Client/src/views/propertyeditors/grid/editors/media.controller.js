@@ -2,6 +2,8 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
     function ($scope, userService, editorService, localizationService) {
 
+        $scope.control.icon = $scope.control.icon || 'icon-picture';
+
         $scope.thumbnailUrl = getThumbnailUrl();
 
         if (!$scope.model.config.startNodeId) {

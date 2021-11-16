@@ -13,17 +13,16 @@ namespace Umbraco.Web.Models.Mapping
     internal abstract class TabsAndPropertiesMapper
     {
         protected ILocalizedTextService LocalizedTextService { get; }
+
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
         protected TabsAndPropertiesMapper(ILocalizedTextService localizedTextService)
-        {
-            LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
-            IgnoreProperties = new List<string>();
-        }
+            : this(localizedTextService, new List<string>())
+        { }
 
         protected TabsAndPropertiesMapper(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
-            : this(localizedTextService)
         {
+            LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
 
@@ -58,7 +57,7 @@ namespace Umbraco.Web.Models.Mapping
             tabs.Add(new Tab<ContentPropertyDisplay>
             {
                 Id = 0,
-                Label = LocalizedTextService.Localize("general/properties"),
+                Label = LocalizedTextService.Localize("general", "properties"),
                 Alias = "Generic properties",
                 Properties = genericproperties
             });
@@ -123,51 +122,48 @@ namespace Umbraco.Web.Models.Mapping
         {
             var tabs = new List<Tab<ContentPropertyDisplay>>();
 
+            // Property groups only exist on the content type (as it's only used for display purposes)
             var contentType = Current.Services.ContentTypeBaseServices.GetContentTypeOf(source);
 
-            // add the tabs, for properties that belong to a tab
-            // need to aggregate the tabs, as content.PropertyGroups contains all the composition tabs,
-            // and there might be duplicates (content does not work like contentType and there is no
-            // content.CompositionPropertyGroups).
-            var groupsGroupsByName = contentType.CompositionPropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
-            foreach (var groupsByName in groupsGroupsByName)
+            // Merge the groups, as compositions can introduce duplicate aliases
+            var groups = contentType.CompositionPropertyGroups.OrderBy(x => x.SortOrder).ToArray();
+            var parentAliases = groups.Select(x => x.GetParentAlias()).Distinct().ToArray();
+            foreach (var groupsByAlias in groups.GroupBy(x => x.Alias))
             {
                 var properties = new List<Property>();
 
-                // merge properties for groups with the same name
-                foreach (var group in groupsByName)
+                // Merge properties for groups with the same alias
+                foreach (var group in groupsByAlias)
                 {
                     var groupProperties = source.GetPropertiesForGroup(group)
-                        .Where(x => IgnoreProperties.Contains(x.Alias) == false); // skip ignored
+                        .Where(x => IgnoreProperties.Contains(x.Alias) == false); // Skip ignored properties
 
                     properties.AddRange(groupProperties);
                 }
 
-                if (properties.Count == 0)
+                if (properties.Count == 0 && !parentAliases.Contains(groupsByAlias.Key))
                     continue;
 
-                //map the properties
+                // Map the properties
                 var mappedProperties = MapProperties(source, properties, context);
 
-                // add the tab
-                // we need to pick an identifier... there is no "right" way...
-                var g = groupsByName.FirstOrDefault(x => x.Id == source.ContentTypeId) // try local
-                    ?? groupsByName.First(); // else pick one randomly
-                var groupId = g.Id;
-                var groupName = groupsByName.Key;
+                // Add the tab (the first is closest to the content type, e.g. local, then direct composition)
+                var g = groupsByAlias.First();
+
                 tabs.Add(new Tab<ContentPropertyDisplay>
                 {
-                    Id = groupId,
-                    Alias = groupName,
-                    Label = LocalizedTextService.UmbracoDictionaryTranslate(groupName),
-                    Properties = mappedProperties,
-                    IsActive = false
+                    Id = g.Id,
+                    Key = g.Key,
+                    Type = (int)g.Type,
+                    Label = LocalizedTextService.UmbracoDictionaryTranslate(g.Name),
+                    Alias = g.Alias,
+                    Properties = mappedProperties
                 });
             }
 
             MapGenericProperties(source, tabs, context);
 
-            // activate the first tab, if any
+            // Activate the first tab, if any
             if (tabs.Count > 0)
                 tabs[0].IsActive = true;
 
