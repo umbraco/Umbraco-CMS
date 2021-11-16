@@ -3257,8 +3257,9 @@ namespace Umbraco.Core.Services.Implement
             // NOTE: v9 - don't service locate
             var documentVersionRepository = Composing.Current.Factory.GetInstance<IDocumentVersionRepository>();
 
-            using (ScopeProvider.CreateScope(autoComplete: true))
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
+                scope.WriteLock(Constants.Locks.ContentTree);
                 documentVersionRepository.SetPreventCleanup(versionId, preventCleanup);
 
                 var version = documentVersionRepository.Get(versionId);
