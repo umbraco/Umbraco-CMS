@@ -24,7 +24,7 @@ context('System Information', () => {
         cy.contains('Current Culture').parent().should('contain', 'en-US');
         cy.contains('Current UI Culture').parent().should('contain', 'en-US');
     });
-    
+
     it('Checks language displays correctly after switching', () => {
 
         //Navigate to edit user and change language
@@ -32,6 +32,7 @@ context('System Information', () => {
         cy.get('[alias="editUser"]').click();
         cy.get('[name="culture"]').select('string:da-DK', { force: true});
         cy.umbracoButtonByLabelKey('buttons_save').click({force: true});
+        cy.umbracoSuccessNotification().should('be.visible');
 
         openSystemInformation();
         //Assert

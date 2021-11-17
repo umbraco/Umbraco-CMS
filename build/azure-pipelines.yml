@@ -259,7 +259,6 @@ stages:
 #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish test artifacts"
-                  condition: failed()
                   inputs:
                     targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                     artifact: 'Test artifacts - Windows'
@@ -361,13 +360,11 @@ stages:
                 #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish test artifacts"
-                  condition: failed()
                   inputs:
                       targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                       artifact: 'Test artifacts - Linux'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish run log"
-                  condition: failed()
                   inputs:
                       targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
                       artifact: Test Run logs - Linux
