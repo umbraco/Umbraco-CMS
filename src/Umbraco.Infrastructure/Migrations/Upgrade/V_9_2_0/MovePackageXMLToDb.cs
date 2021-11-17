@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
                     {
                         Name = package.Name,
                         Value = _xmlParser.ToXml(package).ToString(),
-                        CreateDate = DateTime.Now,
+                        UpdateDate = DateTime.Now,
                         PackageId = Guid.NewGuid()
                     };
                     createdPackageDtos.Add(dto);

@@ -148,7 +148,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 {
                     Name = definition.Name,
                     Value = _xmlParser.ToXml(definition).ToString(),
-                    CreateDate = DateTime.Now,
+                    UpdateDate = DateTime.Now,
                     PackageId = Guid.NewGuid()
                 };
 
@@ -166,7 +166,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 Name = definition.Name,
                 Value = _xmlParser.ToXml(definition).ToString(),
                 Id = definition.Id,
-                PackageId = definition.PackageId
+                PackageId = definition.PackageId,
+                UpdateDate = DateTime.Now
             };
             _umbracoDatabase.Update(updatedDto);
 
