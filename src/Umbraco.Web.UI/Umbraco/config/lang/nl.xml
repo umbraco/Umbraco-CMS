@@ -1689,7 +1689,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="newPassword">Wijzig je wachtwoord</key>
     <key alias="noLockouts">is niet gedeblokkeerd</key>
     <key alias="noPasswordChange">Het wachtwoord is niet gewijzigd</key>
-    <key alias="confirmNewPassword">Bevestig nieuw password</key>
+    <key alias="confirmNewPassword">Bevestig nieuw wachtwoord</key>
     <key alias="changePasswordDescription">Je kunt je wachtwoord veranderen door onderstaand formulier in te vullen en op de knop 'Verander wachtwoord' te klikken </key>
     <key alias="contentChannel">Inhoudskanaal</key>
     <key alias="createAnotherUser">Nog een gebruiker aanmaken</key>
