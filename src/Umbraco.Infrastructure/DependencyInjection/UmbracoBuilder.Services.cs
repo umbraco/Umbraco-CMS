@@ -83,6 +83,23 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             return builder;
         }
 
+        // private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
+        //     => new PackagesRepository(
+        //         factory.GetRequiredService<IContentService>(),
+        //         factory.GetRequiredService<IContentTypeService>(),
+        //         factory.GetRequiredService<IDataTypeService>(),
+        //         factory.GetRequiredService<IFileService>(),
+        //         factory.GetRequiredService<IMacroService>(),
+        //         factory.GetRequiredService<ILocalizationService>(),
+        //         factory.GetRequiredService<IHostingEnvironment>(),
+        //         factory.GetRequiredService<IEntityXmlSerializer>(),
+        //         factory.GetRequiredService<IOptions<GlobalSettings>>(),
+        //         factory.GetRequiredService<IMediaService>(),
+        //         factory.GetRequiredService<IMediaTypeService>(),
+        //         factory.GetRequiredService<MediaFileManager>(),
+        //         factory.GetRequiredService<FileSystems>(),
+        //         packageRepoFileName);
+
         /// <summary>
         /// Creates an instance of PackagesRepository for either the ICreatedPackagesRepository or the IInstalledPackagesRepository
         /// </summary>

@@ -137,20 +137,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return false;
             }
 
-            var xml = new XDocument(new XElement("packages"));
-
             // Ensure it's valid
             ValidatePackage(definition);
 
 
             if (definition.Id == default)
             {
-                xml.Root.Add(_xmlParser.ToXml(definition));
                 // Create dto from definition
                 var dto = new CreatedPackageSchemaDto()
                 {
                     Name = definition.Name,
-                    Value = xml.ToString(),
+                    Value = _xmlParser.ToXml(definition).ToString(),
                     CreateDate = DateTime.Now,
                     PackageId = Guid.NewGuid()
                 };
@@ -163,12 +160,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return true;
             }
 
-            xml.Root.Add(_xmlParser.ToXml(definition));
             // Create dto from definition
             var updatedDto = new CreatedPackageSchemaDto()
             {
                 Name = definition.Name,
-                Value = xml.ToString(),
+                Value = _xmlParser.ToXml(definition).ToString(),
                 Id = definition.Id,
                 PackageId = definition.PackageId
             };

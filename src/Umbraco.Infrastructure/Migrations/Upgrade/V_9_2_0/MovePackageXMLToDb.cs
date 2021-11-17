@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
     {
 
         private readonly ICreatedPackagesRepository _createdPackagesRepository;
+        private readonly PackageDefinitionXmlParser _xmlParser;
         /// <summary>
         /// Initializes a new instance of the <see cref="MovePackageXMLToDb"/> class.
         /// </summary>
@@ -22,6 +23,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
             : base(context)
         {
             _createdPackagesRepository = createdPackagesRepository;
+            _xmlParser = new PackageDefinitionXmlParser();
         }
 
         private void CreateDatabaseTable()
@@ -50,7 +52,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
                     var dto = new CreatedPackageSchemaDto()
                     {
                         Name = package.Name,
-                        Value = xmlDoc.ToString(),
+                        Value = _xmlParser.ToXml(package).ToString(),
                         CreateDate = DateTime.Now,
                         PackageId = Guid.NewGuid()
                     };
