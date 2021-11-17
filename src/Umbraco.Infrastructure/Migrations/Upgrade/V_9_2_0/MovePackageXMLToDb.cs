@@ -1,34 +1,44 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
 {
     public class MovePackageXMLToDb : MigrationBase
     {
-        private readonly IUmbracoDatabase _umbracoDatabase;
 
         private readonly ICreatedPackagesRepository _createdPackagesRepository;
         /// <summary>
         /// Initializes a new instance of the <see cref="MovePackageXMLToDb"/> class.
         /// </summary>
-        public MovePackageXMLToDb(IMigrationContext context, IUmbracoDatabase umbracoDatabase, ICreatedPackagesRepository createdPackagesRepository)
+        public MovePackageXMLToDb(IMigrationContext context, ICreatedPackagesRepository createdPackagesRepository)
             : base(context)
         {
-            _umbracoDatabase = umbracoDatabase;
             _createdPackagesRepository = createdPackagesRepository;
         }
 
-        /// <inheritdoc/>
-        protected override void Migrate()
+        private void CreateDatabaseTable()
+        {
+            // Add CreatedPackage table in database if it doesn't exist
+            IEnumerable<string> tables = SqlSyntax.GetTablesInSchema(Context.Database);
+            if (!tables.InvariantContains(CreatedPackageSchemaDto.TableName))
+            {
+                Create.Table<CreatedPackageSchemaDto>().Do();
+            }
+        }
+
+        private void MigrateCreatedPackageFilesToDb()
         {
             // Load data from file
             IEnumerable<PackageDefinition> packages = _createdPackagesRepository.GetAll();
+            var createdPackageDtos = new List<CreatedPackageSchemaDto>();
             foreach (PackageDefinition package in packages)
             {
                 // Load file from path
@@ -37,25 +47,28 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
                 if (xmlDoc.Document != null)
                 {
                     // Create dto from xmlDocument
-                    var xmlString = xmlDoc.Document.CreateReader().Value;
-                    var dto = new KeyValueDto
+                    var dto = new CreatedPackageSchemaDto()
                     {
-                        Key = Guid.NewGuid().ToString(),
-                        Value = xmlString,
-                        UpdateDate = DateTime.Now
+                        Name = package.Name,
+                        Value = xmlDoc.ToString(),
+                        CreateDate = DateTime.Now,
+                        PackageId = Guid.NewGuid()
                     };
-
-                    // Insert dto into KeyValue table
-                    _umbracoDatabase.Insert(
-                        Cms.Core.Constants.DatabaseSchema.Tables.KeyValue,
-                        "key",
-                        false,
-                        dto);
+                    createdPackageDtos.Add(dto);
                 }
 
-                // Delete local file
                 File.Delete(package.PackagePath);
             }
+
+            // Insert dto into CreatedPackage table
+            Database.InsertBulk(createdPackageDtos);
+        }
+
+        /// <inheritdoc/>
+        protected override void Migrate()
+        {
+            CreateDatabaseTable();
+            MigrateCreatedPackageFilesToDb();
         }
     }
 }

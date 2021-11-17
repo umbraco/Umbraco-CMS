@@ -1,189 +1,199 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
+using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 using File = System.IO.File;
 
-namespace Umbraco.Cms.Core.Packaging
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
-    /// <summary>
-    /// Manages the storage of installed/created package definitions
-    /// </summary>
-    [Obsolete("Packages has now been moved to the database instead of local files, please use CreatedPackageSchemaRepository instead")]
-    public class PackagesRepository : ICreatedPackagesRepository
+    /// <inheritdoc />
+    public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
     {
-        private readonly IContentService _contentService;
-        private readonly IContentTypeService _contentTypeService;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly IFileService _fileService;
-        private readonly IMacroService _macroService;
-        private readonly ILocalizationService _languageService;
-        private readonly IEntityXmlSerializer _serializer;
+        private readonly PackageDefinitionXmlParser _xmlParser;
+        private readonly IUmbracoDatabase _umbracoDatabase;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly string _packageRepositoryFileName;
-        private readonly string _mediaFolderPath;
-        private readonly string _packagesFolderPath;
-        private readonly string _tempFolderPath;
-        private readonly PackageDefinitionXmlParser _parser;
+        private readonly FileSystems _fileSystems;
+        private readonly IEntityXmlSerializer _serializer;
+        private readonly IDataTypeService _dataTypeService;
+        private readonly ILocalizationService _localizationService;
+        private readonly IFileService _fileService;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
+        private readonly IContentService _contentService;
         private readonly MediaFileManager _mediaFileManager;
-        private readonly FileSystems _fileSystems;
+        private readonly IMacroService _macroService;
+        private readonly IContentTypeService _contentTypeService;
+        private readonly string _tempFolderPath;
+        private readonly string _mediaFolderPath;
 
         /// <summary>
-        /// Constructor
+        /// Initializes a new instance of the <see cref="CreatedPackageSchemaRepository"/> class.
         /// </summary>
-        /// <param name="contentService"></param>
-        /// <param name="contentTypeService"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="fileService"></param>
-        /// <param name="macroService"></param>
-        /// <param name="languageService"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="serializer"></param>
-        /// <param name="logger"></param>
-        /// <param name="packageRepositoryFileName">
-        /// The file name for storing the package definitions (i.e. "createdPackages.config")
-        /// </param>
-        /// <param name="tempFolderPath"></param>
-        /// <param name="packagesFolderPath"></param>
-        /// <param name="mediaFolderPath"></param>
-        public PackagesRepository(
-            IContentService contentService,
-            IContentTypeService contentTypeService,
-            IDataTypeService dataTypeService,
-            IFileService fileService,
-            IMacroService macroService,
-            ILocalizationService languageService,
+        public CreatedPackageSchemaRepository(
+            IUmbracoDatabase umbracoDatabase,
             IHostingEnvironment hostingEnvironment,
-            IEntityXmlSerializer serializer,
             IOptions<GlobalSettings> globalSettings,
+            FileSystems fileSystems,
+            IEntityXmlSerializer serializer,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            IFileService fileService,
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
+            IContentService contentService,
             MediaFileManager mediaFileManager,
-            FileSystems fileSystems,
-            string packageRepositoryFileName,
-            string tempFolderPath = null,
-            string packagesFolderPath = null,
-            string mediaFolderPath = null)
+            IMacroService macroService,
+            IContentTypeService contentTypeService,
+            string mediaFolderPath = null,
+            string tempFolderPath = null)
         {
-            if (string.IsNullOrWhiteSpace(packageRepositoryFileName))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(packageRepositoryFileName));
-            _contentService = contentService;
-            _contentTypeService = contentTypeService;
-            _dataTypeService = dataTypeService;
-            _fileService = fileService;
-            _macroService = macroService;
-            _languageService = languageService;
-            _serializer = serializer;
+            _umbracoDatabase = umbracoDatabase;
             _hostingEnvironment = hostingEnvironment;
-            _packageRepositoryFileName = packageRepositoryFileName;
-
-            _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
-            _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
-            _mediaFolderPath = mediaFolderPath ?? globalSettings.Value.UmbracoMediaPath + "/created-packages";
-
-            _parser = new PackageDefinitionXmlParser();
+            _fileSystems = fileSystems;
+            _serializer = serializer;
+            _dataTypeService = dataTypeService;
+            _localizationService = localizationService;
+            _fileService = fileService;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
+            _contentService = contentService;
             _mediaFileManager = mediaFileManager;
-            _fileSystems = fileSystems;
+            _macroService = macroService;
+            _contentTypeService = contentTypeService;
+            _xmlParser = new PackageDefinitionXmlParser();
+            _mediaFolderPath = mediaFolderPath ?? globalSettings.Value.UmbracoMediaPath + "/created-packages";
+            _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
         }
-
-        private string CreatedPackagesFile => _packagesFolderPath.EnsureEndsWith('/') + _packageRepositoryFileName;
 
         public IEnumerable<PackageDefinition> GetAll()
         {
-            var packagesXml = EnsureStorage(out _);
-            if (packagesXml?.Root == null)
-                yield break;
+            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase.SqlContext)
+                .Select<CreatedPackageSchemaDto>()
+                .From<CreatedPackageSchemaDto>()
+                .OrderBy<CreatedPackageSchemaDto>(x => x.Id);
 
-            foreach (var packageXml in packagesXml.Root.Elements("package"))
-                yield return _parser.ToPackageDefinition(packageXml);
+            var packageDefinitions = new List<PackageDefinition>();
+
+            List<CreatedPackageSchemaDto> xmlSchemas = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
+            foreach (CreatedPackageSchemaDto packageSchema in xmlSchemas)
+            {
+                var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
+                packageDefinition.Id = packageSchema.Id;
+                packageDefinition.Name = packageSchema.Name;
+                packageDefinitions.Add(packageDefinition);
+            }
+
+            return packageDefinitions;
         }
 
         public PackageDefinition GetById(int id)
         {
-            var packagesXml = EnsureStorage(out var packageFile);
-            var packageXml = packagesXml?.Root?.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == id);
-            return packageXml == null ? null : _parser.ToPackageDefinition(packageXml);
+            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase.SqlContext)
+                .Select<CreatedPackageSchemaDto>()
+                .From<CreatedPackageSchemaDto>()
+                .Where<CreatedPackageSchemaDto>(x => x.Id == id);
+            List<CreatedPackageSchemaDto> schemaDtos = _umbracoDatabase.Fetch<CreatedPackageSchemaDto>(query);
+
+            if (schemaDtos.IsCollectionEmpty())
+            {
+                return null;
+            }
+            return _xmlParser.ToPackageDefinition(XElement.Parse(schemaDtos.First().Value));
         }
 
         public void Delete(int id)
         {
-            var packagesXml = EnsureStorage(out var packagesFile);
-            var packageXml = packagesXml?.Root?.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == id);
-            if (packageXml == null)
-                return;
+            Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase.SqlContext)
+                .Delete<CreatedPackageSchemaDto>()
+                .Where<CreatedPackageSchemaDto>(x => x.Id == id);
 
-            packageXml.Remove();
-
-            packagesXml.Save(packagesFile);
+            _umbracoDatabase.Delete<CreatedPackageSchemaDto>(query);
         }
 
         public bool SavePackage(PackageDefinition definition)
         {
             if (definition == null)
-                throw new ArgumentNullException(nameof(definition));
+            {
+                throw new NullReferenceException("PackageDefinition cannot be null when saving");
+            }
 
-            var packagesXml = EnsureStorage(out var packagesFile);
-
-            if (packagesXml?.Root == null)
+            if (definition.Name == null || string.IsNullOrEmpty(definition.Name) || definition.PackagePath == null)
+            {
                 return false;
+            }
 
-            //ensure it's valid
+            var xml = new XDocument(new XElement("packages"));
+
+            // Ensure it's valid
             ValidatePackage(definition);
+
 
             if (definition.Id == default)
             {
-                //need to gen an id and persist
-                // Find max id
-                var maxId = packagesXml.Root.Elements("package").Max(x => x.AttributeValue<int?>("id")) ?? 0;
-                var newId = maxId + 1;
-                definition.Id = newId;
-                definition.PackageId = definition.PackageId == default ? Guid.NewGuid() : definition.PackageId;
-                var packageXml = _parser.ToXml(definition);
-                packagesXml.Root.Add(packageXml);
+                xml.Root.Add(_xmlParser.ToXml(definition));
+                // Create dto from definition
+                var dto = new CreatedPackageSchemaDto()
+                {
+                    Name = definition.Name,
+                    Value = xml.ToString(),
+                    CreateDate = DateTime.Now,
+                    PackageId = Guid.NewGuid()
+                };
+
+                // Set the definitionIds
+                definition.PackageId = dto.PackageId;
+                var result = _umbracoDatabase.Insert(dto);
+                var decimalResult = result.SafeCast<decimal>();
+                definition.Id = decimal.ToInt32(decimalResult);
+                return true;
             }
-            else
+
+            xml.Root.Add(_xmlParser.ToXml(definition));
+            // Create dto from definition
+            var updatedDto = new CreatedPackageSchemaDto()
             {
-                //existing
-                var packageXml = packagesXml.Root.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == definition.Id);
-                if (packageXml == null)
-                    return false;
-
-                var updatedXml = _parser.ToXml(definition);
-                packageXml.ReplaceWith(updatedXml);
-            }
-
-            packagesXml.Save(packagesFile);
+                Name = definition.Name,
+                Value = xml.ToString(),
+                Id = definition.Id,
+                PackageId = definition.PackageId
+            };
+            _umbracoDatabase.Update(updatedDto);
 
             return true;
+
         }
 
         public string ExportPackage(PackageDefinition definition)
         {
             if (definition.Id == default)
+            {
                 throw new ArgumentException("The package definition does not have an ID, it must be saved before being exported");
-            if (definition.PackageId == default)
-                throw new ArgumentException("the package definition does not have a GUID, it must be saved before being exported");
+            }
 
-            //ensure it's valid
+            if (definition.PackageId == default)
+            {
+                throw new ArgumentException("the package definition does not have a GUID, it must be saved before being exported");
+            }
+
+            // ensure it's valid
             ValidatePackage(definition);
 
-            //Create a folder for building this package
+            // Create a folder for building this package
             var temporaryPath = _hostingEnvironment.MapPathContentRoot(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
             if (Directory.Exists(temporaryPath) == false)
             {
@@ -192,10 +202,10 @@ namespace Umbraco.Cms.Core.Packaging
 
             try
             {
-                //Init package file
+                // Init package file
                 XDocument compiledPackageXml = CreateCompiledPackageXml(out XElement root);
 
-                //Info section
+                // Info section
                 root.Add(GetPackageInfoXml(definition));
 
                 PackageDocumentsAndTags(definition, root);
@@ -276,19 +286,28 @@ namespace Umbraco.Cms.Core.Packaging
             }
             finally
             {
-                //Clean up
+                // Clean up
                 Directory.Delete(temporaryPath, true);
             }
         }
 
+        private XDocument CreateCompiledPackageXml(out XElement root)
+        {
+            root = new XElement("umbPackage");
+            var compiledPackageXml = new XDocument(root);
+            return compiledPackageXml;
+        }
+
         private void ValidatePackage(PackageDefinition definition)
         {
-            //ensure it's valid
+            // Ensure it's valid
             var context = new ValidationContext(definition, serviceProvider: null, items: null);
             var results = new List<ValidationResult>();
             var isValid = Validator.TryValidateObject(definition, context, results);
             if (!isValid)
+            {
                 throw new InvalidOperationException("Validation failed, there is invalid data on the model: " + string.Join(", ", results.Select(x => x.ErrorMessage)));
+            }
         }
 
         private void PackageDataTypes(PackageDefinition definition, XContainer root)
@@ -297,12 +316,19 @@ namespace Umbraco.Cms.Core.Packaging
             foreach (var dtId in definition.DataTypes)
             {
                 if (!int.TryParse(dtId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+                {
                     continue;
-                var dataType = _dataTypeService.GetDataType(outInt);
+                }
+
+                IDataType dataType = _dataTypeService.GetDataType(outInt);
                 if (dataType == null)
+                {
                     continue;
+                }
+
                 dataTypes.Add(_serializer.Serialize(dataType));
             }
+
             root.Add(dataTypes);
         }
 
@@ -312,12 +338,19 @@ namespace Umbraco.Cms.Core.Packaging
             foreach (var langId in definition.Languages)
             {
                 if (!int.TryParse(langId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+                {
                     continue;
-                var lang = _languageService.GetLanguageById(outInt);
+                }
+
+                ILanguage lang = _localizationService.GetLanguageById(outInt);
                 if (lang == null)
+                {
                     continue;
+                }
+
                 languages.Add(_serializer.Serialize(lang));
             }
+
             root.Add(languages);
         }
 
@@ -333,7 +366,7 @@ namespace Umbraco.Cms.Core.Packaging
                     continue;
                 }
 
-                IDictionaryItem di = _languageService.GetDictionaryItemById(outInt);
+                IDictionaryItem di = _localizationService.GetDictionaryItemById(outInt);
 
                 if (di == null)
                 {
@@ -386,8 +419,10 @@ namespace Umbraco.Cms.Core.Packaging
             {
                 // track it
                 processed.Add(key, serializedDictionaryValue);
+
                 // append it
                 rootDictionaryItems.Add(serializedDictionaryValue);
+
                 // remove it so its not re-processed
                 items.Remove(key);
             }
@@ -438,6 +473,7 @@ namespace Umbraco.Cms.Core.Packaging
                     stylesheetsXml.Add(xml);
                 }
             }
+
             root.Add(stylesheetsXml);
         }
 
@@ -472,6 +508,7 @@ namespace Umbraco.Cms.Core.Packaging
                             new XCData(fileContents)));
                 }
             }
+
             root.Add(scriptsXml);
         }
 
@@ -481,12 +518,19 @@ namespace Umbraco.Cms.Core.Packaging
             foreach (var templateId in definition.Templates)
             {
                 if (!int.TryParse(templateId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+                {
                     continue;
-                var template = _fileService.GetTemplate(outInt);
+                }
+
+                ITemplate template = _fileService.GetTemplate(outInt);
                 if (template == null)
+                {
                     continue;
+                }
+
                 templatesXml.Add(_serializer.Serialize(template));
             }
+
             root.Add(templatesXml);
         }
 
@@ -497,14 +541,23 @@ namespace Umbraco.Cms.Core.Packaging
             foreach (var dtId in definition.DocumentTypes)
             {
                 if (!int.TryParse(dtId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+                {
                     continue;
-                var contentType = _contentTypeService.Get(outInt);
+                }
+
+                IContentType contentType = _contentTypeService.Get(outInt);
                 if (contentType == null)
+                {
                     continue;
+                }
+
                 AddDocumentType(contentType, contentTypes);
             }
-            foreach (var contentType in contentTypes)
+
+            foreach (IContentType contentType in contentTypes)
+            {
                 docTypesXml.Add(_serializer.Serialize(contentType));
+            }
 
             root.Add(docTypesXml);
         }
@@ -516,97 +569,49 @@ namespace Umbraco.Cms.Core.Packaging
             foreach (var mediaTypeId in definition.MediaTypes)
             {
                 if (!int.TryParse(mediaTypeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+                {
                     continue;
-                var mediaType = _mediaTypeService.Get(outInt);
+                }
+
+                IMediaType mediaType = _mediaTypeService.Get(outInt);
                 if (mediaType == null)
+                {
                     continue;
+                }
+
                 AddMediaType(mediaType, mediaTypes);
             }
-            foreach (var mediaType in mediaTypes)
+
+            foreach (IMediaType mediaType in mediaTypes)
+            {
                 mediaTypesXml.Add(_serializer.Serialize(mediaType));
+            }
 
             root.Add(mediaTypesXml);
         }
 
         private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
         {
-            //Documents and tags
+            // Documents and tags
             if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
             {
                 if (contentNodeId > 0)
                 {
-                    //load content from umbraco.
-                    var content = _contentService.GetById(contentNodeId);
+                    // load content from umbraco.
+                    IContent content = _contentService.GetById(contentNodeId);
                     if (content != null)
                     {
                         var contentXml = definition.ContentLoadChildNodes ? content.ToDeepXml(_serializer) : content.ToXml(_serializer);
 
-                        //Create the Documents/DocumentSet node
+                        // Create the Documents/DocumentSet node
 
                         root.Add(
-                            new XElement("Documents",
-                                new XElement("DocumentSet",
+                            new XElement(
+                                "Documents",
+                                new XElement(
+                                    "DocumentSet",
                                     new XAttribute("importMode", "root"),
                                     contentXml)));
-
-                        // TODO: I guess tags has been broken for a very long time for packaging, we should get this working again sometime
-                        ////Create the TagProperties node - this is used to store a definition for all
-                        //// document properties that are tags, this ensures that we can re-import tags properly
-                        //XmlNode tagProps = new XElement("TagProperties");
-
-                        ////before we try to populate this, we'll do a quick lookup to see if any of the documents
-                        //// being exported contain published tags.
-                        //var allExportedIds = documents.SelectNodes("//@id").Cast<XmlNode>()
-                        //    .Select(x => x.Value.TryConvertTo<int>())
-                        //    .Where(x => x.Success)
-                        //    .Select(x => x.Result)
-                        //    .ToArray();
-                        //var allContentTags = new List<ITag>();
-                        //foreach (var exportedId in allExportedIds)
-                        //{
-                        //    allContentTags.AddRange(
-                        //        Current.Services.TagService.GetTagsForEntity(exportedId));
-                        //}
-
-                        ////This is pretty round-about but it works. Essentially we need to get the properties that are tagged
-                        //// but to do that we need to lookup by a tag (string)
-                        //var allTaggedEntities = new List<TaggedEntity>();
-                        //foreach (var group in allContentTags.Select(x => x.Group).Distinct())
-                        //{
-                        //    allTaggedEntities.AddRange(
-                        //        Current.Services.TagService.GetTaggedContentByTagGroup(group));
-                        //}
-
-                        ////Now, we have all property Ids/Aliases and their referenced document Ids and tags
-                        //var allExportedTaggedEntities = allTaggedEntities.Where(x => allExportedIds.Contains(x.EntityId))
-                        //    .DistinctBy(x => x.EntityId)
-                        //    .OrderBy(x => x.EntityId);
-
-                        //foreach (var taggedEntity in allExportedTaggedEntities)
-                        //{
-                        //    foreach (var taggedProperty in taggedEntity.TaggedProperties.Where(x => x.Tags.Any()))
-                        //    {
-                        //        XmlNode tagProp = new XElement("TagProperty");
-                        //        var docId = packageManifest.CreateAttribute("docId", "");
-                        //        docId.Value = taggedEntity.EntityId.ToString(CultureInfo.InvariantCulture);
-                        //        tagProp.Attributes.Append(docId);
-
-                        //        var propertyAlias = packageManifest.CreateAttribute("propertyAlias", "");
-                        //        propertyAlias.Value = taggedProperty.PropertyTypeAlias;
-                        //        tagProp.Attributes.Append(propertyAlias);
-
-                        //        var group = packageManifest.CreateAttribute("group", "");
-                        //        group.Value = taggedProperty.Tags.First().Group;
-                        //        tagProp.Attributes.Append(group);
-
-                        //        tagProp.AppendChild(packageManifest.CreateCDataSection(
-                        //            JsonConvert.SerializeObject(taggedProperty.Tags.Select(x => x.Text).ToArray())));
-
-                        //        tagProps.AppendChild(tagProp);
-                        //    }
-                        //}
-
-                        //manifestRoot.Add(tagProps);
                     }
                 }
             }
@@ -652,14 +657,18 @@ namespace Umbraco.Cms.Core.Packaging
             return mediaStreams;
         }
 
-        // TODO: Delete this
         /// <summary>
+        /// Gets a macros xml node
+        /// </summary>
         private XElement GetMacroXml(int macroId, out IMacro macro)
         {
             macro = _macroService.GetById(macroId);
             if (macro == null)
+            {
                 return null;
-            var xml = _serializer.Serialize(macro);
+            }
+
+            XElement xml = _serializer.Serialize(macro);
             return xml;
         }
 
@@ -668,7 +677,6 @@ namespace Umbraco.Cms.Core.Packaging
         /// </summary>
         /// <param name="path">The path of the stylesheet.</param>
         /// <param name="includeProperties">if set to <c>true</c> [include properties].</param>
-        /// <returns></returns>
         private XElement GetStylesheetXml(string path, bool includeProperties)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -689,61 +697,45 @@ namespace Umbraco.Cms.Core.Packaging
         {
             if (dt.ParentId > 0)
             {
-                var parent = _contentTypeService.Get(dt.ParentId);
-                if (parent != null) // could be a container
+                IContentType parent = _contentTypeService.Get(dt.ParentId);
+                if (parent != null)
+                {
                     AddDocumentType(parent, dtl);
+                }
             }
 
             if (!dtl.Contains(dt))
+            {
                 dtl.Add(dt);
+            }
         }
 
         private void AddMediaType(IMediaType mediaType, HashSet<IMediaType> mediaTypes)
         {
             if (mediaType.ParentId > 0)
             {
-                var parent = _mediaTypeService.Get(mediaType.ParentId);
-                if (parent != null) // could be a container
+                IMediaType parent = _mediaTypeService.Get(mediaType.ParentId);
+                if (parent != null)
+                {
                     AddMediaType(parent, mediaTypes);
+                }
             }
 
             if (!mediaTypes.Contains(mediaType))
+            {
                 mediaTypes.Add(mediaType);
+            }
         }
 
         private static XElement GetPackageInfoXml(PackageDefinition definition)
         {
             var info = new XElement("info");
 
-            //Package info
+            // Package info
             var package = new XElement("package");
             package.Add(new XElement("name", definition.Name));
             info.Add(package);
             return info;
-        }
-
-        private static XDocument CreateCompiledPackageXml(out XElement root)
-        {
-            root = new XElement("umbPackage");
-            var compiledPackageXml = new XDocument(root);
-            return compiledPackageXml;
-        }
-
-        private XDocument EnsureStorage(out string packagesFile)
-        {
-            var packagesFolder = _hostingEnvironment.MapPathContentRoot(_packagesFolderPath);
-            //ensure it exists
-            Directory.CreateDirectory(packagesFolder);
-
-            packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
-            if (!File.Exists(packagesFile))
-            {
-                var xml = new XDocument(new XElement("packages"));
-                xml.Save(packagesFile);
-            }
-
-            var packagesXml = XDocument.Load(packagesFile);
-            return packagesXml;
         }
     }
 }

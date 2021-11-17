@@ -80,6 +80,8 @@ namespace Umbraco.Cms.Core
                 public const string UserLogin = TableNamePrefix + "UserLogin";
 
                 public const string LogViewerQuery = TableNamePrefix + "LogViewerQuery";
+
+                public const string CreatedPackageSchema = TableNamePrefix + "CreatedPackageSchema";
             }
         }
     }

@@ -77,7 +77,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             typeof(DocumentCultureVariationDto),
             typeof(ContentScheduleDto),
             typeof(LogViewerQueryDto),
-            typeof(ContentVersionCleanupPolicyDto)
+            typeof(ContentVersionCleanupPolicyDto),
+            typeof(CreatedPackageSchemaDto)
         };
 
         private readonly IUmbracoDatabase _database;

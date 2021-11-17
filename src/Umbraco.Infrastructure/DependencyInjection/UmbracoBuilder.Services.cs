@@ -15,6 +15,8 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
@@ -84,22 +86,22 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         /// <summary>
         /// Creates an instance of PackagesRepository for either the ICreatedPackagesRepository or the IInstalledPackagesRepository
         /// </summary>
-        private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
-            => new PackagesRepository(
-                factory.GetRequiredService<IContentService>(),
-                factory.GetRequiredService<IContentTypeService>(),
-                factory.GetRequiredService<IDataTypeService>(),
-                factory.GetRequiredService<IFileService>(),
-                factory.GetRequiredService<IMacroService>(),
-                factory.GetRequiredService<ILocalizationService>(),
+        private static CreatedPackageSchemaRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
+            => new CreatedPackageSchemaRepository(
+                factory.GetRequiredService<IUmbracoDatabase>(),
                 factory.GetRequiredService<IHostingEnvironment>(),
-                factory.GetRequiredService<IEntityXmlSerializer>(),
                 factory.GetRequiredService<IOptions<GlobalSettings>>(),
+                factory.GetRequiredService<FileSystems>(),
+                factory.GetRequiredService<IEntityXmlSerializer>(),
+                factory.GetRequiredService<IDataTypeService>(),
+                factory.GetRequiredService<ILocalizationService>(),
+                factory.GetRequiredService<IFileService>(),
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>(),
+                factory.GetRequiredService<IContentService>(),
                 factory.GetRequiredService<MediaFileManager>(),
-                factory.GetRequiredService<FileSystems>(),
-                packageRepoFileName);
+                factory.GetRequiredService<IMacroService>(),
+                factory.GetRequiredService<IContentTypeService>());
 
         private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider container)
         {
