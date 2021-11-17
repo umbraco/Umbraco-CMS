@@ -129,7 +129,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where<UserGroup2NodeDto>(dto => dto.NodeId == entityId)
                 .OrderBy<UserGroup2NodeDto>(dto => dto.NodeId);
 
-
             List<UserGroup2NodePermissionDto> result = AmbientScope.Database.Fetch<UserGroup2NodePermissionDto>(sql);
             return ConvertToPermissionList(result);
         }
@@ -154,7 +153,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             foreach (IEnumerable<int> group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                db.Execute(@"DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@nodeIds);
+                db.Execute(
+                    @"DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@nodeIds);
                                 DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)",
                     new { groupId, nodeIds = group });
             }
@@ -195,7 +195,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
 
             var sql =
-                @"DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds;
+                @"DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds);
                  DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@entityIds);";
 
             db.Execute(sql,
@@ -249,8 +249,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             db.BulkInsertRecords(actions);
             db.BulkInsertRecords(actionsPermissions);
-
-
         }
 
         /// <summary>
@@ -329,7 +327,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 {
                     var perms = permission.Select(x => x.Permission).Distinct().ToArray();
 
-                    // perms can contain null if there is no permissions assigned, but the node is chosen in the UI.
+                    // perms can contain null if there are no permissions assigned, but the node is chosen in the UI.
                     permissions.Add(new EntityPermission(permission.Key, np.Key,
                         perms.Where(x => x is not null).ToArray()));
                 }

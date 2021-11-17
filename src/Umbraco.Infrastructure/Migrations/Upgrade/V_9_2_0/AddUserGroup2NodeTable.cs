@@ -1,5 +1,4 @@
 using System.Linq;
-using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -18,11 +17,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
                 Create.Table<UserGroup2NodeDto>().Do();
             }
 
-            // insert if there exists specific permissions today. Can't do it directly in db in any nice way.
+            // Insert if there exists specific permissions today. Can't do it directly in db in any nice way.
             var allData = Database.Fetch<UserGroup2NodePermissionDto>();
             var toInsert = allData.Select(x => new UserGroup2NodeDto() { NodeId = x.NodeId, UserGroupId = x.UserGroupId }).Distinct().ToArray();
             Database.Insert(toInsert);
-
         }
     }
 }
