@@ -79,7 +79,7 @@ namespace Umbraco.Extensions
                 // in some cases there will be the same URL for multiple cultures:
                 // * The entire branch is invariant
                 // * If there are less domain/cultures assigned to the branch than the number of cultures/languages installed
-                foreach (UrlInfo dUrl in urlGroup.DistinctBy(x => x.Text.ToUpperInvariant()).OrderBy(x => x.Text).ThenBy(x => x.Culture))
+                foreach (UrlInfo dUrl in urlGroup.LegacyDistinctBy(x => x.Text.ToUpperInvariant()).OrderBy(x => x.Text).ThenBy(x => x.Culture))
                 {
                     result.Add(dUrl);
                 }
