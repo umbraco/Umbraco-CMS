@@ -27,7 +27,6 @@ namespace Umbraco.Cms.Web.Common.ApplicationModels
     /// </remarks>
     public class UmbracoApiBehaviorApplicationModelProvider : IApplicationModelProvider
     {
-
         private readonly List<IActionModelConvention> _actionModelConventions;
 
         /// <summary>
