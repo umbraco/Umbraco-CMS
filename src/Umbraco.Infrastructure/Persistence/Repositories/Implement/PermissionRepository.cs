@@ -153,9 +153,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             foreach (IEnumerable<int> group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                db.Execute(
-                    @"DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@nodeIds);
-                                DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)",
+
+                db.Execute("DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@nodeIds)",
+                    new { groupId, nodeIds = group });
+
+                db.Execute("DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND nodeId in (@nodeIds)",
                     new { groupId, nodeIds = group });
             }
 
@@ -192,13 +194,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             IUmbracoDatabase db = AmbientScope.Database;
 
-
-
-            var sql =
-                @"DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds);
-                 DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@entityIds);";
-
-            db.Execute(sql,
+            db.Execute("DELETE FROM umbracoUserGroup2Node WHERE userGroupId = @groupId AND nodeId in (@entityIds)",
+                new { groupId,  entityIds });
+            db.Execute("DELETE FROM umbracoUserGroup2NodePermission WHERE userGroupId = @groupId AND permission=@permission AND nodeId in (@entityIds)",
                 new { groupId, permission = permission.ToString(CultureInfo.InvariantCulture), entityIds });
 
             UserGroup2NodeDto[] actionsPermissions = entityIds.Select(id => new UserGroup2NodeDto
@@ -226,10 +224,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             IUmbracoDatabase db = AmbientScope.Database;
             var groupIdsA = groupIds.ToArray();
 
-            const string sql =
-                @"DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId AND userGroupId in (@groupIds);
-                  DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId AND permission = @permission AND userGroupId in (@groupIds);";
-            db.Execute(sql,
+            db.Execute("DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId AND userGroupId in (@groupIds)",
+                new {
+                    nodeId = entity.Id,
+                    groupIds = groupIdsA
+                });
+            db.Execute("DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId AND permission = @permission AND userGroupId in (@groupIds)",
                 new
                 {
                     nodeId = entity.Id,
@@ -263,9 +263,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             IUmbracoDatabase db = AmbientScope.Database;
 
-            const string sql = @"DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId;
-                                 DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId;";
-            db.Execute(sql, new { nodeId = permissionSet.EntityId });
+            db.Execute("DELETE FROM umbracoUserGroup2Node WHERE nodeId = @nodeId", new { nodeId = permissionSet.EntityId });
+            db.Execute("DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @nodeId", new { nodeId = permissionSet.EntityId });
 
             var toInsert = new List<UserGroup2NodeDto>();
             var toInsertPermissions = new List<UserGroup2NodePermissionDto>();
