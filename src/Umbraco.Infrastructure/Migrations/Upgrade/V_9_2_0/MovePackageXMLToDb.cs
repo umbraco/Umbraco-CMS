@@ -14,15 +14,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
     public class MovePackageXMLToDb : MigrationBase
     {
 
-        private readonly ICreatedPackagesRepository _createdPackagesRepository;
+        private readonly PackagesRepository _packagesRepository;
         private readonly PackageDefinitionXmlParser _xmlParser;
         /// <summary>
         /// Initializes a new instance of the <see cref="MovePackageXMLToDb"/> class.
         /// </summary>
-        public MovePackageXMLToDb(IMigrationContext context, ICreatedPackagesRepository createdPackagesRepository)
+        public MovePackageXMLToDb(IMigrationContext context, PackagesRepository packagesRepository)
             : base(context)
         {
-            _createdPackagesRepository = createdPackagesRepository;
+            _packagesRepository = packagesRepository;
             _xmlParser = new PackageDefinitionXmlParser();
         }
 
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
         private void MigrateCreatedPackageFilesToDb()
         {
             // Load data from file
-            IEnumerable<PackageDefinition> packages = _createdPackagesRepository.GetAll();
+            IEnumerable<PackageDefinition> packages = _packagesRepository.GetAll();
             var createdPackageDtos = new List<CreatedPackageSchemaDto>();
             foreach (PackageDefinition package in packages)
             {

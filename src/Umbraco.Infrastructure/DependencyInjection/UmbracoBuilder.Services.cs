@@ -76,49 +76,30 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<ConflictingPackageData>();
             builder.Services.AddUnique<CompiledPackageXmlParser>();
-            builder.Services.AddUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));
+            builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
+            builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
             builder.Services.AddUnique<PackageDataInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
 
             return builder;
         }
 
-        // private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
-        //     => new PackagesRepository(
-        //         factory.GetRequiredService<IContentService>(),
-        //         factory.GetRequiredService<IContentTypeService>(),
-        //         factory.GetRequiredService<IDataTypeService>(),
-        //         factory.GetRequiredService<IFileService>(),
-        //         factory.GetRequiredService<IMacroService>(),
-        //         factory.GetRequiredService<ILocalizationService>(),
-        //         factory.GetRequiredService<IHostingEnvironment>(),
-        //         factory.GetRequiredService<IEntityXmlSerializer>(),
-        //         factory.GetRequiredService<IOptions<GlobalSettings>>(),
-        //         factory.GetRequiredService<IMediaService>(),
-        //         factory.GetRequiredService<IMediaTypeService>(),
-        //         factory.GetRequiredService<MediaFileManager>(),
-        //         factory.GetRequiredService<FileSystems>(),
-        //         packageRepoFileName);
-
-        /// <summary>
-        /// Creates an instance of PackagesRepository for either the ICreatedPackagesRepository or the IInstalledPackagesRepository
-        /// </summary>
-        private static CreatedPackageSchemaRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
-            => new CreatedPackageSchemaRepository(
-                factory.GetRequiredService<IUmbracoDatabase>(),
-                factory.GetRequiredService<IHostingEnvironment>(),
-                factory.GetRequiredService<IOptions<GlobalSettings>>(),
-                factory.GetRequiredService<FileSystems>(),
-                factory.GetRequiredService<IEntityXmlSerializer>(),
+        private static PackagesRepository CreatePackageRepository(IServiceProvider factory, string packageRepoFileName)
+            => new PackagesRepository(
+                factory.GetRequiredService<IContentService>(),
+                factory.GetRequiredService<IContentTypeService>(),
                 factory.GetRequiredService<IDataTypeService>(),
-                factory.GetRequiredService<ILocalizationService>(),
                 factory.GetRequiredService<IFileService>(),
+                factory.GetRequiredService<IMacroService>(),
+                factory.GetRequiredService<ILocalizationService>(),
+                factory.GetRequiredService<IHostingEnvironment>(),
+                factory.GetRequiredService<IEntityXmlSerializer>(),
+                factory.GetRequiredService<IOptions<GlobalSettings>>(),
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>(),
-                factory.GetRequiredService<IContentService>(),
                 factory.GetRequiredService<MediaFileManager>(),
-                factory.GetRequiredService<IMacroService>(),
-                factory.GetRequiredService<IContentTypeService>());
+                factory.GetRequiredService<FileSystems>(),
+                packageRepoFileName);
 
         private static LocalizedTextServiceFileSources SourcesFactory(IServiceProvider container)
         {
