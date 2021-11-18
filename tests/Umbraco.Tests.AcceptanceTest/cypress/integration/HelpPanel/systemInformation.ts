@@ -24,7 +24,7 @@ context('System Information', () => {
         cy.contains('Current Culture').parent().should('contain', 'en-US');
         cy.contains('Current UI Culture').parent().should('contain', 'en-US');
     });
-    
+
     it('Checks language displays correctly after switching', () => {
 
         //Navigate to edit user and change language
@@ -32,10 +32,8 @@ context('System Information', () => {
         cy.get('[alias="editUser"]').click();
         cy.get('[name="culture"]').select('string:da-DK', { force: true});
         cy.umbracoButtonByLabelKey('buttons_save').click({force: true});
-        //Refresh site to display new language
-        cy.reload();
-        cy.get('.umb-tour-step', { timeout: 60000 }).should('be.visible'); // We now due to the api calls this will be shown, but slow computers can take a while
-        cy.get('.umb-tour-step__close').click();
+        cy.umbracoSuccessNotification().should('be.visible');
+
         openSystemInformation();
         //Assert
         cy.contains('Current Culture').parent().should('contain', 'da-DK');

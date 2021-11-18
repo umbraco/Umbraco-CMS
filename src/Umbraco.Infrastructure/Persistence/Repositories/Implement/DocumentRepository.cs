@@ -233,6 +233,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
                 "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
@@ -292,9 +293,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
+            var pageIndex = skip / take;
+
+            return MapDtosToContent(Database.Page<DocumentDto>(pageIndex+1, take, sql).Items, true,
                 // load bare minimum, need variants though since this is used to rollback with variants
-                false, false, false, true).Skip(skip).Take(take);
+                false, false, false, true);
         }
 
         public override IContent GetVersion(int versionId)

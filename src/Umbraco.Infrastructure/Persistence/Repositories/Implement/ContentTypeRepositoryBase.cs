@@ -1383,6 +1383,7 @@ WHERE {Cms.Core.Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cm
             var list = new List<string>
             {
                 "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @id",
+                "DELETE FROM umbracoUserGroup2Node WHERE nodeId = @id",
                 "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @id",
                 "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
                 "DELETE FROM cmsContentTypeAllowedContentType WHERE Id = @id",

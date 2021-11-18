@@ -18,10 +18,10 @@
     <key alias="delete">Delete</key>
     <key alias="disable">Disable</key>
     <key alias="editSettings">Edit settings</key>
-    <key alias="emptyrecyclebin">Empty recycle bin</key>
+    <key alias="emptyRecycleBin">Empty recycle bin</key>
     <key alias="enable">Enable</key>
     <key alias="exportDocumentType">Export Document Type</key>
-    <key alias="importdocumenttype">Import Document Type</key>
+    <key alias="importDocumentType">Import Document Type</key>
     <key alias="importPackage">Import Package</key>
     <key alias="liveEdit">Edit in Canvas</key>
     <key alias="logout">Exit</key>
@@ -286,6 +286,7 @@
       name. Use
     </key>
     <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
+    <key alias="nestedContentNoGroups">The selected element type does not contain any supported groups (tabs are not supported by this editor, either change them to groups or use the Block List editor).</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -329,6 +330,7 @@
     <key alias="clickToUpload">Click to upload</key>
     <key alias="orClickHereToUpload">or click here to choose files</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
+    <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
     <key alias="moveToSameFolderFailed">Parent and destination folders cannot be the same</key>
@@ -469,6 +471,7 @@
     <key alias="anchorInsert">Name</key>
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <b>%0%</b> of <b>%1%</b> items]]></key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
     <key alias="confirmremove">Are you sure you want to remove</key>
     <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <b>%0%</b>]]></key>
@@ -569,6 +572,7 @@
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
+    <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -869,6 +873,7 @@
     <key alias="avatar">Avatar for</key>
     <key alias="header">Header</key>
     <key alias="systemField">system field</key>
+    <key alias="lastUpdated">Last Updated</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1881,6 +1886,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       types beneath a node.
     </key>
     <key alias="usingEditor">using this editor will get updated with the new settings.</key>
+    <key alias="historyCleanupHeading">History cleanup</key>
+    <key alias="historyCleanupDescription">Allow override the global settings for when history versions are removed.</key>
+    <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
+    <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
+    <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
+    <key alias="historyCleanupGloballyDisabled">NOTE! The cleanup of historically content versions is disabled globally. These settings will not take effect before it is enabled.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

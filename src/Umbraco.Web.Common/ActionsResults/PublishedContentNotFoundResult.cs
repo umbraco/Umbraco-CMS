@@ -44,18 +44,14 @@ namespace Umbraco.Cms.Web.Common.ActionsResults
                 reason = "No template exists to render the document at URL '{0}'.";
             }
 
-            await response.WriteAsync("<html><body><h1>Page not found</h1>");
-            await response.WriteAsync("<h2>");
-            await response.WriteAsync(string.Format(reason, WebUtility.HtmlEncode(_umbracoContext.OriginalRequestUrl.PathAndQuery)));
-            await response.WriteAsync("</h2>");
-            if (string.IsNullOrWhiteSpace(_message) == false)
+            var viewResult = new ViewResult
             {
-                await response.WriteAsync("<p>" + _message + "</p>");
-            }
+                ViewName = "~/umbraco/UmbracoWebsite/NotFound.cshtml"
+            };
+            context.HttpContext.Items.Add("reason", string.Format(reason, WebUtility.HtmlEncode(_umbracoContext.OriginalRequestUrl.PathAndQuery)));
+            context.HttpContext.Items.Add("message", _message);
 
-            await response.WriteAsync("<p>This page can be replaced with a custom 404. Check the <a target='_blank' href='https://umbra.co/custom-error-pages'>documentation for <a href=\"https://our.umbraco.com/Documentation/Tutorials/Custom-Error-Pages/#404-errors\" target=\"_blank\">Custom 404 Error Pages</a>.</p>");
-            await response.WriteAsync("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
-            await response.WriteAsync("</body></html>");
+            await viewResult.ExecuteResultAsync(context);
         }
     }
 }

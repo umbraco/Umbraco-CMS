@@ -39,6 +39,9 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // register the scheme for media paths
             builder.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
+            builder.Services.AddUnique<IViewHelper, ViewHelper>();
+            builder.Services.AddUnique<IDefaultViewContentProvider, DefaultViewContentProvider>();
+
             builder.SetMediaFileSystem(factory =>
             {
                 IIOHelper ioHelper = factory.GetRequiredService<IIOHelper>();
