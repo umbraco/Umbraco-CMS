@@ -17,16 +17,14 @@ using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
-
 namespace Umbraco.Tests.Scoping
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ScopedNuCacheTests : UmbracoIntegrationTest
     {
-
         private IContentService ContentService => GetRequiredService<IContentService>();
-        private Mock<IHttpContextAccessor> MockHttpContextAccessor { get; set; }  = CreateMockHttpContextAccessor();
+        private Mock<IHttpContextAccessor> MockHttpContextAccessor { get; set; } = CreateMockHttpContextAccessor();
         private IUmbracoContextFactory UmbracoContextFactory => GetRequiredService<IUmbracoContextFactory>();
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
         private IVariationContextAccessor VariationContextAccessor => GetRequiredService<IVariationContextAccessor>();
@@ -71,15 +69,13 @@ namespace Umbraco.Tests.Scoping
             ContentTypeService.Save(contentType);
             var item = new Content("name", -1, contentType);
 
-            // event handler
-
-
             using (var scope = ScopeProvider.CreateScope())
             {
                 ContentService.SaveAndPublish(item);
                 scope.Complete();
             }
 
+            // event handler
             var evented = 0;
             NotificationHandler.PublishedContent = notification =>
             {
