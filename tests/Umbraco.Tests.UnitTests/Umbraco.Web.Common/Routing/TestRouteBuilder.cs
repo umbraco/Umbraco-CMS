@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -21,6 +22,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
         public TestRouteBuilder()
         {
             var services = new ServiceCollection();
+
+            var diagnosticListener = new DiagnosticListener("UnitTests");
+            services.AddSingleton<DiagnosticSource>(diagnosticListener);
+            services.AddSingleton<DiagnosticListener>(diagnosticListener);
+
             services.AddLogging();
             services.AddMvc();
             services.AddSingleton<IHostApplicationLifetime>(x => new ApplicationLifetime(x.GetRequiredService<ILogger<ApplicationLifetime>>()));

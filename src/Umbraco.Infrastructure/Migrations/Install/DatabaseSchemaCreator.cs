@@ -189,7 +189,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private void ValidateDbConstraints(DatabaseSchemaResult result)
         {
             //Check constraints in configured database against constraints in schema
-            var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
+            var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).LegacyDistinctBy(x => x.Item3).ToList();
             var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
             var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_")).Select(x => x.Item3).ToList();
 

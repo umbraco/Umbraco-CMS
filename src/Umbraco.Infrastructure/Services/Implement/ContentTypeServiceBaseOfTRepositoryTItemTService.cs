@@ -598,7 +598,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
-                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
+                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.LegacyDistinctBy(x => x.Id), eventMessages);
                 deletedNotification.WithStateFrom(deletingNotification);
                 scope.Notifications.Publish(deletedNotification);
 
@@ -625,7 +625,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 // all descendants are going to be deleted
                 TItem[] allDescendantsAndSelf = itemsA.SelectMany(xx => GetDescendants(xx.Id, true))
-                    .DistinctBy(x => x.Id)
+                    .LegacyDistinctBy(x => x.Id)
                     .ToArray();
                 TItem[] deleted = allDescendantsAndSelf;
 
@@ -656,7 +656,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
-                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
+                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.LegacyDistinctBy(x => x.Id), eventMessages);
                 deletedNotification.WithStateFrom(deletingNotification);
                 scope.Notifications.Publish(deletedNotification);
 

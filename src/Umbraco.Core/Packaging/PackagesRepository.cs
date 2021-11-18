@@ -578,7 +578,7 @@ namespace Umbraco.Cms.Core.Packaging
 
                         ////Now, we have all property Ids/Aliases and their referenced document Ids and tags
                         //var allExportedTaggedEntities = allTaggedEntities.Where(x => allExportedIds.Contains(x.EntityId))
-                        //    .DistinctBy(x => x.EntityId)
+                        //    .LegacyDistinctBy(x => x.EntityId)
                         //    .OrderBy(x => x.EntityId);
 
                         //foreach (var taggedEntity in allExportedTaggedEntities)

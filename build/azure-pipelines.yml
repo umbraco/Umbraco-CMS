@@ -49,9 +49,9 @@ stages:
                 vmImage: ubuntu-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 5.x
+                  displayName: Use .Net 6.x
                   inputs:
-                      version: 5.x
+                      version: 6.x
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -69,9 +69,9 @@ stages:
                 vmImage: macOS-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 5.x
+                  displayName: Use .Net 6.x
                   inputs:
-                      version: 5.x
+                      version: 6.x
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -89,9 +89,9 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 5.x
+                  displayName: Use .Net 6.x
                   inputs:
-                      version: 5.x
+                      version: 6.x
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -116,9 +116,9 @@ stages:
                 vmImage: ubuntu-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 5.x
+                  displayName: Use .Net 6.x
                   inputs:
-                      version: 5.x
+                      version: 6.x
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build
                   inputs:
@@ -139,9 +139,9 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 5.x
+                  displayName: Use .Net 6.x
                   inputs:
-                      version: 5.x
+                      version: 6.x
                 - powershell: sqllocaldb start mssqllocaldb
                   displayName: Start MSSQL LocalDb
                 - task: DotNetCoreCLI@2
@@ -181,9 +181,9 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 5.x
+                  displayName: Use .Net 6.x
                   inputs:
-                      version: 5.x
+                      version: 6.x
 
                 - powershell: sqllocaldb start mssqllocaldb
                   displayName: Start MSSQL LocalDb
@@ -278,9 +278,9 @@ stages:
                 vmImage: ubuntu-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 5.x
+                  displayName: Use .Net 6.x
                   inputs:
-                      version: 5.x
+                      version: 6.x
                 - task: Bash@3
                   displayName: Create database
                   inputs:
@@ -380,9 +380,9 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 5.x
+                  displayName: Use .Net 6.x
                   inputs:
-                      version: 5.x
+                      version: 6.x
                 - task: NuGetToolInstaller@1
                   displayName: Use NuGet Latest
                 - task: NuGetCommand@2
@@ -533,9 +533,9 @@ stages:
                 vmImage: windows-latest
             steps:
                 - task: UseDotNet@2
-                  displayName: Use .Net 5.x
+                  displayName: Use .Net 6.x
                   inputs:
-                      version: 5.x
+                      version: 6.x
                 - task: PowerShell@2
                   displayName: 'Prep build tool -  C# Docs'
                   inputs:
