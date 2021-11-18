@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
     /// Used to assign user group permissions to a content node
     /// </summary>
     [DataContract(Name = "contentPermission", Namespace = "")]
-    public class UserGroupPermissionsSave : IValidatableObject
+    public class UserGroupPermissionsSave
     {
         public UserGroupPermissionsSave()
         {
@@ -28,13 +28,5 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "permissions")]
         public IDictionary<int, IEnumerable<string>> AssignedPermissions { get; set; }
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (AssignedPermissions.SelectMany(x => x.Value).Any(x => x.IsNullOrWhiteSpace()))
-            {
-                yield return new ValidationResult("A permission value cannot be null or empty", new[] { "Permissions" });
-            }
-        }
     }
 }
