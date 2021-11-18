@@ -168,12 +168,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     {
                         _userService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
                         continue;
-
                     }
 
-                    //create a string collection of the assigned letters
+                    // Create a string collection of the assigned letters
                     var groupPermissionCodes = groupPermissions.ToArray();
-                    //check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
+                    // Check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
                     if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
                     {
 
