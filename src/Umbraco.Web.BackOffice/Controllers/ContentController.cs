@@ -164,27 +164,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 IEnumerable<string> groupPermissions;
                 if (saveModel.AssignedPermissions.TryGetValue(userGroup.Id, out groupPermissions))
                 {
-                    //create a string collection of the assigned letters
-                    var groupPermissionCodes = groupPermissions.ToArray();
-
-                    //check if there are no permissions assigned for this group save model, if that is the case we want to reset the permissions
-                    //for this group/node which will go back to the defaults
-                    if (groupPermissionCodes.Length == 0)
+                    if (groupPermissions is null)
                     {
                         _userService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
+                        continue;
+
                     }
+
+                    //create a string collection of the assigned letters
+                    var groupPermissionCodes = groupPermissions.ToArray();
                     //check if they are the defaults, if so we should just remove them if they exist since it's more overhead having them stored
-                    else if (userGroup.Permissions.UnsortedSequenceEqual(groupPermissionCodes))
-                    {
-                        //only remove them if they are actually currently assigned
-                        if (contentPermissions.ContainsKey(userGroup.Id))
-                        {
-                            //remove these permissions from this node for this group since the ones being assigned are the same as the defaults
-                            _userService.RemoveUserGroupPermissions(userGroup.Id, content.Id);
-                        }
-                    }
-                    //if they are different we need to update, otherwise there's nothing to update
-                    else if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
+                    if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
                     {
 
                         _userService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
