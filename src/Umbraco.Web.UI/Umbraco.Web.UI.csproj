@@ -79,6 +79,7 @@
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <UseRazorSourceGenerator>false</UseRazorSourceGenerator> <!-- Disabling the Razor source generators in .NET 6 -->
   </PropertyGroup>
 
   <PropertyGroup>
