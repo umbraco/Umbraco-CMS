@@ -283,6 +283,10 @@ namespace Umbraco.Web.Editors
                 {
                     var display = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(child);
                     display.Level = level;
+                    
+                    //for having the same order as dictionary(translations view)
+                    display.Translations = display.Translations.OrderBy(t => t.DisplayName).ToList();
+                    
                     list.Add(display);
 
                     BuildTree(level + 1, child.Key);
