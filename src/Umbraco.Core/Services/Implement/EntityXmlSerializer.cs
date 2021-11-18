@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services.Implement
@@ -447,11 +448,16 @@ namespace Umbraco.Core.Services.Implement
 
             var tabs = new XElement("Tabs", SerializePropertyGroups(contentType.PropertyGroups)); // TODO Rename to PropertyGroups
 
+       
+
             var xml = new XElement("DocumentType",
                 info,
                 structure,
                 genericProperties,
                 tabs);
+
+            // Never null in v8, ContentTypeCommonRepository.MapHistoryCleanup always returns an instance even if no db record.
+            xml.Add(SerializeCleanupPolicy(contentType.HistoryCleanup));
 
             var folderNames = string.Empty;
             //don't add folders if this is a child doc type
@@ -513,6 +519,29 @@ namespace Umbraco.Core.Services.Implement
                     new XElement("Alias", propertyGroup.Alias),
                     new XElement("SortOrder", propertyGroup.SortOrder));
             }
+        }
+
+        private XElement SerializeCleanupPolicy(HistoryCleanup cleanupPolicy)
+        {
+            if (cleanupPolicy == null)
+            {
+                throw new ArgumentNullException(nameof(cleanupPolicy));
+            }
+
+            var element = new XElement("HistoryCleanupPolicy",
+                new XAttribute("preventCleanup", cleanupPolicy.PreventCleanup));
+
+            if (cleanupPolicy.KeepAllVersionsNewerThanDays.HasValue)
+            {
+                element.Add(new XAttribute("keepAllVersionsNewerThanDays", cleanupPolicy.KeepAllVersionsNewerThanDays));
+            }
+
+            if (cleanupPolicy.KeepLatestVersionPerDayForDays.HasValue)
+            {
+                element.Add(new XAttribute("keepLatestVersionPerDayForDays", cleanupPolicy.KeepLatestVersionPerDayForDays));
+            }
+
+            return element;
         }
 
         // exports an IContentBase (IContent, IMedia or IMember) as an XElement.

@@ -297,6 +297,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void PersistHistoryCleanup(IContentType entity)
         {
+            // property is not mandatory via public API, if it's not present NOOP
+            if (entity.HistoryCleanup == null)
+            {
+                return;
+            }
+
             ContentVersionCleanupPolicyDto dto = new ContentVersionCleanupPolicyDto()
             {
                 ContentTypeId = entity.Id,

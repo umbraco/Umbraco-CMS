@@ -416,6 +416,25 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
+        public void Can_Import_Single_DocType_With_Cleanup_Policy()
+        {
+            // Arrange
+            var docTypeElement = XElement.Parse(ImportResources.SingleDocType_WithCleanupPolicy);
+
+            // Act
+            var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(contentTypes.Single().HistoryCleanup);
+                Assert.IsTrue(contentTypes.Single().HistoryCleanup.PreventCleanup);
+                Assert.AreEqual(1,contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
+                Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+            });
+        }
+
+        [Test]
         public void Can_Export_Single_DocType()
         {
             // Arrange
@@ -440,6 +459,28 @@ namespace Umbraco.Tests.Packaging
         }
 
         [Test]
+        public void Can_Export_Single_DocType_With_Cleanup_Policy()
+        {
+            // Arrange
+            var docTypeElement = XElement.Parse(ImportResources.SingleDocType_WithCleanupPolicy);
+
+            var serializer = Factory.GetInstance<IEntityXmlSerializer>();
+
+            // Act
+            var contentTypes = PackageDataInstallation.ImportDocumentType(docTypeElement, 0);
+            var contentType = contentTypes.FirstOrDefault();
+            var element = serializer.Serialize(contentType);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("preventCleanup")!.Value, Is.EqualTo("true"));
+                Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepAllVersionsNewerThanDays")!.Value, Is.EqualTo("1"));
+                Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepLatestVersionPerDayForDays")!.Value, Is.EqualTo("2"));
+            });
+        }
+
+        [Test]
         public void Can_ReImport_Single_DocType()
         {
             // Arrange
@@ -460,6 +501,32 @@ namespace Umbraco.Tests.Packaging
             Assert.That(contentTypesUpdated.Any(x => x.HasIdentity == false), Is.False);
             Assert.That(contentTypesUpdated.Count(), Is.EqualTo(1));
             Assert.That(contentTypesUpdated.First().AllowedContentTypes.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Can_ReImport_Single_DocType_With_Cleanup_Policy()
+        {
+            // Arrange
+            var withoutCleanupPolicy = XElement.Parse(ImportResources.SingleDocType);
+            var withCleanupPolicy = XElement.Parse(ImportResources.SingleDocType_WithCleanupPolicy);
+
+            // Act
+            var contentTypes = PackageDataInstallation.ImportDocumentType(withCleanupPolicy, 0);
+            var contentTypesUpdated = PackageDataInstallation.ImportDocumentType(withoutCleanupPolicy, 0);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(contentTypes.Single().HistoryCleanup);
+                Assert.IsTrue(contentTypes.Single().HistoryCleanup.PreventCleanup);
+                Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
+                Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+
+                Assert.NotNull(contentTypesUpdated.Single().HistoryCleanup);
+                Assert.IsFalse(contentTypesUpdated.Single().HistoryCleanup.PreventCleanup);
+                Assert.IsNull(contentTypesUpdated.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
+                Assert.IsNull(contentTypesUpdated.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+            });
         }
 
         [Test]

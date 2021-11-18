@@ -9,6 +9,7 @@ using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Models.PublishedContent;
@@ -692,8 +693,43 @@ namespace Umbraco.Core.Packaging
             UpdateContentTypesAllowedTemplates(contentType, infoElement.Element("AllowedTemplates"), defaultTemplateElement);
             UpdateContentTypesPropertyGroups(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
+            UpdateHistoryCleanupPolicy(contentType, documentType.Element("HistoryCleanupPolicy"));
 
             return contentType;
+        }
+
+        private void UpdateHistoryCleanupPolicy(IContentType contentType, XElement element)
+        {
+            contentType.HistoryCleanup ??= new HistoryCleanup();
+
+            if (element == null)
+            {
+                contentType.HistoryCleanup = new HistoryCleanup();
+                return;
+            }
+
+            if (bool.TryParse(element.Attribute("preventCleanup")?.Value, out var preventCleanup))
+            {
+                contentType.HistoryCleanup.PreventCleanup = preventCleanup;
+            }
+
+            if (int.TryParse(element.Attribute("keepAllVersionsNewerThanDays")?.Value, out var keepAll))
+            {
+                contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = keepAll;
+            }
+            else
+            {
+                contentType.HistoryCleanup.KeepAllVersionsNewerThanDays = null;
+            }
+
+            if (int.TryParse(element.Attribute("keepLatestVersionPerDayForDays")?.Value, out var keepLatest))
+            {
+                contentType.HistoryCleanup.KeepLatestVersionPerDayForDays = keepLatest;
+            }
+            else
+            {
+                contentType.HistoryCleanup.KeepLatestVersionPerDayForDays = null;
+            }
         }
 
         private void UpdateContentTypesAllowedTemplates(IContentType contentType,

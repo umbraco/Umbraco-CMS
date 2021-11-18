@@ -15,4 +15,3 @@ namespace Umbraco.Core.Models.ContentEditing
         public int? KeepLatestVersionPerDayForDays { get;set; }
     }
 }
-
