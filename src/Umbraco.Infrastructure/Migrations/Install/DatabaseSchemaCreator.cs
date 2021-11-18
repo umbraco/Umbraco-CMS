@@ -78,6 +78,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             typeof(ContentScheduleDto),
             typeof(LogViewerQueryDto),
             typeof(ContentVersionCleanupPolicyDto),
+            typeof(UserGroup2NodeDto),
             typeof(CreatedPackageSchemaDto)
         };
 
