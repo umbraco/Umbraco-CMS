@@ -19,12 +19,18 @@
             <umb-box ng-if="!vm.loading">
                 <umb-box-content>
                     <ul class="umb-tree">
-                        <li ng-repeat="section in vm.sections" class="umb-tree-item" ng-class="{'umb-tree-node-checked': section.selected }">
-                            <div class="umb-tree-item__inner cursor-pointer" ng-click="vm.selectSection(section)" style="padding: 5px 10px;">
-                                <i class="icon umb-tree-icon {{section.icon}}"></i>
-                                <a class="flex-auto" href="" prevent-default>
+                        <li class="umb-tree-item" ng-repeat="section in vm.sections">
+                            <div class="umb-tree-item__inner" style="padding: 5px 10px;">
+                                <button type="button"
+                                        class="btn-reset text-left flex-auto"
+                                        ng-class="{ 'umb-tree-node-checked': section.selected }"
+                                        ng-click="vm.selectSection(section)">
+                                    <umb-icon icon="{{section.selected ? 'icon-check' : section.icon}}"
+                                              class="icon umb-tree-icon"
+                                              ng-class="{ 'color-green': section.selected }">
+                                    </umb-icon>
                                     <span>{{ section.name }}</span>
-                                </a>
+                                </button>
                             </div>
                         </li>
                     </ul>

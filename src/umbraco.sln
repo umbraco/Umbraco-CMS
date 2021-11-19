@@ -58,6 +58,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 		StartServerOnDebug = "false"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Tests.AcceptanceTest", "Umbraco.Tests.AcceptanceTest\", "{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_62926"
+		Debug.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_62926"
+		Release.AspNetCompiler.PhysicalPath = "Umbraco.Tests.AcceptanceTest\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_62926\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "62926"
+		SlnRelativePath = "Umbraco.Tests.AcceptanceTest\"
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web", "Umbraco.Web\Umbraco.Web.csproj", "{651E1350-91B6-44B7-BD60-7207006D7003}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Core", "Umbraco.Core\Umbraco.Core.csproj", "{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}"
@@ -118,6 +139,9 @@ Global
 		{4C4C194C-B5E4-4991-8F87-4373E24CC19F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{651E1350-91B6-44B7-BD60-7207006D7003}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -152,6 +176,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{227C3B55-80E5-4E7E-A802-BE16C5128B9D} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
+		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{E3F9F378-AFE1-40A5-90BD-82833375DBFE} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 		{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}

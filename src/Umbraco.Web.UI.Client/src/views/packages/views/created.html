@@ -5,7 +5,7 @@
         <umb-editor-sub-header-content-left>
             <umb-button
                 button-style="action"
-                type="button" 
+                type="button"
                 action="vm.createPackage()"
                 label="Create package"
                 label-key="packager_createPackage">
@@ -19,13 +19,13 @@
             <tr ng-repeat="createdPackage in vm.createdPackages track by createdPackage.id" style="cursor: pointer;" ng-click="vm.goToPackage(createdPackage)">
                 <td class="flex items-center">
                     <div class="umb-package-list__item-icon">
-                        <i ng-if="!createdPackage.iconUrl" class="icon-box"></i>
-                        <img ng-if="createdPackage.iconUrl" ng-src="{{createdPackage.iconUrl}}" />
+                        <umb-icon ng-if="!createdPackage.iconUrl" icon="icon-box"></umb-icon>
+                        <img ng-if="createdPackage.iconUrl" ng-src="{{createdPackage.iconUrl}}" alt="" />
                     </div>
                     <div class="umb-package-list__item-content">
                         <div class="umb-package-list__item-name">{{ createdPackage.name }}</div>
                         <div class="umb-package-list__item-description">
-                            {{ createdPackage.version }} | <a href="{{ createdPackage.url }}" target="_blank">{{ createdPackage.url }}</a> | {{ createdPackage.author }}
+                            {{ createdPackage.version }} | <a href="{{ createdPackage.url }}" target="_blank" rel="noopener">{{ createdPackage.url }}</a> | {{ createdPackage.author }}
                         </div>
                     </div>
                 </td>

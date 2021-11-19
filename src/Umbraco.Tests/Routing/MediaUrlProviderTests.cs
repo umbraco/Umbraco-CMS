@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Routing
             property.SetSourceValue("en", enMediaUrl, true);
             property.SetSourceValue("da", daMediaUrl);
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), new [] { umbracoFilePropertyType }, ContentVariation.Culture);
+            var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), new [] { umbracoFilePropertyType }, ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) {Properties = new[] {property}};
 
             var resolvedUrl = umbracoContext.UrlProvider.GetMediaUrl(publishedContent, UrlMode.Auto, "da");
@@ -150,7 +150,7 @@ namespace Umbraco.Tests.Routing
         {
             var umbracoFilePropertyType = CreatePropertyType(propertyEditorAlias, dataTypeConfiguration, ContentVariation.Nothing);
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(),
+            var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(),
                 new[] {umbracoFilePropertyType}, ContentVariation.Nothing);
 
             return new SolidPublishedContent(contentType)

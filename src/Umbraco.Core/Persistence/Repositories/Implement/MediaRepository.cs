@@ -24,6 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepository>, IMediaRepository
     {
+        private readonly AppCaches _cache;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
@@ -32,6 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditorCollection, DataValueReferenceFactoryCollection dataValueReferenceFactories)
             : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories)
         {
+            _cache = cache;
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, logger);
@@ -186,7 +188,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             const string pattern = ".*[_][0-9]+[x][0-9]+[.].*";
             var isResized = Regex.IsMatch(mediaPath, pattern);
 
-            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url.
+            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" URL.
             if (isResized)
             {
                 var underscoreIndex = mediaPath.LastIndexOf('_');
@@ -219,7 +221,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IMedia entity)
         {
-            var media = (Models.Media) entity;
             entity.AddingEntity();
 
             // ensure unique name on the same level
@@ -274,17 +275,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
-            media.VersionId = contentVersionDto.Id;
+            entity.VersionId = contentVersionDto.Id;
 
             // persist the media version dto
             var mediaVersionDto = dto.MediaVersionDto;
-            mediaVersionDto.Id = media.VersionId;
+            mediaVersionDto.Id = entity.VersionId;
             Database.Insert(mediaVersionDto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(media.ContentType.Variations, media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            InsertPropertyValues(entity, 0, out _, out _);
 
             // set tags
             SetEntityTags(entity, _tagRepository);
@@ -298,26 +297,32 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IMedia entity)
         {
-            var media = (Models.Media) entity;
-
             // update
-            media.UpdatingEntity();
+            entity.UpdatingEntity();
 
-            // ensure unique name on the same level
-            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
+            // Check if this entity is being moved as a descendant as part of a bulk moving operations.
+            // In this case we can bypass a lot of the below operations which will make this whole operation go much faster.
+            // When moving we don't need to create new versions, etc... because we cannot roll this operation back anyways.
+            var isMoving = entity.IsMoving();
 
-            // ensure that strings don't contain characters that are invalid in xml
-            // TODO: do we really want to keep doing this here?
-            entity.SanitizeEntityPropertiesForXmlStorage();
-
-            // if parent has changed, get path, level and sort order
-            if (entity.IsPropertyDirty("ParentId"))
+            if (!isMoving)
             {
-                var parent = GetParentNodeDto(entity.ParentId);
+                // ensure unique name on the same level
+                entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
-                entity.Path = string.Concat(parent.Path, ",", entity.Id);
-                entity.Level = parent.Level + 1;
-                entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+                // ensure that strings don't contain characters that are invalid in xml
+                // TODO: do we really want to keep doing this here?
+                entity.SanitizeEntityPropertiesForXmlStorage();
+
+                // if parent has changed, get path, level and sort order
+                if (entity.IsPropertyDirty(nameof(entity.ParentId)))
+                {
+                    var parent = GetParentNodeDto(entity.ParentId);
+
+                    entity.Path = string.Concat(parent.Path, ",", entity.Id);
+                    entity.Level = parent.Level + 1;
+                    entity.SortOrder = GetNewChildSortOrder(entity.ParentId, 0);
+                }
             }
 
             // create the dto
@@ -328,26 +333,25 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             nodeDto.ValidatePathWithException();
             Database.Update(nodeDto);
 
-            // update the content dto
-            Database.Update(dto.ContentDto);
+            if (!isMoving)
+            {
+                // update the content dto
+                Database.Update(dto.ContentDto);
 
-            // update the content & media version dtos
-            var contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
-            var mediaVersionDto = dto.MediaVersionDto;
-            contentVersionDto.Current = true;
-            Database.Update(contentVersionDto);
-            Database.Update(mediaVersionDto);
+                // update the content & media version dtos
+                var contentVersionDto = dto.MediaVersionDto.ContentVersionDto;
+                var mediaVersionDto = dto.MediaVersionDto;
+                contentVersionDto.Current = true;
+                Database.Update(contentVersionDto);
+                Database.Update(mediaVersionDto);
 
-            // replace the property data
-            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == media.VersionId);
-            Database.Execute(deletePropertyDataSql);
-            var propertyDataDtos = PropertyFactory.BuildDtos(media.ContentType.Variations, media.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+                // replace the property data
+                ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
-            SetEntityTags(entity, _tagRepository);
+                SetEntityTags(entity, _tagRepository);
 
-            PersistRelations(entity);
+                PersistRelations(entity);
+            }
 
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
 
@@ -366,6 +370,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Recycle Bin
 
         public override int RecycleBinId => Constants.System.RecycleBinMedia;
+
+        public bool RecycleBinSmells()
+        {
+            var cache = _cache.RuntimeCache;
+            var cacheKey = CacheKeys.MediaRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
 
         #endregion
 
@@ -495,10 +508,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Models.Media) cached;
+                        content[i] = (Models.Media)cached;
                         continue;
                     }
                 }

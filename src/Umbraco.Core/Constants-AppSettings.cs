@@ -44,6 +44,11 @@ namespace Umbraco.Core
             public const string Path = "Umbraco.Core.Path";
 
             /// <summary>
+            /// Gets the path to umbraco's icons directory (/umbraco/assets/icons by default).
+            /// </summary>
+            public const string IconsPath = "Umbraco.Icons.Path";
+
+            /// <summary>
             /// Gets the path to the css directory (/css by default).
             /// </summary>
             public const string CssPath = "umbracoCssPath";
@@ -59,7 +64,7 @@ namespace Umbraco.Core
             public const string MediaPath = "umbracoMediaPath";
 
             /// <summary>
-            /// The reserved urls from web.config.
+            /// The reserved URLs from web.config.
             /// </summary>
             public const string ReservedUrls = "Umbraco.Core.ReservedUrls";
 
@@ -96,7 +101,7 @@ namespace Umbraco.Core
             public const string DefaultUILanguage = "Umbraco.Core.DefaultUILanguage";
 
             /// <summary>
-            /// A true/false value indicating whether umbraco should hide top level nodes from generated urls.
+            /// A true/false value indicating whether umbraco should hide top level nodes from generated URLs.
             /// </summary>
             public const string HideTopLevelNodeFromPath = "Umbraco.Core.HideTopLevelNodeFromPath";
 
@@ -104,6 +109,16 @@ namespace Umbraco.Core
             /// A true or false indicating whether umbraco should force a secure (https) connection to the backoffice.
             /// </summary>
             public const string UseHttps = "Umbraco.Core.UseHttps";
+
+            /// <summary>
+            /// A true/false value indicating whether the content dashboard should be visible for all user groups.
+            /// </summary>
+            public const string AllowContentDashboardAccessToAllUsers = "Umbraco.Core.AllowContentDashboardAccessToAllUsers";
+
+            /// <summary>
+            /// The path to use when constructing the URL for retrieving data for the content dashboard.
+            /// </summary>
+            public const string ContentDashboardPath = "Umbraco.Core.ContentDashboardPath";
 
             /// <summary>
             /// TODO: FILL ME IN
@@ -135,6 +150,16 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string DatabaseFactoryServerVersion = "Umbraco.Core.Debug.DatabaseFactoryServerVersion";
             }
+
+            /// <summary>
+            /// An int value representing the time in milliseconds to lock the database for a write operation
+            /// </summary>
+            public const string SqlWriteLockTimeOut = "Umbraco.Core.SqlWriteLockTimeOut";
+
+            /// <summary>
+            /// Returns true if TinyMCE scripting sanitization should be applied
+            /// </summary>
+            public const string SanitizeTinyMce = "Umbraco.Web.SanitizeTinyMce";
         }
     }
 }

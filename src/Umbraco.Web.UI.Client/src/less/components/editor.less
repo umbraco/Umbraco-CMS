@@ -73,6 +73,11 @@
     height: @editorHeaderHeight;
 }
 
+.umb-editor-header .umb-button__button[disabled] {
+    // do not dim down the background color of disabled buttons in the header
+    background-color: unset;
+}
+
 .umb-editor-header__back {
     background: transparent;
     border: 0;
@@ -99,7 +104,7 @@
 }
 
 .-split-view-active .umb-editor-header__name-and-description {
-    margin-right: 0;
+	margin-right: 0;
 }
 
 .umb-editor-header__name-wrapper ng-form {
@@ -135,22 +140,19 @@ input.umb-editor-header__name-input:disabled {
 	margin-left: auto;
 }
 
-a.umb-editor-header__close-split-view {
-    
+.umb-editor-header__close-split-view {
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     height: 69px;
     width: 69px;
-    
-	font-size: 20px;
-	color: @gray-6;
-	text-decoration: none !important;
-}
+    font-size: 20px;
+    color: @gray-6;
 
-a.umb-editor-header__close-split-view:hover {
-	color: @black;
+    &:hover {
+        color: @black;
+    }
 }
 
 .umb-editor-header {
@@ -162,164 +164,30 @@ a.umb-editor-header__close-split-view:hover {
     }
 }
 
-/* variant switcher */
-.umb-variant-switcher__toggle {
-    position: relative;
-	display: flex;
-	align-items: center;
-	padding: 0 10px; 
-    margin: 1px 1px;
-    right: 0;
-    height: 30px;
-	text-decoration: none !important;
-	font-size: 13px;
-    color: @ui-action-discreet-type;
-    background: transparent;
-    border: none;
-    
-    max-width: 50%;
-    white-space: nowrap;
-    
-    user-select: none;
-    
-    span {
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-}
+// Tab bar
+.umb-editor-tab-bar {
+	position: sticky;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 90;
+	margin: -20px -20px 20px -20px;
+	padding: 0 20px;
+	background: @white;
+	box-shadow: 1px 1px 0 @gray-9;
 
-button.umb-variant-switcher__toggle {
-	transition: color 0.2s ease-in-out;
-	&:hover {
-		//background-color: @gray-10;
-        color: @ui-action-discreet-type-hover;
-        .umb-variant-switcher__expand {
-            color: @ui-action-discreet-type-hover;
-        }
+	.umb-tabs-nav {
+		border-bottom: none;
 	}
-    
-    &.--error {
-        &::before {
-            content: '!';
-            position: absolute;
-            top: -8px;
-            right: -10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-            background-color: @errorBackground;
-            color: @errorText;
-        }
-    }
-}
 
-.umb-variant-switcher__expand {
-    color: @ui-action-discreet-type;
-	margin-top: 3px;
-	margin-left: 5px;
-	margin-right: -5px;
-    transition: color 0.2s ease-in-out;
-}
-
-.umb-variant-switcher__item {
-	display: flex;
-    justify-content: space-between;
-	align-items: center;
-	border-bottom: 1px solid @gray-9;
-    position: relative;
-}
-
-.umb-variant-switcher__item:last-child {
-	border-bottom: none;
-}
-
-.umb-variant-switcher__item.--current {
-    color: @ui-light-active-type;
-}
-.umb-variant-switcher__item.--current .umb-variant-switcher__name-wrapper {
-	border-left: 4px solid @ui-active;
-}
-
-.umb-variant-switcher__item:hover {
-	outline: none;
-}
-
-.umb-variant-switcher__item.--not-allowed:not(.--current) .umb-variant-switcher__name-wrapper:hover {
-	//background-color: @white !important;
-	cursor: default;
-}
-
-.umb-variant-switcher__item:hover .umb-variant-switcher__split-view {
-	display: block;
-	cursor: pointer;
-}
-
-.umb-variant-switcher__item.--error {
-    .umb-variant-switcher__name {
-        color: @red;
-        &::after {
-            content: '!';
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 5px;
-            top: -3px;
-            width: 14px;
-            height: 14px;
-            border-radius: 7px;
-            font-size: 8px;
-            text-align: center;
-            font-weight: bold;
-            background-color: @errorBackground;
-            color: @errorText;
-        }
-    }
-}
-
-.umb-variant-switcher__name-wrapper {
-	font-size: 14px;
-	flex: 1;
-	cursor: pointer;
-	padding-top: 6px !important;
-    padding-bottom: 6px !important;
-    background-color: transparent;
-    border: none;
-    border-left: 2px solid transparent;
-}
-
-.umb-variant-switcher__name {
-	display: block;
-}
-
-.umb-variant-switcher__state {
-	font-size: 13px;
-	color: @gray-4;
-}
-
-.umb-variant-switcher__split-view {
-    font-size: 13px;
-    display: none;
-    padding: 16px 20px;
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background-color: @white;
-
-    &:hover {
-        background-color: @ui-option-hover;
-        color: @ui-option-type-hover;
-    }
+	.umb-tab {
+		button {
+			padding: 15px 20px;
+		}
+	}
 }
 
 // container
-
 .umb-editor-container {
 	position: absolute;
 	top: @editorHeaderHeight;

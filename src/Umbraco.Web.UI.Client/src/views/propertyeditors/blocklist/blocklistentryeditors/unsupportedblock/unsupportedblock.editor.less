@@ -1,0 +1,46 @@
+.blockelement-unsupportedblock-editor {
+    position: relative;
+    display: block;
+    box-sizing: border-box;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    width: 100%;
+    border: 1px solid @gray-9;
+    border-radius: @baseBorderRadius;
+
+    > .__header {
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+        padding-bottom: 2px;
+        min-height: 48px;
+        border-bottom: 1px solid @gray-9;    
+        background-color: @gray-11;
+        color: @gray-6;
+        
+        .icon {
+            font-size: 22px;
+            margin-right: 5px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        span {
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+
+    > .__body {
+        padding: 20px;
+        background-color: @gray-11;
+
+        a {
+            text-decoration: underline;
+            color: @ui-action-type;
+
+            &:hover {
+                color: @ui-action-type-hover;
+            }
+        }
+    }
+}

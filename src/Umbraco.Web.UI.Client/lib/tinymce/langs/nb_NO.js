@@ -150,7 +150,7 @@ tinymce.addI18n('nb_NO',{
 "Insert link": "Sett inn lenke",
 "Insert\/edit link": "Sett inn\/endre lenke",
 "Text to display": "Tekst som skal vises",
-"Url": "Url",
+"Url": "URL",
 "Target": "M\u00e5l",
 "None": "Ingen",
 "New window": "Nytt vindu",

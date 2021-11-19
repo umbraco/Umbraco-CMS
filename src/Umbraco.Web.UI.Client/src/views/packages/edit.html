@@ -19,10 +19,10 @@
 
                 <div class="umb-expansion-panel">
 
-                    <div class="umb-expansion-panel__header" ng-click="vm.propertiesOpen = !vm.propertiesOpen">
-                        <div><localize key="packager_packageProperties">Package Properties</localize></div>
-                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.propertiesOpen, 'icon-navigation-up': vm.propertiesOpen}">&nbsp;</ins>
-                    </div>
+                    <button type="button" aria-expanded="{{vm.propertiesOpen}}" class="btn-reset umb-expansion-panel__header" ng-click="vm.propertiesOpen = !vm.propertiesOpen">
+                        <span><localize key="packager_packageProperties">Package Properties</localize></span>
+                        <umb-icon icon="{{vm.propertiesOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand"></umb-icon>
+                    </button>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.propertiesOpen">
 
@@ -103,10 +103,10 @@
 
                 <div class="umb-expansion-panel">
 
-                    <div class="umb-expansion-panel__header" ng-click="vm.contentOpen = !vm.contentOpen">
-                        <div><localize key="packager_packageContent">Package Content</localize></div>
-                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.contentOpen, 'icon-navigation-up': vm.contentOpen}">&nbsp;</ins>
-                    </div>
+                    <button type="button" aria-expanded="{{vm.contentOpen}}" class="btn-reset umb-expansion-panel__header" ng-click="vm.contentOpen = !vm.contentOpen">
+                        <span><localize key="packager_packageContent">Package Content</localize></span>
+                        <umb-icon icon="{{vm.contentOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand"></umb-icon>
+                    </button>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.contentOpen">
 
@@ -122,73 +122,81 @@
                                 on-remove="vm.removeContentItem()">
                             </umb-node-preview>
 
-                            <a href=""
-                                ng-if="!vm.package.contentNodeId"
-                                style="margin-bottom: 10px;"
-                                class="umb-node-preview-add"
-                                ng-click="vm.openContentPicker()"
-                                prevent-default>
+                            <button type="button"
+                                    ng-if="!vm.package.contentNodeId"
+                                    style="margin-bottom: 10px;"
+                                    class="umb-node-preview-add"
+                                    ng-click="vm.openContentPicker()">
                                 <localize key="general_add">Add</localize>
-                            </a>
+                            </button>
 
-                                <umb-checkbox model="vm.package.contentLoadChildNodes"
+                            <umb-checkbox model="vm.package.contentLoadChildNodes"
                                                 disabled="!vm.package.contentNodeId"
-                                                text="{{vm.labels.includeAllChildNodes}}" />
+                                            text="{{vm.labels.includeAllChildNodes}}">
+                            </umb-checkbox>
+
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_documentTypes">
                             <div ng-repeat="doctype in ::vm.documentTypes | orderBy:'name'">
-                                    <umb-checkbox model="doctype.selected"
+                                <umb-checkbox model="doctype.selected"
                                                   on-change="vm.selectDocumentType(doctype)"
-                                                  text="{{doctype.name}}" />
+                                                text="{{doctype.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_templates">
                             <div ng-repeat="template in ::vm.templates | orderBy:'name'">
-                                    <umb-checkbox model="template.selected"
-                                                  on-change="vm.selectTemplate(template)"
-                                                  text="{{template.name}}" />
+                                <umb-checkbox model="template.selected"
+                                              on-change="vm.selectTemplate(template)"
+                                                  text="{{template.name}}">
+                                    </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_stylesheets">
                             <div ng-repeat="stylesheet in ::vm.stylesheets | orderBy:'name'">
-                                    <umb-checkbox model="stylesheet.selected"
-                                                  on-change="vm.selectStyleSheet(stylesheet)"
-                                                  text="{{stylesheet.path}}" />
+                                <umb-checkbox model="stylesheet.selected"
+                                              on-change="vm.selectStyleSheet(stylesheet)"
+                                                  text="{{stylesheet.path}}">
+                                    </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_macros">
                             <div ng-repeat="macro in ::vm.macros | orderBy:'name'">
-                                    <umb-checkbox model="macro.selected"
+                                <umb-checkbox model="macro.selected"
                                                   on-change="vm.selectMacro(macro)"
-                                                  text="{{macro.name}}" />
+                                                text="{{macro.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_languages">
                             <div ng-repeat="language in ::vm.languages | orderBy:'name'">
-                                    <umb-checkbox model="language.selected"
+                                <umb-checkbox model="language.selected"
                                                   on-change="vm.selectLanguage(language)"
-                                                  text="{{language.name}}" />
+                                                text="{{language.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_dictionary">
                             <div ng-repeat="dictionaryItem in ::vm.dictionaryItems | orderBy:'name'">
-                                    <umb-checkbox model="dictionaryItem.selected"
+                                <umb-checkbox model="dictionaryItem.selected"
                                                   on-change="vm.selectDictionaryItem(dictionaryItem)"
-                                                  text="{{dictionaryItem.name}}" />
+                                                text="{{dictionaryItem.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
                         <umb-control-group label="@treeHeaders_dataTypes">
                             <div ng-repeat="dataType in ::vm.dataTypes | orderBy:'name'">
-                                    <umb-checkbox model="dataType.selected"
+                                <umb-checkbox model="dataType.selected"
                                                   on-change="vm.selectDataType(dataType)"
-                                                  text="{{dataType.name}}" />
+                                                text="{{dataType.name}}">
+                                </umb-checkbox>
                             </div>
                         </umb-control-group>
 
@@ -198,15 +206,13 @@
 
                 <div class="umb-expansion-panel">
 
-                    <div class="umb-expansion-panel__header" ng-click="vm.filesOpen = !vm.filesOpen">
-                        <div><localize key="packager_packageFiles">Package Files</localize></div>
-                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.filesOpen, 'icon-navigation-up': vm.filesOpen}">&nbsp;</ins>
-                    </div>
+                    <button type="button" aria-expanded="{{vm.filesOpen}}" class="btn-reset umb-expansion-panel__header" ng-click="vm.filesOpen = !vm.filesOpen">
+                        <span><localize key="packager_packageFiles">Package Files</localize></span>
+                        <umb-icon icon="{{vm.filesOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand"></umb-icon>
+                    </button>
 
                     <div class="umb-expansion-panel__content" ng-show="vm.filesOpen">
-                        <!--
-                        <p>Remember: .xslt and .ascx files for your macros will be added automaticly, but you will still need to add assemblies, images and script files manually to the list below.</p>
-                        -->
+
                         <umb-control-group
                             label="@packager_pathToFile"
                             description="@packager_pathToFileDescription">
@@ -220,12 +226,11 @@
                                 on-remove="vm.removeFile($index)">
                             </umb-node-preview>
 
-                            <a href=""
-                                class="umb-node-preview-add"
-                                ng-click="vm.openFilePicker()"
-                                prevent-default>
+                           <button type="button"
+                                   class="umb-node-preview-add"
+                                   ng-click="vm.openFilePicker()">
                                 <localize key="general_add">Add</localize>
-                            </a>
+                            </button>
 
                         </umb-control-group>
 
@@ -243,13 +248,12 @@
                                 on-remove="vm.removePackageView()">
                             </umb-node-preview>
 
-                            <a href=""
+                            <button type="button"
                                 ng-show="!vm.package.packageView"
                                 class="umb-node-preview-add"
-                                ng-click="vm.openViewPicker()"
-                                prevent-default>
+                                ng-click="vm.openViewPicker()">
                                 <localize key="general_add">Add</localize>
-                            </a>
+                            </button>
 
                         </umb-control-group>
                     </div>
@@ -257,19 +261,22 @@
                 </div>
 
                 <div class="umb-expansion-panel">
-                    <div class="umb-expansion-panel__header" ng-click="vm.actionsOpen = !vm.actionsOpen">
-                        <div><localize key="packager_packageActions">Package Actions</localize></div>
-                        <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !vm.actionsOpen, 'icon-navigation-up': vm.actionsOpen}">&nbsp;</ins>
-                    </div>
+                    <button type="button" aria-expanded="{{vm.actionsOpen}}" class="btn-reset umb-expansion-panel__header" ng-click="vm.actionsOpen = !vm.actionsOpen">
+                        <span><localize key="packager_packageActions">Package Actions</localize></span>
+                        <umb-icon icon="{{vm.actionsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand">&nbsp;</umb-icon>
+                    </button>
                     <div class="umb-expansion-panel__content" ng-show="vm.actionsOpen">
                         <umb-control-group
                             label="@packager_actions"
                             description="Here you can add custom installer / uninstaller events to perform certain tasks during installation and uninstallation.
                             All actions are formed as a xml node, containing data for the action to be performed.">
                             <div>
-                                <a target="_blank" ng-href="https://our.umbraco.com/documentation/Reference/Packaging/">Documentation</a>
+                                <a href="https://our.umbraco.com/documentation/Reference/Packaging/" target="_blank" rel="noopener">Documentation</a>
                                 <div>
-                                    <textarea class="umb-property-editor" rows="10" ng-model="vm.package.actions"></textarea>
+                                    <div data-element="package-actions"
+                                         umb-ace-editor="vm.aceOption"
+                                         model="vm.package.actions">
+                                    </div>
                                 </div>
                             </div>
                         </umb-control-group>

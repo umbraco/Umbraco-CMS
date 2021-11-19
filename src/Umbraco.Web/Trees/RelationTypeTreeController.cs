@@ -5,6 +5,7 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Actions;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Trees
 {
@@ -16,8 +17,6 @@ namespace Umbraco.Web.Trees
     {
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            //TODO: Do not allow deleting built in types
-
             var menu = new MenuItemCollection();
 
             if (id == Constants.System.RootString)
@@ -34,7 +33,10 @@ namespace Umbraco.Web.Trees
             var relationType = Services.RelationService.GetRelationTypeById(int.Parse(id));
             if (relationType == null) return new MenuItemCollection();
 
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.ActionAlias));
+            if (relationType.IsSystemRelationType() == false)
+            {
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.ActionAlias));
+            }
 
             return menu;
         }

@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../config');
-const {watch, parallel, dest, src} = require('gulp');
+const {watch, series, parallel, dest, src} = require('gulp');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
@@ -9,9 +9,7 @@ var MergeStream = require('merge-stream');
 var processJs = require('../util/processJs');
 var processLess = require('../util/processLess');
 
-//const { less } = require('./less');
-//const { views } = require('./views');
-
+var {js} = require('./js');
 
 function watchTask(cb) {
     
@@ -35,11 +33,14 @@ function watchTask(cb) {
     var viewWatcher;
     _.forEach(config.sources.views, function (group) {
         if(group.watch !== false) {
-            viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval });
-            viewWatcher.on('change', function(path, stats) {
-                console.log("copying " + group.files + " to " + config.root + config.targets.views + group.folder);
-                src(group.files).pipe( dest(config.root + config.targets.views + group.folder) );
-            });
+            viewWatcher = watch(group.files, { ignoreInitial: true, interval: watchInterval }, 
+                parallel(
+                    function MoveViewsAndRegenerateJS() {
+                        return src(group.files).pipe( dest(config.root + config.targets.views + group.folder) );
+                    }, 
+                    js
+                )
+            );
         }
     });
     

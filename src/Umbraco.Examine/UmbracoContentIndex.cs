@@ -11,17 +11,17 @@ using Lucene.Net.Store;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Examine.LuceneEngine;
-
+using Examine.Search;
 namespace Umbraco.Examine
 {
     /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
-    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
+    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex2
     {
         public const string VariesByCultureFieldName = SpecialFieldPrefix + "VariesByCulture";
         protected ILocalizationService LanguageService { get; }
-
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
         #region Constructors
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Umbraco.Examine
         /// <param name="onComplete"></param>
         protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
         {
-            //We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
+            // We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
             // The Invalid items will be deleted, these are items that have invalid paths (i.e. moved to the recycle bin, etc...)
             // Then we'll index the Value group all together.
             // We return 0 or 1 here so we can order the results and do the invalid first and then the valid.
@@ -80,7 +80,7 @@ namespace Umbraco.Examine
                         || !validator.ValidateProtectedContent(path, v.Category))
                     ? 0
                     : 1;
-            });
+            }).ToList();
 
             var hasDeletes = false;
             var hasUpdates = false;
@@ -99,7 +99,7 @@ namespace Umbraco.Examine
                 {
                     hasUpdates = true;
                     //these are the valid ones, so just index them all at once
-                    base.PerformIndexItems(group, onComplete);
+                    base.PerformIndexItems(group.ToList(), onComplete);
                 }
             }
 
@@ -131,9 +131,10 @@ namespace Umbraco.Examine
                 var searcher = GetSearcher();
                 var c = searcher.CreateQuery();
                 var filtered = c.NativeQuery(rawQuery);
-                var results = filtered.Execute();
 
-                ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+                var selectedFields = filtered.SelectFields(_idOnlyFieldSet);
+                var results = selectedFields.Execute();
+                ProfilingLogger.Debug<string, long>(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
                 //need to queue a delete item for each one found
                 QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));

@@ -1,7 +1,11 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
+using System.IO;
 using System.Threading;
 using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Runtime;
 using Umbraco.Web.Runtime;
@@ -17,16 +21,73 @@ namespace Umbraco.Web
         {
             var logger = SerilogLogger.CreateWithDefaultConfiguration();
 
+            var runtime = new WebRuntime(this, logger, GetMainDom(logger));
+
+            return runtime;
+        }
+
+        protected override void OnApplicationError(object sender, EventArgs evargs)
+        {
+            base.OnApplicationError(sender, evargs);
+
+            // if the exception is a BootFailedException we want to show a custom 500 page
+            if (Server.GetLastError() is BootFailedException)
+            {
+                // if the requested file exists on disk, clear the error and return
+                // this is needed to serve static files
+                if (File.Exists(Request.PhysicalPath))
+                {
+                    Server.ClearError();
+                    return;
+                }
+
+                // if the application is in debug mode we don't want to show the custom 500 page
+                if (Context.IsDebuggingEnabled) return;
+
+                // find the error file to show
+                var fileName = GetBootErrorFileName();
+
+                // if the file doesn't exist we return and a YSOD will be shown
+                if (File.Exists(fileName) == false) return;
+
+                Response.TrySkipIisCustomErrors = true;
+                Server.ClearError();
+                Response.Clear();
+
+                Response.StatusCode = 500;
+                Response.ContentType = "text/html";
+                Response.WriteFile(fileName);
+
+                CompleteRequest();
+            }
+        }
+
+        /// <summary>
+        /// Returns the absolute filename to the BootException html file.
+        /// </summary>
+        protected virtual string GetBootErrorFileName()
+        {
+            var fileName = Server.MapPath("~/config/errors/BootFailed.html");
+            if (File.Exists(fileName)) return fileName;
+
+            return Server.MapPath("~/umbraco/views/errors/BootFailed.html");
+        }
+
+        /// <summary>
+        /// Returns a new MainDom
+        /// </summary>
+        protected virtual IMainDom GetMainDom(ILogger logger)
+        {
             // Determine if we should use the sql main dom or the default
             var appSettingMainDomLock = ConfigurationManager.AppSettings[Constants.AppSettings.MainDomLock];
+
+            // TODO: Can we automatically and consistently determine we're running on Azure without this app setting?
 
             var mainDomLock = appSettingMainDomLock == "SqlMainDomLock"
                 ? (IMainDomLock)new SqlMainDomLock(logger)
                 : new MainDomSemaphoreLock(logger);
-            
-            var runtime = new WebRuntime(this, logger, new MainDom(logger, mainDomLock));
 
-            return runtime;
+            return new MainDom(logger, mainDomLock);
         }
 
         /// <summary>

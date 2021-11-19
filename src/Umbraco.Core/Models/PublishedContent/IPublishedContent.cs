@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models.PublishedContent
         string Name { get; }
 
         /// <summary>
-        /// Gets the url segment of the content item for the current culture.
+        /// Gets the URL segment of the content item for the current culture.
         /// </summary>
         string UrlSegment { get; }
 
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Models.PublishedContent
         DateTime UpdateDate { get; }
 
         /// <summary>
-        /// Gets the url of the content item for the current culture.
+        /// Gets the URL of the content item for the current culture.
         /// </summary>
         /// <remarks>
         /// <para>The value of this property is contextual. It depends on the 'current' request uri,

@@ -54,10 +54,13 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
         });
 
         // load references when the 'relations' tab is first activated/switched to
-        eventsService.on("app.tabChange", function (event, args) {
+        var appTabChange =  eventsService.on("app.tabChange", function (event, args) {
             if (args.alias === "relations") {
                 loadRelations();
             }
+        });
+        $scope.$on('$destroy', function () {
+            appTabChange();
         });
 
         // Inital page/overview API call of relation type
@@ -102,7 +105,7 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
     function formatDates(relations) {
         if (relations) {
             userService.getCurrentUser().then(function (currentUser) {
-                angular.forEach(relations, function (relation) {
+                relations.forEach(function (relation) {
                     relation.timestampFormatted = dateHelper.getLocalDate(relation.createDate, currentUser.locale, 'LLL');
                 });
             });
@@ -116,12 +119,13 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
             vm.page.saveButtonState = "busy";
 
             relationTypeResource.save(vm.relationType).then(function (data) {
-                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                formHelper.resetForm({ scope: $scope });
                 bindRelationType(data);
 
                 vm.page.saveButtonState = "success";
 
             }, function (error) {
+                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 contentEditingHelper.handleSaveError({
                     err: error
                 });

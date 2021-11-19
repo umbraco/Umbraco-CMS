@@ -13,6 +13,9 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("editor", "Editor", "views/propertyeditors/rte/rte.prevalues.html", HideLabel = true)]
         public JObject Editor { get; set; }
 
+        [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay (link picker).")]
+        public string OverlaySize { get; set; }
+
         [ConfigurationField("hideLabel", "Hide Label", "boolean")]
         public bool HideLabel { get; set; }
 

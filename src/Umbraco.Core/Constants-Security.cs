@@ -25,7 +25,7 @@ namespace Umbraco.Core
             /// <summary>
             /// The name of the 'unknown' user.
             /// </summary>
-            public const string UnknownUserName = "SYTEM";
+            public const string UnknownUserName = "SYSTEM";
 
             public const string AdminGroupAlias = "admin";
             public const string EditorGroupAlias = "editor";
@@ -55,6 +55,8 @@ namespace Umbraco.Core
             public const string StartMediaNodeIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/startmedianode";
             public const string AllowedApplicationsClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/allowedapp";
             public const string SessionIdClaimType = "http://umbraco.org/2015/02/identity/claims/backoffice/sessionid";
+
+            public const string BackOfficeExternalLoginOptionsProperty = "UmbracoBackOfficeExternalLoginOptions";
 
         }
     }

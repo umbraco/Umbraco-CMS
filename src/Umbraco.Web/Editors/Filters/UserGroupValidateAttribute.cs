@@ -58,13 +58,9 @@ namespace Umbraco.Web.Editors.Filters
                         return;
                     }
 
-                    //map the model to the persisted instance
-                    Mapper.Map(userGroupSave, persisted);
                     break;
                 case ContentSaveAction.SaveNew:
-                    //create the persisted model from mapping the saved model
-                    persisted = Mapper.Map<IUserGroup>(userGroupSave);
-                    ((UserGroup)persisted).ResetIdentity();
+                    persisted = new UserGroup();
                     break;
                 default:
                     actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new ArgumentOutOfRangeException());

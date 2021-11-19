@@ -1,13 +1,16 @@
 .umb-validation-label {
     position: absolute;
-    top: 27px;
-    min-width: 100px;
-    max-width: 200px;
-    padding: 1px 5px;
+    z-index: 1;
+    min-width: 80px;
+    max-width: 260px;
+    padding: 2px 6px;
     background: @red;
     color: @white;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 1.5em;
+    border-radius: @baseBorderRadius;
+    pointer-events: none;
+    user-select: none;
 }
 
 .umb-validation-label:after {
@@ -54,14 +57,22 @@
     top: 50%;
     left: auto;
     bottom: auto;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-    border-color: rgba(255, 255, 255, 0);
+    border-color: transparent;
     border-right-color: @red;
-    border-width: 4px;
     margin-top: -4px;
+}
+
+
+.umb-validation-label.-arrow-bottom {
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+
+.umb-validation-label.-arrow-bottom:after {
+    right: auto;
+    top: 100%;
+    left: 20px;
+    bottom: auto;
+    border-color: transparent;
+    border-top-color: @red;
 }

@@ -3,6 +3,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
+
     /// <summary>
     /// Represents the configuration for the nested content value editor.
     /// </summary>

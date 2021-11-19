@@ -18,9 +18,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="(key, val) in model.searchResultValues track by key">
+                            <tr ng-repeat="(key, values) in model.searchResultValues track by key">
                                 <td>{{key}}</td>
-                                <td style="word-break: break-word;">{{val}}</td>
+                                <td style="word-break: break-word;">{{ ::values | umbCmsJoinArray:', '}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -33,6 +33,7 @@
                     type="button"
                     button-style="link"
                     label-key="general_close"
+                    shortcut="esc"
                     action="model.close()">
                 </umb-button>
             </umb-editor-footer-content-right>

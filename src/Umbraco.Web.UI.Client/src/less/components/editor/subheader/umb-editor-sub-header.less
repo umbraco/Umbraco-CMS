@@ -5,7 +5,7 @@
    border-right: 5px solid @brownGrayLight;
    display: flex;
    justify-content: space-between;
-   margin: -10px -5px 10px;
+   margin: -10px -1px 10px;
    position: relative;
    top: 0;
    box-sizing: border-box;
@@ -34,6 +34,7 @@
     transition: box-shadow 240ms;
     position:sticky;
     z-index: 30;
+    width: calc(100% + 2px);
 
     &.umb-sticky-bar--active {
         box-shadow: 0 6px 3px -3px rgba(0,0,0,.16);
@@ -50,7 +51,6 @@
 
     &.-top {
         height:1px;
-        transform:translateY(-10px);
     }
 }
 

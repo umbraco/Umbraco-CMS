@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Configuration
 {
-    internal class CoreDebug
+    internal class CoreDebug : ICoreDebug
     {
         public CoreDebug()
         {

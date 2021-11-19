@@ -11,6 +11,19 @@
             scope.allowChangeMemberType = false;
 
             function onInit() {
+                
+                userService.getCurrentUser().then(function (user) {
+                    // only allow change of member type if user has access to the settings sections
+                    Utilities.forEach(user.sections, function (section) {
+                        if (section.alias === "settings") {
+                            scope.allowChangeMemberType = true;
+                        }
+                    });
+                });
+
+                // get member type details
+                scope.memberType = scope.node.contentType;
+
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
             }

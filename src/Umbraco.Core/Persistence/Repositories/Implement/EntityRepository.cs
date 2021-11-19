@@ -281,7 +281,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (v == null) return entitiesList;
 
             // fetch all variant info dtos
-            var dtos = Database.FetchByGroups<VariantInfoDto, int>(v.Select(x => x.Id), 2000, GetVariantInfos);
+            var dtos = Database.FetchByGroups<VariantInfoDto, int>(v.Select(x => x.Id), Constants.Sql.MaxParameterCount, GetVariantInfos);
 
             // group by node id (each group contains all languages)
             var xdtos = dtos.GroupBy(x => x.NodeId).ToDictionary(x => x.Key, x => x);
@@ -369,7 +369,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 if (isContent || isMedia || isMember)
                     sql
-                        .AndSelect<ContentVersionDto>(x => Alias(x.Id, "versionId"))
+                        .AndSelect<ContentVersionDto>(x => Alias(x.Id, "versionId"), x=>x.VersionDate)
                         .AndSelect<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer, x => x.Variations);
 
                 if (isContent)
@@ -490,7 +490,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (isContent || isMedia || isMember)
                 sql
-                    .AndBy<ContentVersionDto>(x => x.Id)
+                    .AndBy<ContentVersionDto>(x => x.Id, x => x.VersionDate)
                     .AndBy<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer, x => x.Variations);
 
             if (defaultSort)
@@ -594,6 +594,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public string Text { get; set; }
             public Guid NodeObjectType { get; set; }
             public DateTime CreateDate { get; set; }
+            public DateTime VersionDate { get; set; }
             public int Children { get; set; }
             public int VersionId { get; set; }
             public string Alias { get; set; }
@@ -627,6 +628,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             entity.Trashed = dto.Trashed;
             entity.CreateDate = dto.CreateDate;
+            entity.UpdateDate = dto.VersionDate;
             entity.CreatorId = dto.UserId ?? Constants.Security.UnknownUserId;
             entity.Id = dto.NodeId;
             entity.Key = dto.UniqueId;

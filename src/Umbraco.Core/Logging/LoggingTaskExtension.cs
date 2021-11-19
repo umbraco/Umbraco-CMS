@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Umbraco.Core.Logging
@@ -14,7 +15,12 @@ namespace Umbraco.Core.Logging
         /// </summary>
         public static Task LogErrors(this Task task, Action<string, Exception> logMethod)
         {
-            return task.ContinueWith(t => LogErrorsInner(t, logMethod), TaskContinuationOptions.OnlyOnFaulted);
+            return task.ContinueWith(
+                t => LogErrorsInner(t, logMethod),
+                CancellationToken.None,
+                TaskContinuationOptions.OnlyOnFaulted,
+                // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                TaskScheduler.Default);
         }
 
         /// <summary>
@@ -26,7 +32,10 @@ namespace Umbraco.Core.Logging
         /// </summary>
         public static Task LogErrorsWaitable(this Task task, Action<string, Exception> logMethod)
         {
-            return task.ContinueWith(t => LogErrorsInner(t, logMethod));
+            return task.ContinueWith(
+                t => LogErrorsInner(t, logMethod),
+                // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                TaskScheduler.Default);
         }
 
         private static void LogErrorsInner(Task task, Action<string, Exception> logAction)

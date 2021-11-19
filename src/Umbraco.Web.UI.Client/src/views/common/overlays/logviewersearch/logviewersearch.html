@@ -1,11 +1,11 @@
 <div>
     <p>
         <strong>Query:</strong><br/>
-        {{ model.query }}
+        {{model.query}}
     </p>
 
     <p>
-        <strong>Name:</strong><br/>
-        <input style="width: 100%" ng-model="model.name" type="text" name="queryName" ng-change="model.disableSubmitButton = model.name.length === 0"/>
+        <strong><localize key="general_name">Name</localize>:</strong><br />
+        <input type="text" class="-full-width-input" ng-model="model.queryName" name="queryName" ng-change="model.disableSubmitButton = model.name.length === 0" />
     </p>
 </div>

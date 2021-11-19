@@ -47,7 +47,7 @@ namespace Umbraco.Web.Templates
             if (!preview)
                 return EnsureInternalLinks(text);
 
-            using (_umbracoContextAccessor.UmbracoContext.ForcedPreview(preview)) // force for url provider
+            using (_umbracoContextAccessor.UmbracoContext.ForcedPreview(preview)) // force for URL provider
             {
                 return EnsureInternalLinks(text);
             }

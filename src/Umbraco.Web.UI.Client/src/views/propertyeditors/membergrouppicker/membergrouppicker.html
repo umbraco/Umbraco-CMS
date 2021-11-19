@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.MemberGroupPickerController" class="umb-property-editor umb-membergrouppicker">
+<div ng-controller="Umbraco.PropertyEditors.MemberGroupPickerController as vm" class="umb-property-editor umb-membergrouppicker">
 
 	<div ng-model="renderModel">
 		<umb-node-preview
@@ -6,18 +6,18 @@
 			icon="node.icon"
 			name="node.name"
 			allow-remove="allowRemove"
-			on-remove="remove($index)">
+			on-remove="vm.remove($index)">
 		</umb-node-preview>
 	</div>
 
-	<a 
-		class="umb-node-preview-add" 
-		href="#"
-		ng-click="openMemberGroupPicker()"
-		prevent-default>
+	<button type="button"
+            class="umb-node-preview-add"
+            ng-click="vm.openMemberGroupPicker()">
 		<localize key="general_add">Add</localize>
-	</a>
+	</button>
 
-    <input type="hidden" name="mandatory" ng-model="model.mandatory" ng-required="model.validation.mandatory && !renderModel.length" />
+	<ng-form name="modelValueForm">
+		<input type="hidden" name="modelValue" ng-model="renderModel.length" ng-required="model.validation.mandatory && !renderModel.length" />
+	</ng-form>
 
 </div>

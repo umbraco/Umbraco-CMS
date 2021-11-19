@@ -142,7 +142,7 @@ namespace Umbraco.Web.Editors
                 //need to create a specific content result formatted as HTML since this controller has been configured
                 //with only json formatters.
                 result.Content = new StringContent(
-                    _componentRenderer.RenderMacro(pageId, m.Alias, macroParams).ToString(),
+                    _componentRenderer.RenderMacroForContent(publishedContent, m.Alias, macroParams).ToString(),
                     Encoding.UTF8,
                     "text/html");
 

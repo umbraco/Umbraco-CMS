@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -20,9 +21,17 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "defaultTemplate")]
         public EntityBasic DefaultTemplate { get; set; }
-        
+
         [DataMember(Name = "allowCultureVariant")]
         public bool AllowCultureVariant { get; set; }
 
+        [DataMember(Name = "allowSegmentVariant")]
+        public bool AllowSegmentVariant { get; set; }
+
+        [DataMember(Name = "apps")]
+        public IEnumerable<ContentApp> ContentApps { get; set; }
+
+        [DataMember(Name = "historyCleanup")]
+        public HistoryCleanupViewModel HistoryCleanup { get; set; }
     }
 }

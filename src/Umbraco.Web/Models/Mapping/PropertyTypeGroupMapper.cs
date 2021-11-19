@@ -70,45 +70,50 @@ namespace Umbraco.Web.Models.Mapping
             var groups = new List<PropertyGroupDisplay<TPropertyType>>();
 
             // add groups local to this content type
-            foreach (var tab in source.PropertyGroups)
+            foreach (var propertyGroup in source.PropertyGroups)
             {
                 var group = new PropertyGroupDisplay<TPropertyType>
                 {
-                    Id = tab.Id,
-                    Inherited = false,
-                    Name = tab.Name,
-                    SortOrder = tab.SortOrder,
+                    Id = propertyGroup.Id,
+                    Key = propertyGroup.Key,
+                    Type = propertyGroup.Type,
+                    Name = propertyGroup.Name,
+                    Alias = propertyGroup.Alias,
+                    SortOrder = propertyGroup.SortOrder,
+                    Properties = MapProperties(propertyGroup.PropertyTypes, source, propertyGroup.Id, false),
                     ContentTypeId = source.Id
                 };
 
-                group.Properties = MapProperties(tab.PropertyTypes, source, tab.Id, false);
                 groups.Add(group);
             }
 
             // add groups inherited through composition
             var localGroupIds = groups.Select(x => x.Id).ToArray();
-            foreach (var tab in source.CompositionPropertyGroups)
+            foreach (var propertyGroup in source.CompositionPropertyGroups)
             {
                 // skip those that are local to this content type
-                if (localGroupIds.Contains(tab.Id)) continue;
+                if (localGroupIds.Contains(propertyGroup.Id)) continue;
 
                 // get the content type that defines this group
-                var definingContentType = GetContentTypeForPropertyGroup(source, tab.Id);
+                var definingContentType = GetContentTypeForPropertyGroup(source, propertyGroup.Id);
                 if (definingContentType == null)
-                    throw new Exception("PropertyGroup with id=" + tab.Id + " was not found on any of the content type's compositions.");
+                    throw new Exception("PropertyGroup with id=" + propertyGroup.Id + " was not found on any of the content type's compositions.");
 
                 var group = new PropertyGroupDisplay<TPropertyType>
                 {
-                    Id = tab.Id,
                     Inherited = true,
-                    Name = tab.Name,
-                    SortOrder = tab.SortOrder,
+                    Id = propertyGroup.Id,
+                    Key = propertyGroup.Key,
+                    Type = propertyGroup.Type,
+                    Name = propertyGroup.Name,
+                    Alias = propertyGroup.Alias,
+                    SortOrder = propertyGroup.SortOrder,
+                    Properties = MapProperties(propertyGroup.PropertyTypes, definingContentType, propertyGroup.Id, true),
                     ContentTypeId = definingContentType.Id,
                     ParentTabContentTypes = new[] { definingContentType.Id },
                     ParentTabContentTypeNames = new[] { definingContentType.Name }
                 };
 
-                group.Properties = MapProperties(tab.PropertyTypes, definingContentType, tab.Id, true);
                 groups.Add(group);
             }
 
@@ -135,16 +140,16 @@ namespace Umbraco.Web.Models.Mapping
             // if there are any generic properties, add the corresponding tab
             if (genericProperties.Any())
             {
-                var genericTab = new PropertyGroupDisplay<TPropertyType>
+                var genericGroup = new PropertyGroupDisplay<TPropertyType>
                 {
                     Id = PropertyGroupBasic.GenericPropertiesGroupId,
                     Name = "Generic properties",
-                    ContentTypeId = source.Id,
                     SortOrder = 999,
-                    Inherited = false,
-                    Properties = genericProperties
+                    Properties = genericProperties,
+                    ContentTypeId = source.Id
                 };
-                groups.Add(genericTab);
+
+                groups.Add(genericGroup);
             }
 
             // handle locked properties
@@ -160,33 +165,33 @@ namespace Umbraco.Web.Models.Mapping
                 property.Locked = lockedPropertyAliases.Contains(property.Alias);
             }
 
-            // now merge tabs based on names
+            // now merge tabs based on alias
             // as for one name, we might have one local tab, plus some inherited tabs
-            var groupsGroupsByName = groups.GroupBy(x => x.Name).ToArray();
+            var groupsGroupsByAlias = groups.GroupBy(x => x.Alias).ToArray();
             groups = new List<PropertyGroupDisplay<TPropertyType>>(); // start with a fresh list
-            foreach (var groupsByName in groupsGroupsByName)
+            foreach (var groupsByAlias in groupsGroupsByAlias)
             {
                 // single group, just use it
-                if (groupsByName.Count() == 1)
+                if (groupsByAlias.Count() == 1)
                 {
-                    groups.Add(groupsByName.First());
+                    groups.Add(groupsByAlias.First());
                     continue;
                 }
 
                 // multiple groups, merge
-                var group = groupsByName.FirstOrDefault(x => x.Inherited == false) // try local
-                    ?? groupsByName.First(); // else pick one randomly
+                var group = groupsByAlias.FirstOrDefault(x => x.Inherited == false) // try local
+                    ?? groupsByAlias.First(); // else pick one randomly
                 groups.Add(group);
 
                 // in case we use the local one, flag as inherited
-                group.Inherited = true;
+                group.Inherited = true; // TODO Remove to allow changing sort order of the local one (and use the inherited group order below)
 
                 // merge (and sort) properties
-                var properties = groupsByName.SelectMany(x => x.Properties).OrderBy(x => x.SortOrder).ToArray();
+                var properties = groupsByAlias.SelectMany(x => x.Properties).OrderBy(x => x.SortOrder).ToArray();
                 group.Properties = properties;
 
                 // collect parent group info
-                var parentGroups = groupsByName.Where(x => x.ContentTypeId != source.Id).ToArray();
+                var parentGroups = groupsByAlias.Where(x => x.ContentTypeId != source.Id).ToArray();
                 group.ParentTabContentTypes = parentGroups.SelectMany(x => x.ParentTabContentTypes).ToArray();
                 group.ParentTabContentTypeNames = parentGroups.SelectMany(x => x.ParentTabContentTypeNames).ToArray();
             }
@@ -222,6 +227,7 @@ namespace Umbraco.Web.Models.Mapping
                     Id = p.Id,
                     Alias = p.Alias,
                     Description = p.Description,
+                    LabelOnTop = p.LabelOnTop,
                     Editor = p.PropertyEditorAlias,
                     Validation = new PropertyTypeValidation
                         {
@@ -238,10 +244,13 @@ namespace Umbraco.Web.Models.Mapping
                     Inherited = inherited,
                     DataTypeId = p.DataTypeId,
                     DataTypeKey = p.DataTypeKey,
+                    DataTypeName = dataType.Name,
+                    DataTypeIcon = propertyEditor.Icon,
                     SortOrder = p.SortOrder,
                     ContentTypeId = contentType.Id,
                     ContentTypeName = contentType.Name,
-                    AllowCultureVariant = p.VariesByCulture()
+                    AllowCultureVariant = p.VariesByCulture(),
+                    AllowSegmentVariant = p.VariesBySegment()
                 });
             }
 

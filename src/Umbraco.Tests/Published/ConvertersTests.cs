@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Published
                 yield return contentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var elementType1 = contentTypeFactory.CreateContentType(1000, "element1", CreatePropertyTypes);
+            var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Published
                 => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
 
             public Type GetPropertyValueType(IPublishedPropertyType propertyType)
-                => typeof (int);
+                => typeof(int);
 
             public PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
                 => PropertyCacheLevel.Element;
@@ -83,10 +83,10 @@ namespace Umbraco.Tests.Published
                 => int.TryParse(source as string, out int i) ? i : 0;
 
             public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-                => (int) inter;
+                => (int)inter;
 
             public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-                => ((int) inter).ToString();
+                => ((int)inter).ToString();
         }
 
         #endregion
@@ -120,11 +120,11 @@ namespace Umbraco.Tests.Published
                 yield return contentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var elementType1 = contentTypeFactory.CreateContentType(1000, "element1", CreatePropertyTypes);
+            var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", CreatePropertyTypes);
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
-            var cntType1 = contentTypeFactory.CreateContentType(1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
+            var cntType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
             var cnt1 = new SolidPublishedContent(cntType1) { Id = 1234 };
             cacheContent[cnt1.Id] = cnt1;
 
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Published
             }
 
             public bool? IsValue(object value, PropertyValueLevel level)
-                => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
+                => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string)value) == false);
 
             public bool IsConverter(IPublishedPropertyType propertyType)
                 => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
@@ -162,10 +162,10 @@ namespace Umbraco.Tests.Published
                 => int.TryParse(source as string, out int i) ? i : -1;
 
             public object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-                => _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById((int) inter);
+                => _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById((int)inter);
 
             public object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-                => ((int) inter).ToString();
+                => ((int)inter).ToString();
         }
 
         #endregion
@@ -215,10 +215,10 @@ namespace Umbraco.Tests.Published
                 yield return contentTypeFactory.CreatePropertyType(contentType, "prop" + i, i);
             }
 
-            var elementType1 = contentTypeFactory.CreateContentType(1000, "element1", t => CreatePropertyTypes(t, 1));
-            var elementType2 = contentTypeFactory.CreateContentType(1001, "element2", t => CreatePropertyTypes(t, 2));
-            var contentType1 = contentTypeFactory.CreateContentType(1002, "content1", t => CreatePropertyTypes(t, 1));
-            var contentType2 = contentTypeFactory.CreateContentType(1003, "content2", t => CreatePropertyTypes(t, 2));
+            var elementType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "element1", t => CreatePropertyTypes(t, 1));
+            var elementType2 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "element2", t => CreatePropertyTypes(t, 2));
+            var contentType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1002, "content1", t => CreatePropertyTypes(t, 1));
+            var contentType2 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1003, "content2", t => CreatePropertyTypes(t, 2));
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
             var element2 = new PublishedElement(elementType2, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
@@ -239,22 +239,22 @@ namespace Umbraco.Tests.Published
             // can get the actual property Clr type
             // ie ModelType gets properly mapped by IPublishedContentModelFactory
             // must test ModelClrType with special equals 'cos they are not ref-equals
-            Assert.IsTrue(ModelType.Equals(typeof (IEnumerable<>).MakeGenericType(ModelType.For("content1")), contentType2.GetPropertyType("prop2").ModelClrType));
-            Assert.AreEqual(typeof (IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>), contentType2.GetPropertyType("prop2").ClrType);
+            Assert.IsTrue(ModelType.Equals(typeof(IEnumerable<>).MakeGenericType(ModelType.For("content1")), contentType2.GetPropertyType("prop2").ModelClrType));
+            Assert.AreEqual(typeof(IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>), contentType2.GetPropertyType("prop2").ClrType);
 
             // can create a model for an element
             var model1 = factory.CreateModel(element1);
             Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel1>(model1);
-            Assert.AreEqual("val1", ((PublishedSnapshotTestObjects.TestElementModel1) model1).Prop1);
+            Assert.AreEqual("val1", ((PublishedSnapshotTestObjects.TestElementModel1)model1).Prop1);
 
             // can create a model for a published content
             var model2 = factory.CreateModel(element2);
             Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestElementModel2>(model2);
-            var mmodel2 = (PublishedSnapshotTestObjects.TestElementModel2) model2;
+            var mmodel2 = (PublishedSnapshotTestObjects.TestElementModel2)model2;
 
             // and get direct property
             Assert.IsInstanceOf<PublishedSnapshotTestObjects.TestContentModel1[]>(model2.Value("prop2"));
-            Assert.AreEqual(1, ((PublishedSnapshotTestObjects.TestContentModel1[]) model2.Value("prop2")).Length);
+            Assert.AreEqual(1, ((PublishedSnapshotTestObjects.TestContentModel1[])model2.Value("prop2")).Length);
 
             // and get model property
             Assert.IsInstanceOf<IEnumerable<PublishedSnapshotTestObjects.TestContentModel1>>(mmodel2.Prop2);
@@ -271,7 +271,7 @@ namespace Umbraco.Tests.Published
                 => propertyType.EditorAlias == "Umbraco.Void";
 
             public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-                => typeof (string);
+                => typeof(string);
 
             public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
                 => PropertyCacheLevel.Element;
@@ -290,7 +290,7 @@ namespace Umbraco.Tests.Published
                 => propertyType.EditorAlias == "Umbraco.Void.2";
 
             public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
-                => typeof (IEnumerable<>).MakeGenericType(ModelType.For("content1"));
+                => typeof(IEnumerable<>).MakeGenericType(ModelType.For("content1"));
 
             public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
                 => PropertyCacheLevel.Elements;
@@ -303,7 +303,7 @@ namespace Umbraco.Tests.Published
 
             public override object ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
             {
-                return ((int[]) inter).Select(x => (PublishedSnapshotTestObjects.TestContentModel1) _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(x)).ToArray();
+                return ((int[])inter).Select(x => (PublishedSnapshotTestObjects.TestContentModel1)_publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(x)).ToArray();
             }
         }
 

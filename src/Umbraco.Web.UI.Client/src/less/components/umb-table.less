@@ -55,6 +55,11 @@ input.umb-table__input {
     color: @ui-disabled-type;
 }
 
+.umb-table-head__icon {
+    position: relative;
+    top: 2px;
+}
+
 .umb-table-head__link {
     background: transparent;
     border: 0 none;
@@ -111,7 +116,7 @@ input.umb-table__input {
 .umb-table-body .umb-table-row.-selectable {
     cursor: pointer;
 }
-.umb-table-row.-selected, 
+.umb-table-row.-selected,
 .umb-table-body .umb-table-row.-selectable:hover {
     &::before {
         content: "";
@@ -164,7 +169,7 @@ input.umb-table__input {
     }
 }
 
-.umb-table-body__icon {
+.umb-table-body .umb-table-body__icon {
     margin: 0 auto;
     font-size: 20px;
     line-height: 20px;
@@ -173,7 +178,7 @@ input.umb-table__input {
     text-decoration: none;
 }
 
-.umb-table-body__checkicon {
+.umb-table-body .umb-table-body__icon.umb-table-body__checkicon {
     display: none;
     font-size: 18px;
     line-height: 20px;
@@ -218,15 +223,15 @@ input.umb-table__input {
 }
 
 // Show checkmark when checked, hide file icon
-.umb-table-row.-selected {
-    
-    .umb-table-body__fileicon {
-        display: none;
+.umb-table-body .umb-table-row.-selected {
+    .umb-table-body__icon {
+        &.umb-table-body__fileicon {
+            display: none;
+        }
+        &.umb-table-body__checkicon {
+            display: inline-block;
+        }
     }
-    .umb-table-body__checkicon {
-        display: inline-block;
-    }
-    
 }
 
 // Table Row Styles
@@ -309,8 +314,8 @@ input.umb-table__input {
 
 .umb-table__loading-overlay {
     position: absolute;
-    width: 100%; 
-    height: 100%; 
+    width: 100%;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.7);
     z-index: 1;
 }
@@ -330,7 +335,7 @@ input.umb-table__input {
 }
 
 .umb-table--condensed {
-    
+
     .umb-table-cell:first-of-type:not(.not-fixed) {
         padding-top: 10px;
         padding-bottom: 10px;

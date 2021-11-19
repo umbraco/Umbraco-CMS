@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -13,27 +14,41 @@ namespace Umbraco.Core.Models
     {
         private string _name;
         private string _alias;
-        private bool _isBidrectional;
+        private bool _isBidirectional;
         private Guid? _parentObjectType;
         private Guid? _childObjectType;
 
-        //TODO: Should we put back the broken ctors with obsolete attributes?
-
+        [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
         public RelationType(string alias, string name)
-            : this(name, alias, false, null, null)
+            : this(name: name, alias: alias, false, null, null)
         {
         }
 
         public RelationType(string name, string alias, bool isBidrectional, Guid? parentObjectType, Guid? childObjectType)
         {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
+
             _name = name;
             _alias = alias;
-            _isBidrectional = isBidrectional;
+            _isBidirectional = isBidrectional;
             _parentObjectType = parentObjectType;
             _childObjectType = childObjectType;
         }
 
+        [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
+        public RelationType(Guid childObjectType, Guid parentObjectType, string alias)
+            : this(name: alias, alias: alias, isBidrectional: false, parentObjectType: parentObjectType, childObjectType: childObjectType)
+        {   
+        }
 
+        [Obsolete("This constructor is no longer used and will be removed in future versions, use one of the other constructors instead")]
+        public RelationType(Guid childObjectType, Guid parentObjectType, string alias, string name)
+            : this(name: name, alias: alias, isBidrectional: false, parentObjectType: parentObjectType, childObjectType: childObjectType)
+        {
+        }
 
         /// <summary>
         /// Gets or sets the Name of the RelationType
@@ -61,8 +76,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public bool IsBidirectional
         {
-            get => _isBidrectional;
-            set => SetPropertyValueAndDetectChanges(value, ref _isBidrectional, nameof(IsBidirectional));
+            get => _isBidirectional;
+            set => SetPropertyValueAndDetectChanges(value, ref _isBidirectional, nameof(IsBidirectional));
         }
 
         /// <summary>

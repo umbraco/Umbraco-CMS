@@ -2,7 +2,7 @@
     position: fixed;
     overflow: hidden;
     background: @white;
-    z-index: @zindexUmbOverlay;
+    z-index: 7501;
     animation: fadeIn 0.2s;
     box-shadow: 0 10px 50px rgba(0,0,0,0.1), 0 6px 20px rgba(0,0,0,0.16);
     text-align: left;
@@ -24,16 +24,19 @@
     margin-top: 0;
     flex-grow: 0;
     flex-shrink: 0;
-    padding: 20px 20px 0;
+    padding: 30px 30px 0;
 }
 
 .umb-overlay__section-header {
     width: 100%;
     margin-top:30px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 
     h5 {
         display: inline;
+        font-size: 16px;
+        line-height: 16px;
+        font-weight: bold;
     }
 
     button {
@@ -66,7 +69,7 @@
     flex-shrink: 1;
     flex-basis: auto;
     position: relative;
-    padding: 30px;
+    padding: 20px 30px;
     background: @white;
     max-height: calc(100vh - 170px);
     overflow-y: auto;
@@ -103,7 +106,6 @@
     height: auto;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, 0);
     transform: translate(-50%, -50%);
     border-radius: @baseBorderRadius;
 }
@@ -125,10 +127,15 @@
     width: 400px;
     max-height: 100vh;
     box-sizing: border-box;
+    visibility: hidden;
     border-radius: @baseBorderRadius;
 
+    &.umb-overlay--small {
+        width: 420px;
+    }
+
     &.umb-overlay--medium {
-        width: 480px;
+        width: 520px;
     }
 }
 
@@ -259,6 +266,9 @@
 
 .umb-overlay .text-error {
     color: @formErrorText;
+}
+.umb-overlay .text-warning {
+    color: @formWarningText;
 }
 
 .umb-overlay .text-success {

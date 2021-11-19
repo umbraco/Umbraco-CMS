@@ -59,15 +59,12 @@
 
 .umb-package-link {
     display: block;
-    flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: center;
     position: relative;
     box-sizing: border-box;
     height: 100%;
     width: 100%;
     border-radius: 3px;
-    border: 0 none;
+    border: 1px solid transparent;
     text-decoration: none !important;
     transition: border-color 100ms ease;
     background-color: @white;
@@ -77,8 +74,6 @@
         border-color: @blueMid;
     }
 }
-
-
 
 // Icon
 .umb-package-icon {
@@ -94,21 +89,19 @@
     border-top-right-radius: 3px;
     border-top-left-radius: 3px;
     min-height: 60px;
-}
 
-.umb-package-icon img {
-    max-width: 70px;
-    width: 70px;
-    height: auto;
+    img {
+        max-width: 70px;
+        width: 70px;
+        height: auto;
+    }
 }
-
 
 // Info
 .umb-package-info {
     padding: 15px;
     text-align: center;
 }
-
 
 // Name
 .umb-package-name {
@@ -143,25 +136,40 @@
     justify-content: center;
     opacity: .6;
     margin-top: 10px;
+
+    small {
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .umb-icon {
+        font-size: 0.9rem;
+    }
 }
 
-.umb-package-numbers small {
-    padding: 0 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+.umb-package-link {
+    &:hover {
+        .umb-package-numbers {
+            opacity: 1;
 
-.umb-package-numbers i {
-    font-size: 14px;
-}
+            .icon-hearts {
+                color: @red !important;
+            }
+        }
+    }
 
-.umb-package-link:hover .umb-package-numbers {
-    opacity: 1;
-}
+    .umb-package-cloud {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        min-height: 1rem; // ensures vertical space is taken up even if "works on cloud" isn't visible
 
-.umb-package-link:hover .umb-package-numbers .icon-hearts {
-    color: @red !important;
+        .umb-icon {
+            color: @turquoise !important;
+            font-size: 0.9rem;
+        }
+    }
 }
 
 // Version
@@ -179,7 +187,7 @@
 
 .umb-packages-categories {
     display: flex;
-    user-select: center;
+    user-select: none;
     flex-wrap: wrap;
 }
 
@@ -285,7 +293,7 @@
     flex: 1 1 auto;
     margin-right: 20px;
     width: calc(~'100%' - ~'@{sidebarwidth}' - ~'20px'); // Make sure that the main content area doesn't gets affected by inline styling
-    min-width: 500px;
+    min-width: 480px;
 }
 
 .umb-package-details__sidebar {

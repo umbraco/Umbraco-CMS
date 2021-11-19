@@ -1,12 +1,14 @@
-﻿<div ng-controller="Umbraco.PropertyEditors.SliderController">
+﻿<div class="umb-property-editor umb-slider" ng-controller="Umbraco.PropertyEditors.SliderController">
 
-    <div style="padding-top: 50px; padding-bottom: 40px; width: 66.6%">
-        <umb-range-slider 
-            ng-model="sliderValue"
-            options="sliderOptions"
-            on-setup="setup(slider)"
-            on-change="change(values)">
-        </umb-range-slider>
-    </div>
+    <ng-form name="modelValueForm">
+        <div style="padding-top: 50px; padding-bottom: 40px;">
+            <umb-range-slider ng-model="sliderValue"
+                              options="sliderOptions"
+                              on-setup="setup(slider)"
+                              on-change="change(values)">
+            </umb-range-slider>
+        </div>
+        <input type="hidden" name="modelValue" ng-model="model.value" />
+    </ng-form>    
     
 </div>

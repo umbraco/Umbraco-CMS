@@ -1,76 +1,87 @@
 <div ng-controller="Umbraco.Editors.PartialViews.CreateController as vm" ng-cloak>
 
-    <div class="umbracoDialog umb-dialog-body with-footer">
+    <div ng-if="!vm.creatingFolder">
+        <div class="umbracoDialog umb-dialog-body with-footer">
 
-        <div class="umb-pane" ng-if="!vm.creatingFolder">
-            
-            <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
+            <div class="umb-pane">
 
-            <!-- Main options -->
-            <div ng-if="!vm.showSnippets">
-                <ul class="umb-actions umb-actions-child">
-                    <li class="umb-action">
-                        <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView()" umb-auto-focus>
-                            <i class="large icon icon-article"></i>
-                            <span class="menu-label"><localize key="create_newEmptyPartialView">New empty partial view</localize></span>
-                        </button>
-                    </li>
-                    <li class="umb-action">
-                        <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFromSnippet()">
-                            <i class="large icon icon-article"></i>
-                            <span class="menu-label"><localize key="create_newPartialViewFromSnippet">New partial view from snippet</localize>...</span>
-                        </button>
-                    </li>
-                    <li class="umb-action">
-                        <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFolder()">
-                            <i class="large icon icon-folder"></i>
-                            <span class="menu-label"><localize key="general_folder"></localize>...</span>
-                        </button>
-                    </li>
-                </ul>
-            </div>
+                <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
-            <!-- Snippets list -->
-            <div ng-if="vm.showSnippets">
-                <ul class="umb-actions umb-actions-child">
-                    <li class="umb-action" ng-repeat="snippet in vm.snippets">
-                        <button href="" class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView(snippet)" style="padding-top: 6px; padding-bottom: 6px;">
-                            <i class="icon-article icon" style="font-size: 20px;"></i>
-                            <span class="menu-label" style="margin-left: 0; padding-left: 5px;">{{ snippet.name }}</span>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-
-        </div>
-
-        <!-- Create folder -->
-        <div class="umb-pane" ng-if="vm.creatingFolder">
-            <form novalidate name="createFolderForm"
-                    ng-submit="vm.createFolder(createFolderForm)"
-                    val-form-manager>
-                
-                <div ng-show="vm.createFolderError">
-                    <div class="alert alert-error">
-                        <div>{{vm.createFolderError.data.message}}</div>
-                    </div>
+                <!-- Main options -->
+                <div ng-if="!vm.showSnippets">
+                    <ul class="umb-actions umb-actions-child">
+                        <li class="umb-action">
+                            <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView()" umb-auto-focus>
+                                <umb-icon icon="icon-article" class="icon large"></umb-icon>
+                                <span class="menu-label"><localize key="create_newEmptyPartialView">New empty partial view</localize></span>
+                            </button>
+                        </li>
+                        <li class="umb-action">
+                            <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFromSnippet()">
+                                <umb-icon icon="icon-article" class="icon large"></umb-icon>
+                                <span class="menu-label"><localize key="create_newPartialViewFromSnippet">New partial view from snippet</localize>...</span>
+                            </button>
+                        </li>
+                        <li class="umb-action">
+                            <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFolder()">
+                                <umb-icon icon="icon-folder" class="icon large"></umb-icon>
+                                <span class="menu-label"><localize key="general_folder">Folder</localize>...</span>
+                            </button>
+                        </li>
+                    </ul>
                 </div>
 
-                <umb-control-group label="@create_enterFolderName" localize="label" hide-label="false">
-                    <input type="text" name="folderName" ng-model="vm.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
-                </umb-control-group>
-
-                <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
-            </form>
+                <!-- Snippets list -->
+                <div ng-if="vm.showSnippets">
+                    <ul class="umb-actions umb-actions-child">
+                        <li class="umb-action" ng-repeat="snippet in vm.snippets">
+                            <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.createPartialView(snippet)" style="padding-top: 6px; padding-bottom: 6px;">
+                                <umb-icon icon="icon-article" class="icon large"></umb-icon>
+                                <span class="menu-label" style="margin-left: 0; padding-left: 5px;">{{ snippet.name }}</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
+        <!-- Dialog footer -->
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            <button type="button" class="btn btn-info" ng-click="vm.close()">
+                <localize key="buttons_somethingElse">Do something else</localize>
+            </button>
+        </div>
     </div>
 
-    <!-- Dialog footer -->
-    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="vm.creatingFolder">
-        <button class="btn btn-info" ng-click="vm.close()">
-            <localize key="buttons_somethingElse">Do something else</localize>
-        </button>
-    </div>
+    <div ng-if="vm.creatingFolder">
+        <form novalidate name="createFolderForm"
+              ng-submit="vm.createFolder(createFolderForm)"
+              val-form-manager>
+            <div class="umbracoDialog umb-dialog-body with-footer">
+                <!-- Create folder -->
+                <div class="umb-pane">
+                    <div ng-show="vm.createFolderError">
+                        <div class="alert alert-error">
+                            <div>{{vm.createFolderError.data.message}}</div>
+                        </div>
+                    </div>
 
+                    <umb-control-group label="@create_enterFolderName" localize="label" hide-label="false">
+                        <input type="text" name="folderName" ng-model="vm.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+                    </umb-control-group>
+                </div>
+            </div>
+            <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+                <umb-button type="button"
+                            button-style="link"
+                            action="vm.close()"
+                            label-key="general_close">
+                </umb-button>
+                <umb-button type="submit"
+                            button-style="primary"
+                            label-key="general_create">
+                </umb-button>
+            </div>
+        </form>
+    </div>
 </div>

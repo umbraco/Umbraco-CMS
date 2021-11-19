@@ -32,7 +32,10 @@
             position: absolute;
             padding: 5px 8px;
             pointer-events: none;
-            top: 2px;
+
+            &i {
+                top: 2px;
+            }
         }
 
         input[type="text"] {
@@ -219,79 +222,73 @@
 /* ---------- LAYOUTS ---------- */
 
 .list-view-layout {
-   display: flex;
-   align-items: center;
-   padding: 10px 15px;
-   background: @gray-10;
-   margin-bottom: 1px;
-}
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background: @gray-10;
+    margin-bottom: 1px;
 
-.list-view-layout__sort-handle {
-   font-size: 14px;
-   color: @gray-8;
-   margin-right: 15px;
-}
+    &__sort-handle {
+        font-size: 14px;
+        color: @gray-8;
+        margin-right: 15px;
+    }
 
-.list-view-layout__name {
-   flex: 5;
-   font-weight: bold;
-   margin-right: 15px;
-   display: flex;
-   align-content: center;
-   flex-wrap: wrap;
-   line-height: 1.2em;
-}
+    &__name {
+        flex: 5;
+        font-weight: bold;
+        margin-right: 15px;
+        display: flex;
+        align-content: center;
+        flex-wrap: wrap;
+        line-height: 1.2em;
+    }
 
-.list-view-layout__name-text {
-   margin-right: 3px;
-}
- 
-.list-view-layout__system {
-   font-size: 10px; 
-   font-weight: normal;
-}
+    &__name-text {
+        margin-right: 3px;
+    }
 
-.list-view-layout__path {
-   flex: 10;
-   margin-right: 15px;
-}
+    &__system {
+        font-size: 10px;
+        font-weight: normal;
+    }
 
-.list-view-layout__icon {
-   font-size: 18px;
-   margin-right: 10px;
-   vertical-align: middle;
-   border: 1px solid @gray-8;
-   background: @white;
-   padding: 6px 8px;
-   display: block;
-}
+    &__path {
+        flex: 10;
+        margin-right: 15px;
+    }
 
-.list-view-layout__icon:hover,
-.list-view-layout__icon:focus,
-.list-view-layout__icon:active {
-   text-decoration: none;
-}
+    &__icon-wrapper {
+        margin-right: 10px;
+    }
 
-.list-view-layout__remove {
-    position: relative;
-    cursor: pointer;
+    &__icon {
+        font-size: 18px;
+        vertical-align: middle;
+        border: 1px solid @gray-8;
+        background: @white;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+    }
+
+    &__remove {
+        position: relative;
+        cursor: pointer;
+    }
+
+    input[type="text"] {
+        margin-bottom: 0;
+    }
 }
 
 .list-view-add-layout {
-   width:100%; 
-   background:0 0;
-   margin-top: 10px;
-   color: @ui-action-discreet-type;
-   border: 1px dashed @ui-action-discreet-border;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   padding: 5px 0;
-   box-sizing: border-box;
+    &:extend(.umb-node-preview-add);
 }
 
 .list-view-add-layout:hover {
-   text-decoration: none;
-   color: @ui-action-discreet-type-hover;
-   border-color: @ui-action-discreet-border-hover;
+    &:extend(.umb-node-preview-add:hover);
 }

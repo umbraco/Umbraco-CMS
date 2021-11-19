@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Published
                 yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
+            var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
 
             // PublishedElementPropertyBase.GetCacheLevels:
             //
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Published
                 yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
+            var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
 
             var elementsCache = new FastDictionaryAppCache();
             var snapshotCache = new FastDictionaryAppCache();
@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Published
                 yield return publishedContentTypeFactory.CreatePropertyType(contentType, "prop1", 1);
             }
 
-            var setType1 = publishedContentTypeFactory.CreateContentType(1000, "set1", CreatePropertyTypes);
+            var setType1 = publishedContentTypeFactory.CreateContentType(Guid.NewGuid(), 1000, "set1", CreatePropertyTypes);
 
             Assert.Throws<Exception>(() =>
             {

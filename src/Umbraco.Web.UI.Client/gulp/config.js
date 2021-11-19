@@ -3,10 +3,16 @@
 module.exports = {
     compile: {
         build: {
-            sourcemaps: false
+            sourcemaps: false,
+            embedtemplates: true
         },
         dev: {
-            sourcemaps: true
+            sourcemaps: true,
+            embedtemplates: true
+        },
+        test: {
+            sourcemaps: false,
+            embedtemplates: true
         }
     },
     sources: {
@@ -17,13 +23,14 @@ module.exports = {
             installer: { files: "./src/less/installer.less", watch: "./src/less/**/*.less", out: "installer.css" },
             nonodes: { files: "./src/less/pages/nonodes.less", watch: "./src/less/**/*.less", out: "nonodes.style.min.css"},
             preview: { files: "./src/less/canvas-designer.less", watch: "./src/less/**/*.less", out: "canvasdesigner.css" },
-            umbraco: { files: "./src/less/belle.less", watch: "./src/less/**/*.less", out: "umbraco.css" },
+            umbraco: { files: "./src/less/belle.less", watch: "./src/**/*.less", out: "umbraco.css" },
             rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" }
         },
 
         // js files for backoffice
         // processed in the js task
         js: {
+            websitepreview: { files: "./src/websitepreview/**/*.js", out: "umbraco.websitepreview.js" },
             preview: { files: "./src/preview/**/*.js", out: "umbraco.preview.js" },
             installer: { files: "./src/installer/**/*.js", out: "umbraco.installer.js" },
             filters: { files: "./src/common/filters/**/*.js", out: "umbraco.filters.js" },
@@ -50,7 +57,7 @@ module.exports = {
                 ],
                 out: "umbraco.directives.js"
             }
-            
+
         },
 
         //selectors for copying all views into the build

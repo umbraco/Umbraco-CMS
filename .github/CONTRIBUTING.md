@@ -16,6 +16,7 @@ This project and everyone participating in it, is governed by the [our Code of C
 
 [Contributing code changes](#contributing-code-changes)
   * [Guidelines for contributions we welcome](#guidelines-for-contributions-we-welcome)
+    * [Ownership and copyright](#ownership-and-copyright)
   * [What can I start with?](#what-can-i-start-with)
   * [How do I begin?](#how-do-i-begin)
   * [Pull requests](#pull-requests)
@@ -43,6 +44,17 @@ Not all changes are wanted, so on occasion we might close a PR without merging i
 We have [documented what we consider small and large changes](CONTRIBUTION_GUIDELINES.md). Make sure to talk to us before making large changes, so we can ensure that you don't put all your hard work into something we would not be able to merge.
 
 Remember, it is always worth working on an issue from the `Up for grabs` list or even asking for some feedback before you send us a PR. This way, your PR will not be closed as unwanted.
+
+#### Ownership and copyright
+
+It is your responsibility to make sure that you're allowed to share the code you're providing us.   
+For example, you should have permission from your employer or customer to share code.  
+
+Similarly, if your contribution is copied or adapted from somewhere else, make sure that the license allows you to reuse that for a contribution to Umbraco-CMS. 
+
+If you're not sure, leave a note on your contribution and we will be happy to guide you.
+
+When your contribution has been accepted, it will be [MIT licensed](https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/LICENSE.md) from that time onwards. 
 
 ### What can I start with?
 
@@ -72,7 +84,7 @@ Great question! The short version goes like this:
 ### Pull requests
 The most successful pull requests usually look a like this:
 
-  * Fill in the required template, linking your pull request to an issue on the [issue tracker,](https://github.com/umbraco/Umbraco-CMS/issues) if applicable.
+  * Fill in the required template (shown when starting a PR on GitHub), and link your pull request to an issue on the [issue tracker,](https://github.com/umbraco/Umbraco-CMS/issues) if applicable.
   * Include screenshots and animated GIFs in your pull request whenever possible.
   * Unit tests, while optional, are awesome. Thank you!
   * New code is commented with documentation from which [the reference documentation](https://our.umbraco.com/documentation/Reference/) is generated.
@@ -102,10 +114,11 @@ That said, the Umbraco development team likes to follow the hints that ReSharper
 
 The Core Contributors team consists of one member of Umbraco HQ, [Sebastiaan](https://github.com/nul800sebastiaan), who gets assistance from the following community members who have comitted to volunteering their free time:
 
-- [Anders Bjerner](https://github.com/abjerner)
-- [Emma Burstow](https://github.com/emmaburstow)
-- [Poornima Nayar](https://github.com/poornimanayar)
-- [Kenn Jacobsen](https://twitter.com/KennJacobsen_DK)
+- [Nathan Woulfe](https://github.com/nathanwoulfe)
+- [Joe Glombek](https://github.com/glombek)
+- [Laura Weatherhead](https://github.com/lssweatherhead)
+- [Michael Latouche](https://github.com/mikecp)
+- [Owain Williams](https://github.com/OwainWilliams)
 
 
 These wonderful people aim to provide you with a first reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. Hq will have final sign-off and will check the work again before it is merged. 
@@ -123,12 +136,12 @@ You can get in touch with [the core contributors team](#the-core-contributors-te
 
 In order to build the Umbraco source code locally, first make sure you have the following installed.
 
-  * Visual Studio 2017 v15.9.7+
-  * Node v10+
-  * npm v6.4.1+
-  * Git command line
+  * [Visual Studio 2019 v16.8+ (with .NET Core 3.0)](https://visualstudio.microsoft.com/vs/)
+  * [Node.js v10+](https://nodejs.org/en/download/)
+  * npm v6.4.1+ (installed with Node.js)
+  * [Git command line](https://git-scm.com/download/)
 
-The easiest way to get started is to open `src\umbraco.sln` in Visual Studio 2017 (version 15.9.7 or higher, [the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
+The easiest way to get started is to open `src\umbraco.sln` in Visual Studio 2019 (version 16.3 or higher, [the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
 
 Alternatively, you can run `build.ps1` from the Powershell command line, which will build both the backoffice (also known as "Belle") and the Umbraco core. You can then easily start debugging from Visual Studio, or if you need to debug Belle you can run `gulp dev` in `src\Umbraco.Web.UI.Client`. See [this page](BUILD.md) for more details.
 

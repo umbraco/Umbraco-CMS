@@ -12,7 +12,7 @@
     <div ng-controller="My.TableController as vm">
         
         <umb-table
-            ng-if="items"
+            ng-if="vm.items"
             items="vm.items"
             item-properties="vm.options.includeProperties"
             allow-select-all="vm.allowSelectAll"
@@ -98,9 +98,9 @@
     })();
 </pre>
 
-@param {string} icon (<code>binding</code>): The node icon.
-@param {string} name (<code>binding</code>): The node name.
-@param {string} published (<code>binding</code>): The node published state.
+@param {array} items (<code>binding</code>): The items for the table.
+@param {array} itemProperties (<code>binding</code>): The properties for the items to use in table.
+@param {boolean} allowSelectAll (<code>binding</code>): Specify whether to allow select all.
 @param {function} onSelect (<code>expression</code>): Callback function when the row is selected.
 @param {function} onClick (<code>expression</code>): Callback function when the "Name" column link is clicked.
 @param {function} onSelectAll (<code>expression</code>): Callback function when selecting all items.

@@ -1,32 +1,92 @@
-# Code Of Conduct
- 
-Our informal code of conduct concentrates on the values we, as Umbraco HQ, have set for ourselves and for our community. We expect you to be a friend. 
-Instead of listing out all the exact "do's" and "don't's" we want to challenge you to think about our values and apply them:
+# Umbraco Code of Conduct
 
-If there's a need to talk to Umbraco HQ about anything, please make sure to send a mail to [Sebastiaan Janssen - sj@umbraco.dk](mailto:sj@umbraco.dk).
+## Preamble
 
-## Be a Friend
+We are the friendly CMS. And our friendliness stems from our values. That's why we have set for ourselves, Umbraco HQ, and the community, five values to guide us in everything we do:  
 
-We welcome and thank you for registering at Our Umbraco. Find below the values that govern Umbraco and which you accept by using Our Umbraco.
+* Trust - We believe in and empower  people
+* Respect - We treat others as we would like to be treated
+* Open - We share our thoughts and knowledge 
+* Hungry - We want to do things better, best is next 
+* Friendly - We want to build long-lasting relationships
 
-## Trust
+With these values in mind, we want to offer the Umbraco community a code of conduct that specifies a baseline standard of behavior so that people with different social values and communication styles can work together.  
 
-Assume positive intent and try to understand before being understood.
+This code of conduct is based on the widely used Contributor Covenant, as described in [https://www.contributor-covenant.org/](https://www.contributor-covenant.org/)  
 
-## Respect
+## Our Pledge
 
-Treat others as you would like to be treated.
+We as members, contributors, and leaders pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, religion, or sexual identity and orientation.  
 
-This also goes for treating the HQ with respect. For example: don’t promote products on [our.umbraco.com](https://our.umbraco.com) that directly compete with our commercial offerings which enables us to work for a sustainable Umbraco.
+We pledge to act and interact in ways that contribute to an open, welcoming, diverse, inclusive, and healthy community.  
 
-## Open
+## Our Standards
+Examples of behavior that contributes to a positive environment for our community include:  
 
-Be honest and straightforward. Tell it as it is. Share thoughts and knowledge and engage in collaboration.
+* Demonstrating empathy and kindness toward other people
+* Being respectful of differing opinions, viewpoints, and experiences
+* Giving and gracefully accepting constructive feedback
+* Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
+* Focusing on what is best not just for us as individuals, but for the overall community
 
-## Hungry
+Examples of unacceptable behavior include:  
 
-Don't rest on your laurels and never accept the status quo. Contribute and give back to fellow Umbracians.
+* The use of sexualized language or imagery, and sexual attention or advances of any kind
+* Trolling, insulting or derogatory comments, and personal or political attacks
+* Public or private harassment
+* Publishing others' private information, such as a physical or email address, without their explicit permission
+* Other conduct which could reasonably be considered inappropriate in a professional setting
 
-## Friendly
+## Enforcement Responsibilities
 
-Don’t judge upon mistakes made but rather upon the speed and quality with which mistakes are corrected. Friendly posts and contributions generate smiles and build long lasting relationships.
+Community leaders (e.g. Meetup & festival organizers, moderators, maintainers, ...) are responsible for clarifying and enforcing our standards of acceptable behavior and will take appropriate and fair corrective action in response to any behavior that they deem inappropriate, threatening, offensive, or harmful.  
+
+Community leaders have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that are not aligned to this Code of Conduct, and will communicate reasons for moderation decisions when appropriate.  
+
+Specific enforcement steps are listed in the [Code of Conduct Enforcement Guidelines](https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/.github/CODE_OF_CONDUCT_ENFORCEMENT.md) document which is an appendix of this document, updated and maintained by the Code of Conduct Team.
+
+## Scope
+This Code of Conduct applies within all community spaces and events supported by Umbraco HQ or using the Umbraco name. It also applies when an individual is officially representing the community in public spaces. 
+
+## Enforcement
+
+Instances of abusive, harassing, or otherwise unacceptable behavior, may be reported at [conduct@umbraco.com](mailto:conduct@umbraco.com). All complaints will be reviewed and investigated promptly and fairly.  
+
+Or alternatively, you can reach out directly to any of the team members behind the address above:  
+
+* Sebastiaan Janssen (He, Him - Languages spoken: English, Dutch, Danish(Read)) [sebastiaan@umbraco.com](mailto:sebastiaan@umbraco.com)
+* Ilham Boulghallat (She, Her - Languages spoken: English, French, Arabic) [ilham@umbraco.com](mailto:ilham@umbraco.com)
+* Arnold Visser (He, Him - Languages spoken: English, Dutch) [arnold@umbraco.com](mailto:arnold@umbraco.com)
+
+The review process is done with full respect for the privacy and security of the reporter of any incident.  
+
+People with a conflict of interest should exclude themselves or if necessary be excluded by the other team members.  
+
+## Enforcement Guidelines
+
+Community leaders will follow these Community Impact Guidelines in determining the consequences for any action they deem in violation of this Code of Conduct:
+
+**1. Correction**  
+Community Impact: Use of inappropriate language or other behavior deemed unprofessional or unwelcome in the community.  
+
+Consequence: A private, written warning from community leaders, providing clarity around the nature of the violation and an explanation of why the behavior was inappropriate. A public apology may be requested.
+
+**2. Warning**  
+Community Impact: A violation through a single incident or series of actions.  
+
+Consequence: A warning with consequences for continued behavior. No interaction with the people involved, including unsolicited interaction with those enforcing the Code of Conduct, for a specified period of time. This includes avoiding interactions in community spaces as well as external channels like social media. Violating these terms may lead to a temporary or permanent ban.
+
+**3. Temporary Ban**  
+Community Impact: A serious violation of community standards, including sustained inappropriate behavior.  
+
+Consequence: A temporary ban from any sort of interaction or public communication with the community for a specified period of time. No public or private interaction with the people involved, including unsolicited interaction with those enforcing the Code of Conduct, is allowed during this period. Violating these terms may lead to a permanent ban.
+
+**4. Permanent Ban**  
+Community Impact: Demonstrating a pattern of violation of community standards, including sustained inappropriate behavior, harassment of an individual, or aggression toward or disparagement of classes of individuals.  
+
+Consequence: A permanent ban from any sort of public interaction within the community.
+
+## Attribution
+This Code of Conduct is adapted from the Contributor Covenant, version 2.0, available at [https://www.contributor-covenant.org/version/2/0/code_of_conduct.html](https://www.contributor-covenant.org/version/2/0/code_of_conduct.html).  
+
+This Code of Conduct will be maintained and reviewed by the team listed above. 

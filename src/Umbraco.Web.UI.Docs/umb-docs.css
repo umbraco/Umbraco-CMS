@@ -2,9 +2,9 @@
 html {
     font-family: 'Segoe UI', Tahoma, Helvetica, sans-serif;
 }
+
 body {
     font-family: 'Segoe UI', Tahoma, Helvetica, sans-serif;
-    
 }
 
 .container, .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container {
@@ -29,45 +29,63 @@ body {
     color: inherit;
 }
 
-.content code {
+a:hover {
+    text-decoration: none;
+    color: rgba(0, 0, 0, .8);
+}
+
+.content p code,
+.content li code {
+    font-size: 85%;
     font-family: inherit;
+    background-color: #f7f7f9;
+    padding: 0px 3px;
+    border: 1px solid #e1e1e8;
+    color: #d14;
+    white-space: nowrap;
+}
+
+.header img {
+    width: 50px;
+}
+
+.breadcrumb {
+    background-color: #f7f7f7;
+}
+
+.navbar .container{
+    min-height: inherit;
+    display: flex;
+    align-items: center;
 }
 
 .navbar .brand {
     display: block;
-    float: left;
-    padding: 10px 20px 10px;
-    margin-left: -20px;
-    font-size: 20px;
-    font-weight: 200;
-    color: rgba(0,0,0,.8);
+    color: white;
     text-shadow: none;
 }
 
 .navbar-fixed-top .navbar-inner {
     min-height: 50px;
-    background: #a3db78;
+    background: #3544b1;
 }
 
 .form-search .well {
-    background-color: #f5fbf1;
+    background-color: #f7f7f7;
 }
 
 .form-search > ul.nav > li.module {
-    background-color: #daf0c9;
+    background-color: #3544b1;
 }
 
-.breadcrumb {    
-    background-color: #f5fbf1;
+.form-search > ul.nav > li.module a {
+    color: white;
 }
 
-a {
-    color: #f36f21;
+.form-search > ul.nav > li.section {
+    background-color: #ccc;
 }
-a:hover {
-    text-decoration: none;
-    color: rgba(0,0,0,.8);
-}
+
 .nav-list > .active > a, .nav-list > .active > a:hover, .nav-list > .active > a:focus,
 .form-search > .nav-list > .active > a, .form-search > .nav-list > .active > a:hover, .form-search > .nav-list > .active > a:focus {
     color: #f36f21;
@@ -87,16 +105,26 @@ a:hover {
     color: #000;
 }
 
-.header img {
-    width: 50px;
-    margin-top: 5px;
+.form-search > ul.nav > li.module > a:hover{
+    color: #fff;
 }
 
-.content .methods code {
-    border: 1px solid #e1e1e8;
-    background-color: #f7f7f9;
-    padding: 0px 3px;
-    font-size: 85%;
-    color: #d14;
-    white-space: nowrap;
+.close {
+    float: initial;
+    font-size: 14px;
+    font-weight: initial;
+    line-height: 20px;
+    color: #333333;
+    text-shadow: initial;
+    opacity: initial;
+    filter: initial;
+}
+
+.close:hover,
+.close:focus {
+    color: #333333;
+    text-decoration: initial;
+    cursor: initial;
+    opacity: initial;
+    filter: initial;
 }

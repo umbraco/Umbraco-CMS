@@ -25,6 +25,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
+        private readonly IRepositoryCachePolicy<IMember, string> _memberByUsernameCachePolicy;
 
         public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
             IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
@@ -34,6 +35,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _memberGroupRepository = memberGroupRepository;
+
+            _memberByUsernameCachePolicy = new DefaultRepositoryCachePolicy<IMember, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
         }
 
         protected override MemberRepository This => this;
@@ -242,8 +245,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             entity.AddingEntity();
 
-            var member = (Member) entity;
-
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
@@ -301,7 +302,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
-            member.VersionId = contentVersionDto.Id;
+            entity.VersionId = contentVersionDto.Id;
 
             // persist the member dto
             dto.NodeId = nodeDto.NodeId;
@@ -318,9 +319,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.ContentType.Variations, member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            InsertPropertyValues(entity, 0, out _, out _);
 
             SetEntityTags(entity, _tagRepository);
 
@@ -333,10 +332,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IMember entity)
         {
-            var member = (Member) entity;
-
             // update
-            member.UpdatingEntity();
+            entity.UpdatingEntity();
 
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
@@ -382,12 +379,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (changedCols.Count > 0)
                 Database.Update(dto, changedCols);
 
-            // replace the property data
-            var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId);
-            Database.Execute(deletePropertyDataSql);
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.ContentType.Variations, member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
-            foreach (var propertyDataDto in propertyDataDtos)
-                Database.Insert(propertyDataDto);
+            ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
             SetEntityTags(entity, _tagRepository);
 
@@ -439,15 +431,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var matchedMembers = Get(query).ToArray();
 
             var membersInGroup = new List<IMember>();
+
             //then we need to filter the matched members that are in the role
-            //since the max sql params are 2100 on sql server, we'll reduce that to be safe for potentially other servers and run the queries in batches
-            var inGroups = matchedMembers.InGroupsOf(1000);
-            foreach (var batch in inGroups)
+            foreach (var group in matchedMembers.Select(x => x.Id).InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                var memberIdBatch = batch.Select(x => x.Id);
                 var sql = Sql().SelectAll().From<Member2MemberGroupDto>()
                     .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id)
-                    .Where("Member IN (@memberIds)", new { memberIds = memberIdBatch });
+                    .WhereIn<Member2MemberGroupDto>(dto => dto.Member, group);
+
                 var memberIdsInGroup = Database.Fetch<Member2MemberGroupDto>(sql)
                     .Select(x => x.Member).ToArray();
 
@@ -505,6 +496,56 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return Database.ExecuteScalar<int>(fullSql);
         }
 
+        /// <inheritdoc />
+        public void SetLastLogin(string username, DateTime date)
+        {
+            // Important - these queries are designed to execute without an exclusive WriteLock taken in our distributed lock
+            // table. However due to the data that we are updating which relies on version data we cannot update this data
+            // without taking some locks, otherwise we'll end up with strange situations because when a member is updated, that operation
+            // deletes and re-inserts all property data. So if there are concurrent transactions, one deleting and re-inserting and another trying
+            // to update there can be problems. This is only an issue for cmsPropertyData, not umbracoContentVersion because that table just
+            // maintains a single row and it isn't deleted/re-inserted.
+            // So the important part here is the ForUpdate() call on the select to fetch the property data to update.
+
+            // Update the cms property value for the member
+
+            var sqlSelectTemplateProperty = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin1", s => s
+                .Select<PropertyDataDto>(x => x.Id)
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>().On<PropertyTypeDto, PropertyDataDto>((l, r) => l.Id == r.PropertyTypeId)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, PropertyDataDto>((l, r) => l.Id == r.VersionId)
+                .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
+                .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
+                .Where<PropertyTypeDto>(x => x.Alias == SqlTemplate.Arg<string>("propertyTypeAlias"))
+                .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username"))
+                .ForUpdate());
+            var sqlSelectProperty = sqlSelectTemplateProperty.Sql(Constants.ObjectTypes.Member, Constants.Conventions.Member.LastLoginDate, username);
+
+            var update = Sql()
+                .Update<PropertyDataDto>(u => u
+                    .Set(x => x.DateValue, date))
+                .WhereIn<PropertyDataDto>(x => x.Id, sqlSelectProperty);
+
+            Database.Execute(update);
+
+            // Update the umbracoContentVersion value for the member
+
+            var sqlSelectTemplateVersion = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin2", s => s
+               .Select<ContentVersionDto>(x => x.Id)
+               .From<ContentVersionDto>()
+               .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
+               .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
+               .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
+               .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username")));
+            var sqlSelectVersion = sqlSelectTemplateVersion.Sql(Constants.ObjectTypes.Member, username);
+
+            Database.Execute(Sql()
+                .Update<ContentVersionDto>(u => u
+                    .Set(x => x.VersionDate, date))
+                .WhereIn<ContentVersionDto>(x => x.Id, sqlSelectVersion));
+        }
+
         /// <summary>
         /// Gets paged member results.
         /// </summary>
@@ -526,20 +567,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 x => MapDtosToContent(x),
                 filterSql,
                 ordering);
-        }
-
-        private string _pagedResultsByQueryWhere;
-
-        private string GetPagedResultsByQueryWhere()
-        {
-            if (_pagedResultsByQueryWhere == null)
-                _pagedResultsByQueryWhere = " AND ("
-                    + $"({SqlSyntax.GetQuotedTableName("umbracoNode")}.{SqlSyntax.GetQuotedColumnName("text")} LIKE @0)"
-                    + " OR "
-                    + $"({SqlSyntax.GetQuotedTableName("cmsMember")}.{SqlSyntax.GetQuotedColumnName("LoginName")} LIKE @0)"
-                    + ")";
-
-            return _pagedResultsByQueryWhere;
         }
 
         protected override string ApplySystemOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
@@ -578,7 +605,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
                         content[i] = (Member) cached;
@@ -630,6 +657,23 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // reset dirty initial properties (U4-1946)
             member.ResetDirtyProperties(false);
             return member;
+        }
+
+        public IMember GetByUsername(string username)
+        {
+            return _memberByUsernameCachePolicy.Get(username, PerformGetByUsername, PerformGetAllByUsername);
+        }
+
+        private IMember PerformGetByUsername(string username)
+        {
+            var query = Query<IMember>().Where(x => x.Username.Equals(username));
+            return PerformGetByQuery(query).FirstOrDefault();
+        }
+
+        private IEnumerable<IMember> PerformGetAllByUsername(params string[] usernames)
+        {
+            var query = Query<IMember>().WhereIn(x => x.Username, usernames);
+            return PerformGetByQuery(query);
         }
     }
 }

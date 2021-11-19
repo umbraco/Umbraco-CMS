@@ -8,7 +8,7 @@
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var id = infiniteMode ? $scope.model.id : $routeParams.id;
         var create = infiniteMode ? $scope.model.create : $routeParams.create;
-        
+
         vm.header = {};
         vm.header.editorfor = "template_template";
         vm.header.setPageTitle = true;
@@ -26,7 +26,7 @@
         vm.page.insertDefaultButton = {
             labelKey: "general_insert",
             addEllipsis: "true",
-            handler: function() {
+            handler: function () {
                 vm.openInsertOverlay();
             }
         };
@@ -68,16 +68,16 @@
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
 
-        templateHelper.getGeneralShortcuts().then(function(data){
+        templateHelper.getGeneralShortcuts().then(function (data) {
             vm.page.keyboardShortcutsOverview.push(data);
         });
-        templateHelper.getEditorShortcuts().then(function(data){
+        templateHelper.getEditorShortcuts().then(function (data) {
             vm.page.keyboardShortcutsOverview.push(data);
         });
-        templateHelper.getTemplateEditorShortcuts().then(function(data){
+        templateHelper.getTemplateEditorShortcuts().then(function (data) {
             vm.page.keyboardShortcutsOverview.push(data);
         });
-        
+
         vm.save = function (suppressNotification) {
             vm.page.saveButtonState = "busy";
 
@@ -87,36 +87,36 @@
                 saveMethod: templateResource.save,
                 scope: $scope,
                 content: vm.template,
-                rebindCallback: function (orignal, saved) {}
+                rebindCallback: function (orignal, saved) { }
             }).then(function (saved) {
 
-				if (!suppressNotification) {
-                    localizationService.localizeMany(["speechBubbles_templateSavedHeader", "speechBubbles_templateSavedText"]).then(function(data){
+                if (!suppressNotification) {
+                    localizationService.localizeMany(["speechBubbles_templateSavedHeader", "speechBubbles_templateSavedText"]).then(function (data) {
                         var header = data[0];
                         var message = data[1];
                         notificationsService.success(header, message);
                     });
-				}
+                }
 
                 vm.page.saveButtonState = "success";
                 vm.template = saved;
 
                 //sync state
-                if(!infiniteMode) {
+                if (!infiniteMode) {
                     editorState.set(vm.template);
                 }
-                
+
                 // sync tree
                 // if master template alias has changed move the node to it's new location
-                if(!infiniteMode && oldMasterTemplateAlias !== vm.template.masterTemplateAlias) {
-                
+                if (!infiniteMode && oldMasterTemplateAlias !== vm.template.masterTemplateAlias) {
+
                     // When creating a new template the id is -1. Make sure We don't remove the root node.
                     if (vm.page.menu.currentNode.id !== "-1") {
                         // move node to new location in tree
                         //first we need to remove the node that we're working on
                         treeService.removeNode(vm.page.menu.currentNode);
                     }
-                    
+
                     // update stored alias to the new one so the node won't move again unless the alias is changed again
                     oldMasterTemplateAlias = vm.template.masterTemplateAlias;
 
@@ -127,7 +127,7 @@
                 } else {
 
                     // normal tree sync
-                    if(!infiniteMode) {
+                    if (!infiniteMode) {
                         navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
                             vm.page.menu.currentNode = syncArgs.node;
                         });
@@ -138,7 +138,7 @@
                 // clear $dirty state on form
                 setFormState("pristine");
 
-                if(infiniteMode) {
+                if (infiniteMode) {
                     submit();
                 }
 
@@ -164,16 +164,16 @@
 
             // load templates - used in the master template picker
             templateResource.getAll()
-                .then(function(templates) {
+                .then(function (templates) {
                     vm.templates = templates;
                 });
 
-            if(create) {
+            if (create) {
                 templateResource.getScaffold((id)).then(function (template) {
-            		vm.ready(template);
-            	});
+                    vm.ready(template);
+                });
             } else {
-            	templateResource.getById(id).then(function(template){
+                templateResource.getById(id).then(function (template) {
                     vm.ready(template);
                 });
             }
@@ -181,26 +181,26 @@
         };
 
 
-        vm.ready = function(template){
-        	vm.page.loading = false;
+        vm.ready = function (template) {
+            vm.page.loading = false;
             vm.template = template;
 
-			// if this is a new template, bind to the blur event on the name
-			if (create) {
-				$timeout(function() {
-					var nameField = angular.element(document.querySelector('[data-element="editor-name-field"]'));
-					if (nameField) {
-						nameField.on('blur', function(event) {
-							if (event.target.value) {
-								vm.save(true);
-							}
-						});
-					}
-				});
-			}	
-					
+            // if this is a new template, bind to the blur event on the name
+            if (create) {
+                $timeout(function () {
+                    var nameField = $('[data-element="editor-name-field"]');
+                    if (nameField) {
+                        nameField.on('blur', function (event) {
+                            if (event.target.value) {
+                                vm.save(true);
+                            }
+                        });
+                    }
+                });
+            }
+
             // sync state
-            if(!infiniteMode) {
+            if (!infiniteMode) {
                 editorState.set(vm.template);
                 navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
                     vm.page.menu.currentNode = syncArgs.node;
@@ -208,7 +208,7 @@
             }
 
             // save state of master template to use for comparison when syncing the tree on save
-            oldMasterTemplateAlias = angular.copy(template.masterTemplateAlias);
+            oldMasterTemplateAlias = Utilities.copy(template.masterTemplateAlias);
 
             // ace configuration
             vm.aceOption = {
@@ -221,12 +221,12 @@
                     enableBasicAutocompletion: true,
                     enableLiveAutocompletion: false
                 },
-                onLoad: function(_editor) {
+                onLoad: function (_editor) {
                     vm.editor = _editor;
-                    
+
                     //Update the auto-complete method to use ctrl+alt+space
                     _editor.commands.bindKey("ctrl-alt-space", "startAutocomplete");
-                    
+
                     // Unassigns the keybinding (That was previously auto-complete)
                     // As conflicts with our own tree search shortcut
                     _editor.commands.bindKey("ctrl-space", null);
@@ -238,20 +238,20 @@
                         {
                             name: 'unSelectOrFindPrevious',
                             bindKey: 'Alt-Shift-K',
-                            exec: function() {
+                            exec: function () {
                                 // Toggle the show keyboard shortcuts overlay
-                                $scope.$apply(function(){
+                                $scope.$apply(function () {
                                     vm.showKeyboardShortcut = !vm.showKeyboardShortcut;
                                 });
-                                
+
                             },
                             readOnly: true
                         },
                         {
                             name: 'insertUmbracoValue',
                             bindKey: 'Alt-Shift-V',
-                            exec: function() {
-                                $scope.$apply(function(){
+                            exec: function () {
+                                $scope.$apply(function () {
                                     openPageFieldOverlay();
                                 });
                             },
@@ -260,18 +260,18 @@
                         {
                             name: 'insertPartialView',
                             bindKey: 'Alt-Shift-P',
-                            exec: function() {
-                                $scope.$apply(function(){
+                            exec: function () {
+                                $scope.$apply(function () {
                                     openPartialOverlay();
                                 });
                             },
                             readOnly: true
                         },
-                         {
+                        {
                             name: 'insertDictionary',
                             bindKey: 'Alt-Shift-D',
-                            exec: function() {
-                                $scope.$apply(function(){
+                            exec: function () {
+                                $scope.$apply(function () {
                                     openDictionaryItemOverlay();
                                 });
                             },
@@ -280,8 +280,8 @@
                         {
                             name: 'insertUmbracoMacro',
                             bindKey: 'Alt-Shift-M',
-                            exec: function() {
-                                $scope.$apply(function(){
+                            exec: function () {
+                                $scope.$apply(function () {
                                     openMacroOverlay();
                                 });
                             },
@@ -290,8 +290,8 @@
                         {
                             name: 'insertQuery',
                             bindKey: 'Alt-Shift-Q',
-                            exec: function() {
-                                $scope.$apply(function(){
+                            exec: function () {
+                                $scope.$apply(function () {
                                     openQueryBuilderOverlay();
                                 });
                             },
@@ -300,8 +300,8 @@
                         {
                             name: 'insertSection',
                             bindKey: 'Alt-Shift-S',
-                            exec: function() {
-                                $scope.$apply(function(){
+                            exec: function () {
+                                $scope.$apply(function () {
                                     openSectionsOverlay();
                                 });
                             },
@@ -310,21 +310,21 @@
                         {
                             name: 'chooseMasterTemplate',
                             bindKey: 'Alt-Shift-T',
-                            exec: function() {
-                                $scope.$apply(function(){
+                            exec: function () {
+                                $scope.$apply(function () {
                                     openMasterTemplateOverlay();
                                 });
                             },
                             readOnly: true
                         }
-                        
+
                     ]);
-                    
+
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
                     // else set the cursor at the bottom of the code editor
-                    if(!create) {
-                        $timeout(function(){
+                    if (!create) {
+                        $timeout(function () {
                             vm.editor.navigateFileEnd();
                             vm.editor.focus();
                             persistCurrentLocation();
@@ -335,9 +335,9 @@
                     vm.editor.on("blur", persistCurrentLocation);
                     vm.editor.on("focus", persistCurrentLocation);
                     vm.editor.on("change", changeAceEditor);
-            	}
+                }
             }
-            
+
         };
 
         vm.openPageFieldOverlay = openPageFieldOverlay;
@@ -363,15 +363,15 @@
                     partial: true,
                     umbracoField: true
                 },
-                submit: function(model) {
-                    switch(model.insert.type) {
+                submit: function (model) {
+                    switch (model.insert.type) {
                         case "macro":
                             var macroObject = macroService.collectValueData(model.insert.selectedMacro, model.insert.macroParams, "Mvc");
                             insert(macroObject.syntax);
                             break;
                         case "dictionary":
-                        	var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
-                        	insert(code);
+                            var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
+                            insert(code);
                             break;
                         case "partial":
                             var code = templateHelper.getInsertPartialSnippet(model.insert.node.parentId, model.insert.node.name);
@@ -383,7 +383,7 @@
                     }
                     editorService.close();
                 },
-                close: function(oldModel) {
+                close: function (oldModel) {
                     // close the dialog
                     editorService.close();
                     // focus editor
@@ -401,7 +401,7 @@
                     insert(macroObject.syntax);
                     editorService.close();
                 },
-                close: function() {
+                close: function () {
                     editorService.close();
                     vm.editor.focus();
                 }
@@ -431,7 +431,7 @@
                 "emptyStates_emptyDictionaryTree"
             ];
 
-            localizationService.localizeMany(labelKeys).then(function(values){
+            localizationService.localizeMany(labelKeys).then(function (values) {
                 var title = values[0];
                 var emptyStateMessage = values[1];
 
@@ -442,7 +442,7 @@
                     multiPicker: false,
                     title: title,
                     emptyStateMessage: emptyStateMessage,
-                    select: function(node){
+                    select: function (node) {
                         var code = templateHelper.getInsertDictionarySnippet(node.name);
                         insert(code);
                         editorService.close();
@@ -463,22 +463,22 @@
 
         function openPartialOverlay() {
 
-            localizationService.localize("template_insertPartialView").then(function(value){
+            localizationService.localize("template_insertPartialView").then(function (value) {
                 var title = value;
 
                 var partialItem = {
-                    section: "settings", 
+                    section: "settings",
                     treeAlias: "partialViews",
                     entityType: "partialView",
                     multiPicker: false,
                     title: title,
-                    filter: function(i) {
-                        if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
+                    filter: function (i) {
+                        if (i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
                             return true;
                         }
                     },
                     filterCssClass: "not-allowed",
-                    select: function(node){
+                    select: function (node) {
                         var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
                         insert(code);
                         editorService.close();
@@ -505,7 +505,7 @@
                 close: function () {
                     editorService.close();
                     // focus editor
-                    vm.editor.focus();   
+                    vm.editor.focus();
                 }
             };
             editorService.queryBuilder(queryBuilder);
@@ -515,7 +515,7 @@
         function openSectionsOverlay() {
             var templateSections = {
                 isMaster: vm.template.isMasterTemplate,
-                submit: function(model) {
+                submit: function (model) {
 
                     if (model.insertType === 'renderBody') {
                         var code = templateHelper.getRenderBodySnippet();
@@ -535,7 +535,7 @@
                     editorService.close();
 
                 },
-                close: function(model) {
+                close: function (model) {
                     editorService.close();
                     vm.editor.focus();
                 }
@@ -549,7 +549,7 @@
             var availableMasterTemplates = [];
 
             // filter out the current template and the selected master template
-            angular.forEach(vm.templates, function (template) {
+            vm.templates.forEach(function (template) {
                 if (template.alias !== vm.template.alias && template.alias !== vm.template.masterTemplateAlias) {
                     var templatePathArray = template.path.split(',');
                     // filter descendant templates of current template
@@ -559,13 +559,13 @@
                 }
             });
 
-            localizationService.localize("template_mastertemplate").then(function(value){
-                var title = value;
-                var masterTemplate = {
-                    title: title,
-                    availableItems: availableMasterTemplates,
-                    submit: function(model) {
-                        var template = model.selectedItem;
+            localizationService.localize("template_mastertemplate").then(title => {
+                const editor = {
+                    title,
+                    filterCssClass: 'not-allowed',
+                    filter: item => !availableMasterTemplates.some(template => template.id == item.id),                    
+                    submit: model => {
+                        var template = model.selection[0];
                         if (template && template.alias) {
                             vm.template.masterTemplateAlias = template.alias;
                             setLayout(template.alias + ".cshtml");
@@ -575,14 +575,10 @@
                         }
                         editorService.close();
                     },
-                    close: function(oldModel) {
-                        // close dialog
-                        editorService.close();
-                        // focus editor
-                        vm.editor.focus();
-                    }
-                };
-                editorService.itemPicker(masterTemplate);
+                    close: () => editorService.close()
+                }
+
+                editorService.templatePicker(editor);
             });
 
         }
@@ -596,14 +592,14 @@
                 vm.template.masterTemplateAlias = null;
                 setLayout(null);
             }
-            
+
         }
 
         function getMasterTemplateName(masterTemplateAlias, templates) {
-            if(masterTemplateAlias) {
+            if (masterTemplateAlias) {
                 var templateName = "";
-                angular.forEach(templates, function(template){
-                    if(template.alias === masterTemplateAlias) {
+                templates.forEach(function (template) {
+                    if (template.alias === masterTemplateAlias) {
                         templateName = template.name;
                     }
                 });
@@ -620,8 +616,8 @@
 
         }
 
-        function setLayout(templatePath){
-            
+        function setLayout(templatePath) {
+
             var templateCode = vm.editor.getValue();
             var newValue = templatePath;
             var layoutDefRegex = new RegExp("(@{[\\s\\S]*?Layout\\s*?=\\s*?)(\"[^\"]*?\"|null)(;[\\s\\S]*?})", "gi");
@@ -645,7 +641,7 @@
             vm.editor.setValue(templateCode);
             vm.editor.clearSelection();
             vm.editor.navigateFileStart();
-            
+
             vm.editor.focus();
             // set form state to $dirty
             setFormState("dirty");
@@ -668,7 +664,7 @@
             str = str.replace("{0}", selectedContent);
             vm.editor.insert(str);
             vm.editor.focus();
-            
+
             // set form state to $dirty
             setFormState("dirty");
         }
@@ -682,14 +678,14 @@
         }
 
         function setFormState(state) {
-            
+
             // get the current form
             var currentForm = angularHelper.getCurrentForm($scope);
 
             // set state
-            if(state === "dirty") {
+            if (state === "dirty") {
                 currentForm.$setDirty();
-            } else if(state === "pristine") {
+            } else if (state === "pristine") {
                 currentForm.$setPristine();
             }
         }
@@ -699,18 +695,18 @@
         }
 
         function submit() {
-            if($scope.model.submit) {
+            if ($scope.model.submit) {
                 $scope.model.template = vm.template;
                 $scope.model.submit($scope.model);
             }
         }
 
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }
-    
+
         vm.init();
 
     }

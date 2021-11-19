@@ -48,6 +48,10 @@
     .form-search {
         flex: 1;
 
+        i.icon-search {
+            top: 16px;
+        }
+
         &__toggle {
             margin: 10px 0;
             display: flex;
@@ -259,9 +263,14 @@
 
 .umb-dialog a.muted:hover,
 .umb-dialog a.muted:focus,
+.umb-dialog button.muted:hover,
+.umb-dialog button.muted:focus,
 .umb-panel a.muted:hover,
-.umb-panel a.muted:focus {
+.umb-panel a.muted:focus,
+.umb-panel button.muted:hover,
+.umb-panel button.muted:focus {
     color: darken(@gray-5, 10%);
+    text-decoration: underline;
 }
 
 .umb-dialog .text-warning,
@@ -340,6 +349,7 @@
 
 .umb-panel-header-icon {
   cursor: pointer;
+  font-size: 2rem;
   margin-right: 5px;
   margin-top: -6px;
   height: 50px;
@@ -392,6 +402,7 @@
     font-size: 30px;
     color: @gray-7;
     transition: opacity 120ms;
+    line-height: 1;
 }
 
 .umb-panel-header-icon-text {
@@ -408,6 +419,8 @@ input.umb-panel-header-name-input.name-is-empty {
 .umb-panel-header-name {
    font-size: 16px;
    font-weight: bold;
+   margin: 0;
+   line-height: 1.2;
 }
 
 
@@ -428,7 +441,7 @@ input.umb-panel-header-description {
 
 .umb-panel-header-locked-description {
     font-size: 12px;
-    margin-top: 2px;
+    margin: 2px 0 0 0;
     height: 22px;
     line-height: 22px;
 }

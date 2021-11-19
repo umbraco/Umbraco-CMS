@@ -77,6 +77,17 @@ namespace Umbraco.Web.Security
             return _publicAccessService.IsProtected(path);
         }
 
+        public virtual IDictionary<string, bool> IsProtected(IEnumerable<string> paths)
+        {
+            var result = new Dictionary<string, bool>();
+            foreach (var path in paths)
+            {
+                //this is a cached call
+                result[path] = _publicAccessService.IsProtected(path);
+            }
+            return result;
+        }
+
         /// <summary>
         /// Check if the current user has access to a document
         /// </summary>
@@ -84,15 +95,33 @@ namespace Umbraco.Web.Security
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public virtual bool MemberHasAccess(string path)
         {
-            //cache this in the request cache
-            return _appCaches.RequestCache.GetCacheItem<bool>($"{typeof(MembershipHelper)}.MemberHasAccess-{path}", () =>
+            if (IsProtected(path))
             {
-                if (IsProtected(path))
-                {
-                    return IsLoggedIn() && HasAccess(path, Roles.Provider);
-                }
-                return true;
-            });
+                return IsLoggedIn() && HasAccess(path, Roles.Provider);
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the current user has access to the paths
+        /// </summary>
+        /// <param name="paths"></param>
+        /// <returns></returns>
+        public virtual IDictionary<string, bool> MemberHasAccess(IEnumerable<string> paths)
+        {
+            var protectedPaths = IsProtected(paths);
+
+            var pathsWithProtection = protectedPaths.Where(x => x.Value).Select(x => x.Key);
+            var pathsWithAccess = HasAccess(pathsWithProtection, Roles.Provider);
+
+            var result = new Dictionary<string, bool>();
+            foreach(var path in paths)
+            {
+                pathsWithAccess.TryGetValue(path, out var hasAccess);
+                // if it's not found it's false anyways
+                result[path] = !pathsWithProtection.Contains(path) || hasAccess;
+            }
+            return result;
         }
 
         /// <summary>
@@ -104,6 +133,25 @@ namespace Umbraco.Web.Security
         private bool HasAccess(string path, RoleProvider roleProvider)
         {
             return _publicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser);
+        }
+
+        private IDictionary<string, bool> HasAccess(IEnumerable<string> paths, RoleProvider roleProvider)
+        {
+            // ensure we only lookup user roles once
+            string[] userRoles = null;
+            string[] getUserRoles(string username)
+            {
+                if (userRoles != null) return userRoles;
+                userRoles = roleProvider.GetRolesForUser(username).ToArray();
+                return userRoles;
+            }
+
+            var result = new Dictionary<string, bool>();
+            foreach (var path in paths)
+            {
+                result[path] = IsLoggedIn() && _publicAccessService.HasAccess(path, CurrentUserName, getUserRoles);
+            }
+            return result;
         }
 
         /// <summary>
@@ -261,12 +309,13 @@ namespace Umbraco.Web.Security
             {
                 return false;
             }
-            //Set member online
-            var member = provider.GetUser(username, true);
+            // Get the member, do not set to online - this is done implicitly as part of ValidateUser which is consistent with
+            // how the .NET framework SqlMembershipProvider works. Passing in true will just cause more unnecessary SQL queries/locks.
+            var member = provider.GetUser(username, false);
             if (member == null)
             {
                 //this should not happen
-                Current.Logger.Warn<MembershipHelper>("The member validated but then no member was returned with the username {Username}", username);
+                Current.Logger.Warn<MembershipHelper, string>("The member validated but then no member was returned with the username {Username}", username);
                 return false;
             }
             //Log them in
@@ -778,33 +827,17 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         private IMember GetCurrentPersistedMember()
         {
-            return _appCaches.RequestCache.GetCacheItem<IMember>(
-                GetCacheKey("GetCurrentPersistedMember"), () =>
-                {
-                    var provider = _membershipProvider;
+            var provider = _membershipProvider;
 
-                    if (provider.IsUmbracoMembershipProvider() == false)
-                    {
-                        throw new NotSupportedException("An IMember model can only be retrieved when using the built-in Umbraco membership providers");
-                    }
-                    var username = provider.GetCurrentUserName();
-                    var member = _memberService.GetByUsername(username);
-                    return member;
-                });
-        }
-
-        private static string GetCacheKey(string key, params object[] additional)
-        {
-            var sb = new StringBuilder();
-            sb.Append(typeof (MembershipHelper).Name);
-            sb.Append("-");
-            sb.Append(key);
-            foreach (var s in additional)
+            if (provider.IsUmbracoMembershipProvider() == false)
             {
-                sb.Append("-");
-                sb.Append(s);
+                throw new NotSupportedException("An IMember model can only be retrieved when using the built-in Umbraco membership providers");
             }
-            return sb.ToString();
+            var username = provider.GetCurrentUserName();
+
+            // The result of this is cached by the MemberRepository
+            var member = _memberService.GetByUsername(username);
+            return member;
         }
 
     }

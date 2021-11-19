@@ -40,9 +40,10 @@ namespace Umbraco.Core.Persistence
             _tableDefinition = DefinitionFactory.GetTableDefinition(pd.Type, sqlSyntaxProvider);
             if (_tableDefinition == null) throw new InvalidOperationException("No table definition found for type " + pd.Type);
 
-            // only real columns, exclude result columns
+            // only real columns, exclude result/computed columns
+            // Like NPoco does: https://github.com/schotime/NPoco/blob/5117a55fde57547e928246c044fd40bd00b2d7d1/src/NPoco.SqlServer/SqlBulkCopyHelper.cs#L59
             _readerColumns = pd.Columns
-                .Where(x => x.Value.ResultColumn == false)
+                .Where(x => x.Value.ResultColumn == false && x.Value.ComputedColumn == false)
                 .Select(x => x.Value)
                 .ToArray();
 
@@ -78,6 +79,9 @@ namespace Umbraco.Core.Persistence
                             break;
                         case SpecialDbTypes.NCHAR:
                             sqlDbType = SqlDbType.NChar;
+                            break;
+                        case SpecialDbTypes.NVARCHARMAX:
+                            sqlDbType = SqlDbType.NVarChar;
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();

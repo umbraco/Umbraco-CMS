@@ -33,9 +33,9 @@
 
                                     <umb-dropdown ng-if="vm.contentTypeSelectOpen" on-close="vm.contentTypeSelectOpen = false">
                                         <umb-dropdown-item ng-repeat="contentType in vm.contentTypes">
-                                            <a href ng-click="vm.setContentType(contentType); vm.contentTypeSelectOpen = false;">
+                                            <button type="button" class="btn-reset" ng-click="vm.setContentType(contentType); vm.contentTypeSelectOpen = false;">
                                                 {{contentType.name}}
-                                            </a>
+                                            </button>
                                         </umb-dropdown-item>
                                     </umb-dropdown>
 
@@ -69,11 +69,11 @@
                                                 show-caret="true">
                                     </umb-button>
 
-                                    <umb-dropdown ng-if="vm.propertyFilterOpen[$index]" on-close="console.log(1);vm.propertyFilterOpen[$index] = false">
+                                    <umb-dropdown ng-if="vm.propertyFilterOpen[$index]" on-close="vm.propertyFilterOpen[$index] = false">
                                         <umb-dropdown-item ng-repeat="property in vm.properties">
-                                            <a href ng-click="vm.setFilterProperty(filter, property); vm.propertyFilterOpen[$parent.$parent.$index] = false;">
+                                            <button type="button" class="btn-reset" ng-click="vm.setFilterProperty(filter, property); vm.propertyFilterOpen[$parent.$parent.$index] = false;">
                                                 {{property.name}}
-                                            </a>
+                                            </button>
                                         </umb-dropdown-item>
                                     </umb-dropdown>
 
@@ -90,9 +90,9 @@
 
                                     <umb-dropdown ng-if="vm.termFilterOpen[$index]" on-close="vm.termFilterOpen[$index] = false">
                                         <umb-dropdown-item ng-repeat="term in vm.getPropertyOperators(filter.property)">
-                                            <a href ng-click="vm.setFilterTerm(filter, term); vm.termFilterOpen[$parent.$parent.$index] = false;">
+                                            <button type="button" class="btn-reset" ng-click="vm.setFilterTerm(filter, term); vm.termFilterOpen[$parent.$parent.$index] = false;">
                                                 {{term.name}}
-                                            </a>
+                                            </button>
                                         </umb-dropdown-item>
                                     </umb-dropdown>
 
@@ -112,13 +112,13 @@
 
                                 </span>
 
-                                <a href ng-click="vm.addFilter(vm.query)">
-                                    <i class="icon-add" aria-hidden="true"></i>
-                                </a>
+                                <button type="button" class="btn-reset" ng-click="vm.addFilter(vm.query)">
+                                    <umb-icon icon="icon-add"></umb-icon>
+                                </button>
 
-                                <a href ng-click="vm.trashFilter(vm.query, filter)">
-                                    <i class="icon-trash" aria-hidden="true"></i>
-                                </a>
+                                <button type="button" class="btn-reset" ng-click="vm.trashFilter(vm.query, filter)">
+                                    <umb-icon icon="icon-trash"></umb-icon>
+                                </button>
 
                             </div>
 
@@ -137,9 +137,9 @@
 
                                     <umb-dropdown ng-if="vm.sortPropertyOpen" on-close="vm.sortPropertyOpen = false">
                                         <umb-dropdown-item ng-repeat="property in vm.properties">
-                                            <a href ng-click="vm.setSortProperty(vm.query, property); vm.sortPropertyOpen = false;">
+                                            <button type="button" class="btn-reset" ng-click="vm.setSortProperty(vm.query, property); vm.sortPropertyOpen = false;">
                                                 {{property.name}}
-                                            </a>
+                                            </button>
                                         </umb-dropdown-item>
                                     </umb-dropdown>
 
@@ -159,7 +159,7 @@
 
                         <ul class="nav unstyled">
                             <li ng-repeat="item in model.result.sampleResults">
-                                <i class="icon icon-document turquoise-d1" aria-hidden="true"></i> {{item.name}}
+                                <umb-icon icon="{{item.icon}}" class="icon turquoise-d1"></umb-icon> {{item.name}}
                             </li>
                         </ul>
 

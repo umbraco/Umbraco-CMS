@@ -6,17 +6,16 @@
         </p>
 
         <p>
-            <i class="icon-alert red"></i>
+            <umb-icon icon="icon-alert" class="red"></umb-icon>
             <strong class="red"><localize key="member_allMembers">All members</localize></strong>
             <localize key="contentTypeEditor_usingThisMember">using this member type will be deleted permanently, please confirm you want to delete these as well.</localize>
         </p>
 
         <hr />
 
-        <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}">
-        </umb-checkbox>
+        <umb-checkbox model="confirmed" text="{{labels.deleteConfirm}}"></umb-checkbox>
 
-        <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel" confirm-button-style="danger">
+        <umb-confirm confirm-disabled="!confirmed" confirm-label-key="delete" on-confirm="performDelete" on-cancel="cancel" confirm-button-style="danger">
         </umb-confirm>
 
 

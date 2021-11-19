@@ -1,0 +1,337 @@
+@umb-block-list__item_minimum_height: 48px;
+
+.umb-block-list {
+    padding-bottom:10px;
+}
+
+.umb-block-list .umb-load-indicator {
+    margin-bottom:20px;
+}
+
+.umb-block-list__wrapper {
+    position: relative;
+    .umb-property-editor--limit-width();
+    > .ui-sortable > .ui-sortable-helper > .umb-block-list__block > .umb-block-list__block--content > * {
+        box-shadow: 0px 5px 10px 0 rgba(0,0,0,.2);
+    }
+}
+
+.umb-block-list__block {
+    position: relative;
+    width: 100%;
+
+    > .umb-block-list__block--actions {
+        opacity: 0;
+        transition: opacity 120ms;
+    }
+
+    &:hover,
+    &:focus,
+    &:focus-within,
+    &.--active {
+
+        > .umb-block-list__block--actions {
+            opacity: 1;
+        }
+    }
+
+    &.--show-validation {
+        ng-form.ng-invalid-val-server-match-content > & {
+            border: 2px solid @formErrorText;
+            border-radius: @baseBorderRadius;
+            &::after {
+                content: "!";
+                position: absolute;
+                top: -12px;
+                right: -12px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                font-size: 13px;
+                text-align: center;
+                font-weight: bold;
+                background-color: @errorBackground;
+                color: @errorText;
+                border: 2px solid @white;
+                font-weight: 900;
+    
+                animation-duration: 1.4s;
+                animation-iteration-count: infinite;
+                animation-name: umb-block-list__block--content--badge-bounce;
+                animation-timing-function: ease;
+                @keyframes umb-block-list__block--content--badge-bounce {
+                    0%   { transform: translateY(0); }
+                    20%  { transform: translateY(-6px); }
+                    40%  { transform: translateY(0); }
+                    55%  { transform: translateY(-3px); }
+                    70%  { transform: translateY(0); }
+                    100% { transform: translateY(0); }
+                }
+            }
+        }
+    }
+}
+ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-block-list__block--actions {
+    opacity: 1;
+}
+.umb-block-list__block--actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0;
+    background-color: rgba(255, 255, 255, .96);
+    border-radius: 16px;
+    padding-left: 5px;
+    padding-right: 5px;
+    .action {
+        position: relative;
+        display: inline-block;
+        color: @ui-action-discreet-type;
+        font-size: 18px;
+        padding: 5px;
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+        }
+        &.--error {
+            color: @errorBackground;
+            .show-validation-type-warning & {
+                color: @warningBackground;
+            }
+        }
+        > .__error-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            min-width: 8px;
+            color: @white;
+            background-color: @ui-active-type;
+            border: 2px solid @white;
+            border-radius: 50%;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 2px;
+            line-height: 8px;
+            background-color: @errorBackground;
+            .show-validation-type-warning & {
+                background-color: @warningBackground;
+            }
+            display: none;
+            font-weight: 900;
+        }
+        &.--error > .__error-badge {
+            display: block;
+
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-block-list__action--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-block-list__action--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-4px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-2px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
+
+        }
+    }
+}
+
+.umb-block-list__block--content {
+
+    > div {
+        position: relative;
+        width: 100%;
+        min-height: @umb-block-list__item_minimum_height;
+        background-color: @white;
+        border-radius: @baseBorderRadius;
+        box-sizing: border-box;
+    }
+
+}
+
+.blockelement__draggable-element {
+    cursor: grab;
+}
+
+
+.umb-block-list__block--create-button {
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+    opacity: 0;
+    outline: none;
+    height: 12px;
+    margin-top: -9px;
+    padding-top: 6px;
+    margin-bottom: -6px;
+    transition: opacity 240ms;
+
+    &::before {
+        content: '';
+        position: absolute;
+        background-color: @blueMid;
+        border-top: 1px solid white;
+        border-bottom: 1px solid white;
+        border-radius: 2px;
+        top: 5px;
+        right: 0;
+        left: 0;
+        height: 2px;
+        animation: umb-block-list__block--create-button_before 400ms ease-in-out alternate infinite;
+        transform: scaleX(.99);
+        transition: transform 240ms ease-out;
+
+        @keyframes umb-block-list__block--create-button_before {
+            0%   { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+    }
+
+    > .__plus {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none; // lets stop avoiding the mouse values in JS move event.
+        box-sizing: border-box;
+        width: 28px;
+        height: 28px;
+        margin-left: -16px - 8px;
+        margin-top: -16px;
+        border-radius: 3em;
+        font-size: 14px;
+        border: 2px solid @blueMid;
+        color: @blueMid;
+        background-color: rgba(255, 255, 255, .96);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, .96);
+        transform: scale(0);
+        transition: transform 240ms ease-in;
+        
+        animation: umb-block-list__block--create-button__plus 400ms ease-in-out alternate infinite;
+
+        @keyframes umb-block-list__block--create-button__plus {
+            0%   { color: rgba(@blueMid, 1); }
+            100% { color: rgba(@blueMid, 0.8); }
+        }
+        
+    }
+
+    &:focus {
+        > .__plus {
+            border-color: @ui-outline;
+        }
+    }
+
+    &:hover, &:focus {
+        opacity: 1;
+
+        &::before {
+            transform: scaleX(1);
+        }
+        > .__plus {
+            transform: scale(1);
+            transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
+        }
+    }
+}
+
+.umb-block-list__actions {
+    display: flex;
+
+    border: 1px dashed @ui-action-discreet-border;
+    border-radius: @baseBorderRadius;
+    box-sizing: border-box;
+
+    &:hover {
+        border-color: transparent;
+        > button {
+
+            border-color: @ui-action-discreet-border;
+
+            &.umb-block-list__clipboard-button {
+                opacity: 1;
+            }
+        }
+        
+    }
+
+    > button {
+        position: relative;
+        display: flex;
+        //width: 100%;
+        align-items: center;
+        justify-content: center;
+        
+        color: @ui-action-discreet-type;
+        font-weight: bold;
+        margin: -1px;
+        padding: 5px 15px;
+
+        border: 1px dashed transparent;
+        border-radius: @baseBorderRadius;
+        box-sizing: border-box;
+        
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+            border-color: @ui-action-discreet-border-hover;
+            text-decoration: none;
+            z-index: 1;
+        }
+
+        &[disabled],
+        &[disabled]:hover {
+            color: @gray-7;
+            border-color: @gray-7;
+            cursor: default;
+        }
+
+        &.umb-block-list__create-button {
+            flex-grow: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    
+        &.umb-block-list__clipboard-button {
+            margin-left: 0;
+            padding: 5px 12px;
+            font-size: 18px;// Align with block action buttons.
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+
+            opacity: 0;
+            &:hover, &:focus {
+                opacity: 1;
+            }
+
+            &.--jump {
+
+                @keyframes umb-block-list__jump-clipboard-button {
+                    0% { opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { opacity: 0; }
+                }
+                animation: umb-block-list__jump-clipboard-button 2s;
+
+                i{
+                    @keyframes umb-block-list__jump-clipboard-button-i {
+                        10% { transform: scale(1); }
+                        10% { transform: scale(1.33); }
+                        20% { transform: scale(.82); }
+                        30% { transform: scale(1.24); }
+                        40% { transform: scale(.94); }
+                        50% { transform: scale(1); }
+                    }
+                    animation: umb-block-list__jump-clipboard-button-i 2s;
+                }
+            }
+            
+        }
+    }
+}

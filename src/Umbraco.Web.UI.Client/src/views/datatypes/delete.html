@@ -38,7 +38,7 @@
                         <div ng-if="vm.references.documentTypes.length > 0">
 
                             <h5 class="mt4" style="margin-bottom: 20px;">
-                                <localize key="treeHeaders_documentTypes"></localize>
+                                <localize key="treeHeaders_documentTypes">Document Types</localize>
                             </h5>
 
                             <table class="table table-condensed table-bordered">
@@ -50,8 +50,18 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="relation in vm.references.documentTypes">
-                                        <td><a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</a></td>
-                                        <td><div><p class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}</p></div></td>
+                                        <td>
+                                            <a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)">
+                                                <umb-icon icon="{{relation.icon}}" class="umb-table-body__icon"></umb-icon> {{::relation.name}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <p class="red" ng-repeat="property in relation.properties">
+                                                    <umb-icon icon="icon-alert" class="icon red"></umb-icon> {{::property.name}}
+                                                </p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -62,7 +72,7 @@
                         <div ng-if="vm.references.mediaTypes.length > 0">
 
                             <h5 class="mt4" style="margin-bottom: 20px;">
-                                <localize key="treeHeaders_mediaTypes"></localize>
+                                <localize key="treeHeaders_mediaTypes">Media Types</localize>
                             </h5>
 
                             <table class="table table-condensed table-bordered">
@@ -74,8 +84,18 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="relation in vm.references.mediaTypes">
-                                        <td><a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</a></td>
-                                        <td><div><p class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}</p></div></td>
+                                        <td>
+                                            <a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)">
+                                                <umb-icon icon="{{relation.icon}}" class="umb-table-body__icon"></umb-icon> {{::relation.name}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <p class="red" ng-repeat="property in relation.properties">
+                                                    <umb-icon icon="icon-alert" class="icon red"></umb-icon> {{::property.name}}
+                                                </p>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -86,7 +106,7 @@
                         <div ng-if="vm.references.memberTypes.length > 0">
 
                             <h5 class="mt4" style="margin-bottom: 20px;">
-                                <localize key="treeHeaders_memberTypes"></localize>
+                                <localize key="treeHeaders_memberTypes">Member Types</localize>
                             </h5>
 
                             <table class="table table-condensed table-bordered">
@@ -98,25 +118,34 @@
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="relation in vm.references.memberTypes">
-                                            <td><a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</a></td>
-                                            <td><div><p class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}</p></div></td>
+                                            <td>
+                                                <a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)">
+                                                    <umb-icon icon="{{relation.icon}}" class="umb-table-body__icon"></umb-icon> {{::relation.name}}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <p class="red" ng-repeat="property in relation.properties">
+                                                        <umb-icon icon="icon-alert" class="icon red"></umb-icon> {{::property.name}}
+                                                    </p>
+                                                </div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
 
                         </div>
 
-                        <umb-checkbox model="vm.confirmed" text="{{vm.labels.deleteConfirm}}">
-                        </umb-checkbox>
+                        <umb-checkbox model="vm.confirmed" text="{{vm.labels.deleteConfirm}}"></umb-checkbox>
 
                     </div>
 
 
-                <umb-confirm ng-if="vm.confirmed || vm.hasReferences === false"
-                            on-confirm="vm.performDelete"
-                            on-cancel="vm.cancel"
-                            confirm-button-style="danger"
-                            confirm-label-key="general_delete">
+                <umb-confirm confirm-disabled="!(vm.confirmed || vm.hasReferences === false)"
+                             on-confirm="vm.performDelete"
+                             on-cancel="vm.cancel"
+                             confirm-button-style="danger"
+                             confirm-label-key="general_delete">
                 </umb-confirm>
             </div>
         </ng-switch>

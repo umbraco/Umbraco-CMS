@@ -1,53 +1,59 @@
-﻿<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.DocumentTypes.ImportController as vm">
-    <div ng-if="vm.state === 'upload'">
-        <p>
-            <localize key="settings_importDocumentTypeHelp">
-                To import a document type, find the '.udt' file on your computer by clicking the 'Browse' button and click 'Import' (you'll be asked for confirmation on the next screen)
-            </localize>
-        </p>
+﻿<div class="umb-dialog" ng-controller="Umbraco.Editors.DocumentTypes.ImportController as vm">
 
-        <form name="importDoctype">
+    <div class="umb-dialog-body with-footer">
+        <div class="umb-pane">
+            <div ng-if="vm.state === 'upload'">
+                <p>
+                    <localize key="settings_importDocumentTypeHelp">
+                        To import a document type, find the '.udt' file on your computer by clicking the 'Import' button (you'll be asked for confirmation on the next screen)
+                    </localize>
+                </p>
 
-            <!-- Select files -->
-            <button class="btn btn-action"
-                name="file"
-                ngf-select
-                ng-model="filesHolder"
-                ngf-change="handleFiles($files, $event)"
-                ngf-multiple="true"
-                ngf-pattern="*.udt">
-                <localize key="general_import">Import</localize>
-            </button>
+                <form name="importDoctype">
 
-            <localize key="general_or">or</localize>
+                    <!-- Select files -->
+                    <button class="btn btn-action"
+                            name="file"
+                            ngf-select
+                            ng-model="filesHolder"
+                            ngf-change="handleFiles($files, $event, $invalidFiles)"
+                            ngf-multiple="true"
+                            ngf-pattern="*.udt"
+                            accept=".udt">
+                        <localize key="general_import">Import</localize>
+                    </button>
+                </form>
 
-            <a class="btn-link" ng-click="close()">
-                <localize key="cancel">Cancel</localize>
-            </a>
-        </form>        
+                <div ng-if="importDoctype.file.$error.pattern">Please choose a .udt file to import</div>
 
-        <div ng-if="importDoctype.file.$error.pattern">Please choose a .udt file to import</div>
-        
-
-        
+            </div>
+            <div ng-if="vm.state === 'confirm'">
+                <strong>
+                    <localize key="name">Name</localize>:
+                </strong>
+                {{vm.model.name}}
+                <br />
+                <strong>
+                    <localize key="alias">Alias</localize>:
+                </strong>
+                {{vm.model.alias}}
+                <br />
+                <br />
+                <button class="btn btn-primary" ng-click="import()">
+                    <localize key="actions_importDocumentType">Import</localize>
+                </button>
+            </div>
+            <div ng-if="vm.state === 'done'">
+                {{vm.model.name}} has been imported!
+            </div>
+        </div>
     </div>
-    <div ng-if="vm.state === 'confirm'">
-        <strong>
-            <localize key="name">Name</localize>:
-        </strong>
-        {{vm.model.name}}
-        <br />
-        <strong>
-            <localize key="alias">Alias</localize>:
-        </strong>
-        {{vm.model.alias}}
-        <br />
-        <br />
-        <button class="btn btn-primary" ng-click="import()">
-            <localize key="actions_importDocumentType">Import</localize>
-        </button>
-    </div>
-    <div ng-if="vm.state === 'done'">
-        {{vm.model.name}} has been imported!
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <umb-button type="button"
+                    button-style="link"
+                    action="close()"
+                    label-key="{{vm.cancelButtonLabel}}">
+        </umb-button>
     </div>
 </div>

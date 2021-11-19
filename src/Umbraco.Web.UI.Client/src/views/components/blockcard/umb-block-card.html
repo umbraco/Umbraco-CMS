@@ -1,0 +1,22 @@
+<div>
+    <div class="__showcase"
+         ng-class="{'--error':vm.elementTypeModel === null}"
+         ng-style="{'background-color': vm.blockConfigModel ? vm.blockConfigModel.backgroundColor : '', 'background-image': vm.styleBackgroundImage}">
+        <div class="__icon">
+            <umb-icon icon="{{vm.icon}}"
+                      ng-attr-style="{{'color:' + vm.blockConfigModel.iconColor}}"
+                      ng-if="vm.blockConfigModel == null || vm.blockConfigModel.thumbnail == null">
+            </umb-icon>
+        </div>
+    </div>
+    <div class="__info" ng-if="vm.elementTypeModel !== null">
+        <div class="__name" ng-bind="vm.elementTypeModel.name"></div>
+        <div class="__subname" ng-if="vm.elementTypeModel.description" ng-bind="vm.elementTypeModel.description"></div>
+    </div>
+    <div class="__info --error" ng-if="vm.elementTypeModel === null">
+        <div class="__name"><localize key="blockEditor_elementTypeDoesNotExistHeadline">Other</localize></div>
+        <div class="__subname"><localize key="blockEditor_elementTypeDoesNotExistDescription">Other</localize></div>
+    </div>
+
+    <ng-transclude></ng-transclude>
+</div>

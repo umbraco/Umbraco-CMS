@@ -124,7 +124,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
         {
             CacheValues cacheValues;
-            PublishedSnapshot publishedSnapshot;
+            IPublishedSnapshot publishedSnapshot;
             IAppCache cache;
             switch (cacheLevel)
             {
@@ -141,7 +141,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // elements cache (if we don't want to pollute the elements cache with short-lived
                     // data) depending on settings
                     // for members, always cache in the snapshot cache - never pollute elements cache
-                    publishedSnapshot = (PublishedSnapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+                    publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
                     cache = publishedSnapshot == null
                         ? null
                         : ((_isPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (_isMember == false)
@@ -151,7 +151,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     break;
                 case PropertyCacheLevel.Snapshot:
                     // cache within the snapshot cache
-                    publishedSnapshot = (PublishedSnapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+                    publishedSnapshot = _publishedSnapshotAccessor.PublishedSnapshot;
                     cache = publishedSnapshot?.SnapshotCache;
                     cacheValues = GetCacheValues(cache);
                     break;

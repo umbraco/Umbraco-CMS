@@ -11,20 +11,20 @@
                 on-change="datePickerChange(dateStr)">
 
                 <div class="input-append">
-                    <input
-                        name="datepicker"
-                        id="{{model.alias}}"
-                        type="text"
-                        ng-model="model.datetimePickerValue"
-                        ng-blur="inputChanged()"
-                        ng-required="model.validation.mandatory"
-                        val-server="value"
-                        class="datepickerinput">
-                    <span class="on-top" ng-click="clearDate()" ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
-                        <i class="icon-delete"></i>
-                    </span>
+                    <input type="text"
+                           name="datepicker"
+                           id="{{model.alias}}"
+                           ng-model="model.datetimePickerValue"
+                           ng-blur="inputChanged()"
+                           ng-required="model.validation.mandatory"
+                           val-server="value"
+                           class="datepickerinput" />
+                    <button type="button" class="btn-clear" ng-click="clearDate()" ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
+                        <umb-icon icon="icon-delete"></umb-icon>
+                        <span class="sr-only"><localize key="content_removeDate">Clear date</localize></span>
+                    </button>
                     <span class="add-on">
-                        <i class="icon-calendar"></i>
+                        <umb-icon icon="icon-{{ datePickerConfig.noCalendar ? 'time' : 'calendar' }}"></umb-icon>
                     </span>
                 </div>
 
@@ -32,7 +32,7 @@
 
         </div>
 
-        <div ng-messages="datePickerForm.datepicker.$error" show-validation-on-submit >
+        <div ng-messages="datePickerForm.datepicker.$error" show-validation-on-submit>
             <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
             <p class="help-inline" ng-message="valServer">{{datePickerForm.datepicker.errorMsg}}</p>
             <p class="help-inline" ng-message="pickerError"><localize key="validation_invalidDate">Invalid date</localize></p>

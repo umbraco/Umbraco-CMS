@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Routing
             var publishedRouter = CreatePublishedRouter(Factory);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
-            // must lookup domain else lookup by url fails
+            // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
 
             var lookup = new ContentFinderByUrl(Logger);
@@ -176,7 +176,7 @@ namespace Umbraco.Tests.Routing
             var publishedRouter = CreatePublishedRouter(Factory);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
 
-            // must lookup domain else lookup by url fails
+            // must lookup domain else lookup by URL fails
             publishedRouter.FindDomain(frequest);
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
 

@@ -91,6 +91,6 @@ angular.module("umbraco.viewcache", [])
 // be able to configure angular values in the Default.cshtml
 // view which is much easier to do that configuring values by injecting them in  the back office controller
 // to follow through to the js initialization stuff
-if (angular.isFunction(document.angularReady)) {
+if (_.isFunction(document.angularReady)) {
     document.angularReady.apply(this, [app]);
 }

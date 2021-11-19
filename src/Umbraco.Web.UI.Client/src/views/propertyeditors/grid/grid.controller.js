@@ -141,9 +141,9 @@ angular.module("umbraco")
                 over: function (event, ui) {
 
                     var area = event.target.getScope_HackForSortable().area;
-                    var allowedEditors = area.allowed;
+                    var allowedEditors = area.$allowedEditors.map(e => e.alias);
 
-                    if (($.inArray(ui.item[0].getScope_HackForSortable().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
+                    if (($.inArray(ui.item[0].getScope_HackForSortable().control.editor.alias, allowedEditors) < 0) ||
                         (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                         $scope.$apply(function () {
@@ -185,7 +185,7 @@ angular.module("umbraco")
                             var rteId = value.id;
 
                             if ($.inArray(rteId, notIncludedRte) < 0) {
-                                
+
                                 // remember this RTEs settings, cause we need to update it later.
                                 var editor = _.findWhere(tinyMCE.editors, { id: rteId })
                                 if (editor) {
@@ -197,17 +197,17 @@ angular.module("umbraco")
                     }
                     else {
                         $(event.target).find(".umb-rte").each(function () {
-                            
+
                             var rteId = $(this).attr("id");
-                            
+
                             if ($.inArray(rteId, notIncludedRte) < 0) {
-                                
+
                                 // remember this RTEs settings, cause we need to update it later.
                                 var editor = _.findWhere(tinyMCE.editors, { id: rteId })
                                 if (editor) {
                                     draggedRteSettings[rteId] = editor.settings;
                                 }
-                                
+
                                 notIncludedRte.splice(0, 0, $(this).attr("id"));
                             }
                         });
@@ -227,12 +227,12 @@ angular.module("umbraco")
                     // reset dragged RTE settings in case a RTE isn't dragged
                     draggedRteSettings = {};
                     notIncludedRte = [];
-                    
+
                     ui.item[0].style.display = "block";
                     ui.item.find(".umb-rte").each(function (key, value) {
-                        
+
                         var rteId = value.id;
-                        
+
                         // remember this RTEs settings, cause we need to update it later.
                         var editor = _.findWhere(tinyMCE.editors, { id: rteId });
 
@@ -255,17 +255,17 @@ angular.module("umbraco")
                     ui.item.offsetParent().find(".umb-rte").each(function (key, value) {
                         var rteId = value.id;
                         if ($.inArray(rteId, notIncludedRte) < 0) {
-                            
+
                             var editor = _.findWhere(tinyMCE.editors, { id: rteId });
                             if (editor) {
                                 draggedRteSettings[rteId] = editor.settings;
                             }
-                            
+
                             // add all dragged's neighbouring RTEs in the new cell
                             notIncludedRte.splice(0, 0, rteId);
                         }
                     });
-                    
+
                     // reconstruct the dragged RTE (could be undefined when dragging something else than RTE)
                     if (draggedRteSettings !== undefined) {
                         tinyMCE.init(draggedRteSettings);
@@ -318,25 +318,25 @@ angular.module("umbraco")
             // Add items overlay menu
             // *********************************************
             $scope.openEditorOverlay = function (event, area, index, key) {
-                var title = "";
-                localizationService.localize("grid_insertControl").then(function (value) {
-                    title = value;
-                    overlayService.open({
-                        view: "itempicker",
-                        filter: area.$allowedEditors.length > 15,
-                        title: title,
-                        availableItems: area.$allowedEditors,
-                        event: event,
-                        submit: function(model) {
-                            if (model.selectedItem) {
-                                $scope.addControl(model.selectedItem, area, index);
-                                overlayService.close();
-                            }
-                        },
-                        close: function() {
+                const dialog = {
+                    view: "itempicker",
+                    filter: area.$allowedEditors.length > 15,
+                    availableItems: area.$allowedEditors,
+                    event: event,
+                    submit: function (model) {
+                        if (model.selectedItem) {
+                            $scope.addControl(model.selectedItem, area, index);
                             overlayService.close();
                         }
-                    });
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+
+                localizationService.localize("grid_insertControl").then(value => {
+                    dialog.title = value;
+                    overlayService.open(dialog);
                 });
             };
 
@@ -345,7 +345,7 @@ angular.module("umbraco")
             // *********************************************
 
             $scope.addTemplate = function (template) {
-                $scope.model.value = angular.copy(template);
+                $scope.model.value = Utilities.copy(template);
 
                 //default row data
                 _.forEach($scope.model.value.sections, function (section) {
@@ -387,7 +387,7 @@ angular.module("umbraco")
             $scope.addRow = function (section, layout, isInit) {
 
                 //copy the selected layout into the rows collection
-                var row = angular.copy(layout);
+                var row = Utilities.copy(layout);
 
                 // Init row value
                 row = $scope.initRow(row);
@@ -404,14 +404,16 @@ angular.module("umbraco")
 
                 eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
 
-                // TODO: find a nicer way to do this without relying on setTimeout
-                setTimeout(function () {
-                    var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
+                if (!isInit) {
+                    // TODO: find a nicer way to do this without relying on setTimeout
+                    setTimeout(function () {
+                        var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
 
-                    if(newRowEl !== null) {
-                        newRowEl.focus();
-                    }
-                }, 0);
+                        if (newRowEl !== null) {
+                            newRowEl.focus();
+                        }
+                    }, 0);
+                }
 
             };
 
@@ -467,10 +469,10 @@ angular.module("umbraco")
                 var styles, config;
                 if (itemType === 'control') {
                     styles = null;
-                    config = angular.copy(gridItem.editor.config.settings);
+                    config = Utilities.copy(gridItem.editor.config.settings);
                 } else {
-                    styles = _.filter(angular.copy($scope.model.config.items.styles), function (item) { return shouldApply(item, itemType, gridItem); });
-                    config = _.filter(angular.copy($scope.model.config.items.config), function (item) { return shouldApply(item, itemType, gridItem); });
+                    styles = _.filter(Utilities.copy($scope.model.config.items.styles), function (item) { return shouldApply(item, itemType, gridItem); });
+                    config = _.filter(Utilities.copy($scope.model.config.items.config), function (item) { return shouldApply(item, itemType, gridItem); });
                 }
 
                 if (Utilities.isObject(gridItem.config)) {
@@ -624,21 +626,8 @@ angular.module("umbraco")
 
             }
 
-
-            var guid = (function () {
-                function s4() {
-                    return Math.floor((1 + Math.random()) * 0x10000)
-                        .toString(16)
-                        .substring(1);
-                }
-                return function () {
-                    return s4() + s4() + "-" + s4() + "-" + s4() + "-" +
-                        s4() + "-" + s4() + s4() + s4();
-                };
-            })();
-
-            $scope.setUniqueId = function (cell, index) {
-                return guid();
+            $scope.setUniqueId = function () {
+                return String.CreateGuid();
             };
 
             $scope.addControl = function (editor, cell, index, initialize) {
@@ -763,7 +752,7 @@ angular.module("umbraco")
                             // allowed for this template based on the current config.
 
                             _.each(found.sections, function (templateSection, index) {
-                                angular.extend($scope.model.value.sections[index], angular.copy(templateSection));
+                                Utilities.extend($scope.model.value.sections[index], Utilities.copy(templateSection));
                             });
 
                         }
@@ -835,7 +824,7 @@ angular.module("umbraco")
                     return null;
                 } else {
                     //make a copy to not touch the original config
-                    original = angular.copy(original);
+                    original = Utilities.copy(original);
                     original.styles = row.styles;
                     original.config = row.config;
                     original.hasConfig = gridItemHasConfig(row.styles, row.config);
@@ -952,7 +941,7 @@ angular.module("umbraco")
                 $scope.availableEditors = response.data;
 
                 //Localize the grid editor names
-                angular.forEach($scope.availableEditors, function (value, key) {
+                $scope.availableEditors.forEach(function (value) {
                     //If no translation is provided, keep using the editor name from the manifest
                     localizationService.localize("grid_" + value.alias, undefined, value.name).then(function (v) {
                         value.name = v;

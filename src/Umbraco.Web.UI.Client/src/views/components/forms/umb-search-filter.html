@@ -1,0 +1,24 @@
+<div class="umb-control-group -no-border">
+    <div class="umb-search-filter" ng-class="vm.cssClass">
+        <label for="{{vm.inputId}}" class="sr-only">{{vm.text}}</label>
+        <button type="button"
+                class="btn-reset icon icon-arrow-left"
+                ng-if="vm.showBackButton && vm.model.length > 0"
+                ng-click="vm.goBack()"
+                localize="title"
+                title="@general_back">
+        </button>
+        <umb-icon icon="icon-search" ng-if="!vm.showBackButton || vm.model.length === 0"></umb-icon>
+        <input type="text"
+               id="{{vm.inputId}}"
+               ng-change="vm.change()"
+               ng-keydown="vm.keyDown($event)"
+               ng-blur="vm.blur($event)"
+               ng-model="vm.model"
+               class="umb-search-filter__input"
+               placeholder="{{vm.text}}"
+               umb-auto-focus="{{vm.autoFocus}}"
+               prevent-enter-submit="{{vm.preventSubmitOnEnter}}"
+               no-dirty-check />
+    </div>
+</div>

@@ -3,8 +3,8 @@
     <div class="flex items-center" style="height: 100%;" ng-hide="loading">
 
         <div ng-if="showBackButton === true && splitViewOpen !== true" style="margin-right: 15px;">
-            <button type="button" class="umb-editor-header__back" ng-click="goBack()" prevent-default>
-                <i class="fa fa-arrow-left" aria-hidden="true"></i>
+            <button type="button" class="umb-editor-header__back" ng-click="goBack()">
+                <umb-icon icon="fa fa-arrow-left"></umb-icon>
                 <span class="sr-only"><localize key="visuallyHiddenTexts_goBack">Go back</localize></span>
             </button>
         </div>
@@ -12,16 +12,16 @@
         <div class="flex items-center" style="flex: 1;">
 
             <ng-form data-element="editor-icon" name="iconForm">
-                <button 
-                    type="button" class="umb-panel-header-icon" 
-                    ng-if="!hideIcon" 
-                    ng-click="openIconPicker()" 
-                    ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
+                <button
+                    type="button" class="umb-panel-header-icon"
+                    ng-if="!hideIcon"
+                    ng-click="openIconPicker()"
+                    ng-class="{'-placeholder': $parent.icon === '' || $parent.icon === null}"
                     title="{{$parent.icon}}">
-                        <i class="icon {{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null" aria-hidden="true"></i>
-                        <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                        <umb-icon icon="{{$parent.icon}}" class="icon" ng-if="$parent.icon !== '' && $parent.icon !== null"></umb-icon>
+                        <span class="umb-panel-header-icon-text" ng-if="$parent.icon === '' || $parent.icon === null">
                             <localize key="settings_addIcon">Add icon</localize>
-                        </div>
+                        </span>
                 </button>
             </ng-form>
 
@@ -48,8 +48,8 @@
                                umb-auto-focus
                                focus-on-filled="true"
                                val-server-field="Name"
-                               required
-                               aria-required="true"
+                               ng-required="nameRequired != null ? nameRequired : true"
+                               aria-required="{{nameRequired != null ? nameRequired : true}}"
                                aria-invalid="{{contentForm.headerNameForm.headerName.$invalid ? true : false}}"
                                autocomplete="off"
                                maxlength="255"/>
@@ -67,7 +67,7 @@
 
                 </div>
 
-                <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
+                <h1 class="umb-panel-header-name" id="editor-headline-{{$id}}" ng-if="nameLocked" title="{{key}}">{{ name }}</h1>
 
                 <input data-element="editor-description"
                        no-password-manager
@@ -78,7 +78,7 @@
                        ng-if="!hideDescription && !descriptionLocked"
                        ng-model="$parent.description"/>
 
-                <div class="umb-panel-header-locked-description" ng-if="descriptionLocked">{{ description }}</div>
+                <p class="umb-panel-header-locked-description" id="editor-description-{{$id}}" ng-if="descriptionLocked">{{ description }}</p>
 
             </div>
 

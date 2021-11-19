@@ -30,24 +30,16 @@
 
             <umb-editor-sub-header-section ng-if="vm.dashboard.urlTrackerDisabled === false">
 
-                <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
+                <ng-form novalidate>
                     <div class="inner-addon left-addon">
-                        <label for="redirect-search" class="form-search__label-icon">
-                            <i class="icon icon-search" aria-hidden="true"></i>
-                            <span class="sr-only">
-                                <localize key="visuallyHiddenTexts_redirectDashboardSearchLabel">Search the redirect dashboard</localize>
-                            </span>
-                        </label>
-                        <input
-                            class="form-control search-input"
-                            type="text"
-                            localize="placeholder"
-                            placeholder="@general_typeToSearch"
-                            ng-model="vm.dashboard.searchTerm"
-                            ng-change="vm.filter()"
-                            id="redirect-search"
-                            prevent-enter-submit
-                            no-dirty-check>
+                        <umb-search-filter
+                            input-id="redirect-search"
+                            model="vm.dashboard.searchTerm"
+                            label-key="general_typeToSearch"
+                            text="Type to search"
+                            on-change="vm.filter()"
+                            prevent-submit-on-enter="true">
+                        </umb-search-filter>
                     </div>
                 </ng-form>
 
@@ -76,16 +68,16 @@
                     {{redirect.culture ||'*'}}
                 </div>
                 <div class="umb-table-cell flx-s1 flx-g1 flx-b4">
-                    <a class="umb-table-body__link" href="{{redirect.originalUrl}}" target="_blank" title="{{redirect.originalUrl}}">{{redirect.originalUrl}}</a>
+                    <a class="umb-table-body__link" href="{{redirect.originalUrl}}" target="_blank" rel="noopener" title="{{redirect.originalUrl}}">{{redirect.originalUrl}}</a>
                 </div>
 
                 <div class="umb-table-cell flx-s0 flx-g0" style="flex-basis: 20px;">
-                    <i class="umb-table-body__icon umb-table-body__fileicon icon-arrow-right" style="font-size: 12px; line-height: 1;"></i>
+                    <umb-icon icon="icon-arrow-right" class="umb-table-body__icon umb-table-body__fileicon" style="font-size: 12px; line-height: 1;"></umb-icon>
                 </div>
 
                 <div class="umb-table-cell flx-s1 flx-g1 flx-b5 items-center">
                     <div class="flx-s1 flx-g1 flx-b0" style="margin-right: 20px;">
-                        <a class="umb-table-body__link" href="{{redirect.destinationUrl}}" target="_blank" title="{{redirect.destinationUrl}}">{{redirect.destinationUrl}}</a>
+                        <a class="umb-table-body__link" href="{{redirect.destinationUrl}}" target="_blank" rel="noopener" title="{{redirect.destinationUrl}}">{{redirect.destinationUrl}}</a>
                     </div>
                     <umb-button
                         type="button"
@@ -103,18 +95,31 @@
 
     </div>
 
-    <umb-empty-state
-        ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length === 0 && !vm.dashboard.loading"
-        position="center">
-        <div><localize key="redirectUrls_noRedirects">No redirects have been made</localize></div>
-        <small class="faded"><localize key="redirectUrls_noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page</localize></small>
-    </umb-empty-state>
+    <umb-box ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length === 0 && !vm.dashboard.loading">
+        <umb-box-content class="block-form">
 
-    <umb-empty-state
-        ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length > 0 && !vm.dashboard.loading"
-        position="center">
-        <localize key="general_searchNoResult"></localize>
-    </umb-empty-state>
+            <umb-empty-state size="small">
+                <div>
+                    <localize key="redirectUrls_noRedirects">No redirects have been made</localize>
+                </div>
+                <small class="faded">
+                    <localize key="redirectUrls_noRedirectsDescription">When a published page gets renamed or moved a redirect will
+                        automatically be made to the new page</localize>
+                </small>
+            </umb-empty-state>
+
+        </umb-box-content>
+    </umb-box>
+
+    <umb-box ng-if="vm.redirectUrls.length === 0 && vm.dashboard.searchTerm.length > 0 && !vm.dashboard.loading">
+        <umb-box-content class="block-form">
+
+            <umb-empty-state size="small">
+                <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
+            </umb-empty-state>
+
+        </umb-box-content>
+    </umb-box>
 
     <div class="flex justify-center items-center">
         <umb-pagination

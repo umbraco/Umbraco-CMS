@@ -11,24 +11,27 @@ Use this directive to render a tabs navigation.
 <pre>
     <div ng-controller="My.Controller as vm">
 
-        <umb-tabs-nav
-            tabs="vm.tabs"
-            on-tab-change="vm.changeTab(tab)">
-        </umb-tabs-nav>
+        <!-- The tabs navigation depends on a form and the validation manager. If the tabs are used inside a property editor or dashboard this is already added -->
+        <ng-form name="tabsForm" val-form-manager>
 
-        <umb-tab-content
-            ng-repeat="tab in vm.tabs"
-            ng-show="tab.active"
-            tab="tab">
-            <div ng-if="tab.alias === 'tabOne'">
-                <div>Content of tab 1</div>
-            </div>
-            <div ng-if="tab.alias === 'tabTwo'">
-                <div>Content of tab 2</div>
-            </div>
-        </umb-tab-content>
+            <umb-tabs-nav
+                tabs="vm.tabs"
+                on-tab-change="vm.changeTab(tab)">
+            </umb-tabs-nav>
 
+            <umb-tab-content
+                ng-repeat="tab in vm.tabs"
+                ng-show="tab.active"
+                tab="tab">
+                <div ng-if="tab.alias === 'tabOne'">
+                    <div>Content of tab 1</div>
+                </div>
+                <div ng-if="tab.alias === 'tabTwo'">
+                    <div>Content of tab 2</div>
+                </div>
+            </umb-tab-content>
 
+        </ng-form>
     </div>
 </pre>
 
@@ -37,7 +40,7 @@ Use this directive to render a tabs navigation.
     (function () {
         "use strict";
 
-        function Controller() {
+        function Controller(eventsService) {
 
             var vm = this;
 
@@ -62,7 +65,7 @@ Use this directive to render a tabs navigation.
                 selectedTab.active = true;
             };
 
-            eventsService.on("tab.tabChange", function(name, args){
+            eventsService.on("app.tabChange", function(name, args){
                 console.log("args", args);
             });
 
@@ -87,7 +90,7 @@ Use this directive to render a tabs navigation.
 (function() {
     'use strict';
 
-    function TabsNavDirective($timeout, $window) {
+    function TabsNavDirective($timeout, $window, eventsService) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -95,11 +98,16 @@ Use this directive to render a tabs navigation.
             // the parent is the component itself so we need to go one level higher
             var container = element.parent().parent();
 
+            const ro = new ResizeObserver(function () {
+                calculateWidth();
+            });
+
+            ro.observe(container[0]);
+
             $timeout(function(){
                 element.find("li:not(umb-tab--expand)").each(function() {
                     tabNavItemsWidths.push($(this).outerWidth());
                 });
-                calculateWidth();
             });
 
             function calculateWidth(){
@@ -128,14 +136,9 @@ Use this directive to render a tabs navigation.
                 });
             }
 
-            $(window).on('resize.tabsNav', function () {
-                calculateWidth();
-            });
-
             scope.$on('$destroy', function() {
-                $(window).off('resize.tabsNav');
+                ro.unobserve(container[0]);
             });
-
         }
 
         function UmbTabsNavController(eventsService) {

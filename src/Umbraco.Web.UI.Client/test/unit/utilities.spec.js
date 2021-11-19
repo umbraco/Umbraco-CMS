@@ -1,5 +1,13 @@
 (function () {
     describe("Utilities", function () {
+        describe("fromJson", function () {
+            it("should deserialize json as object", function () {
+                expect(Utilities.fromJson('{"a":1,"b":2}')).toEqual({ a: 1, b: 2 });
+            });
+            it("should return object as object", function () {
+                expect(Utilities.fromJson({ a: 1, b: 2 })).toEqual({ a: 1, b: 2 });
+            });
+        }),
         describe("toJson", function () {
             it("should delegate to JSON.stringify", function () {
                 var spy = spyOn(JSON, "stringify").and.callThrough();

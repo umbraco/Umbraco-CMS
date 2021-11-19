@@ -19,6 +19,13 @@ function umbFileUpload() {
                 //clear the element value - this allows us to pick the same file again and again
                 el.val('');
             });
+
+            el.on('dragover dragenter', function () {
+                scope.$emit("isDragover", { value: true });
+            })
+            .on('dragleave dragend drop', function () {
+                scope.$emit("isDragover", { value: false });
+            });
         }
     };
 }
