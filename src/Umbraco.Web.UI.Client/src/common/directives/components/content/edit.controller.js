@@ -773,7 +773,7 @@
                                 model.submitButtonState = "error";
                                 //re-map the dialog model since we've re-bound the properties
                                 dialog.variants = $scope.content.variants;
-                                debugger;
+
                                 //ensure error messages are displayed
                                 formHelper.showNotifications(err.data);
                                 clearNotifications($scope.content);
