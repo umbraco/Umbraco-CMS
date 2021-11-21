@@ -317,7 +317,7 @@
     <key alias="nodeIsInTrash">Dette element er i papirkurven</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Opret en ny indholdsskabelon fra '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Opret en ny indholdsskabelon fra <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Blank</key>
     <key alias="selectBlueprint">Vælg en indholdsskabelon</key>
     <key alias="createdBlueprintHeading">Indholdsskabelon oprettet</key>
@@ -813,6 +813,8 @@
     <key alias="videos">Videoer</key>
     <key alias="installing">installere</key>
     <key alias="avatar">Avatar til</key>
+    <key alias="header">Overskrift</key>
+    <key alias="systemField">system felt</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blå</key>
@@ -1455,6 +1457,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="warning">Advarsel</key>
     <key alias="youAreDeleting">Du sletter en rækkekonfiguration</key>
     <key alias="deletingARow">Sletning af et rækkekonfigurations navn vil resultere i et tab af data for alle eksiterende indhold som bruger dens konfiguration.</key>
+    <key alias="deleteLayout">Du sletter et layoutet</key>
+    <key alias="deletingALayout">Når du redigerer et layout vil data gå tabt de steder, hvor denne konfiguration bruges.</key>
     <key alias="maxItems">Maksimalt emner</key>
     <key alias="maxItemsDescription">Efterlad blank eller sæt til 0 for ubegrænset</key>
   </area>
@@ -1527,6 +1531,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="propertyHasChanges">Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?</key>
     <key alias="displaySettingsHeadline">Visning</key>
     <key alias="displaySettingsLabelOnTop">Label hen over (fuld bredde)</key>
+    <key alias="removeChildNode">Du fjerner noden</key>
+    <key alias="removeChildNodeWarning">Fjernelse af noden, begrænser redaktørens muligheder for at oprette forskellige typer af underindhold.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Tilføj sprog</key>

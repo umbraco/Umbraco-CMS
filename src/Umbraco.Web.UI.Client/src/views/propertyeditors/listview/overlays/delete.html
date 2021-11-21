@@ -1,7 +1,7 @@
 <div>
 
     <p class="abstract">
-        <localize key="defaultdialogs_confirmdelete"></localize>?
+        <localize key="defaultdialogs_confirmdeleteNumberOfItems" tokens="[model.numberOfItems, model.totalItems]">Are you sure you want to delete</localize>?
     </p>
 
     <div class="umb-alert umb-alert--warning" ng-show="model.deletesVariants && !model.isTrashed">

@@ -535,7 +535,7 @@
                     // remove all tabs except the specified tab
                     var tabs = scaffold.variants[0].tabs;
                     var tab = _.find(tabs, function (tab) {
-                        return tab.id !== 0 && (tab.alias.toLowerCase() === contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias === "");
+                        return tab.id !== 0 && (tab.label.toLowerCase() === contentType.ncTabAlias.toLowerCase() || contentType.ncTabAlias === "");
                     });
                     scaffold.variants[0].tabs = [];
                     if (tab) {

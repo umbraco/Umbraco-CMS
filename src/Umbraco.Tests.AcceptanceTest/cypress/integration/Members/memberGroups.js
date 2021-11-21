@@ -1,4 +1,4 @@
-context('User Groups', () => {
+context('Member Groups', () => {
 
     beforeEach(() => {
         cy.umbracoLogin(Cypress.env('username'), Cypress.env('password'));

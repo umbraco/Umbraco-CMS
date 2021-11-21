@@ -256,6 +256,7 @@
     <Compile Include="Models\ContentEditing\ContentTypesByAliases.cs" />
     <Compile Include="Models\ContentEditing\ContentTypesByKeys.cs" />
     <Compile Include="Models\ContentEditing\DataTypeReferences.cs" />
+    <Compile Include="Models\ContentEditing\HistoryCleanup.cs" />
     <Compile Include="Models\ContentEditing\LinkDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroDisplay.cs" />
     <Compile Include="Models\ContentEditing\MacroParameterDisplay.cs" />
@@ -320,6 +321,7 @@
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
+    <Compile Include="Scheduling\ContentVersionCleanup.cs" />
     <Compile Include="Scheduling\SimpleTask.cs" />
     <Compile Include="Scheduling\TempFileCleanup.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />

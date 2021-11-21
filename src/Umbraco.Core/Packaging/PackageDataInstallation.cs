@@ -750,7 +750,7 @@ namespace Umbraco.Core.Packaging
                     alias = name.ToSafeAlias(true);
                 }
 
-                contentType.AddPropertyGroup(name, alias);
+                contentType.AddPropertyGroup(alias, name);
                 var propertyGroup = contentType.PropertyGroups[alias];
 
                 if (Guid.TryParse(propertyGroupElement.Element("Key")?.Value, out var key))

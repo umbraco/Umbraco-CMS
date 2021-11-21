@@ -90,17 +90,20 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
         },
 
         convertGroupToTab: function (groups, group) {
+            const tabs = groups.filter(group => group.type === this.TYPE_TAB).sort((a, b) => a.sortOrder - b.sortOrder);
+            const nextSortOrder = tabs && tabs.length > 0 ? tabs[tabs.length - 1].sortOrder + 1 : 0;
+
             group.convertingToTab = true;
 
             group.type = this.TYPE_TAB;
-            
+
             const newAlias = this.generateLocalAlias(group.name);
             // when checking for alias uniqueness we need to exclude the current group or the alias would get a + 1
             const otherGroups = [...groups].filter(groupCopy => !groupCopy.convertingToTab);
 
             group.alias = this.isAliasUnique(otherGroups, newAlias) ? newAlias : this.createUniqueAlias(otherGroups, newAlias);
             group.parentAlias = null;
-
+            group.sortOrder = nextSortOrder;
             group.convertingToTab = false;
         },
 
@@ -436,6 +439,51 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
             array.push(placeholder);
 
+        },
+
+        rebindSavedContentType: function (contentType, savedContentType) {
+            // The saved content type might have updated values (eg. new IDs/keys), so make sure the view model is updated
+            contentType.ModelState = savedContentType.ModelState;
+            contentType.id = savedContentType.id;
+
+            // Prevent rebinding if there was an error: https://github.com/umbraco/Umbraco-CMS/pull/11257
+            if (savedContentType.ModelState) {
+              return;
+            }
+
+            contentType.groups.forEach(function (group) {
+                if (!group.alias) return;
+
+                var k = 0;
+                while (k < savedContentType.groups.length && savedContentType.groups[k].alias != group.alias)
+                    k++;
+
+                if (k == savedContentType.groups.length) {
+                    group.id = 0;
+                    return;
+                }
+
+                var savedGroup = savedContentType.groups[k];
+                group.id = savedGroup.id;
+                group.key = savedGroup.key;
+                group.contentTypeId = savedGroup.contentTypeId;
+
+                group.properties.forEach(function (property) {
+                    if (property.id || !property.alias) return;
+
+                    k = 0;
+                    while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
+                        k++;
+
+                    if (k == savedGroup.properties.length) {
+                        property.id = 0;
+                        return;
+                    }
+
+                    var savedProperty = savedGroup.properties[k];
+                    property.id = savedProperty.id;
+                });
+            });
         }
 
     };

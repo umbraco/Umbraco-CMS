@@ -1,13 +1,7 @@
 <div ng-controller="Umbraco.Overlays.UserController">
     <div class="umb-control-group" ng-if="!showPasswordFields">
 
-       <h5><localize key="user_yourProfile"></localize></h5>
-
-       <!--<p class="muted">
-           <small>
-               <localize key="user_sessionExpires"></localize>: {{remainingAuthSeconds | timespan}}
-           </small>
-       </p>-->
+       <h5><localize key="user_yourProfile">Your profile</localize></h5>
 
         <umb-button
             alias="editUser"
@@ -74,14 +68,14 @@
                     <localize key="defaultdialogs_unLinkYour">Un-link your</localize>&nbsp;{{login.caption}}&nbsp;<localize key="defaultdialogs_account">account</localize>
                 </button>
             </div>
-			
+
         </div>
 
     </div>
 
 
     <div class="umb-control-group" ng-if="!showPasswordFields && history.length">
-        <h5><localize key="user_yourHistory"></localize></h5>
+        <h5><localize key="user_yourHistory">Your recent history</localize></h5>
         <ul class="umb-tree">
             <li ng-repeat="item in history | orderBy:'time':true">
                 <a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>

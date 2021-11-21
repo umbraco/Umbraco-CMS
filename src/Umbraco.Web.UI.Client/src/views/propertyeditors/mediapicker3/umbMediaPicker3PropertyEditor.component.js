@@ -137,6 +137,10 @@
             if (vm.propertyForm) {
                 vm.propertyForm.$setDirty();
             }
+
+            if (vm.modelValueForm) {
+                vm.modelValueForm.modelValue.$setDirty();
+            }
         }
 
         function addMediaAt(createIndex, $event) {

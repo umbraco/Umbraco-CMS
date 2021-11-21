@@ -20,7 +20,7 @@
                 <umb-box-content>
 
                     <div ng-if="model.node.variants.length > 1">
-                        <h5><localize key="general_language"></localize></h5>
+                        <h5><localize key="general_language">Language</localize></h5>
                         <select
                             class="input-block-level"
                             ng-model="vm.selectedLanguage"
@@ -34,7 +34,7 @@
                         <h5><localize key="rollback_currentVersion">Current version</localize></h5>
                         <p>{{vm.currentVersion.name}} (<localize key="rollback_created">Created</localize>: {{vm.currentVersion.createDate}})</p>
 
-                        <h5><localize key="rollback_rollbackTo"></localize></h5>
+                        <h5><localize key="rollback_rollbackTo">Rollback to</localize></h5>
                         <select
                             class="input-block-level"
                             ng-model="vm.selectedVersion"
@@ -47,12 +47,19 @@
                     <div ng-if="vm.diff && !vm.loading" class="diff" style="border-top: 1px solid #e9e9eb; margin-top: 30px;">
 
                         <h5><localize key="rollback_changes">Changes</localize></h5>
-                        <small style="margin-bottom: 15px; display: block;"><localize key="rollback_diffHelp"></localize></small>
+                        <small style="margin-bottom: 15px; display: block;">
+                            <localize key="rollback_diffHelp">
+                                This shows the differences between the current version and the selected version<br /><del>Red text</del> will be
+                                removed in the selected version, <ins>green text</ins> will be added
+                            </localize>
+                        </small>
 
                         <table class="table table-condensed table-bordered">
                             <tbody>
                                 <tr>
-                                    <td class="bold">Name</td>
+                                    <td class="bold">
+                                        <localize key="general_name">Name</localize>
+                                    </td>
                                     <td>
                                         <span ng-repeat="part in vm.diff.name track by $id(part)">
                                             <ins ng-if="part.added">{{part.value}}</ins>

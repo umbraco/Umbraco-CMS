@@ -99,7 +99,7 @@
     <key alias="historyIncludingVariants">Historik (alla varianter)</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Skapa en ny innehållsmall för '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Tom</key>
     <key alias="selectBlueprint">Välj en innehållsmall</key>
     <key alias="createdBlueprintHeading">Innehållsmall skapad</key>

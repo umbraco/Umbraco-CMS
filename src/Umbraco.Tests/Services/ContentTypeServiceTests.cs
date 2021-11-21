@@ -1325,7 +1325,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, meta.PropertyTypes.Count());
             Assert.AreEqual("Meta Keywords", meta.PropertyTypes.First().Name);
             Assert.AreEqual("Meta Description", meta.PropertyTypes.Skip(1).First().Name);
-            meta.AddPropertyGroup("Content", "content");
+            meta.AddPropertyGroup("content", "Content");
             Assert.AreEqual(2, meta.PropertyTypes.Count());
             service.Save(meta);
 

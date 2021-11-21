@@ -108,7 +108,7 @@
     <key alias="inherit">Devral</key>
     <key alias="setLanguage">Kültür</key>
     <key alias="setLanguageHelp">
-      <![CDATA[Geçerli düğümün altındaki düğümler için kültürü ayarlayın, <br /> veya kültürü üst düğümlerden devralın. Ayrıca <br /> 
+      <![CDATA[Geçerli düğümün altındaki düğümler için kültürü ayarlayın, <br /> veya kültürü üst düğümlerden devralın. Ayrıca <br />
         aşağıdaki alan da geçerli değilse geçerli düğüme.]]>
     </key>
     <key alias="setDomains">Alanlar</key>
@@ -309,7 +309,7 @@
     <key alias="nodeIsInTrash">Bu öğe Geri Dönüşüm Kutusu'nda</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">'%0%' den yeni bir İçerik Şablonu oluşturun</key>
+    <key alias="createBlueprintFrom"><![CDATA[<em>%0%</em> den yeni bir İçerik Şablonu oluşturun]]></key>
     <key alias="blankBlueprint">Boş</key>
     <key alias="selectBlueprint">Bir İçerik Şablonu Seçin</key>
     <key alias="createdBlueprintHeading">İçerik Şablonu oluşturuldu</key>
@@ -1079,7 +1079,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 					</tr>
 				</table>
 			</body>
-		</html>              
+		</html>
   ]]>
     </key>
   </area>
@@ -1108,17 +1108,17 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="mailBody">
       <![CDATA[
       Merhaba %0%
- 
+
       Bu, '%1%' görevinin size bildirilmesi için otomatik bir postadır.
       '%2%' sayfasında gerçekleştirildi
       '%3%' kullanıcısı tarafından
- 
+
       Düzenlemek için http://%4%/#/content/content/edit/%5% adresine gidin.
- 
+
       %6%
- 
+
       İyi günler!
- 
+
       Umbraco robotundan teşekkürler
     ]]>
     </key>
@@ -1198,7 +1198,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 					</tr>
 				</table>
 			</body>
-		</html>  
+		</html>
 	]]>
     </key>
     <key alias="mailBodyVariantHtmlSummary">
@@ -1825,18 +1825,18 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="mailBody">
       <![CDATA[
       Merhaba %0%
- 
+
       Bu, '%1%' belgesinin size bildirilmesi için otomatik bir postadır.
       %2% tarafından '%5%' e çevrilmesi istendi.
- 
+
       Düzenlemek için http://%3%/translation/details.aspx?id=%4% adresine gidin.
- 
+
       Veya çeviri görevlerinize genel bir bakış için Umbraco'da oturum açın
       http://%3%
- 
-      İyi günler!       
-      
-      Umbraco robotdan teşekkürler    
+
+      İyi günler!
+
+      Umbraco robotdan teşekkürler
       ]]>
     </key>
     <key alias="noTranslators">Çevirmen kullanıcısı bulunamadı. Lütfen çeviriye içerik göndermeye başlamadan önce bir çevirmen kullanıcısı oluşturun</key>
@@ -2077,7 +2077,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
                 <td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>
             </tr>
         </table>
-    </body>                           
+    </body>
 </html>]]>
     </key>
     <key alias="invite">Davet Et</key>
@@ -2399,7 +2399,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="tooltipForPropertyActionsMenuClose">Özellik Eylemlerini Kapat</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Bekle</key>
     <key alias="refreshStatus">Durumu yenile</key>
     <key alias="memoryCache">Bellek Önbelleği</key>
     <key alias="memoryCacheDescription">

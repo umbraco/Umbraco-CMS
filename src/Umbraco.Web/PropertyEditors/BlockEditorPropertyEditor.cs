@@ -258,7 +258,7 @@ namespace Umbraco.Web.PropertyEditors
                         _textService.Localize("validation", "entriesShort", new[]
                         {
                             validationLimit.Min.ToString(),
-                            (validationLimit.Min - blockEditorData.Layout.Count()).ToString()
+                            (validationLimit.Min - (blockEditorData?.Layout.Count() ?? 0)).ToString()
                         }),
                         new[] { "minCount" });
                 }

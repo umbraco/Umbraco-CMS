@@ -99,19 +99,20 @@
             }
         }
 
-
         /**
          * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
          * @param {Object} blockObject BlockObject to recive data values from.
          */
         function getBlockLabel(blockObject) {
             if (blockObject.labelInterpolator !== undefined) {
-                var labelVars = Object.assign({"$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
-                return blockObject.labelInterpolator(labelVars);
+                var labelVars = Object.assign({"$contentTypeName": blockObject.content.contentTypeName, "$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
+                var label = blockObject.labelInterpolator(labelVars);
+                if (label) {
+                    return label;
+                }
             }
             return blockObject.content.contentTypeName;
         }
-
 
         /**
          * Used to add watchers on all properties in a content or settings model
