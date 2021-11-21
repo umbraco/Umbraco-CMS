@@ -49,5 +49,9 @@ namespace Umbraco.Core.Persistence.Dtos
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId", ReferenceMemberName = "NodeId")]
         public ContentDto ContentDto { get; set; }
+
+        [Column("preventCleanup")]
+        [Constraint(Default = "0")]
+        public bool PreventCleanup { get; set; }
     }
 }

@@ -77,5 +77,10 @@
         /// Gets the write lock timeout.
         /// </summary>
         int SqlWriteLockTimeOut { get; }
+
+        /// <summary>
+        /// Returns true if TinyMCE scripting sanitization should be applied
+        /// </summary>
+        bool SanitizeTinyMce { get; }
     }
 }

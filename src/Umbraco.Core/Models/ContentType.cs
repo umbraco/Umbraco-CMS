@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models.ContentEditing;
 
 namespace Umbraco.Core.Models
 {
@@ -26,6 +27,7 @@ namespace Umbraco.Core.Models
         public ContentType(int parentId) : base(parentId)
         {
             _allowedTemplates = new List<ITemplate>();
+            HistoryCleanup = new HistoryCleanup();
         }
 
 
@@ -39,6 +41,7 @@ namespace Umbraco.Core.Models
             : base(parent, alias)
         {
             _allowedTemplates = new List<ITemplate>();
+            HistoryCleanup = new HistoryCleanup();
         }
 
         /// <inheritdoc />
@@ -46,6 +49,8 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         public override bool SupportsPublishing => SupportsPublishingConst;
+
+
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
@@ -92,6 +97,8 @@ namespace Umbraco.Core.Models
                     DefaultTemplateId = 0;
             }
         }
+
+        public HistoryCleanup HistoryCleanup { get; set; }
 
         /// <summary>
         /// Determines if AllowedTemplates contains templateId

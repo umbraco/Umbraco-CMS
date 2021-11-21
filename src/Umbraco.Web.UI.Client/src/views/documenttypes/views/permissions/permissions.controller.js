@@ -27,6 +27,7 @@
         vm.toggleAllowSegmentVariants = toggleAllowSegmentVariants;
         vm.canToggleIsElement = false;
         vm.toggleIsElement = toggleIsElement;
+        vm.toggleHistoryCleanupPreventCleanup = toggleHistoryCleanupPreventCleanup;
 
         /* ---------- INIT ---------- */
 
@@ -55,6 +56,11 @@
             } else {
                 vm.canToggleIsElement = true;
             }
+
+            if(!$scope.model.historyCleanup){
+                $scope.model.historyCleanup = {};
+            }
+
         }
 
         function addChild($event) {
@@ -62,7 +68,7 @@
             var editor = {
                 multiPicker: true,
                 filterCssClass: 'not-allowed not-published',
-                filter: item => 
+                filter: item =>
                     !vm.contentTypes.some(x => x.udi == item.udi) || vm.selectedChildren.some(x => x.udi === item.udi),
                 submit: model => {
                     model.selection.forEach(item =>
@@ -73,7 +79,7 @@
 
                     editorService.close();
                 },
-                close: () => editorService.close()                
+                close: () => editorService.close()
             };
 
             editorService.contentTypePicker(editor);
@@ -109,6 +115,10 @@
 
         function toggleIsElement() {
             $scope.model.isElement = $scope.model.isElement ? false : true;
+        }
+
+        function toggleHistoryCleanupPreventCleanup() {
+            $scope.model.historyCleanup.preventCleanup = $scope.model.historyCleanup.preventCleanup ? false : true;
         }
 
     }
