@@ -225,7 +225,7 @@ Use this directive to construct a header inside the main editor window.
 
             // trim the name if required
             scope.nameMaxLength = scope.nameMaxLength || 255;
-            if (scope.name.length > scope.nameMaxLength) {
+            if (scope.name && scope.name.length > scope.nameMaxLength) {
                 scope.name = scope.name.substring(0, scope.nameMaxLength - 1) + '…';
             }
 
