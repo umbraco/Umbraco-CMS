@@ -103,7 +103,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
         try {
             // Check that we can parse the JSON:
-            var storageJSON = JSON.parse(storageString);
+            var _ = JSON.parse(storageString);
 
             // Store the string:
             localStorageService.set(STORAGE_KEY, storageString);
@@ -114,10 +114,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
         } catch(e) {
             return false;
         }
-
-        return false;
     }
-
 
     function resolvePropertyForStorage(prop, type) {
 
@@ -159,9 +156,6 @@ function clipboardService($window, notificationsService, eventsService, localSto
         );
     }
 
-
-
-
     function resolvePropertyForPaste(prop, type) {
 
         type = type || "raw";
@@ -172,8 +166,6 @@ function clipboardService($window, notificationsService, eventsService, localSto
             }
         }
     }
-
-
 
     var service = {};
 
@@ -383,6 +375,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
         return localStorageService.isSupported;
     };
 
+
     /**
     * @ngdoc method
     * @name umbraco.services.supportsCopy#hasEntriesOfType
@@ -402,6 +395,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
         return false;
     };
+
 
     /**
     * @ngdoc method
@@ -428,9 +422,19 @@ function clipboardService($window, notificationsService, eventsService, localSto
         return filteretEntries;
     };
 
+
+    /**
+    * @obsolete Use the typo-free version instead.
+    */
+    service.retriveEntriesOfType = (type, allowedAliases) => {
+        console.warn('clipboardService.retriveEntriesOfType is obsolete, use clipboardService.retrieveEntriesOfType instead');
+        return service.retrieveEntriesOfType(type, allowedAliases);
+    }
+
+
     /**
     * @ngdoc method
-    * @name umbraco.services.supportsCopy#retrieveEntriesOfType
+    * @name umbraco.services.supportsCopy#retrieveDataOfType
     * @methodOf umbraco.services.clipboardService
     *
     * @param {string} type A string defining the type of data to recive.
@@ -443,9 +447,19 @@ function clipboardService($window, notificationsService, eventsService, localSto
         return service.retrieveEntriesOfType(type, aliases).map((x) => x.data);
     };
 
+
+    /**
+    * @obsolete Use the typo-free version instead.
+    */
+     service.retriveDataOfType = (type, aliases) => {
+        console.warn('clipboardService.retriveDataOfType is obsolete, use clipboardService.retrieveDataOfType instead');
+        return service.retrieveDataOfType(type, aliases);
+    }
+
+    
     /**
     * @ngdoc method
-    * @name umbraco.services.supportsCopy#retrieveEntriesOfType
+    * @name umbraco.services.supportsCopy#clearEntriesOfType
     * @methodOf umbraco.services.clipboardService
     *
     * @param {string} type A string defining the type of data to remove.
@@ -470,7 +484,6 @@ function clipboardService($window, notificationsService, eventsService, localSto
         saveStorage(storage);
     };
 
-
     var emitClipboardStorageUpdate = _.debounce(function(e) {
         eventsService.emit("clipboardService.storageUpdate");
     }, 1000);
@@ -478,10 +491,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
     // Fires if LocalStorage was changed from another tab than this one.
     $window.addEventListener("storage", emitClipboardStorageUpdate);
 
-
-
     return service;
 }
-
 
 angular.module("umbraco.services").factory("clipboardService", clipboardService);
