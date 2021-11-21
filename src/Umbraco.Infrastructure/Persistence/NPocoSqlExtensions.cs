@@ -268,7 +268,7 @@ namespace Umbraco.Extensions
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
                 : fields.Select(x => sqlSyntax.GetFieldName(x)).ToArray();
-            return sql.OrderBy(columns.Select(x => x + " DESC"));
+            return sql.OrderByDescending(columns);
         }
 
         /// <summary>
