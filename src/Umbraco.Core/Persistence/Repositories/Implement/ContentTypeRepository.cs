@@ -6,6 +6,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.ContentEditing;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
@@ -297,11 +298,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void PersistHistoryCleanup(IContentType entity)
         {
-            // property is not mandatory via public API, if it's not present NOOP
-            if (entity.HistoryCleanup == null)
-            {
-                return;
-            }
+            // historyCleanup property is not mandatory for api endpoint if it's not present instantiate a default one.
+            // DocumentTypeSave doesn't handle this for us like ContentType constructors do.
+            entity.HistoryCleanup ??= new HistoryCleanup();
 
             ContentVersionCleanupPolicyDto dto = new ContentVersionCleanupPolicyDto()
             {
