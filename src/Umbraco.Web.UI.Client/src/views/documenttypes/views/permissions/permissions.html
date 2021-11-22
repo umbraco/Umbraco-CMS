@@ -102,7 +102,7 @@
 
                 <div class="sub-view-column-right">
                     <umb-box-content>
-                        <p ng-if="!model.historyCleanup.globalEnableCleanup" class="umb-alert umb-alert--warning"><localize key="contentTypeEditor_historyCleanupGloballyDisabled"></localize></p>
+                        <p ng-if="!model.historyCleanup.globalEnableCleanup" class="umb-alert umb-alert--info"><localize key="contentTypeEditor_historyCleanupGloballyDisabled"></localize></p>
 
                         <umb-control-group label="@contentTypeEditor_historyCleanupPreventCleanup">
                             <umb-toggle checked="model.historyCleanup.preventCleanup" on-click="vm.toggleHistoryCleanupPreventCleanup()"></umb-toggle>
