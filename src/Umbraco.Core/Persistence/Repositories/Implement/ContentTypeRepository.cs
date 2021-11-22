@@ -298,17 +298,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void PersistHistoryCleanup(IContentType entity)
         {
-            // historyCleanup property is not mandatory for api endpoint if it's not present instantiate a default one.
+            // historyCleanup property is not mandatory for api endpoint, handle the case where it's not present.
             // DocumentTypeSave doesn't handle this for us like ContentType constructors do.
-            entity.HistoryCleanup ??= new HistoryCleanup();
-
             ContentVersionCleanupPolicyDto dto = new ContentVersionCleanupPolicyDto()
             {
                 ContentTypeId = entity.Id,
                 Updated = DateTime.Now,
-                PreventCleanup = entity.HistoryCleanup.PreventCleanup,
-                KeepAllVersionsNewerThanDays = entity.HistoryCleanup.KeepAllVersionsNewerThanDays,
-                KeepLatestVersionPerDayForDays = entity.HistoryCleanup.KeepLatestVersionPerDayForDays,
+                PreventCleanup = entity.HistoryCleanup?.PreventCleanup ?? false,
+                KeepAllVersionsNewerThanDays = entity.HistoryCleanup?.KeepAllVersionsNewerThanDays,
+                KeepLatestVersionPerDayForDays = entity.HistoryCleanup?.KeepLatestVersionPerDayForDays,
             };
             Database.InsertOrUpdate(dto);
         }

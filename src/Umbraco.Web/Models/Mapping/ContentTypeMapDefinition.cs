@@ -130,9 +130,9 @@ namespace Umbraco.Web.Models.Mapping
 
             target.HistoryCleanup = new HistoryCleanupViewModel()
             {
-                PreventCleanup = source.HistoryCleanup.PreventCleanup,
-                KeepAllVersionsNewerThanDays = source.HistoryCleanup.KeepAllVersionsNewerThanDays,
-                KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays,
+                PreventCleanup = source.HistoryCleanup?.PreventCleanup ?? false,
+                KeepAllVersionsNewerThanDays = source.HistoryCleanup?.KeepAllVersionsNewerThanDays,
+                KeepLatestVersionPerDayForDays = source.HistoryCleanup?.KeepLatestVersionPerDayForDays,
                 GlobalKeepAllVersionsNewerThanDays = _umbracoSettingsSection.Content.ContentVersionCleanupPolicyGlobalSettings.KeepAllVersionsNewerThanDays,
                 GlobalKeepLatestVersionPerDayForDays = _umbracoSettingsSection.Content.ContentVersionCleanupPolicyGlobalSettings.KeepLatestVersionPerDayForDays,
                 GlobalEnableCleanup = _umbracoSettingsSection.Content.ContentVersionCleanupPolicyGlobalSettings.EnableCleanup,
