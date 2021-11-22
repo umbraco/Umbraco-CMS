@@ -421,7 +421,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
                 var requests = [
                     entityResource.getByIds(missingIds, entityType),
-                    entityResource.getUrlsByUdis(missingIds)
+                    entityResource.getUrlsByIds(missingIds, entityType)
                 ];
 
                 return $q.all(requests).then(function ([data, urlMap]) {

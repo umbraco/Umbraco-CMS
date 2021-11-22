@@ -54,6 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     [ParameterSwapControllerActionSelector(nameof(GetByIds), "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))]
     [ParameterSwapControllerActionSelector(nameof(GetUrl), "id", typeof(int), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetUrlsByIds), "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))]
     public class EntityController : UmbracoAuthorizedJsonController
     {
         private static readonly string[] _postFilterSplitStrings = { "=", "==", "!=", "<>", ">", "<", ">=", "<=" };
@@ -319,6 +320,145 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         /// <summary>
+        /// Get entity URLs by IDs
+        /// </summary>
+        /// <param name="ids">
+        /// A list of IDs to lookup items by
+        /// </param>
+        /// <param name="type">The entity type to look for.</param>
+        /// <param name="culture">The culture to fetch the URL for.</param>
+        /// <returns>Dictionary mapping Udi -> Url</returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids.
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        public IDictionary<int, string> GetUrlsByIds([FromJsonPath] int[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string culture = null)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return new Dictionary<int, string>();
+            }
+
+            string MediaOrDocumentUrl(int id)
+            {
+                switch (type)
+                {
+                    case UmbracoEntityTypes.Document:
+                        return _publishedUrlProvider.GetUrl(id, culture: culture ?? ClientCulture());
+
+                    case UmbracoEntityTypes.Media:
+                    {
+                        IPublishedContent media = _publishedContentQuery.Media(id);
+
+                        // NOTE: If culture is passed here we get an empty string rather than a media item URL.
+                        return _publishedUrlProvider.GetMediaUrl(media, culture: null);
+                    }
+
+                    default:
+                        return null;
+                }
+            }
+
+            return ids
+                .Distinct()
+                .Select(id => new {
+                    Id = id,
+                    Url = MediaOrDocumentUrl(id)
+                }).ToDictionary(x => x.Id, x => x.Url);
+        }
+
+        /// <summary>
+        /// Get entity URLs by IDs
+        /// </summary>
+        /// <param name="ids">
+        /// A list of IDs to lookup items by
+        /// </param>
+        /// <param name="type">The entity type to look for.</param>
+        /// <param name="culture">The culture to fetch the URL for.</param>
+        /// <returns>Dictionary mapping Udi -> Url</returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids.
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        public IDictionary<Guid, string> GetUrlsByIds([FromJsonPath] Guid[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string culture = null)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return new Dictionary<Guid, string>();
+            }
+
+            string MediaOrDocumentUrl(Guid id)
+            {
+                return type switch
+                {
+                    UmbracoEntityTypes.Document => _publishedUrlProvider.GetUrl(id, culture: culture ?? ClientCulture()),
+
+                    // NOTE: If culture is passed here we get an empty string rather than a media item URL.
+                    UmbracoEntityTypes.Media => _publishedUrlProvider.GetMediaUrl(id, culture: null),
+
+                    _ => null
+                };
+            }
+
+            return ids
+                .Distinct()
+                .Select(id => new {
+                    Id = id,
+                    Url = MediaOrDocumentUrl(id)
+                }).ToDictionary(x => x.Id, x => x.Url);
+        }
+
+        /// <summary>
+        /// Get entity URLs by IDs
+        /// </summary>
+        /// <param name="ids">
+        /// A list of IDs to lookup items by
+        /// </param>
+        /// <param name="type">The entity type to look for.</param>
+        /// <param name="culture">The culture to fetch the URL for.</param>
+        /// <returns>Dictionary mapping Udi -> Url</returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids.
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        public IDictionary<Udi, string> GetUrlsByIds([FromJsonPath] Udi[] ids, [FromQuery] UmbracoEntityTypes type, [FromQuery] string culture = null)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return new Dictionary<Udi, string>();
+            }
+
+            // TODO: PMJ 2021-09-27 - Should GetUrl(Udi) exist as an extension method on UrlProvider/IUrlProvider (in v9)
+            string MediaOrDocumentUrl(Udi id)
+            {
+                if (id is not GuidUdi guidUdi)
+                {
+                    return null;
+                }
+
+                return type switch
+                {
+                    UmbracoEntityTypes.Document => _publishedUrlProvider.GetUrl(guidUdi.Guid, culture: culture ?? ClientCulture()),
+
+                    // NOTE: If culture is passed here we get an empty string rather than a media item URL.
+                    UmbracoEntityTypes.Media => _publishedUrlProvider.GetMediaUrl(guidUdi.Guid, culture: null),
+
+                    _ => null
+                };
+            }
+
+            return ids
+                .Distinct()
+                .Select(id => new {
+                    Id = id,
+                    Url = MediaOrDocumentUrl(id)
+                }).ToDictionary(x => x.Id, x => x.Url);
+        }
+
+        /// <summary>
         ///     Get entity URLs by UDIs
         /// </summary>
         /// <param name="udis">
@@ -331,33 +471,31 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </remarks>
         [HttpGet]
         [HttpPost]
+        [Obsolete("Use GetUrlsByIds instead.")]
         public IDictionary<Udi, string> GetUrlsByUdis([FromJsonPath] Udi[] udis, string culture = null)
         {
-            if (udis == null || udis.Length == 0)
+            if (udis == null || !udis.Any())
             {
                 return new Dictionary<Udi, string>();
             }
 
-            // TODO: PMJ 2021-09-27 - Should GetUrl(Udi) exist as an extension method on UrlProvider/IUrlProvider (in v9)
-            string MediaOrDocumentUrl(Udi udi)
-            {
-                if (udi is not GuidUdi guidUdi)
-                {
-                    return null;
-                }
+            var udiEntityType = udis.First().EntityType;
+            UmbracoEntityTypes entityType;
 
-                return guidUdi.EntityType switch
-                {
-                    Constants.UdiEntityType.Document => _publishedUrlProvider.GetUrl(guidUdi.Guid,
-                        culture: culture ?? ClientCulture()),
-                    // NOTE: If culture is passed here we get an empty string rather than a media item URL WAT
-                    Constants.UdiEntityType.Media => _publishedUrlProvider.GetMediaUrl(guidUdi.Guid, culture: null),
-                    _ => null
-                };
+            switch (udiEntityType)
+            {
+                case Constants.UdiEntityType.Document:
+                    entityType = UmbracoEntityTypes.Document;
+                    break;
+                case Constants.UdiEntityType.Media:
+                    entityType = UmbracoEntityTypes.Media;
+                    break;
+                default:
+                    entityType = (UmbracoEntityTypes)(-1);
+                    break;
             }
 
-            return udis
-                .Select(udi => new { Udi = udi, Url = MediaOrDocumentUrl(udi) }).ToDictionary(x => x.Udi, x => x.Url);
+            return GetUrlsByIds(udis, entityType, culture);
         }
 
         /// <summary>
