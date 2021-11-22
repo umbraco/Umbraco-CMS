@@ -19,9 +19,11 @@ namespace Umbraco.Core.Models
         IEnumerable<ITemplate> AllowedTemplates { get; set; }
 
         /// <summary>
-        /// Gets or Sets the history cleanup configuration
+        /// Gets or sets the history cleanup configuration.
         /// </summary>
+        /// <value>The history cleanup configuration.</value>
         HistoryCleanup HistoryCleanup { get; set; }
+
         /// <summary>
         /// Determines if AllowedTemplates contains templateId
         /// </summary>

@@ -9,10 +9,10 @@ namespace Umbraco.Core.Models.ContentEditing
         public bool PreventCleanup { get; set; }
 
         [DataMember(Name = "keepAllVersionsNewerThanDays")]
-        public int? KeepAllVersionsNewerThanDays { get;set; }
+        public int? KeepAllVersionsNewerThanDays { get; set; }
 
         [DataMember(Name = "keepLatestVersionPerDayForDays")]
-        public int? KeepLatestVersionPerDayForDays { get;set; }
+        public int? KeepLatestVersionPerDayForDays { get; set; }
     }
 }
 

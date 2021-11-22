@@ -301,10 +301,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 ContentTypeId = entity.Id,
                 Updated = DateTime.Now,
-                PreventCleanup = entity.HistoryCleanup.PreventCleanup,
-                KeepAllVersionsNewerThanDays = entity.HistoryCleanup.KeepAllVersionsNewerThanDays,
-                KeepLatestVersionPerDayForDays = entity.HistoryCleanup.KeepLatestVersionPerDayForDays,
+                PreventCleanup = entity.HistoryCleanup?.PreventCleanup ?? false,
+                KeepAllVersionsNewerThanDays = entity.HistoryCleanup?.KeepAllVersionsNewerThanDays,
+                KeepLatestVersionPerDayForDays = entity.HistoryCleanup?.KeepLatestVersionPerDayForDays,
             };
+
             Database.InsertOrUpdate(dto);
         }
     }
