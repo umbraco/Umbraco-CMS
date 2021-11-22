@@ -1,12 +1,6 @@
-//this controller simply tells the dialogs service to open a memberPicker window
+//this controller tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 function memberGroupPicker($scope, editorService, memberGroupResource, localizationService, overlayService){
-
-    var vm = this;
-
-    vm.openMemberGroupPicker = openMemberGroupPicker;
-    vm.remove = remove;
-    vm.clear = clear;
 
     var vm = this;
 
@@ -32,12 +26,9 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
     $scope.groupIds = [];
 
     if ($scope.model.config && $scope.umbProperty) {
-
-        var propertyActions = [
+        $scope.umbProperty.setPropertyActions([
             removeAllEntriesAction
-        ];
-
-        $scope.umbProperty.setPropertyActions(propertyActions);
+        ]);
     }
 
     if ($scope.model.value) {
@@ -104,6 +95,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
     function clear() {
         $scope.renderModel = [];
         removeAllEntriesAction.isDisabled = true;
+
         setDirty();
     }
 
@@ -124,11 +116,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
     }
 
     function renderModelIds() {
-
-        var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
-        });
-
+        var currIds = $scope.renderModel.map(i => i.id);
         return currIds;
     }
 
