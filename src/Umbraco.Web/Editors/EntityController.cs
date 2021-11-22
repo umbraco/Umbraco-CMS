@@ -76,7 +76,8 @@ namespace Umbraco.Web.Editors
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetPath", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetUrlAndAnchors", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[])),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetUrlsByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))));
             }
         }
 
@@ -236,47 +237,147 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Get entity URLs by UDIs
+        /// Get entity URLs by IDs
         /// </summary>
-        /// <param name="udis">
-        /// A list of UDIs to lookup items by
+        /// <param name="ids">
+        /// A list of IDs to lookup items by
         /// </param>
-        /// <param name="culture">The culture to fetch the URL for</param>
+        /// <param name="type">The entity type to look for.</param>
+        /// <param name="culture">The culture to fetch the URL for.</param>
         /// <returns>Dictionary mapping Udi -> Url</returns>
         /// <remarks>
         /// We allow for POST because there could be quite a lot of Ids.
         /// </remarks>
         [HttpGet]
         [HttpPost]
-        public IDictionary<Udi, string> GetUrlsByUdis([FromJsonPath] Udi[] udis, string culture = null)
+        public IDictionary<int, string> GetUrlsByIds([FromJsonPath] int[] ids, [FromUri] UmbracoEntityTypes type, [FromUri] string culture = null)
         {
-            if (udis == null || udis.Length == 0)
+            if (ids == null || !ids.Any())
+            {
+                return new Dictionary<int, string>();
+            }
+
+            string MediaOrDocumentUrl(int id)
+            {
+                switch (type)
+                {
+                    case UmbracoEntityTypes.Document:
+                        return UmbracoContext.UrlProvider.GetUrl(id, culture: culture ?? ClientCulture());
+                    case UmbracoEntityTypes.Media: {
+                        var media = UmbracoContext.Media.GetById(id);
+                        // NOTE: If culture is passed here we get an empty string rather than a media item URL.
+                        return UmbracoContext.UrlProvider.GetMediaUrl(media, culture: null);
+                    }
+                    default:
+                        return null;
+                }
+            }
+
+            return ids
+                .Distinct()
+                .Select(id => new {
+                    Id = id,
+                    Url = MediaOrDocumentUrl(id)
+                }).ToDictionary(x => x.Id, x => x.Url);
+        }
+
+        /// <summary>
+        /// Get entity URLs by IDs
+        /// </summary>
+        /// <param name="ids">
+        /// A list of IDs to lookup items by
+        /// </param>
+        /// <param name="type">The entity type to look for.</param>
+        /// <param name="culture">The culture to fetch the URL for.</param>
+        /// <returns>Dictionary mapping Udi -> Url</returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids.
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        public IDictionary<Guid, string> GetUrlsByIds([FromJsonPath] Guid[] ids, [FromUri] UmbracoEntityTypes type, [FromUri] string culture = null)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return new Dictionary<Guid, string>();
+            }
+
+            string MediaOrDocumentUrl(Guid id)
+            {
+                switch (type)
+                {
+                    case UmbracoEntityTypes.Document:
+                        return UmbracoContext.UrlProvider.GetUrl(id, culture: culture ?? ClientCulture());
+                    case UmbracoEntityTypes.Media:
+                    {
+                        var media = UmbracoContext.Media.GetById(id);
+                        // NOTE: If culture is passed here we get an empty string rather than a media item URL.
+                        return UmbracoContext.UrlProvider.GetMediaUrl(media, culture: null);
+                    }
+                    default:
+                        return null;
+                }
+            }
+
+            return ids
+                .Distinct()
+                .Select(id => new {
+                    Id = id,
+                    Url = MediaOrDocumentUrl(id)
+                }).ToDictionary(x => x.Id, x => x.Url);
+        }
+
+        /// <summary>
+        /// Get entity URLs by IDs
+        /// </summary>
+        /// <param name="ids">
+        /// A list of IDs to lookup items by
+        /// </param>
+        /// <param name="type">The entity type to look for.</param>
+        /// <param name="culture">The culture to fetch the URL for.</param>
+        /// <returns>Dictionary mapping Udi -> Url</returns>
+        /// <remarks>
+        /// We allow for POST because there could be quite a lot of Ids.
+        /// </remarks>
+        [HttpGet]
+        [HttpPost]
+        // NOTE: V9 - can't rename GetUrlsByUdis in v9 as it's already released, it's OK to do here as 8.18 isn't out yet.
+        public IDictionary<Udi, string> GetUrlsByIds([FromJsonPath] Udi[] ids, [FromUri] UmbracoEntityTypes type, [FromUri] string culture = null)
+        {
+            if (ids == null || !ids.Any())
             {
                 return new Dictionary<Udi, string>();
             }
 
             // TODO: PMJ 2021-09-27 - Should GetUrl(Udi) exist as an extension method on UrlProvider/IUrlProvider (in v9)
-            string MediaOrDocumentUrl(Udi udi)
+            string MediaOrDocumentUrl(Udi id)
             {
-                if (udi is not GuidUdi guidUdi)
+                if (id is not GuidUdi guidUdi)
                 {
                     return null;
                 }
 
-                return guidUdi.EntityType switch
+                switch (type)
                 {
-                    Constants.UdiEntityType.Document => UmbracoContext.UrlProvider.GetUrl(guidUdi.Guid, culture: culture ?? ClientCulture()),
-                    // NOTE: If culture is passed here we get an empty string rather than a media item URL WAT
-                    Constants.UdiEntityType.Media => UmbracoContext.UrlProvider.GetMediaUrl(guidUdi.Guid, culture: null),
-                    _ => null
-                };
+                    case UmbracoEntityTypes.Document:
+                        return UmbracoContext.UrlProvider.GetUrl(guidUdi.Guid, culture: culture ?? ClientCulture());
+                    case UmbracoEntityTypes.Media:
+                        {
+                            var media = UmbracoContext.Media.GetById(id);
+                            // NOTE: If culture is passed here we get an empty string rather than a media item URL.
+                            return UmbracoContext.UrlProvider.GetMediaUrl(media, culture: null);
+                        }
+                    default:
+                        return null;
+                }
             }
 
-            return udis
-                .Select(udi => new {
-                    Udi = udi,
-                    Url = MediaOrDocumentUrl(udi)
-                }).ToDictionary(x => x.Udi, x => x.Url);
+            return ids
+                .Distinct()
+                .Select(id => new {
+                    Id = id,
+                    Url = MediaOrDocumentUrl(id)
+                }).ToDictionary(x => x.Id, x => x.Url);
         }
 
         /// <summary>
