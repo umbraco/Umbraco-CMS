@@ -308,6 +308,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 KeepAllVersionsNewerThanDays = entity.HistoryCleanup?.KeepAllVersionsNewerThanDays,
                 KeepLatestVersionPerDayForDays = entity.HistoryCleanup?.KeepLatestVersionPerDayForDays,
             };
+
             Database.InsertOrUpdate(dto);
         }
     }
