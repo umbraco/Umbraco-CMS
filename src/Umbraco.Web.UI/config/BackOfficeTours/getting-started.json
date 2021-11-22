@@ -47,7 +47,15 @@
                 "element": "[data-element='section-content']",
                 "elementPreventClick": true,
                 "title": "Sections",
-                "content": "Each area in Umbraco is called a <b>Section</b>. Right now you are in the Content section, when you want to go to another section simply click on the appropriate name in the main menu and you'll be there in no time.",
+                "content": "Each area in Umbraco is called a <b>Section</b>. The current section is highlighted in the main menu, when you want to go to another section click on the name and you'll be there in no time.",
+                "backdropOpacity": 0.6
+            },
+            {
+                "element": "[data-element='section-content']",
+                "skipStepIfVisible": "[data-element='dashboard']",
+                "title": "Content section",
+                "content": "Try clicking <b>Content</b> to enter the content section.",
+                "event": "click",
                 "backdropOpacity": 0.6
             },
             {
