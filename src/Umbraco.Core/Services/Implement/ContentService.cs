@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services.Implement
     /// <summary>
     /// Implements the content service.
     /// </summary>
-    public class ContentService : RepositoryService, IContentService
+    public class ContentService : RepositoryService, IContentService, IContentVersionService
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IEntityRepository _entityRepository;
@@ -188,11 +188,34 @@ namespace Umbraco.Core.Services.Implement
             // TODO: what about culture?
 
             var contentType = GetContentType(contentTypeAlias);
-            if (contentType == null)
-                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
+            return Create(name, parentId, contentType, userId);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object of a specified content type.
+        /// </summary>
+        /// <remarks>This method simply returns a new, non-persisted, IContent without any identity. It
+        /// is intended as a shortcut to creating new content objects that does not invoke a save
+        /// operation against the database.
+        /// </remarks>
+        /// <param name="name">The name of the content object.</param>
+        /// <param name="parentId">The identifier of the parent, or -1.</param>
+        /// <param name="contentType">The content type of the content</param>
+        /// <param name="userId">The optional id of the user creating the content.</param>
+        /// <returns>The content object.</returns>
+        public IContent Create(string name, int parentId, IContentType contentType,
+            int userId = Constants.Security.SuperUserId)
+        {
+            if (contentType is null)
+            {
+                throw new ArgumentException("Content type must be specified", nameof(contentType));
+            }
+
             var parent = parentId > 0 ? GetById(parentId) : null;
-            if (parentId > 0 && parent == null)
+            if (parentId > 0 && parent is null)
+            {
                 throw new ArgumentException("No content with that id.", nameof(parentId));
+            }
 
             var content = new Content(name, parentId, contentType);
             using (var scope = ScopeProvider.CreateScope())
@@ -911,7 +934,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = 0, bool raiseEvents = true)
+        public PublishResult SaveAndPublish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId, bool raiseEvents = true)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (cultures == null) throw new ArgumentNullException(nameof(cultures));
@@ -1088,7 +1111,7 @@ namespace Umbraco.Core.Services.Implement
         /// <remarks>
         /// <para>
         /// Business logic cases such: as unpublishing a mandatory culture, or unpublishing the last culture, checking for pending scheduled publishing, etc... is dealt with in this method.
-        /// There is quite a lot of cases to take into account along with logic that needs to deal with scheduled saving/publishing, branch saving/publishing, etc...       
+        /// There is quite a lot of cases to take into account along with logic that needs to deal with scheduled saving/publishing, branch saving/publishing, etc...
         /// </para>
         /// </remarks>
         private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content,
@@ -1415,7 +1438,7 @@ namespace Umbraco.Core.Services.Implement
 
                         var result = CommitDocumentChangesInternal(scope, d, saveEventArgs, allLangs.Value, d.WriterId);
                         if (result.Success == false)
-                            Logger.Error<ContentService,int,PublishResultType>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
+                            Logger.Error<ContentService, int, PublishResultType>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                         results.Add(result);
 
                     }
@@ -2118,6 +2141,15 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Succeed(evtMsgs);
         }
 
+        public bool RecycleBinSmells()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.RecycleBinSmells();
+            }
+        }
+
         #endregion
 
         #region Others
@@ -2356,7 +2388,7 @@ namespace Umbraco.Core.Services.Implement
             if (raiseEvents)
             {
                 //raise cancelable sorting event
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Sorting)))
+                if (scope.Events.DispatchCancelable(Sorting, this, saveEventArgs, nameof(Sorting)))
                     return OperationResult.Cancel(evtMsgs);
 
                 //raise saving event (this one cannot be canceled)
@@ -2420,7 +2452,7 @@ namespace Umbraco.Core.Services.Implement
                 if (report.FixedIssues.Count > 0)
                 {
                     //The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
-                    var root = new Content("root", -1, new ContentType(-1)) {Id = -1, Key = Guid.Empty};
+                    var root = new Content("root", -1, new ContentType(-1)) { Id = -1, Key = Guid.Empty };
                     scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>.EventArgs(new TreeChange<IContent>(root, TreeChangeTypes.RefreshAll)));
                 }
 
@@ -3169,7 +3201,7 @@ namespace Umbraco.Core.Services.Implement
                 if (rollbackSaveResult.Success == false)
                 {
                     //Log the error/warning
-                    Logger.Error<ContentService,int,int,int>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Logger.Error<ContentService, int, int, int>("User '{UserId}' was unable to rollback content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
                 }
                 else
                 {
@@ -3178,7 +3210,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(RolledBack, this, rollbackEventArgs);
 
                     //Logging & Audit message
-                    Logger.Info<ContentService,int,int,int>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
+                    Logger.Info<ContentService, int, int, int>("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
                     Audit(AuditType.RollBack, userId, id, $"Content '{content.Name}' was rolled back to version '{versionId}'");
                 }
 
@@ -3190,7 +3222,110 @@ namespace Umbraco.Core.Services.Implement
 
         #endregion
 
+        /// <inheritdoc />
+        /// <remarks>
+        /// In v9 this can live in another class as we publish the notifications via IEventAggregator.
+        /// But for v8 must be here for access to the static events.
+        /// </remarks>
+        public IReadOnlyCollection<HistoricContentVersionMeta> PerformContentVersionCleanup(DateTime asAtDate)
+        {
+            return CleanupDocumentVersions(asAtDate);
+            // Media - ignored
+            // Members - ignored
+        }
 
+        /// <remarks>
+        /// v9 - move to another class
+        /// </remarks>
+        private IReadOnlyCollection<HistoricContentVersionMeta> CleanupDocumentVersions(DateTime asAtDate)
+        {
+            // NOTE: v9 - don't service locate
+            var documentVersionRepository = Composing.Current.Factory.GetInstance<IDocumentVersionRepository>();
 
+            // NOTE: v9 - don't service locate
+            var cleanupPolicy = Composing.Current.Factory.GetInstance<IContentVersionCleanupPolicy>();
+
+            List<HistoricContentVersionMeta> versionsToDelete;
+
+            /* Why so many scopes?
+             *
+             * We could just work out the set to delete at SQL infra level which was the original plan, however we agreed that really we should fire
+             * ContentService.DeletingVersions so people can hook & cancel if required.
+             *
+             * On first time run of cleanup on a site with a lot of history there may be a lot of historic ContentVersions to remove e.g. 200K for our.umbraco.com.
+             * If we weren't supporting SQL CE we could do TVP, or use temp tables to bulk delete with joins to our list of version ids to nuke.
+             * (much nicer, we can kill 100k in sub second time-frames).
+             *
+             * However we are supporting SQL CE, so the easiest thing to do is use the Umbraco InGroupsOf helper to create a query with 2K args of version 
+             * ids to delete at a time.
+             *
+             * This is already done at the repository level, however if we only had a single scope at service level we're still locking
+             * the ContentVersions table (and other related tables) for a couple of minutes which makes the back office unusable.
+             *
+             * As a quick fix, we can also use InGroupsOf at service level, create a scope per group to give other connections a chance
+             * to grab the locks and execute their queries.
+             *
+             * This makes the back office a tiny bit sluggish during first run but it is usable for loading tree and publishing content.
+             *
+             * There are optimizations we can do, we could add a bulk delete for SqlServerSyntaxProvider which differs in implementation
+             * and fallback to this naive approach only for SQL CE, however we agreed it is not worth the effort as this is a one time pain,
+             * subsequent runs shouldn't have huge numbers of versions to cleanup.
+             *
+             * tl;dr lots of scopes to enable other connections to use the DB whilst we work.
+             */
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                var allHistoricVersions = documentVersionRepository.GetDocumentVersionsEligibleForCleanup();
+
+                Logger.Debug<ContentService>("Discovered {count} candidate(s) for ContentVersion cleanup.", allHistoricVersions.Count);
+                versionsToDelete = new List<HistoricContentVersionMeta>(allHistoricVersions.Count);
+
+                var filteredContentVersions = cleanupPolicy.Apply(asAtDate, allHistoricVersions);
+
+                foreach (var version in filteredContentVersions)
+                {
+                    var args = new DeleteRevisionsEventArgs(version.ContentId, version.VersionId);
+
+                    if (scope.Events.DispatchCancelable(ContentService.DeletingVersions, this, args))
+                    {
+                        Logger.Debug<ContentService>("Delete cancelled for ContentVersion [{versionId}]",  version.VersionId);
+                        continue;
+                    }
+
+                    versionsToDelete.Add(version);
+                }
+            }
+
+            if (!versionsToDelete.Any())
+            {
+                Logger.Debug<ContentService>("No remaining ContentVersions for cleanup.", versionsToDelete.Count);
+                return Array.Empty<HistoricContentVersionMeta>();
+            }
+
+            Logger.Debug<ContentService>("Removing {count} ContentVersion(s).", versionsToDelete.Count);
+
+            foreach (var group in versionsToDelete.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+                {
+                    scope.WriteLock(Constants.Locks.ContentTree);
+                    var groupEnumerated = group.ToList();
+                    documentVersionRepository.DeleteVersions(groupEnumerated.Select(x => x.VersionId));
+
+                    foreach (var version in groupEnumerated)
+                    {
+                        var args = new DeleteRevisionsEventArgs(version.ContentId, version.VersionId);
+                        scope.Events.Dispatch(ContentService.DeletedVersions, this, args);
+                    }
+                }
+            }
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                Audit(AuditType.Delete, Constants.Security.SuperUserId, -1, $"Removed {versionsToDelete.Count} ContentVersion(s) according to cleanup policy.");
+            }
+
+            return versionsToDelete;
+        }
     }
 }

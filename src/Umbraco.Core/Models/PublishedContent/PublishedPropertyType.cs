@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.PropertyEditors;
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Models.PublishedContent
     /// </summary>
     /// <remarks>Instances of the <see cref="PublishedPropertyType"/> class are immutable, ie
     /// if the property type changes, then a new class needs to be created.</remarks>
+    [DebuggerDisplay("{Alias} ({EditorAlias})")]
     public class PublishedPropertyType : IPublishedPropertyType
     {
         private readonly IPublishedModelFactory _publishedModelFactory;

@@ -19,7 +19,7 @@ context('User Groups', () => {
 
     // Assign sections
     cy.get('.umb-box:nth-child(1) .umb-property:nth-child(1) localize').click();
-    cy.get('.umb-tree-item span').click({multiple:true});
+    cy.get('.umb-tree-item__inner').click({multiple:true, timeout: 10000});
     cy.get('.btn-success').last().click();
 
     // Save

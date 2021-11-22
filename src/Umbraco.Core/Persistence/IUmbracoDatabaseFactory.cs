@@ -36,6 +36,12 @@ namespace Umbraco.Core.Persistence
         string ConnectionString { get; }
 
         /// <summary>
+        /// Gets the provider name.
+        /// </summary>
+        /// <remarks>May return <c>null</c> if the database factory is not configured.</remarks>
+        string ProviderName { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the database factory is configured (see <see cref="Configured"/>),
         /// and it is possible to connect to the database. The factory may however not be initialized (see
         /// <see cref="Initialized"/>).

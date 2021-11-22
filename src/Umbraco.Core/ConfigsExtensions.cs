@@ -28,8 +28,8 @@ namespace Umbraco.Core
         public static IGridConfig Grids(this Configs configs)
             => configs.GetConfig<IGridConfig>();
 
-        internal static CoreDebug CoreDebug(this Configs configs)
-            => configs.GetConfig<CoreDebug>();
+        public static ICoreDebug CoreDebug(this Configs configs)
+            => configs.GetConfig<ICoreDebug>();
 
         public static void AddCoreConfigs(this Configs configs)
         {
@@ -39,7 +39,7 @@ namespace Umbraco.Core
             configs.Add<IUmbracoSettingsSection>("umbracoConfiguration/settings");
             configs.Add<IHealthChecks>("umbracoConfiguration/HealthChecks");
 
-            configs.Add(() => new CoreDebug());
+            configs.Add<ICoreDebug>(() => new CoreDebug());
 
             // GridConfig depends on runtime caches, manifest parsers... and cannot be available during composition
             configs.Add<IGridConfig>(factory => new GridConfig(

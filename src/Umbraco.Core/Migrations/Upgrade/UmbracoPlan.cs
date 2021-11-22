@@ -9,6 +9,9 @@ using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_15_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_17_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_18_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -118,7 +121,6 @@ namespace Umbraco.Core.Migrations.Upgrade
 
 
             // plan starts at 7.14.0 (anything before 7.14.0 is not supported)
-            //
             From(GetInitState(new SemVersion(7, 14, 0)));
 
             // begin migrating from v7 - remove all keys and indexes
@@ -173,13 +175,12 @@ namespace Umbraco.Core.Migrations.Upgrade
             // finish migrating from v7 - recreate all keys and indexes
             To<CreateKeysAndIndexes>("{3F9764F5-73D0-4D45-8804-1240A66E43A2}");
 
+            // to 8.0.0
             To<RenameLabelAndRichTextPropertyEditorAliases>("{E0CBE54D-A84F-4A8F-9B13-900945FD7ED9}");
             To<MergeDateAndDateTimePropertyEditor>("{78BAF571-90D0-4D28-8175-EF96316DA789}");
-            // release-8.0.0
 
             // to 8.0.1
             To<ChangeNuCacheJsonFormat>("{80C0A0CB-0DD5-4573-B000-C4B7C313C70D}");
-            // release-8.0.1
 
             // to 8.1.0
             To<ConvertTinyMceAndGridMediaUrlsToLocalLink>("{B69B6E8C-A769-4044-A27E-4A4E18D1645A}");
@@ -198,11 +199,20 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.9.0
             To<ExternalLoginTableUserData>("{B5838FF5-1D22-4F6C-BCEB-F83ACB14B575}");
-			
+
             // to 8.10.0
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
 
+            // to 8.15.0
+            To<AddCmsContentNuByteColumn>("{8DDDCD0B-D7D5-4C97-BD6A-6B38CA65752F}");
+            To<UpgradedIncludeIndexes>("{4695D0C9-0729-4976-985B-048D503665D8}");
+            To<UpdateCmsPropertyGroupIdSeed>("{5C424554-A32D-4852-8ED1-A13508187901}");
+
+            // to 8.17.0
+            To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
+
             //FINAL
+            To<AddContentVersionCleanupFeature>("{8BAF5E6C-DCB7-41AE-824F-4215AE4F1F98}");
         }
     }
 }

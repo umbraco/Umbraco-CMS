@@ -1,0 +1,196 @@
+.umb-media-card,
+umb-media-card {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    //background-color: white;
+    border-radius: @baseBorderRadius;
+    //box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    overflow: hidden;
+    transition: box-shadow 120ms;
+    cursor: pointer;
+    .umb-outline();
+
+    &:hover {
+        box-shadow: 0 1px 3px rgba(@ui-action-type-hover, .5);
+    }
+
+    &.--isOpen {
+        &::after {
+            content: "";
+            position: absolute;
+            border: 2px solid @ui-active-border;
+            border-radius: @baseBorderRadius;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    }
+
+    &.--hasError {
+        border: 2px solid @errorBackground;
+    }
+
+    &.--sortable-placeholder {
+        box-shadow: none;
+
+        &::after {
+            content: "";
+            position: absolute;
+            background-color: rgba(@ui-drop-area-color, .05);
+            border: 2px solid rgba(@ui-drop-area-color, .1);
+            border-radius: @baseBorderRadius;
+            box-shadow: 0 0 4px rgba(@ui-drop-area-color, 0.05);
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            animation: umb-block-card--sortable-placeholder 400ms ease-in-out alternate infinite;
+
+            @keyframes umb-block-card--sortable-placeholder {
+                0% {
+                    opacity: 1;
+                }
+
+                100% {
+                    opacity: 0.5;
+                }
+            }
+        }
+    }
+
+    .__status {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 2px;
+
+        &.--error {
+            background-color: @errorBackground;
+            color: @errorText;
+        }
+    }
+
+    .__showcase {
+        position: relative;
+        display: flex;
+        max-width: 100%;
+        min-height: 120px;
+        max-height: 240px;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+
+        .checkeredBackground();
+
+        img {
+            object-fit: contain;
+            max-height: 240px;
+        }
+
+        umb-file-icon {
+            width: 100%;
+            padding-bottom: 100%;
+            display: block;
+
+            .umb-file-icon {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: 10px;
+                right: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+
+    .__info {
+        position: absolute;
+        text-align: left;
+        bottom: 0;
+        width: 100%;
+        background-color: #fff;
+        padding-top: 6px;
+        padding-bottom: 7px; // 7 + 1 to compentiate for the -1 substraction in margin-bottom.
+
+        opacity: 0;
+        transition: opacity 120ms;
+
+        &.--error {
+            opacity: 1;
+            background-color: @errorBackground;
+
+            .__name,
+            .__subname {
+                color: @errorText;
+            }
+        }
+
+        .__name {
+            font-weight: bold;
+            font-size: 13px;
+            color: @ui-action-type;
+            margin-left: 16px;
+            margin-bottom: -1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .__subname {
+            color: @gray-4;
+            font-size: 12px;
+            margin-left: 16px;
+            margin-top: 1px;
+            margin-bottom: -1px;
+            line-height: 1.5em;
+        }
+    }
+
+    &:hover, &:focus, &:focus-within {
+        .__info {
+            opacity: 1;
+        }
+
+        .__info:not(.--error) {
+            .__name {
+                color: @ui-action-type-hover;
+            }
+        }
+    }
+
+    .__actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0;
+        background-color: rgba(255, 255, 255, .96);
+        border-radius: 16px;
+        padding-left: 5px;
+        padding-right: 5px;
+        opacity: 0;
+        transition: opacity 120ms;
+
+        .__action {
+            position: relative;
+            display: inline-block;
+            padding: 5px;
+            font-size: 18px;
+            color: @ui-action-discreet-type;
+
+            &:hover {
+                color: @ui-action-discreet-type-hover;
+            }
+        }
+    }
+
+    &:hover, &:focus, &:focus-within {
+        .__actions {
+            opacity: 1;
+        }
+    }
+}

@@ -14,8 +14,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 {
     public abstract class BaseHttpHeaderCheck : HealthCheck
     {
-        protected IRuntimeState Runtime { get; }
-        protected ILocalizedTextService TextService { get; }
+        private readonly ILocalizedTextService _textService;
+        private readonly IRuntimeState _runtime;
 
         private const string SetHeaderInConfigAction = "setHeaderInConfig";
 
@@ -24,14 +24,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private readonly string _localizedTextPrefix;
         private readonly bool _metaTagOptionAvailable;
 
+
         protected BaseHttpHeaderCheck(
             IRuntimeState runtime,
             ILocalizedTextService textService,
             string header, string value, string localizedTextPrefix, bool metaTagOptionAvailable)
         {
-            Runtime = runtime;
-            TextService = textService ?? throw new ArgumentNullException(nameof(textService));
-
+            _runtime = runtime;
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
             _header = header;
             _value = value;
             _localizedTextPrefix = localizedTextPrefix;
@@ -70,7 +70,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var url = Runtime.ApplicationUrl;
+            var url = _runtime.ApplicationUrl.GetLeftPart(UriPartial.Authority);
+
             var request = WebRequest.Create(url);
             request.Method = "GET";
             try
@@ -84,15 +85,16 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 if (success == false && _metaTagOptionAvailable)
                 {
                     success = DoMetaTagsContainKeyForHeader(response);
+
                 }
 
                 message = success
-                    ? TextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderFound")
-                    : TextService.Localize($"healthcheck/{_localizedTextPrefix}CheckHeaderNotFound");
+                    ? _textService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderFound")
+                    : _textService.Localize($"healthcheck", $"{_localizedTextPrefix}CheckHeaderNotFound");
             }
             catch (Exception ex)
             {
-                message = TextService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = _textService.Localize("healthcheck", "healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             var actions = new List<HealthCheckAction>();
@@ -100,8 +102,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             {
                 actions.Add(new HealthCheckAction(SetHeaderInConfigAction, Id)
                 {
-                    Name = TextService.Localize("healthcheck/setHeaderInConfig"),
-                    Description = TextService.Localize($"healthcheck/{_localizedTextPrefix}SetHeaderInConfigDescription")
+                    Name = _textService.Localize("healthcheck", "setHeaderInConfig"),
+                    Description = _textService.Localize($"healthcheck", $"{_localizedTextPrefix}SetHeaderInConfigDescription")
                 });
             }
 
@@ -149,14 +151,14 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             if (success)
             {
                 return
-                    new HealthCheckStatus(TextService.Localize(string.Format("healthcheck/{0}SetHeaderInConfigSuccess", _localizedTextPrefix)))
+                    new HealthCheckStatus(_textService.Localize("healthcheck", _localizedTextPrefix + "SetHeaderInConfigSuccess"))
                     {
                         ResultType = StatusResultType.Success
                     };
             }
 
             return
-                new HealthCheckStatus(TextService.Localize("healthcheck/setHeaderInConfigError", new [] { errorMessage }))
+                new HealthCheckStatus(_textService.Localize("healthcheck", "setHeaderInConfigError", new [] { errorMessage }))
                 {
                     ResultType = StatusResultType.Error
                 };

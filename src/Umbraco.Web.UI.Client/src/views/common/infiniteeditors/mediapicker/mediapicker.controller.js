@@ -30,9 +30,9 @@ angular.module("umbraco")
             vm.showMediaList = false;
 
             vm.navigation = [];
-            vm.clipboardImages = [];
 
             var dialogOptions = $scope.model;
+            vm.clipboardItems = dialogOptions.clipboardItems;
 
             $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
             $scope.disableFocalPoint = (dialogOptions.disableFocalPoint && dialogOptions.disableFocalPoint !== "0") ? true : false;
@@ -105,7 +105,7 @@ angular.module("umbraco")
 
             function setTitle() {
                 if (!$scope.model.title) {
-                    localizationService.localizeMany(["defaultdialogs_selectMedia", "defaultdialogs_tabClipboard"])
+                    localizationService.localizeMany(["defaultdialogs_selectMedia", "mediaPicker_tabClipboard"])
                         .then(function (data) {
                             $scope.model.title = data[0];
 
@@ -116,31 +116,25 @@ angular.module("umbraco")
                                 "icon": "icon-umb-media",
                                 "active": true,
                                 "view": ""
-                            },
-                            {
-                                "alias": "clipboard",
-                                "name": data[1],
-                                "icon": "icon-paste-in",
-                                "view": "",
-                                "disabled": vm.clipboardImages.length === 0
                             }];
+
+                            if(vm.clipboardItems) {
+                                vm.navigation.push({
+                                    "alias": "clipboard",
+                                    "name": data[1],
+                                    "icon": "icon-paste-in",
+                                    "view": "",
+                                    "disabled": vm.clipboardItems.length === 0
+                                });
+                            }
 
                             vm.activeTab = vm.navigation[0];
                         });
+
                 }
             }
 
             function onInit() {
-
-                clipboardService.retriveEntriesOfType(clipboardService.TYPES.IMAGE, ["Media"]).forEach(item => {
-                    var media = item.data.media;
-                    if ((($scope.disableFolderSelect || $scope.onlyImages) && media.isFolder) ||
-                        ($scope.onlyFolders && !media.isFolder)) {
-                        return;
-                    }
-                    setDefaultData(media);
-                    vm.clipboardImages.push(media);
-                });
 
                 setTitle();
 
@@ -174,6 +168,7 @@ angular.module("umbraco")
                     var originalTarget = $scope.target;
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
+                    var caption = $scope.target.caption;
 
                     // ID of a UDI or legacy int ID still could be null/undefinied here
                     // As user may dragged in an image that has not been saved to media section yet
@@ -187,6 +182,7 @@ angular.module("umbraco")
                                     $scope.target.url = mediaHelper.resolveFileFromEntity(node);
                                     $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
                                     $scope.target.altText = altText;
+                                    $scope.target.caption = caption;
                                     $scope.target.focalPoint = originalTarget.focalPoint;
                                     $scope.target.coordinates = originalTarget.coordinates;
                                     openDetailsDialog();
@@ -437,8 +433,8 @@ angular.module("umbraco")
             function clickClearClipboard() {
                 vm.onNavigationChanged(vm.navigation[0]);
                 vm.navigation[1].disabled = true;
-                vm.clipboardImages = [];
-                clipboardService.clearEntriesOfType(clipboardService.TYPES.IMAGE, ["Media"]);
+                vm.clipboardItems = [];
+                dialogOptions.clickClearClipboard();
             };
 
             var debounceSearchMedia = _.debounce(function () {
@@ -483,9 +479,15 @@ angular.module("umbraco")
                 vm.loading = true;
                 entityResource.getPagedDescendants($scope.filterOptions.excludeSubFolders ? $scope.currentFolder.id : $scope.startNodeId, "Media", vm.searchOptions)
                     .then(function (data) {
+
                         // update image data to work with image grid
                         if (data.items) {
-                            data.items.forEach(mediaItem => setMediaMetaData(mediaItem));
+                            var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
+
+                            data.items.forEach(function(mediaItem) {
+                                setMediaMetaData(mediaItem);
+                                mediaItem.filtered = allowedTypes && allowedTypes.indexOf(mediaItem.metaData.ContentTypeAlias) < 0;
+                            });
                         }
 
                         // update images

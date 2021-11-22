@@ -8,6 +8,12 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
     vm.remove = remove;
     vm.clear = clear;
 
+    var vm = this;
+
+    vm.openMemberGroupPicker = openMemberGroupPicker;
+    vm.remove = remove;
+    vm.clear = clear;
+
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
         return str.replace(rgxtrim, '');
@@ -44,6 +50,12 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
         removeAllEntriesAction.isDisabled = groupIds.length === 0;
     }
 
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
+
     function openMemberGroupPicker() {
         var memberGroupPicker = {
             multiPicker: true,
@@ -64,6 +76,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
                 if (newGroupIds && newGroupIds.length) {
                     memberGroupResource.getByIds(newGroupIds).then(function (groups) {
                         $scope.renderModel = _.union($scope.renderModel, groups);
+                        setDirty();
                         editorService.close();
                     });
                 }
@@ -77,18 +90,21 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
             }
         };
         editorService.memberGroupPicker(memberGroupPicker);
-    };
+    }
 
     function remove(index) {
         $scope.renderModel.splice(index, 1);
 
         var currIds = renderModelIds();
         removeAllEntriesAction.isDisabled = currIds.length === 0;
+
+        setDirty();
     }
 
     function clear() {
         $scope.renderModel = [];
         removeAllEntriesAction.isDisabled = true;
+        setDirty();
     }
 
     function removeAllEntries() {

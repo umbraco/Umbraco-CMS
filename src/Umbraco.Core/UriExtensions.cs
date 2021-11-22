@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Umbraco.Core.Composing;
@@ -138,6 +139,14 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Non Client Side request Extensions <see cref="IsClientSideRequest"/>
+        /// </summary>
+        internal readonly static HashSet<string> NonClientSideRequestExtensions = new (5, StringComparer.InvariantCultureIgnoreCase)
+        {
+            ".aspx", ".ashx", ".asmx", ".axd", ".svc"
+        };
+
+        /// <summary>
         /// This is a performance tweak to check if this not an ASP.Net server file
         /// .Net will pass these requests through to the module when in integrated mode.
         /// We want to ignore all of these requests immediately.
@@ -150,8 +159,7 @@ namespace Umbraco.Core
             {
                 var ext = Path.GetExtension(url.LocalPath);
                 if (ext.IsNullOrWhiteSpace()) return false;
-                var toInclude = new[] {".aspx", ".ashx", ".asmx", ".axd", ".svc"};
-                return toInclude.Any(ext.InvariantEquals) == false;
+                return !NonClientSideRequestExtensions.Contains(ext);
             }
             catch (ArgumentException)
             {

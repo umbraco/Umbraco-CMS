@@ -54,13 +54,19 @@
 
                                     <div class="umb-package-numbers">
                                         <small class="umb-package-downloads">
-                                            <i class="icon-download-alt" aria-hidden="true"></i>
+                                            <umb-icon icon="icon-download-alt"></umb-icon>
                                             <strong>{{package.downloads}}</strong>
                                         </small>
                                         <small class="umb-package-likes">
-                                            <i class="icon-hearts" aria-hidden="true"></i>
+                                            <umb-icon icon="icon-hearts"></umb-icon>
                                             <strong>{{package.likes}}</strong>
                                         </small>
+                                    </div>
+                                    <div class="umb-package-cloud">
+                                        <div ng-if="package.certifiedToWorkOnUmbracoCloud">
+                                            <umb-icon icon="icon-cloud"></umb-icon>
+                                            <span><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</localize></span>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -93,18 +99,24 @@
 
                                     <div class="umb-package-numbers">
                                         <small class="umb-package-downloads">
-                                            <i class="icon-download-alt" aria-hidden="true"></i>
-                                            <strong>{{ package.downloads }}</strong>
+                                            <umb-icon icon="icon-download-alt"></umb-icon>
+                                            <strong>{{package.downloads}}</strong>
                                         </small>
                                         <small class="umb-package-likes">
-                                            <i class="icon-hearts" aria-hidden="true"></i>
-                                            <strong>{{ package.likes }}</strong>
+                                            <umb-icon icon="icon-hearts"></umb-icon>
+                                            <strong>{{package.likes}}</strong>
                                         </small>
+                                    </div>
+                                    <div class="umb-package-cloud">
+                                        <div ng-if="package.certifiedToWorkOnUmbracoCloud">
+                                            <umb-icon icon="icon-cloud"></umb-icon>
+                                            <span><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco Cloud</localize></span>
+                                        </div>
                                     </div>
 
                                 </div>
                             </div>
-                            
+
                         </button>
                     </div> <!-- end package -->
 
@@ -269,6 +281,10 @@
                                     <div class="umb-package-details__information-item-content">{{vm.package.likes}}</div>
                                 </div>
 
+                                <div class="umb-package-details__information-item" ng-if="vm.package.certifiedToWorkOnUmbracoCloud">
+                                    <div class="umb-package-details__information-item-label"><localize key="packager_verifiedToWorkOnUmbracoCloud">Verified to work on Umbraco CLoud</localize></div>
+                                </div>
+
                             </div>
                         </umb-box-content>
                     </umb-box>
@@ -295,7 +311,7 @@
                             <div>
                                 <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
                                     <a class="umb-package-details__link" href="{{ externalSource.url }}" target="_blank" rel="noopener noreferrer">
-                                        <i class="icon-out" aria-hidden="true"></i>
+                                        <umb-icon icon="icon-out"></umb-icon>
                                         {{ externalSource.name }}
                                     </a>
                                 </div>
@@ -325,7 +341,7 @@
 
                     <form novalidate name="localPackageForm" class="w-100">
                         <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.icon" class="icon-box" aria-hidden="true"></i>
+                            <umb-icon ng-if="!vm.localPackage.icon" icon="icon-box"></umb-icon>
                             <img ng-if="vm.localPackage.icon" ng-src="{{vm.localPackage.icon}}" alt="" />
                         </div>
 

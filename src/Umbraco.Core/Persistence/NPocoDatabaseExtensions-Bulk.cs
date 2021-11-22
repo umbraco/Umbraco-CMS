@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlServerCe;
+using System.Data.SqlTypes;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -61,26 +62,33 @@ namespace Umbraco.Core.Persistence
         /// <returns>The number of records that were inserted.</returns>
         public static int BulkInsertRecords<T>(this IUmbracoDatabase database, IEnumerable<T> records, bool useNativeBulkInsert = true)
         {
-            var recordsA = records.ToArray();
-            if (recordsA.Length == 0) return 0;
+            if (!records.Any()) return 0;
 
             var pocoData = database.PocoDataFactory.ForType(typeof(T));
             if (pocoData == null) throw new InvalidOperationException("Could not find PocoData for " + typeof(T));
 
             if (database.DatabaseType.IsSqlCe())
             {
-                if (useNativeBulkInsert) return BulkInsertRecordsSqlCe(database, pocoData, recordsA);
+                if (useNativeBulkInsert)
+                {
+                    return BulkInsertRecordsSqlCe(database, pocoData, records);
+                }
+
                 // else, no other choice
-                foreach (var record in recordsA)
+                var count = 0;                
+                foreach (var record in records)
+                {
                     database.Insert(record);
-                return recordsA.Length;
+                    count++;
+                }   
+                return count;
             }
 
             if (database.DatabaseType.IsSqlServer())
             {
                 return useNativeBulkInsert && database.DatabaseType.IsSqlServer2008OrLater()
-                    ? BulkInsertRecordsSqlServer(database, pocoData, recordsA)
-                    : BulkInsertRecordsWithCommands(database, recordsA);
+                    ? BulkInsertRecordsSqlServer(database, pocoData, records)
+                    : BulkInsertRecordsWithCommands(database, records.ToArray());
             }
             throw new NotSupportedException();
         }
@@ -95,7 +103,9 @@ namespace Umbraco.Core.Persistence
         private static int BulkInsertRecordsWithCommands<T>(IUmbracoDatabase database, T[] records)
         {
             foreach (var command in database.GenerateBulkInsertCommands(records))
+            {
                 command.ExecuteNonQuery();
+            }   
 
             return records.Length; // what else?
         }
@@ -127,7 +137,7 @@ namespace Umbraco.Core.Persistence
             // Math.Floor(2100 / 8) = 262 record per command
             // 4168 / 262 = 15.908... = there will be 16 command in total
             // (if we have disabled db parameters, then all records will be included, in only one command)
-            var recordsPerCommand = paramsPerRecord == 0 ? int.MaxValue : Convert.ToInt32(Math.Floor(2000.00 / paramsPerRecord));
+            var recordsPerCommand = paramsPerRecord == 0 ? int.MaxValue : Convert.ToInt32(Math.Floor((double)Constants.Sql.MaxParameterCount / paramsPerRecord));
             var commandsCount = Convert.ToInt32(Math.Ceiling((double)records.Length / recordsPerCommand));
 
             var commands = new IDbCommand[commandsCount];
@@ -210,7 +220,15 @@ namespace Umbraco.Core.Persistence
                             if (IncludeColumn(pocoData, columns[i]))
                             {
                                 var val = columns[i].Value.GetValue(record);
-                                updatableRecord.SetValue(i, val);
+                                if (val is byte[])
+                                {
+                                    var bytes = val as byte[];
+                                    updatableRecord.SetSqlBinary(i, new SqlBinary(bytes));
+                                }
+                                else
+                                {
+                                    updatableRecord.SetValue(i, val);
+                                }
                             }
                         }
                         resultSet.Insert(updatableRecord);
@@ -232,6 +250,10 @@ namespace Umbraco.Core.Persistence
         /// <returns>The number of records that were inserted.</returns>
         internal static int BulkInsertRecordsSqlServer<T>(IUmbracoDatabase database, PocoData pocoData, IEnumerable<T> records)
         {
+            // TODO: The main reason this exists is because the NPoco InsertBulk method doesn't return the number of items.
+            // It is worth investigating the performance of this vs NPoco's because we use a custom BulkDataReader
+            // which in theory should be more efficient than NPocos way of building up an in-memory DataTable.
+
             // create command against the original database.Connection
             using (var command = database.CreateCommand(database.Connection, CommandType.Text, string.Empty))
             {
@@ -243,7 +265,13 @@ namespace Umbraco.Core.Persistence
                 var syntax = database.SqlContext.SqlSyntax as SqlServerSyntaxProvider;
                 if (syntax == null) throw new NotSupportedException("SqlSyntax must be SqlServerSyntaxProvider.");
 
-                using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction) { BulkCopyTimeout = 10000, DestinationTableName = tableName })
+                using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction)
+                {
+                    BulkCopyTimeout = 0, // 0 = no bulk copy timeout. If a timeout occurs it will be an connection/command timeout.
+                    DestinationTableName = tableName,
+                    // be consistent with NPoco: https://github.com/schotime/NPoco/blob/5117a55fde57547e928246c044fd40bd00b2d7d1/src/NPoco.SqlServer/SqlBulkCopyHelper.cs#L50
+                    BatchSize = 4096
+                })
                 using (var bulkReader = new PocoDataDataReader<T, SqlServerSyntaxProvider>(records, pocoData, syntax))
                 {
                     //we need to add column mappings here because otherwise columns will be matched by their order and if the order of them are different in the DB compared

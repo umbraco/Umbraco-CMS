@@ -192,6 +192,7 @@ Use this directive to construct a header inside the main editor window.
 @param {array=} tabs Array of tabs. See example above.
 @param {array=} navigation Array of sub views. See example above.
 @param {boolean=} nameLocked Set to <code>true</code> to lock the name.
+@param {number=} nameMaxLength Maximum length of the name.
 @param {object=} menu Add a context menu to the editor.
 @param {string=} icon Show and edit the content icon. Opens an overlay to change the icon.
 @param {boolean=} hideIcon Set to <code>true</code> to hide icon.
@@ -210,17 +211,23 @@ Use this directive to construct a header inside the main editor window.
 
     function EditorHeaderDirective(editorService, localizationService, editorState, $rootScope) {
 
-        function link(scope, $injector) {
+        function link(scope) {
 
             scope.vm = {};
             scope.vm.dropdownOpen = false;
-            scope.vm.currentVariant = "";
+            scope.vm.currentVariant = ""; 
             scope.loading = true;
             scope.accessibility = {};
             scope.accessibility.a11yMessage = "";
             scope.accessibility.a11yName = "";
             scope.accessibility.a11yMessageVisible = false;
             scope.accessibility.a11yNameVisible = false;
+
+            // trim the name if required
+            scope.nameMaxLength = scope.nameMaxLength || 255;
+            if (scope.name && scope.name.length > scope.nameMaxLength) {
+                scope.name = scope.name.substring(0, scope.nameMaxLength - 1) + '…';
+            }
 
             // need to call localizationService service outside of routine to set a11y due to promise requirements
             if (editorState.current) {
@@ -251,6 +258,7 @@ Use this directive to construct a header inside the main editor window.
                 var iconPicker = {
                     icon: scope.icon.split(' ')[0],
                     color: scope.icon.split(' ')[1],
+                    size: "medium",
                     submit: function (model) {
                         if (model.icon) {
                             if (model.color) {
@@ -375,6 +383,7 @@ Use this directive to construct a header inside the main editor window.
                 name: "=",
                 nameLocked: "=",
                 nameRequired: "=?",
+                nameMaxLength: "=?",
                 menu: "=",
                 hideActionsMenu: "<?",
                 icon: "=",

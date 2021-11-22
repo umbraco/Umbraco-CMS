@@ -89,7 +89,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrWhiteSpace(parentId)) throw new ArgumentException("Value cannot be null or whitespace.", "parentId");
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", "name");
             if (name.ContainsAny(Path.GetInvalidPathChars())) {
-                return Request.CreateNotificationValidationErrorResponse(Services.TextService.Localize("codefile/createFolderIllegalChars"));
+                return Request.CreateNotificationValidationErrorResponse(Services.TextService.Localize("codefile", "createFolderIllegalChars"));
             }
 
             // if the parentId is root (-1) then we just need an empty string as we are
@@ -389,8 +389,8 @@ namespace Umbraco.Web.Editors
                     }
 
                     display.AddErrorNotification(
-                        Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
-                        Services.TextService.Localize("speechBubbles/partialViewErrorText"));
+                        Services.TextService.Localize("speechBubbles", "partialViewErrorHeader"),
+                        Services.TextService.Localize("speechBubbles", "partialViewErrorText"));
                     break;
 
                 case Core.Constants.Trees.PartialViewMacros:
@@ -404,8 +404,8 @@ namespace Umbraco.Web.Editors
                     }
 
                     display.AddErrorNotification(
-                        Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
-                        Services.TextService.Localize("speechBubbles/partialViewErrorText"));
+                        Services.TextService.Localize("speechBubbles", "partialViewErrorHeader"),
+                        Services.TextService.Localize("speechBubbles", "partialViewErrorText"));
                     break;
 
                 case Core.Constants.Trees.Scripts:
@@ -638,7 +638,10 @@ namespace Umbraco.Web.Editors
         {
             var path = IOHelper.MapPath(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
-            return dirInfo.Attributes == FileAttributes.Directory;
+
+            // If you turn off indexing in Windows this will have the attribute:
+            // `FileAttributes.Directory | FileAttributes.NotContentIndexed`
+            return (dirInfo.Attributes & FileAttributes.Directory) != 0;
         }
 
         // this is an internal class for passing stylesheet data from the client to the controller while editing

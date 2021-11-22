@@ -14,13 +14,12 @@
         margin-left: 30px;
         position: relative;
     }
-    
 
-    &.-small-text{
+    &.-small-text {
         font-size: 13px;
     }
 
-    &.-bold{
+    &.-bold {
         font-weight: 700;
     }
 
@@ -38,12 +37,15 @@
         &:hover ~ .umb-form-check__state .umb-form-check__check {
             border-color: @inputBorderFocus;
         }
+
         &:checked ~ .umb-form-check__state .umb-form-check__check {
             border-color: @ui-option-type;
         }
+
         &[type='checkbox']:checked ~ .umb-form-check__state .umb-form-check__check {
             background-color: @ui-option-type;
         }
+
         &:checked:hover ~ .umb-form-check__state .umb-form-check__check {
             &::before {
                 background: @ui-option-type-hover;
@@ -80,16 +82,23 @@
         border: 2px solid @inputBorderTabFocus;
         margin: -1px;
     }
+
     .tabbing-active &.umb-form-check--checkbox &__input:focus ~ .umb-form-check__state .umb-form-check__check {
         outline: 2px solid @inputBorderTabFocus;
     }
+
     .tabbing-active &.umb-form-check--checkbox &__input:checked:focus ~ .umb-form-check__state .umb-form-check__check {
         border-color: @white;
     }
-
     // add spacing between when flexed/inline, equal to the width of the input
     .flex & + & {
-        margin-left:@checkboxWidth;
+        margin-left: @checkboxWidth;
+    }
+
+    .icon,
+    .umb-icon {
+        font-size: 0.9rem;
+        line-height: 1;
     }
 
     &__state {
@@ -98,12 +107,12 @@
         width: 20px;
         position: absolute;
         top: 0;
-
     }
-
 
     &__check {
         display: flex;
+        align-items: center;
+        justify-content: center;
         position: relative;
         background: @white;
         border: 1px solid @inputBorder;
@@ -150,6 +159,8 @@
         font-size: 12px;
         opacity: 0;
         transition: .2s ease-out;
+        position: relative;
+        z-index: 1;
 
         &:before {
             display: flex;

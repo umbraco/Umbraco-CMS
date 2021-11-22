@@ -1,7 +1,7 @@
 /**
  * @ngdoc service
  * @name umbraco.resources.logViewerResource
- * @description Retrives Umbraco log items (by default from JSON files on disk)
+ * @description Retrieves Umbraco log items (by default from JSON files on disk)
  *
  *
  **/
@@ -58,7 +58,7 @@ function logViewerResource($q, $http, umbRequestHelper) {
             }
 
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
 
             //now copy back to the options we will use
             options = defaults;

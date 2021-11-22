@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("nodeId")]
         [ForeignKey(typeof(ContentDto))]
-        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,current")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,current", IncludeColumns = "id,versionDate,text,userId")]
         public int NodeId { get; set; }
 
         [Column("versionDate")] // TODO: db rename to 'updateDate'
@@ -32,6 +32,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
         [Column("current")]
+        [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Current", IncludeColumns = "nodeId")]
         public bool Current { get; set; }
 
         // about current:
@@ -48,5 +49,9 @@ namespace Umbraco.Core.Persistence.Dtos
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ColumnName = "NodeId", ReferenceMemberName = "NodeId")]
         public ContentDto ContentDto { get; set; }
+
+        [Column("preventCleanup")]
+        [Constraint(Default = "0")]
+        public bool PreventCleanup { get; set; }
     }
 }

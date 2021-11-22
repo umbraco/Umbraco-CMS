@@ -12,5 +12,9 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("defaultValue", "Default value", "textarea", Description = "If value is blank, the editor will show this")]
         public string DefaultValue { get; set; }
+
+
+        [ConfigurationField("overlaySize", "Overlay Size", "overlaysize", Description = "Select the width of the overlay (link picker).")]
+        public string OverlaySize { get; set; }
     }
 }

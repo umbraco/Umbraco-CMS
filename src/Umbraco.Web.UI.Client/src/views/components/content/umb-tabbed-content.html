@@ -1,12 +1,42 @@
 ﻿<div>
     <ng-form name="tabbedContentForm">
-        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.id">
+
+        <umb-editor-tab-bar ng-if="tabs.length > 0">
+            <umb-tabs-nav tabs="tabs" on-tab-change="setActiveTab(tab)"></umb-tabs-nav>
+        </umb-editor-tab-bar>
+
+        <umb-box ng-repeat="tab in tabs track by tab.key" ng-show="tab.alias === activeTabAlias && tab.properties.length > 0">
+            <umb-box-content data-element="tab-content-{{tab.alias}}">
+                <umb-property
+                    data-element="property-{{property.alias}}"
+                    ng-repeat="property in tab.properties track by property.alias"
+                    property="property"
+                    show-inherit="propertyEditorDisabled(property)"
+                    inherits-from="defaultVariant.displayName">
+
+                    <div ng-class="{'o-40 cursor-not-allowed': propertyEditorDisabled(property) }">
+                        <umb-property-editor
+                            model="property"
+                            preview="propertyEditorDisabled(property)">
+                        </umb-property-editor>
+                    </div>
+                </umb-property>
+            </umb-box-content>
+        </umb-box>
+
+        <div class="umb-group-panel"
+            retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)"
+            data-app-anchor="{{group.id}}"
+            data-element="group-{{group.alias}}"
+            ng-repeat="group in content.tabs track by group.key"
+            ng-if="group.type === 0"
+            ng-show="group.parentAlias === activeTabAlias || tabs.length === 0">
 
             <div class="umb-group-panel__header">
                 <div id="group-{{group.id}}">{{ group.label }}</div>
             </div>
 
-            <div class="umb-group-panel__content">
+            <div class="umb-group-panel__content" data-element="tab-content-{{group.type === 0 ? group.parentAlias : group.alias}}">
                 <umb-property
                     data-element="property-{{property.alias}}"
                     ng-repeat="property in group.properties track by property.alias"
@@ -23,13 +53,12 @@
 
                 </umb-property>
             </div>
-
         </div>
 
         <umb-empty-state
             ng-if="content.tabs.length === 0"
             position="center">
-            <localize key="content_noProperties"></localize>
+            <localize key="content_noProperties">No content can be added for this item</localize>
         </umb-empty-state>
 
     </ng-form>

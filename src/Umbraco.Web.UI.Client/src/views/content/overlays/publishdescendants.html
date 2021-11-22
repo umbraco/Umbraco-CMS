@@ -22,7 +22,7 @@
     <div ng-if="vm.displayVariants.length > 1">
 
         <div class="mb3">
-            <p><localize key="content_publishDescendantsWithVariantsHelp"></localize></p>
+            <p><localize key="content_publishDescendantsWithVariantsHelp">Publish variants and variants of same type underneath and thereby making their content publicly available.</localize></p>
         </div>
 
         <div class="flex mb3">
@@ -60,7 +60,7 @@
                             <span class="umb-variant-selector-entry__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                 <umb-variant-state variant="variant"></umb-variant-state>
                                 <span ng-if="variant.isMandatory"> - </span>
-                                <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.publish === false) }"><localize key="general_mandatory"></localize></span>
+                                <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.publish === false) }"><localize key="general_mandatory">Mandatory</localize></span>
                             </span>
                             <span class="umb-variant-selector-entry__description" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                                 <span class="text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>

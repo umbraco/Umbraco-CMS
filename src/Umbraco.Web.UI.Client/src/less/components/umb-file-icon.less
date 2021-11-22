@@ -4,7 +4,7 @@
     flex-direction: column;
     align-items: center;
 
-    .file-icon {
+    &__inner {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -17,44 +17,36 @@
             display: block;
             text-align: center;
         }
-
-        > span {
-            position: absolute;
-            color: @white;
-            background: @ui-active;
-            padding: 1px 3px;
-            font-size: 10px;
-            line-height: 130%;
-            display: block;
-            margin-bottom: 0.75rem;
-            min-width: 1.2rem;
-            bottom: 0;
-        }
-
-        & + small {
-            display: block;
-            margin-top: 0.25rem;
-        }
     }
-}
 
-.umb-file-icon--s {
-    .file-icon {
-        > .icon {
+    &__extension {
+        position: absolute;
+        color: @ui-active-type;
+        background: @ui-active;
+        padding: 1px 3px;
+        font-size: 10px;
+        line-height: 130%;
+        display: block;
+        margin-bottom: 0.75rem;
+        min-width: 1.2rem;
+        bottom: 0;
+    }
 
-        }
+    &__text {
+        display: block;
+        margin-top: 0.25rem;
     }
 }
 
 .umb-file-icon--m {
-    .file-icon {
+    .umb-file-icon__inner {
         > .icon {
             font-size: 70px;
         }
-        > span {
-            font-size: 14px;
-            margin-bottom: 0.95rem;
-            min-width: 1.5rem;
-        }
+    }
+    .umb-file-icon__extension {
+        font-size: 14px;
+        margin-bottom: 0.95rem;
+        min-width: 1.5rem;
     }
 }

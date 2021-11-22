@@ -17,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Services;
 
@@ -32,14 +33,19 @@ namespace Umbraco.Web.Editors
     public class DashboardController : UmbracoApiController
     {
         private readonly IDashboardService _dashboardService;
+        private readonly IContentDashboardSettings _dashboardSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper)
+        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
+            IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper,
+            IContentDashboardSettings dashboardSettings)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _dashboardService = dashboardService;
+            _dashboardSettings = dashboardSettings;
         }
 
         //we have just one instance of HttpClient shared for the entire application
@@ -47,7 +53,7 @@ namespace Umbraco.Web.Editors
 
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
-        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.com/")
         {
             var user = Security.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
@@ -55,7 +61,14 @@ namespace Umbraco.Web.Editors
             var version = UmbracoVersion.SemanticVersion.ToSemanticString();
             var isAdmin = user.IsAdmin();
 
-            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}&admin={4}", section, allowedSections, language, version, isAdmin);
+            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}",
+                baseUrl,
+                _dashboardSettings.ContentDashboardPath,
+                section,
+                allowedSections,
+                language,
+                version,
+                isAdmin);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = AppCaches.RuntimeCache.GetCacheItem<JObject>(key);
@@ -202,6 +215,8 @@ namespace Umbraco.Web.Editors
             return _dashboardService.GetDashboards(section, Security.CurrentUser).Select(x => new Tab<IDashboardSlim>
             {
                 Id = x.Id,
+                Key = x.Key,
+                Type = x.Type,
                 Alias = x.Alias,
                 Label = x.Label,
                 Expanded = x.Expanded,

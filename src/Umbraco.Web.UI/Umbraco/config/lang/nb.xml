@@ -89,26 +89,6 @@
     <key alias="styleShow">Vis stiler</key>
     <key alias="tableInsert">Sett inn tabell</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">For å endre det valge innholdets dokumenttype, velger du først en ny dokumenttype som er gyldig på gjeldende plassering.</key>
-    <key alias="changeDocTypeInstruction2">Kontroller deretter at alle egenskaper blir overført riktig til den nye dokumenttypen og klikk på Lagre.</key>
-    <key alias="contentRepublished">Innholdet har blitt republisert.</key>
-    <key alias="currentProperty">Nåværende egenskap</key>
-    <key alias="currentType">Nåværende type</key>
-    <key alias="docTypeCannotBeChanged">Du kan ikke endre dokumenttype, ettersom det ikke er andre gyldige dokumenttyper på denne plasseringen.</key>
-    <key alias="docTypeChanged">Dokumenttype endret</key>
-    <key alias="mapProperties">Overfør egenskaper</key>
-    <key alias="mapToProperty">Overfør til egenskap</key>
-    <key alias="newTemplate">Ny mal</key>
-    <key alias="newType">Ny type</key>
-    <key alias="none">ingen</key>
-    <key alias="selectedContent">Innhold</key>
-    <key alias="selectNewDocType">Velg ny dokumenttype</key>
-    <key alias="successMessage">Dokumenttypen på det valgte innhold ble endret til [new type], og følgende egenskaper ble overført:</key>
-    <key alias="to">til</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Overføringen av egenskaper kunne ikke fullføres da en eller flere egenskaper er satt til å bli overført mer enn en gang.</key>
-    <key alias="validDocTypesNote">Kun andre dokumenttyper som er gyldige for denne plasseringen vises.</key>
-  </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Publisert</key>
     <key alias="about">Om siden</key>
@@ -937,5 +917,9 @@ Vennlig hilsen Umbraco roboten
     <key alias="yourProfile" version="7.0">Din profil</key>
     <key alias="yourHistory" version="7.0">Din historikk</key>
     <key alias="sessionExpires" version="7.0">Sesjonen utløper om</key>
+  </area>
+  <area alias="logViewer">
+    <key alias="selectAllLogLevelFilters">Velg alle</key>
+    <key alias="deselectAllLogLevelFilters">Opphev alle</key>
   </area>
 </language>
