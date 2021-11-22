@@ -81,8 +81,8 @@
                 ng-class="{'-selected': group.selected, '-selectable': group.hasAccess && !group.isSystemUserGroup}">
 
                 <div class="umb-table-cell">
-                    <i ng-if="group.icon" class="umb-table-body__icon umb-table-body__fileicon {{ group.icon }}"></i>
-                    <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+                    <umb-icon icon="{{group.icon}}" class="umb-table-body__icon umb-table-body__fileicon" ng-if="!group.selected"></umb-icon>
+                    <umb-icon icon="icon-check" class="umb-table-body__icon umb-table-body__checkicon" ng-if="group.selected"></umb-icon>
                 </div>
                 <div class="umb-table-cell">
                     <a
@@ -113,7 +113,7 @@
 
     <!-- Empty states -->
     <umb-empty-state ng-if="!vm.loading && !vm.filteredUserGroups.length" position="center">
-        <localize key="general_searchNoResult"></localize>
+        <localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize>
     </umb-empty-state>
 
 </div>

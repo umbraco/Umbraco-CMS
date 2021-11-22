@@ -192,26 +192,6 @@
     <key alias="smallCustom">Custom</key>
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">To change the Document Type for the selected content, first select from the list of valid types for this location.</key>
-    <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
-    <key alias="contentRepublished">The content has been re-published.</key>
-    <key alias="currentProperty">Current Property</key>
-    <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The Document Type cannot be changed, as there are no alternatives valid for this location.  An alternative will be valid if it is allowed under the parent of the selected content item and that all existing child content items are allowed to be created under it.</key>
-    <key alias="docTypeChanged">Document Type Changed</key>
-    <key alias="mapProperties">Map Properties</key>
-    <key alias="mapToProperty">Map to Property</key>
-    <key alias="newTemplate">New Template</key>
-    <key alias="newType">New Type</key>
-    <key alias="none">none</key>
-    <key alias="selectedContent">Content</key>
-    <key alias="selectNewDocType">Select New Document Type</key>
-    <key alias="successMessage">The Document Type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
-    <key alias="to">to</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
-    <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Failed to create a folder under parent with ID %0%</key>
     <key alias="createFolderFailedByName">Failed to create a folder under parent with name %0%</key>
@@ -298,6 +278,7 @@
     <key alias="nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the Element Type will be used.</key>
     <key alias="nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</key>
     <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
+    <key alias="nestedContentNoGroups">The selected element type does not contain any supported groups (tabs are not supported by this editor, either change them to groups or use the Block List editor).</key>
     <key alias="addTextBox">Add another text box</key>
     <key alias="removeTextBox">Remove this text box</key>
     <key alias="contentRoot">Content root</key>
@@ -327,6 +308,7 @@
     <key alias="notReadyToPublish">We are not ready to Publish</key>
     <key alias="readyToPublish">Ready to publish?</key>
     <key alias="readyToSave">Ready to Save?</key>
+    <key alias="resetFocalPoint">Reset focal point</key>
     <key alias="sendForApproval">Send for approval</key>
     <key alias="schedulePublishHelp">Select the date and time to publish and/or unpublish the content item.</key>
     <key alias="createEmpty">Create new</key>
@@ -334,7 +316,7 @@
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Create a new Content Template from <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Blank</key>
     <key alias="selectBlueprint">Select a Content Template</key>
     <key alias="createdBlueprintHeading">Content Template created</key>
@@ -347,6 +329,7 @@
     <key alias="orClickHereToUpload">or click here to choose files</key>
         <key alias="dragFilesHereToUpload">You can drag files here to upload.</key>
     <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
+    <key alias="invalidFileName">Cannot upload this file, it does not have a valid file name</key>
     <key alias="maxFileSize">Max file size is</key>
     <key alias="mediaRoot">Media root</key>
     <key alias="moveFailed">Failed to move media</key>
@@ -460,6 +443,7 @@
     <key alias="anchorInsert">Name</key>
     <key alias="closeThisWindow">Close this window</key>
     <key alias="confirmdelete">Are you sure you want to delete</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Are you sure you want to delete <b>%0%</b> of <b>%1%</b> items]]></key>
     <key alias="confirmdisable">Are you sure you want to disable</key>
     <key alias="confirmremove">Are you sure you want to remove</key>
     <key alias="confirmremoveusageof"><![CDATA[Are you sure you want to remove the usage of <b>%0%</b>]]></key>
@@ -549,6 +533,7 @@
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
+    <key alias="createNew">Create dictionary item</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -724,6 +709,7 @@
     <key alias="first">First</key>
     <key alias="focalPoint">Focal point</key>
     <key alias="general">General</key>
+    <key alias="generic">Generic</key>
     <key alias="groups">Groups</key>
     <key alias="group">Group</key>
     <key alias="height">Height</key>
@@ -829,11 +815,15 @@
     <key alias="videos">Videos</key>
     <key alias="installing">Installing</key>
     <key alias="avatar">Avatar for</key>
+    <key alias="header">Header</key>
+    <key alias="systemField">system field</key>
+    <key alias="lastUpdated">Last Updated</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
   </area>
   <area alias="shortcuts">
+    <key alias="addTab">Add tab</key>
     <key alias="addGroup">Add group</key>
     <key alias="addProperty">Add property</key>
     <key alias="addEditor">Add editor</key>
@@ -1376,6 +1366,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmRemoveAllMediaEntryMessage">Remove all medias?</key>
     <key alias="tabClipboard">Clipboard</key>
     <key alias="notAllowed">Not allowed</key>
+    <key alias="openMediaPicker">Open media picker</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
@@ -1399,7 +1390,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="created">Created</key>
     <key alias="headline">Select a version to compare with the current version</key>
     <key alias="currentVersion">Current version</key>
-    <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red</del> text will not be shown in the selected version. , <ins>green means added</ins>]]></key>
+    <key alias="diffHelp"><![CDATA[This shows the differences between the current version and the selected version<br /><del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added]]></key>
     <key alias="documentRolledBack">Document has been rolled back</key>
     <key alias="htmlHelp">This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view</key>
     <key alias="rollbackTo">Rollback to</key>
@@ -1427,7 +1418,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
-    <key alias="importDocumentTypeHelp">To import a Document Type, find the ".udt" file on your computer by clicking the "Browse" button and click "Import" (you'll be asked for confirmation on the next screen)</key>
+    <key alias="importDocumentTypeHelp">To import a Document Type, find the ".udt" file on your computer by clicking the "Import" button (you'll be asked for confirmation on the next screen)</key>
     <key alias="newtabname">New Tab Title</key>
     <key alias="nodetype">Node type</key>
     <key alias="objecttype">Type</key>
@@ -1505,6 +1496,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="mediaTypeSavedHeader">Media Type saved</key>
     <key alias="memberTypeSavedHeader">Member Type saved</key>
     <key alias="memberGroupSavedHeader">Member Group saved</key>
+    <key alias="memberGroupNameDuplicate">Another Member Group with the same name already exists</key>
     <key alias="templateErrorHeader">Template not saved</key>
     <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
     <key alias="templateSavedHeader">Template saved</key>
@@ -1677,16 +1669,18 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="setAsDefault">Set as default</key>
     <key alias="chooseExtra">Choose extra</key>
     <key alias="chooseDefault">Choose default</key>
-      <key alias="areAdded">are added</key>
-        <key alias="warning">Warning</key>
-        <key alias="youAreDeleting">You are deleting the row configuration</key>
-        <key alias="deletingARow">
-            Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.
-        </key>
+    <key alias="areAdded">are added</key>
+    <key alias="warning">Warning</key>
+    <key alias="warningText"><![CDATA[<p>Modifying a row configuration name will result in loss of data for any existing content that is based on this configuration.</p> <p><strong>Modifying only the label will not result in data loss.</strong></p>]]></key>
+    <key alias="youAreDeleting">You are deleting the row configuration</key>
+    <key alias="deletingARow">Deleting a row configuration name will result in loss of data for any existing content that is based on this configuration.</key>
+    <key alias="deleteLayout">You are deleting the layout</key>
+    <key alias="deletingALayout">Modifying a layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Compositions</key>
     <key alias="group">Group</key>
+    <key alias="groupReorderSameAliasError">You can't move the group %0% to this tab because the group will get the same alias as a tab: "%1%". Rename the group to continue.</key>
     <key alias="noGroups">You have not added any groups</key>
     <key alias="addGroup">Add group</key>
     <key alias="inheritedFrom">Inherited from</key>
@@ -1753,6 +1747,23 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
     <key alias="displaySettingsHeadline">Appearance</key>
     <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
+    <key alias="confirmDeleteTabMessage"><![CDATA[Are you sure you want to delete the tab <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteGroupMessage"><![CDATA[Are you sure you want to delete the group <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeletePropertyMessage"><![CDATA[Are you sure you want to delete the property <strong>%0%</strong>?]]></key>
+    <key alias="confirmDeleteTabNotice">This will also delete all items below this tab.</key>
+    <key alias="confirmDeleteGroupNotice">This will also delete all items below this group.</key>
+    <key alias="addTab">Add tab</key>
+    <key alias="convertToTab">Convert to tab</key>
+    <key alias="tabDirectPropertiesDropZone">Drag properties here to place directly on the tab</key>
+    <key alias="removeChildNode">You are removing the child node</key>
+    <key alias="removeChildNodeWarning">Removing a child node will limit the editors options to create different content types beneath a node.</key>
+    <key alias="usingEditor">using this editor will get updated with the new settings.</key>
+    <key alias="historyCleanupHeading">History cleanup</key>
+    <key alias="historyCleanupDescription">Allow override the global settings for when history versions are removed.</key>
+    <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
+    <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
+    <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
+    <key alias="historyCleanupGloballyDisabled">NOTE! The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2349,6 +2360,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
+    <key alias="maxAmount">Maximum amount</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2357,7 +2369,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="noDocumentTypes">No references to Document Types.</key>
     <key alias="labelUsedByMediaTypes">Used in Media Types</key>
     <key alias="noMediaTypes">No references to Media Types.</key>
-    <key alias="labelUsedByMemberTypes">Used in  Member Types</key>
+    <key alias="labelUsedByMemberTypes">Used in Member Types</key>
     <key alias="noMemberTypes">No references to Member Types.</key>
     <key alias="usedByProperties">Used by</key>
     <key alias="labelUsedByDocuments">Used in Documents</key>
@@ -2367,6 +2379,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="logViewer">
       <key alias="deleteSavedSearch">Delete Saved Search</key>
       <key alias="logLevels">Log Levels</key>
+      <key alias="selectAllLogLevelFilters">Select all</key>
+      <key alias="deselectAllLogLevelFilters">Deselect all</key>
       <key alias="savedSearches">Saved Searches</key>
       <key alias="saveSearch">Save Search</key>
       <key alias="saveSearchDescription">Enter a friendly name for your search query</key>
@@ -2419,7 +2433,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="tooltipForPropertyActionsMenuClose">Close Property Actions</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Wait</key>
     <key alias="refreshStatus">Refresh status</key>
     <key alias="memoryCache">Memory Cache</key>
     <key alias="memoryCacheDescription">

@@ -4,8 +4,8 @@
             <div class="sub-view-columns">
 
                 <div class="sub-view-column-left">
-                    <h5><localize key="contentTypeEditor_allowedTemplatesHeading" /></h5>
-                    <small><localize key="contentTypeEditor_allowedTemplatesDescription" /></small>
+                    <h5><localize key="contentTypeEditor_allowedTemplatesHeading">Allowed Templates</localize></h5>
+                    <small><localize key="contentTypeEditor_allowedTemplatesDescription">Choose which templates editors are allowed to use on content of this type</localize></small>
                 </div>
                 
                 <div class="sub-view-column-right">
@@ -17,7 +17,8 @@
                         item-name="template"
                         name="model.name"
                         alias="model.alias"
-                        update-placeholder="vm.updateTemplatePlaceholder">
+                        update-placeholder="vm.updateTemplatePlaceholder"
+                        item-picker="vm.openTemplatePicker">
                     </umb-grid-selector>
 
                     <umb-button

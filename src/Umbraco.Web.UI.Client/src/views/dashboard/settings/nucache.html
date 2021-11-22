@@ -1,11 +1,8 @@
 ﻿<div id="nuCache" style="position: relative;" ng-controller="Umbraco.Dashboard.NuCacheController as vm">
 
-    <div ng-show="vm.loading || vm.working" style="background: rgba(255, 255, 255, 0.60); position: absolute; left: 0; right: 0; top: 0; bottom: 0;">
+    <div ng-show="vm.loading || vm.working" style="background: rgba(255, 255, 255, 0.60); position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 1;">
         <umb-load-indicator></umb-load-indicator>
     </div>
-    <p>
-        <span ng-show="vm.working">(<localize key="nuCache_wait">wait</localize>)</span>
-    </p>
 
     <div class="umb-panel-group__details-group">
         <div class="umb-panel-group__details-group-title">

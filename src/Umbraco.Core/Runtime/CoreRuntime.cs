@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlServerCe;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Web;
@@ -20,9 +20,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Scoping;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Runtime
@@ -172,7 +170,7 @@ namespace Umbraco.Core.Runtime
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
 
-                
+
 
                 // register runtime-level services
                 // there should be none, really - this is here "just in case"
@@ -276,7 +274,7 @@ namespace Umbraco.Core.Runtime
                 || unattendedEmail.IsNullOrWhiteSpace()
                 || unattendedPassword.IsNullOrWhiteSpace())
             {
-                
+
                 fileExists = File.Exists(filePath);
                 if (fileExists == false)
                 {
@@ -342,7 +340,7 @@ namespace Umbraco.Core.Runtime
 
             Current.Services.UserService.Save(admin);
 
-            // Delete JSON file if it existed to tidy 
+            // Delete JSON file if it existed to tidy
             if (fileExists)
             {
                 File.Delete(filePath);
@@ -362,6 +360,19 @@ namespace Umbraco.Core.Runtime
 
             // no connection string set
             if (databaseFactory.Configured == false) return;
+
+            // create SQL CE database if not existing and database provider is SQL CE
+            if (databaseFactory.ProviderName == Constants.DbProviderNames.SqlCe)
+            {
+                var dataSource = new SqlCeConnectionStringBuilder(databaseFactory.ConnectionString).DataSource;
+                var dbFilePath = dataSource.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
+
+                if(File.Exists(dbFilePath) == false)
+                {
+                    var engine = new SqlCeEngine(databaseFactory.ConnectionString);
+                    engine.CreateDatabase();
+                }
+            }
 
             var tries = 5;
             var connect = false;
@@ -385,7 +396,7 @@ namespace Umbraco.Core.Runtime
 
                 // all conditions fulfilled, do the install
                 Logger.Info<CoreRuntime>("Starting unattended install.");
-                
+
                 try
                 {
                     database.BeginTransaction();

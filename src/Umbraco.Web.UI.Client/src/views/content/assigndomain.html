@@ -8,7 +8,7 @@
 
             <umb-pane ng-if="!currentNode.metaData.variesByCulture">
                 <h5 class="umb-pane-title"><localize key="assignDomain_setLanguage">Culture</localize></h5>
-                <label for="assignDomain_language" class="control-label"><localize key="general_language"></localize></label>
+                <label for="assignDomain_language" class="control-label"><localize key="general_language">Language</localize></label>
                 <select class="umb-property-editor umb-dropdown" name="language" id="assignDomain_language" ng-model="vm.language" ng-options="lang.name for lang in vm.languages">
                     <option value="">{{vm.inherit}}</option>
                 </select>
@@ -25,21 +25,22 @@
 
                 <h5 class="umb-pane-title"><localize key="assignDomain_setDomains">Domains</localize></h5>
                 <small class="db mb3">
-                    <localize key="assignDomain_domainHelpWithVariants"></localize>
+                    <localize key="assignDomain_domainHelpWithVariants">Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".
+                    Furthermore also one-level paths in domains are supported, eg. "example.com/en" or "/en".</localize>
                 </small>
                 <div class="umb-el-wrap  hidelabel">
                     <table class="table table-condensed table-bordered domains mb3" ng-if="vm.domains.length > 0">
                         <thead>
                             <tr>
                                 <th>
-                                    <localize key="assignDomain_domain"></localize>
+                                    <localize key="assignDomain_domain">Domain</localize>
                                     <span class="umb-control-required">*</span>
                                 </th>
                                 <th>
-                                    <localize key="assignDomain_language"></localize>
+                                    <localize key="assignDomain_language">Language</localize>
                                     <span class="umb-control-required">*</span>
                                 </th>
-                                <th />
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -49,9 +50,9 @@
                                     <input type="text" class="w-100" ng-model="domain.name" name="domain_name_{{$index}}" required umb-auto-focus />
 
                                     <span ng-if="vm.domainForm.$submitted" ng-messages="vm.domainForm['domain_name_' + $index].$error">
-                                        <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty"></localize></span>
+                                        <span class="help-inline" ng-message="required"><localize key="validation_invalidEmpty">Value cannot be empty</localize></span>
                                     </span>
-                                    <span ng-show="domain.duplicate" class="help-inline"><localize key="assignDomain_duplicateDomain"></localize><span ng-show="domain.other">({{domain.other}})</span></span>
+                                    <span ng-show="domain.duplicate" class="help-inline"><localize key="assignDomain_duplicateDomain">Domain has already been assigned.</localize><span ng-show="domain.other">({{domain.other}})</span></span>
                                 </td>
                                 <td>
                                     <select

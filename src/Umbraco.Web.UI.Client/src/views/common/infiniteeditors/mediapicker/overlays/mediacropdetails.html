@@ -12,21 +12,21 @@
 
             <div class="umb-control-group" ng-if="vm.shouldShowUrl">
                 <h5>
-                    <localize key="@general_url"></localize>
+                    <localize key="@general_url">URL</localize>
                 </h5>
                 <input type="text" localize="placeholder" placeholder="@general_url" class="umb-property-editor umb-textstring" ng-model="model.target.url" />
             </div>
 
             <div class="umb-control-group" ng-if="model.target">
                 <h5>
-                    <localize key="@content_altTextOptional"></localize>
+                    <localize key="@content_altTextOptional">Alternative text (optional)</localize>
                 </h5>
                 <input type="text" class="umb-property-editor umb-textstring" ng-model="model.target.altText" umb-auto-focus />
             </div>
 
             <div class="umb-control-group" ng-if="model.target">
                 <h5>
-                    <localize key="@content_captionTextOptional"></localize>
+                    <localize key="@content_captionTextOptional">Caption (optional)</localize>
                 </h5>
                 <input type="text" class="umb-property-editor umb-textstring" ng-model="model.target.caption" />
             </div>
@@ -50,6 +50,11 @@
                                            center="model.target.focalPoint"
                                            on-value-changed="vm.focalPointChanged(left, top)">
                         </umb-image-gravity>
+                        <div class="media-crop-details-buttons">
+                            <button type="button" ng-show="(model.target.focalPoint.left !== 0.5 && model.target.focalPoint.top !== 0.5)" class="btn btn-link btn-gravity-reset" ng-click="vm.focalPointChanged(0.5,0.5)">
+                                <umb-icon icon="icon-axis-rotation"></umb-icon> <localize key="content_resetFocalPoint">Reset focal point</localize>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

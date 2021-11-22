@@ -85,7 +85,8 @@ namespace Umbraco.Core.Migrations.Install
             typeof (AuditEntryDto),
             typeof (ContentVersionCultureVariationDto),
             typeof (DocumentCultureVariationDto),
-            typeof (ContentScheduleDto)
+            typeof (ContentScheduleDto),
+            typeof (ContentVersionCleanupPolicyDto)
         };
 
         /// <summary>
