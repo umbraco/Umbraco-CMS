@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public DirectoryInfo ApplicationRoot
             => new DirectoryInfo(
                 Path.Combine(
-                    _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempData),
+                    _hostingEnvironment.LocalTempPath,
                     "ExamineIndexes"));
     }
 }
