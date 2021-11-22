@@ -11,7 +11,6 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
 
         // setup the default config
         var config = {
-            pickDate: true,
             pickTime: true,
             useSeconds: true,
             format: "YYYY-MM-DD HH:mm:ss",
