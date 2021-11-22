@@ -700,13 +700,12 @@ namespace Umbraco.Core.Packaging
 
         private void UpdateHistoryCleanupPolicy(IContentType contentType, XElement element)
         {
-            contentType.HistoryCleanup ??= new HistoryCleanup();
-
             if (element == null)
             {
-                contentType.HistoryCleanup = new HistoryCleanup();
                 return;
             }
+
+            contentType.HistoryCleanup ??= new HistoryCleanup();
 
             if (bool.TryParse(element.Attribute("preventCleanup")?.Value, out var preventCleanup))
             {

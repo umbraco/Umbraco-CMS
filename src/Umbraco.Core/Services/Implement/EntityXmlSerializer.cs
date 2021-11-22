@@ -456,8 +456,10 @@ namespace Umbraco.Core.Services.Implement
                 genericProperties,
                 tabs);
 
-            // Never null in v8, ContentTypeCommonRepository.MapHistoryCleanup always returns an instance even if no db record.
-            xml.Add(SerializeCleanupPolicy(contentType.HistoryCleanup));
+            if (contentType.HistoryCleanup != null)
+            {
+                xml.Add(SerializeCleanupPolicy(contentType.HistoryCleanup));
+            }
 
             var folderNames = string.Empty;
             //don't add folders if this is a child doc type
