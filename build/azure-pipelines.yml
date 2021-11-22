@@ -226,14 +226,14 @@ stages:
                   inputs:
                       command: ci
                       workingDir: 'tests\Umbraco.Tests.AcceptanceTest'
-                - task: Npm@1
+                - task: PowerShell@2
                   displayName: Run Cypress (Desktop)
                   condition: always()
                   continueOnError: true
                   inputs:
-                      workingDir: tests\Umbraco.Tests.AcceptanceTest
-                      command: 'custom'
-                      customCommand: 'run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+                      targetType: inline
+                      workingDirectory: tests\Umbraco.Tests.AcceptanceTest
+                      script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
 
                 - task: PublishTestResults@2
                   condition: always()
@@ -259,7 +259,6 @@ stages:
 #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish test artifacts"
-                  condition: failed()
                   inputs:
                     targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                     artifact: 'Test artifacts - Windows'
@@ -329,14 +328,14 @@ stages:
                   inputs:
                       command: ci
                       workingDir: 'tests/Umbraco.Tests.AcceptanceTest'
-                - task: Npm@1
+                - task: Bash@3
                   displayName: Run Cypress (Desktop)
                   condition: always()
                   continueOnError: true
                   inputs:
-                      workingDir: tests/Umbraco.Tests.AcceptanceTest
-                      command: 'custom'
-                      customCommand: 'run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
+                      targetType: inline
+                      workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+                      script: 'npm run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
                 - task: PublishTestResults@2
                   condition: always()
                   inputs:
@@ -361,13 +360,11 @@ stages:
                 #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish test artifacts"
-                  condition: failed()
                   inputs:
                       targetPath: '$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                       artifact: 'Test artifacts - Linux'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish run log"
-                  condition: failed()
                   inputs:
                       targetPath: '$(Build.ArtifactStagingDirectory)/dotnet_run_log_linux.txt'
                       artifact: Test Run logs - Linux
@@ -541,7 +538,7 @@ stages:
                   inputs:
                       targetType: inline
                       script: |
-                        choco install docfx -y
+                        choco install docfx --version=2.58.5 -y
                         if ($lastexitcode -ne 0){
                            throw ("Error installing DocFX")
                         }

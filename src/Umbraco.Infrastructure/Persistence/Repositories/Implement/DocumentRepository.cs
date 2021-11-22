@@ -233,6 +233,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
                 "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
@@ -292,9 +293,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .OrderByDescending<ContentVersionDto>(x => x.Current)
                 .AndByDescending<ContentVersionDto>(x => x.VersionDate);
 
-            return MapDtosToContent(Database.Fetch<DocumentDto>(sql), true,
+            var pageIndex = skip / take;
+
+            return MapDtosToContent(Database.Page<DocumentDto>(pageIndex+1, take, sql).Items, true,
                 // load bare minimum, need variants though since this is used to rollback with variants
-                false, false, true).Skip(skip).Take(take);
+                false, false, true);
         }
 
         public override IContent GetVersion(int versionId)
@@ -625,6 +628,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     documentVersionDto.Published = true; // now published
                     contentVersionDto.Current = false; // no more current
                 }
+
+                // Ensure existing version retains current preventCleanup flag (both saving and publishing).
+                contentVersionDto.PreventCleanup = version.PreventCleanup;
+
                 Database.Update(contentVersionDto);
                 Database.Update(documentVersionDto);
 
@@ -636,6 +643,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     contentVersionDto.Id = 0; // want a new id
                     contentVersionDto.Current = true; // current version
                     contentVersionDto.Text = entity.Name;
+                    contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag
                     Database.Insert(contentVersionDto);
                     entity.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 
@@ -1421,7 +1429,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (versions.Count == 0)
                 return new Dictionary<int, List<ContentVariation>>();
 
-            var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, 2000, batch
+            var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, Constants.Sql.MaxParameterCount, batch
                 => Sql()
                     .Select<ContentVersionCultureVariationDto>()
                     .From<ContentVersionCultureVariationDto>()
@@ -1450,7 +1458,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             var ids = temps.Select(x => x.Id);
 
-            var dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(ids, 2000, batch =>
+            var dtos = Database.FetchByGroups<DocumentCultureVariationDto, int>(ids, Constants.Sql.MaxParameterCount, batch =>
                 Sql()
                     .Select<DocumentCultureVariationDto>()
                     .From<DocumentCultureVariationDto>()

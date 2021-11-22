@@ -13,9 +13,9 @@
     <key alias="createPackage">패키지 새로 만들기</key>
     <key alias="delete">삭제</key>
     <key alias="disable">비활성</key>
-    <key alias="emptyrecyclebin">휴지통 비우기</key>
+    <key alias="emptyRecycleBin">휴지통 비우기</key>
     <key alias="exportDocumentType">추출 문서 유형</key>
-    <key alias="importdocumenttype">등록 문서 유형</key>
+    <key alias="importDocumentType">등록 문서 유형</key>
     <key alias="importPackage">패키지 등록</key>
     <key alias="liveEdit">캔버스 내용 편집</key>
     <key alias="logout">종료</key>
@@ -346,16 +346,10 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">인스톨러가 데이터베이스에 연결할 수 없습니다.</key>
-    <key alias="databaseErrorWebConfig">web.config를 저장할 수 없습니다.connection string을 수동으로 수정하세요.</key>
     <key alias="databaseFound">데이터베이스가 확인되었으며 정보는 </key>
     <key alias="databaseHeader">데이터베이스 설정</key>
     <key alias="databaseInstall"><![CDATA[<strong>설치</strong> 버튼을 누르면 Umbraco %0% 데이터베이스가 설치됩니다.]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% 가 데이터베이스에 복사되었습니다. 계속하시려면 <strong>다음</strong>을 누르세요.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>데이터베이스를 찾을 수 없습니다. “web.config”파일의 "connection string"이 바르게 설정되었는지 확인하세요.</p>
-            <p>"web.config" 파일에 맨아래에 ,키네임을 "UmbracoDbDSN"로 하여 사용하시는 데이터베이스의 connection string 정보를 입력하시고 파일을 저장하세요. </p>
-            <p>
-            완료 후<strong>재시도</strong>버튼을 누르세요.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-		               web.config의 더많은 정보는 여기에 있습니다</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[이과정을 위해선, 당신의 DB서버 정보에 대해서 알고 계셔야합니다.("connection string").<br />
       필요하시다면 사용하시는 ISP쪽에 문의하시기 바랍니다..
       로컬 머신이나 서버에 설치되어 있다면 해당 시스템 관리자에게 문의하시기 바랍니다.]]></key>
@@ -367,7 +361,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>설치후 기본사용자의 암호가 성공적으로 변경되었습니다!</strong></p><p>더 이상 과정이 필요없으시면 <strong>다음</strong>을 눌러주세요.]]></key>
     <key alias="defaultUserPasswordChanged">비밀번호가 변경되었습니다!</key>
     <key alias="greatStart">편리한 시작을 위해, 소개 Video를 시청하세요</key>
-    <key alias="licenseText">다음버튼을 누르시면 (또는Web.config에 UmbracoConfigurationStatus를 수정하시면), 여러분은 아래에 명시된 소프트웨어 라이센스를 수락합니다. Umbraco 배포는 2가지 다른 라이센스로 구성되어 있습니다. 프레임워크에는 오픈소스 MIT라이센스가 UI에는 Umbraco 프리웨어 라이센스가 적용됩니다.</key>
     <key alias="None">아직 설치되지 않았습니다.</key>
     <key alias="permissionsAffectedFolders">영향받는 파일과 폴더</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Umbraco권한관리을 위해 더정보가 필요하시면 여기를 누르세요</key>
@@ -427,7 +420,6 @@
     <key alias="theEndFurtherHelp"><![CDATA[<h3>고급 도움말과 정보</h3>
      우수 커뮤니티에서 도음을 받으세요. 간단한 사이트제작이나 패키지 사용법, Umbraco기술의 퀵가이드를 제공하는 문서를 보시거나 무료 비디오를 시청하세요.]]></key>
     <key alias="theEndHeader">Umbraco %0% 가 설치되어 사용준비가 되었습니다.</key>
-    <key alias="theEndInstallFailed"><![CDATA[설치를 마치기 위해, <strong>/web.config file</strong>을 수동으로 편집해야 합니다. AppSetting 키의 <strong>UmbracoConfigurationStatus</strong> 를 <strong>'%0%'</strong>의 값으로 설정하세요.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[<strong>Umbraco 와 첫만남</strong>이시면 <br />아래의 "Umbraco 접속하기" 버튼을 클릭하여 <strong>즉시 시작</strong>하실 수 있습니다.
     시작페이지에서 풍부한 리소소를 제공받을 수 있습니다.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Umbraco 실행</h3>

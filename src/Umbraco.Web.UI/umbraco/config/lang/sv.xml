@@ -20,9 +20,9 @@
     <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
-    <key alias="emptyrecyclebin">Töm papperskorgen</key>
+    <key alias="emptyRecycleBin">Töm papperskorgen</key>
     <key alias="exportDocumentType">Exportera dokumenttyp</key>
-    <key alias="importdocumenttype">Importera dokumenttyp</key>
+    <key alias="importDocumentType">Importera dokumenttyp</key>
     <key alias="importPackage">Importera paket</key>
     <key alias="liveEdit">Redigera i Canvas</key>
     <key alias="logout">Logga ut</key>
@@ -98,7 +98,7 @@
     <key alias="historyIncludingVariants">Historik (alla varianter)</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Skapa en ny innehållsmall för '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Tom</key>
     <key alias="selectBlueprint">Välj en innehållsmall</key>
     <key alias="createdBlueprintHeading">Innehållsmall skapad</key>
@@ -483,12 +483,10 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Installationsprogrammet kan inte ansluta till databasen.</key>
-    <key alias="databaseErrorWebConfig">Kunde inte spara filen web.config. Vänligen ändra databasanslutnings-inställningarna manuellt.</key>
     <key alias="databaseFound">Din databas har lokaliserats och är identifierad som</key>
     <key alias="databaseHeader">Databaskonfiguration</key>
     <key alias="databaseInstall"><![CDATA[För att installera Umbraco %0% databasen, tryck på knappen <strong>installera</strong>]]></key>
     <key alias="databaseInstallDone"><![CDATA[Nu har Umbraco %0% kopierats till din databas. Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Mer information om att redigera web.config hittar du här</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[För att avsluta det här steget måste du veta lite information om din databasserver ("connection string").<br /> Eventuellt kan du behöva kontakta ditt webb-hotell. Om du installerar på en lokal maskin eller server kan du få informationen från din systemadministratör.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Tryck <strong>Uppgradera</strong> knappen för att uppgradera din databas till Umbraco %0%</p> <p> Du behöver inte vara orolig. Inget innehåll kommer att raderas och efteråt kommer allt att fungera som vanligt! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din databas har nu uppgraderats till den senaste versionen %0%.<br />Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
@@ -498,7 +496,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Standardanvändarens lösenord har ändrats sedan installationen!</strong></p><p>Du behöver inte göra något ytterligare här. Klicka <strong>Nästa</strong> för att fortsätta.]]></key>
     <key alias="defaultUserPasswordChanged">Lösenordet är ändrat!</key>
     <key alias="greatStart">Få en flygande start, kolla på våra introduktionsvideor</key>
-    <key alias="licenseText">Genom att klicka på Nästa knappen (eller redigera UmbracoConfigurationStatus i web.config), accepterar du licensavtalet för den här mjukvaran som det är skrivet i rutan nedan. Observera att den här Umbracodistributionen består av två olika licensavtal, "the open source MIT license" för ramverket och "the Umbraco freeware license" som täcker användargränssnittet.</key>
     <key alias="None">Inte installerad än.</key>
     <key alias="permissionsAffectedFolders">Berörda filer och mappar</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Här hittar du mer information om att sätta rättigheter för Umbraco</key>
@@ -533,7 +530,6 @@
     <key alias="theEndBrowseSite"><![CDATA[<h3>Besök din nya webbplats</h3> Du installerade Runway, så varför inte se hur din nya webbplats ser ut.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Ytterligare hjälp och information</h3> Få hjälp från våra prisbelönta community, bläddra i dokumentationen eller titta på några gratis videor om hur man bygger en enkel webbplats, hur du använder paket eller en snabbguide till Umbracos terminologi]]></key>
     <key alias="theEndHeader">Umbraco %0% är installerat och klart för användning</key>
-    <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>UmbracoConfigurationStatus</strong> på slutet till <strong>%0%</strong>]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny Umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco backoffice och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
     <key alias="Unavailable">Anslutningen till databasen misslyckades.</key>

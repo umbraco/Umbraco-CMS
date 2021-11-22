@@ -16,10 +16,10 @@
     <key alias="createGroup">Neue Gruppe</key>
     <key alias="delete">Entfernen</key>
     <key alias="disable">Deaktivieren</key>
-    <key alias="emptyrecyclebin">Papierkorb leeren</key>
+    <key alias="emptyRecycleBin">Papierkorb leeren</key>
     <key alias="enable">Aktivieren</key>
     <key alias="exportDocumentType">Dokumenttyp exportieren</key>
-    <key alias="importdocumenttype">Dokumenttyp importieren</key>
+    <key alias="importDocumentType">Dokumenttyp importieren</key>
     <key alias="importPackage">Paket importieren</key>
     <key alias="liveEdit">'Canvas'-Modus starten</key>
     <key alias="logout">Abmelden</key>
@@ -281,8 +281,8 @@
     <key alias="createEmpty">Neues Element anlegen</key>
     <key alias="createFromClipboard">Aus der Zwischenablage einfügen</key>
   </area>
-  <area alias="blueprints">
-    <key alias="createBlueprintFrom">Erzeuge eine neue Inhaltsvorlage von '%0%'</key>
+    <area alias="blueprints">
+    <key alias="createBlueprintFrom"><![CDATA[Erzeuge eine neue Inhaltsvorlage von <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Leer</key>
     <key alias="selectBlueprint">Wählen Sie eine Inhaltsvorlage</key>
     <key alias="createdBlueprintHeading">Inhaltsvorlage erzeugt</key>
@@ -765,7 +765,6 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Mit dieser Datenbank kann leider keine Verbindung hergestellt werden.</key>
-    <key alias="databaseErrorWebConfig">Die "web.config"-Datei konnte nicht angepasst werden (Zugriffsrechte?). Bitte passen Sie die Verbindungszeichenfolge manuell an.</key>
     <key alias="databaseFound">Die Datenbank ist erreichbar und wurde identifiziert als</key>
     <key alias="databaseHeader">Datenbank</key>
     <key alias="databaseInstall">
@@ -774,13 +773,6 @@
     ]]>
     </key>
     <key alias="databaseInstallDone">Die Datenbank wurde für Umbraco %0% konfiguriert. Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
-    <key alias="databaseNotFound">
-        <![CDATA[
-      <p>Die angegebene Datenbank ist leider nicht erreichbar. Bitte prüfen Sie die Verbindungszeichenfolge ("Connection String") in der "web.config"-Datei.</p>
-      <p>Um fortzufahren, passen Sie bitte die "web.config"-Datei mit einem beliebigen Text-Editor an. Scrollen Sie dazu nach unten, fügen Sie die Verbindungszeichenfolge für die zuverbindende Datenbank als Eintrag "UmbracoDbDSN" hinzu und speichern Sie die Datei.</p>
-      <p>Klicken Sie nach erfolgter Anpassung auf <strong>Wiederholen</strong>.<br />Wenn Sie weitere technische Informationen benötigen, besuchen Sie <a href="https://our.umbraco.com/wiki" target="_blank" rel="noopener">The Umbraco documentation wik</a>.</p>
-    ]]>
-    </key>
     <key alias="databaseText">Um diesen Schritt abzuschließen, müssen Sie die notwendigen Informationen zur Datenbankverbindung angeben.&lt;br /&gt;Bitte kontaktieren Sie Ihren Provider bzw. Server-Administrator für weitere Informationen.</key>
     <key alias="databaseUpgrade">
       <![CDATA[
@@ -799,7 +791,6 @@
     <key alias="defaultUserPassChanged">&lt;strong&gt;Das Kennwort des Standard-Benutzers wurde seit der Installation verändert.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Es sind keine weiteren Aktionen notwendig. Klicken Sie auf &lt;b&gt;Weiter&lt;/b&gt; um fortzufahren.</key>
     <key alias="defaultUserPasswordChanged">Das Kennwort wurde geändert!</key>
     <key alias="greatStart">Schauen Sie sich die Einführungsvideos für einen schnellen und einfachen Start an.</key>
-    <key alias="licenseText">Mit der Installation stimmen Sie der angezeigten Lizenz für diese Software zu. Bitte beachten Sie, dass diese Umbraco-Distribution aus zwei Lizenzen besteht. Einer freien Open-Source MIT-Lizenz für das Framework und der Umbraco-Freeware-Lizenz für die Verwaltungsoberfläche.</key>
     <key alias="None">Noch nicht installiert.</key>
     <key alias="permissionsAffectedFolders">Betroffene Verzeichnisse und Dateien</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Weitere Informationen zum Thema "Dateiberechtigungen" für Umbraco</key>
@@ -854,7 +845,6 @@
     <key alias="theEndBrowseSite">&lt;h3&gt;Zur neuen Seite&lt;/h3&gt;Sie haben Runway installiert, schauen Sie sich doch mal auf Ihrer Website um.</key>
     <key alias="theEndFurtherHelp">&lt;h3&gt;Weitere Hilfe und Informationen&lt;/h3&gt;Hilfe von unserer preisgekrönten Community, Dokumentation und kostenfreie Videos, wie Sie eine einfache Website erstellen, ein Packages nutzen und eine schnelle Einführung in alle Umbraco-Begriffe</key>
     <key alias="theEndHeader">Umbraco %0% wurde installiert und kann verwendet werden</key>
-    <key alias="theEndInstallFailed">Um die Installation abzuschließen, müssen Sie die &lt;strong&gt;"web.config"-Datei&lt;/strong&gt; von Hand anpassen und den AppSetting-Schlüssel &lt;strong&gt;UmbracoConfigurationStatus&lt;/strong&gt; auf den Wert &lt;strong&gt;'%0%'&lt;/strong&gt; ändern.</key>
     <key alias="theEndInstallSuccess">Sie können &lt;strong&gt;sofort starten&lt;/strong&gt;, in dem Sie auf "Umbraco starten" klicken.</key>
     <key alias="theEndOpenUmbraco">&lt;h3&gt;Umbraco starten&lt;/h3&gt;Um Ihre Website zu verwalten, öffnen Sie einfach den Administrationsbereich und beginnen Sie damit, Inhalte hinzuzufügen sowie Vorlagen und Stylesheets zu bearbeiten oder neue Funktionen einzurichten</key>
     <key alias="Unavailable">Verbindung zur Datenbank fehlgeschlagen.</key>
@@ -2004,8 +1994,6 @@
     <key alias="httpsCheckExpiringCertificate">Ihr Website-Zertifikat (SSL) wird in %0% Tagen ablaufen.</key>
     <key alias="healthCheckInvalidUrl">Fehler beim PINGen der URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Sie betrachten diese Website %0% unter Verwendung des HTTPS-Schemas.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">Der Schlüssel 'Umbraco.Core.UseHttps' im Abschnitt 'appSettings' der 'web.config'-Datei ist auf 'false' gesetzt. Sobald Sie diese Site über HTTPS nutzen, sollte dieser auf 'true' gestellt werden.</key>
-    <key alias="httpsCheckConfigurationCheckResult">Der Schlüssel 'Umbraco.Core.UseHttps' im Abschnitt 'appSettings' der 'web.config'-Datei ist auf '%0%' gesetzt, Cookies sind %1% als sicher markiert.</key>
     <key alias="compilationDebugCheckSuccessMessage">'Debug' Kompilierungsmodus ist abgeschaltet.</key>
     <key alias="compilationDebugCheckErrorMessage">'Debug' Kompilierungsmodus ist gegenwertig eingeschaltet. Es ist empfehlenswert diesen vor Live-Gang abzuschalten.</key>
     <!-- The following keys get these tokens passed in:
@@ -2021,10 +2009,7 @@
     <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Der Header <strong>X-XSS-Protection</strong> ist <strong>nicht</strong> vorhanden]]></key>
     <key alias="excessiveHeadersFound"><![CDATA[Folgende Header, die Informationen über die Website-Technologie preisgeben, sind vorhanden: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Es sind keine Header, die Informationen über die Website-Technologie preisgeben, vorhanden.</key>
-    <key alias="smtpMailSettingsNotFound">In der 'web.config'-Datei ist der Abschnitt 'system.net/mailsettings' nicht vorhanden.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">In der 'web.config'-Datei ist der Host im Abschnitt 'system.net/mailsettings' nicht konfiguriert.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Die SMTP-Einstellungen sind korrekt konfiguriert und der Dienst arbeitet wie erwartet.</key>
-    <key alias="smtpMailSettingsConnectionFail">Der konfigurierte SMTP-Server mit Host '%0%' und Port '%1%' konnte nicht erreicht werden. Bitte überprüfen Sie die SMTP-Einstellungen in der 'web.config'-Datei im Abschnitt 'system.net/mailsettings'.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Die E-Mail-Adresse für Benachrichtigungen wurde auf <strong>%0%</strong> eingestellt.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Die E-Mail-Adresse für Benachrichtigungen ist noch auf den Standardwert <strong>%0%</strong> gestellt.]]></key>
     <key alias="scheduledHealthCheckEmailBody">

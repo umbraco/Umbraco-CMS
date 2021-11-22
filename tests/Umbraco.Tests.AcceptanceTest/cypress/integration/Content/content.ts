@@ -343,17 +343,11 @@ context('Content', () => {
         // Rollback
         cy.get('.umb-box-header :button').click();
 
-        cy.get('.umb-box-content > div > .input-block-level')
-            .find('option[label*=' + new Date().getDate() + ']')
-            .then(elements => {
-                const option = elements[elements.length - 1].getAttribute('value');
-                cy.get('.umb-box-content > div > .input-block-level')
-                    .select(option);
-            });
+        cy.get('.-selectable.cursor-pointer:first').click();
 
         cy.get('.umb-editor-footer-content__right-side > [button-style="success"] > .umb-button > .btn-success').click();
 
-        cy.reload();
+        refreshContentTree();
 
         // Assert
         cy.get('.history').find('.umb-badge').contains('Save').should('be.visible');
@@ -759,7 +753,8 @@ context('Content', () => {
         // Click macro
         cy.get(':nth-child(4) > .umb-card-grid-item > :nth-child(1)').click();
         // Select the macro
-        cy.get('.umb-card-grid-item').contains(macroName).click();
+        cy.get(`.umb-card-grid-item[title='${macroName}']`).click('bottom');
+
 
         // Save and publish
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();

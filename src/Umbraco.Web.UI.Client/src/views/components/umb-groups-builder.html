@@ -55,7 +55,7 @@
                 ng-if="sortingMode"
                 class="umb-group-builder__convert-dropzone"
                 umb-droppable="droppableOptionsConvert">
-                <localize key="contentTypeEditor_convertToTab" />
+                <localize key="contentTypeEditor_convertToTab">Convert to tab</localize>
             </div>
 
             <umb-button
@@ -91,7 +91,7 @@
     <a ng-if="!sortingMode" hotkey="alt+shift+g" ng-click="addGroupToActiveTab()"></a>
 
     <div ng-if="sortingMode && model.groups.length === 0" class="umb-group-builder__no-data-text">
-        <localize key="contentTypeEditor_noGroups"></localize>
+        <localize key="contentTypeEditor_noGroups">You have not added any groups</localize>
     </div>
 
     <!-- Properties added directly to a tab -->
@@ -118,7 +118,7 @@
                 data-element="property-add"
                 class="umb-group-builder__group-add-property"
                 ng-click="addNewProperty(tab)">
-                <localize key="contentTypeEditor_addProperty"></localize>
+                <localize key="contentTypeEditor_addProperty">Add property</localize>
             </button>
 
             <umb-empty-state
@@ -172,7 +172,7 @@
                     data-element="property-add"
                     class="umb-group-builder__group-add-property"
                     ng-click="addNewProperty(group)">
-                    <localize key="contentTypeEditor_addProperty"></localize>
+                    <localize key="contentTypeEditor_addProperty">Add property</localize>
                 </button>
             </umb-content-type-group>
         </div>
@@ -183,6 +183,6 @@
         class="umb-group-builder__group -placeholder"
         ng-click="addGroupToActiveTab()"
         data-element="group-add">
-        <localize key="contentTypeEditor_addGroup"></localize>
+        <localize key="contentTypeEditor_addGroup">Add group</localize>
     </button>
 </div>

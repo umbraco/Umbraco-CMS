@@ -52,6 +52,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
+    <None Remove="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
+    <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -82,6 +84,9 @@
     <PackageReference Include="Examine.Lucene" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.0" />
+    <PackageReference Include="Bogus" Version="33.1.1" />
+    <PackageReference Include="Examine.Lucene" Version="2.0.1" />
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="68.2.0.9" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="NUnit" Version="3.13.2" />

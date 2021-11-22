@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PublishedCache.Internal
 {
-
+    // TODO: Only used in unit tests, needs to be moved to test project
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class InternalPublishedContent : IPublishedContent
     {
         public InternalPublishedContent(IPublishedContentType contentType)

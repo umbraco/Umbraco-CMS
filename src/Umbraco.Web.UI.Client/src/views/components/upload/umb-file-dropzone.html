@@ -82,8 +82,8 @@
                    <strong>{{file.name}}</strong>
 
                    <span class="file-error" ng-if="file.$error">
-                      <span ng-if="file.$error === 'pattern'" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
-                      <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red"><localize key="media_maxFileSize"></localize> "{{maxFileSize}}"</span>
+                      <span ng-if="file.$error === 'pattern'" class="errorMessage color-red"><localize key="media_disallowedFileType">Cannot upload this file, it does not have an approved file type</localize></span>
+                      <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red"><localize key="media_maxFileSize">Max file size is</localize> "{{maxFileSize}}"</span>
                    </span>
 
                    <span class="file-error" ng-if="file.serverErrorMessage">

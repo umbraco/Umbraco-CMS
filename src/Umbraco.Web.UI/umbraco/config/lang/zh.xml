@@ -14,9 +14,9 @@
     <key alias="createPackage">创建扩展包</key>
     <key alias="delete">删除</key>
     <key alias="disable">禁用</key>
-    <key alias="emptyrecyclebin">清空回收站</key>
+    <key alias="emptyRecycleBin">清空回收站</key>
     <key alias="exportDocumentType">导出文档类型</key>
-    <key alias="importdocumenttype">导入文档类型</key>
+    <key alias="importDocumentType">导入文档类型</key>
     <key alias="importPackage">导入扩展包</key>
     <key alias="liveEdit">实时编辑模式</key>
     <key alias="logout">退出</key>
@@ -482,19 +482,12 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">无法连接到数据库。</key>
-    <key alias="databaseErrorWebConfig">无法保存web.config文件，请手工修改。</key>
     <key alias="databaseFound">发现数据库</key>
     <key alias="databaseHeader">数据库配置</key>
     <key alias="databaseInstall"><![CDATA[
       点击<strong>安装</strong>进行 %0% 数据库配置
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[%0%数据库安装完成。点击<strong>下一步</strong>继续。]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>数据库未找到！请检查数据库连接串设置。</p>
-              <p>您可以自行编辑“web.config”文件，键名为 “UmbracoDbDSN”</p>
-              <p>
-             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">。
-                                    如何编辑web.config</a></p>
-    ]]></key>
     <key alias="databaseText"><![CDATA[完成本步，需要配置一个正确的连接字符串（“connection string”）。<br />
       如有必要，请联系您的系统管理员。
       如果您是本机安装，请使用管理员账号。]]></key>
@@ -512,7 +505,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>安装过程中默认用户密码已更改</strong></p><p>点击<strong>下一步</strong>继续。]]></key>
     <key alias="defaultUserPasswordChanged">密码已更改</key>
     <key alias="greatStart">作为入门者，从视频教程开始吧！</key>
-    <key alias="licenseText">点击下一步 (或在Web.config中自行修改UmbracoConfigurationStatus)，意味着您接受上述许可协议。</key>
     <key alias="None">安装失败。</key>
     <key alias="permissionsAffectedFolders">受影响的文件和文件夹</key>
     <key alias="permissionsAffectedFoldersMoreInfo">此处查看更多信息</key>
@@ -575,8 +567,6 @@
     <key alias="theEndFurtherHelp"><![CDATA[<h3>更多的帮助信息</h3>
 从社区获取帮助]]></key>
     <key alias="theEndHeader">系统 %0% 安装完毕</key>
-    <key alias="theEndInstallFailed"><![CDATA[完成安装，您需要手工编辑<strong>/web.config file</strong> 的 AppSetting 键
-        <strong>UmbracoConfigurationStatus</strong>为 <strong>'%0%'</strong>。]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[您想要<strong>立即开始</strong>请点“运行系统”<br />如果您是<strong>新手</strong>, 您可以得到相当丰富的学习资源。]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>运行系统</h3>
 管理您的网站, 运行后台添加内容，
@@ -1153,8 +1143,6 @@
     <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
     <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco.Core.UseHttps' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco.Core.UseHttps' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>
     <key alias="compilationDebugCheckErrorMessage">Debug compilation mode is currently enabled. It is recommended to disable this setting before go live.</key>
@@ -1174,10 +1162,7 @@
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[The following headers revealing information about the website technology were found: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">No headers revealing information about the website technology were found.</key>
-    <key alias="smtpMailSettingsNotFound">In the Web.config file, system.net/mailsettings could not be found.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">In the Web.config file system.net/mailsettings section, the host is not configured.</key>
     <key alias="smtpMailSettingsConnectionSuccess">SMTP settings are configured correctly and the service is operating as expected.</key>
-    <key alias="smtpMailSettingsConnectionFail">The SMTP server configured with host '%0%' and port '%1%' could not be reached. Please check to ensure the SMTP settings in the Web.config file system.net/mailsettings are correct.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Notification email has been set to <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
   </area>

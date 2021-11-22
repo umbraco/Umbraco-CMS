@@ -16,10 +16,10 @@
     <key alias="createGroup">Créer un groupe</key>
     <key alias="delete">Supprimer</key>
     <key alias="disable">Désactiver</key>
-    <key alias="emptyrecyclebin">Vider la corbeille</key>
+    <key alias="emptyRecycleBin">Vider la corbeille</key>
     <key alias="enable">Activer</key>
     <key alias="exportDocumentType">Exporter le type de document</key>
-    <key alias="importdocumenttype">Importer un type de document</key>
+    <key alias="importDocumentType">Importer un type de document</key>
     <key alias="importPackage">Importer un package</key>
     <key alias="liveEdit">Editer dans Canvas</key>
     <key alias="logout">Déconnexion</key>
@@ -136,6 +136,7 @@
     <key alias="saveListView">Sauver la mise en page de la liste</key>
     <key alias="schedulePublish">Planifier</key>
     <key alias="saveAndPreview">Prévisualiser</key>
+    <key alias="showPage">Prévisualiser</key>
     <key alias="showPageDisabled">La prévisualisation est désactivée car aucun modèle n'a été assigné.</key>
     <key alias="styleChoose">Choisir un style</key>
     <key alias="styleShow">Afficher les styles</key>
@@ -276,7 +277,7 @@
     <key alias="createFromClipboard">Copier du clipboard</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Créer un nouveau Modèle de Contenu à partir de '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Créer un nouveau Modèle de Contenu à partir de <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Vide</key>
     <key alias="selectBlueprint">Sélectionner un Modèle de Contenu</key>
     <key alias="createdBlueprintHeading">Modèle de Contenu créé</key>
@@ -387,6 +388,7 @@
     <key alias="anchorInsert">Nom</key>
     <key alias="closeThisWindow">Fermer cette fenêtre</key>
     <key alias="confirmdelete">Êtes-vous certain(e) de vouloir supprimer</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Êtes-vous certain(e) de vouloir supprimer <b>%0%</b> des <b>%1%</b> éléments]]></key>
     <key alias="confirmdisable">Êtes-vous certain(e) de vouloir désactiver</key>
     <key alias="confirmlogout">Êtes-vous certain(e)?</key>
     <key alias="confirmSure">Êtes-vous certain(e)?</key>
@@ -772,19 +774,12 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Le programme d'installation ne parvient pas à se connecter à la base de données.</key>
-    <key alias="databaseErrorWebConfig">Impossible de sauvegarder le fichier web.config. Veuillez modifier la "connection string" manuellement.</key>
     <key alias="databaseFound">Votre base de données a été détectée et est identifiée comme étant</key>
     <key alias="databaseHeader">Configuration de la base de données</key>
     <key alias="databaseInstall"><![CDATA[
       Appuyez sur le bouton <strong>installer</strong> pour installer la base de données Umbraco %0%
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% a été copié dans votre base de données. Appuyez sur <strong>Suivant</strong> pour poursuivre.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Base de données non trouvée ! Veuillez vérifier les informations de la "connection string" dans le fichier web.config.</p>
-              <p>Pour poursuivre, veuillez éditer le fichier "web.config" (avec Visual Studio ou votre éditeur de texte favori), scroller jusqu'en bas, ajouter le "connection string" pour votre base de données dans la ligne avec la clé "umbracoDbDSN" et sauvegarder le fichier.</p>
-              <p>
-              Cliquez sur le bouton <strong>Réessayer</strong> lorsque cela est fait.
-              <br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-			              Plus d'informations sur l'édition du fichier web.config ici.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Pour réaliser cette étape, vous devez d'abord connaître des informations concernant votre serveur de base de données ("connection string").<br />
         Veuillez contacter votre fournisseur de services internet si nécessaire.
         Si vous installez Umbraco sur un ordinateur ou un serveur local, vous aurez peut-être besoin de consulter votre administrateur système.]]></key>
@@ -803,7 +798,6 @@
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Le mot de passe par défaut a été modifié avec succès depuis l'installation!</strong></p><p>Aucune autre action n'est requise. Cliquez sur <strong>Suivant</strong> pour poursuivre.]]></key>
     <key alias="defaultUserPasswordChanged">Le mot de passe a été modifié !</key>
     <key alias="greatStart">Pour bien commencer, regardez nos vidéos d'introduction</key>
-    <key alias="licenseText">En cliquant sur le bouton "Suivant" (ou en modifiant umbracoConfigurationStatus dans le fichier web.config), vous acceptez la licence de ce logiciel telle que spécifiée dans le champ ci-dessous. Veuillez noter que cette distribution Umbraco consiste en deux licences différentes, la licence open source MIT pour le framework et la licence Umbraco freeware qui couvre l'UI.</key>
     <key alias="None">Pas encore installé.</key>
     <key alias="permissionsAffectedFolders">Fichiers et dossiers concernés</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Plus d'informations sur la configuration des permissions</key>
@@ -866,8 +860,6 @@ Vous avez installé Runway, alors pourquoi ne pas jeter un oeil au look de votre
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Aide et informations complémentaires</h3>
 Obtenez de l'aide de notre communauté "award winning", parcourez la documentation ou regardez quelques vidéos gratuites sur la manière de construire un site simple, d'utiliser les packages ainsi qu'un guide rapide sur la terminologie Umbraco]]></key>
     <key alias="theEndHeader">Umbraco %0% est installé et prêt à être utilisé</key>
-    <key alias="theEndInstallFailed"><![CDATA[Pour terminer l'installation, vous allez devoir modifier manuellement le
-        <strong>fichier /web.config</strong> et mettre à jour le paramètre AppSetting  <strong>umbracoConfigurationStatus</strong> situé en bas à la valeur <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Vous pouvez <strong>démarrer instantanément</strong> en cliquant sur le bouton "Lancer Umbraco" ci-dessous.<br />
 Si vous <strong>débutez avec Umbraco</strong>, vous pouvez trouver une foule de ressources dans nos pages "Getting Started".]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lancer Umbraco</h3>
@@ -1355,6 +1347,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="mediaTypeSavedHeader">Type de média sauvegardé</key>
     <key alias="memberTypeSavedHeader">Type de membre sauvegardé</key>
     <key alias="memberGroupSavedHeader">Groupe de membres sauvegardé</key>
+    <key alias="memberGroupNameDuplicate">Un autre groupe de membres existe déjà avec le même nom</key>
     <key alias="templateErrorHeader">Modèle non sauvegardé</key>
     <key alias="templateErrorText">Assurez-vous de ne pas avoir 2 modèles avec le même alias.</key>
     <key alias="templateSavedHeader">Modèle sauvegardé</key>
@@ -1969,8 +1962,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="httpsCheckExpiringCertificate">Le certificat SSL de votre site web va expirer dans %0% jours.</key>
     <key alias="healthCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Vous êtes actuellement %0% à voir le site via le schéma HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">La valeur appSetting 'Umbraco.Core.UseHttps' est fixée à 'false' dans votre fichier web.config. Une fois que vous donnerez accès à ce site en utilisant le schéma HTTPS, cette valeur devra être mise à 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">La valeur appSetting 'Umbraco.Core.UseHttps' est fixée à '%0%' dans votre fichier web.config, vos cookies sont %1% marqués comme étant sécurisés.</key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Le mode de compilation Debug est désactivé.</key>
     <key alias="compilationDebugCheckErrorMessage">Le mode de compilation Debug est actuellement activé. Il est recommandé de désactiver ce paramètre avant la mise en ligne.</key>
@@ -1996,10 +1987,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[Les headers suivants révélant des informations à propos de la technologie du site web ont été trouvés  : <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Aucun header révélant des informations à propos de la technologie du site web n'a été trouvé.</key>
-    <key alias="smtpMailSettingsNotFound">La section system.net/mailsettings n'a pas pu être trouvée dans le fichier Web.config.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">Dans la section system.net/mailsettings du fichier Web.config, le "host" n'est pas configuré.</key>
     <key alias="smtpMailSettingsConnectionSuccess">La configuration SMTP est correcte et le service fonctionne comme prévu.</key>
-    <key alias="smtpMailSettingsConnectionFail">Le serveur SMTP configuré avec le host '%0%' et le port '%1%' n'a pas pu être contacté. Veuillez vérifier et vous assurer que la configuration SMTP est correcte dans la section system.net/mailsettings du fichier Web.config.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[Un email de notification a été envoyé à <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[L'adresse email de notification est toujours à sa valeur par défaut : <strong>%0%</strong>.]]></key>
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Les résultats de l'exécution du Umbraco Health Checks planifiée le %0% à %1% sont les suivants :</p>%2%</body></html>]]></key>
@@ -2136,7 +2124,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="tooltipForPropertyActionsMenu">Ouvrir les Property Actions</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Attendez</key>
     <key alias="refreshStatus">Rafraîchir le Statut</key>
     <key alias="memoryCache">Cache Mémoire</key>
     <key alias="memoryCacheDescription">

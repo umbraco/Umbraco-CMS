@@ -15,10 +15,10 @@
     <key alias="createGroup">Stwórz grupę</key>
     <key alias="delete">Usuń</key>
     <key alias="disable">Deaktywuj</key>
-    <key alias="emptyrecyclebin">Opróżnij kosz</key>
+    <key alias="emptyRecycleBin">Opróżnij kosz</key>
     <key alias="enable">Aktywuj</key>
     <key alias="exportDocumentType">Eksportuj typ dokumentu</key>
-    <key alias="importdocumenttype">Importuj typ dokumentu</key>
+    <key alias="importDocumentType">Importuj typ dokumentu</key>
     <key alias="importPackage">Importuj zbiór</key>
     <key alias="liveEdit">Edytuj na stronie</key>
     <key alias="logout">Wyjście</key>
@@ -192,7 +192,7 @@
     <key alias="contentRoot">Korzeń zawartości</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Stwórz nowy Szablon Zawartości z '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Stwórz nowy Szablon Zawartości z <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Pusty</key>
     <key alias="selectBlueprint">Wybierz Szablon Zawartości</key>
     <key alias="createdBlueprintHeading">Szablon Zawartości został stworzony</key>
@@ -576,19 +576,12 @@
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Instalator nie mógł połączyć się z bazą danych.</key>
-    <key alias="databaseErrorWebConfig">Nie udało się zapisać pliku web.config. Zmodyfikuj parametry połączenia ręcznie.</key>
     <key alias="databaseFound">Twoja baza danych została znaleziona i zidentyfikowana jako</key>
     <key alias="databaseHeader">Konfiguracja bazy danych</key>
     <key alias="databaseInstall"><![CDATA[
 Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umbraco %0%
 ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% zostało skopiowane do Twojej bazy danych. Naciśnij <strong>Dalej</strong>, aby kontynuować.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Nie odnaleziono bazy danych! Sprawdź, czy informacje w sekcji "connection string" w pliku "web.config" są prawidłowe.</p>
-                <p>Aby kontynuować, dokonaj edycji pliku "web.config" (używając Visual Studio lub dowolnego edytora tekstu), przemieść kursor na koniec pliku, dodaj parametry połączenia do Twojej bazy danych w kluczu o nazwie "umbracoDbDSN" i zapisz plik.</p>
-                <p>
-                Kliknij <strong>ponów próbę</strong> kiedy
-                skończysz.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
-                Tu znajdziesz więcej informacji na temat edycji pliku "web.config"</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[Aby zakończyć ten etap instalacji, będziesz musiał podać parametry połączenia do Twojego serwera baz danych ("connection string").<br />
                 Skontaktuj się z Twoim dostawą usług internetowych jeśli zajdzie taka potrzeba.
                 W przypadku instalacji na lokalnej maszynie lub serwerze możesz potrzebować pomocy administratora.]]></key>
@@ -607,7 +600,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Hasło domyślnego użytkownika zostało zmienione od czasu instalacji!</strong></p><p>Żadne dodatkowe czynności nie są konieczne. Naciśnij <strong>Dalej</strong>, aby kontynuować.]]></key>
     <key alias="defaultUserPasswordChanged">Hasło zostało zmienione!</key>
     <key alias="greatStart">Aby szybko wejść w świat Umbraco, obejrzyj nasze filmy wprowadzające</key>
-    <key alias="licenseText">Klikając przycisk dalej (lub modyfikując klucz UmbracoConfigurationStatus w pliku web.config), akceptujesz licencję na niniejsze oprogramowanie zgodnie ze specyfikacją w poniższym polu. Zauważ, że ta dystrybucja Umbraco składa się z dwoch licencji - licencja MIT typu open source dla kodu oraz licencja "Umbraco freeware", która dotyczy interfejsu użytkownika.</key>
     <key alias="None">Nie zainstalowane.</key>
     <key alias="permissionsAffectedFolders">Zmienione pliki i foldery</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Więcej informacji na temat ustalania pozwoleń dla Umbraco znajdziesz tutaj</key>
@@ -670,8 +662,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Dalsza pomoc i informacje</h3>
                 Zaczerpnij pomocy z naszej nagrodzonej społeczności, przeglądaj dokumentację lub obejrzyj niektóre darmowe filmy o tym, jak budować proste strony, jak używać pakietów i szybki przewodnik po terminologii Umbraco]]></key>
     <key alias="theEndHeader">Umbraco %0% zostało zainstalowane i jest gotowe do użycia</key>
-    <key alias="theEndInstallFailed"><![CDATA[Aby dokończyć instalację musisz
-                ręcznie edytować <strong>plik web.config</strong> i zaktualizować klucz AppSetting o nazwie <strong>UmbracoConfigurationStatus</strong> na dole do wartości <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Możesz <strong>rozpocząć natychmiast</strong> klikając przycisk "Uruchom Umbraco" poniżej. <br />Jeżeli jesteś <strong>nowy dla Umbraco</strong>
                 znajdziesz mnóstwo materiałów na naszych stronach "jak rozpocząć".]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Uruchom Umbraco</h3>
@@ -1345,8 +1335,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="httpsCheckExpiringCertificate">Certyfikat SSL Twojej strony wygaśnie za %0% dni.</key>
     <key alias="healthCheckInvalidUrl">Błąd pingowania adresu URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Oglądasz %0% stronę używając HTTPS.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'Umbraco.Core.UseHttps' został ustawiony na 'false' w Twoim pliku web.config. Po uzyskaniu dostępu do strony, używając HTTPS, powinieneś go ustawić na 'true'.</key>
-    <key alias="httpsCheckConfigurationCheckResult">appSetting 'Umbraco.Core.UseHttps' został ustawiony na '%0%' w Twoim pliku web.config, Twoje ciasteczka są %1% ustawione jako bezpieczne.</key>
     <!-- Następujące klucze nie mają przekazanych tokenów -->
     <key alias="compilationDebugCheckSuccessMessage">Tryb kompilacji debugowania jest wyłączony.</key>
     <key alias="compilationDebugCheckErrorMessage">Tryb kompilacji debugowania jest obecnie włączony. Zaleca się wyłączenie tego ustawienia przed wypuszczeniem strony na produkcję.</key>
@@ -1363,10 +1351,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   	-->
     <key alias="excessiveHeadersFound"><![CDATA[Znaleziono następujące nagłówki, ujawniające informacje o technologii strony: <strong>%0%</strong>.]]></key>
     <key alias="excessiveHeadersNotFound">Nie znaleziono żadnych nagłówków, ujawniających informacji o technologii strony.</key>
-    <key alias="smtpMailSettingsNotFound">Nie znaleziono system.net/mailsettings w pliku Web.config.</key>
-    <key alias="smtpMailSettingsHostNotConfigured">Host nie jest skonfigurowany w sekcji system.net/mailsettings pliku Web.config.</key>
     <key alias="smtpMailSettingsConnectionSuccess">Ustawienia SMTP są skonfigurowane poprawnie i serwis działa według oczekiwań.</key>
-    <key alias="smtpMailSettingsConnectionFail">Nie można połączyć się z serwerem SMTP skonfigurowanym z hostem '%0%' i portem '%1%'. Proszę sprawdzić ponownie, czy ustawienia system.net/mailsettings w pliku Web.config są poprawne.</key>
     <key alias="notificationEmailsCheckSuccessMessage"><![CDATA[E-mail z powiadomieniem został wysłany do <strong>%0%</strong>.]]></key>
     <key alias="notificationEmailsCheckErrorMessage"><![CDATA[E-mail do powiadomień jest nadal ustawiony na domyślną wartość <strong>%0%</strong>.]]></key>
   </area>

@@ -96,7 +96,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
             group.convertingToTab = true;
 
             group.type = this.TYPE_TAB;
-            
+
             const newAlias = this.generateLocalAlias(group.name);
             // when checking for alias uniqueness we need to exclude the current group or the alias would get a + 1
             const otherGroups = [...groups].filter(groupCopy => !groupCopy.convertingToTab);
@@ -445,6 +445,12 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
             // The saved content type might have updated values (eg. new IDs/keys), so make sure the view model is updated
             contentType.ModelState = savedContentType.ModelState;
             contentType.id = savedContentType.id;
+
+            // Prevent rebinding if there was an error: https://github.com/umbraco/Umbraco-CMS/pull/11257
+            if (savedContentType.ModelState) {
+              return;
+            }
+
             contentType.groups.forEach(function (group) {
                 if (!group.alias) return;
 
