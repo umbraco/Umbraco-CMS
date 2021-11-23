@@ -21,8 +21,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     ///
     /// <example>
     /// <code>
-    /// public IActionResult Foo([FromUriOrBodyOfType(typeof(Guid))] Guid id) GetById {}
-    /// public IActionResult Foo([FromUriOrBodyOfType(typeof(int))] int id) GetById {}
+    ///
+    /// [HasParameterFromUriOrBodyOfType("ids", typeof(Guid[]))]
+    /// public IActionResult GetByIds([FromJsonPath] Guid[] ids) { }
+    ///
+    /// [HasParameterFromUriOrBodyOfType("ids", typeof(int[]))]
+    /// public IActionResult GetByIds([FromJsonPath] int[] ids) { }
     /// </code>
     /// </example>
     /// </para>
