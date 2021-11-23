@@ -416,5 +416,69 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Controllers
                 Assert.IsTrue(results![payload.ids[1]].StartsWith("/baz"));
             });
         }
+
+
+        [Test]
+        public async Task GetByIds_MultipleCalls_WorksAsExpected()
+        {
+            IContentTypeService contentTypeService = Services.GetRequiredService<IContentTypeService>();
+            IContentService contentService = Services.GetRequiredService<IContentService>();
+
+            var contentItems = new List<IContent>();
+
+            using (ScopeProvider.CreateScope(autoComplete: true))
+            {
+                IContentType contentType = ContentTypeBuilder.CreateBasicContentType();
+                contentTypeService.Save(contentType);
+
+                ContentBuilder builder = new ContentBuilder()
+                    .WithContentType(contentType);
+
+                Content root = builder.WithName("foo").Build();
+                contentService.SaveAndPublish(root);
+
+                contentItems.Add(builder.WithParent(root).WithName("bar").Build());
+                contentItems.Add(builder.WithParent(root).WithName("baz").Build());
+
+                foreach (IContent content in contentItems)
+                {
+                    contentService.SaveAndPublish(content);
+                }
+            }
+
+            var queryParameters = new Dictionary<string, object>
+            {
+                ["type"] = Constants.UdiEntityType.Document
+            };
+
+            var url = LinkGenerator.GetUmbracoControllerUrl("GetByIds", typeof(EntityController), queryParameters);
+
+            var udiPayload = new
+            {
+                ids = new[]
+                {
+                    contentItems[0].GetUdi().ToString(),
+                    contentItems[1].GetUdi().ToString(),
+                }
+            };
+
+            var intPayload = new
+            {
+                ids = new[]
+                {
+                    contentItems[0].Id,
+                    contentItems[1].Id,
+                }
+            };
+
+            HttpResponseMessage udiResponse = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, udiPayload);
+            HttpResponseMessage intResponse = await HttpClientJsonExtensions.PostAsJsonAsync(Client, url, intPayload);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(HttpStatusCode.OK, udiResponse.StatusCode, "First request error");
+                Assert.AreEqual(HttpStatusCode.OK, intResponse.StatusCode, "Second request error");
+            });
+        }
     }
 }
