@@ -26,7 +26,6 @@
             vm.loading = true;
             contentResource.getDetailedPermissions($scope.currentNode.id).then(function (userGroups) {
                 initData(userGroups);
-                vm.initialState = angular.copy(userGroups);
                 vm.loading = false;
                 currentForm = angularHelper.getCurrentForm($scope);
             });
@@ -47,6 +46,7 @@
               assignGroupPermissions(group);
             }
           });
+          vm.initialState = angular.copy(userGroups);
         }
 
         function resetData() {
@@ -163,8 +163,7 @@
 
                 //re-assign model from server since it could have changed
                 initData(userGroups);
-                vm.initialState = angular.copy(userGroups);
-
+                
                 // clear dirty state on the form so we don't see the discard changes notification
                 // we use a timeout here because in some cases the initData reformats the userGroups model and triggers a change after the form state was changed
                 $timeout(function() {
