@@ -85,13 +85,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
                 else
                 {
-                    // Note: Copied the below comment, it's not clear, there's a sync GetRawBodyString extension that doesn't care about config?
-                    // Taking their word for it for now.
-
                     // We need to use the asynchronous method here if synchronous IO is not allowed (it may or may not be, depending
                     // on configuration in UmbracoBackOfficeServiceCollectionExtensions.AddUmbraco()).
                     // We can't use async/await due to the need to override IsValidForRequest, which doesn't have an async override, so going with
                     // this, which seems to be the least worst option for "sync to async" (https://stackoverflow.com/a/32429753/489433).
+                    //
+                    // To expand on the above, if KestrelServerOptions/IISServerOptions is AllowSynchronousIO=false
+                    // And you attempt to read stream sync an InvalidOperationException is thrown with message
+                    // "Synchronous operations are disallowed. Call ReadAsync or set AllowSynchronousIO to true instead."
                     body = Task.Run(() => context.RouteContext.HttpContext.Request.GetRawBodyStringAsync()).GetAwaiter().GetResult();
                     httpContext.Items[requestItemKey] = body;
                 }
