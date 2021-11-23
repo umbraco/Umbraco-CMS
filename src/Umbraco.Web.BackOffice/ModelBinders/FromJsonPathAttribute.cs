@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 
             public static bool TryModelBindFromHttpContextItems(ModelBindingContext bindingContext)
             {
-                const string key = Constants.HttpContextItems.RequestBodyAsJObject;
+                const string key = Constants.HttpContext.Items.RequestBodyAsJObject;
 
                 if (!bindingContext.HttpContext.Items.TryGetValue(key, out var cached))
                 {

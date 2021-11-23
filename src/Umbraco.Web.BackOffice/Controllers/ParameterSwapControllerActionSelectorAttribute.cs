@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 JObject postBodyJson;
 
-                if (httpContext.Items.TryGetValue(Constants.HttpContextItems.RequestBodyAsJObject, out var cached))
+                if (httpContext.Items.TryGetValue(Constants.HttpContext.Items.RequestBodyAsJObject, out var cached))
                 {
                     postBodyJson = (JObject)cached;
                 }
@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     try
                     {
                         postBodyJson = JsonConvert.DeserializeObject<JObject>(rawBody);
-                        httpContext.Items[Constants.HttpContextItems.RequestBodyAsJObject] = postBodyJson;
+                        httpContext.Items[Constants.HttpContext.Items.RequestBodyAsJObject] = postBodyJson;
                     }
                     catch (JsonException)
                     {

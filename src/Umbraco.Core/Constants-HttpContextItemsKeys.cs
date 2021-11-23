@@ -2,15 +2,18 @@ namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
-        /// <summary>
-        /// Defines keys for items stored in HttpContext.Items
-        /// </summary>
-        public static class HttpContextItems
+        public static class HttpContext
         {
             /// <summary>
-            /// Key for current requests body deserialized as JObject.
+            /// Defines keys for items stored in HttpContext.Items
             /// </summary>
-            public const string RequestBodyAsJObject = "RequestBodyAsJObject";
+            public static class Items
+            {
+                /// <summary>
+                /// Key for current requests body deserialized as JObject.
+                /// </summary>
+                public const string RequestBodyAsJObject = "RequestBodyAsJObject";
+            }
         }
     }
 }
