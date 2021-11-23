@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
@@ -16,6 +15,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Packaging;
+using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection
@@ -43,6 +43,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IBasicAuthService, BasicAuthService>();
             builder.Services.AddUnique<ITagService, TagService>();
             builder.Services.AddUnique<IContentService, ContentService>();
+            builder.Services.AddUnique<IContentVersionService, ContentVersionService>();
+            builder.Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             builder.Services.AddUnique<IUserService, UserService>();
             builder.Services.AddUnique<IMemberService, MemberService>();
             builder.Services.AddUnique<IMediaService, MediaService>();

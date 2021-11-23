@@ -131,7 +131,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
                 _globalSettings.Smtp.Port,
                 (MailKit.Security.SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 
-            if (!(_globalSettings.Smtp.Username is null && _globalSettings.Smtp.Password is null))
+            if (!string.IsNullOrWhiteSpace(_globalSettings.Smtp.Username) && !string.IsNullOrWhiteSpace(_globalSettings.Smtp.Password))
             {
                 await client.AuthenticateAsync(_globalSettings.Smtp.Username, _globalSettings.Smtp.Password);
             }

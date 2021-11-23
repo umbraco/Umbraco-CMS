@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
@@ -12,6 +13,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -24,15 +26,28 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IFileService _fileService;
         private readonly IUmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IDefaultViewContentProvider _defaultViewContentProvider;
 
+        [ActivatorUtilitiesConstructor]
         public TemplateController(
             IFileService fileService,
             IUmbracoMapper umbracoMapper,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IDefaultViewContentProvider defaultViewContentProvider)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _defaultViewContentProvider = defaultViewContentProvider ?? throw new ArgumentNullException(nameof(defaultViewContentProvider));
+        }
+
+        [Obsolete("Use ctor will all params")]
+        public TemplateController(
+            IFileService fileService,
+            IUmbracoMapper umbracoMapper,
+            IShortStringHelper shortStringHelper)
+            : this(fileService, umbracoMapper, shortStringHelper, StaticServiceProvider.Instance.GetRequiredService<IDefaultViewContentProvider>())
+        {
         }
 
         /// <summary>
@@ -136,10 +151,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            var content = ViewHelper.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
+            var content = _defaultViewContentProvider.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
             var scaffold = _umbracoMapper.Map<ITemplate, TemplateDisplay>(dt);
 
-            scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
+            scaffold.Content =  content;
             return scaffold;
         }
 

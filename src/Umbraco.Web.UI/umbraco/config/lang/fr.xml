@@ -136,6 +136,7 @@
     <key alias="saveListView">Sauver la mise en page de la liste</key>
     <key alias="schedulePublish">Planifier</key>
     <key alias="saveAndPreview">Prévisualiser</key>
+    <key alias="showPage">Prévisualiser</key>
     <key alias="showPageDisabled">La prévisualisation est désactivée car aucun modèle n'a été assigné.</key>
     <key alias="styleChoose">Choisir un style</key>
     <key alias="styleShow">Afficher les styles</key>
@@ -276,7 +277,7 @@
     <key alias="createFromClipboard">Copier du clipboard</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Créer un nouveau Modèle de Contenu à partir de '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Créer un nouveau Modèle de Contenu à partir de <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Vide</key>
     <key alias="selectBlueprint">Sélectionner un Modèle de Contenu</key>
     <key alias="createdBlueprintHeading">Modèle de Contenu créé</key>
@@ -1346,6 +1347,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="mediaTypeSavedHeader">Type de média sauvegardé</key>
     <key alias="memberTypeSavedHeader">Type de membre sauvegardé</key>
     <key alias="memberGroupSavedHeader">Groupe de membres sauvegardé</key>
+    <key alias="memberGroupNameDuplicate">Un autre groupe de membres existe déjà avec le même nom</key>
     <key alias="templateErrorHeader">Modèle non sauvegardé</key>
     <key alias="templateErrorText">Assurez-vous de ne pas avoir 2 modèles avec le même alias.</key>
     <key alias="templateSavedHeader">Modèle sauvegardé</key>
@@ -1960,7 +1962,14 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="httpsCheckExpiringCertificate">Le certificat SSL de votre site web va expirer dans %0% jours.</key>
     <key alias="healthCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Vous êtes actuellement %0% à voir le site via le schéma HTTPS.</key>
-    <!-- The following keys don't get tokens passed in -->
+    <key alias="httpsCheckConfigurationRectifyNotPossible">
+      L'appSetting 'Umbraco:CMS:Global:UseHttps' se trouve à 'false' dans votre fichier appSettings.json.
+      Une fois que vous aurez accès à ce site via le schema HTTPS, il faudra la mettre à 'true'.
+    </key>
+    <key alias="httpsCheckConfigurationCheckResult">
+      L'appSetting 'Umbraco:CMS:Global:UseHttps' se trouve à '%0%' dans votre fichier
+      appSettings.json, vos cookies sont %1% marqués comme 'secured'.
+    </key>   <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Le mode de compilation Debug est désactivé.</key>
     <key alias="compilationDebugCheckErrorMessage">Le mode de compilation Debug est actuellement activé. Il est recommandé de désactiver ce paramètre avant la mise en ligne.</key>
     <!-- The following keys get these tokens passed in:
@@ -2122,7 +2131,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="tooltipForPropertyActionsMenu">Ouvrir les Property Actions</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Attendez</key>
     <key alias="refreshStatus">Rafraîchir le Statut</key>
     <key alias="memoryCache">Cache Mémoire</key>
     <key alias="memoryCacheDescription">

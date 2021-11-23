@@ -224,5 +224,8 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         public string BackOfficeLogoImage { get; set; } = string.Empty;
         
+        /// Get or sets the model representing the global content version cleanup policy
+        /// </summary>
+        public ContentVersionCleanupPolicySettings ContentVersionCleanupPolicy { get; set; } = new ContentVersionCleanupPolicySettings();
     }
 }
