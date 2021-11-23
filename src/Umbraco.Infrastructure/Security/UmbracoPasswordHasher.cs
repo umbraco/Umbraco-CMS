@@ -53,6 +53,22 @@ namespace Umbraco.Cms.Core.Security
                 if (LegacyPasswordSecurity.SupportHashAlgorithm(deserialized.HashAlgorithm))
                 {
                     var result = LegacyPasswordSecurity.VerifyPassword(deserialized.HashAlgorithm, providedPassword, hashedPassword);
+
+                    //We need to special handle this case, apparently v8 still saves the user algorithm as {"hashAlgorithm":"HMACSHA256"}, when using legacy encoding and hasinging.
+                    if (result == false)
+                    {
+                        result = LegacyPasswordSecurity.VerifyLegacyHashedPassword(providedPassword, hashedPassword);
+                        if (result)
+                        {
+                            //We need to update the password algorithm on the user to match the truth before we rehash..
+                            //No need to persist it, as it will be overridden doing the rehash.
+                            user.PasswordConfig = _jsonSerializer.Serialize(new PersistedPasswordSettings()
+                            {
+                                HashAlgorithm = Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName
+                            });
+                        }
+                    }
+
                     return result
                         ? PasswordVerificationResult.SuccessRehashNeeded
                         : PasswordVerificationResult.Failed;

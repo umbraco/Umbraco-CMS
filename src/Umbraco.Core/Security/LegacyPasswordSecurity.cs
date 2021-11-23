@@ -56,6 +56,21 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <summary>
+        /// Verify a legacy hashed password (HMACSHA1)
+        /// </summary>
+        public bool VerifyLegacyHashedPassword(string password, string dbPassword)
+        {
+            var hashAlgorith = new HMACSHA1
+            {
+                //the legacy salt was actually the password :(
+                Key = Encoding.Unicode.GetBytes(password)
+            };
+            var hashed = Convert.ToBase64String(hashAlgorith.ComputeHash(Encoding.Unicode.GetBytes(password)));
+
+            return dbPassword == hashed;
+        }
+
+        /// <summary>
         /// Create a new password hash and a new salt
         /// </summary>
         /// <param name="algorithm">The hashing algorithm for the password.</param>
