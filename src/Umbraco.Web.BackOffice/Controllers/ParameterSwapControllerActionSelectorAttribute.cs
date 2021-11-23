@@ -76,12 +76,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // if it's a post we can try to read from the body and bind from the json value
             if (context.RouteContext.HttpContext.Request.Method.Equals(HttpMethod.Post.Method))
             {
-                string body;
+                JObject postBodyJson;
                 var requestItemKey = $"{nameof(ParameterSwapControllerActionSelectorAttribute)}_Body";
 
                 if (httpContext.Items.TryGetValue(requestItemKey, out var cached))
                 {
-                    body = cached.ToString();
+                    postBodyJson = (JObject)cached;
                 }
                 else
                 {
@@ -93,23 +93,25 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     // To expand on the above, if KestrelServerOptions/IISServerOptions is AllowSynchronousIO=false
                     // And you attempt to read stream sync an InvalidOperationException is thrown with message
                     // "Synchronous operations are disallowed. Call ReadAsync or set AllowSynchronousIO to true instead."
-                    body = Task.Run(() => context.RouteContext.HttpContext.Request.GetRawBodyStringAsync()).GetAwaiter().GetResult();
-                    httpContext.Items[requestItemKey] = body;
+                    var rawBody = Task.Run(() => httpContext.Request.GetRawBodyStringAsync()).GetAwaiter().GetResult();
+                    try
+                    {
+                        postBodyJson = JsonConvert.DeserializeObject<JObject>(rawBody);
+                    }
+                    catch (JsonException)
+                    {
+                        postBodyJson = null;
+                    }
+
+                    httpContext.Items[requestItemKey] = postBodyJson;
                 }
 
-                if (body == null)
+                if (postBodyJson == null)
                 {
                     return null;
                 }
 
-                var json = JsonConvert.DeserializeObject<JObject>(body);
-
-                if (json == null)
-                {
-                    return null;
-                }
-
-                var requestParam = json[_parameterName];
+                var requestParam = postBodyJson[_parameterName];
 
                 if (requestParam != null)
                 {
@@ -129,11 +131,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 }
                             }
                         }
-                        catch (JsonReaderException)
-                        {
-                            // can't convert
-                        }
-                        catch (JsonSerializationException)
+                        catch (JsonException)
                         {
                             // can't convert
                         }
