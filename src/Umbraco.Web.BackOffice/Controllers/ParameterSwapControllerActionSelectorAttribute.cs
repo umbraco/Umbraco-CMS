@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -38,6 +39,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     internal class ParameterSwapControllerActionSelectorAttribute : Attribute, IActionConstraint
     {
+
         private readonly string _actionName;
         private readonly string _parameterName;
         private readonly Type[] _supportedTypes;
@@ -81,9 +83,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (context.RouteContext.HttpContext.Request.Method.Equals(HttpMethod.Post.Method))
             {
                 JObject postBodyJson;
-                var requestItemKey = $"{nameof(ParameterSwapControllerActionSelectorAttribute)}_Body";
 
-                if (httpContext.Items.TryGetValue(requestItemKey, out var cached))
+                if (httpContext.Items.TryGetValue(Constants.HttpContextItems.RequestBodyAsJObject, out var cached))
                 {
                     postBodyJson = (JObject)cached;
                 }
@@ -107,7 +108,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         postBodyJson = null;
                     }
 
-                    httpContext.Items[requestItemKey] = postBodyJson;
+                    httpContext.Items[Constants.HttpContextItems.RequestBodyAsJObject] = postBodyJson;
                 }
 
                 if (postBodyJson == null)

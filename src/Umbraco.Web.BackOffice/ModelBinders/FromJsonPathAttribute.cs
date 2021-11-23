@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.ModelBinders
@@ -36,6 +37,10 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                     return;
                 }
 
+                if (TryModelBindFromHttpContextItems(bindingContext))
+                {
+                    return;
+                }
 
                 var strJson =  await bindingContext.HttpContext.Request.GetRawBodyStringAsync();
 
@@ -60,6 +65,27 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                 bindingContext.Result = ModelBindingResult.Success(model);
             }
 
+            public static bool TryModelBindFromHttpContextItems(ModelBindingContext bindingContext)
+            {
+                const string key = Constants.HttpContextItems.RequestBodyAsJObject;
+
+                if (!bindingContext.HttpContext.Items.TryGetValue(key, out var cached))
+                {
+                    return false;
+                }
+
+                var json = (JObject)cached;
+
+                JToken match = json.SelectToken(bindingContext.FieldName);
+
+                // ReSharper disable once InvertIf
+                if (match != null)
+                {
+                    bindingContext.Result = ModelBindingResult.Success(match.ToObject(bindingContext.ModelType));
+                }
+
+                return true;
+            }
         }
     }
 }
