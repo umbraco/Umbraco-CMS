@@ -102,13 +102,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     try
                     {
                         postBodyJson = JsonConvert.DeserializeObject<JObject>(rawBody);
+                        httpContext.Items[Constants.HttpContextItems.RequestBodyAsJObject] = postBodyJson;
                     }
                     catch (JsonException)
                     {
                         postBodyJson = null;
                     }
-
-                    httpContext.Items[Constants.HttpContextItems.RequestBodyAsJObject] = postBodyJson;
                 }
 
                 if (postBodyJson == null)

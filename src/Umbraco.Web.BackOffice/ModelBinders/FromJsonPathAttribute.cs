@@ -74,7 +74,10 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
                     return false;
                 }
 
-                var json = (JObject)cached;
+                if (cached is not JObject json)
+                {
+                    return false;
+                }
 
                 JToken match = json.SelectToken(bindingContext.FieldName);
 
