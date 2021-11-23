@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
@@ -21,6 +22,8 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
+using Language = Umbraco.Cms.Core.Models.Language;
+using Stylesheet = Umbraco.Cms.Core.Models.Stylesheet;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
 {
@@ -814,7 +817,45 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             UpdateContentTypesPropertyGroups(contentType, documentType.Element("Tabs"));
             UpdateContentTypesProperties(contentType, documentType.Element("GenericProperties"));
 
+            if (contentType is IContentTypeWithHistoryCleanup withCleanup)
+            {
+                UpdateHistoryCleanupPolicy(withCleanup, documentType.Element("HistoryCleanupPolicy"));
+            }
+
             return contentType;
+        }
+
+        private void UpdateHistoryCleanupPolicy(IContentTypeWithHistoryCleanup withCleanup, XElement element)
+        {
+            if (element == null)
+            {
+                return;
+            }
+
+            withCleanup.HistoryCleanup ??= new HistoryCleanup();
+
+            if (bool.TryParse(element.Attribute("preventCleanup")?.Value, out var preventCleanup))
+            {
+                withCleanup.HistoryCleanup.PreventCleanup = preventCleanup;
+            }
+
+            if (int.TryParse(element.Attribute("keepAllVersionsNewerThanDays")?.Value, out var keepAll))
+            {
+                withCleanup.HistoryCleanup.KeepAllVersionsNewerThanDays = keepAll;
+            }
+            else
+            {
+                withCleanup.HistoryCleanup.KeepAllVersionsNewerThanDays = null;
+            }
+
+            if (int.TryParse(element.Attribute("keepLatestVersionPerDayForDays")?.Value, out var keepLatest))
+            {
+                withCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays = keepLatest;
+            }
+            else
+            {
+                withCleanup.HistoryCleanup.KeepLatestVersionPerDayForDays = null;
+            }
         }
 
         private void UpdateContentTypesAllowedTemplates(IContentType contentType, XElement allowedTemplatesElement, XElement defaultTemplateElement)
