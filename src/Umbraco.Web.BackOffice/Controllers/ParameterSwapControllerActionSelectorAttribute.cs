@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Newtonsoft.Json;
@@ -10,13 +11,32 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
+    /// <remarks>
+    /// <para>
+    /// This attribute is odd because it applies at class level where some methods may use it whilst others don't.
+    /// </para>
+    ///
+    /// <para>
+    /// What we should probably have (if we really even need something like this at all) is an attribute for method level.
+    ///
+    /// <example>
+    /// <code>
+    /// public IActionResult Foo([FromUriOrBodyOfType(typeof(Guid))] Guid id) GetById {}
+    /// public IActionResult Foo([FromUriOrBodyOfType(typeof(int))] int id) GetById {}
+    /// </code>
+    /// </example>
+    /// </para>
+    ///
+    /// <para>
+    /// That way we wouldn't need confusing things like Accept returning true when action name doesn't even match attribute metadata.
+    /// </para>
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     internal class ParameterSwapControllerActionSelectorAttribute : Attribute, IActionConstraint
     {
         private readonly string _actionName;
         private readonly string _parameterName;
         private readonly Type[] _supportedTypes;
-        private string _requestBody;
 
         public ParameterSwapControllerActionSelectorAttribute(string actionName, string parameterName, params Type[] supportedTypes)
         {
@@ -33,10 +53,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             if (!IsValidCandidate(context.CurrentCandidate))
             {
+                // See remarks on class, required because we apply at class level
+                // and some controllers have some actions with parameter swaps and others without.
                 return true;
             }
 
-            var chosenCandidate = SelectAction(context);
+            ActionSelectorCandidate? chosenCandidate = SelectAction(context);
 
             var found = context.CurrentCandidate.Equals(chosenCandidate);
             return found;
@@ -49,16 +71,37 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return candidate;
             }
 
-            // if it's a post we can try to read from the body and bind from the json value
-            if (context.RouteContext.HttpContext.Request.Method == HttpMethod.Post.ToString())
-            {
-                // We need to use the asynchronous method here if synchronous IO is not allowed (it may or may not be, depending
-                // on configuration in UmbracoBackOfficeServiceCollectionExtensions.AddUmbraco()).
-                // We can't use async/await due to the need to override IsValidForRequest, which doesn't have an async override, so going with
-                // this, which seems to be the least worst option for "sync to async" (https://stackoverflow.com/a/32429753/489433).
-                var strJson = _requestBody ??= Task.Run(() => context.RouteContext.HttpContext.Request.GetRawBodyStringAsync()).GetAwaiter().GetResult();
+            HttpContext httpContext = context.RouteContext.HttpContext;
 
-                var json = JsonConvert.DeserializeObject<JObject>(strJson);
+            // if it's a post we can try to read from the body and bind from the json value
+            if (context.RouteContext.HttpContext.Request.Method.Equals(HttpMethod.Post.Method))
+            {
+                string body;
+                var requestItemKey = $"{nameof(ParameterSwapControllerActionSelectorAttribute)}_Body";
+
+                if (httpContext.Items.TryGetValue(requestItemKey, out var cached))
+                {
+                    body = cached.ToString();
+                }
+                else
+                {
+                    // Note: Copied the below comment, it's not clear, there's a sync GetRawBodyString extension that doesn't care about config?
+                    // Taking their word for it for now.
+
+                    // We need to use the asynchronous method here if synchronous IO is not allowed (it may or may not be, depending
+                    // on configuration in UmbracoBackOfficeServiceCollectionExtensions.AddUmbraco()).
+                    // We can't use async/await due to the need to override IsValidForRequest, which doesn't have an async override, so going with
+                    // this, which seems to be the least worst option for "sync to async" (https://stackoverflow.com/a/32429753/489433).
+                    body = Task.Run(() => context.RouteContext.HttpContext.Request.GetRawBodyStringAsync()).GetAwaiter().GetResult();
+                    httpContext.Items[requestItemKey] = body;
+                }
+
+                if (body == null)
+                {
+                    return null;
+                }
+
+                var json = JsonConvert.DeserializeObject<JObject>(body);
 
                 if (json == null)
                 {
