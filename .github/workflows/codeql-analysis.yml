@@ -24,10 +24,9 @@ jobs:
         config-file: ./.github/config/codeql-config.yml
 
     - run: |
-        echo "Run Umbraco-CMS build"
-        dotnet build umbraco-netcore-only.sln
+        echo "Run Umbraco.Web.UI.Client build"
         cd src/Umbraco.Web.UI.Client
-        npm i
+        npm install
         npm run build
 
     - name: Perform CodeQL Analysis
