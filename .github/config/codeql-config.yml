@@ -3,9 +3,8 @@ on:
   push:
     branches: [v9/contrib,v9/dev,v9/bug*,v9/feature*]
 paths-ignore: 
-  - **/node_modules
-  - **/lib
-  - **/bin
-  - **/build.tmp
+  - node_modules/**
+  - lib/**
+  - bin/**
 paths:
   - src
