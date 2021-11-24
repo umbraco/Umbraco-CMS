@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -84,9 +84,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 JObject postBodyJson;
 
-                if (httpContext.Items.TryGetValue(Constants.HttpContext.Items.RequestBodyAsJObject, out var cached))
+                if (httpContext.Items.TryGetValue(Constants.HttpContext.Items.RequestBodyAsJObject, out var value) && value is JObject cached)
                 {
-                    postBodyJson = (JObject)cached;
+                    postBodyJson = cached;
                 }
                 else
                 {
