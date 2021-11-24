@@ -11,7 +11,7 @@ on:
 jobs:
   CodeQL-Build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -22,16 +22,13 @@ jobs:
       uses: github/codeql-action/init@v1
       with:
         config-file: ./.github/config/codeql-config.yml
-          
-    - name: configure Pagefile
-      uses: al-cheb/configure-pagefile-action@v1.2
-      with:
-          minimum-size: 8GB
-          maximum-size: 32GB
-          
+
     - run: |
         echo "Run Umbraco-CMS build"
-        pwsh -command .\build\build.ps1
+        dotnet build umbraco-netcore-only.sln
+        cd src/Umbraco.Web.UI.Client
+        npm i
+        npm run build
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
@@ -39,8 +36,7 @@ jobs:
   # This job is to prevent the workflow status from showing as failed when all other jobs are skipped - See https://github.community/t/workflow-is-failing-if-no-job-can-be-ran-due-to-condition/16873
   always_job:
     name: Always run job
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
     steps:
       - name: Always run
         run: echo "This job is to prevent the workflow status from showing as failed when all other jobs are skipped"
-
