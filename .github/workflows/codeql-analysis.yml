@@ -2,9 +2,9 @@ name: "Code scanning - action"
 
 on:
   push:
-    branches: [v9/contrib,v9/dev,v9/bug,v9/bugfix,v9/feature]
+    branches: [v9/contrib,v9/dev,v9/bug*,v9/feature*]
   pull_request:
-    branches: [v9/contrib,v9/dev,v9/bug,v9/bugfix,v9/feature]
+    branches: [v9/contrib,v9/dev,v9/bug*,v9/feature*]
   schedule:
     - cron: '0 7 * * 2'
 
@@ -16,30 +16,13 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      with:
-        # We must fetch at least the immediate parents so that if this is
-        # a pull request then we can checkout the head.
-        fetch-depth: 2
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
       with:
-        config-file: ./.github/config/codeql-config.yml      
-      # Override language selection by uncommenting this and choosing your languages
-      # with:
-      #   languages: go, javascript, csharp, python, cpp, java
-
-    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
-    # If this step fails, then you should remove it and run the build manually (see below)
-    
-    # ℹ️ Command-line programs to run using the OS shell.
-    # 📚 https://git.io/JvXDl
-
-    # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
-    #    and modify them (or add more) to build your code if your project
-    #    uses a compiled language
-    
+        config-file: ./.github/config/codeql-config.yml
+          
     - name: configure Pagefile
       uses: al-cheb/configure-pagefile-action@v1.2
       with:
