@@ -124,7 +124,6 @@
         vm.logOptions.orderDirection = 'Descending';
 
         vm.fromDatePickerConfig = {
-            pickDate: true,
             pickTime: true,
             useSeconds: false,
             useCurrent: false,
@@ -138,7 +137,6 @@
         };
 
         vm.toDatePickerConfig = {
-            pickDate: true,
             pickTime: true,
             useSeconds: false,
             format: "YYYY-MM-DD HH:mm",
