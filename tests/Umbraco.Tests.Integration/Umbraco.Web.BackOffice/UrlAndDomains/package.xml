@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<umbPackage>
+  <info>
+    <package>
+      <name>Test</name>
+    </package>
+  </info>
+  <Documents>
+    <DocumentSet importMode="root">
+      <textPageLang id="5818" key="092b28ba-f1ce-4469-9573-ed716cfe32bc" parentID="-1" level="1" creatorID="-1" sortOrder="0" createDate="2021-10-13T15:39:32" updateDate="2021-10-13T15:39:32" nodeName="svSE" urlName="svse" path="-1,5818" isDoc="" nodeName-sv-se="svSE" nodeName-da="daDK" nodeName-en-us="enUS" nodeType="4130" nodeTypeAlias="textPageLang" creatorName="Bjarke Berg" writerName="Bjarke Berg" writerID="−1" template="4129" isPublished="true" />
+    </DocumentSet>
+  </Documents>
+  <DocumentTypes>
+    <DocumentType>
+      <Info>
+        <Name>TextPageLang</Name>
+        <Alias>textPageLang</Alias>
+        <Key>d4a44303-bf68-4f34-9f87-6668ff9e9cdc</Key>
+        <Icon>icon-document</Icon>
+        <Thumbnail>folder.png</Thumbnail>
+        <Description />
+        <AllowAtRoot>True</AllowAtRoot>
+        <IsListView>False</IsListView>
+        <IsElement>False</IsElement>
+        <Variations>Culture</Variations>
+        <Compositions />
+        <AllowedTemplates>
+          <Template>TextPageLang</Template>
+        </AllowedTemplates>
+        <DefaultTemplate>TextPageLang</DefaultTemplate>
+      </Info>
+      <Structure>
+        <DocumentType>textPage</DocumentType>
+        <DocumentType>textPageLang</DocumentType>
+      </Structure>
+      <GenericProperties>
+        <GenericProperty>
+          <Name>Grid</Name>
+          <Alias>grid</Alias>
+          <Key>74dcad47-03e6-4190-a7d5-480bd1d96783</Key>
+          <Type>Umbraco.Grid</Type>
+          <Definition>9ccf22c3-34c5-4e58-b365-a2d806c00540</Definition>
+          <Tab Alias="content">Content</Tab>
+          <SortOrder>0</SortOrder>
+          <Mandatory>False</Mandatory>
+          <LabelOnTop>False</LabelOnTop>
+          <Variations>Culture</Variations>
+        </GenericProperty>
+      </GenericProperties>
+      <Tabs>
+        <Tab>
+          <Id>2074</Id>
+          <Key>1cd3a297-a821-49e9-98d8-5c21ddd2aeaf</Key>
+          <Type>Group</Type>
+          <Caption>Content</Caption>
+          <Alias>content</Alias>
+          <SortOrder>0</SortOrder>
+        </Tab>
+      </Tabs>
+    </DocumentType>
+  </DocumentTypes>
+  <MediaTypes />
+  <Templates />
+  <Stylesheets />
+  <Scripts />
+  <PartialViews />
+  <Macros />
+  <MacroPartialViews />
+  <DictionaryItems />
+  <Languages>
+    <Language Id="1003" CultureAlias="da" FriendlyName="dansk" />
+    <Language Id="3" CultureAlias="sv-SE" FriendlyName="svensk (Sverige)" />
+    <Language Id="1" CultureAlias="en-US" FriendlyName="English (United States)" />
+  </Languages>
+  <DataTypes />
+  <MediaItems />
+</umbPackage>

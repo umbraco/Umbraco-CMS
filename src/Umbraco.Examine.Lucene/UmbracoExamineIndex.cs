@@ -8,8 +8,6 @@ using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Providers;
 using Lucene.Net.Documents;
-using Lucene.Net.Index;
-using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -103,10 +101,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     //remove the original value so we can store it the correct way
                     d.RemoveField(f.Key);
 
-                    d.Add(new StringField(
-                        f.Key,
-                        f.Value[0].ToString(),
-                        Field.Store.YES));
+                    d.Add(new StoredField(f.Key, f.Value[0].ToString()));
                 }
             }
 

@@ -103,8 +103,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
 
             if (string.IsNullOrWhiteSpace(programFiles)) return;
 
-            // detect 14, 13, 12, 11
-            for (var i = 14; i > 10; i--)
+            // detect 15, 14, 13, 12, 11
+            for (var i = 15; i > 10; i--)
             {
                 var exe = Path.Combine(programFiles, $@"Microsoft SQL Server\{i}0\Tools\Binn\SqlLocalDB.exe");
                 if (File.Exists(exe) == false) continue;

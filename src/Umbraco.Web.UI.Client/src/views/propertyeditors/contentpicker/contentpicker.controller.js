@@ -44,14 +44,15 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     function validate() {
         if ($scope.contentPickerForm) {
             //Validate!
-            if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
+            var hasItemsOrMandatory = $scope.renderModel.length !== 0 || ($scope.model.validation && $scope.model.validation.mandatory);
+            if (hasItemsOrMandatory && $scope.minNumberOfItems && $scope.minNumberOfItems > $scope.renderModel.length) {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", false);
             }
             else {
                 $scope.contentPickerForm.minCount.$setValidity("minCount", true);
             }
 
-            if ($scope.model.config && $scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) < $scope.renderModel.length) {
+            if ($scope.maxNumberOfItems && $scope.maxNumberOfItems < $scope.renderModel.length) {
                 $scope.contentPickerForm.maxCount.$setValidity("maxCount", false);
             }
             else {
@@ -145,6 +146,10 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
             $scope.umbProperty.setPropertyActions(propertyActions);
         }
+
+        // use these to avoid the nested property lookups/null-checks
+        $scope.minNumberOfItems = $scope.model.config.minNumber ? parseInt($scope.model.config.minNumber) : 0;
+        $scope.maxNumberOfItems = $scope.model.config.maxNumber ? parseInt($scope.model.config.maxNumber) : 0;
     }
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
@@ -194,7 +199,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     dialogOptions.dataTypeKey = $scope.model.dataTypeKey;
 
     // if we can't pick more than one item, explicitly disable multiPicker in the dialog options
-    if ($scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) === 1) {
+    if ($scope.maxNumberOfItems === 1) {
         dialogOptions.multiPicker = false;
     }
 
@@ -413,8 +418,13 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             var missingIds = _.difference(valueIds, renderModelIds);
 
             if (missingIds.length > 0) {
-                return entityResource.getByIds(missingIds, entityType).then(function (data) {
 
+                var requests = [
+                    entityResource.getByIds(missingIds, entityType),
+                    entityResource.getUrlsByUdis(missingIds)
+                ];
+
+                return $q.all(requests).then(function ([data, urlMap]) {
                     _.each(valueIds,
                         function (id, i) {
                             var entity = _.find(data, function (d) {
@@ -422,7 +432,12 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
                             });
 
                             if (entity) {
-                                addSelectedItem(entity);
+
+                              entity.url = entity.trashed
+                                ? vm.labels.general_recycleBin
+                                : urlMap[id];
+
+                              addSelectedItem(entity);
                             }
 
                         });
@@ -469,26 +484,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
     }
 
-    function setEntityUrl(entity) {
-
-        // get url for content and media items
-        if (entityType !== "Member") {
-            entityResource.getUrl(entity.id, entityType).then(function (data) {
-                // update url
-                $scope.renderModel.forEach(function (item) {
-                    if (item.id === entity.id) {
-                        if (entity.trashed) {
-                            item.url = vm.labels.general_recycleBin;
-                        } else {
-                            item.url = data;
-                        }
-                    }
-                });
-            });
-        }
-
-    }
-
     function addSelectedItem(item) {
 
         // set icon
@@ -523,8 +518,6 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct
         });
-
-        setEntityUrl(item);
     }
 
     function setSortingState(items) {

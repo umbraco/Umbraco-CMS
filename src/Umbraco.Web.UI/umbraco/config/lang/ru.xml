@@ -17,11 +17,11 @@
     <key alias="defaultValue">Значение по умолчанию</key>
     <key alias="delete">Удалить</key>
     <key alias="disable">Отключить</key>
-    <key alias="emptyrecyclebin">Очистить корзину</key>
+    <key alias="emptyRecycleBin">Очистить корзину</key>
     <key alias="enable">Включить</key>
     <key alias="export">Экспорт</key>
     <key alias="exportDocumentType">Экспортировать</key>
-    <key alias="importdocumenttype">Импортировать</key>
+    <key alias="importDocumentType">Импортировать</key>
     <key alias="importPackage">Импортировать пакет</key>
     <key alias="liveEdit">Править на месте</key>
     <key alias="logout">Выйти</key>
@@ -95,7 +95,7 @@
     <key alias="atViewingFor">Наблюдать за</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Создать новый шаблон содержимого из '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Создать новый шаблон содержимого из <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Пустой</key>
     <key alias="selectBlueprint">Выбрать шаблон содержимого</key>
     <key alias="createdBlueprintHeading">Шаблон содержимого создан</key>

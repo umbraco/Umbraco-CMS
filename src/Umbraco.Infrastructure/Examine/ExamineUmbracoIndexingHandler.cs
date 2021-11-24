@@ -194,9 +194,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
                             .Field("nodeType", id.ToInvariantString())
                             .Execute(QueryOptions.SkipTake(page * pageSize, pageSize));
                         total = results.TotalItemCount;
-                        var paged = results.Skip(page * pageSize);
-
-                        foreach (ISearchResult item in paged)
+                        
+                        foreach (ISearchResult item in results)
                         {
                             if (int.TryParse(item.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out int contentId))
                             {

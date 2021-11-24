@@ -15,10 +15,10 @@
     <key alias="createGroup">Crear grupo</key>
     <key alias="delete">Borrar</key>
     <key alias="disable">Deshabilitar</key>
-    <key alias="emptyrecyclebin">Vaciar Papelera</key>
+    <key alias="emptyRecycleBin">Vaciar Papelera</key>
     <key alias="enable">Activar</key>
     <key alias="exportDocumentType">Exportar Documento (tipo)</key>
-    <key alias="importdocumenttype">Importar Documento (tipo)</key>
+    <key alias="importDocumentType">Importar Documento (tipo)</key>
     <key alias="importPackage">Importar Paquete</key>
     <key alias="liveEdit">Editar en vivo</key>
     <key alias="logout">Cerrar sesión</key>
@@ -194,7 +194,7 @@
     <key alias="contentRoot">Raíz de contenido</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Crear nueva Plantilla de Contenido desde '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Crear nueva Plantilla de Contenido desde <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Vacía</key>
     <key alias="selectBlueprint">Seleccionar Plantilla de Contenido</key>
     <key alias="createdBlueprintHeading">Plantilla de Contenido creada</key>

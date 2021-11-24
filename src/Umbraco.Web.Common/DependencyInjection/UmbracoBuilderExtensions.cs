@@ -176,6 +176,7 @@ namespace Umbraco.Extensions
             builder.Services.AddHostedService<HealthCheckNotifier>();
             builder.Services.AddHostedService<KeepAlive>();
             builder.Services.AddHostedService<LogScrubber>();
+            builder.Services.AddHostedService<ContentVersionCleanup>();
             builder.Services.AddHostedService<ScheduledPublishing>();
             builder.Services.AddHostedService<TempFileCleanup>();
             builder.Services.AddHostedService<InstructionProcessTask>();
@@ -348,6 +349,7 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<ContentModelBinder>();
 
             builder.Services.AddSingleton<IUmbracoHelperAccessor, UmbracoHelperAccessor>();
+            builder.Services.AddSingleton<IScopedServiceProvider, ScopedServiceProvider>();
             builder.Services.AddScoped<UmbracoHelper>();
             builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
 

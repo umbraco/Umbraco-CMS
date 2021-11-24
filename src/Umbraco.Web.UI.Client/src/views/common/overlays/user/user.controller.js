@@ -182,6 +182,12 @@ angular.module("umbraco")
            $scope.changePasswordModel.value.confirm = "";
         }
 
+        $scope.editUser = function()  {
+          $location
+            .path('/users/users/user/' + $scope.user.id);
+          $scope.model.close();
+        }
+
         dashboardResource.getDashboard("user-dialog").then(function (dashboard) {
             $scope.dashboard = dashboard;
         });

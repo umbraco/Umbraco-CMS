@@ -145,9 +145,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
             totalFound = result.TotalItemCount;
 
-            var pagedResult = result.Skip(Convert.ToInt32(pageIndex));
-
-            return pagedResult;
+            return result;
         }
 
         private bool BuildQuery(StringBuilder sb, string query, string searchFrom, List<string> fields, string type)

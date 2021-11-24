@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             {
                                 json = JToken.Parse(asString);
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                                 // See issue https://github.com/umbraco/Umbraco-CMS/issues/10879
                                 // We are detecting JSON data by seeing if a string is surrounded by [] or {}
