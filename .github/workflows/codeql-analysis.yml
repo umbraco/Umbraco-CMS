@@ -23,12 +23,6 @@ jobs:
       with:
         config-file: ./.github/config/codeql-config.yml
 
-    - run: |
-        echo "Run Umbraco.Web.UI.Client build"
-        cd src/Umbraco.Web.UI.Client
-        npm install
-        npm run build
-
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
         
