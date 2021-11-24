@@ -162,6 +162,7 @@
     <Compile Include="ContentApps\ContentTypeListViewContentAppFactory.cs" />
     <Compile Include="ContentApps\ContentTypeDesignContentAppFactory.cs" />
     <Compile Include="ContentApps\ListViewContentAppFactory.cs" />
+    <Compile Include="ContentApps\MemberEditorContentAppFactory.cs" />
     <Compile Include="Dashboards\ContentDashboard.cs" />
     <Compile Include="Dashboards\DashboardCollection.cs" />
     <Compile Include="Dashboards\DashboardCollectionBuilder.cs" />
@@ -1186,7 +1187,9 @@
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
-    <Compile Include="FormlessPage.cs" />
+    <Compile Include="FormlessPage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="ModelStateExtensions.cs" />

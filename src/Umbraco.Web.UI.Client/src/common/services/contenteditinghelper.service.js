@@ -624,24 +624,29 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     var origProp = allOrigProps[k];
                     var alias = origProp.alias;
                     var newProp = getNewProp(alias, allNewProps);
-                    if (newProp && !_.isEqual(origProp.value, newProp.value)) {
+                    if (newProp) {
+                        // Always update readonly state
+                        origProp.readonly = newProp.readonly;
 
-                        //they have changed so set the origContent prop to the new one
-                        var origVal = origProp.value;
+                        // Check whether the value has changed and update accordingly
+                        if (!_.isEqual(origProp.value, newProp.value)) {
 
-                        origProp.value = newProp.value;
+                            //they have changed so set the origContent prop to the new one
+                            var origVal = origProp.value;
 
-                        //instead of having a property editor $watch their expression to check if it has
-                        // been updated, instead we'll check for the existence of a special method on their model
-                        // and just call it.
-                        if (Utilities.isFunction(origProp.onValueChanged)) {
-                            //send the newVal + oldVal
-                            origProp.onValueChanged(origProp.value, origVal);
+                            origProp.value = newProp.value;
+
+                            //instead of having a property editor $watch their expression to check if it has
+                            // been updated, instead we'll check for the existence of a special method on their model
+                            // and just call it.
+                            if (Utilities.isFunction(origProp.onValueChanged)) {
+                                //send the newVal + oldVal
+                                origProp.onValueChanged(origProp.value, origVal);
+                            }
+
+                            changed.push(origProp);
                         }
-
-                        changed.push(origProp);
                     }
-
                 }
             }
 
