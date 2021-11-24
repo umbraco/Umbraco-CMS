@@ -3,8 +3,19 @@ on:
   push:
     branches: [v9/contrib,v9/dev,v9/bug*,v9/feature*]
 paths-ignore: 
-  - node_modules/**
-  - lib/**
-  - bin/**
+  - src/Umbraco.Web.UI.Client/node_modules/**
+  - src/Umbraco.Web.UI.Client/lib/**
+  - src/Umbraco.Web.UI.Client/test/**
+  - src/Umbraco.Web.UI.Client/wwwroot/umbraco/lib/**
+  - src/JsonSchema/bin/**
+  - src/Umbraco.Core/bin/**
+  - src/Umbraco.Examine.Lucene/bin/**
+  - src/Umbraco.Infrastructure/bin/**
+  - src/Umbraco.Persistence.SqlCe/bin/**
+  - src/Umbraco.PublishedCache.NuCache/bin/**
+  - src/Umbraco.Web.BackOffice/bin/**
+  - src/Umbraco.Web.Common/bin/**
+  - src/Umbraco.Web.UI/bin/**
+  - src/Umbraco.Web.Website/bin/**
 paths:
   - src
