@@ -72,7 +72,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             return builder;
         }
 
-
         /// <summary>
         /// Register a embed provider.
         /// </summary>
