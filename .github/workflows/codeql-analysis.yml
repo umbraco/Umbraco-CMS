@@ -9,7 +9,7 @@ on:
     - cron: '0 7 * * 2'
 
 jobs:
-  CodeQL-Build:
+  CodeQL-Build-Umbraco.Web.UI.Client:
 
     runs-on: ubuntu-latest
 
@@ -17,22 +17,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
       with:
-        config-file: ./.github/config/codeql-config.yml
+        languages: javascript
 
     - run: |
-        echo "Run Umbraco-CMS build"
-        dotnet build umbraco-netcore-only.sln
-        cd src/Umbraco.Web.UI.Client
-        npm i
-        npm run build
+       cd src/Umbraco.Web.UI.Client
+       npm install
+       npm run build
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
-        
+      uses: github/codeql-action/analyze@v1        
+      
   # This job is to prevent the workflow status from showing as failed when all other jobs are skipped - See https://github.community/t/workflow-is-failing-if-no-job-can-be-ran-due-to-condition/16873
   always_job:
     name: Always run job
