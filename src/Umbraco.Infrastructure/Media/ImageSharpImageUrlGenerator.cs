@@ -56,14 +56,14 @@ namespace Umbraco.Cms.Infrastructure.Media
             void AddQueryString(string key, params IConvertible[] values)
                 => AppendQueryString(key + '=' + string.Join(",", values.Select(x => x.ToString(CultureInfo.InvariantCulture))));
 
-            if (options.FocalPoint != null)
-            {
-                AddQueryString("rxy", options.FocalPoint.Left, options.FocalPoint.Top);
-            }
-
             if (options.Crop != null)
             {
                 AddQueryString("cc", options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
+            }
+
+            if (options.FocalPoint != null)
+            {
+                AddQueryString("rxy", options.FocalPoint.Left, options.FocalPoint.Top);
             }
 
             if (options.ImageCropMode.HasValue)

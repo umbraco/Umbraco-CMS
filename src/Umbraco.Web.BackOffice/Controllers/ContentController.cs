@@ -62,6 +62,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ActionCollection _actionCollection;
         private readonly ISqlContext _sqlContext;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IContentVersionService _contentVersionService;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
         private readonly ILogger<ContentController> _logger;
         private readonly IScopeProvider _scopeProvider;
@@ -90,7 +91,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ISqlContext sqlContext,
             IJsonSerializer serializer,
             IScopeProvider scopeProvider,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService,
+            IContentVersionService contentVersionService)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _propertyEditors = propertyEditors;
@@ -109,6 +111,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _actionCollection = actionCollection;
             _sqlContext = sqlContext;
             _authorizationService = authorizationService;
+            _contentVersionService = contentVersionService;
             _logger = loggerFactory.CreateLogger<ContentController>();
             _scopeProvider = scopeProvider;
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
@@ -2489,6 +2492,53 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (content == null) return NotFound();
 
             _notificationService.SetNotifications(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, content, notifyOptions);
+
+            return NoContent();
+        }
+
+        [HttpGet]
+        [JsonCamelCaseFormatter]
+        public IActionResult GetPagedContentVersions(
+            int contentId,
+            int pageNumber = 1,
+            int pageSize = 10,
+            string culture = null)
+        {
+            if (!string.IsNullOrEmpty(culture))
+            {
+                if (!_allLangs.Value.TryGetValue(culture, out _))
+                {
+                    return NotFound();
+                }
+            }
+
+            IEnumerable<ContentVersionMeta> results = _contentVersionService.GetPagedContentVersions(
+                contentId,
+                pageNumber - 1,
+                pageSize,
+                out var totalRecords,
+                culture);
+
+            var model = new PagedResult<ContentVersionMeta>(totalRecords, pageNumber, pageSize)
+            {
+                Items = results
+            };
+
+            return Ok(model);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.ContentPermissionAdministrationById)]
+        public IActionResult PostSetContentVersionPreventCleanup(int contentId, int versionId, bool preventCleanup)
+        {
+            IContent content = _contentService.GetVersion(versionId);
+
+            if (content == null || content.Id != contentId)
+            {
+                return NotFound();
+            }
+
+            _contentVersionService.SetPreventCleanup(versionId, preventCleanup, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
             return NoContent();
         }

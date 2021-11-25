@@ -343,13 +343,7 @@ context('Content', () => {
         // Rollback
         cy.get('.umb-box-header :button').click();
 
-        cy.get('.umb-box-content > div > .input-block-level')
-            .find('option[label*=' + new Date().getDate() + ']')
-            .then(elements => {
-                const option = elements[elements.length - 1].getAttribute('value');
-                cy.get('.umb-box-content > div > .input-block-level')
-                    .select(option);
-            });
+        cy.get('.-selectable.cursor-pointer:first').click();
 
         cy.get('.umb-editor-footer-content__right-side > [button-style="success"] > .umb-button > .btn-success').click();
 

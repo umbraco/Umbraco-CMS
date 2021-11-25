@@ -358,13 +358,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
                 void AddQueryString(string key, params IConvertible[] values)
                     => AppendQueryString(key + '=' + string.Join(",", values.Select(x => x.ToString(CultureInfo.InvariantCulture))));
 
+                if (options.Crop != null)
+                {
+                    AddQueryString("c", options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
+                }
+
                 if (options.FocalPoint != null)
                 {
                     AddQueryString("f", options.FocalPoint.Top, options.FocalPoint.Left);
-                }
-                else if (options.Crop != null)
-                {
-                    AddQueryString("c", options.Crop.Left, options.Crop.Top, options.Crop.Right, options.Crop.Bottom);
                 }
 
                 if (options.ImageCropMode.HasValue)
@@ -399,7 +400,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
 
                 if (options.CacheBusterValue != null)
                 {
-                    AddQueryString("r", options.CacheBusterValue);
+                    AddQueryString("v", options.CacheBusterValue);
                 }
 
                 return imageUrl.ToString();
