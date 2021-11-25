@@ -24,7 +24,6 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IConfigManipulator _configManipulator;
         private readonly CacheBusterResolver _cacheBusterResolver;
-        private readonly RuntimeMinificationSettings _runtimeMinificationSettings;
         private readonly IBundleManager _bundles;
         private readonly SmidgeHelperAccessor _smidge;
 
@@ -53,7 +52,6 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
             _hostingEnvironment = hostingEnvironment;
             _configManipulator = configManipulator;
             _cacheBusterResolver = cacheBusterResolver;
-            _runtimeMinificationSettings = runtimeMinificationSettings.Value;
             _jsMinPipeline = new Lazy<PreProcessPipeline>(() => _bundles.PipelineFactory.Create(typeof(JsMinifier)));
             _cssMinPipeline = new Lazy<PreProcessPipeline>(() => _bundles.PipelineFactory.Create(typeof(NuglifyCss)));
 
@@ -76,10 +74,10 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
                 return defaultCss;
             });
 
-            Type cacheBusterType = _runtimeMinificationSettings.CacheBuster switch
+            Type cacheBusterType = runtimeMinificationSettings.Value.CacheBuster switch
             {
                 RuntimeMinificationCacheBuster.AppDomain => typeof(AppDomainLifetimeCacheBuster),
-                RuntimeMinificationCacheBuster.Version => typeof(ConfigCacheBuster),
+                RuntimeMinificationCacheBuster.Version => typeof(UmbracoSmidgeConfigCacheBuster),
                 RuntimeMinificationCacheBuster.Timestamp => typeof(TimestampCacheBuster),
                 _ => throw new NotImplementedException()
             };
@@ -169,18 +167,10 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
             }
         }
 
-
         /// <inheritdoc />
-        /// <remarks>
-        /// Smidge uses the version number as cache buster (configurable).
-        /// We therefore can reset, by updating the version number in config
-        /// </remarks>
         public void Reset()
         {
-            var version = DateTime.UtcNow.Ticks.ToString();
-            _configManipulator.SaveConfigValue(Cms.Core.Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
+            // noop, handled by UmbracoSmidgeConfigCacheBuster.
         }
-
-
     }
 }

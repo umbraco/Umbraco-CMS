@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Smidge;
+using Smidge.Cache;
 using Smidge.FileProcessors;
 using Smidge.InMemory;
 using Smidge.Nuglify;
@@ -274,6 +275,7 @@ namespace Umbraco.Extensions
                         new[] { "/App_Plugins/**/*.js", "/App_Plugins/**/*.css" }));
             });
 
+            builder.Services.AddUnique<ICacheBuster, UmbracoSmidgeConfigCacheBuster>();
             builder.Services.AddSmidge(builder.Config.GetSection(Constants.Configuration.ConfigRuntimeMinification));
             builder.Services.AddSmidgeNuglify();
             builder.Services.AddSmidgeInMemory(false); // it will be enabled based on config/cachebuster

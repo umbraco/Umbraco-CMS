@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Core.WebAssets
         /// <summary>
         /// Ensures that all runtime minifications are refreshed on next request. E.g. Clearing cache.
         /// </summary>
+        [Obsolete("Invalidation is handled automatically unless efforts are taken to disable sensible defaults.")]
         void Reset();
-
     }
 }
