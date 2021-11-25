@@ -1,5 +1,11 @@
 name: "Code scanning - action"
 
+paths:
+  - src/Umbraco.Web.UI.Client
+paths-ignore: 
+  - src/Umbraco.Web.UI.Client/node_modules
+  - src/Umbraco.Web.UI.Client/test
+
 on:
   push:
     branches: [v9/contrib,v9/dev,v9/bug*,v9/feature*]
