@@ -9,7 +9,7 @@ on:
     - cron: '0 7 * * 2'
 
 jobs:
-  CodeQL-Build-Umbraco.Web.UI.Client:
+  CodeQL-Build-Umbraco-Web-UI-Client:
 
     runs-on: ubuntu-latest
 
