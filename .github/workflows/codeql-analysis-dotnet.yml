@@ -9,29 +9,6 @@ on:
     - cron: '0 7 * * 2'
 
 jobs:
-  CodeQL-Build-Umbraco-Web-UI-Client:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: javascript
-        config-file: ./.github/config/codeql-config.yml
-
-    - run: |
-        echo "Run gulp build"
-        npm install
-        npm run build
-      working-directory: src/Umbraco.Web.UI.Client
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
-
   CodeQL-Build-Dotnet:
 
     runs-on: ubuntu-latest

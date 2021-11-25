@@ -1,0 +1,8 @@
+name: "CodeQL Dotnet config"
+
+paths:
+  - src
+paths-ignore: 
+  - src/Umbraco.Web.UI.Client
+  - src/Umbraco.Web.UI.Docs
+  - src/ApiDocs
