@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Media.EmbedProviders
@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
     /// Wrapper class for OEmbed response
     /// </summary>
     [DataContract]
+    // TODO(V10) : change base class to OEmbedProviderBase
     public class OEmbedResponse
     {
         [DataMember(Name ="type")]
