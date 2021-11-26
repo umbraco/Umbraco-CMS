@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public static IUmbracoBuilder AddEmbedProvider<T>(this IUmbracoBuilder builder)
             where T : class, IEmbedProvider
         {
-            builder.OEmbedProviders().Append<T>();
+            builder.EmbedProviders().Append<T>();
             return builder;
         }
 
