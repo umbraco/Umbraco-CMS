@@ -1174,7 +1174,7 @@
     <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
     <key alias="httpsCheckValidCertificate">Your site certificate was marked as valid.</key>
     <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
-    <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+    <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco.Core.UseHttps' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco.Core.UseHttps' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
