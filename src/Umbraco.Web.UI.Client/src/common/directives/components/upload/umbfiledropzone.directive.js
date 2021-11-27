@@ -64,24 +64,22 @@ angular.module("umbraco.directives")
 
                     function _filesQueued(files, event) {
                         //Push into the queue
-                        angular.forEach(files,
-                            function(file) {
+                        Utilities.forEach(files, file => {
+                            if (_filterFile(file) === true) {
 
-                                if (_filterFile(file) === true) {
-
-                                    if (file.$error) {
-                                        scope.rejected.push(file);
-                                    } else {
-                                        scope.queue.push(file);
-                                    }
+                                if (file.$error) {
+                                    scope.rejected.push(file);
+                                } else {
+                                    scope.queue.push(file);
                                 }
-                            });
+                            }
+                        });
 
                         //when queue is done, kick the uploader
                         if (!scope.working) {
                             // Upload not allowed
                             if (!scope.acceptedMediatypes || !scope.acceptedMediatypes.length) {
-                                files.map(function(file) {
+                                files.map(file => {
                                     file.uploadStatus = "error";
                                     file.serverErrorMessage = "File type is not allowed here";
                                     scope.rejected.push(file);
@@ -174,6 +172,8 @@ angular.module("umbraco.directives")
                                     }
                                 } else if (evt.Message) {
                                     file.serverErrorMessage = evt.Message;
+                                } else if (evt && typeof evt === 'string') {
+                                    file.serverErrorMessage = evt;
                                 }
                                 // If file not found, server will return a 404 and display this message
                                 if (status === 404) {
@@ -188,6 +188,11 @@ angular.module("umbraco.directives")
 
                     function _requestChooseMediaTypeDialog() {
 
+                        if (scope.queue.length === 0) {
+                            // if queue has no items so there is nothing to choose a type for
+                            return false;
+                        }
+                        
                         if (scope.acceptedMediatypes.length === 1) {
                             // if only one accepted type, then we wont ask to choose.
                             return false;
@@ -243,11 +248,18 @@ angular.module("umbraco.directives")
                         return true;// yes, we did open the choose-media dialog, therefor we return true.
                     }
 
-                    scope.handleFiles = function(files, event) {
+                    scope.handleFiles = function(files, event, invalidFiles) {
+                        const allFiles = [...files, ...invalidFiles];
+
+                        // add unique key for each files to use in ng-repeats
+                        allFiles.forEach(file => {
+                            file.key = String.CreateGuid();
+                        });
+
                         if (scope.filesQueued) {
-                            scope.filesQueued(files, event);
+                            scope.filesQueued(allFiles, event);
                         }
-                        _filesQueued(files, event);
+                        _filesQueued(allFiles, event);
                     };
                 }
             };

@@ -14,7 +14,7 @@ The prompt can be opened in four direction up, down, left or right.</p>
     <div ng-controller="My.Controller as vm">
 
         <div class="my-action" style="position:relative;">
-            <i class="icon-trash" ng-click="vm.showPrompt()"></i>
+            <umb-icon icon="icon-trash" ng-click="vm.showPrompt()"></umb-icon>
             <umb-confirm-action
                 ng-if="vm.promptIsVisible"
                 direction="left"

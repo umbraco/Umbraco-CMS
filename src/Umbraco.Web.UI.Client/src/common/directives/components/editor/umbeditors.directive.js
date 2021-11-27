@@ -126,7 +126,9 @@
                 // close all editors
                 if (args && !args.editor && args.editors.length === 0) {
                     editorCount = 0;
-                    scope.editors = [];
+                    scope.editors = [];                    
+                    // Remove the inert attribute from the #mainwrapper
+                    focusLockService.removeInertAttribute();
                 }
             }));
 

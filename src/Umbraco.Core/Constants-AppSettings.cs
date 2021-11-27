@@ -116,6 +116,11 @@ namespace Umbraco.Core
             public const string AllowContentDashboardAccessToAllUsers = "Umbraco.Core.AllowContentDashboardAccessToAllUsers";
 
             /// <summary>
+            /// The path to use when constructing the URL for retrieving data for the content dashboard.
+            /// </summary>
+            public const string ContentDashboardPath = "Umbraco.Core.ContentDashboardPath";
+
+            /// <summary>
             /// TODO: FILL ME IN
             /// </summary>
             public const string DisableElectionForSingleServer = "Umbraco.Core.DisableElectionForSingleServer";
@@ -150,6 +155,11 @@ namespace Umbraco.Core
             /// An int value representing the time in milliseconds to lock the database for a write operation
             /// </summary>
             public const string SqlWriteLockTimeOut = "Umbraco.Core.SqlWriteLockTimeOut";
+
+            /// <summary>
+            /// Returns true if TinyMCE scripting sanitization should be applied
+            /// </summary>
+            public const string SanitizeTinyMce = "Umbraco.Web.SanitizeTinyMce";
         }
     }
 }

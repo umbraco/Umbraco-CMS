@@ -11,7 +11,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
     //These are absolutely required in order for the macros to render inline
     //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-    var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style]";
+    var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang]";
     var fallbackStyles = [{ title: "Page header", block: "h2" }, { title: "Section header", block: "h3" }, { title: "Paragraph header", block: "h4" }, { title: "Normal", block: "p" }, { title: "Quote", block: "blockquote" }, { title: "Code", block: "code" }];
     // these languages are available for localization
     var availableLanguages = [
@@ -352,18 +352,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     return plugin.name;
                 });
 
-                //plugins that must always be active
+                // Plugins that must always be active
                 plugins.push("autoresize");
                 plugins.push("noneditable");
+
+                // Table plugin use color picker plugin in table properties
+                if (plugins.includes("table")) {
+                    plugins.push("colorpicker");
+                }
 
                 var modeTheme = '';
                 var modeInline = false;
 
-
-                //Based on mode set
-                //classic = Theme: modern, inline: false
-                //inline = Theme: modern, inline: true,
-                //distraction-free = Theme: inlite, inline: true
+                // Based on mode set
+                // classic = Theme: modern, inline: false
+                // inline = Theme: modern, inline: true,
+                // distraction-free = Theme: inlite, inline: true
                 switch (args.mode) {
                     case "classic":
                         modeTheme  = "modern";
@@ -1217,6 +1221,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 });
             });
 
+            editor.addShortcut('Ctrl+P', '', function () {
+                angularHelper.safeApply($rootScope, function () {
+                    eventsService.emit("rte.shortcut.saveAndPublish");
+                });
+            });
+
         },
 
         insertLinkInEditor: function (editor, target, anchorElm) {
@@ -1263,11 +1273,22 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             function insertLink() {
                 if (anchorElm) {
                     editor.dom.setAttribs(anchorElm, createElemAttributes());
-
                     editor.selection.select(anchorElm);
                     editor.execCommand('mceEndTyping');
                 } else {
-                    editor.execCommand('mceInsertLink', false, createElemAttributes());
+                    var selectedContent = editor.selection.getContent();
+                    // If there is no selected content, we can't insert a link
+                    // as TinyMCE needs selected content for this, so instead we
+                    // create a new dom element and insert it, using the chosen
+                    // link name as the content.
+                    if (selectedContent !== "") {
+                        editor.execCommand('mceInsertLink', false, createElemAttributes());
+                    } else {
+                        // Using the target url as a fallback, as href might be confusing with a local link
+                        var linkContent = typeof target.name !== "undefined" && target.name !== "" ? target.name : target.url
+                        var domElement = editor.dom.createHTML("a", createElemAttributes(), linkContent);
+                        editor.execCommand('mceInsertContent', false, domElement);
+                    }
                 }
             }
 
@@ -1487,6 +1508,19 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     });
 
                 }
+
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
+                    /** prevent injecting arbitrary JavaScript execution in on-attributes. */
+                    const allNodes = Array.prototype.slice.call(args.editor.dom.doc.getElementsByTagName("*"));
+                    allNodes.forEach(node => {
+                        for (var i = 0; i < node.attributes.length; i++) {
+                            if(node.attributes[i].name.indexOf("on") === 0) {
+                                node.removeAttribute(node.attributes[i].name)
+                            }
+                        }
+                    });
+                }
+
             });
 
             args.editor.on('init', function (e) {
@@ -1497,6 +1531,60 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 //enable browser based spell checking
                 args.editor.getBody().setAttribute('spellcheck', true);
+
+
+                /** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
+                 * https://github.com/advisories/GHSA-w7jx-j77m-wp65
+                 * https://github.com/advisories/GHSA-5vm8-hhgr-jcjp
+                 */
+                const uriAttributesToSanitize = ['src', 'href', 'data', 'background', 'action', 'formaction', 'poster', 'xlink:href'];
+                const parseUri = function() {
+                    // Encapsulated JS logic.
+                    const safeSvgDataUrlElements = [ 'img', 'video' ];
+                    const scriptUriRegExp = /((java|vb)script|mhtml):/i;
+                    const trimRegExp = /[\s\u0000-\u001F]+/g;
+                    const isInvalidUri = (uri, tagName) => {
+                        if (/^data:image\//i.test(uri)) {
+                            return safeSvgDataUrlElements.indexOf(tagName) !== -1 && /^data:image\/svg\+xml/i.test(uri);
+                        } else {
+                            return /^data:/i.test(uri);
+                        }
+                    };
+
+                    return function parseUri(uri, tagName) {
+                        uri = uri.replace(trimRegExp, '');
+                        try {
+                            // Might throw malformed URI sequence
+                            uri = decodeURIComponent(uri);
+                        } catch (ex) {
+                            // Fallback to non UTF-8 decoder
+                            uri = unescape(uri);
+                        }
+
+                        if (scriptUriRegExp.test(uri)) {
+                            return;
+                        }
+
+                        if (isInvalidUri(uri, tagName)) {
+                            return;
+                        }
+
+                        return uri;
+                    }
+                }();
+
+                if(Umbraco.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce === true){
+                    args.editor.serializer.addAttributeFilter(uriAttributesToSanitize, function (nodes) {
+                        nodes.forEach(function(node) {
+                            node.attributes.forEach(function(attr) {
+                                const attrName = attr.name.toLowerCase();
+                                if(uriAttributesToSanitize.indexOf(attrName) !== -1) {
+                                    attr.value = parseUri(attr.value, node.name);
+                                }
+                            });
+                        });
+                    });
+                }
 
                 //start watching the value
                 startWatch();
@@ -1532,21 +1620,23 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             //create link picker
             self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
 
+                entityResource.getAnchors(args.model.value).then(anchorValues => {
 
-                entityResource.getAnchors(args.model.value).then(function (anchorValues) {
-                    var linkPicker = {
+                    const linkPicker = {
                         currentTarget: currentTarget,
                         dataTypeKey: args.model.dataTypeKey,
                         ignoreUserStartNodes: args.model.config.ignoreUserStartNodes,
                         anchors: anchorValues,
-                        submit: function (model) {
+                        size: args.model.config.overlaySize,
+                        submit: model => {
                             self.insertLinkInEditor(args.editor, model.target, anchorElement);
                             editorService.close();
                         },
-                        close: function () {
+                        close: () => {
                             editorService.close();
                         }
                     };
+
                     editorService.linkPicker(linkPicker);
                 });
 

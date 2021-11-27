@@ -2,10 +2,13 @@
     'use strict';
 
     function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource,
-        dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService,
+        $filter, iconHelper, $q, $timeout, notificationsService,
         localizationService, editorService, eventsService, overlayService) {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope, element) {
+
+            const TYPE_GROUP = contentTypeHelper.TYPE_GROUP;
+            const TYPE_TAB = contentTypeHelper.TYPE_TAB;
 
             var eventBindings = [];
             var validationTranslated = "";
@@ -14,126 +17,251 @@
             scope.dataTypeHasChanged = false;
             scope.sortingMode = false;
             scope.toolbar = [];
-            scope.sortableOptionsGroup = {};
-            scope.sortableOptionsProperty = {};
             scope.sortingButtonKey = "general_reorder";
             scope.compositionsButtonState = "init";
+            scope.tabs = [];
+            scope.genericGroups = [];
+            scope.openTabAlias = null;
+            scope.hasGenericTab = false;
+            scope.genericTab = {
+                key: String.CreateGuid(),
+                type: TYPE_TAB,
+                name: "Generic",
+                alias: null,
+                parentAlias: null,
+                sortOrder: 0,
+                properties: []
+            };
 
-            function activate() {
+            let tabsInitialized = false;
 
-                setSortingOptions();
-
-                // set placeholder property on each group
-                if (scope.model.groups.length !== 0) {
-                    angular.forEach(scope.model.groups, function (group) {
-                        addInitProperty(group);
-                    });
+            eventBindings.push(scope.$watchCollection('model.groups', (newValue, oldValue) => {
+                // we only want to run this logic when new groups are added or removed
+                if (newValue.length === oldValue.length && tabsInitialized) {
+                    tabsInitialized = true;
+                    return;
                 }
 
-                // add init tab
-                addInitGroup(scope.model.groups);
+                contentTypeHelper.defineParentAliasOnGroups(newValue);
+                contentTypeHelper.relocateDisorientedGroups(newValue);
 
-                activateFirstGroup(scope.model.groups);
-
-                // localize texts
-                localizationService.localize("validation_validation").then(function (value) {
-                    validationTranslated = value;
+                scope.tabs = $filter("filter")(newValue, group => {
+                    return group.type === TYPE_TAB && group.parentAlias == null;
                 });
 
-                localizationService.localize("contentTypeEditor_tabHasNoSortOrder").then(function (value) {
-                    tabNoSortOrderTranslated = value;
+                // order tabs
+                scope.orderTabs();
+
+                // set server validation index
+                // the server filters out inherited groups if they don't have any local properties when returning the group index
+                const noInherited = newValue.filter(group => !group.inherited || (group.inherited && group.properties.filter(property => !property.inherited).length > 0));
+
+                noInherited.forEach((group, index) => {
+                    group.serverValidationIndex = !group.inherited ? index : undefined;
+                });
+
+                checkGenericTabVisibility();
+
+                if (!scope.openTabAlias && scope.hasGenericTab) {
+                    scope.openTabAlias = null;
+                } else if (!scope.openTabAlias && scope.tabs.length > 0) {
+                    scope.openTabAlias = scope.tabs[0].alias;
+                }
+
+                tabsInitialized = true;
+            }));
+
+            function activate() {
+                setSortingOptions();
+
+                // localize texts
+                localizationService.localizeMany([
+                    "validation_validation",
+                    "contentTypeEditor_tabHasNoSortOrder",
+                    "general_generic",
+                    "contentTypeEditor_tabDirectPropertiesDropZone"
+                ]).then(data => {
+                    validationTranslated = data[0];
+                    tabNoSortOrderTranslated = data[1];
+                    scope.genericTab.name = data[2];
+                    scope.tabDirectPropertiesDropZoneLabel = data[3];
                 });
             }
 
             function setSortingOptions() {
 
-                scope.sortableOptionsGroup = {
-                    axis: 'y',
-                    distance: 10,
+                const defaultOptions = {
+                    axis: '',
                     tolerance: "pointer",
                     opacity: 0.7,
                     scroll: true,
                     cursor: "move",
-                    placeholder: "umb-group-builder__group-sortable-placeholder",
                     zIndex: 6000,
+                    forcePlaceholderSize: true,
+                    dropOnEmpty: true,
+                    helper: "clone",
+                    appendTo: "body"
+                };
+
+                scope.sortableOptionsTab = {
+                    ...defaultOptions,
+                    connectWith: ".umb-group-builder__tabs",
+                    placeholder: "umb-group-builder__tab-sortable-placeholder",
+                    handle: ".umb-group-builder__tab-handle",
+                    items: ".umb-group-builder__tab-sortable",
+                    stop: (event, ui) => {
+                        const tabKey = ui.item[0].dataset.tabKey ? ui.item[0].dataset.tabKey : false;
+                        const dropIndex = scope.tabs.findIndex(tab => tab.key === tabKey);
+                        updateSortOrder(scope.tabs, dropIndex);
+                    }
+                };
+
+                scope.sortableOptionsGroup = {
+                    ...defaultOptions,
+                    connectWith: ".umb-group-builder__groups",
+                    placeholder: "umb-group-builder__group-sortable-placeholder",
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
-                    start: function (e, ui) {
-                        ui.placeholder.height(ui.item.height());
-                    },
-                    stop: function (e, ui) {
-                        updateTabsSortOrder();
+                    stop: (e, ui) => {
+                        const groupKey = ui.item[0].dataset.groupKey ? ui.item[0].dataset.groupKey : false;
+                        const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
+
+                        // the code also runs when you convert a group to a tab.
+                        // We want to make sure it only run when groups are reordered
+                        if (group && group.type === TYPE_GROUP) {
+
+                            // Update aliases
+                            const parentAlias = scope.openTabAlias;
+                            const oldAlias = group.alias || null; // null when group comes from root aka. 'generic'
+                            const newAlias = contentTypeHelper.updateParentAlias(oldAlias, parentAlias);
+
+                            group.alias = newAlias;
+                            group.parentAlias = parentAlias;
+                            contentTypeHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
+
+                            const groupsInTab = scope.model.groups.filter(group => group.parentAlias === parentAlias);
+                            const dropIndex = groupsInTab.findIndex(group => group.key === groupKey);
+
+                            updateSortOrder(groupsInTab, dropIndex);
+
+                            // when a group is dropped we need to reset the requested tab hover alias
+                            scope.sortableRequestedTabAlias = undefined;
+                        }
                     }
                 };
 
                 scope.sortableOptionsProperty = {
-                    axis: 'y',
-                    distance: 10,
-                    tolerance: "pointer",
+                    ...defaultOptions,
                     connectWith: ".umb-group-builder__properties",
-                    opacity: 0.7,
-                    scroll: true,
-                    cursor: "move",
                     placeholder: "umb-group-builder__property_sortable-placeholder",
-                    zIndex: 6000,
                     handle: ".umb-group-builder__property-handle",
                     items: ".umb-group-builder__property-sortable",
-                    start: function (e, ui) {
-                        ui.placeholder.height(ui.item.height());
-                    },
-                    stop: function (e, ui) {
+                    stop: (e, ui) => {
                         updatePropertiesSortOrder();
                     }
                 };
 
-            }
+                scope.droppableOptionsConvert = {
+                    accept: '.umb-group-builder__group-sortable',
+                    tolerance : 'pointer',
+                    drop: (evt, ui) => {
+                        const groupKey = ui.draggable[0].dataset.groupKey ? ui.draggable[0].dataset.groupKey : false;
+                        const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
 
-            function updateTabsSortOrder() {
+                        if (group) {
+                            contentTypeHelper.convertGroupToTab(scope.model.groups, group);
 
-                var first = true;
-                var prevSortOrder = 0;
+                            scope.tabs.push(group);
+                            scope.$broadcast('umbOverflowChecker.checkOverflow');
+                            scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
+                        }
+                    }
+                };
 
-                scope.model.groups.map(function (group) {
+                scope.sortableRequestedTabAlias = undefined;//set to undefined as null is the generic group.
+                scope.sortableRequestedTabTimeout = null;
+                scope.droppableOptionsTab = {
+                    accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
+                    tolerance : 'pointer',
+                    over: (evt, ui) => {
+                        const hoveredTabAlias = evt.target.dataset.tabAlias === "" ? null : evt.target.dataset.tabAlias;
 
-                    var index = scope.model.groups.indexOf(group);
+                        // if dragging a group
+                        if (ui.draggable[0].dataset.groupKey) {
 
-                    if (group.tabState !== "init") {
+                            const groupKey = ui.draggable[0].dataset.groupKey ? ui.draggable[0].dataset.groupKey : false;
+                            const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : {};
 
-                        // set the first not inherited tab to sort order 0
-                        if (!group.inherited && first) {
-
-                            // set the first tab sort order to 0 if prev is 0
-                            if (prevSortOrder === 0) {
-                                group.sortOrder = 0;
-                                // when the first tab is inherited and sort order is not 0
-                            } else {
-                                group.sortOrder = prevSortOrder + 1;
+                            const newAlias = contentTypeHelper.updateParentAlias(group.alias || null, hoveredTabAlias);
+                            // Check alias is unique
+                            if (group.alias !== newAlias && contentTypeHelper.isAliasUnique(scope.model.groups, newAlias) === false) {
+                                localizationService.localize("contentTypeEditor_groupReorderSameAliasError",  [group.name, newAlias]).then((value) => {
+                                    notificationsService.error(value);
+                                });
+                                return;
                             }
-
-                            first = false;
-
-                        } else if (!group.inherited && !first) {
-
-                            // find next group
-                            var nextGroup = scope.model.groups[index + 1];
-
-                            // if a groups is dropped in the middle of to groups with
-                            // same sort order. Give it the dropped group same sort order
-                            if (prevSortOrder === nextGroup.sortOrder) {
-                                group.sortOrder = prevSortOrder;
-                            } else {
-                                group.sortOrder = prevSortOrder + 1;
-                            }
-
                         }
 
-                        // store this tabs sort order as reference for the next
-                        prevSortOrder = group.sortOrder;
-
+                        if(scope.sortableRequestedTabAlias !== hoveredTabAlias) {
+                            if(scope.sortableRequestedTabTimeout !== null) {
+                                $timeout.cancel(scope.sortableRequestedTabTimeout);
+                                scope.sortableRequestedTabTimeout = null;
+                                scope.sortableRequestedTabAlias = undefined;
+                            }
+                            scope.sortableRequestedTabAlias = hoveredTabAlias;
+                            scope.sortableRequestedTabTimeout = $timeout(() => {
+                                scope.openTabAlias = scope.sortableRequestedTabAlias;
+                                scope.sortableRequestedTabTimeout = null;
+                                /* hack to update sortable positions when switching from one tab to another. 
+                                without this sorting direct properties doesn't work correctly */
+                                scope.$apply();
+                                $('.umb-group-builder__ungrouped-properties .umb-group-builder__properties').sortable('refresh');
+                                $('.umb-group-builder__groups').sortable('refresh');
+                            }, 400);
+                        }
+                    },
+                    out: (evt, ui) => {
+                        const hoveredTabAlias = evt.target.dataset.tabAlias === "" ? null : evt.target.dataset.tabAlias;
+                        if(scope.sortableRequestedTabTimeout !== null && (hoveredTabAlias === undefined || scope.sortableRequestedTabAlias === hoveredTabAlias)) {
+                            $timeout.cancel(scope.sortableRequestedTabTimeout);
+                            scope.sortableRequestedTabTimeout = null;
+                            scope.sortableRequestedTabAlias = null;
+                        }
                     }
+                };
+            }
 
-                });
+            function updateSortOrder(items, movedIndex) {
+                if (items && items.length <= 1) {
+                    return;
+                }
+                
+                // update the moved item sort order to fit into where it is dragged
+                const movedItem = items[movedIndex];
 
+                if (movedIndex === 0) {
+                    const nextItem =  items[movedIndex + 1];
+                    movedItem.sortOrder = nextItem.sortOrder - 1;
+                } else {
+                    const prevItem =  items[movedIndex - 1];
+                    movedItem.sortOrder = prevItem.sortOrder + 1;
+                }
+
+                /* After the above two items next to each other might have the same sort order 
+                 to prevent this we run through the rest of the 
+                 items and update the sort order if they are next to each other.
+                 This will make it possible to make gaps without the number being updated */
+                for (let i = movedIndex; i < items.length; i++) {
+                    const item = items[i];
+
+                    if (!item.inherited && i !== 0) {
+                        const prev = items[i - 1];
+
+                        if (item.sortOrder === prev.sortOrder) {
+                            item.sortOrder = item.sortOrder + 1;
+                        }
+                    }
+                }
             }
 
             function filterAvailableCompositions(selectedContentType, selecting) {
@@ -144,23 +272,23 @@
                     //the user has selected the item so add to the current list
                     _.union(scope.compositionsDialogModel.compositeContentTypes, [selectedContentType.alias]) :
                     //the user has unselected the item so remove from the current list
-                    _.reject(scope.compositionsDialogModel.compositeContentTypes, function (i) {
+                    _.reject(scope.compositionsDialogModel.compositeContentTypes, i => {
                         return i === selectedContentType.alias;
                     });
 
                 //get the currently assigned property type aliases - ensure we pass these to the server side filer
-                var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, function (g) {
-                    return _.map(g.properties, function (p) {
+                var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, g => {
+                    return _.map(g.properties, p => {
                         return p.alias;
                     });
-                })), function (f) {
+                })), f => {
                     return f !== null && f !== undefined;
                 });
 
                 //use a different resource lookup depending on the content type type
                 var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
 
-                return resourceLookup(scope.model.id, selectedContentTypeAliases, propAliasesExisting).then(function (filteredAvailableCompositeTypes) {
+                return resourceLookup(scope.model.id, selectedContentTypeAliases, propAliasesExisting).then(filteredAvailableCompositeTypes => {
                     scope.compositionsDialogModel.availableCompositeContentTypes.forEach(current => {
                         //reset first
                         current.allowed = true;
@@ -178,13 +306,7 @@
             }
 
             function updatePropertiesSortOrder() {
-
-                angular.forEach(scope.model.groups, function (group) {
-                    if (group.tabState !== "init") {
-                        group.properties = contentTypeHelper.updatePropertiesSortOrder(group.properties);
-                    }
-                });
-
+                scope.model.groups.forEach(group => group.properties = contentTypeHelper.updatePropertiesSortOrder(group.properties));
             }
 
             function setupAvailableContentTypesModel(result) {
@@ -208,17 +330,17 @@
 
             /* ---------- DELETE PROMT ---------- */
 
-            scope.togglePrompt = function (object) {
+            scope.togglePrompt = object => {
                 object.deletePrompt = !object.deletePrompt;
             };
 
-            scope.hidePrompt = function (object) {
+            scope.hidePrompt = object => {
                 object.deletePrompt = false;
             };
 
             /* ---------- TOOLBAR ---------- */
 
-            scope.toggleSortingMode = function (tool) {
+            scope.toggleSortingMode = () => {
 
                 if (scope.sortingMode === true) {
 
@@ -238,46 +360,38 @@
                         scope.sortingButtonKey = "general_reorder";
                     }
 
-                } else {
+                    // When exiting the reorder mode while the generic tab is empty, set the active tab to the first available one
+                    if (scope.tabs.length > 0 && !scope.openTabAlias) {
+                        scope.openTabAlias = scope.tabs[0].alias;
+                    }
 
+                } else {
                     scope.sortingMode = true;
                     scope.sortingButtonKey = "general_reorderDone";
-
                 }
 
+                checkGenericTabVisibility();
+                scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
-            scope.openCompositionsDialog = function () {
+            scope.openCompositionsDialog = () => {
 
                 scope.compositionsDialogModel = {
                     contentType: scope.model,
                     compositeContentTypes: scope.model.compositeContentTypes,
                     view: "views/common/infiniteeditors/compositions/compositions.html",
                     size: "small",
-                    submit: function () {
-
-                        // make sure that all tabs has an init property
-                        if (scope.model.groups.length !== 0) {
-                            angular.forEach(scope.model.groups, function (group) {
-                                addInitProperty(group);
-                            });
-                        }
-
-                        // remove overlay
+                    submit: () => {
                         editorService.close();
-
                     },
-                    close: function (oldModel) {
-
+                    close: oldModel => {
                         // reset composition changes
                         scope.model.groups = oldModel.contentType.groups;
                         scope.model.compositeContentTypes = oldModel.contentType.compositeContentTypes;
 
-                        // remove overlay
                         editorService.close();
-
                     },
-                    selectCompositeContentType: function (selectedContentType) {
+                    selectCompositeContentType: selectedContentType => {
 
                         var deferred = $q.defer();
 
@@ -291,7 +405,7 @@
                             //use a different resource lookup depending on the content type type
                             var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getById : mediaTypeResource.getById;
 
-                            resourceLookup(selectedContentType.id).then(function (composition) {
+                            resourceLookup(selectedContentType.id).then(composition => {
                                 //based on the above filtering we shouldn't be able to select an invalid one, but let's be safe and
                                 // double check here.
                                 var overlappingAliases = contentTypeHelper.validateAddingComposition(scope.model, composition);
@@ -307,11 +421,11 @@
                                 }
 
                                 //based on the selection, we need to filter the available composite types list
-                                filterAvailableCompositions(selectedContentType, newSelection).then(function () {
-                            deferred.resolve({ selectedContentType, newSelection });
-                                    // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
-                        }, function () {
-                                    deferred.reject();
+                                filterAvailableCompositions(selectedContentType, newSelection).then(() => {
+                                    deferred.resolve({ selectedContentType, newSelection });
+                                            // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
+                                }, () => {
+                                   deferred.reject();
                                 });
                             });
                         }
@@ -320,10 +434,10 @@
                             contentTypeHelper.splitCompositeContentType(scope.model, selectedContentType);
 
                             //based on the selection, we need to filter the available composite types list
-                            filterAvailableCompositions(selectedContentType, newSelection).then(function () {
-                            deferred.resolve({ selectedContentType, newSelection });
+                            filterAvailableCompositions(selectedContentType, newSelection).then(() => {
+                                deferred.resolve({ selectedContentType, newSelection });
                                 // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
-                    }, function () {
+                            }, () => {
                                 deferred.reject();
                             });
                         }
@@ -338,31 +452,31 @@
                 var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
 
                 //get the currently assigned property type aliases - ensure we pass these to the server side filer
-                var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, function (g) {
-                    return _.map(g.properties, function (p) {
+                var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, g => {
+                    return _.map(g.properties, p => {
                         return p.alias;
                     });
-                })), function (f) {
+                })), f => {
                     return f !== null && f !== undefined;
                 });
                 scope.compositionsButtonState = "busy";
                 $q.all([
                     //get available composite types
-                    availableContentTypeResource(scope.model.id, [], propAliasesExisting, scope.model.isElement).then(function (result) {
+                    availableContentTypeResource(scope.model.id, [], propAliasesExisting, scope.model.isElement).then(result => {
                         setupAvailableContentTypesModel(result);
                     }),
                     //get where used document types
-                    whereUsedContentTypeResource(scope.model.id).then(function (whereUsed) {
+                    whereUsedContentTypeResource(scope.model.id).then(whereUsed => {
                         //pass to the dialog model the content type eg documentType or mediaType
                         scope.compositionsDialogModel.section = scope.contentType;
                         //pass the list of 'where used' document types
                         scope.compositionsDialogModel.whereCompositionUsed = whereUsed;
                     }),
                     //get content type count
-                    countContentTypeResource().then(function (result) {
+                    countContentTypeResource().then(result => {
                         scope.compositionsDialogModel.totalContentTypes = parseInt(result, 10);
                     })
-                ]).then(function () {
+                ]).then(() => {
                     //resolves when both other promises are done, now show it
                     editorService.open(scope.compositionsDialogModel);
                     scope.compositionsButtonState = "init";
@@ -370,16 +484,15 @@
 
             };
 
-
-            scope.openDocumentType = function (documentTypeId) {
+            scope.openDocumentType = (documentTypeId) => {
                 const editor = {
                     id: documentTypeId,
-                    submit: function (model) {
+                    submit: () => {
                         const args = { node: scope.model };
                         eventsService.emit("editors.documentType.reload", args);
                         editorService.close();
                     },
-                    close: function () {
+                    close: () => {
                         editorService.close();
                     }
                 };
@@ -387,34 +500,233 @@
 
             };
 
-            /* ---------- GROUPS ---------- */
-
-            scope.addGroup = function (group) {
-
-                // set group sort order
-                var index = scope.model.groups.indexOf(group);
-                var prevGroup = scope.model.groups[index - 1];
-
-                if (index > 0) {
-                    // set index to 1 higher than the previous groups sort order
-                    group.sortOrder = prevGroup.sortOrder + 1;
-
-                } else {
-                    // first group - sort order will be 0
-                    group.sortOrder = 0;
-                }
-
-                // activate group
-                scope.activateGroup(group);
-
-                // push new init tab to the scope
-                addInitGroup(scope.model.groups);
+            /* ---------- TABS ---------- */
+            scope.changeTab = ({ alias }) => {
+                scope.openTabAlias = alias;
             };
 
-            scope.activateGroup = function (selectedGroup) {
+            scope.addTab = () => {
+                const newTabIndex = scope.tabs.length;
+                const lastTab = scope.tabs[newTabIndex - 1];
+                const sortOrder = lastTab && lastTab.sortOrder !== undefined ? lastTab.sortOrder + 1 : 0;
+
+                const key = String.CreateGuid();
+                const tab = {
+                    key: key,
+                    type: TYPE_TAB,
+                    name: '',
+                    alias: key, // Temporarily set alias to key, because the name is empty
+                    parentAlias: null,
+                    sortOrder,
+                    properties: []
+                };
+
+                if (newTabIndex === 0 && scope.hasGenericTab === false) {
+                    scope.model.groups.forEach(group => {
+                        if (!group.inherited && group.parentAlias == null) {
+                            group.parentAlias = tab.alias;
+                            group.alias = contentTypeHelper.updateParentAlias(group.alias, group.parentAlias);
+                        }
+                    });
+                }
+
+                scope.model.groups = [...scope.model.groups, tab];
+
+                scope.openTabAlias = tab.alias;
+
+                notifyChanged();
+
+                scope.$broadcast('umbOverflowChecker.checkOverflow');
+                scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
+            };
+
+            scope.removeTab = (tab, indexInTabs) => {
+                const tabName = tab.name || "";
+
+                const localizeMany = localizationService.localizeMany(['general_delete', 'contentTypeEditor_confirmDeleteTabNotice']);
+                const localize =  localizationService.localize('contentTypeEditor_confirmDeleteTabMessage',  [tabName]);
+                
+                $q.all([localizeMany, localize]).then(values => {
+                    const translations = values[0];
+                    const message = values[1];
+
+                    overlayService.confirmDelete({
+                        title: `${translations[0]} ${tabName}`,
+                        content: message,
+                        confirmMessage: translations[1],
+                        submitButtonLabelKey: 'actions_delete',
+                        submit: () => {
+                            const indexInGroups = scope.model.groups.findIndex(group => group.alias === tab.alias);
+                            scope.model.groups.splice(indexInGroups, 1);
+
+                            // remove all child groups
+                            scope.model.groups = scope.model.groups.filter(group => group.parentAlias !== tab.alias);
+
+                            // we need a timeout because the filter hasn't updated the tabs collection
+                            $timeout(() => {
+                                if (scope.tabs.length > 0) {
+                                    scope.openTabAlias = indexInTabs > 0 ? scope.tabs[indexInTabs - 1].alias : scope.tabs[0].alias;
+                                } else {
+                                    scope.openTabAlias = null;
+                                }
+                            });
+
+                            scope.$broadcast('umbOverflowChecker.checkOverflow');
+
+                            notifyChanged();
+
+                            overlayService.close();
+                        }
+                    });
+                });
+            };
+
+            scope.canRemoveTab = (tab) => {
+                return scope.canRemoveGroup(tab) && _.every(scope.model.groups.filter(group => group.parentAlias === tab.alias), group => scope.canRemoveGroup(group));
+            };
+
+            scope.setTabOverflowState = (overflowLeft, overflowRight) => {
+                scope.overflow = { left: overflowLeft, right: overflowRight };
+            };
+
+            scope.moveTabsOverflowLeft = () => {
+                //TODO: optimize this...
+                const el = element[0].querySelector(".umb-group-builder__tabs-list");
+                el.scrollLeft -= el.clientWidth * 0.5;
+            }
+            scope.moveTabsOverflowRight = () => {
+                //TODO: optimize this...
+                const el = element[0].querySelector(".umb-group-builder__tabs-list");
+                el.scrollLeft += el.clientWidth * 0.5;
+            }
+
+            scope.orderTabs = () => {
+                scope.tabs = $filter('orderBy')(scope.tabs, 'sortOrder');
+            };
+
+            scope.onChangeTabName = tab => {
+                if (updateGroupAlias(tab)) {
+                    scope.openTabAlias = tab.alias;
+                    scope.$broadcast('umbOverflowChecker.checkOverflow');
+                }
+            };
+
+            /** Universal method for updating group alias (for tabs, field-sets etc.) */
+            function updateGroupAlias(group) {
+                const localAlias = contentTypeHelper.generateLocalAlias(group.name),
+                    oldAlias = group.alias;
+                let newAlias = contentTypeHelper.updateLocalAlias(oldAlias, localAlias);
+
+                // Ensure unique alias, otherwise we would be transforming groups of other parents, we do not want this.
+                if(contentTypeHelper.isAliasUnique(scope.model.groups, newAlias) === false) {
+                    newAlias = contentTypeHelper.createUniqueAlias(scope.model.groups, newAlias);
+                }
+
+                group.alias = newAlias;
+                group.parentAlias = contentTypeHelper.getParentAlias(newAlias);
+                contentTypeHelper.updateDescendingAliases(scope.model.groups, oldAlias, newAlias);
+                return true;
+            }
+
+            scope.isUngroupedPropertiesVisible = ({alias, properties}) => {
+                const isOpenTab = alias === scope.openTabAlias;
+
+                if (isOpenTab && properties.length > 0) {
+                    return true;
+                }
+
+                if (isOpenTab && scope.sortingMode) {
+                    return true;
+                }
+
+                const tabHasGroups = scope.model.groups.filter(group => group.parentAlias === alias).length > 0;
+
+                if (isOpenTab && !tabHasGroups) {
+                    return true;
+                }
+            };
+
+            function checkGenericTabVisibility () {
+                const hasRootGroups = scope.model.groups.filter(group => group.type === TYPE_GROUP && group.parentAlias === null).length > 0;
+                scope.hasGenericTab = (hasRootGroups && scope.tabs.length > 0) || scope.sortingMode;
+            }
+
+            /* Properties */
+
+            scope.addNewProperty = group => {
+                let newProperty = {
+                    label: null,
+                    alias: null,
+                    propertyState: "init",
+                    validation: {
+                        mandatory: false,
+                        mandatoryMessage: null,
+                        pattern: null,
+                        patternMessage: null
+                    },
+                    labelOnTop: false
+                };
+
+                const propertySettings = {
+                    title: "Property settings",
+                    property: newProperty,
+                    contentType: scope.contentType,
+                    contentTypeName: scope.model.name,
+                    contentTypeAllowCultureVariant: scope.model.allowCultureVariant,
+                    contentTypeAllowSegmentVariant: scope.model.allowSegmentVariant,
+                    view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
+                    size: "small",
+                    submit: model => {
+                        newProperty = {...model.property};
+                        newProperty.propertyState = "active";
+
+                        group.properties.push(newProperty);
+
+                        editorService.close();
+                    },
+                    close: () => {
+                        editorService.close();
+                    }
+                };
+
+                editorService.open(propertySettings);
+            };
+
+            /* ---------- GROUPS ---------- */
+
+            scope.addGroup = tabAlias => {
+                scope.model.groups = scope.model.groups || [];
+
+                const groupsInTab = scope.model.groups.filter(group => group.parentAlias === tabAlias);
+                const lastGroupSortOrder = groupsInTab.length > 0 ? groupsInTab[groupsInTab.length - 1].sortOrder + 1 : 0;
+
+                const key = String.CreateGuid();
+                const group = {
+                    key: key,
+                    type: TYPE_GROUP,
+                    name: '',
+                    alias: contentTypeHelper.updateParentAlias(key, tabAlias), // Temporarily set alias to key, because the name is empty
+                    parentAlias: tabAlias || null,
+                    sortOrder: lastGroupSortOrder,
+                    properties: [],
+                    parentTabContentTypes: [],
+                    parentTabContentTypeNames: []
+                };
+
+                scope.model.groups = [...scope.model.groups, group];
+
+                scope.activateGroup(group);
+
+                notifyChanged();
+            };
+
+            scope.activateGroup = selectedGroup => {
+                if (!selectedGroup) {
+                    return;
+                }
 
                 // set all other groups that are inactive to active
-                angular.forEach(scope.model.groups, function (group) {
+                scope.model.groups.forEach(group => {
                     // skip init tab
                     if (group.tabState !== "init") {
                         group.tabState = "inActive";
@@ -422,84 +734,74 @@
                 });
 
                 selectedGroup.tabState = "active";
-
             };
 
-            scope.canRemoveGroup = function (group) {
-                return group.inherited !== true && _.find(group.properties, function (property) { return property.locked === true; }) == null;
+            scope.onChangeGroupName = group => {
+                updateGroupAlias(group);
             }
 
-            scope.removeGroup = function (groupIndex) {
-                scope.model.groups.splice(groupIndex, 1);
+            scope.canRemoveGroup = group => {
+                return group.inherited !== true && _.find(group.properties, property => property.locked === true) == null;
             };
 
-            scope.updateGroupTitle = function (group) {
-                if (group.properties.length === 0) {
-                    addInitProperty(group);
-                }
+            scope.removeGroup = (selectedGroup) => {
+                const groupName = selectedGroup.name || "";
+
+                const localizeMany = localizationService.localizeMany(['general_delete', 'contentTypeEditor_confirmDeleteGroupNotice']);
+                const localize =  localizationService.localize('contentTypeEditor_confirmDeleteGroupMessage',  [groupName]);
+                
+                $q.all([localizeMany, localize]).then(values => {
+                    const translations = values[0];
+                    const message = values[1];
+
+                    overlayService.confirmDelete({
+                        title: `${translations[0]} ${groupName}`,
+                        content: message,
+                        confirmMessage: translations[1],
+                        submitButtonLabelKey: 'actions_delete',
+                        submit: () => {
+                            const index = scope.model.groups.findIndex(group => group.alias === selectedGroup.alias);
+                            scope.model.groups.splice(index, 1);
+
+                            overlayService.close();
+                            notifyChanged();
+                        }
+                    });
+                });
             };
 
-            scope.changeSortOrderValue = function (group) {
+            scope.addGroupToActiveTab = () => {
+                scope.addGroup(scope.openTabAlias);
+            };
+
+            scope.changeSortOrderValue = group => {
 
                 if (group.sortOrder !== undefined) {
                     group.showSortOrderMissing = false;
                 }
+
                 scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
             };
 
-            function addInitGroup(groups) {
-
-                // check i init tab already exists
-                var addGroup = true;
-
-                angular.forEach(groups, function (group) {
-                    if (group.tabState === "init") {
-                        addGroup = false;
-                    }
-                });
-
-                if (addGroup) {
-                    groups.push({
-                        properties: [],
-                        parentTabContentTypes: [],
-                        parentTabContentTypeNames: [],
-                        name: "",
-                        tabState: "init"
-                    });
-                }
-
-                return groups;
-            }
-
-            function activateFirstGroup(groups) {
-                if (groups && groups.length > 0) {
-                    var firstGroup = groups[0];
-                    if (!firstGroup.tabState || firstGroup.tabState === "inActive") {
-                        firstGroup.tabState = "active";
-                    }
-                }
-            }
+            scope.onChangeGroupSortOrderValue = sortedGroup => {
+                const groupsInTab = scope.model.groups.filter(group => group.parentAlias === sortedGroup.parentAlias);
+                const otherGroups = scope.model.groups.filter(group => group.parentAlias !== sortedGroup.parentAlias);
+                const sortedGroups = $filter('orderBy')(groupsInTab, 'sortOrder');
+                scope.model.groups = [...otherGroups, ...sortedGroups];
+            };
 
             /* ---------- PROPERTIES ---------- */
+            scope.addPropertyToActiveGroup = () => {
+                let activeGroup = scope.model.groups.find(group => group.tabState === "active");
 
-            scope.addPropertyToActiveGroup = function () {
-                var group = _.find(scope.model.groups, group => group.tabState === "active");
-                if (!group && scope.model.groups.length) {
-                    group = scope.model.groups[0];
+                if (!activeGroup && scope.model.groups.length) {
+                    activeGroup = scope.model.groups[0];
                 }
 
-                if (!group || !group.name) {
-                    return;
-                }
+                scope.addNewProperty(activeGroup);
+            };
 
-                var property = _.find(group.properties, property => property.propertyState === "init");
-                if (!property) {
-                    return;
-                }
-                scope.addProperty(property, group);
-            }
-
-            scope.addProperty = function (property, group) {
+            scope.addProperty = (property, group) => {
 
                 // set property sort order
                 var index = group.properties.indexOf(property);
@@ -519,7 +821,7 @@
 
             };
 
-            scope.editPropertyTypeSettings = function (property, group) {
+            scope.editPropertyTypeSettings = (property, group) => {
 
                 if (!property.inherited) {
 
@@ -540,7 +842,7 @@
                         contentTypeAllowSegmentVariant: scope.model.allowSegmentVariant,
                         view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
                         size: "small",
-                        submit: function (model) {
+                        submit: model => {
 
                             property.inherited = false;
                             property.dialogIsOpen = false;
@@ -576,28 +878,35 @@
                             // close the editor
                             editorService.close();
 
-                            // push new init property to group
-                            addInitProperty(group);
+                            if (group) {
+                                // push new init property to group
+                                addInitProperty(group);
 
-                            // set focus on init property
-                            var numberOfProperties = group.properties.length;
-                            group.properties[numberOfProperties - 1].focus = true;
+                                // set focus on init property
+                                var numberOfProperties = group.properties.length;
+                                group.properties[numberOfProperties - 1].focus = true;
+                            }
 
                             notifyChanged();
                         },
-                        close: function () {
+                        close: () => {
                             if (_.isEqual(oldPropertyModel, propertyModel) === false) {
-                                localizationService.localizeMany(["general_confirm", "contentTypeEditor_propertyHasChanges", "general_cancel", "general_ok"]).then(function (data) {
+                                localizationService.localizeMany([
+                                    "general_confirm",
+                                    "contentTypeEditor_propertyHasChanges",
+                                    "general_cancel",
+                                    "general_ok"
+                                ]).then(data => {
                                     const overlay = {
                                         title: data[0],
                                         content: data[1],
                                         closeButtonLabel: data[2],
                                         submitButtonLabel: data[3],
                                         submitButtonStyle: "danger",
-                                        close: function () {
+                                        close: () => {
                                             overlayService.close();
                                         },
-                                        submit: function () {
+                                        submit: () => {
                                             // close the confirmation
                                             overlayService.close();
                                             // close the editor
@@ -624,12 +933,33 @@
                 }
             };
 
-            scope.deleteProperty = function (tab, propertyIndex) {
+            scope.deleteProperty = (properties, property) => {
+                const propertyName = property.label || "";
 
-                // remove property
-                tab.properties.splice(propertyIndex, 1);
+                const localizeMany = localizationService.localizeMany(['general_delete']);
+                const localize = localizationService.localize('contentTypeEditor_confirmDeletePropertyMessage', [propertyName]);
 
-                notifyChanged();
+                $q.all([localizeMany, localize]).then(values => {
+                    const translations = values[0];
+                    const message = values[1];
+
+                    overlayService.confirmDelete({
+                        title: `${translations[0]} ${propertyName}`,
+                        content: message,
+                        submitButtonLabelKey: 'actions_delete',
+                        submit: () => {
+                            const index = properties.findIndex(p => property.id ? p.id === property.id : p === property);
+                            properties.splice(index, 1);
+                            notifyChanged();
+
+                            overlayService.close();
+                        }
+                    });
+                });
+            };
+
+            scope.onChangePropertySortOrderValue = group => {
+                group.properties = $filter('orderBy')(group.properties, 'sortOrder');
             };
 
             function notifyChanged() {
@@ -653,7 +983,7 @@
                 };
 
                 // check if there already is an init property
-                angular.forEach(group.properties, function (property) {
+                Utilities.forEach(group.properties, property => {
                     if (property.propertyState === "init") {
                         addInitPropertyBool = false;
                     }
@@ -669,8 +999,8 @@
             function updateSameDataTypes(newProperty) {
 
                 // find each property
-                angular.forEach(scope.model.groups, function (group) {
-                    angular.forEach(group.properties, function (property) {
+                Utilities.forEach(scope.model.groups, group => {
+                    Utilities.forEach(group.properties, property => {
 
                         if (property.dataTypeId === newProperty.dataTypeId) {
 
@@ -691,8 +1021,8 @@
             function hasPropertyOfDataTypeId(dataTypeId) {
 
                 // look at each property
-                var result = _.filter(scope.model.groups, function (group) {
-                    return _.filter(group.properties, function (property) {
+                var result = _.filter(scope.model.groups, group => {
+                    return _.filter(group.properties, property => {
                         return (property.dataTypeId === dataTypeId);
                     });
                 });
@@ -700,22 +1030,21 @@
                 return (result.length > 0);
             }
 
-
-            eventBindings.push(scope.$watch('model', function (newValue, oldValue) {
+            eventBindings.push(scope.$watch('model', (newValue, oldValue) => {
                 if (newValue !== undefined && newValue.groups !== undefined) {
                     activate();
                 }
             }));
 
             // clean up
-            eventBindings.push(eventsService.on("editors.dataTypeSettings.saved", function (name, args) {
+            eventBindings.push(eventsService.on("editors.dataTypeSettings.saved", (name, args) => {
                 if (hasPropertyOfDataTypeId(args.dataType.id)) {
                     scope.dataTypeHasChanged = true;
                 }
             }));
 
             // clean up
-            eventBindings.push(scope.$on('$destroy', function () {
+            eventBindings.push(scope.$on('$destroy', () => {
                 for (var e in eventBindings) {
                     eventBindings[e]();
                 }

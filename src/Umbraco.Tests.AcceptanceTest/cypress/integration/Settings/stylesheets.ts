@@ -18,7 +18,9 @@ context('Stylesheets', () => {
 
     cy.umbracoContextMenuAction("action-create").click();
     cy.get('.menu-label').first().click(); // TODO: Fucked we cant use something like cy.umbracoContextMenuAction("action-mediaType").click();
-
+    //We have to wait here till everything is loaded, or worker will throw error
+    cy.intercept('/umbraco/lib/ace-builds/src-min-noconflict/worker-css.js').as('aceWorker');
+    cy.wait('@aceWorker');
     //Type name
     cy.umbracoEditorHeaderName(name);
 

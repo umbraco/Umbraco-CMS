@@ -605,7 +605,7 @@ context('Content', () => {
         cy.umbracoEditorHeaderName('ContentPickerContent');
         cy.get('.umb-node-preview-add').click();
         // Should really try and find a better way to do this, but umbracoTreeItem tries to click the content pane in the background
-        cy.get('[ng-if="vm.treeReady"] > .umb-tree > [ng-if="!tree.root.containsGroups"] > .umb-animated > .umb-tree-item__inner').click();
+        cy.get('[ng-if="vm.treeReady"] > .umb-tree .umb-tree-item__inner').click();
         // We have to wait for the picked content to show up or it wont be added.
         cy.get('.umb-node-preview__description').should('be.visible');
         //save and publish
@@ -766,7 +766,8 @@ context('Content', () => {
         // Click macro
         cy.get(':nth-child(4) > .umb-card-grid-item > :nth-child(1)').click();
         // Select the macro
-        cy.get('.umb-card-grid-item').contains(macroName).click();
+        cy.get(`.umb-card-grid-item[title='${macroName}']`).click('bottom');
+
 
         // Save and publish
         cy.umbracoButtonByLabelKey('buttons_saveAndPublish').click();

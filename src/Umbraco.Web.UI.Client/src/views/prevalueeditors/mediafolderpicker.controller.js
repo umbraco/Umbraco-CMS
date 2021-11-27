@@ -4,7 +4,7 @@ function mediaFolderPickerController($scope, editorService, entityResource) {
     $scope.folderName = "";
     
     
-    function retriveFolderData() {
+    function retrieveFolderData() {
         
         var id = $scope.model.value;
         
@@ -21,7 +21,7 @@ function mediaFolderPickerController($scope, editorService, entityResource) {
     }
     
     
-    retriveFolderData();
+    retrieveFolderData();
     
     
     $scope.add = function() {
@@ -35,7 +35,7 @@ function mediaFolderPickerController($scope, editorService, entityResource) {
                 
                 $scope.model.value = model.selection[0].udi;
                 
-                retriveFolderData();
+                retrieveFolderData();
                 
                 editorService.close();
             },
@@ -48,7 +48,7 @@ function mediaFolderPickerController($scope, editorService, entityResource) {
 
     $scope.remove = function () {
         $scope.model.value = null;
-        retriveFolderData();
+        retrieveFolderData();
     };
 
 }

@@ -207,10 +207,10 @@ function dependencies() {
         {
             "name": "nouislider",
             "src":  [
-                "./node_modules/nouislider/distribute/nouislider.min.js",
-                "./node_modules/nouislider/distribute/nouislider.min.css"
+                "./node_modules/nouislider/dist/nouislider.min.js",
+                "./node_modules/nouislider/dist/nouislider.min.css"
             ],
-            "base": "./node_modules/nouislider/distribute"
+            "base": "./node_modules/nouislider/dist"
         },
         {
             "name": "signalr",

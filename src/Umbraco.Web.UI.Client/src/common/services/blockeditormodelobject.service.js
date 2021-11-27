@@ -87,16 +87,17 @@
 
             for (var t = 0; t < fromVariant.tabs.length; t++) {
                 var fromTab = fromVariant.tabs[t];
-                var toTab = toVariant.tabs[t];
+                var toTab = toVariant.tabs.find(tab => tab.alias === fromTab.alias);
 
-                for (var p = 0; p < fromTab.properties.length; p++) {
-                    var fromProp = fromTab.properties[p];
-                    var toProp = toTab.properties[p];
-                    toProp.value = fromProp.value;
+                if (fromTab && fromTab.properties && fromTab.properties.length > 0 && toTab && toTab.properties && toTab.properties.length > 0) {
+                    for (var p = 0; p < fromTab.properties.length; p++) {
+                        var fromProp = fromTab.properties[p];
+                        var toProp = toTab.properties[p];
+                        toProp.value = fromProp.value;
+                    }
                 }
             }
         }
-
 
         /**
          * Generate label for Block, uses either the labelInterpolator or falls back to the contentTypeName.
@@ -104,12 +105,14 @@
          */
         function getBlockLabel(blockObject) {
             if (blockObject.labelInterpolator !== undefined) {
-                var labelVars = Object.assign({"$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
-                return blockObject.labelInterpolator(labelVars);
+                var labelVars = Object.assign({"$contentTypeName": blockObject.content.contentTypeName, "$settings": blockObject.settingsData || {}, "$layout": blockObject.layout || {}, "$index": (blockObject.index || 0)+1 }, blockObject.data);
+                var label = blockObject.labelInterpolator(labelVars);
+                if (label) {
+                    return label;
+                }
             }
             return blockObject.content.contentTypeName;
         }
-
 
         /**
          * Used to add watchers on all properties in a content or settings model
@@ -419,18 +422,18 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                scaffoldKeys.forEach(contentTypeKey => {
-                    tasks.push(contentResource.getScaffoldByKey(-20, contentTypeKey).then(scaffold => {
+                tasks.push(contentResource.getScaffoldByKeys(-20, scaffoldKeys).then(scaffolds => {
+                    Object.values(scaffolds).forEach(scaffold => {
                         // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
                         if (self.scaffolds) {
                             self.scaffolds.push(formatScaffoldData(scaffold));
                         }
-                    }).catch(
-                        () => {
-                            // Do nothing if we get an error.
-                        }
-                    ));
-                });
+                    });
+                }).catch(
+                    () => {
+                        // Do nothing if we get an error.
+                    }
+                ));
 
                 return $q.all(tasks);
             },
@@ -439,7 +442,7 @@
              * @ngdoc method
              * @name getAvailableAliasesForBlockContent
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Retrive a list of aliases that are available for content of blocks in this property editor, does not contain aliases of block settings.
+             * @description Retrieve a list of aliases that are available for content of blocks in this property editor, does not contain aliases of block settings.
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function () {
@@ -457,7 +460,7 @@
              * @ngdoc method
              * @name getAvailableBlocksForBlockPicker
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Retrive a list of available blocks, the list containing object with the confirugation model(blockConfigModel) and the element type model(elementTypeModel).
+             * @description Retrieve a list of available blocks, the list containing object with the confirugation model(blockConfigModel) and the element type model(elementTypeModel).
              * The purpose of this data is to provide it for the Block Picker.
              * @return {Array} array of objects representing available blocks, each object containing properties blockConfigModel and elementTypeModel.
              */
@@ -487,7 +490,7 @@
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromKey: function (contentTypeKey) {
-                return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey);
+                return this.scaffolds.find(o => o.contentTypeKey === contentTypeKey) || null;
             },
 
             /**
@@ -499,7 +502,7 @@
              * @returns {Object | null} Scaffold model for the that content type. Or null if the scaffolding model dosnt exist in this context.
              */
             getScaffoldFromAlias: function (contentTypeAlias) {
-                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias);
+                return this.scaffolds.find(o => o.contentTypeAlias === contentTypeAlias) || null;
             },
 
             /**
@@ -606,13 +609,23 @@
                             return null;
                         }
 
+                        // the Settings model has been changed to a new Element Type.
+                        // we need to update the settingsData with the new Content Type key
+                        if (settingsData.contentTypeKey !== settingsScaffold.contentTypeKey) {
+                            settingsData.contentTypeKey = settingsScaffold.contentTypeKey;
+                        }
+
                         blockObject.settingsData = settingsData;
 
                         // make basics from scaffold
-                        blockObject.settings = Utilities.copy(settingsScaffold);
-                        ensureUdiAndKey(blockObject.settings, settingsUdi);
+                        if (settingsScaffold !== null) {// We might not have settingsScaffold
+                            blockObject.settings = Utilities.copy(settingsScaffold);
+                            ensureUdiAndKey(blockObject.settings, settingsUdi);
 
-                        mapToElementModel(blockObject.settings, settingsData);
+                            mapToElementModel(blockObject.settings, settingsData);
+                        } else {
+                            blockObject.settings = null;
+                        }
 
                         // add settings content-app
                         appendSettingsContentApp(blockObject.content, this.__labels.settingsName);

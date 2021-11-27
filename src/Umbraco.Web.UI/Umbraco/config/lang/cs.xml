@@ -185,26 +185,6 @@
     <key alias="smallSort">Seřadit</key>
     <key alias="historyIncludingVariants">Historie (všechny jazyky)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Abyste změnili typ dokumentu pro zvolený obsah, nejprve jej vyberte ze seznamu typů platných pro tohle umístění.</key>
-    <key alias="changeDocTypeInstruction2">Pak potvrďte a/nebo pozměňte mapování vlastností z aktuálního typu na nový a dejte Uložit.</key>
-    <key alias="contentRepublished">Obsah byl znovu publikován.</key>
-    <key alias="currentProperty">Aktuální vlastnost</key>
-    <key alias="currentType">Aktuální typ</key>
-    <key alias="docTypeCannotBeChanged">Typ dokumentu nemůže být změněn, neboť neexistují alternativy platné pro toto umístění.</key>
-    <key alias="docTypeChanged">Typ dokumentu byl změněn</key>
-    <key alias="mapProperties">Mapování vlastností</key>
-    <key alias="mapToProperty">Mapování na vlastnost</key>
-    <key alias="newTemplate">Nová šablona</key>
-    <key alias="newType">Nový typ</key>
-    <key alias="none">nic</key>
-    <key alias="selectedContent">Obsah</key>
-    <key alias="selectNewDocType">Vybrat nový typ dokumentu</key>
-    <key alias="successMessage">Typ dokumentu pro zvolený obsah byl úspěšně změněný na [new type] a následující vlastnosti byly namapovány:</key>
-    <key alias="to">na</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Nelze dokončit mapování vlastností, neboť nejméně jedna z vlastností má definováno více než jedno mapování.</key>
-    <key alias="validDocTypesNote">Jsou zobrazeny pouze alternativní typy platné pro aktuální umístění.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Nepodařilo se vytvořit složku pod rodičem s ID %0%</key>
     <key alias="createFolderFailedByName">Nepodařilo se vytvořit složku pod rodičem s názvem %0%</key>
@@ -316,7 +296,7 @@
     <key alias="nodeIsInTrash">This item is in the Recycle Bin</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Vytvořit novou šablonu obsahu z '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Vytvořit novou šablonu obsahu z <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Prázdná</key>
     <key alias="selectBlueprint">Vybrat obsahovou šablonu</key>
     <key alias="createdBlueprintHeading">Šablona obsahu byla vytvořena</key>
@@ -357,7 +337,7 @@
     <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[Nejsou zde k dispozici žádné povolené typy dokumentů pro vytváření obsahu. Musíte je povolit v sekci <strong>Typy dokumentů</strong> v části <strong>Nastavení</strong> změnou možnosti <strong>Povolit jako root</strong> v části <strong>Oprávnění</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Nejsou dostupné žádné povolené typy medií. Tyto musíte povolit v sekci nastavení pod <strong>"typy medií"</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">Vybraná média ve stromu neumožňuje vytváření pod nimi žádná další média.</key>
-    <key alias="noMediaTypesEditPermissions">Upravit oprávnění pro tento typ média</key>    
+    <key alias="noMediaTypesEditPermissions">Upravit oprávnění pro tento typ média</key>
     <key alias="documentTypeWithoutTemplate">Typ dokumentu bez šablony</key>
     <key alias="newFolder">Nová složka</key>
     <key alias="newDataType">Nový datový typ</key>
@@ -2215,6 +2195,8 @@
   </area>
   <area alias="logViewer">
       <key alias="logLevels">Úrovně logování</key>
+      <key alias="selectAllLogLevelFilters">Vybrat vše</key>
+      <key alias="deselectAllLogLevelFilters">Odznačit vše</key>
       <key alias="savedSearches">Uložená vyhledávání</key>
       <key alias="totalItems">Celkem položek</key>
       <key alias="timestamp">Časové razítko</key>
@@ -2250,7 +2232,6 @@
     <key alias="tooltipForPropertyActionsMenu">Otevřít akce vlastností</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Čekejte</key>
     <key alias="refreshStatus">Stav obnovení</key>
     <key alias="memoryCache">Cache paměť</key>
     <key alias="memoryCacheDescription">
@@ -2346,7 +2327,7 @@
   <area alias="startupDashboard">
     <key alias="fallbackHeadline">Vítejte v přátelském CMS</key>
     <key alias="fallbackDescription">Děkujeme, že jste si vybrali Umbraco - myslíme si, že by to mohl být začátek něčeho krásného. I když se to může zpočátku zdát ohromující, udělali jsme hodně pro to, aby byla křivka učení co nejhladší a nejrychlejší.</key>
-  </area>  
+  </area>
   <area alias="formsDashboard">
     <key alias="formsHeadline">Umbraco formuláře</key>
     <key alias="formsDescription">Vytvářejte formuláře pomocí intuitivního rozhraní drag and drop. Od jednoduchých kontaktních formulářů, které odesílají e-maily, až po pokročilé dotazníky, které se integrují do systémů CRM. Vaši klienti to budou milovat!</key>

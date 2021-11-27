@@ -138,7 +138,7 @@
     <key alias="saveListView">Sauver la mise en page de la liste</key>
     <key alias="schedulePublish">Planifier</key>
     <key alias="saveAndPreview">Prévisualiser</key>
-    <key alias="showPage">Prévisualiser</key>    
+    <key alias="showPage">Prévisualiser</key>
     <key alias="showPageDisabled">La prévisualisation est désactivée car aucun modèle n'a été assigné.</key>
     <key alias="styleChoose">Choisir un style</key>
     <key alias="styleShow">Afficher les styles</key>
@@ -182,26 +182,6 @@
     <key alias="smallSendToPublishVariant">Envoyer pour publication</key>
     <key alias="smallSort">Ordonner</key>
     <key alias="historyIncludingVariants">Historique (toutes variantes)</key>
-  </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Pour changer le type de document du contenu séléctionné, faites d'abord un choix dans la liste des types valides à cet endroit.</key>
-    <key alias="changeDocTypeInstruction2">Puis confirmez et/ou modifiez la correspondance des propriétés du type actuel vers le nouveau, et cliquez sur Sauver.</key>
-    <key alias="contentRepublished">Le contenu a été republié.</key>
-    <key alias="currentProperty">Propriété actuelle</key>
-    <key alias="currentType">Type actuel</key>
-    <key alias="docTypeCannotBeChanged">Le type de document ne peut être changé car il n'y a pas d'alternative valide à cet endroit. Une alternative sera valide si elle est autorisée sous le parent du contenu sélectionné et si tous les éléments de contenu enfants existants peuvent être créés avec celle-ci.</key>
-    <key alias="docTypeChanged">Type de document modifié</key>
-    <key alias="mapProperties">Faire correspondre les propriétés</key>
-    <key alias="mapToProperty">Faire correspondre à la propriété</key>
-    <key alias="newTemplate">Nouveau modèle</key>
-    <key alias="newType">Nouveau type</key>
-    <key alias="none">aucun</key>
-    <key alias="selectedContent">Contenu</key>
-    <key alias="selectNewDocType">Choisir le nouveau Type de Document</key>
-    <key alias="successMessage">Le type de document du contenu séléctionné a bien été changé en [new type] et les correspondances de propriétés suivantes effectuées :</key>
-    <key alias="to">en</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Impossible de terminer la correspondance des propriétés car une ou plusieurs propriétés ont plus d'une correspondance définie.</key>
-    <key alias="validDocTypesNote">Seuls les types de documents valides à cet endroit sont affichés.</key>
   </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Echec de la création d'un dossier sous le parent avec l'ID %0%</key>
@@ -284,6 +264,7 @@
     <key alias="nestedContentNoContentTypes">Aucun type de contenu n'est configuré pour cette propriété.</key>
     <key alias="nestedContentAddElementType">Ajouter un type d'élément</key>
     <key alias="nestedContentSelectElementTypeModalTitle">Sélectionner un type d'élément</key>
+    <key alias="nestedContentNoGroups">Le type d'élément sélectionné ne contient aucun groupe supporté (les onglets/tabs ne sont pas supportés par cet éditeur, changez-les en groupes ou utilisez l'éditeur Block List).</key>
     <key alias="addTextBox">Ajouter un autre champ texte</key>
     <key alias="removeTextBox">Enlever ce champ texte</key>
     <key alias="contentRoot">Racine du contenu</key>
@@ -309,7 +290,7 @@
     <key alias="createFromClipboard">Copier du clipboard</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Créer un nouveau Modèle de Contenu à partir de '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Créer un nouveau Modèle de Contenu à partir de <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Vide</key>
     <key alias="selectBlueprint">Sélectionner un Modèle de Contenu</key>
     <key alias="createdBlueprintHeading">Modèle de Contenu créé</key>
@@ -322,6 +303,7 @@
     <key alias="orClickHereToUpload">ou cliquez ici pour choisir un fichier</key>
 	<key alias="dragFilesHereToUpload">Vous pouvez faire glisser des fichiers ici pour télécharger.</key>
     <key alias="disallowedFileType">Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé.</key>
+    <key alias="invalidFileName">Ce fichier ne peut pas être chargé, le nom du fichier n'est pas valide</key>
     <key alias="maxFileSize">La taille maximum de fichier est</key>
     <key alias="mediaRoot">Racine du média</key>
     <key alias="moveFailed">Echec du déplacement du média</key>
@@ -423,6 +405,7 @@
     <key alias="anchorInsert">Nom</key>
     <key alias="closeThisWindow">Fermer cette fenêtre</key>
     <key alias="confirmdelete">Êtes-vous certain(e) de vouloir supprimer</key>
+    <key alias="confirmdeleteNumberOfItems"><![CDATA[Êtes-vous certain(e) de vouloir supprimer <b>%0%</b> des <b>%1%</b> éléments]]></key>
     <key alias="confirmdisable">Êtes-vous certain(e) de vouloir désactiver</key>
     <key alias="confirmlogout">Êtes-vous certain(e)?</key>
     <key alias="confirmSure">Êtes-vous certain(e)?</key>
@@ -776,6 +759,9 @@
     <key alias="embed">Intégrer</key>
     <key alias="selected">sélectionné</key>
     <key alias="avatar">Avatar de</key>
+    <key alias="header">Entête</key>
+    <key alias="systemField">champ système</key>
+    <key alias="lastUpdated">Dernière mise à jour</key>
   </area>
   <area alias="colors">
     <key alias="blue">Bleu</key>
@@ -1431,6 +1417,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="mediaTypeSavedHeader">Type de média sauvegardé</key>
     <key alias="memberTypeSavedHeader">Type de membre sauvegardé</key>
     <key alias="memberGroupSavedHeader">Groupe de membres sauvegardé</key>
+    <key alias="memberGroupNameDuplicate">Un autre groupe de membres existe déjà avec le même nom</key>
     <key alias="templateErrorHeader">Modèle non sauvegardé</key>
     <key alias="templateErrorText">Assurez-vous de ne pas avoir 2 modèles avec le même alias.</key>
     <key alias="templateSavedHeader">Modèle sauvegardé</key>
@@ -2228,6 +2215,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="logViewer">
       <key alias="logLevels">Niveaux de Log</key>
+      <key alias="selectAllLogLevelFilters">Tout sélectionner</key>
+      <key alias="deselectAllLogLevelFilters">Tout déselectionner</key>
       <key alias="savedSearches">Recherches sauvegardées</key>
       <key alias="totalItems">Nombre total d'éléments</key>
       <key alias="timestamp">Date</key>
@@ -2263,7 +2252,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="tooltipForPropertyActionsMenu">Ouvrir les Property Actions</key>
   </area>
   <area alias="nuCache">
-    <key alias="wait">Attendez</key>
     <key alias="refreshStatus">Rafraîchir le Statut</key>
     <key alias="memoryCache">Cache Mémoire</key>
     <key alias="memoryCacheDescription">

@@ -60,7 +60,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             if (ids.Any())
             {
-                return Database.FetchByGroups<NodeDto, int>(ids, 2000, batch =>
+                return Database.FetchByGroups<NodeDto, int>(ids, Constants.Sql.MaxParameterCount, batch =>
                     GetBaseQuery(false)
                         .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
                         .WhereIn<NodeDto>(x => x.NodeId, batch))

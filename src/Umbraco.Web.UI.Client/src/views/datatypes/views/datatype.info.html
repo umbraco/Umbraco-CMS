@@ -24,7 +24,7 @@
                 <div ng-if="vm.references.documentTypes.length > 0" class="mb4">
 
                     <h5 class="mt0" style="margin-bottom: 20px;">
-                        <localize key="references_labelUsedByDocumentTypes"></localize>
+                        <localize key="references_labelUsedByDocumentTypes">Used in Document Types</localize>
                     </h5>
 
                     <div class="umb-table">
@@ -39,7 +39,7 @@
                         </div>
                         <div class="umb-table-body">
                             <div class="umb-table-row" ng-repeat="reference in vm.references.documentTypes">
-                                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                                <div class="umb-table-cell"><umb-icon icon="{{reference.icon}}" class="umb-table-body__icon"></umb-icon></div>
                                 <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                                 <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                                 <div class="umb-table-cell --noOverflow"><span>{{::reference.properties | umbCmsJoinArray:', ':'name'}}</span></div>
@@ -54,7 +54,7 @@
                 <div ng-if="vm.references.mediaTypes.length > 0" class="mb4">
 
                     <h5 class="mt0" style="margin-bottom: 20px;">
-                        <localize key="references_labelUsedByMediaTypes"></localize>
+                        <localize key="references_labelUsedByMediaTypes">Used in Media Types</localize>
                     </h5>
 
                     <div class="umb-table">
@@ -69,7 +69,7 @@
                         </div>
                         <div class="umb-table-body">
                             <div class="umb-table-row" ng-repeat="reference in vm.references.mediaTypes">
-                                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                                <div class="umb-table-cell"><umb-icon icon="{{reference.icon}}" class="umb-table-body__icon"></umb-icon></div>
                                 <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                                 <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                                 <div class="umb-table-cell --noOverflow"><span>{{::reference.properties | umbCmsJoinArray:', ':'name'}}</span></div>
@@ -85,7 +85,7 @@
                 <div ng-if="vm.references.memberTypes.length > 0" class="mb4">
 
                     <h5 class="mt0" style="margin-bottom: 20px;">
-                        <localize key="references_labelUsedByMemberTypes"></localize>
+                        <localize key="references_labelUsedByMemberTypes">Used in Member Types</localize>
                     </h5>
 
                     <div class="umb-table">
@@ -100,7 +100,7 @@
                         </div>
                         <div class="umb-table-body">
                             <div class="umb-table-row" ng-repeat="reference in vm.references.memberTypes">
-                                <div class="umb-table-cell"><i class="umb-table-body__icon {{reference.icon}}"></i></div>
+                                <div class="umb-table-cell"><umb-icon icon="{{reference.icon}}" class="umb-table-body__icon"></umb-icon></div>
                                 <div class="umb-table-cell umb-table__name"><span>{{::reference.name}}</span></div>
                                 <div class="umb-table-cell"><span title="{{::reference.alias}}">{{::reference.alias}}</span></div>
                                 <div class="umb-table-cell --noOverflow"><span>{{::reference.properties | umbCmsJoinArray:', ':'name'}}</span></div>

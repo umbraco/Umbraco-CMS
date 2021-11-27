@@ -1,13 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlServerCe;
 using System.Diagnostics;
-using System.Linq;
+using System.IO;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -16,6 +20,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Security;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Runtime
@@ -119,6 +124,9 @@ namespace Umbraco.Core.Runtime
 
             try
             {
+                // Setup event listener
+                UnattendedInstalled += CoreRuntime_UnattendedInstalled;
+
                 // throws if not full-trust
                 new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
 
@@ -162,8 +170,7 @@ namespace Umbraco.Core.Runtime
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
 
-                // determines if unattended install is enabled and performs it if required
-                DoUnattendedInstall(databaseFactory);
+
 
                 // register runtime-level services
                 // there should be none, really - this is here "just in case"
@@ -190,6 +197,13 @@ namespace Umbraco.Core.Runtime
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
 
+                // determines if unattended install is enabled and performs it if required
+                DoUnattendedInstall(databaseFactory);
+
+                // determine our runtime level (AFTER UNATTENDED INSTALL)
+                // TODO: Feels kinda weird to call this again
+                DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
+
                 // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
                 if (_state.Reason == RuntimeLevelReason.UpgradeMigrations && _state.Level == RuntimeLevel.Run)
                 {
@@ -203,8 +217,6 @@ namespace Umbraco.Core.Runtime
                 // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
                 _components.Initialize();
-
-
             }
             catch (Exception e)
             {
@@ -227,7 +239,13 @@ namespace Umbraco.Core.Runtime
                     {
                         _factory = Current.Factory = composition?.CreateFactory();
                     }
-                    catch { /* yea */ }
+                    catch
+                    {
+                        // In this case we are basically dead, we do not have a factory but we need
+                        // to report on the state so we need to manually set that, this is the only time
+                        // we ever do this.
+                        Current.RuntimeState = _state;
+                    }
                 }
 
                 Debugger.Break();
@@ -240,6 +258,93 @@ namespace Umbraco.Core.Runtime
             }
 
             return _factory;
+        }
+
+        private void CoreRuntime_UnattendedInstalled(IRuntime sender, UnattendedInstallEventArgs e)
+        {
+            var unattendedName = Environment.GetEnvironmentVariable("UnattendedUserName");
+            var unattendedEmail = Environment.GetEnvironmentVariable("UnattendedUserEmail");
+            var unattendedPassword = Environment.GetEnvironmentVariable("UnattendedUserPassword");
+
+            var fileExists = false;
+            var filePath = IOHelper.MapPath("~/App_Data/unattended.user.json");
+
+            // No values store in ENV vars - try fallback file of /app_data/unattended.user.json
+            if (unattendedName.IsNullOrWhiteSpace()
+                || unattendedEmail.IsNullOrWhiteSpace()
+                || unattendedPassword.IsNullOrWhiteSpace())
+            {
+
+                fileExists = File.Exists(filePath);
+                if (fileExists == false)
+                {
+                    return;
+                }
+
+                // Attempt to deserialize JSON
+                try
+                {
+                    var fileContents = File.ReadAllText(filePath);
+                    var credentials = JsonConvert.DeserializeObject<UnattendedUserConfig>(fileContents);
+
+                    unattendedName = credentials.Name;
+                    unattendedEmail = credentials.Email;
+                    unattendedPassword = credentials.Password;
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
+            }
+
+            // ENV Variables & JSON still empty
+            if (unattendedName.IsNullOrWhiteSpace()
+                || unattendedEmail.IsNullOrWhiteSpace()
+                || unattendedPassword.IsNullOrWhiteSpace())
+            {
+                return;
+            }
+
+
+            // Update user details
+            var currentProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            var admin = Current.Services.UserService.GetUserById(Constants.Security.SuperUserId);
+            if (admin == null)
+            {
+                throw new InvalidOperationException("Could not find the super user!");
+            }
+
+            var membershipUser = currentProvider.GetUser(Constants.Security.SuperUserId, true);
+            if (membershipUser == null)
+            {
+                throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
+            }
+
+            try
+            {
+                var success = membershipUser.ChangePassword("default", unattendedPassword.Trim());
+                if (success == false)
+                {
+                    throw new FormatException("Password must be at least " + currentProvider.MinRequiredPasswordLength + " characters long and contain at least " + currentProvider.MinRequiredNonAlphanumericCharacters + " symbols");
+                }
+            }
+            catch (Exception)
+            {
+                throw new FormatException("Password must be at least " + currentProvider.MinRequiredPasswordLength + " characters long and contain at least " + currentProvider.MinRequiredNonAlphanumericCharacters + " symbols");
+            }
+
+            admin.Email = unattendedEmail.Trim();
+            admin.Name = unattendedName.Trim();
+            admin.Username = unattendedEmail.Trim();
+
+            Current.Services.UserService.Save(admin);
+
+            // Delete JSON file if it existed to tidy
+            if (fileExists)
+            {
+                File.Delete(filePath);
+            }
         }
 
         private void DoUnattendedInstall(IUmbracoDatabaseFactory databaseFactory)
@@ -255,6 +360,19 @@ namespace Umbraco.Core.Runtime
 
             // no connection string set
             if (databaseFactory.Configured == false) return;
+
+            // create SQL CE database if not existing and database provider is SQL CE
+            if (databaseFactory.ProviderName == Constants.DbProviderNames.SqlCe)
+            {
+                var dataSource = new SqlCeConnectionStringBuilder(databaseFactory.ConnectionString).DataSource;
+                var dbFilePath = dataSource.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
+
+                if(File.Exists(dbFilePath) == false)
+                {
+                    var engine = new SqlCeEngine(databaseFactory.ConnectionString);
+                    engine.CreateDatabase();
+                }
+            }
 
             var tries = 5;
             var connect = false;
@@ -278,13 +396,18 @@ namespace Umbraco.Core.Runtime
 
                 // all conditions fulfilled, do the install
                 Logger.Info<CoreRuntime>("Starting unattended install.");
-                
+
                 try
                 {
                     database.BeginTransaction();
                     var creator = new DatabaseSchemaCreator(database, Logger);
                     creator.InitializeDatabaseSchema();
                     database.CompleteTransaction();
+
+                    // Emit an event that unattended install completed
+                    // Then this event can be listened for and create an unattended user
+                    UnattendedInstalled?.Invoke(this, new UnattendedInstallEventArgs());
+
                     Logger.Info<CoreRuntime>("Unattended install completed.");
                 }
                 catch (Exception ex)
@@ -397,6 +520,7 @@ namespace Umbraco.Core.Runtime
         public virtual void Terminate()
         {
             _components?.Terminate();
+            UnattendedInstalled -= CoreRuntime_UnattendedInstalled;
         }
 
         /// <summary>
@@ -404,7 +528,7 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         public virtual void Compose(Composition composition)
         {
-            // nothing
+            // Nothing
         }
 
         #region Getters
@@ -465,5 +589,23 @@ namespace Umbraco.Core.Runtime
         }
 
         #endregion
+
+        /// <summary>
+        /// Event to be used to notify when the Unattended Install has finished
+        /// </summary>
+        public static event TypedEventHandler<IRuntime, UnattendedInstallEventArgs> UnattendedInstalled;
+
+        [DataContract]
+        public class UnattendedUserConfig
+        {
+            [DataMember(Name = "name")]
+            public string Name { get; set; }
+
+            [DataMember(Name = "email")]
+            public string Email { get; set; }
+
+            [DataMember(Name = "password")]
+            public string Password { get; set; }
+        }
     }
 }

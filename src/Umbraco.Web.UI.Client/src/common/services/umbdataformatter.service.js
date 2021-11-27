@@ -37,7 +37,7 @@
 
         return {
 
-            formatChangePasswordModel: function(model) {
+            formatChangePasswordModel: function (model) {
                 if (!model) {
                     return null;
                 }
@@ -59,26 +59,23 @@
             },
 
             formatContentTypePostData: function (displayModel, action) {
-
-                //create the save model from the display model
+                // Create the save model from the display model
                 var saveModel = _.pick(displayModel,
                     'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
                     'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
-                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'allowSegmentVariant', 'isElement');
+                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'allowSegmentVariant', 'isElement','historyCleanup');
 
-                // TODO: Map these
                 saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
                 saveModel.defaultTemplate = displayModel.defaultTemplate ? displayModel.defaultTemplate.alias : null;
                 var realGroups = _.reject(displayModel.groups, function (g) {
-                    //do not include these tabs
+                    // Do not include groups with init state
                     return g.tabState === "init";
                 });
                 saveModel.groups = _.map(realGroups, function (g) {
-
-                    var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name');
+                    var saveGroup = _.pick(g, 'id', 'sortOrder', 'name', 'key', 'alias', 'type');
 
                     var realProperties = _.reject(g.properties, function (p) {
-                        //do not include these properties
+                        // Do not include properties with init state or inherited from a composition
                         return p.propertyState === "init" || p.inherited === true;
                     });
 
@@ -89,16 +86,21 @@
 
                     saveGroup.properties = saveProperties;
 
-                    //if this is an inherited group and there are not non-inherited properties on it, then don't send up the data
-                    if (saveGroup.inherited === true && saveProperties.length === 0) {
-                        return null;
+                    if (g.inherited === true) {
+                        if (saveProperties.length === 0) {
+                            // All properties are inherited from the compositions, no need to save this group
+                            return null;
+                        } else if (g.contentTypeId != saveModel.id) {
+                            // We have local properties, but the group id is not local, ensure a new id/key is generated on save
+                            saveGroup = _.omit(saveGroup, 'id', 'key');
+                        }
                     }
 
                     return saveGroup;
                 });
 
-                //we don't want any null groups
                 saveModel.groups = _.reject(saveModel.groups, function (g) {
+                    // Do not include empty/null groups
                     return !g;
                 });
 
@@ -127,17 +129,17 @@
             },
 
             /** formats the display model used to display the dictionary to the model used to save the dictionary */
-            formatDictionaryPostData : function(dictionary, nameIsDirty) {
+            formatDictionaryPostData: function (dictionary, nameIsDirty) {
                 var saveModel = {
                     parentId: dictionary.parentId,
                     id: dictionary.id,
                     name: dictionary.name,
                     nameIsDirty: nameIsDirty,
                     translations: [],
-                    key : dictionary.key
+                    key: dictionary.key
                 };
 
-                for(var i = 0; i < dictionary.translations.length; i++) {
+                for (var i = 0; i < dictionary.translations.length; i++) {
                     saveModel.translations.push({
                         isoCode: dictionary.translations[i].isoCode,
                         languageId: dictionary.translations[i].languageId,
@@ -267,51 +269,37 @@
 
             /** formats the display model used to display the member to the model used to save the member */
             formatMemberPostData: function (displayModel, action) {
-                //this is basically the same as for media but we need to explicitly add the username,email, password to the save model
+                //this is basically the same as for media but we need to explicitly add the username, email, password to the save model
 
                 var saveModel = this.formatMediaPostData(displayModel, action);
 
                 saveModel.key = displayModel.key;
 
-                var genericTab = _.find(displayModel.tabs, function (item) {
-                    return item.id === 0;
-                });
-
-                //map the member login, email, password and groups
-                var propLogin = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_login";
-                });
-                var propEmail = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_email";
-                });
-                var propPass = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_password";
-                });
-                var propGroups = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_membergroup";
-                });
-                saveModel.email = propEmail.value.trim();
-                saveModel.username = propLogin.value.trim();
-
-                saveModel.password = this.formatChangePasswordModel(propPass.value);
-
-                var selectedGroups = [];
-                for (var n in propGroups.value) {
-                    if (propGroups.value[n] === true) {
-                        selectedGroups.push(n);
+                // Map membership properties
+                _.each(displayModel.membershipProperties, prop => {
+                    switch (prop.alias) {
+                        case '_umb_login':
+                            saveModel.username = prop.value.trim();
+                            break;
+                        case '_umb_email':
+                            saveModel.email = prop.value.trim();
+                            break;
+                        case '_umb_password':
+                            saveModel.password = this.formatChangePasswordModel(prop.value);
+                            break;
+                        case '_umb_membergroup':
+                            saveModel.memberGroups = _.keys(_.pick(prop.value, value => value === true));
+                            break;
                     }
-                }
-                saveModel.memberGroups = selectedGroups;
+                });
 
-                //turn the dictionary into an array of pairs
+                // Map custom member provider properties
                 var memberProviderPropAliases = _.pairs(displayModel.fieldConfig);
-                _.each(displayModel.tabs, function (tab) {
-                    _.each(tab.properties, function (prop) {
-                        var foundAlias = _.find(memberProviderPropAliases, function (item) {
-                            return prop.alias === item[1];
-                        });
+                _.each(displayModel.tabs, tab => {
+                    _.each(tab.properties, prop => {
+                        var foundAlias = _.find(memberProviderPropAliases, item => prop.alias === item[1]);
                         if (foundAlias) {
-                            //we know the current property matches an alias, now we need to determine which membership provider property it was for
+                            // we know the current property matches an alias, now we need to determine which membership provider property it was for
                             // by looking at the key
                             switch (foundAlias[0]) {
                                 case "umbracoMemberLockedOut":
@@ -327,8 +315,6 @@
                         }
                     });
                 });
-
-
 
                 return saveModel;
             },
@@ -362,7 +348,7 @@
                     parentId: displayModel.parentId,
                     //set the action on the save model
                     action: action,
-                    variants: _.map(displayModel.variants, function(v) {
+                    variants: _.map(displayModel.variants, function (v) {
                         return {
                             name: v.name || "", //if its null/empty,we must pass up an empty string else we get json converter errors
                             properties: getContentProperties(v.tabs),
@@ -392,7 +378,7 @@
              * @param {} displayModel
              * @returns {}
              */
-            formatContentGetData: function(displayModel) {
+            formatContentGetData: function (displayModel) {
 
                 // We need to check for invariant properties among the variant variants,
                 // as the value of an invariant property is shared between different variants.
@@ -458,12 +444,12 @@
              * Formats the display model used to display the relation type to a model used to save the relation type.
              * @param {Object} relationType
              */
-            formatRelationTypePostData : function(relationType) {
+            formatRelationTypePostData: function (relationType) {
                 var saveModel = {
                     id: relationType.id,
                     name: relationType.name,
                     alias: relationType.alias,
-                    key : relationType.key,
+                    key: relationType.key,
                     isBidirectional: relationType.isBidirectional,
                     parentObjectType: relationType.parentObjectType,
                     childObjectType: relationType.childObjectType

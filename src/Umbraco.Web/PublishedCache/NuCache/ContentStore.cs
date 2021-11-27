@@ -717,7 +717,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     previousNode = null; // there is no previous sibling
                 }
 
-                _logger.Debug<ContentStore>($"Set {thisNode.Id} with parent {thisNode.ParentContentId}");
+                _logger.Debug<ContentStore>("Set {Id} with parent {ParentContentId}", thisNode.Id, thisNode.ParentContentId);
                 SetValueLocked(_contentNodes, thisNode.Id, thisNode);
 
                 // if we are initializing from the database source ensure the local db is updated

@@ -196,26 +196,6 @@
     <key alias="smallCustom">Brugerdefineret</key>
     <key alias="historyIncludingVariants">Historik (alle sprog)</key>
   </area>
-  <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
-    <key alias="changeDocTypeInstruction2">Kontroller derefter, at alle egenskaber bliver overført rigtigt til den nye dokumenttype, og klik derefter på Gem.</key>
-    <key alias="contentRepublished">Indholdet er blevet genudgivet.</key>
-    <key alias="currentProperty">Nuværende egenskab</key>
-    <key alias="currentType">Nuværende type</key>
-    <key alias="docTypeCannotBeChanged">Du kan ikke skifte dokumenttype, da der ikke er andre gyldige dokumenttyper på denne placering.</key>
-    <key alias="docTypeChanged">Dokumenttype skiftet</key>
-    <key alias="mapProperties">Overfør egenskaber</key>
-    <key alias="mapToProperty">Overfør til egenskab</key>
-    <key alias="newTemplate">Ny skabelon</key>
-    <key alias="newType">Ny type</key>
-    <key alias="none">ingen</key>
-    <key alias="selectedContent">Indhold</key>
-    <key alias="selectNewDocType">Vælg ny dokumenttype</key>
-    <key alias="successMessage">Dokumenttypen på detvalgte indhold blev skiftet til [new type], og følgende egenskaber blev overført:</key>
-    <key alias="to">til</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Overførsel af egenskaber kunne ikke fuldføres, da en eller flere egenskaber er indstillet til at blive overført mere end én gang.</key>
-    <key alias="validDocTypesNote">Kun andre dokumenttyper, der er gyldige på denne placering, vises.</key>
-  </area>
   <area alias="codefile">
     <key alias="createFolderFailedById">Oprettelse af mappen under parent med ID %0% fejlede</key>
     <key alias="createFolderFailedByName">Oprettelse af mappen under parent med navnet %0% fejlede</key>
@@ -317,6 +297,7 @@
     <key alias="languagesToSchedule">Hvilke sprog vil du gerne planlægge?</key>
     <key alias="languagesToUnpublish">Vælg sproget du vil afpublicere. Afpublicering af et obligatorisk sprog vil afpublicere alle sprog.</key>
     <key alias="publishedLanguages">Udgivne sprog</key>
+    <key alias="resetFocalPoint">Nulstil fokuspunkt</key>
     <key alias="unpublishedLanguages">Ikke-udgivne sprog</key>
     <key alias="unmodifiedLanguages">Uændrede sprog</key>
     <key alias="untouchedLanguagesForFirstTime">Disse sprog er ikke blevet oprettet</key>
@@ -337,7 +318,7 @@
     <key alias="nodeIsInTrash">Dette element er i papirkurven</key>
   </area>
   <area alias="blueprints">
-    <key alias="createBlueprintFrom">Opret en ny indholdsskabelon fra '%0%'</key>
+    <key alias="createBlueprintFrom"><![CDATA[Opret en ny indholdsskabelon fra <em>%0%</em>]]></key>
     <key alias="blankBlueprint">Blank</key>
     <key alias="selectBlueprint">Vælg en indholdsskabelon</key>
     <key alias="createdBlueprintHeading">Indholdsskabelon oprettet</key>
@@ -833,6 +814,8 @@
     <key alias="videos">Videoer</key>
     <key alias="installing">installere</key>
     <key alias="avatar">Avatar til</key>
+    <key alias="header">Overskrift</key>
+    <key alias="systemField">system felt</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blå</key>
@@ -1475,6 +1458,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="warning">Advarsel</key>
     <key alias="youAreDeleting">Du sletter en rækkekonfiguration</key>
     <key alias="deletingARow">Sletning af et rækkekonfigurations navn vil resultere i et tab af data for alle eksiterende indhold som bruger dens konfiguration.</key>
+    <key alias="deleteLayout">Du sletter et layoutet</key>
+    <key alias="deletingALayout">Når du redigerer et layout vil data gå tabt de steder, hvor denne konfiguration bruges.</key>
     <key alias="maxItems">Maksimalt emner</key>
     <key alias="maxItemsDescription">Efterlad blank eller sæt til 0 for ubegrænset</key>
   </area>
@@ -1547,6 +1532,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="propertyHasChanges">Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?</key>
     <key alias="displaySettingsHeadline">Visning</key>
     <key alias="displaySettingsLabelOnTop">Label hen over (fuld bredde)</key>
+    <key alias="removeChildNode">Du fjerner noden</key>
+    <key alias="removeChildNodeWarning">Fjernelse af noden, begrænser redaktørens muligheder for at oprette forskellige typer af underindhold.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Tilføj sprog</key>
@@ -1933,6 +1920,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="contextMenuDescription">Udfør handling %0% på %1% noden</key>
     <key alias="addImageCaption">Tilføj billede overskrift</key>
     <key alias="searchContentTree">Søg i indholdstræet</key>
+    <key alias="maxAmount">Maximum antal</key>
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>
@@ -1951,6 +1939,8 @@ Mange hilsner fra Umbraco robotten
   <area alias="logViewer">
     <key alias="deleteSavedSearch">Slet gemte søgning</key>
     <key alias="logLevels">Log type</key>
+    <key alias="selectAllLogLevelFilters">Vælg alle</key>
+    <key alias="deselectAllLogLevelFilters">Fravælg alle</key>
     <key alias="savedSearches">Gemte søgninger</key>
     <key alias="saveSearch">Gem søgning</key>
     <key alias="saveSearchDescription">Indtast et navn for din søgebetingelse</key>

@@ -75,8 +75,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             if (args.showNotifications === undefined) {
                 args.showNotifications = true;
             }
-			// needed for infinite editing to create new items
-			if (args.create === undefined) {
+            // needed for infinite editing to create new items
+            if (args.create === undefined) {
                 if ($routeParams.create) {
                     args.create = true;
                 }
@@ -178,6 +178,38 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 });
             }
 
+        },
+
+        registerGenericTab: function (groups) {
+            if (!groups) {
+                return;
+            }
+
+            const hasGenericTab = groups.find(group => group.isGenericTab);
+            if (hasGenericTab) {
+                return;
+            }
+
+            const isRootGroup = (group) => group.type === 0 && group.parentAlias === null;
+            const hasRootGroups = groups.filter(group => isRootGroup(group)).length > 0;
+            if (!hasRootGroups) {
+                return;
+            }
+
+            const genericTab = {
+                isGenericTab: true,
+                type: 1,
+                label: 'Generic',
+                key: String.CreateGuid(),
+                alias: null,
+                parentAlias: null,
+                properties: []
+            };
+
+            localizationService.localize("general_generic").then(function (value) {
+                genericTab.label = value;
+                groups.unshift(genericTab);
+            });
         },
 
         /** Returns the action button definitions based on what permissions the user has.
@@ -592,24 +624,29 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     var origProp = allOrigProps[k];
                     var alias = origProp.alias;
                     var newProp = getNewProp(alias, allNewProps);
-                    if (newProp && !_.isEqual(origProp.value, newProp.value)) {
+                    if (newProp) {
+                        // Always update readonly state
+                        origProp.readonly = newProp.readonly;
 
-                        //they have changed so set the origContent prop to the new one
-                        var origVal = origProp.value;
+                        // Check whether the value has changed and update accordingly
+                        if (!_.isEqual(origProp.value, newProp.value)) {
 
-                        origProp.value = newProp.value;
+                            //they have changed so set the origContent prop to the new one
+                            var origVal = origProp.value;
 
-                        //instead of having a property editor $watch their expression to check if it has
-                        // been updated, instead we'll check for the existence of a special method on their model
-                        // and just call it.
-                        if (Utilities.isFunction(origProp.onValueChanged)) {
-                            //send the newVal + oldVal
-                            origProp.onValueChanged(origProp.value, origVal);
+                            origProp.value = newProp.value;
+
+                            //instead of having a property editor $watch their expression to check if it has
+                            // been updated, instead we'll check for the existence of a special method on their model
+                            // and just call it.
+                            if (Utilities.isFunction(origProp.onValueChanged)) {
+                                //send the newVal + oldVal
+                                origProp.onValueChanged(origProp.value, origVal);
+                            }
+
+                            changed.push(origProp);
                         }
-
-                        changed.push(origProp);
                     }
-
                 }
             }
 
