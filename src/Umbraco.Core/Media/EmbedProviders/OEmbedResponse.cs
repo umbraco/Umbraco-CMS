@@ -7,7 +7,6 @@ namespace Umbraco.Cms.Core.Media.EmbedProviders
     /// Wrapper class for OEmbed response
     /// </summary>
     [DataContract]
-    // TODO(V10) : change base class to OEmbedProviderBase
     public class OEmbedResponse
     {
         [DataMember(Name ="type")]
