@@ -9,6 +9,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_18_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -201,6 +202,9 @@ namespace Umbraco.Core.Migrations.Upgrade
 			
             // to 8.10.0
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
+
+            // to 8.18.0
+            To<AddDefaultForNotificationsToggle>("{AD3D3B7F-8E74-45A4-85DB-7FFAD57F9243}");
 
             //FINAL
         }
