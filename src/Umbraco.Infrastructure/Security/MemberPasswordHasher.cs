@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Serialization;
@@ -22,18 +23,28 @@ namespace Umbraco.Cms.Core.Security
     public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
     {
         private readonly IOptions<LegacyMachineKeySettings> _legacyMachineKeySettings;
+        private readonly ILogger<MemberPasswordHasher> _logger;
 
         [Obsolete("Use ctor with all params")]
         public MemberPasswordHasher(LegacyPasswordSecurity legacyPasswordHasher, IJsonSerializer jsonSerializer)
-            : this(legacyPasswordHasher, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptions<LegacyMachineKeySettings>>())
+            : this(legacyPasswordHasher,
+                jsonSerializer,
+                StaticServiceProvider.Instance.GetRequiredService<IOptions<LegacyMachineKeySettings>>(),
+                StaticServiceProvider.Instance.GetRequiredService<ILogger<MemberPasswordHasher>>())
         {
         }
 
-        public MemberPasswordHasher(LegacyPasswordSecurity legacyPasswordHasher, IJsonSerializer jsonSerializer, IOptions<LegacyMachineKeySettings> legacyMachineKeySettings)
+        public MemberPasswordHasher(
+            LegacyPasswordSecurity legacyPasswordHasher,
+            IJsonSerializer jsonSerializer,
+            IOptions<LegacyMachineKeySettings> legacyMachineKeySettings,
+            ILogger<MemberPasswordHasher> logger)
             : base(legacyPasswordHasher, jsonSerializer)
         {
             _legacyMachineKeySettings = legacyMachineKeySettings;
+            _logger = logger;
         }
+
         /// <summary>
         /// Verifies a user's hashed password
         /// </summary>
@@ -85,7 +96,8 @@ namespace Umbraco.Cms.Core.Security
                     return base.VerifyHashedPassword(user, hashedPassword, providedPassword);
                 }
 
-                throw new InvalidOperationException("unable to determine member password hashing algorithm");
+                _logger.LogError("unable to determine member password hashing algorithm");
+                return PasswordVerificationResult.Failed;
             }
 
 
@@ -105,6 +117,7 @@ namespace Umbraco.Cms.Core.Security
                 return true;
             }
 
+            bool result;
             if (!string.IsNullOrEmpty(_legacyMachineKeySettings.Value.DecryptionKey))
             {
                 try
@@ -112,13 +125,14 @@ namespace Umbraco.Cms.Core.Security
                     var decryptedPassword = DecryptLegacyPassword(hashedPassword, _legacyMachineKeySettings.Value.Decryption,  _legacyMachineKeySettings.Value.DecryptionKey);
                     return decryptedPassword == providedPassword;
                 }
-                catch (InvalidOperationException ex)
+                catch (Exception ex)
                 {
-                    throw new InvalidOperationException(
-                        "Could not decrypt password even that a DecryptionKey is provided. This means the DecryptionKey is wrong.", ex);
+                    _logger.LogError(ex, "Could not decrypt password even that a DecryptionKey is provided. This means the DecryptionKey is wrong.");
+                    result = false;
                 }
             }
-            var result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName, providedPassword, hashedPassword);
+
+            result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName, providedPassword, hashedPassword);
             return result || LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName, providedPassword, hashedPassword);
         }
 

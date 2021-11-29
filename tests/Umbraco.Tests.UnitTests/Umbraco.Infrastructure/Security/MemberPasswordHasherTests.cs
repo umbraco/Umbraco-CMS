@@ -1,5 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -12,65 +14,35 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
     [TestFixture]
     public class MemberPasswordHasherTests
     {
-        private MemberPasswordHasher CreateSut() => new MemberPasswordHasher(new LegacyPasswordSecurity(), new JsonNetSerializer(), Options.Create<LegacyMachineKeySettings>(new LegacyMachineKeySettings()));
-
         [Test]
-        public void VerifyHashedPassword_GivenAnAspNetIdentity2PasswordHash_ThenExpectSuccessRehashNeeded()
+        [TestCase("Password123!", "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==", null,  ExpectedResult = PasswordVerificationResult.Success, Description = "AspNetCoreIdentityPasswordHash: Correct password")]
+        [TestCase("wrongPassword", "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "AspNetCoreIdentityPasswordHash: Wrong password")]
+        [TestCase("Password123!", "yDiU2YyuYZU4jz6F0fpErQ==BxNRHkXBVyJs9gwWF6ktWdfDwYf5bwm+rvV7tOcNNx8=", null,  ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "GivenALegacyPasswordHash: Correct password")]
+        [TestCase("wrongPassword", "yDiU2YyuYZU4jz6F0fpErQ==BxNRHkXBVyJs9gwWF6ktWdfDwYf5bwm+rvV7tOcNNx8=", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "GivenALegacyPasswordHash: Wrong password")]
+        [TestCase("Password123!", "AJszAsQqxOYbASKfL3JVUu6cjU18ouizXDfX4j7wLlir8SWj2yQaTepE9e5bIohIsQ==", null,  ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "GivenALegacyPasswordHash: Correct password")]
+        [TestCase("wrongPassword", "AJszAsQqxOYbASKfL3JVUu6cjU18ouizXDfX4j7wLlir8SWj2yQaTepE9e5bIohIsQ==", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "GivenALegacyPasswordHash: Wrong password")]
+        [TestCase("1234567890", "1234567890", null,  ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "ClearText: Correct password")]
+        [TestCase("wrongPassword", "1234567890", null, ExpectedResult = PasswordVerificationResult.Failed, Description = "ClearText: Wrong password")]
+        [TestCase("1234567890", "XyFRG4/xJ5JGQJYqqIFK70BjHdM=",  null, ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "Hashed: Correct password")]
+        [TestCase("wrongPassword", "XyFRG4/xJ5JGQJYqqIFK70BjHdM=", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "Hashed: Wrong password")]
+        [TestCase("1234567890", "K2JPOhoqNoysfnnD67QsWDSliHrjoSTRTvv9yiaKf30=", "1D43BFA074DF6DCEF6E44A7F5B5F56CDDD60BE198FBBB0222C96A5BD696F3CAA", ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "Encrypted: Correct password and correct decryptionKey")]
+        [TestCase("wrongPassword", "K2JPOhoqNoysfnnD67QsWDSliHrjoSTRTvv9yiaKf30=", "1D43BFA074DF6DCEF6E44A7F5B5F56CDDD60BE198FBBB0222C96A5BD696F3CAA", ExpectedResult = PasswordVerificationResult.Failed, Description = "Encrypted: Wrong password but correct decryptionKey")]
+        [TestCase("1234567890", "qiuwRr4K7brpTcIzLFfR3iGG9zj4/z4ewHCVZmYUDKM=", "B491B602E0CE1D52450A8089FD2013B340743A7EFCC12B039BD11977A083ACA1", ExpectedResult = PasswordVerificationResult.Failed, Description = "Encrypted: Correct password but wrong decryptionKey")]
+        [TestCase("1234567890", "qiuwRr4K7brpTcIzLFfR3iGG9zj4/z4ewHCVZmYUDKM=", "InvalidDecryptionKey", ExpectedResult = PasswordVerificationResult.Failed, Description = "Encrypted: Invalid decryptionKey")]
+        public PasswordVerificationResult VerifyHashedPassword(string password, string encryptedPassword, string decryptionKey)
         {
-            const string password = "Password123!";
-            const string hash = "AJszAsQqxOYbASKfL3JVUu6cjU18ouizXDfX4j7wLlir8SWj2yQaTepE9e5bIohIsQ==";
+            var member = new MemberIdentityUser() { PasswordConfig = null };
 
-            var sut = CreateSut();
-            var result = sut.VerifyHashedPassword(new MemberIdentityUser(), hash, password);
+            var sut = new MemberPasswordHasher(
+                new LegacyPasswordSecurity(),
+                new JsonNetSerializer(),
+                Options.Create<LegacyMachineKeySettings>(new LegacyMachineKeySettings()
+                {
+                    DecryptionKey = decryptionKey
+                }),
+                NullLoggerFactory.Instance.CreateLogger<MemberPasswordHasher>());
 
-            Assert.AreEqual(result, PasswordVerificationResult.SuccessRehashNeeded);
-        }
-
-        [Test]
-        public void VerifyHashedPassword_GivenAnAspNetCoreIdentityPasswordHash_ThenExpectSuccess()
-        {
-            const string password = "Password123!";
-            const string hash = "AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==";
-
-            var sut = CreateSut();
-            var result = sut.VerifyHashedPassword(new MemberIdentityUser(), hash, password);
-
-            Assert.AreEqual(result, PasswordVerificationResult.Success);
-        }
-
-        [Test]
-        public void VerifyHashedPassword_GivenALegacyPasswordHash_ThenExpectSuccessRehashNeeded()
-        {
-            const string password = "Password123!";
-            const string hash = "yDiU2YyuYZU4jz6F0fpErQ==BxNRHkXBVyJs9gwWF6ktWdfDwYf5bwm+rvV7tOcNNx8=";
-
-            var sut = CreateSut();
-            var result = sut.VerifyHashedPassword(new MemberIdentityUser(), hash, password);
-
-            Assert.AreEqual(result, PasswordVerificationResult.SuccessRehashNeeded);
-        }
-
-        [Test]
-        public void VerifyHashedPassword_GivenAnUnknownBase64Hash_ThenExpectInvalidOperationException()
-        {
-            var hashBytes = new byte[] {3, 2, 1};
-            var hash = Convert.ToBase64String(hashBytes);
-
-            var sut = CreateSut();
-            Assert.Throws<InvalidOperationException>(() => sut.VerifyHashedPassword(new MemberIdentityUser(), hash, "password"));
-        }
-
-        [TestCase("AJszAsQqxOYbASKfL3JVUu6cjU18ouizXDfX4j7wLlir8SWj2yQaTepE9e5bIohIsQ==")]
-        [TestCase("AQAAAAEAACcQAAAAEGF/tTVoL6ef3bQPZFYfbgKFu1CDQIAMgyY1N4EDt9jqdG/hsOX93X1U6LNvlIQ3mw==")]
-        [TestCase("yDiU2YyuYZU4jz6F0fpErQ==BxNRHkXBVyJs9gwWF6ktWdfDwYf5bwm+rvV7tOcNNx8=")]
-        public void VerifyHashedPassword_GivenAnInvalidPassword_ThenExpectFailure(string hash)
-        {
-            const string invalidPassword = "nope";
-
-            var sut = CreateSut();
-            var result = sut.VerifyHashedPassword(new MemberIdentityUser(), hash, invalidPassword);
-
-            Assert.AreEqual(result, PasswordVerificationResult.Failed);
+            return sut.VerifyHashedPassword(member, encryptedPassword, password);
         }
     }
 }
