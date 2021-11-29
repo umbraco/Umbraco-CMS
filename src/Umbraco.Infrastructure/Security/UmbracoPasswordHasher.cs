@@ -58,15 +58,6 @@ namespace Umbraco.Cms.Core.Security
                     if (result == false)
                     {
                         result = LegacyPasswordSecurity.VerifyLegacyHashedPassword(providedPassword, hashedPassword);
-                        if (result)
-                        {
-                            //We need to update the password algorithm on the user to match the truth before we rehash..
-                            //No need to persist it, as it will be overridden doing the rehash.
-                            user.PasswordConfig = _jsonSerializer.Serialize(new PersistedPasswordSettings()
-                            {
-                                HashAlgorithm = Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName
-                            });
-                        }
                     }
 
                     return result

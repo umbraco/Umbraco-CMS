@@ -82,6 +82,7 @@ namespace JsonSchema
                 public BasicAuthSettings BasicAuth { get; set; }
 
                 public PackageMigrationSettings PackageMigration { get; set; }
+                public LegacyMachineKeySettings LegacyMachineKey { get; set; }
             }
 
             /// <summary>
