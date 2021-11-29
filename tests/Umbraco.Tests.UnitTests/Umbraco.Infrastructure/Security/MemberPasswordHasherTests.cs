@@ -1,6 +1,8 @@
 using System;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -10,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
     [TestFixture]
     public class MemberPasswordHasherTests
     {
-        private MemberPasswordHasher CreateSut() => new MemberPasswordHasher(new LegacyPasswordSecurity(), new JsonNetSerializer());
+        private MemberPasswordHasher CreateSut() => new MemberPasswordHasher(new LegacyPasswordSecurity(), new JsonNetSerializer(), Options.Create<LegacyMachineKeySettings>(new LegacyMachineKeySettings()));
 
         [Test]
         public void VerifyHashedPassword_GivenAnAspNetIdentity2PasswordHash_ThenExpectSuccessRehashNeeded()

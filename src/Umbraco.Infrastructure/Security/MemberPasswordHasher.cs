@@ -118,15 +118,8 @@ namespace Umbraco.Cms.Core.Security
                         "Could not decrypt password even that a DecryptionKey is provided. This means the DecryptionKey is wrong.", ex);
                 }
             }
-
             var result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName, providedPassword, hashedPassword);
-
-            if (result)
-            {
-                return result;
-            }
-            return LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName, providedPassword, hashedPassword);
-
+            return result || LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName, providedPassword, hashedPassword);
         }
 
         private static string DecryptLegacyPassword(string encryptedPassword, string algorithmName, string decryptionKey)

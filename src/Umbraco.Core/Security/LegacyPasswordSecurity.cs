@@ -50,9 +50,18 @@ namespace Umbraco.Cms.Core.Security
             if (dbPassword.StartsWith(Constants.Security.EmptyPasswordPrefix))
                 return false;
 
-            var storedHashedPass = ParseStoredHashPassword(algorithm, dbPassword, out var salt);
-            var hashed = HashPassword(algorithm, password, salt);
-            return storedHashedPass == hashed;
+            try
+            {
+                var storedHashedPass = ParseStoredHashPassword(algorithm, dbPassword, out var salt);
+                var hashed = HashPassword(algorithm, password, salt);
+                return storedHashedPass == hashed;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                //This can happen if the length of the password is wrong and a salt cannot be extracted.
+                return false;
+            }
+
         }
 
         /// <summary>
