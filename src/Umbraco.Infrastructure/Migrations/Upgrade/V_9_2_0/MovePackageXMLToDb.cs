@@ -13,7 +13,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
 {
     public class MovePackageXMLToDb : MigrationBase
     {
-
         private readonly PackagesRepository _packagesRepository;
         private readonly PackageDefinitionXmlParser _xmlParser;
         /// <summary>

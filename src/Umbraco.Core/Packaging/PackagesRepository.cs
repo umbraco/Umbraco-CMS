@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Packaging
     /// <summary>
     /// Manages the storage of installed/created package definitions
     /// </summary>
-    [Obsolete("Packages has now been moved to the database instead of local files, please use CreatedPackageSchemaRepository instead")]
+    [Obsolete("Packages have now been moved to the database instead of local files, please use CreatedPackageSchemaRepository instead")]
     public class PackagesRepository : ICreatedPackagesRepository
     {
         private readonly IContentService _contentService;

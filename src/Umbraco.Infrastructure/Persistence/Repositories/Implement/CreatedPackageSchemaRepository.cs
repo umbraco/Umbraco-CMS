@@ -187,7 +187,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 throw new ArgumentException("the package definition does not have a GUID, it must be saved before being exported");
             }
 
-            // ensure it's valid
+            // Ensure it's valid
             ValidatePackage(definition);
 
             // Create a folder for building this package
