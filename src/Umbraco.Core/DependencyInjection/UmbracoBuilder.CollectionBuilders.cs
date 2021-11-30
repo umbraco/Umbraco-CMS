@@ -77,10 +77,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// </summary>
         /// <typeparam name="T">The type of the embed provider.</typeparam>
         /// <param name="builder">The builder.</param>
-        public static IUmbracoBuilder AddOEmbedProvider<T>(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddEmbedProvider<T>(this IUmbracoBuilder builder)
             where T : class, IEmbedProvider
         {
-            builder.OEmbedProviders().Append<T>();
+            builder.EmbedProviders().Append<T>();
             return builder;
         }
 
