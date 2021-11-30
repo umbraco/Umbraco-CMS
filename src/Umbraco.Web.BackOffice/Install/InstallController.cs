@@ -105,10 +105,6 @@ namespace Umbraco.Cms.Web.BackOffice.Install
         [IgnoreFromNotFoundSelectorPolicy]
         public ActionResult Redirect()
         {
-            if (!_runtime.EnableInstaller())
-            {
-                return NotFound();
-            }
             var uri = HttpContext.Request.GetEncodedUrl();
 
             // redirect to install
