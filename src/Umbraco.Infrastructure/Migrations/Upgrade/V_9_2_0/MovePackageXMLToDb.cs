@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
     {
         private readonly PackagesRepository _packagesRepository;
         private readonly PackageDefinitionXmlParser _xmlParser;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MovePackageXMLToDb"/> class.
         /// </summary>
@@ -43,26 +44,32 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
             foreach (PackageDefinition package in packages)
             {
                 // Load file from path
-                var xmlDoc = XDocument.Load(package.PackagePath);
-
-                if (xmlDoc.Document != null)
+                if (File.Exists(package.PackagePath))
                 {
-                    // Create dto from xmlDocument
-                    var dto = new CreatedPackageSchemaDto()
-                    {
-                        Name = package.Name,
-                        Value = _xmlParser.ToXml(package).ToString(),
-                        UpdateDate = DateTime.Now,
-                        PackageId = Guid.NewGuid()
-                    };
-                    createdPackageDtos.Add(dto);
-                }
+                    var xmlDoc = XDocument.Load(package.PackagePath);
 
-                File.Delete(package.PackagePath);
+                    if (xmlDoc.Document != null)
+                    {
+                        // Create dto from xmlDocument
+                        var dto = new CreatedPackageSchemaDto()
+                        {
+                            Name = package.Name,
+                            Value = _xmlParser.ToXml(package).ToString(),
+                            UpdateDate = DateTime.Now,
+                            PackageId = Guid.NewGuid()
+                        };
+                        createdPackageDtos.Add(dto);
+                    }
+
+                    File.Delete(package.PackagePath);
+                }
             }
 
-            // Insert dto into CreatedPackage table
-            Database.InsertBulk(createdPackageDtos);
+            if (createdPackageDtos.Any())
+            {
+                // Insert dto into CreatedPackage table
+                Database.InsertBulk(createdPackageDtos);
+            }
         }
 
         /// <inheritdoc/>
