@@ -774,6 +774,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 memberDto.PasswordConfig = DefaultPasswordConfigJson;
                 changedCols.Add("passwordConfig");
+            }else if (memberDto.PasswordConfig == Constants.Security.UnknownPasswordConfigJson)
+            {
+                changedCols.Add("passwordConfig");
             }
 
             // do NOT update the password if it has not changed or if it is null or empty

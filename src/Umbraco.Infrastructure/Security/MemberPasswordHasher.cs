@@ -60,14 +60,19 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
+            var isPasswordAlgorithmKnown = user.PasswordConfig.IsNullOrWhiteSpace() == false &&
+                                             user.PasswordConfig != Constants.Security.UnknownPasswordConfigJson;
             // if there's password config use the base implementation
-            if (!user.PasswordConfig.IsNullOrWhiteSpace())
+            if (isPasswordAlgorithmKnown)
             {
-                return base.VerifyHashedPassword(user, hashedPassword, providedPassword);
+                var result = base.VerifyHashedPassword(user, hashedPassword, providedPassword);
+                if (result != PasswordVerificationResult.Failed)
+                {
+                    return result;
+                }
             }
-
             // We need to check for clear text passwords from members as the first thing. This was possible in v8 :(
-            if (IsSuccessfullLegacyPassword(hashedPassword, providedPassword))
+            else if (IsSuccessfulLegacyPassword(hashedPassword, providedPassword))
             {
                 return PasswordVerificationResult.SuccessRehashNeeded;
             }
@@ -96,7 +101,15 @@ namespace Umbraco.Cms.Core.Security
                     return base.VerifyHashedPassword(user, hashedPassword, providedPassword);
                 }
 
-                _logger.LogError("unable to determine member password hashing algorithm");
+                if (isPasswordAlgorithmKnown)
+                {
+                    _logger.LogError("Unable to determine member password hashing algorithm");
+                }
+                else
+                {
+                    _logger.LogDebug("Unable to determine member password hashing algorithm, but this can happen when member enters a wrong password, before it has be rehashed");
+                }
+
                 return PasswordVerificationResult.Failed;
             }
 
@@ -110,14 +123,8 @@ namespace Umbraco.Cms.Core.Security
             return isValid ? PasswordVerificationResult.SuccessRehashNeeded : PasswordVerificationResult.Failed;
         }
 
-        private bool IsSuccessfullLegacyPassword(string hashedPassword, string providedPassword)
+        private bool IsSuccessfulLegacyPassword(string hashedPassword, string providedPassword)
         {
-            if (hashedPassword == providedPassword)
-            {
-                return true;
-            }
-
-            bool result;
             if (!string.IsNullOrEmpty(_legacyMachineKeySettings.Value.DecryptionKey))
             {
                 try
@@ -128,12 +135,19 @@ namespace Umbraco.Cms.Core.Security
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Could not decrypt password even that a DecryptionKey is provided. This means the DecryptionKey is wrong.");
-                    result = false;
+                    return false;
                 }
             }
+            else
+            {
+                if (hashedPassword == providedPassword)
+                {
+                    return true;
+                }
 
-            result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName, providedPassword, hashedPassword);
-            return result || LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName, providedPassword, hashedPassword);
+                var result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName, providedPassword, hashedPassword);
+                return result || LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName, providedPassword, hashedPassword);
+            }
         }
 
         private static string DecryptLegacyPassword(string encryptedPassword, string algorithmName, string decryptionKey)
