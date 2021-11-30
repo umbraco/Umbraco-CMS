@@ -36,9 +36,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
             var sut = new MemberPasswordHasher(
                 new LegacyPasswordSecurity(),
                 new JsonNetSerializer(),
-                Options.Create<LegacyMachineKeySettings>(new LegacyMachineKeySettings()
+                Options.Create<LegacyPasswordMigrationSettings>(new LegacyPasswordMigrationSettings()
                 {
-                    DecryptionKey = decryptionKey
+                    MachineKeyDecryptionKey = decryptionKey
                 }),
                 NullLoggerFactory.Instance.CreateLogger<MemberPasswordHasher>());
 

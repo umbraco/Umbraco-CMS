@@ -22,14 +22,14 @@ namespace Umbraco.Cms.Core.Security
     /// </remarks>
     public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
     {
-        private readonly IOptions<LegacyMachineKeySettings> _legacyMachineKeySettings;
+        private readonly IOptions<LegacyPasswordMigrationSettings> _legacyMachineKeySettings;
         private readonly ILogger<MemberPasswordHasher> _logger;
 
         [Obsolete("Use ctor with all params")]
         public MemberPasswordHasher(LegacyPasswordSecurity legacyPasswordHasher, IJsonSerializer jsonSerializer)
             : this(legacyPasswordHasher,
                 jsonSerializer,
-                StaticServiceProvider.Instance.GetRequiredService<IOptions<LegacyMachineKeySettings>>(),
+                StaticServiceProvider.Instance.GetRequiredService<IOptions<LegacyPasswordMigrationSettings>>(),
                 StaticServiceProvider.Instance.GetRequiredService<ILogger<MemberPasswordHasher>>())
         {
         }
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Security
         public MemberPasswordHasher(
             LegacyPasswordSecurity legacyPasswordHasher,
             IJsonSerializer jsonSerializer,
-            IOptions<LegacyMachineKeySettings> legacyMachineKeySettings,
+            IOptions<LegacyPasswordMigrationSettings> legacyMachineKeySettings,
             ILogger<MemberPasswordHasher> logger)
             : base(legacyPasswordHasher, jsonSerializer)
         {
@@ -125,11 +125,16 @@ namespace Umbraco.Cms.Core.Security
 
         private bool IsSuccessfulLegacyPassword(string hashedPassword, string providedPassword)
         {
-            if (!string.IsNullOrEmpty(_legacyMachineKeySettings.Value.DecryptionKey))
+            if (_legacyMachineKeySettings.Value.AllowClearTextPasswordRehash && hashedPassword == providedPassword)
+            {
+                return true;
+            }
+
+            if (!string.IsNullOrEmpty(_legacyMachineKeySettings.Value.MachineKeyDecryptionKey))
             {
                 try
                 {
-                    var decryptedPassword = DecryptLegacyPassword(hashedPassword, _legacyMachineKeySettings.Value.Decryption,  _legacyMachineKeySettings.Value.DecryptionKey);
+                    var decryptedPassword = DecryptLegacyPassword(hashedPassword, _legacyMachineKeySettings.Value.MachineKeyDecryption,  _legacyMachineKeySettings.Value.MachineKeyDecryptionKey);
                     return decryptedPassword == providedPassword;
                 }
                 catch (Exception ex)
@@ -138,16 +143,9 @@ namespace Umbraco.Cms.Core.Security
                     return false;
                 }
             }
-            else
-            {
-                if (hashedPassword == providedPassword)
-                {
-                    return true;
-                }
 
-                var result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName, providedPassword, hashedPassword);
-                return result || LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName, providedPassword, hashedPassword);
-            }
+            var result = LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName, providedPassword, hashedPassword);
+            return result || LegacyPasswordSecurity.VerifyPassword(Constants.Security.AspNetUmbraco4PasswordHashAlgorithmName, providedPassword, hashedPassword);
         }
 
         private static string DecryptLegacyPassword(string encryptedPassword, string algorithmName, string decryptionKey)
