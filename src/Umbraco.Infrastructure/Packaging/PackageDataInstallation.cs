@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
@@ -22,8 +21,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
-using Language = Umbraco.Cms.Core.Models.Language;
-using Stylesheet = Umbraco.Cms.Core.Models.Stylesheet;
 
 namespace Umbraco.Cms.Infrastructure.Packaging
 {
@@ -832,7 +829,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 return;
             }
 
-            withCleanup.HistoryCleanup ??= new HistoryCleanup();
+            withCleanup.HistoryCleanup ??= new Core.Models.ContentEditing.HistoryCleanup();
 
             if (bool.TryParse(element.Attribute("preventCleanup")?.Value, out var preventCleanup))
             {
