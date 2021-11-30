@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 
@@ -101,8 +102,13 @@ namespace Umbraco.Cms.Web.BackOffice.Install
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [IgnoreFromNotFoundSelectorPolicy]
         public ActionResult Redirect()
         {
+            if (!_runtime.EnableInstaller())
+            {
+                return NotFound();
+            }
             var uri = HttpContext.Request.GetEncodedUrl();
 
             // redirect to install
