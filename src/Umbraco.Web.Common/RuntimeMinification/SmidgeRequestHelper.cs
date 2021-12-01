@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         /// </summary>
         /// <param name="headers"></param>
         /// <returns></returns>
-        public new CompressionType GetClientCompression(IDictionary<string, StringValues> headers)
+        public CompressionType GetClientCompression(IDictionary<string, StringValues> headers)
         {
             var type = CompressionType.None;
 
