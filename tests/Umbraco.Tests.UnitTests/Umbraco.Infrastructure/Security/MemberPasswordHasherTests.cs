@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Security
         [TestCase("wrongPassword", "yDiU2YyuYZU4jz6F0fpErQ==BxNRHkXBVyJs9gwWF6ktWdfDwYf5bwm+rvV7tOcNNx8=", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "GivenALegacyPasswordHash: Wrong password")]
         [TestCase("Password123!", "AJszAsQqxOYbASKfL3JVUu6cjU18ouizXDfX4j7wLlir8SWj2yQaTepE9e5bIohIsQ==", null,  ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "GivenALegacyPasswordHash: Correct password")]
         [TestCase("wrongPassword", "AJszAsQqxOYbASKfL3JVUu6cjU18ouizXDfX4j7wLlir8SWj2yQaTepE9e5bIohIsQ==", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "GivenALegacyPasswordHash: Wrong password")]
-        [TestCase("1234567890", "1234567890", null,  ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "ClearText: Correct password")]
+        [TestCase("1234567890", "1234567890", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "ClearText: Correct password, but not supported")]
         [TestCase("wrongPassword", "1234567890", null, ExpectedResult = PasswordVerificationResult.Failed, Description = "ClearText: Wrong password")]
         [TestCase("1234567890", "XyFRG4/xJ5JGQJYqqIFK70BjHdM=",  null, ExpectedResult = PasswordVerificationResult.SuccessRehashNeeded, Description = "Hashed: Correct password")]
         [TestCase("wrongPassword", "XyFRG4/xJ5JGQJYqqIFK70BjHdM=", null,  ExpectedResult = PasswordVerificationResult.Failed, Description = "Hashed: Wrong password")]
