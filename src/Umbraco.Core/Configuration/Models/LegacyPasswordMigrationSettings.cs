@@ -11,9 +11,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     [UmbracoOptions(Constants.Configuration.ConfigLegacyPasswordMigration)]
     public class LegacyPasswordMigrationSettings
     {
-
         private const string StaticDecryptionKey = "";
-        private const bool StaticAllowClearTextPasswordRehash = false;
 
         /// <summary>
         /// Gets the decryption algorithm.
@@ -28,15 +26,5 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         [DefaultValue(StaticDecryptionKey)]
         public string MachineKeyDecryptionKey { get; set; } = StaticDecryptionKey;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether migration of clear text passwords are allowed.
-        /// </summary>
-        /// <remarks>
-        /// This is not recommended.
-        /// Instead you should hash all the passwords and persists the hash manually.
-        /// </remarks>
-        [DefaultValue(StaticAllowClearTextPasswordRehash)]
-        public bool AllowClearTextPasswordRehash { get; set; } = StaticAllowClearTextPasswordRehash;
     }
 }

@@ -113,8 +113,6 @@ namespace Umbraco.Cms.Core.Security
                 return PasswordVerificationResult.Failed;
             }
 
-
-
             var isValid = LegacyPasswordSecurity.VerifyPassword(
                 Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName,
                 providedPassword,
@@ -125,11 +123,6 @@ namespace Umbraco.Cms.Core.Security
 
         private bool IsSuccessfulLegacyPassword(string hashedPassword, string providedPassword)
         {
-            if (_legacyMachineKeySettings.Value.AllowClearTextPasswordRehash && hashedPassword == providedPassword)
-            {
-                return true;
-            }
-
             if (!string.IsNullOrEmpty(_legacyMachineKeySettings.Value.MachineKeyDecryptionKey))
             {
                 try
