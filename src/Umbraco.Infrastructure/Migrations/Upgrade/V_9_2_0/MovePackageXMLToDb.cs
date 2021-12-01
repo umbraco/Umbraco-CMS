@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
             if (createdPackageDtos.Any())
             {
                 // Insert dto into CreatedPackage table
-                Context.Database.InsertBulk(createdPackageDtos);
+                Database.InsertBulk(createdPackageDtos);
             }
         }
 

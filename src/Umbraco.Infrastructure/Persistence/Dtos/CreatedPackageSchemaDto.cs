@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(TableName)]
     [ExplicitColumns]
-    [PrimaryKey("Id")]
+    [PrimaryKey("id")]
     public class CreatedPackageSchemaDto
     {
         public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.CreatedPackageSchema;
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.NotNull)]
         public string Value { get; set; }
 
-        [Column("createDate")]
+        [Column("updateDate")]
         [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime UpdateDate { get; set; }
 
