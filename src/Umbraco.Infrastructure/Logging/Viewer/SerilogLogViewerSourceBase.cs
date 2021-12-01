@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Serilog.Events;
 using Umbraco.Cms.Core.Models;
@@ -10,11 +11,13 @@ namespace Umbraco.Cms.Core.Logging.Viewer
     public abstract class SerilogLogViewerSourceBase : ILogViewer
     {
         private readonly ILogViewerConfig _logViewerConfig;
+        private readonly ILogLevelLoader _logLevelLoader;
         private readonly global::Serilog.ILogger _serilogLog;
 
-        protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, global::Serilog.ILogger serilogLog)
+        protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, ILogLevelLoader logLevelLoader, global::Serilog.ILogger serilogLog)
         {
             _logViewerConfig = logViewerConfig;
+            _logLevelLoader = logLevelLoader;
             _serilogLog = serilogLog;
         }
 
@@ -44,13 +47,21 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         }
 
         /// <summary>
+        /// Get the Serilog minimum-level and UmbracoFile-level values from the config file.
+        /// </summary>
+        public ReadOnlyDictionary<string, LogEventLevel> GetLogLevels()
+        {
+            return _logLevelLoader.GetLogLevelsFromSinks();
+        }
+
+        /// <summary>
         /// Get the Serilog minimum-level value from the config file.
         /// </summary>
-        /// <returns></returns>
+        [Obsolete("Please use LogLevelLoader.GetGlobalMinLogLevel() instead")]
         public string GetLogLevel()
         {
             var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(_serilogLog.IsEnabled).DefaultIfEmpty(LogEventLevel.Information)?.Min() ?? null;
-            return logLevel?.ToString() ?? "";
+            return logLevel?.ToString() ?? string.Empty;
         }
 
         public LogLevelCounts GetLogLevelCounts(LogTimePeriod logTimePeriod)
@@ -129,7 +140,5 @@ namespace Umbraco.Cms.Core.Logging.Viewer
                 Items = logMessages
             };
         }
-
-
     }
 }
