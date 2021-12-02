@@ -168,7 +168,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         }
 
         /// <inheritdoc />
-        [Obsolete("Invalidation is handled automatically unless efforts are taken to disable sensible defaults.")]
+        [Obsolete("Invalidation is handled automatically. Scheduled for removal V11.")]
         public void Reset()
         {
             var version = DateTime.UtcNow.Ticks.ToString();
