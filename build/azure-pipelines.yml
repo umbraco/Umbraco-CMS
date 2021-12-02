@@ -1,4 +1,5 @@
 name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+# Doing a test
 variables:
     buildConfiguration: Release
     SA_PASSWORD: UmbracoIntegration123!
