@@ -73,6 +73,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<RichTextEditorSettings>()
                 .AddUmbracoOptions<BasicAuthSettings>()
                 .AddUmbracoOptions<RuntimeMinificationSettings>()
+                .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
                 .AddUmbracoOptions<PackageMigrationSettings>();
 
             return builder;
