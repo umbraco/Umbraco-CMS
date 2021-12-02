@@ -95,6 +95,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
                 packageDefinition.Id = packageSchema.Id;
                 packageDefinition.Name = packageSchema.Name;
+                packageDefinition.PackageId = packageSchema.PackageId;
                 packageDefinitions.Add(packageDefinition);
             }
 
@@ -113,7 +114,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 return null;
             }
-            return _xmlParser.ToPackageDefinition(XElement.Parse(schemaDtos.First().Value));
+
+            var packageSchema = schemaDtos.First();
+            var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(schemaDtos.First().Value));
+            packageDefinition.Id = packageSchema.Id;
+            packageDefinition.Name = packageSchema.Name;
+            packageDefinition.PackageId = packageSchema.PackageId;
+            return packageDefinition;
         }
 
         public void Delete(int id)
