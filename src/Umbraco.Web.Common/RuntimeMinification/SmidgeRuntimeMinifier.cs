@@ -168,9 +168,11 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         }
 
         /// <inheritdoc />
+        [Obsolete("Invalidation is handled automatically unless efforts are taken to disable sensible defaults.")]
         public void Reset()
         {
-            // noop, handled by UmbracoSmidgeConfigCacheBuster.
+            var version = DateTime.UtcNow.Ticks.ToString();
+            _configManipulator.SaveConfigValue(Cms.Core.Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
         }
     }
 }
