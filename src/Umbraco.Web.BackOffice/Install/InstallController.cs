@@ -72,9 +72,6 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             // TODO: Update for package migrations
             if (_runtime.Level == RuntimeLevel.Upgrade)
             {
-                // Update ClientDependency version and delete its temp directories to make sure we get fresh caches
-                _runtimeMinifier.Reset();
-
                 var authResult = await this.AuthenticateBackOfficeAsync();
 
                 if (!authResult.Succeeded)
