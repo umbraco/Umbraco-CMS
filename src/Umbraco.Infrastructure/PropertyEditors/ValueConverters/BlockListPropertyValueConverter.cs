@@ -4,6 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -17,12 +20,13 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly IProfilingLogger _proflog;
         private readonly BlockEditorConverter _blockConverter;
         private readonly BlockListEditorDataConverter _blockListEditorDataConverter;
-
-        public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
+        private readonly ModelsBuilderSettings _modelsBuilderSettings;
+        public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IOptions<ModelsBuilderSettings> modelsBuilderOptions)
         {
             _proflog = proflog;
             _blockConverter = blockConverter;
             _blockListEditorDataConverter = new BlockListEditorDataConverter();
+            _modelsBuilderSettings = modelsBuilderOptions?.Value;
         }
 
         /// <inheritdoc />
@@ -116,7 +120,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     }
 
                     // Get settings type from configuration
-                    var settingsType = blockConfig.SettingsElementTypeKey.HasValue
+                    var settingsType = blockConfig.SettingsElementTypeKey.HasValue && _modelsBuilderSettings.ModelsMode != ModelsMode.Nothing
                         ? _blockConverter.GetModelType(blockConfig.SettingsElementTypeKey.Value)
                         : typeof(IPublishedElement);
 
