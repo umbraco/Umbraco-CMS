@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         {
             var requestHandlerSettings = new RequestHandlerSettings()
             {
-                CharCollection = Enumerable.Empty<IChar>(),
+                UseEmpty = true,
                 ConvertUrlsToAscii = "false"
             };
 
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         {
             var requestHandlerSettings = new RequestHandlerSettings()
             {
-                CharCollection = Enumerable.Empty<IChar>(),
+                UseEmpty = true,
                 ConvertUrlsToAscii = "false"
             };
 
@@ -339,7 +339,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         {
             var requestHandlerSettings = new RequestHandlerSettings()
             {
-                CharCollection = Enumerable.Empty<IChar>(),
+                UseEmpty = true,
                 ConvertUrlsToAscii = "false"
             };
 

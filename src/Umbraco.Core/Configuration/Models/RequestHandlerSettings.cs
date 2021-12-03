@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 
@@ -86,11 +87,58 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
         //// return DefaultCharCollection;
 
+        private IEnumerable<IChar> _charCollection;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to use empty list of characters.
+        /// UrlReplaceCharacters is empty during initialization (first time only), it's a trick for unit testing.
+        /// </summary>
+        public bool UseEmpty { get; set; }
         /// <summary>
         /// Gets or sets a value for the default character collection for replacements.
         /// </summary>
         /// WB-TODO
-        public IEnumerable<IChar> CharCollection { get; set; } = DefaultCharCollection;
+        public IEnumerable<IChar> CharCollection
+        {
+            get
+            {
+                if (UseEmpty)
+                {
+                    return Enumerable.Empty<IChar>();
+                }
+
+                return SetCharCollection();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets list of characters that can be overwritten from configuration.
+        /// </summary>
+        public IEnumerable<CharItem> UrlReplaceCharacters { get; set; }
+
+        /// <summary>
+        /// Returns a combination of default characters and from configuration.
+
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<IChar> SetCharCollection()
+        {
+            if (UrlReplaceCharacters?.Any() != true)
+            {
+                return DefaultCharCollection;
+            }
+
+            var charCollection = new List<IChar>();
+            foreach (var defaultChar in DefaultCharCollection)
+            {
+                if (UrlReplaceCharacters.Any(x => x.Char == defaultChar.Char))
+                    continue;
+
+                charCollection.Add(defaultChar);
+            }
+
+            return charCollection;
+        }
 
         /// <summary>
         /// Defines a character replacement.
