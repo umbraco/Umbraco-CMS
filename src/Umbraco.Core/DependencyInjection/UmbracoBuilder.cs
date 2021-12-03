@@ -163,6 +163,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RequestCache);
             Services.AddUnique<IProfilingLogger, ProfilingLogger>();
             Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
+            Services.AddUnique<IEntryAssemblyMetadata, EntryAssemblyMetadata>();
 
             this.AddAllCoreCollectionBuilders();
             this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
