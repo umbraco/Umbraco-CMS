@@ -24,14 +24,12 @@ angular.module("umbraco.filters").filter('umbCmsBlockCard', function () {
 
       // Return the filtered array
       return array.filter((block, i) => {
-        console.log("block", block);
         const props = ['id', 'key', 'udi', 'alias', 'name', 'description'];
 
         let found = false;
 
         for (let i = 0; i < props.length; i++) {
-          console.log("prop", props[i]);
-          console.log("id", block.elementTypeModel["id"]);
+
           if (!block.elementTypeModel.hasOwnProperty(props[i])) {
             continue;
           }
