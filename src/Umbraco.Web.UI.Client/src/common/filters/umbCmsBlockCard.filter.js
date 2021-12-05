@@ -25,7 +25,7 @@ angular.module("umbraco.filters").filter('umbCmsBlockCard', function () {
       // Return the filtered array
       return array.filter((block, i) => {
         console.log("block", block);
-        const props = ['id', 'key', 'udi', 'alias', 'name'];
+        const props = ['id', 'key', 'udi', 'alias', 'name', 'description'];
 
         let found = false;
 
@@ -36,7 +36,9 @@ angular.module("umbraco.filters").filter('umbCmsBlockCard', function () {
             continue;
           }
 
-          if (block.elementTypeModel[props[i]].toString().toLowerCase().includes(term)) {
+          if (block.elementTypeModel[props[i]] != null &&
+             block.elementTypeModel[props[i]] !== '' &&
+             block.elementTypeModel[props[i]].toString().toLowerCase().includes(term)) {
              found = true;
           }
         }
