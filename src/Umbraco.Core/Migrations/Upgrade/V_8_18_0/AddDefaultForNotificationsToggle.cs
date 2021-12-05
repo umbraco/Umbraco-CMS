@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Persistence.Dtos;
-
-namespace Umbraco.Core.Migrations.Upgrade.V_8_18_0
+﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_18_0
 {
     public class AddDefaultForNotificationsToggle : MigrationBase
     {
@@ -15,7 +8,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_18_0
 
         public override void Migrate()
         {
-            Update.Table(Constants.DatabaseSchema.Tables.UserGroup).Set("userGroupDefaultPermissions = userGroupDefaultPermissions + 'N'").Where("id = '1' OR id = '2' OR id = '3'").Do();
+            var updateSQL = Sql($"UPDATE {Constants.DatabaseSchema.Tables.UserGroup} SET userGroupDefaultPermissions = userGroupDefaultPermissions + 'N' WHERE userGroupAlias IN ('admin', 'writer', 'editor')");
+            Execute.Sql(updateSQL.SQL).Do();
         }
     }
 }
