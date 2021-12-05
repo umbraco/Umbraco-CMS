@@ -211,8 +211,11 @@ namespace Umbraco.Core.Migrations.Upgrade
             // to 8.17.0
             To<AddPropertyTypeGroupColumns>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
 
-            //FINAL
+            // to 8.18.0
             To<AddContentVersionCleanupFeature>("{8BAF5E6C-DCB7-41AE-824F-4215AE4F1F98}");
+            To<AddDefaultForNotificationsToggle>("{AD3D3B7F-8E74-45A4-85DB-7FFAD57F9243}");
+
+            //FINAL
         }
     }
 }
