@@ -72,8 +72,6 @@
 
             </div>
 
-            <umb-notifications></umb-notifications>
-
         </div>
 
         <umb-tour ng-if="tour.show"
@@ -86,6 +84,8 @@
         <umb-search ng-if="search.show" on-close="closeSearch()"></umb-search>
 
     </div>
+
+    <umb-notifications></umb-notifications>
 
     <umb-backdrop ng-if="backdrop.show || infiniteMode"
                   backdrop-opacity="backdrop.opacity"
