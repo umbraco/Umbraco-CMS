@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
-using Umbraco.Cms.Core.Logging;
 
 namespace Umbraco.Cms.Core.Logging.Viewer
 {
@@ -19,8 +18,9 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             ILogger<SerilogJsonLogViewer> logger,
             ILogViewerConfig logViewerConfig,
             ILoggingConfiguration loggingConfiguration,
+            ILogLevelLoader logLevelLoader,
             global::Serilog.ILogger serilogLog)
-            : base(logViewerConfig, serilogLog)
+            : base(logViewerConfig, logLevelLoader, serilogLog)
         {
             _logger = logger;
             _logsPath = loggingConfiguration.LogDirectory;
