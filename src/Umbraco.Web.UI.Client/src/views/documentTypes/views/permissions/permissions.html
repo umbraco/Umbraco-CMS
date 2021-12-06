@@ -101,23 +101,19 @@
                 </div>
 
                 <div class="sub-view-column-right">
-                    <umb-box-content>
-                        <div class="umb-panel-group__details-status-text" ng-if="!model.historyCleanup.globalEnableCleanup">
-                            <p class="umb-panel-group__details-status-action"><localize key="contentTypeEditor_historyCleanupGloballyDisabled"></localize></p>
-                        </div>
+                    <p ng-if="!model.historyCleanup.globalEnableCleanup" class="umb-alert umb-alert--info"><localize key="contentTypeEditor_historyCleanupGloballyDisabled"></localize></p>
 
-                        <umb-control-group label="@contentTypeEditor_historyCleanupPreventCleanup">
-                            <umb-toggle checked="model.historyCleanup.preventCleanup" on-click="vm.toggleHistoryCleanupPreventCleanup()"></umb-toggle>
-                        </umb-control-group>
+                    <umb-control-group label="@contentTypeEditor_historyCleanupPreventCleanup">
+                        <umb-toggle checked="model.historyCleanup.preventCleanup" on-click="vm.toggleHistoryCleanupPreventCleanup()"></umb-toggle>
+                    </umb-control-group>
 
-                        <umb-control-group label="@contentTypeEditor_historyCleanupKeepAllVersionsNewerThanDays">
-                            <input ng-readonly="model.historyCleanup.preventCleanup" placeholder="{{model.historyCleanup.globalKeepAllVersionsNewerThanDays}}" type="number" min="0" max="2147483647" ng-model="model.historyCleanup.keepAllVersionsNewerThanDays" />
-                        </umb-control-group>
+                    <umb-control-group label="@contentTypeEditor_historyCleanupKeepAllVersionsNewerThanDays">
+                        <input ng-readonly="model.historyCleanup.preventCleanup" placeholder="{{model.historyCleanup.globalKeepAllVersionsNewerThanDays}}" type="number" min="0" max="2147483647" ng-model="model.historyCleanup.keepAllVersionsNewerThanDays" />
+                    </umb-control-group>
 
-                        <umb-control-group label="@contentTypeEditor_historyCleanupKeepLatestVersionPerDayForDays">
-                            <input ng-readonly="model.historyCleanup.preventCleanup" placeholder="{{model.historyCleanup.globalKeepLatestVersionPerDayForDays}}" type="number" min="0" max="2147483647" ng-model="model.historyCleanup.keepLatestVersionPerDayForDays" />
-                        </umb-control-group>
-                    </umb-box-content>
+                    <umb-control-group label="@contentTypeEditor_historyCleanupKeepLatestVersionPerDayForDays">
+                        <input ng-readonly="model.historyCleanup.preventCleanup" placeholder="{{model.historyCleanup.globalKeepLatestVersionPerDayForDays}}" type="number" min="0" max="2147483647" ng-model="model.historyCleanup.keepLatestVersionPerDayForDays" />
+                    </umb-control-group>
                 </div>
 
             </div>

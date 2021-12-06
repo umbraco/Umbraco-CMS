@@ -1833,11 +1833,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="usingEditor">using this editor will get updated with the new settings.</key>
     <key alias="historyCleanupHeading">History cleanup</key>
-    <key alias="historyCleanupDescription">Allow override the global settings for when history versions are removed.</key>
+    <key alias="historyCleanupDescription">Allow overriding the global history cleanup settings.</key>
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
-    <key alias="historyCleanupGloballyDisabled">NOTE! The content version cleanup feature is disabled globally. These settings will not take effect until it is enabled.</key>
+    <key alias="historyCleanupGloballyDisabled">History cleanup is disabled globally, these settings will not take effect until it is enabled.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

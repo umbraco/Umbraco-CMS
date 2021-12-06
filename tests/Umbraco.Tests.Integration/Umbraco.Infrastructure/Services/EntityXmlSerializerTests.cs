@@ -25,6 +25,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
@@ -224,6 +225,58 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual(media.Properties[Constants.Conventions.Media.Height].GetValue().ToString(), element.Elements(Constants.Conventions.Media.Height).Single().Value);
             Assert.AreEqual(media.Properties[Constants.Conventions.Media.Bytes].GetValue().ToString(), element.Elements(Constants.Conventions.Media.Bytes).Single().Value);
             Assert.AreEqual(media.Properties[Constants.Conventions.Media.Extension].GetValue().ToString(), element.Elements(Constants.Conventions.Media.Extension).Single().Value);
+        }
+        
+        [Test]
+        public void Serialize_ForContentTypeWithHistoryCleanupPolicy_OutputsSerializedHistoryCleanupPolicy()
+        {
+            // Arrange
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template); // else, FK violation on contentType!
+
+            var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+
+            contentType.HistoryCleanup = new HistoryCleanup
+            {
+                PreventCleanup = true,
+                KeepAllVersionsNewerThanDays = 1,
+                KeepLatestVersionPerDayForDays = 2
+            };
+
+            ContentTypeService.Save(contentType);
+
+            // Act
+            var element = Serializer.Serialize(contentType);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("preventCleanup")!.Value, Is.EqualTo("true"));
+                Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepAllVersionsNewerThanDays")!.Value, Is.EqualTo("1"));
+                Assert.That(element.Element("HistoryCleanupPolicy")!.Attribute("keepLatestVersionPerDayForDays")!.Value, Is.EqualTo("2"));
+            });
+        }
+
+        [Test]
+        public void Serialize_ForContentTypeWithNullHistoryCleanupPolicy_DoesNotOutputSerializedDefaultPolicy()
+        {
+            // Arrange
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template); // else, FK violation on contentType!
+
+            var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+
+            contentType.HistoryCleanup = null;
+
+            ContentTypeService.Save(contentType);
+
+            var element = Serializer.Serialize(contentType);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(element.Element("HistoryCleanupPolicy"), Is.Null);
+            });
         }
 
         private void CreateDictionaryData()

@@ -766,6 +766,77 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
             Assert.That(testContentType.ContentTypeCompositionExists("Seo"), Is.True);
         }
 
+        [Test]
+        public void ImportDocumentType_NewTypeWithOmittedHistoryCleanupPolicy_InsertsDefaultPolicy()
+        {
+            // Arrange
+            var withoutCleanupPolicy = XElement.Parse(ImportResources.SingleDocType);
+
+            // Act
+            var contentTypes = PackageDataInstallation
+                .ImportDocumentType(withoutCleanupPolicy, 0)
+                .OfType<IContentTypeWithHistoryCleanup>();
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(contentTypes.Single().HistoryCleanup);
+                Assert.IsFalse(contentTypes.Single().HistoryCleanup.PreventCleanup);
+            });
+        }
+
+        [Test]
+        public void ImportDocumentType_WithHistoryCleanupPolicyElement_ImportsWithCorrectValues()
+        {
+            // Arrange
+            var docTypeElement = XElement.Parse(ImportResources.SingleDocType_WithCleanupPolicy);
+
+            // Act
+            var contentTypes = PackageDataInstallation
+                .ImportDocumentType(docTypeElement, 0)
+                .OfType<IContentTypeWithHistoryCleanup>();
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(contentTypes.Single().HistoryCleanup);
+                Assert.IsTrue(contentTypes.Single().HistoryCleanup.PreventCleanup);
+                Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
+                Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+            });
+        }
+
+        [Test]
+        public void ImportDocumentType_ExistingTypeWithOmittedHistoryCleanupPolicy_DoesNotOverwriteDatabaseContent()
+        {
+            // Arrange
+            var withoutCleanupPolicy = XElement.Parse(ImportResources.SingleDocType);
+            var withCleanupPolicy = XElement.Parse(ImportResources.SingleDocType_WithCleanupPolicy);
+
+            // Act
+            var contentTypes = PackageDataInstallation
+                .ImportDocumentType(withCleanupPolicy, 0)
+                .OfType<IContentTypeWithHistoryCleanup>();
+
+            var contentTypesUpdated = PackageDataInstallation
+                .ImportDocumentType(withoutCleanupPolicy, 0)
+                .OfType<IContentTypeWithHistoryCleanup>();
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.NotNull(contentTypes.Single().HistoryCleanup);
+                Assert.IsTrue(contentTypes.Single().HistoryCleanup.PreventCleanup);
+                Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
+                Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+
+                Assert.NotNull(contentTypesUpdated.Single().HistoryCleanup);
+                Assert.IsTrue(contentTypesUpdated.Single().HistoryCleanup.PreventCleanup);
+                Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
+                Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
+            });
+        }
+
         private void AddLanguages()
         {
             var globalSettings = new GlobalSettings();
