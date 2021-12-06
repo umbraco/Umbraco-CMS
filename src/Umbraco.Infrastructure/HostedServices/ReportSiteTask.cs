@@ -1,6 +1,5 @@
 using System;
 using System.Net.Http;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -8,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Telemetry.Models;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
@@ -94,16 +94,5 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 _logger.LogDebug("There was a problem sending a request to the Umbraco telemetry service");
             }
         }
-        [DataContract]
-        private class TelemetryReportData
-        {
-            [DataMember(Name = "id")]
-            public Guid Id { get; set; }
-
-            [DataMember(Name = "version")]
-            public string Version { get; set; }
-        }
-
-
     }
 }
