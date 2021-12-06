@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Logging.Viewer
@@ -13,6 +15,14 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         private readonly ILogViewerConfig _logViewerConfig;
         private readonly ILogLevelLoader _logLevelLoader;
         private readonly global::Serilog.ILogger _serilogLog;
+
+        [Obsolete("Please use ctor with all params instead. Scheduled for removal in V11.")]
+        protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, global::Serilog.ILogger serilogLog)
+        {
+            _logViewerConfig = logViewerConfig;
+            _logLevelLoader = StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>();
+            _serilogLog = serilogLog;
+        }
 
         protected SerilogLogViewerSourceBase(ILogViewerConfig logViewerConfig, ILogLevelLoader logLevelLoader, global::Serilog.ILogger serilogLog)
         {
@@ -57,7 +67,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// <summary>
         /// Get the Serilog minimum-level value from the config file.
         /// </summary>
-        [Obsolete("Please use LogLevelLoader.GetGlobalMinLogLevel() instead")]
+        [Obsolete("Please use LogLevelLoader.GetGlobalMinLogLevel() instead. Scheduled for removal in V11.")]
         public string GetLogLevel()
         {
             var logLevel = Enum.GetValues(typeof(LogEventLevel)).Cast<LogEventLevel>().Where(_serilogLog.IsEnabled).DefaultIfEmpty(LogEventLevel.Information)?.Min() ?? null;

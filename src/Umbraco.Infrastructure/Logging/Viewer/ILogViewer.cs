@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         /// Gets the current Serilog minimum log level
         /// </summary>
         /// <returns></returns>
-        [Obsolete("Please use GetLogLevels() instead")]
+        [Obsolete("Please use GetLogLevels() instead. Scheduled for removal in V11.")]
         string GetLogLevel();
 
         /// <summary>

@@ -22,8 +22,8 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         {
             var configuredLogLevels = new Dictionary<string, LogEventLevel>
             {
-                { "Global min", GetGlobalMinLogLevel() },
-                { "Umbraco", _umbracoFileConfig.RestrictedToMinimumLevel }
+                { "Global", GetGlobalMinLogLevel() },
+                { "UmbracoFile", _umbracoFileConfig.RestrictedToMinimumLevel }
             };
 
             return new ReadOnlyDictionary<string, LogEventLevel>(configuredLogLevels);

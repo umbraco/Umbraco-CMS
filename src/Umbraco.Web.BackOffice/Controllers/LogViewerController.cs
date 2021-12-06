@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _logViewer.GetLogLevels();
         }
 
-        [Obsolete("Please use GetLogLevels() instead")]
+        [Obsolete("Please use GetLogLevels() instead. Scheduled for removal in V11.")]
         [HttpGet]
         public string GetLogLevel()
         {
