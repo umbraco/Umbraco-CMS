@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Telemetry
     /// <summary>
     /// Service which provides the required data for telemetry reporting
     /// </summary>
-    public class TelemetryService
+    public sealed class TelemetryService
     {
         private readonly GlobalSettings _globalSettings;
         private readonly IManifestParser _manifestParser;
