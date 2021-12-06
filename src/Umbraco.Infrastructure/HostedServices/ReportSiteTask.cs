@@ -64,9 +64,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 #if DEBUG
                     // Send data to DEBUG telemetry service
                     s_httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
-
-
-
 #endif
                 }
 

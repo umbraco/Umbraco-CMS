@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Telemetry.Models;
 
 namespace Umbraco.Cms.Core.Telemetry
 {
@@ -12,14 +13,14 @@ namespace Umbraco.Cms.Core.Telemetry
             _manifestParser = manifestParser;
         }
 
-        public IEnumerable<string> GetInstalledPackages()
+        public IEnumerable<PackageTelemetry> GetInstalledPackages()
         {
-            List<string> packages = new ();
+            List<PackageTelemetry> packages = new ();
 
-            var manifests = _manifestParser.GetManifests();
-            foreach (var manifest in manifests)
+            IEnumerable<PackageManifest> manifests = _manifestParser.GetManifests();
+            foreach (PackageManifest manifest in manifests)
             {
-                packages.Add(manifest.PackageName);
+                packages.Add(new PackageTelemetry { Name = manifest.PackageName, Version = manifest.Version });
             }
 
             return packages;

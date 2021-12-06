@@ -48,6 +48,13 @@ namespace Umbraco.Cms.Core.Manifest
         /// </remarks>
         [IgnoreDataMember]
         public string Source { get; set; }
+
+        /// <summary>
+        /// Gets or sets the version of the package
+        /// </summary>
+        [DataMember(Name = "version")]
+        public string Version { get; set; } = string.Empty;
+
         [DataMember(Name = "bundleOptions")]
         public BundleOptions BundleOptions { get; set; }
 
