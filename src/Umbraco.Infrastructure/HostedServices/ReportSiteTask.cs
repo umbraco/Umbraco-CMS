@@ -3,31 +3,25 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Telemetry.Models;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     public class ReportSiteTask : RecurringHostedServiceBase
     {
         private readonly ILogger<ReportSiteTask> _logger;
-        private readonly IUmbracoVersion _umbracoVersion;
-        private readonly IOptions<GlobalSettings> _globalSettings;
+        private readonly TelemetryService _telemetryService;
         private static HttpClient s_httpClient;
 
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
-            IUmbracoVersion umbracoVersion,
-            IOptions<GlobalSettings> globalSettings)
+            TelemetryService telemetryService)
             : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
         {
             _logger = logger;
-            _umbracoVersion = umbracoVersion;
-            _globalSettings = globalSettings;
+            _telemetryService = telemetryService;
             s_httpClient = new HttpClient();
         }
 
@@ -37,14 +31,8 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// </summary>
         public override async Task PerformExecuteAsync(object state)
         {
-            // Try & get a value stored in umbracoSettings.config on the backoffice XML element ID attribute
-            var backofficeIdentifierRaw = _globalSettings.Value.Id;
-
-            // Parse as a GUID & verify its a GUID and not some random string
-            // In case of users may have messed or decided to empty the file contents or put in something random
-            if (Guid.TryParse(backofficeIdentifierRaw, out var telemetrySiteIdentifier) == false)
+            if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData telemetryReportData) is false)
             {
-                // Some users may have decided to mess with the XML attribute and put in something else
                 _logger.LogWarning("No telemetry marker found");
 
                 return;
@@ -72,8 +60,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
                 using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
                 {
-                    var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild() };
-                    request.Content = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
+                    request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
 
                     // Make a HTTP Post to telemetry service
                     // https://telemetry.umbraco.com/installs/
