@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Telemetry
 {
     /// <summary>
-    /// Service which provides the required data for telemetry reporting
+    /// Service which gathers the data for telemetry reporting
     /// </summary>
     public sealed class TelemetryService
     {
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Telemetry
         }
 
         /// <summary>
-        /// Try and get the <see cref="TelemetryReportData"/> for this site.
+        /// Try and get the <see cref="TelemetryReportData"/>
         /// </summary>
         public bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData)
         {
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Core.Telemetry
         private bool TryGetTelemetryId(out Guid telemetryId)
         {
             // Parse telemetry string as a GUID & verify its a GUID and not some random string
-            // In case of users may have messed or decided to empty the file contents or put in something random
+            // since users may have messed with or decided to empty the app setting or put in something random
             if (Guid.TryParse(_globalSettings.Id, out var parsedTelemetryId) is false)
             {
                 telemetryId = Guid.Empty;

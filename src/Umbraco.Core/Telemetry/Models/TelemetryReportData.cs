@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// Gets or sets an enumerable containing information about packages.
         /// </summary>
         /// <remarks>
-        /// Contains only the name and version of the packages, unless no version is specified or the feature has been opted out.
+        /// Contains only the name and version of the packages, unless no version is specified or package telemetry has been restricted.
         /// </remarks>
         [DataMember(Name = "packages")]
         public IEnumerable<PackageTelemetry> Packages { get; set; }
