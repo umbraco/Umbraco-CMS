@@ -68,10 +68,15 @@ namespace Umbraco.Cms.Core.Telemetry
         private IEnumerable<PackageTelemetry> GetPackageTelemetry()
         {
             List<PackageTelemetry> packages = new ();
-
             IEnumerable<PackageManifest> manifests = _manifestParser.GetManifests();
+
             foreach (PackageManifest manifest in manifests)
             {
+                if (manifest.AllowPackageTelemetry is false)
+                {
+                    continue;
+                }
+
                 packages.Add(new PackageTelemetry { Name = manifest.PackageName, Version = manifest.Version });
             }
 
