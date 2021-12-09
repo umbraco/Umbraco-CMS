@@ -185,6 +185,10 @@ Use this directive to generate a thumbnail grid of media items.
                             item.extension = extensionProp.value;
                         }
 
+                        if(item.extension == 'tiff'){
+                          item.thumbnail += '&format=jpg';
+                        }
+
                     }
                 }
             }
