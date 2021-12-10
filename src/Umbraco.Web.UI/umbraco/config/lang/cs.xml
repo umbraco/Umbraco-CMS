@@ -19,7 +19,7 @@
     <key alias="emptyRecycleBin">Vyprázdnit koš</key>
     <key alias="enable">Aktivovat</key>
     <key alias="exportDocumentType">Exportovat typ dokumentu</key>
-    <key alias="importDocumentType">Importovat typ dokumentu</key>
+    <key alias="importdocumenttype">Importovat typ dokumentu</key>
     <key alias="importPackage">Importovat balíček</key>
     <key alias="liveEdit">Editovat na stránce</key>
     <key alias="logout">Odhlásit</key>
