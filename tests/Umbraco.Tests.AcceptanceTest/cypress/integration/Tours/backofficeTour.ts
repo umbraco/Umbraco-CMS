@@ -81,20 +81,24 @@ function runBackOfficeIntroTour(percentageComplete, buttonText, timeout) {
     cy.get('.umb-tour-step__footer').should('be.visible');
     cy.get('.umb-tour-step__counter').should('be.visible');
 
-    for (let i = 1; i < 7; i++) {
-        cy.get('.umb-tour-step__counter').contains(i + '/12');
+    for (let i = 1; i < 8; i++) {
+        
+        if(i == 4) {
+            continue
+        }
+        cy.get('.umb-tour-step__counter').contains(i + '/13');
         cy.get('.umb-tour-step__footer .umb-button').should('be.visible').click();
     }
     cy.umbracoGlobalUser().click()
-    cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('8/12');
+    cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('9/13');
     cy.get('.umb-tour-step__footer .umb-button').should('be.visible').click();
-    cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('9/12');
+    cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('10/13');
     cy.get('.umb-overlay-drawer__align-right .umb-button').should('be.visible').click();
-    cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('10/12');
+    cy.get('.umb-tour-step__counter', { timeout: timeout }).contains('11/13');
     cy.umbracoGlobalHelp().click()
 
-    for (let i = 11; i < 13; i++) {
-        cy.get('.umb-tour-step__counter', { timeout: timeout }).contains(i + '/12');
+    for (let i = 12; i <= 13; i++) {
+        cy.get('.umb-tour-step__counter', { timeout: timeout }).contains(i + '/13');
         cy.get('.umb-tour-step__footer .umb-button').should('be.visible').click();
     }
     cy.get('.umb-tour-step__footer .umb-button').should('be.visible').click();
