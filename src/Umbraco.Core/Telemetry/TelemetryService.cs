@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Telemetry
                     continue;
                 }
 
-                if (!_globalSettings.CurrentValue.RestrictPackageTelemetry || !string.IsNullOrEmpty(manifest.Version))
+                if (_globalSettings.CurrentValue.RestrictPackageTelemetry is false || string.IsNullOrEmpty(manifest.Version) is false)
                 {
                     packages.Add(new PackageTelemetry
                     {
