@@ -96,12 +96,17 @@
             <div class="sub-view-columns">
 
                 <div class="sub-view-column-left">
-                    <h5><localize key="contentTypeEditor_historyCleanupHeading"></localize></h5>
-                    <small><localize key="contentTypeEditor_historyCleanupDescription"></localize></small>
+                    <h5><localize key="contentTypeEditor_historyCleanupHeading">History cleanup</localize></h5>
+                    <small><localize key="contentTypeEditor_historyCleanupDescription">Allow override the global settings for when history versions are removed.</localize></small>
                 </div>
 
                 <div class="sub-view-column-right">
-                    <p ng-if="!model.historyCleanup.globalEnableCleanup" class="umb-alert umb-alert--info"><localize key="contentTypeEditor_historyCleanupGloballyDisabled"></localize></p>
+                  <umb-box-content>
+                    <div class="umb-panel-group__details-status-text umb-alert umb-alert--info mb3" ng-if="!model.historyCleanup.globalEnableCleanup">
+                      <p class="mb0">
+                        <localize key="contentTypeEditor_historyCleanupGloballyDisabled"><b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.</localize>
+                      </p>
+                    </div>
 
                     <umb-control-group label="@contentTypeEditor_historyCleanupPreventCleanup">
                         <umb-toggle checked="model.historyCleanup.preventCleanup" on-click="vm.toggleHistoryCleanupPreventCleanup()"></umb-toggle>

@@ -442,7 +442,7 @@
              * @ngdoc method
              * @name getAvailableAliasesForBlockContent
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Retrive a list of aliases that are available for content of blocks in this property editor, does not contain aliases of block settings.
+             * @description Retrieve a list of aliases that are available for content of blocks in this property editor, does not contain aliases of block settings.
              * @return {Array} array of strings representing alias.
              */
             getAvailableAliasesForBlockContent: function () {
@@ -460,7 +460,7 @@
              * @ngdoc method
              * @name getAvailableBlocksForBlockPicker
              * @methodOf umbraco.services.blockEditorModelObject
-             * @description Retrive a list of available blocks, the list containing object with the confirugation model(blockConfigModel) and the element type model(elementTypeModel).
+             * @description Retrieve a list of available blocks, the list containing object with the confirugation model(blockConfigModel) and the element type model(elementTypeModel).
              * The purpose of this data is to provide it for the Block Picker.
              * @return {Array} array of objects representing available blocks, each object containing properties blockConfigModel and elementTypeModel.
              */
