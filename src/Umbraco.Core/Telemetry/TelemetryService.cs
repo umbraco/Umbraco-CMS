@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Telemetry
     /// <inheritdoc/>
     internal class TelemetryService : ITelemetryService
     {
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptionsMonitor<GlobalSettings> _globalSettings;
         private readonly IManifestParser _manifestParser;
         private readonly IUmbracoVersion _umbracoVersion;
 
@@ -20,13 +20,13 @@ namespace Umbraco.Cms.Core.Telemetry
         /// Initializes a new instance of the <see cref="TelemetryService"/> class.
         /// </summary>
         public TelemetryService(
-            IOptions<GlobalSettings> globalSettings,
+            IOptionsMonitor<GlobalSettings> globalSettings,
             IManifestParser manifestParser,
             IUmbracoVersion umbracoVersion)
         {
-            _globalSettings = globalSettings.Value;
             _manifestParser = manifestParser;
             _umbracoVersion = umbracoVersion;
+            _globalSettings = globalSettings;
         }
 
         /// <inheritdoc/>
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Telemetry
         {
             // Parse telemetry string as a GUID & verify its a GUID and not some random string
             // since users may have messed with or decided to empty the app setting or put in something random
-            if (Guid.TryParse(_globalSettings.Id, out var parsedTelemetryId) is false)
+            if (Guid.TryParse(_globalSettings.CurrentValue.Id, out var parsedTelemetryId) is false)
             {
                 telemetryId = Guid.Empty;
                 return false;
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.Telemetry
                     continue;
                 }
 
-                if (!_globalSettings.RestrictPackageTelemetry || !string.IsNullOrEmpty(manifest.Version))
+                if (!_globalSettings.CurrentValue.RestrictPackageTelemetry || !string.IsNullOrEmpty(manifest.Version))
                 {
                     packages.Add(new PackageTelemetry
                     {

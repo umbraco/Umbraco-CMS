@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             return Mock.Of<IUmbracoVersion>(x => x.SemanticVersion == version);
         }
 
-        private IOptions<GlobalSettings> CreateGlobalSettings(string guidString = null, bool restrictPackageTelemetry = false)
+        private IOptionsMonitor<GlobalSettings> CreateGlobalSettings(string guidString = null, bool restrictPackageTelemetry = false)
         {
             if (guidString is null)
             {
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             }
 
             var globalSettings = new GlobalSettings { Id = guidString, RestrictPackageTelemetry = restrictPackageTelemetry };
-            return Mock.Of<IOptions<GlobalSettings>>(x => x.Value == globalSettings);
+            return Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
         }
     }
 }
