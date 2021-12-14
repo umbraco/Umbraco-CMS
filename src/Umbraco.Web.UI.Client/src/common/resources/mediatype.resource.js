@@ -85,7 +85,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
          *        $scope.type = type;
          *    });
          * </pre>
-         * @param {Int} mediaId id of the media item to retrive allowed child types for
+         * @param {Int} mediaId id of the media item to retrieve allowed child types for
          * @returns {Promise} resourcePromise object.
          *
          */

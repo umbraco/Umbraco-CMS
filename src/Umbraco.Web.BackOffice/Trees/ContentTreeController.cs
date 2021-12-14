@@ -282,12 +282,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             if (_emailSender.CanSendRequiredEmail())
             {
-	            menu.Items.Add(new MenuItem("notify", LocalizedTextService)
-	            {
-	                Icon = "megaphone",
-	                SeparatorBefore = true,
-	                OpensDialog = true
-	            });
+                AddActionNode<ActionNotify>(item, menu, true, opensDialog: true);
             }
 
             if((item is DocumentEntitySlim documentEntity && documentEntity.IsContainer) == false)
