@@ -1201,8 +1201,10 @@ namespace Umbraco.Core.Services.Implement
             var memType = new MemberType(-1);
             var propGroup = new PropertyGroup(MemberType.SupportsPublishingConst)
             {
-                Name = "Membership",
-                Id = --identity
+                Alias = Constants.Conventions.Member.StandardPropertiesGroupAlias,
+                Name = Constants.Conventions.Member.StandardPropertiesGroupName,
+                Id = --identity,
+                Key = identity.ToGuid()
             };
             propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Ntext, Constants.Conventions.Member.Comments)
             {

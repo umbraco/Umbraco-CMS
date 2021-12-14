@@ -576,7 +576,7 @@
 
             vm.clipboardItems = [];
 
-            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.ELEMENT_TYPE,
@@ -596,7 +596,7 @@
                 blockPickerModel.clipboardItems.push(pasteEntry);
             });
 
-            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            var entriesForPaste = clipboardService.retrieveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {
                     type: clipboardService.TYPES.BLOCK,

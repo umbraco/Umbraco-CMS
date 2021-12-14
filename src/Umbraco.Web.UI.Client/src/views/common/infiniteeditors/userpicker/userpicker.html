@@ -23,13 +23,12 @@
                         model="vm.usersOptions.filter"
                         label-key="placeholders_filter"
                         text="Type to filter..."
-                        on-change="vm.searchUsers()"
                         css-class="w-100 mb-15"
                         auto-focus="true">
                     </umb-search-filter>
 
                     <div class="umb-user-picker-item-list">
-                        <button type="button" class="btn-reset umb-user-picker-list-item" ng-repeat="user in vm.users" ng-click="vm.selectUser(user)">
+                        <button type="button" class="btn-reset umb-user-picker-list-item" ng-repeat="user in vm.users | filter:vm.usersOptions.filter" ng-click="vm.selectUser(user)">
                             <div class="umb-user-picker-list-item__avatar">
                                 <umb-checkmark
                                     class="umb-user-picker-list-item__checkmark"

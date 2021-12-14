@@ -188,9 +188,9 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateUserGroupData()
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, new UserGroupDto { Id = 1, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7ï", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-medal" });
-            _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, new UserGroupDto { Id = 2, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.WriterGroupAlias, Name = "Writers", DefaultPermissions = "CAH:F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-edit" });
-            _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, new UserGroupDto { Id = 3, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.EditorGroupAlias, Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5Fï", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-tools" });
+            _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, new UserGroupDto { Id = 1, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7ïN", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-medal" });
+            _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, new UserGroupDto { Id = 2, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.WriterGroupAlias, Name = "Writers", DefaultPermissions = "CAH:FN", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-edit" });
+            _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, new UserGroupDto { Id = 3, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.EditorGroupAlias, Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5FïN", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-tools" });
             _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, new UserGroupDto { Id = 4, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.TranslatorGroupAlias, Name = "Translators", DefaultPermissions = "AF", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-globe" });
             _database.Insert(Constants.DatabaseSchema.Tables.UserGroup, "id", false, new UserGroupDto { Id = 5, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.SensitiveDataGroupAlias, Name = "Sensitive data", DefaultPermissions = "", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-lock" });
         }
@@ -230,7 +230,7 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 54, UniqueId = new Guid(Constants.PropertyTypeGroups.Article), ContentTypeNodeId = 1036, Text = "Article", Alias = "article", SortOrder = 1 });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 55, UniqueId = new Guid(Constants.PropertyTypeGroups.VectorGraphics), ContentTypeNodeId = 1037, Text = "Vector Graphics", Alias = "vectorGraphics", SortOrder = 1 });
             //membership property group
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 11, UniqueId = new Guid(Constants.PropertyTypeGroups.Membership), ContentTypeNodeId = 1044, Text = "Membership", Alias = "membership", SortOrder = 1 });
+            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 11, UniqueId = new Guid(Constants.PropertyTypeGroups.Membership), ContentTypeNodeId = 1044, Text = Constants.Conventions.Member.StandardPropertiesGroupName, Alias = Constants.Conventions.Member.StandardPropertiesGroupAlias, SortOrder = 1 });
         }
 
         private void CreatePropertyTypeData()

@@ -242,7 +242,8 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentTypeDesignContentAppFactory>()
                 .Append<ContentTypeListViewContentAppFactory>()
                 .Append<ContentTypePermissionsContentAppFactory>()
-                .Append<ContentTypeTemplatesContentAppFactory>();
+                .Append<ContentTypeTemplatesContentAppFactory>()
+                .Append<MemberEditorContentAppFactory>();
 
             // register back office sections in the order we want them rendered
             composition.Sections()
