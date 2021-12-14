@@ -43,26 +43,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
             var createdPackageDtos = new List<CreatedPackageSchemaDto>();
             foreach (PackageDefinition package in packages)
             {
-                // Load file from path
-                if (File.Exists(package.PackagePath))
+                // Create dto from xmlDocument
+                var dto = new CreatedPackageSchemaDto()
                 {
-                    var xmlDoc = XDocument.Load(package.PackagePath);
+                    Name = package.Name,
+                    Value = _xmlParser.ToXml(package).ToString(),
+                    UpdateDate = DateTime.Now,
+                    PackageId = Guid.NewGuid()
+                };
+                createdPackageDtos.Add(dto);
 
-                    if (xmlDoc.Document != null)
-                    {
-                        // Create dto from xmlDocument
-                        var dto = new CreatedPackageSchemaDto()
-                        {
-                            Name = package.Name,
-                            Value = _xmlParser.ToXml(package).ToString(),
-                            UpdateDate = DateTime.Now,
-                            PackageId = Guid.NewGuid()
-                        };
-                        createdPackageDtos.Add(dto);
-                    }
-
-                    File.Delete(package.PackagePath);
-                }
+                File.Delete(package.PackagePath);
             }
 
             if (createdPackageDtos.Any())
