@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Telemetry.Models
     public class TelemetryReportData
     {
         /// <summary>
-        /// Gets or sets a random GUID to prevent an instance for posting multiple times pr. day.
+        /// Gets or sets a random GUID to prevent an instance posting multiple times pr. day.
         /// </summary>
         [DataMember(Name = "id")]
         public Guid Id { get; set; }
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// Gets or sets an enumerable containing information about packages.
         /// </summary>
         /// <remarks>
-        /// Contains only the name and version of the packages, unless no version is specified or package telemetry has been restricted.
+        /// Contains only the name and version of the packages, unless no version is specified.
         /// </remarks>
         [DataMember(Name = "packages")]
         public IEnumerable<PackageTelemetry> Packages { get; set; }
