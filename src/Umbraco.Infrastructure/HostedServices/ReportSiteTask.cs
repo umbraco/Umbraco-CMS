@@ -40,7 +40,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
             try
             {
-
                 if (s_httpClient.BaseAddress is null)
                 {
                     // Send data to LIVE telemetry

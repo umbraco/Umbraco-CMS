@@ -73,8 +73,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             Assert.IsTrue(success);
             Assert.Multiple(() =>
             {
-                Assert.IsFalse(telemetry.RestrictPackageTelemetry);
-
                 Assert.AreEqual(2, telemetry.Packages.Count());
                 var versionPackage = telemetry.Packages.FirstOrDefault(x => x.Name == versionPackageName);
                 Assert.AreEqual(versionPackageName, versionPackage.Name);
@@ -109,33 +107,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             });
         }
 
-        [Test]
-        public void RespectsRestrictPackageTelemetry()
-        {
-            var globalSettings = CreateGlobalSettings(restrictPackageTelemetry: true);
-            var version = CreateUmbracoVersion(9, 1, 1);
-            PackageManifest[] manifests =
-            {
-                new () { PackageName = "Package1", Version = "1.0.1" },
-                new () { PackageName = "Package2", Version = string.Empty },
-                new () { PackageName = "Package3", Version = "2.0.1", AllowPackageTelemetry = false }
-            };
-            var manifestParser = CreateManifestParser(manifests);
-            var sut = new TelemetryService(globalSettings, manifestParser, version);
-
-            var success = sut.TryGetTelemetryReportData(out var telemetry);
-
-            Assert.IsTrue(success);
-            Assert.Multiple(() =>
-            {
-                Assert.IsTrue(telemetry.RestrictPackageTelemetry);
-
-                Assert.AreEqual(1, telemetry.Packages.Count());
-                var package = telemetry.Packages.First();
-                Assert.AreEqual("1.0.1", package.Version);
-                Assert.AreEqual("Package1", package.Name);
-            });
-        }
 
         private IManifestParser CreateManifestParser(IEnumerable<PackageManifest> manifests)
         {
@@ -150,14 +121,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             return Mock.Of<IUmbracoVersion>(x => x.SemanticVersion == version);
         }
 
-        private IOptionsMonitor<GlobalSettings> CreateGlobalSettings(string guidString = null, bool restrictPackageTelemetry = false)
+        private IOptionsMonitor<GlobalSettings> CreateGlobalSettings(string guidString = null)
         {
             if (guidString is null)
             {
                 guidString = Guid.NewGuid().ToString();
             }
 
-            var globalSettings = new GlobalSettings { Id = guidString, RestrictPackageTelemetry = restrictPackageTelemetry };
+            var globalSettings = new GlobalSettings { Id = guidString };
             return Mock.Of<IOptionsMonitor<GlobalSettings>>(x => x.CurrentValue == globalSettings);
         }
     }

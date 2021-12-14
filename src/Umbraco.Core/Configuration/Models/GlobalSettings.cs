@@ -29,7 +29,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
         internal const string StaticSqlWriteLockTimeOut = "00:00:05";
         internal const bool StaticSanitizeTinyMce = false;
-        internal const bool StaticRestrictPackageTelemetry = false;
 
         /// <summary>
         /// Gets or sets a value for the reserved URLs.
@@ -133,12 +132,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public string MainDomLock { get; set; } = string.Empty;
 
         public string Id { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets a value indicating if the package telemetry information should be restricted.
-        /// </summary>
-        [DefaultValue(StaticRestrictPackageTelemetry)]
-        public bool RestrictPackageTelemetry { get; set; } = StaticRestrictPackageTelemetry;
 
         /// <summary>
         /// Gets or sets a value for the path to the no content view.

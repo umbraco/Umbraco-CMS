@@ -30,11 +30,5 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// </remarks>
         [DataMember(Name = "packages")]
         public IEnumerable<PackageTelemetry> Packages { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether package telemetry is restricted.
-        /// </summary>
-        [DataMember(Name = "restrictPackageTelemetry")]
-        public bool RestrictPackageTelemetry { get; set; }
     }
 }

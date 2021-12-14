@@ -42,8 +42,7 @@ namespace Umbraco.Cms.Core.Telemetry
             {
                 Id = telemetryId,
                 Version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild(),
-                Packages = GetPackageTelemetry(),
-                RestrictPackageTelemetry = _globalSettings.CurrentValue.RestrictPackageTelemetry
+                Packages = GetPackageTelemetry()
             };
             return true;
         }
@@ -74,14 +73,11 @@ namespace Umbraco.Cms.Core.Telemetry
                     continue;
                 }
 
-                if (_globalSettings.CurrentValue.RestrictPackageTelemetry is false || string.IsNullOrEmpty(manifest.Version) is false)
+                packages.Add(new PackageTelemetry
                 {
-                    packages.Add(new PackageTelemetry
-                    {
-                        Name = manifest.PackageName,
-                        Version = manifest.Version ?? string.Empty
-                    });
-                }
+                    Name = manifest.PackageName,
+                    Version = manifest.Version ?? string.Empty
+                });
             }
 
             return packages;
