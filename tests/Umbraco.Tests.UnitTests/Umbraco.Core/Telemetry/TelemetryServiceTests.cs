@@ -73,6 +73,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             Assert.IsTrue(success);
             Assert.Multiple(() =>
             {
+                Assert.IsFalse(telemetry.RestrictPackageTelemetry);
+
                 Assert.AreEqual(2, telemetry.Packages.Count());
                 var versionPackage = telemetry.Packages.FirstOrDefault(x => x.Name == versionPackageName);
                 Assert.AreEqual(versionPackageName, versionPackage.Name);
@@ -114,7 +116,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             var version = CreateUmbracoVersion(9, 1, 1);
             PackageManifest[] manifests =
             {
-                new () { PackageName = "Package1", Version = "1.0.1" }
+                new () { PackageName = "Package1", Version = "1.0.1" },
+                new () { PackageName = "Package2", Version = string.Empty },
+                new () { PackageName = "Package3", Version = "2.0.1", AllowPackageTelemetry = false }
             };
             var manifestParser = CreateManifestParser(manifests);
             var sut = new TelemetryService(globalSettings, manifestParser, version);
@@ -124,9 +128,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry
             Assert.IsTrue(success);
             Assert.Multiple(() =>
             {
+                Assert.IsTrue(telemetry.RestrictPackageTelemetry);
+
                 Assert.AreEqual(1, telemetry.Packages.Count());
                 var package = telemetry.Packages.First();
-                Assert.AreEqual(string.Empty, package.Version);
+                Assert.AreEqual("1.0.1", package.Version);
                 Assert.AreEqual("Package1", package.Name);
             });
         }
