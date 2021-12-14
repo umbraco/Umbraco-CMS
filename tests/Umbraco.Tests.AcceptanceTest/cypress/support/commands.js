@@ -57,9 +57,8 @@ Cypress.Commands.add('umbracoCreateLanguage', (culture, isMandatory = false, fal
     });   
 }); 
 
-Cypress.Commands.add('umbracoEnsureLanguageNotExists', (culture) => {
+Cypress.Commands.add('umbracoEnsureLanguageCultureNotExists', (culture) => {
     cy.getCookie('UMB-XSRF-TOKEN', { log: false }).then((token) => {
-        console.log('hit commands')
         cy.request({
           method: 'GET',
           url: '/umbraco/backoffice/umbracoapi/language/GetAllLanguages',
