@@ -22,5 +22,8 @@ namespace Umbraco.Cms.Core.Telemetry.Models
         /// </remarks>
         [DataMember(Name = "version")]
         public string Version { get; set; }
+
+        [DataMember(Name = "restrictPackageTelemetry")]
+        public bool RestrictPackageTelemetry { get; set; }
     }
 }

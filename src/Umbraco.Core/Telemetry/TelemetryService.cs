@@ -73,12 +73,14 @@ namespace Umbraco.Cms.Core.Telemetry
                     continue;
                 }
 
-                if (_globalSettings.CurrentValue.RestrictPackageTelemetry is false || string.IsNullOrEmpty(manifest.Version) is false)
+                var restrictPackageTelemetry = _globalSettings.CurrentValue.RestrictPackageTelemetry;
+                if (restrictPackageTelemetry is false || string.IsNullOrEmpty(manifest.Version) is false)
                 {
                     packages.Add(new PackageTelemetry
                     {
                         Name = manifest.PackageName,
-                        Version = manifest.Version ?? string.Empty
+                        Version = manifest.Version ?? string.Empty,
+                        RestrictPackageTelemetry = restrictPackageTelemetry
                     });
                 }
             }
