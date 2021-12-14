@@ -87,4 +87,10 @@
         <RemoveDir Directories="@(WwwrootUmbracoPackageDir)"  />
     </Target>
 
+    <Target Name="IncludeUmbracoRazorFiles" BeforeTargets="ResolveRazorGenerateInputs">
+        <ItemGroup>
+            <Content Include="$(MSBuildProjectDirectory)\umbraco\**\*.cshtml" />
+        </ItemGroup>
+    </Target>
+
 </Project>
