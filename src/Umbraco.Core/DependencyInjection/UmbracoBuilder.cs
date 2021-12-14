@@ -262,7 +262,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<IValueEditorCache, ValueEditorCache>();
 
             // Register telemetry service used to gather data about installed packages
-            Services.AddSingleton<TelemetryService>();
+            Services.AddUnique<ITelemetryService, TelemetryService>();
         }
     }
 }

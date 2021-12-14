@@ -12,13 +12,13 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
     public class ReportSiteTask : RecurringHostedServiceBase
     {
         private readonly ILogger<ReportSiteTask> _logger;
-        private readonly TelemetryService _telemetryService;
+        private readonly ITelemetryService _telemetryService;
         private static HttpClient s_httpClient;
 
         public ReportSiteTask(
             ILogger<ReportSiteTask> logger,
-            TelemetryService telemetryService)
-            : base(TimeSpan.FromDays(1), TimeSpan.FromMinutes(1))
+            ITelemetryService telemetryService)
+            : base(TimeSpan.FromDays(1), TimeSpan.FromSeconds(10))
         {
             _logger = logger;
             _telemetryService = telemetryService;

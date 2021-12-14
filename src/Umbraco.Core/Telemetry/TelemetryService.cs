@@ -9,10 +9,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Telemetry
 {
-    /// <summary>
-    /// Service which gathers the data for telemetry reporting
-    /// </summary>
-    public sealed class TelemetryService
+    /// <inheritdoc/>
+    internal class TelemetryService : ITelemetryService
     {
         private readonly GlobalSettings _globalSettings;
         private readonly IManifestParser _manifestParser;
@@ -31,9 +29,7 @@ namespace Umbraco.Cms.Core.Telemetry
             _umbracoVersion = umbracoVersion;
         }
 
-        /// <summary>
-        /// Try and get the <see cref="TelemetryReportData"/>
-        /// </summary>
+        /// <inheritdoc/>
         public bool TryGetTelemetryReportData(out TelemetryReportData telemetryReportData)
         {
             if (TryGetTelemetryId(out Guid telemetryId) is false)
