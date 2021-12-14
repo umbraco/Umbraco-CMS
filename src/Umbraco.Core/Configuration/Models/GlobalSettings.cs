@@ -159,6 +159,10 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
 
         /// <summary>
+        /// Gets a value indicating whether there is a physical pickup directory configured.
+        /// </summary>
+        public bool IsPickupDirectoryLocationConfigured => !string.IsNullOrWhiteSpace(Smtp?.PickupDirectoryLocation);
+
         /// Gets a value indicating whether TinyMCE scripting sanitization should be applied
         /// </summary>
         [DefaultValue(StaticSanitizeTinyMce)]
