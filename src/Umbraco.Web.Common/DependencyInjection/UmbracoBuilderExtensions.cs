@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Smidge;
+using Smidge.Cache;
 using Smidge.FileProcessors;
 using Smidge.InMemory;
 using Smidge.Nuglify;
@@ -27,7 +28,6 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Diagnostics;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Macros;
@@ -35,6 +35,7 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.WebAssets;
@@ -181,7 +182,10 @@ namespace Umbraco.Extensions
             builder.Services.AddHostedService<TempFileCleanup>();
             builder.Services.AddHostedService<InstructionProcessTask>();
             builder.Services.AddHostedService<TouchServerTask>();
-            builder.Services.AddHostedService<ReportSiteTask>();
+            builder.Services.AddHostedService(provider =>
+                new ReportSiteTask(
+                    provider.GetRequiredService<ILogger<ReportSiteTask>>(),
+                    provider.GetRequiredService<ITelemetryService>()));
             return builder;
         }
 
@@ -274,7 +278,10 @@ namespace Umbraco.Extensions
                         new[] { "/App_Plugins/**/*.js", "/App_Plugins/**/*.css" }));
             });
 
+            builder.Services.AddUnique<ICacheBuster, UmbracoSmidgeConfigCacheBuster>();
             builder.Services.AddSmidge(builder.Config.GetSection(Constants.Configuration.ConfigRuntimeMinification));
+            // Replace the Smidge request helper, in order to discourage the use of brotli since it's super slow
+            builder.Services.AddUnique<IRequestHelper, SmidgeRequestHelper>();
             builder.Services.AddSmidgeNuglify();
             builder.Services.AddSmidgeInMemory(false); // it will be enabled based on config/cachebuster
 

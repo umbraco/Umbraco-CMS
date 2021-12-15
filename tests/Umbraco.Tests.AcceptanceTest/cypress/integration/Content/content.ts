@@ -436,7 +436,7 @@ context('Content', () => {
         cy.umbracoTreeItem("content", [nodeName]).click();
 
         // Assert
-        cy.get('[data-element="node-info-status"]').find('.umb-badge').should('contain.text', "Draft");
+        cy.get('[data-element="node-info-status"]').find('.umb-badge').should('contain.text', "Unpublished");
 
         // Clean up (content is automatically deleted when document types are gone)
         cy.umbracoEnsureDocumentTypeNameNotExists(rootDocTypeName);

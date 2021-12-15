@@ -83,6 +83,7 @@
     <key alias="translate">Tillad adgang til at oversætte en node</key>
     <key alias="update">Tillad adgang til at gemme en node</key>
     <key alias="createblueprint">Tillad adgang til at oprette en indholdsskabelon</key>
+    <key alias="notify">Tillad adgang til at oprette notificeringer for noder</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Indhold</key>
@@ -1395,6 +1396,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="publishWithMissingDomain">Der er ikke noget domæne konfigureret for %0%, kontakt vensligst en
       administrator, se loggen for mere information
     </key>
+    <key alias="copySuccessMessage">Dit systems information er blevet kopieret til udklipsholderen</key>
+    <key alias="cannotCopyInformation">Kunne desværre ikke kopiere dit systems information til udklipsholderen</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Tilføj style</key>

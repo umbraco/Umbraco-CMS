@@ -267,6 +267,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 
             // TO 9.2.0
             To<AddUserGroup2NodeTable>("{0571C395-8F0B-44E9-8E3F-47BDD08D817B}");
+
         }
     }
 }

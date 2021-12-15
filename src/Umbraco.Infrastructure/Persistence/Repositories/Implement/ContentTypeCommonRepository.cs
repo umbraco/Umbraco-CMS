@@ -334,13 +334,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // ensure builtin properties
                 if (contentType is IMemberType memberType)
                 {
-                    // ensure that the group exists (ok if it already exists)
-                    memberType.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupAlias,
-                        Constants.Conventions.Member.StandardPropertiesGroupName);
-
                     // ensure that property types exist (ok if they already exist)
                     foreach ((var alias, PropertyType propertyType) in builtinProperties)
                     {
+
                         var added = memberType.AddPropertyType(propertyType,
                             Constants.Conventions.Member.StandardPropertiesGroupAlias,
                             Constants.Conventions.Member.StandardPropertiesGroupName);

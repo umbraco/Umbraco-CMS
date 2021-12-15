@@ -592,6 +592,12 @@ namespace Umbraco.Cms.Core.Security
                 member.PasswordConfiguration = identityUser.PasswordConfig;
             }
 
+            if (member.PasswordConfiguration != identityUser.PasswordConfig)
+            {
+                changeType = MemberDataChangeType.FullSave;
+                member.PasswordConfiguration = identityUser.PasswordConfig;
+            }
+
             if (member.SecurityStamp != identityUser.SecurityStamp)
             {
                 changeType = MemberDataChangeType.FullSave;
