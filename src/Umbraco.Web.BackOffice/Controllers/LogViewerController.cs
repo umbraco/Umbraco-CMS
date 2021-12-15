@@ -30,9 +30,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public LogViewerController(ILogViewer logViewer)
             : this(logViewer, StaticServiceProvider.Instance.GetRequiredService<ILogLevelLoader>())
         {
-
         }
 
+        [ActivatorUtilitiesConstructor]
         public LogViewerController(ILogViewer logViewer, ILogLevelLoader logLevelLoader)
         {
             _logViewer = logViewer ?? throw new ArgumentNullException(nameof(logViewer));
