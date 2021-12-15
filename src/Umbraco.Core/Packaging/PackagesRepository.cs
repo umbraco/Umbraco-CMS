@@ -746,7 +746,7 @@ namespace Umbraco.Cms.Core.Packaging
             return packagesXml;
         }
 
-        public void DeleteLocalFiles()
+        public void DeleteLocalRepositoryFiles()
         {
             var packagesFile = _hostingEnvironment.MapPathContentRoot(CreatedPackagesFile);
             File.Delete(packagesFile);

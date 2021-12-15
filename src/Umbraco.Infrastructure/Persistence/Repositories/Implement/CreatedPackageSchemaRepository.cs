@@ -77,7 +77,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _contentTypeService = contentTypeService;
             _xmlParser = new PackageDefinitionXmlParser();
             _mediaFolderPath = mediaFolderPath ?? globalSettings.Value.UmbracoMediaPath + "/created-packages";
-            _tempFolderPath = tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
+            _tempFolderPath =
+                tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
         }
 
         public IEnumerable<PackageDefinition> GetAll()
@@ -120,11 +121,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             packageDefinition.Id = packageSchema.Id;
             packageDefinition.Name = packageSchema.Name;
             packageDefinition.PackageId = packageSchema.PackageId;
+            packageDefinition.PackagePath = _hostingEnvironment.MapPathWebRoot(Path.Combine(
+                Path.Combine(_mediaFolderPath, packageDefinition.Name.Replace(' ', '_')), "package.xml"));
             return packageDefinition;
         }
 
         public void Delete(int id)
         {
+            // Delete package snapshot
+            var packageDef = GetById(id);
+            if (File.Exists(packageDef.PackagePath))
+            {
+                File.Delete(packageDef.PackagePath);
+            }
+
             Sql<ISqlContext> query = new Sql<ISqlContext>(_umbracoDatabase.SqlContext)
                 .Delete<CreatedPackageSchemaDto>()
                 .Where<CreatedPackageSchemaDto>(x => x.Id == id);
@@ -178,27 +188,32 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             };
             _umbracoDatabase.Update(updatedDto);
 
-            return true;
+            // Save package snapshot locally
+            ExportPackage(definition);
 
+            return true;
         }
 
         public string ExportPackage(PackageDefinition definition)
         {
             if (definition.Id == default)
             {
-                throw new ArgumentException("The package definition does not have an ID, it must be saved before being exported");
+                throw new ArgumentException(
+                    "The package definition does not have an ID, it must be saved before being exported");
             }
 
             if (definition.PackageId == default)
             {
-                throw new ArgumentException("the package definition does not have a GUID, it must be saved before being exported");
+                throw new ArgumentException(
+                    "the package definition does not have a GUID, it must be saved before being exported");
             }
 
             // Ensure it's valid
             ValidatePackage(definition);
 
             // Create a folder for building this package
-            var temporaryPath = _hostingEnvironment.MapPathContentRoot(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
+            var temporaryPath =
+                _hostingEnvironment.MapPathContentRoot(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
             if (Directory.Exists(temporaryPath) == false)
             {
                 Directory.CreateDirectory(temporaryPath);
@@ -218,7 +233,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 PackageTemplates(definition, root);
                 PackageStylesheets(definition, root);
                 PackageStaticFiles(definition.Scripts, root, "Scripts", "Script", _fileSystems.ScriptsFileSystem);
-                PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View", _fileSystems.PartialViewsFileSystem);
+                PackageStaticFiles(definition.PartialViews, root, "PartialViews", "View",
+                    _fileSystems.PartialViewsFileSystem);
                 PackageMacros(definition, root);
                 PackageDictionaryItems(definition, root);
                 PackageLanguages(definition, root);
@@ -265,9 +281,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 }
 
 
-
                 var directoryName =
-                    _hostingEnvironment.MapPathWebRoot(Path.Combine(_mediaFolderPath, definition.Name.Replace(' ', '_')));
+                    _hostingEnvironment.MapPathWebRoot(
+                        Path.Combine(_mediaFolderPath, definition.Name.Replace(' ', '_')));
 
                 if (Directory.Exists(directoryName) == false)
                 {
@@ -310,7 +326,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var isValid = Validator.TryValidateObject(definition, context, results);
             if (!isValid)
             {
-                throw new InvalidOperationException("Validation failed, there is invalid data on the model: " + string.Join(", ", results.Select(x => x.ErrorMessage)));
+                throw new InvalidOperationException("Validation failed, there is invalid data on the model: " +
+                                                    string.Join(", ", results.Select(x => x.ErrorMessage)));
             }
         }
 
@@ -399,7 +416,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         if (processed.ContainsKey(dictionaryItem.ParentId.Value))
                         {
                             // we've processed this parent element already so we can just append this xml child to it
-                            AppendDictionaryElement(processed[dictionaryItem.ParentId.Value], items, processed, key, serializedDictionaryValue);
+                            AppendDictionaryElement(processed[dictionaryItem.ParentId.Value], items, processed, key,
+                                serializedDictionaryValue);
                         }
                         else if (items.ContainsKey(dictionaryItem.ParentId.Value))
                         {
@@ -411,7 +429,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         {
                             // in this case, the parent of this item doesn't exist in our collection, we have no
                             // choice but to add it to the root.
-                            AppendDictionaryElement(rootDictionaryItems, items, processed, key, serializedDictionaryValue);
+                            AppendDictionaryElement(rootDictionaryItems, items, processed, key,
+                                serializedDictionaryValue);
                         }
                     }
                 }
@@ -419,7 +438,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             root.Add(rootDictionaryItems);
 
-            static void AppendDictionaryElement(XElement rootDictionaryItems, Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items, Dictionary<Guid, XElement> processed, Guid key, XElement serializedDictionaryValue)
+            static void AppendDictionaryElement(XElement rootDictionaryItems,
+                Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items,
+                Dictionary<Guid, XElement> processed, Guid key, XElement serializedDictionaryValue)
             {
                 // track it
                 processed.Add(key, serializedDictionaryValue);
@@ -456,8 +477,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             root.Add(macros);
 
             // Get the partial views for macros and package those (exclude views outside of the default directory, e.g. App_Plugins\*\Views)
-            IEnumerable<string> views = packagedMacros.Where(x => x.MacroSource.StartsWith(Constants.SystemDirectories.MacroPartials))
-                .Select(x => x.MacroSource.Substring(Constants.SystemDirectories.MacroPartials.Length).Replace('/', '\\'));
+            IEnumerable<string> views = packagedMacros
+                .Where(x => x.MacroSource.StartsWith(Constants.SystemDirectories.MacroPartials))
+                .Select(x =>
+                    x.MacroSource.Substring(Constants.SystemDirectories.MacroPartials.Length).Replace('/', '\\'));
             PackageStaticFiles(views, root, "MacroPartialViews", "View", _fileSystems.MacroPartialsFileSystem);
         }
 
@@ -597,7 +620,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private void PackageDocumentsAndTags(PackageDefinition definition, XContainer root)
         {
             // Documents and tags
-            if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
+            if (string.IsNullOrEmpty(definition.ContentNodeId) == false && int.TryParse(definition.ContentNodeId,
+                    NumberStyles.Integer, CultureInfo.InvariantCulture, out var contentNodeId))
             {
                 if (contentNodeId > 0)
                 {
@@ -605,7 +629,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     IContent content = _contentService.GetById(contentNodeId);
                     if (content != null)
                     {
-                        var contentXml = definition.ContentLoadChildNodes ? content.ToDeepXml(_serializer) : content.ToXml(_serializer);
+                        var contentXml = definition.ContentLoadChildNodes
+                            ? content.ToDeepXml(_serializer)
+                            : content.ToXml(_serializer);
 
                         // Create the Documents/DocumentSet node
 
@@ -645,16 +671,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             IEnumerable<IMedia> medias = _mediaService.GetByIds(definition.MediaUdis);
 
             var mediaXml = new XElement(
-                                "MediaItems",
-                                medias.Select(media =>
-                                {
-                                    XElement serializedMedia = _serializer.Serialize(
-                                        media,
-                                        definition.MediaLoadChildNodes,
-                                        OnSerializedMedia);
+                "MediaItems",
+                medias.Select(media =>
+                {
+                    XElement serializedMedia = _serializer.Serialize(
+                        media,
+                        definition.MediaLoadChildNodes,
+                        OnSerializedMedia);
 
-                                    return new XElement("MediaSet", serializedMedia);
-                                }));
+                    return new XElement("MediaSet", serializedMedia);
+                }));
 
             root.Add(mediaXml);
 

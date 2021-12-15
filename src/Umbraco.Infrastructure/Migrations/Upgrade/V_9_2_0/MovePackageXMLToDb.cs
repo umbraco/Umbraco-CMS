@@ -52,11 +52,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_2_0
                     PackageId = Guid.NewGuid()
                 };
                 createdPackageDtos.Add(dto);
-
-                File.Delete(package.PackagePath);
             }
 
-            _packagesRepository.DeleteLocalFiles();
+            _packagesRepository.DeleteLocalRepositoryFiles();
             if (createdPackageDtos.Any())
             {
                 // Insert dto into CreatedPackage table
