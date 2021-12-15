@@ -83,6 +83,7 @@
     <key alias="translate">Tillad adgang til at oversætte en node</key>
     <key alias="update">Tillad adgang til at gemme en node</key>
     <key alias="createblueprint">Tillad adgang til at oprette en indholdsskabelon</key>
+    <key alias="notify">Tillad adgang til at oprette notificeringer for noder</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Indhold</key>

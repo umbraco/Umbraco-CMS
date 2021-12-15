@@ -130,6 +130,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets or sets a value for the main dom lock.
         /// </summary>
         public string MainDomLock { get; set; } = string.Empty;
+
         public string Id { get; set; } = string.Empty;
 
         /// <summary>
