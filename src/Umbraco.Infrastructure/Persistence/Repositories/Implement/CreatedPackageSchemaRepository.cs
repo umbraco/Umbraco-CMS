@@ -169,12 +169,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
                 // Set the definitionIds
                 definition.PackageId = dto.PackageId;
+                ExportPackage(definition);
                 var result = _umbracoDatabase.Insert(dto);
                 var decimalResult = result.SafeCast<decimal>();
                 definition.Id = decimal.ToInt32(decimalResult);
+
                 return true;
             }
 
+            // Save snapshot locally, we do this to the updated packagePath
+            ExportPackage(definition);
             // Create dto from definition
             var updatedDto = new CreatedPackageSchemaDto()
             {
@@ -186,25 +190,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             };
             _umbracoDatabase.Update(updatedDto);
 
-            // Save package snapshot locally
-            ExportPackage(definition);
-
             return true;
         }
 
         public string ExportPackage(PackageDefinition definition)
         {
-            if (definition.Id == default)
-            {
-                throw new ArgumentException(
-                    "The package definition does not have an ID, it must be saved before being exported");
-            }
-
-            if (definition.PackageId == default)
-            {
-                throw new ArgumentException(
-                    "the package definition does not have a GUID, it must be saved before being exported");
-            }
 
             // Ensure it's valid
             ValidatePackage(definition);
@@ -293,6 +283,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (File.Exists(finalPackagePath))
                 {
                     File.Delete(finalPackagePath);
+                }
+
+                if (File.Exists(finalPackagePath.Replace("zip", ".xml")))
+                {
+                    File.Delete(finalPackagePath.Replace("zip", ".xml"));
                 }
 
                 File.Move(tempPackagePath, finalPackagePath);
