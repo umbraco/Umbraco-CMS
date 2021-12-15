@@ -2,10 +2,15 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Telemetry.Models;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -23,6 +28,15 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _logger = logger;
             _telemetryService = telemetryService;
             s_httpClient = new HttpClient();
+        }
+
+        [Obsolete("Use the constructor that takes ITelemetryService instead, scheduled for removal in V11")]
+        public ReportSiteTask(
+            ILogger<ReportSiteTask> logger,
+            IUmbracoVersion umbracoVersion,
+            IOptions<GlobalSettings> globalSettings)
+            : this(logger, StaticServiceProvider.Instance.GetRequiredService<ITelemetryService>())
+        {
         }
 
         /// <summary>
