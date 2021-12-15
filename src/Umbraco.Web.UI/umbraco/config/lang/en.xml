@@ -81,6 +81,7 @@
     <key alias="translate">Allow access to translate a node</key>
     <key alias="update">Allow access to save a node</key>
     <key alias="createblueprint">Allow access to create a Content Template</key>
+    <key alias="notify">Allow access to setup notifications for content nodes</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Content</key>
@@ -258,6 +259,7 @@
     <key alias="type">Type</key>
     <key alias="unpublish">Unpublish</key>
     <key alias="unpublished">Unpublished</key>
+    <key alias="notCreated">Not created</key>
     <key alias="updateDate">Last edited</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Remove file(s)</key>
@@ -562,6 +564,8 @@
     <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
     <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
+    <key alias="deleteLayout">You are deleting the layout</key>
+    <key alias="deletingALayout">Modifying layout will result in loss of data for any existing content that is based on this configuration.</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
@@ -1576,6 +1580,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="publishWithMissingDomain">There is no domain configured for %0%, please contact an administrator, see
       log for more information
     </key>
+    <key alias="copySuccessMessage">Your system information has successfully been copied to the clipboard</key>
+    <key alias="cannotCopyInformation">Could not copy your system information to the clipboard</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>
@@ -1833,11 +1839,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="usingEditor">using this editor will get updated with the new settings.</key>
     <key alias="historyCleanupHeading">History cleanup</key>
-    <key alias="historyCleanupDescription">Allow override the global settings for when history versions are removed.</key>
+    <key alias="historyCleanupDescription">Allow overriding the global history cleanup settings.</key>
     <key alias="historyCleanupKeepAllVersionsNewerThanDays">Keep all versions newer than days</key>
     <key alias="historyCleanupKeepLatestVersionPerDayForDays">Keep latest version per day for days</key>
     <key alias="historyCleanupPreventCleanup">Prevent cleanup</key>
-    <key alias="historyCleanupGloballyDisabled">NOTE! The content version cleanup feature is disabled globally. These settings will not take effect until it is enabled.</key>
+    <key alias="historyCleanupGloballyDisabled"><![CDATA[<b>NOTE!</b> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2264,11 +2270,11 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
     <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
-    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco.Core.UseHttps' is set to 'false' in
-      your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.
+    <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco:CMS:Global:UseHttps' is set to 'false' in
+      your appSettings.json file. Once you access this site using the HTTPS scheme, that should be set to 'true'.
     </key>
-    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco.Core.UseHttps' is set to '%0%' in your
-      web.config file, your cookies are %1% marked as secure.
+    <key alias="httpsCheckConfigurationCheckResult">The appSetting 'Umbraco:CMS:Global:UseHttps' is set to '%0%' in your
+      appSettings.json file, your cookies are %1% marked as secure.
     </key>
     <!-- The following keys don't get tokens passed in -->
     <key alias="compilationDebugCheckSuccessMessage">Debug compilation mode is disabled.</key>

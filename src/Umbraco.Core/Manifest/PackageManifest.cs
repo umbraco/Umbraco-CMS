@@ -48,6 +48,19 @@ namespace Umbraco.Cms.Core.Manifest
         /// </remarks>
         [IgnoreDataMember]
         public string Source { get; set; }
+
+        /// <summary>
+        /// Gets or sets the version of the package
+        /// </summary>
+        [DataMember(Name = "version")]
+        public string Version { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether telemetry is allowed
+        /// </summary>
+        [DataMember(Name = "allowPackageTelemetry")]
+        public bool AllowPackageTelemetry { get; set; } = true;
+
         [DataMember(Name = "bundleOptions")]
         public BundleOptions BundleOptions { get; set; }
 

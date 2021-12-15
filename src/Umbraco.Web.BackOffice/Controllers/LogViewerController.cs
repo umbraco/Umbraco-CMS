@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog.Events;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
@@ -135,6 +137,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _logViewer.DeleteSavedSearch(item.Name, item.Query);
         }
 
+        [HttpGet]
+        public ReadOnlyDictionary<string, LogEventLevel> GetLogLevels()
+        {
+            return _logViewer.GetLogLevels();
+        }
+
+        [Obsolete("Please use GetLogLevels() instead. Scheduled for removal in V11.")]
         [HttpGet]
         public string GetLogLevel()
         {

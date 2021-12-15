@@ -37,5 +37,9 @@ namespace Umbraco.Cms.Core.Models.ContentEditing
 
         [DataMember(Name = "apps")]
         public IEnumerable<ContentApp> ContentApps { get; set; }
+
+
+        [DataMember(Name = "membershipProperties")]
+        public IEnumerable<ContentPropertyDisplay> MembershipProperties { get; set; }
     }
 }

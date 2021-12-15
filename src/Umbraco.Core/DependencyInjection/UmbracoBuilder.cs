@@ -36,6 +36,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -163,6 +164,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RequestCache);
             Services.AddUnique<IProfilingLogger, ProfilingLogger>();
             Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
+            Services.AddUnique<IEntryAssemblyMetadata, EntryAssemblyMetadata>();
 
             this.AddAllCoreCollectionBuilders();
             this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
@@ -258,6 +260,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // Register ValueEditorCache used for validation
             Services.AddSingleton<IValueEditorCache, ValueEditorCache>();
+
+            // Register telemetry service used to gather data about installed packages
+            Services.AddUnique<ITelemetryService, TelemetryService>();
         }
     }
 }
