@@ -121,8 +121,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             packageDefinition.Id = packageSchema.Id;
             packageDefinition.Name = packageSchema.Name;
             packageDefinition.PackageId = packageSchema.PackageId;
-            packageDefinition.PackagePath = _hostingEnvironment.MapPathWebRoot(Path.Combine(
-                Path.Combine(_mediaFolderPath, packageDefinition.Name.Replace(' ', '_')), "package.xml"));
             return packageDefinition;
         }
 
@@ -300,7 +298,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 File.Move(tempPackagePath, finalPackagePath);
 
                 definition.PackagePath = finalPackagePath;
-                SavePackage(definition);
 
                 return finalPackagePath;
             }
