@@ -6,6 +6,6 @@
     public interface IArtifact : IArtifactSignature
     {
         string Name { get; }
-        string Alias { get; }
+        string? Alias { get; }
     }
 }

@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // at the moment we try our best to be backward compatible, but really,
         // should get rid of hideTopLevelNode and other oddities entirely, eventually
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null) =>
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string? culture = null) =>
             GetByRoute(PreviewDefault, route, hideTopLevelNode, culture);
 
         public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null,
@@ -139,10 +139,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return content;
         }
 
-        public string GetRouteById(int contentId, string culture = null) =>
+        public string GetRouteById(int contentId, string? culture = null) =>
             GetRouteById(PreviewDefault, contentId, culture);
 
-        public string GetRouteById(bool preview, int contentId, string culture = null)
+        public string GetRouteById(bool preview, int contentId, string? culture = null)
         {
             IAppCache cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing
                 ? _elementsCache
@@ -301,7 +301,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         IEnumerable<IPublishedContent> INavigableData.GetAtRoot(bool preview) => GetAtRoot(preview);
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
         {
             // handle context culture for variant
             if (culture == null)

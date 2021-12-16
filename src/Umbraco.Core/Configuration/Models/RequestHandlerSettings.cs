@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Umbraco.Cms.Core.Configuration.UmbracoSettings;
 using Umbraco.Extensions;
 
@@ -98,10 +99,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public class CharItem : IChar
         {
             /// <inheritdoc/>
-            public string Char { get; set; }
+            [Required]
+            public string Char { get; set; } = null!;
 
             /// <inheritdoc/>
-            public string Replacement { get; set; }
+            [Required]
+            public string Replacement { get; set; } = null!;
         }
     }
 }

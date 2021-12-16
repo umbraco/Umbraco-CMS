@@ -229,7 +229,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 })
                 .Build();
 
-        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1, string culture = null, string segment = null) =>
+        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1, string? culture = null, string? segment = null) =>
             new ContentBuilder()
                 .WithContentType(contentType)
                 .WithName(name)
@@ -245,7 +245,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                     segment)
                 .Build();
 
-        public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent, string culture = null, string segment = null, bool setPropertyValues = true)
+        public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent, string? culture = null, string? segment = null, bool setPropertyValues = true)
         {
             ContentBuilder builder = new ContentBuilder()
                 .WithContentType(contentType)

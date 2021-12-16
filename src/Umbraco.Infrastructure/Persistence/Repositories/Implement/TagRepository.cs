@@ -310,7 +310,7 @@ WHERE r.tagId IS NULL";
 
         /// <inheritdoc />
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag,
-            string group = null, string culture = null)
+            string group = null, string? culture = null)
         {
             Sql<ISqlContext> sql = GetTaggedEntitiesSql(objectType, culture);
 
@@ -408,7 +408,7 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntity(int contentId, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForEntity(int contentId, string group = null, string? culture = null)
         {
             Sql<ISqlContext> sql = GetTagsSql(culture);
 
@@ -427,7 +427,7 @@ WHERE r.tagId IS NULL";
         }
 
         /// <inheritdoc />
-        public IEnumerable<ITag> GetTagsForEntity(Guid contentId, string group = null, string culture = null)
+        public IEnumerable<ITag> GetTagsForEntity(Guid contentId, string group = null, string? culture = null)
         {
             Sql<ISqlContext> sql = GetTagsSql(culture);
 

@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly IProfilingLogger _logger;
         private readonly RuntimeHashPaths _paths;
-        private string _calculated;
+        private string? _calculated;
 
         public RuntimeHash(IProfilingLogger logger, RuntimeHashPaths paths)
         {

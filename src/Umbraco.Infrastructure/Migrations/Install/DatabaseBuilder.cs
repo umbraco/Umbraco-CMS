@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             if (string.IsNullOrWhiteSpace(connectionString) == false)
             {
-                providerName = ConfigConnectionString.ParseProviderName(connectionString);
+                providerName = ConfigConnectionString.ParseProviderName(connectionString)!;
             }
             else if (integratedAuth)
             {

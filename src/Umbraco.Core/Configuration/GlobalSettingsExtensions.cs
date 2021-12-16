@@ -7,8 +7,8 @@ namespace Umbraco.Extensions
 {
     public static class GlobalSettingsExtensions
     {
-        private static string _mvcArea;
-        private static string _backOfficePath;
+        private static string? _mvcArea;
+        private static string? _backOfficePath;
 
         /// <summary>
         /// Returns the absolute path for the Umbraco back office

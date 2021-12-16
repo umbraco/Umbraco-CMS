@@ -89,7 +89,7 @@ namespace Umbraco.TestData
             return Content($"The document type {alias} no longer allows segments");
         }
 
-        public ActionResult AddSegmentData(int contentId, string propertyAlias, string value, string segment, string culture = null)
+        public ActionResult AddSegmentData(int contentId, string propertyAlias, string value, string segment, string? culture = null)
         {
             IContent content = Services.ContentService.GetById(contentId);
             if (content == null)

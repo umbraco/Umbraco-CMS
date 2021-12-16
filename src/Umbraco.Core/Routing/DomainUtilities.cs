@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <para>If culture is null, uses the default culture for the installation instead. Otherwise,
         /// will try with the specified culture, else return null.</para>
         /// </remarks>
-        internal static DomainAndUri DomainForNode(IDomainCache domainCache, ISiteDomainMapper siteDomainMapper, int nodeId, Uri current, string culture = null)
+        internal static DomainAndUri DomainForNode(IDomainCache domainCache, ISiteDomainMapper siteDomainMapper, int nodeId, Uri current, string? culture = null)
         {
             // be safe
             if (nodeId <= 0)
@@ -148,7 +148,7 @@ namespace Umbraco.Cms.Core.Routing
         /// the right one, unless it is <c>null</c>, in which case the method returns <c>null</c>.</para>
         /// <para>The filter, if any, will be called only with a non-empty argument, and _must_ return something.</para>
         /// </remarks>
-        public static DomainAndUri SelectDomain(IEnumerable<Domain> domains, Uri uri, string culture = null, string defaultCulture = null, Func<IReadOnlyCollection<DomainAndUri>, Uri, string, string, DomainAndUri> filter = null)
+        public static DomainAndUri SelectDomain(IEnumerable<Domain> domains, Uri uri, string? culture = null, string defaultCulture = null, Func<IReadOnlyCollection<DomainAndUri>, Uri, string, string, DomainAndUri> filter = null)
         {
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar

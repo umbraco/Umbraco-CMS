@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Core.Install
             return new List<InstallTrackingItem>(_steps);
         }
 
-        public void SetComplete(Guid installId, string name, IDictionary<string, object> additionalData = null)
+        public void SetComplete(Guid installId, string name, IDictionary<string, object>? additionalData = null)
         {
             var trackingItem = _steps.Single(x => x.Name == name);
             if (additionalData != null)

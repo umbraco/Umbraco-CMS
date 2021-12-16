@@ -247,7 +247,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object ToEditor(IProperty property, string culture = null, string segment = null)
+        public virtual object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var val = property.GetValue(culture, segment);
             if (val == null) return string.Empty;

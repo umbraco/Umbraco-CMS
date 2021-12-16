@@ -190,7 +190,7 @@ namespace Umbraco.Extensions
         /// <param name="key">The key.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns></returns>
-        public static TVal GetValue<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key, TVal defaultValue = default(TVal))
+        public static TVal? GetValue<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key, TVal? defaultValue = default(TVal))
         {
             if (d.ContainsKey(key))
             {
@@ -206,13 +206,7 @@ namespace Umbraco.Extensions
         /// <param name="key"></param>
         /// <returns></returns>
         public static string GetValueAsString<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key)
-        {
-            if (d.ContainsKey(key))
-            {
-                return d[key].ToString();
-            }
-            return String.Empty;
-        }
+            => d.ContainsKey(key) ? d[key]!.ToString() : string.Empty;
 
         /// <summary>
         /// Returns the value of the key value based on the key as it's string value, if the key is not found or is an empty string, then the provided default value is returned
@@ -225,7 +219,7 @@ namespace Umbraco.Extensions
         {
             if (d.ContainsKey(key))
             {
-                var value = d[key].ToString();
+                var value = d[key]!.ToString();
                 if (value != string.Empty)
                     return value;
             }
@@ -266,10 +260,8 @@ namespace Umbraco.Extensions
         /// <param name="key">The key.</param>
         /// <typeparam name="TValue">The type</typeparam>
         /// <returns>The entry</returns>
-        public static TValue GetValueIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key)
-        {
-            return dictionary.GetValueIgnoreCase(key, default(TValue));
-        }
+        public static TValue? GetValueIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key)
+            => dictionary!.GetValueIgnoreCase(key, default(TValue));
 
         /// <summary>The get entry ignore case.</summary>
         /// <param name="dictionary">The dictionary.</param>

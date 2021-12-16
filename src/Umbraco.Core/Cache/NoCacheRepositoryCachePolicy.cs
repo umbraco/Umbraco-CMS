@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Cache
             return performGet(id);
         }
 
-        public TEntity GetCached(TId id)
+        public TEntity? GetCached(TId id)
         {
             return null;
         }
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Cache
             persistDeleted(entity);
         }
 
-        public TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll)
+        public TEntity?[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity?>> performGetAll)
         {
             return performGetAll(ids).ToArray();
         }

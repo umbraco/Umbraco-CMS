@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Services
         /// <para>The <paramref name="orderBy"/> can be null, meaning: not sorting. If it is the empty string, it becomes null.</para>
         /// <para>The <paramref name="culture"/> can be the empty string, meaning: invariant. If it is null, it becomes the empty string.</para>
         /// </remarks>
-        public Ordering(string orderBy, Direction direction = Direction.Ascending, string culture = null, bool isCustomField = false)
+        public Ordering(string orderBy, Direction direction = Direction.Ascending, string? culture = null, bool isCustomField = false)
         {
             OrderBy = orderBy.IfNullOrWhiteSpace(null); // empty is null and means, not sorting
             Direction = direction;
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Services
         /// <para>The <paramref name="orderBy"/> can be null, meaning: not sorting. If it is the empty string, it becomes null.</para>
         /// <para>The <paramref name="culture"/> can be the empty string, meaning: invariant. If it is null, it becomes the empty string.</para>
         /// </remarks>
-        public static Ordering By(string orderBy, Direction direction = Direction.Ascending, string culture = null, bool isCustomField = false)
+        public static Ordering By(string orderBy, Direction direction = Direction.Ascending, string? culture = null, bool isCustomField = false)
             => new Ordering(orderBy, direction, culture, isCustomField);
 
         /// <summary>

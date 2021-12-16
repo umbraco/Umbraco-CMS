@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="performGetAll">The repository PerformGetAll method.</param>
         /// <returns>The entity with the specified identifier, if it exits, else null.</returns>
         /// <remarks>First considers the cache then the repository.</remarks>
-        TEntity Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll);
+        TEntity? Get(TId id, Func<TId, TEntity> performGet, Func<TId[], IEnumerable<TEntity>> performGetAll);
 
         /// <summary>
         /// Gets an entity from the cache.
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="id">The identifier.</param>
         /// <returns>The entity with the specified identifier, if it is in the cache already, else null.</returns>
         /// <remarks>Does not consider the repository at all.</remarks>
-        TEntity GetCached(TId id);
+        TEntity? GetCached(TId id);
 
         /// <summary>
         /// Gets a value indicating whether an entity with a specified identifier exists.
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="performGetAll">The repository PerformGetAll method.</param>
         /// <returns>If <paramref name="ids"/> is empty, all entities, else the entities with the specified identifiers.</returns>
         /// <remarks>Get all the entities. Either from the cache or the repository depending on the implementation.</remarks>
-        TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> performGetAll);
+        TEntity?[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity?>> performGetAll);
 
         /// <summary>
         /// Clears the entire cache.

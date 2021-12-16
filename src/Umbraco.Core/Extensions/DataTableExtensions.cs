@@ -27,7 +27,7 @@ namespace Umbraco.Extensions
         public static DataTable GenerateDataTable(
             string tableAlias,
             Func<string, IEnumerable<KeyValuePair<string, string>>> getHeaders,
-            Func<IEnumerable<Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>>> rowData)
+            Func<IEnumerable<Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>>> rowData)
         {
             var dt = new DataTable(tableAlias);
 
@@ -60,9 +60,9 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// This is for legacy code, I didn't want to go creating custom classes for these
         /// </remarks>
-        public static List<System.Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>> CreateTableData()
+        public static List<System.Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>> CreateTableData()
         {
-            return new List<System.Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>>();
+            return new List<System.Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>>();
         }
 
         /// <summary>
@@ -75,11 +75,11 @@ namespace Umbraco.Extensions
         /// This is for legacy code, I didn't want to go creating custom classes for these
         /// </remarks>
         public static void AddRowData(
-            List<System.Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>> rowData,
-            IEnumerable<KeyValuePair<string, object>> standardVals,
-            IEnumerable<KeyValuePair<string, object>> userVals)
+            List<System.Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>> rowData,
+            IEnumerable<KeyValuePair<string, object?>> standardVals,
+            IEnumerable<KeyValuePair<string, object?>> userVals)
         {
-            rowData.Add(new System.Tuple<IEnumerable<KeyValuePair<string, object>>, IEnumerable<KeyValuePair<string, object>>>(
+            rowData.Add(new System.Tuple<IEnumerable<KeyValuePair<string, object?>>, IEnumerable<KeyValuePair<string, object?>>>(
                             standardVals,
                             userVals
                             ));
@@ -95,8 +95,8 @@ namespace Umbraco.Extensions
         private static void PopulateRow(
             this DataTable dt,
             IDictionary<string, string> aliasesToNames,
-            IEnumerable<KeyValuePair<string, object>> standardVals,
-            IEnumerable<KeyValuePair<string, object>> userPropertyVals)
+            IEnumerable<KeyValuePair<string, object?>> standardVals,
+            IEnumerable<KeyValuePair<string, object?>> userPropertyVals)
         {
             var dr = dt.NewRow();
             foreach (var r in standardVals)

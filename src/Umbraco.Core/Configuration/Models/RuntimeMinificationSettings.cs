@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     {
         internal const bool StaticUseInMemoryCache = false;
         internal const string StaticCacheBuster = "Version";
-        internal const string StaticVersion = null;
+        internal const string? StaticVersion = null;
 
         /// <summary>
         /// Use in memory cache
@@ -25,6 +25,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// The unique version string used if CacheBuster is 'Version'.
         /// </summary>
         [DefaultValue(StaticVersion)]
-        public string Version { get; set; } = StaticVersion;
+        public string? Version { get; set; } = StaticVersion;
     }
 }

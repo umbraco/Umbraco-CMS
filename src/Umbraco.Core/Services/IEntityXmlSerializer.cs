@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Services
         XElement Serialize(
             IMedia media,
             bool withDescendants = false,
-            Action<IMedia, XElement> onMediaItemSerialized = null);
+            Action<IMedia, XElement>? onMediaItemSerialized = null);
 
         /// <summary>
         /// Exports an IMember item as an XElement.

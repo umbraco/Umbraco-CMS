@@ -32,15 +32,15 @@
         /// <summary>
         /// Gets or sets the artifact.
         /// </summary>
-        public new TArtifact Artifact { get; set; }
+        public new TArtifact? Artifact { get; set; }
 
         /// <summary>
         /// Gets or sets the entity.
         /// </summary>
-        public TEntity Entity { get; set; }
+        public TEntity? Entity { get; set; }
 
         /// <inheritdoc/>
-        protected sealed override IArtifact GetArtifactAsIArtifact()
+        protected sealed override IArtifact? GetArtifactAsIArtifact()
         {
             return Artifact;
         }

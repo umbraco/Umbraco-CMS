@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.Composing
             {
                 foreach(var dll in Directory.EnumerateFiles(dir, "*.dll"))
                 {
-                    AssemblyName assemblyName = null;
+                    AssemblyName? assemblyName = null;
                     try
                     {
                         assemblyName = AssemblyName.GetAssemblyName(dll);

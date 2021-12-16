@@ -7,7 +7,8 @@ namespace Umbraco.Cms.Core
     {
         public HybridEventMessagesAccessor(IRequestCache requestCache)
             : base(requestCache)
-        { }
+        {
+        }
 
         public EventMessages EventMessages
         {

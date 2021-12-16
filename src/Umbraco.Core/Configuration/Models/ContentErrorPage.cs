@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the content XPath.
         /// </summary>
-        public string ContentXPath { get; set; }
+        public string? ContentXPath { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="ContentId"/> field is populated.
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets or sets a value for the content culture.
         /// </summary>
         [Required]
-        public string Culture { get; set; }
+        public string Culture { get; set; } = null!;
 
         internal override bool IsValid() =>
             base.IsValid() &&

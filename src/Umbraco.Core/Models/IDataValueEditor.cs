@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Converts a property value to a value for the editor.
         /// </summary>
-        object ToEditor(IProperty property, string culture = null, string segment = null);
+        object ToEditor(IProperty property, string? culture = null, string? segment = null);
 
         // TODO: / deal with this when unplugging the xml cache
         // why property vs propertyType? services should be injected! etc...

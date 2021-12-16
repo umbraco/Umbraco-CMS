@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <param name="culture"></param>
         /// <param name="segment"></param>
         /// <returns></returns>
-        public override object ToEditor(IProperty property, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var json = base.ToEditor(property, culture, segment).ToString();
             return JsonConvert.DeserializeObject<string[]>(json) ?? Array.Empty<string>();

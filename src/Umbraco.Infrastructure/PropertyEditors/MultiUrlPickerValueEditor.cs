@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _publishedUrlProvider = publishedUrlProvider;
         }
 
-        public override object ToEditor(IProperty property, string culture = null, string segment = null)
+        public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment)?.ToString();
 

@@ -44,7 +44,7 @@ namespace Umbraco.Extensions
         /// <param name="culture">A culture, for multi-lingual properties.</param>
         /// <param name="propertyEditors"></param>
         /// <param name="dataTypeService"></param>
-        public static void AssignTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, bool merge = false, string culture = null)
+        public static void AssignTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, bool merge = false, string? culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -100,7 +100,7 @@ namespace Umbraco.Extensions
         /// <param name="culture">A culture, for multi-lingual properties.</param>
         /// <param name="propertyEditors"></param>
         /// <param name="dataTypeService"></param>
-        public static void RemoveTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, string culture = null)
+        public static void RemoveTags(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, IEnumerable<string> tags, string? culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -134,7 +134,7 @@ namespace Umbraco.Extensions
         }
 
         // used by ContentRepositoryBase
-        public static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string culture = null)
+        public static IEnumerable<string> GetTagsValue(this IProperty property, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string? culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 
@@ -145,7 +145,7 @@ namespace Umbraco.Extensions
             return property.GetTagsValue(configuration.StorageType, serializer, configuration.Delimiter, culture);
         }
 
-        private static IEnumerable<string> GetTagsValue(this IProperty property, TagsStorageType storageType, IJsonSerializer serializer, char delimiter, string culture = null)
+        private static IEnumerable<string> GetTagsValue(this IProperty property, TagsStorageType storageType, IJsonSerializer serializer, char delimiter, string? culture = null)
         {
             if (property == null) throw new ArgumentNullException(nameof(property));
 

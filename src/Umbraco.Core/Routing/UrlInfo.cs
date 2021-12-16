@@ -13,12 +13,12 @@ namespace Umbraco.Cms.Core.Routing
         /// <summary>
         /// Creates a <see cref="UrlInfo"/> instance representing a true URL.
         /// </summary>
-        public static UrlInfo Url(string text, string culture = null) => new UrlInfo(text, true, culture);
+        public static UrlInfo Url(string text, string? culture = null) => new UrlInfo(text, true, culture);
 
         /// <summary>
         /// Creates a <see cref="UrlInfo"/> instance representing a message.
         /// </summary>
-        public static UrlInfo Message(string text, string culture = null) => new UrlInfo(text, false, culture);
+        public static UrlInfo Message(string text, string? culture = null) => new UrlInfo(text, false, culture);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlInfo"/> class.

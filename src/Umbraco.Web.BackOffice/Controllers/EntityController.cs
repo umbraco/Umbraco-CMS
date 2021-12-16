@@ -472,7 +472,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpGet]
         [HttpPost]
         [Obsolete("Use GetUrlsByIds instead.")]
-        public IDictionary<Udi, string> GetUrlsByUdis([FromJsonPath] Udi[] udis, string culture = null)
+        public IDictionary<Udi, string> GetUrlsByUdis([FromJsonPath] Udi[] udis, string? culture = null)
         {
             if (udis == null || !udis.Any())
             {
@@ -508,7 +508,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <remarks>
         ///     We are not restricting this with security because there is no sensitive data
         /// </remarks>
-        public IActionResult GetUrl(int id, UmbracoEntityTypes type, string culture = null)
+        public IActionResult GetUrl(int id, UmbracoEntityTypes type, string? culture = null)
         {
             culture = culture ?? ClientCulture();
 
@@ -1445,7 +1445,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return x => MapEntity(x, culture);
         }
 
-        private EntityBasic MapEntity(object entity, string culture = null)
+        private EntityBasic MapEntity(object entity, string? culture = null)
         {
             culture = culture ?? ClientCulture();
             return _umbracoMapper.Map<EntityBasic>(entity, context => { context.SetCulture(culture); });

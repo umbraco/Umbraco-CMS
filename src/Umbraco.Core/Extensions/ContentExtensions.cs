@@ -33,9 +33,9 @@ namespace Umbraco.Extensions
             this IContentBase content,
             string propertyTypeAlias,
             MediaUrlGeneratorCollection mediaUrlGenerators,
-            out string mediaFilePath,
-            string culture = null,
-            string segment = null)
+            out string? mediaFilePath,
+            string? culture = null,
+            string? segment = null)
         {
             if (!content.Properties.TryGetValue(propertyTypeAlias, out IProperty property))
             {
@@ -141,7 +141,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the current status of the Content
         /// </summary>
-        public static ContentStatus GetStatus(this IContent content, ContentScheduleCollection contentSchedule, string culture = null)
+        public static ContentStatus GetStatus(this IContent content, ContentScheduleCollection contentSchedule, string? culture = null)
         {
             if (content.Trashed)
                 return ContentStatus.Trashed;
@@ -151,11 +151,11 @@ namespace Umbraco.Extensions
             else if (culture.IsNullOrWhiteSpace())
                 throw new ArgumentNullException($"{nameof(culture)} cannot be null or empty");
 
-            var expires = contentSchedule.GetSchedule(culture, ContentScheduleAction.Expire);
+            var expires = contentSchedule.GetSchedule(culture!, ContentScheduleAction.Expire);
             if (expires != null && expires.Any(x => x.Date > DateTime.MinValue && DateTime.Now > x.Date))
                 return ContentStatus.Expired;
 
-            var release = contentSchedule.GetSchedule(culture, ContentScheduleAction.Release);
+            var release = contentSchedule.GetSchedule(culture!, ContentScheduleAction.Release);
             if (release != null && release.Any(x => x.Date > DateTime.MinValue && x.Date > DateTime.Now))
                 return ContentStatus.AwaitingRelease;
 
@@ -258,8 +258,8 @@ namespace Umbraco.Extensions
             string propertyTypeAlias,
             string filename,
             Stream filestream,
-            string culture = null,
-            string segment = null)
+            string? culture = null,
+            string? segment = null)
         {
             if (filename == null || filestream == null)
                 return;
@@ -280,18 +280,18 @@ namespace Umbraco.Extensions
             string propertyTypeAlias,
             string filename,
             Stream filestream,
-            string culture = null,
-            string segment = null)
+            string? culture = null,
+            string? segment = null)
         {
             var property = GetProperty(content, contentTypeBaseServiceProvider, propertyTypeAlias);
 
             // Fixes https://github.com/umbraco/Umbraco-CMS/issues/3937 - Assigning a new file to an
             // existing IMedia with extension SetValue causes exception 'Illegal characters in path'
-            string oldpath = null;
+            string? oldpath = null;
 
-            if (content.TryGetMediaPath(property.Alias, mediaUrlGenerators, out string mediaFilePath, culture, segment))
+            if (content.TryGetMediaPath(property.Alias, mediaUrlGenerators, out string? mediaFilePath, culture, segment))
             {
-                oldpath = mediaFileManager.FileSystem.GetRelativePath(mediaFilePath);
+                oldpath = mediaFileManager.FileSystem.GetRelativePath(mediaFilePath!);
             }
 
             var filepath = mediaFileManager.StoreFile(content, property.PropertyType, filename, filestream, oldpath);

@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.Configuration.Grid
                     ? GetResult()
                     : _appCaches.RuntimeCache.GetCacheItem<List<IGridEditorConfig>>(typeof(GridEditorsConfig) + ".Editors",GetResult, TimeSpan.FromMinutes(10));
 
-                return result;
+                return result!;
             }
         }
     }

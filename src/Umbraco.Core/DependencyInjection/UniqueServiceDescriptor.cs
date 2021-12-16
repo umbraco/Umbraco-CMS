@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public override bool Equals(object obj) => Equals(obj as UniqueServiceDescriptor);
 
         /// <inheritdoc/>
-        public bool Equals(UniqueServiceDescriptor other) => other != null && Lifetime == other.Lifetime && EqualityComparer<Type>.Default.Equals(ServiceType, other.ServiceType) && EqualityComparer<Type>.Default.Equals(ImplementationType, other.ImplementationType) && EqualityComparer<object>.Default.Equals(ImplementationInstance, other.ImplementationInstance) && EqualityComparer<Func<IServiceProvider, object>>.Default.Equals(ImplementationFactory, other.ImplementationFactory);
+        public bool Equals(UniqueServiceDescriptor? other) => other != null && Lifetime == other.Lifetime && EqualityComparer<Type>.Default.Equals(ServiceType, other.ServiceType) && EqualityComparer<Type?>.Default.Equals(ImplementationType, other.ImplementationType) && EqualityComparer<object?>.Default.Equals(ImplementationInstance, other.ImplementationInstance) && EqualityComparer<Func<IServiceProvider, object>?>.Default.Equals(ImplementationFactory, other.ImplementationFactory);
 
         /// <inheritdoc/>
         public override int GetHashCode()
@@ -36,9 +36,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             int hashCode = 493849952;
             hashCode = (hashCode * -1521134295) + Lifetime.GetHashCode();
             hashCode = (hashCode * -1521134295) + EqualityComparer<Type>.Default.GetHashCode(ServiceType);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<Type>.Default.GetHashCode(ImplementationType);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<object>.Default.GetHashCode(ImplementationInstance);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<Func<IServiceProvider, object>>.Default.GetHashCode(ImplementationFactory);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<Type?>.Default.GetHashCode(ImplementationType);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<object?>.Default.GetHashCode(ImplementationInstance);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<Func<IServiceProvider, object>?>.Default.GetHashCode(ImplementationFactory);
             return hashCode;
         }
     }

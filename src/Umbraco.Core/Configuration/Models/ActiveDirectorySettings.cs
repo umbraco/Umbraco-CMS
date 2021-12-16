@@ -12,6 +12,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the Active Directory domain.
         /// </summary>
-        public string Domain { get; set; }
+        public string? Domain { get; set; }
     }
 }

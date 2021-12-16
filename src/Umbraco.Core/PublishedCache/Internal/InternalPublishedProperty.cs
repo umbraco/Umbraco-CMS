@@ -19,12 +19,12 @@ namespace Umbraco.Cms.Core.PublishedCache.Internal
 
         public object SolidXPathValue { get; set; }
 
-        public virtual object GetSourceValue(string culture = null, string segment = null) => SolidSourceValue;
+        public virtual object GetSourceValue(string culture = null, string? segment = null) => SolidSourceValue;
 
-        public virtual object GetValue(string culture = null, string segment = null) => SolidValue;
+        public virtual object GetValue(string culture = null, string? segment = null) => SolidValue;
 
-        public virtual object GetXPathValue(string culture = null, string segment = null) => SolidXPathValue;
+        public virtual object GetXPathValue(string culture = null, string? segment = null) => SolidXPathValue;
 
-        public virtual bool HasValue(string culture = null, string segment = null) => SolidHasValue;
+        public virtual bool HasValue(string culture = null, string? segment = null) => SolidHasValue;
     }
 }

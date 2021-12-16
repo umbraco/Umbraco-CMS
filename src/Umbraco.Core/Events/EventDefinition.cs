@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Events
         private readonly object _sender;
         private readonly EventArgs _args;
 
-        public EventDefinition(EventHandler trackedEvent, object sender, EventArgs args, string eventName = null)
+        public EventDefinition(EventHandler trackedEvent, object sender, EventArgs args, string? eventName = null)
             : base(sender, args, eventName)
         {
             _trackedEvent = trackedEvent;

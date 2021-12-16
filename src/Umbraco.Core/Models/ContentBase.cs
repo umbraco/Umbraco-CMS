@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, IPropertyCollection properties, string culture = null)
+        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
             : this(name, contentType, properties, culture)
         {
             if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
@@ -53,14 +53,14 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, IPropertyCollection properties, string culture = null)
+        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
             : this(name, contentType, properties, culture)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             SetParent(parent);
         }
 
-        private ContentBase(string name, IContentTypeComposition contentType, IPropertyCollection properties, string culture = null)
+        private ContentBase(string name, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
         {
             ContentType = contentType?.ToSimple() ?? throw new ArgumentNullException(nameof(contentType));
 
@@ -295,7 +295,7 @@ namespace Umbraco.Cms.Core.Models
             => Properties.Contains(propertyTypeAlias);
 
         /// <inheritdoc />
-        public object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
+        public object GetValue(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false)
         {
             return Properties.TryGetValue(propertyTypeAlias, out var property)
                 ? property.GetValue(culture, segment, published)
@@ -303,7 +303,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
+        public TValue GetValue<TValue>(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false)
         {
             if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 return default;
@@ -313,7 +313,7 @@ namespace Umbraco.Cms.Core.Models
         }
 
         /// <inheritdoc />
-        public void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null)
+        public void SetValue(string propertyTypeAlias, object value, string? culture = null, string? segment = null)
         {
             if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");

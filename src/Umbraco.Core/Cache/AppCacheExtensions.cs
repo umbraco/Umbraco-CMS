@@ -10,12 +10,12 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class AppCacheExtensions
     {
-        public static T GetCacheItem<T>(this IAppPolicyCache provider,
+        public static T? GetCacheItem<T>(this IAppPolicyCache provider,
             string cacheKey,
-            Func<T> getCacheItem,
+            Func<T?> getCacheItem,
             TimeSpan? timeout,
             bool isSliding = false,
-            string[] dependentFiles = null)
+            string[]? dependentFiles = null)
         {
             var result = provider.Get(cacheKey, () => getCacheItem(), timeout, isSliding, dependentFiles);
             return result == null ? default(T) : result.TryConvertTo<T>().Result;
@@ -26,7 +26,7 @@ namespace Umbraco.Extensions
             Func<T> getCacheItem,
             TimeSpan? timeout = null,
             bool isSliding = false,
-            string[] dependentFiles = null)
+            string[]? dependentFiles = null)
         {
             provider.Insert(cacheKey, () => getCacheItem(), timeout, isSliding, dependentFiles);
         }
@@ -43,7 +43,7 @@ namespace Umbraco.Extensions
             return result.Select(x => x.TryConvertTo<T>().Result);
         }
 
-        public static T GetCacheItem<T>(this IAppCache provider, string cacheKey)
+        public static T? GetCacheItem<T>(this IAppCache provider, string cacheKey)
         {
             var result = provider.Get(cacheKey);
             if (result == null)
@@ -53,7 +53,7 @@ namespace Umbraco.Extensions
             return result.TryConvertTo<T>().Result;
         }
 
-        public static T GetCacheItem<T>(this IAppCache provider, string cacheKey, Func<T> getCacheItem)
+        public static T? GetCacheItem<T>(this IAppCache provider, string cacheKey, Func<T> getCacheItem)
         {
             var result = provider.Get(cacheKey, () => getCacheItem());
             if (result == null)

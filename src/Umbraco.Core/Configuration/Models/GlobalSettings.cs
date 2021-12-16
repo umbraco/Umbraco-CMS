@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the SMTP settings.
         /// </summary>
-        public SmtpSettings Smtp { get; set; }
+        public SmtpSettings? Smtp { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether SMTP is configured.

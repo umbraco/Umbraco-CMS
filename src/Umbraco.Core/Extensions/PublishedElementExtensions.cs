@@ -66,7 +66,7 @@ namespace Umbraco.Extensions
         /// Gets a value indicating whether the content has a value for a property identified by its alias.
         /// </summary>
         /// <remarks>Returns true if <c>GetProperty(alias)</c> is not <c>null</c> and <c>GetProperty(alias).HasValue</c> is <c>true</c>.</remarks>
-        public static bool HasValue(this IPublishedElement content, string alias, string culture = null, string segment = null)
+        public static bool HasValue(this IPublishedElement content, string alias, string? culture = null, string? segment = null)
         {
             var prop = content.GetProperty(alias);
             return prop != null && prop.HasValue(culture, segment);
@@ -93,7 +93,7 @@ namespace Umbraco.Extensions
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedElement content, IPublishedValueFallback publishedValueFallback, string alias, string culture = null, string segment = null, Fallback fallback = default, object defaultValue = default)
+        public static object? Value(this IPublishedElement content, IPublishedValueFallback publishedValueFallback, string alias, string? culture = null, string? segment = null, Fallback fallback = default, object? defaultValue = default)
         {
             var property = content.GetProperty(alias);
 
@@ -132,7 +132,7 @@ namespace Umbraco.Extensions
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedElement content, IPublishedValueFallback publishedValueFallback, string alias, string culture = null, string segment = null, Fallback fallback = default, T defaultValue = default)
+        public static T? Value<T>(this IPublishedElement content, IPublishedValueFallback publishedValueFallback, string alias, string? culture = null, string? segment = null, Fallback fallback = default, T? defaultValue = default)
         {
             var property = content.GetProperty(alias);
 
@@ -198,7 +198,7 @@ namespace Umbraco.Extensions
         /// if any. In addition, when the content type is multi-lingual, this is the url for the
         /// specified culture. Otherwise, it is the invariant url.</para>
         /// </remarks>
-        public static string MediaUrl(this IPublishedContent content, IPublishedUrlProvider publishedUrlProvider, string culture = null, UrlMode mode = UrlMode.Default, string propertyAlias = Constants.Conventions.Media.File)
+        public static string MediaUrl(this IPublishedContent content, IPublishedUrlProvider publishedUrlProvider, string? culture = null, UrlMode mode = UrlMode.Default, string propertyAlias = Constants.Conventions.Media.File)
         {
             if (publishedUrlProvider == null) throw new ArgumentNullException(nameof(publishedUrlProvider));
 

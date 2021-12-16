@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Composing
             get
             {
                 EnsureCollection();
-                return _count.Value;
+                return _count.GetValueOrDefault();
             }
         }
 

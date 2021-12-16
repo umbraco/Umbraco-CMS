@@ -2451,7 +2451,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }
-        
+
         /// <summary>
         /// Used to map an <see cref="IContent"/> instance to a <see cref="ContentItemDisplay"/> and ensuring AllowPreview is set correctly.
         /// Also allows you to pass in an action for the mapper context where you can pass additional information on to the mapper.
@@ -2550,7 +2550,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string culture = null)
+        public IEnumerable<RollbackVersion> GetRollbackVersions(int contentId, string? culture = null)
         {
             var rollbackVersions = new List<RollbackVersion>();
             var writerIds = new HashSet<int>();
@@ -2595,7 +2595,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        public ContentVariantDisplay GetRollbackVersion(int versionId, string culture = null)
+        public ContentVariantDisplay GetRollbackVersion(int versionId, string? culture = null)
         {
             var version = _contentService.GetVersion(versionId);
             var content = MapToDisplay(version);

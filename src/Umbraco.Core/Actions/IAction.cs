@@ -44,6 +44,6 @@ namespace Umbraco.Cms.Core.Actions
         /// <remarks>
         /// Used in the UI when assigning permissions
         /// </remarks>
-        string Category { get; }
+        string? Category { get; }
     }
 }

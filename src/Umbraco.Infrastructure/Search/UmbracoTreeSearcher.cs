@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Search
             string query,
             UmbracoEntityTypes entityType,
             int pageSize,
-            long pageIndex, out long totalFound, string culture = null, string searchFrom = null, bool ignoreUserStartNodes = false)
+            long pageIndex, out long totalFound, string? culture = null, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
             var pagedResult = _backOfficeExamineSearcher.Search(query, entityType, pageSize, pageIndex, out totalFound, searchFrom, ignoreUserStartNodes);
 
@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// <param name="results"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results, string culture = null)
+        private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results, string? culture = null)
         {
             var defaultLang = _languageService.GetDefaultLanguageIsoCode();
 

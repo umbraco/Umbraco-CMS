@@ -18,12 +18,12 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="isSliding">An optional value indicating whether the cache timeout is sliding (default is false).</param>
         /// <param name="dependentFiles">Files the cache entry depends on.</param>
         /// <returns>The item.</returns>
-        object Get(
+        object? Get(
             string key,
-            Func<object> factory,
+            Func<object?> factory,
             TimeSpan? timeout,
             bool isSliding = false,
-            string[] dependentFiles = null);
+            string[]? dependentFiles = null);
 
         /// <summary>
         /// Inserts an item.
@@ -35,9 +35,9 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="dependentFiles">Files the cache entry depends on.</param>
         void Insert(
             string key,
-            Func<object> factory,
+            Func<object?> factory,
             TimeSpan? timeout = null,
             bool isSliding = false,
-            string[] dependentFiles = null);
+            string[]? dependentFiles = null);
     }
 }

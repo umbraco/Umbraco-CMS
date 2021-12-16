@@ -21,6 +21,6 @@ namespace Umbraco.Cms.Core.CodeAnnotations
 
         public Guid ObjectId { get; private set; }
 
-        public Type ModelType { get; private set; }
+        public Type? ModelType { get; private set; }
     }
 }

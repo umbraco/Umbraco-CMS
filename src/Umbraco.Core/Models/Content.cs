@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, IContent parent, IContentType contentType, string culture = null)
+        public Content(string name, IContent parent, IContentType contentType, string? culture = null)
             : this(name, parent, contentType, new PropertyCollection(), culture)
         { }
 
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="userId">The identifier of the user creating the Content object</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, IContent parent, IContentType contentType, int userId, string culture = null)
+        public Content(string name, IContent parent, IContentType contentType, int userId, string? culture = null)
             : this(name, parent, contentType, new PropertyCollection(), culture)
         {
             CreatorId = userId;
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
+        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string? culture = null)
             : base(name, parent, contentType, properties, culture)
         {
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, int parentId, IContentType contentType, string culture = null)
+        public Content(string name, int parentId, IContentType contentType, string? culture = null)
             : this(name, parentId, contentType, new PropertyCollection(), culture)
         { }
 
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="userId">The identifier of the user creating the Content object</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, int parentId, IContentType contentType, int userId, string culture = null)
+        public Content(string name, int parentId, IContentType contentType, int userId, string? culture = null)
             : this(name, parentId, contentType, new PropertyCollection(), culture)
         {
             CreatorId = userId;
@@ -103,7 +103,7 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
         /// <param name="culture">An optional culture.</param>
-        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
+        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string? culture = null)
             : base(name, parentId, contentType, properties, culture)
         {
             if (contentType == null) throw new ArgumentNullException(nameof(contentType));

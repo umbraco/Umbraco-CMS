@@ -11,7 +11,7 @@ namespace Umbraco.Extensions
     {
         #region Value
 
-        public static object Value(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string culture = null, string segment = null, Fallback fallback = default, object defaultValue = default)
+        public static object Value(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string? culture = null, string? segment = null, Fallback fallback = default, object? defaultValue = default)
         {
             if (property.HasValue(culture, segment))
                 return property.GetValue(culture, segment);
@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
 
         #region Value<T>
 
-        public static T Value<T>(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string culture = null, string segment = null, Fallback fallback = default, T defaultValue = default)
+        public static T? Value<T>(this IPublishedProperty property, IPublishedValueFallback publishedValueFallback, string? culture = null, string? segment = null, Fallback fallback = default, T? defaultValue = default)
         {
             if (property.HasValue(culture, segment))
             {

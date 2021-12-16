@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Core.Deploy
         /// <param name="differences">A collection of differences to append to, if not null.</param>
         /// <returns>A boolean value indicating whether the artifacts are identical.</returns>
         /// <remarks>ServiceConnectorBase{TArtifact} provides a very basic default implementation.</remarks>
-        bool Compare(IArtifact art1, IArtifact art2, ICollection<Difference> differences = null);
+        bool Compare(IArtifact art1, IArtifact art2, ICollection<Difference>? differences = null);
     }
 
 }

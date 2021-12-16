@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <remarks>
         /// This may be null.
         /// </remarks>
-        IHostingEnvironment BuilderHostingEnvironment { get; }
+        IHostingEnvironment? BuilderHostingEnvironment { get; }
 
         IProfiler Profiler { get; }
         AppCaches AppCaches { get; }

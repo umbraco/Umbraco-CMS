@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         IEnumerable<IPublishedContent> INavigableData.GetAtRoot(bool preview) => GetAtRoot(preview);
 
-        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null)
+        public override IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null)
         {
             // handle context culture for variant
             if (culture == null)

@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Strings
         /// <param name="content">The content.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The URL segment.</returns>
-        public string GetUrlSegment(IContentBase content, string culture = null)
+        public string GetUrlSegment(IContentBase content, string? culture = null)
         {
             return GetUrlSegmentSource(content, culture).ToUrlSegment(_shortStringHelper, culture);
         }

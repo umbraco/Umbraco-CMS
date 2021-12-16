@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _redirectUrlRepository = redirectUrlRepository;
         }
 
-        public void Register(string url, Guid contentKey, string culture = null)
+        public void Register(string url, Guid contentKey, string? culture = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {

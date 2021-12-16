@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Collections
     public class TopoGraph<TKey, TItem> : TopoGraph
     {
         private readonly Func<TItem, TKey> _getKey;
-        private readonly Func<TItem, IEnumerable<TKey>> _getDependencies;
+        private readonly Func<TItem, IEnumerable<TKey>?> _getDependencies;
         private readonly Dictionary<TKey, TItem> _items = new Dictionary<TKey, TItem>();
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Collections
         /// </summary>
         /// <param name="getKey">A method that returns the key of an item.</param>
         /// <param name="getDependencies">A method that returns the dependency keys of an item.</param>
-        public TopoGraph(Func<TItem, TKey> getKey, Func<TItem, IEnumerable<TKey>> getDependencies)
+        public TopoGraph(Func<TItem, TKey> getKey, Func<TItem, IEnumerable<TKey>?> getDependencies)
         {
             _getKey = getKey;
             _getDependencies = getDependencies;

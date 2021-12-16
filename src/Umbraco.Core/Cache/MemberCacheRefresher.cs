@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Cache
         public class JsonPayload
         {
             //[JsonConstructor]
-            public JsonPayload(int id, string username, bool removed)
+            public JsonPayload(int id, string? username, bool removed)
             {
                 Id = id;
                 Username = username;
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Cache
             }
 
             public int Id { get; }
-            public string Username { get; }
+            public string? Username { get; }
             public bool Removed { get; }
         }
 

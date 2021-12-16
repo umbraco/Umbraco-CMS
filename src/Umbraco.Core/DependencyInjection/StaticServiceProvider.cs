@@ -20,6 +20,6 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
         /// The service locator.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IServiceProvider Instance { get; set; }
+        public static IServiceProvider Instance { get; set; } = null!; // This is set doing startup and will always exists after that
     }
 }

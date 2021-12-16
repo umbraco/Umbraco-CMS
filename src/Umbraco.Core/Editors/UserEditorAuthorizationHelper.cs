@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Core.Editors
             return Attempt<string>.Succeed();
         }
 
-        private Attempt<string> AuthorizePath(IUser currentUser, IEnumerable<int> startContentIds, IEnumerable<int> startMediaIds)
+        private Attempt<string> AuthorizePath(IUser currentUser, IEnumerable<int>? startContentIds, IEnumerable<int>? startMediaIds)
         {
             if (startContentIds != null)
             {

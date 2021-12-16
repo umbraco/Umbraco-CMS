@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly List<Type> _types = new List<Type>();
         private readonly object _locker = new object();
-        private Type[] _registeredTypes;
+        private Type[]? _registeredTypes;
 
         /// <summary>
         /// Gets the internal list of types as an IEnumerable (immutable).

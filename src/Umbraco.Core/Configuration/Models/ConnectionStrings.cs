@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         // See: https://stackoverflow.com/a/54607296/489433
 #pragma warning disable SA1300  // Element should begin with upper-case letter
 #pragma warning disable IDE1006 // Naming Styles
-        private string umbracoDbDSN
+        private string? umbracoDbDSN
 #pragma warning restore IDE1006 // Naming Styles
 #pragma warning restore SA1300  // Element should begin with upper-case letter
         {

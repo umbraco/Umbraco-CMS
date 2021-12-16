@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Actions
         public string Alias => ActionAlias;
 
         /// <inheritdoc/>
-        public string Category => null;
+        public string? Category => null;
 
         /// <inheritdoc/>
         public string Icon => "undo";

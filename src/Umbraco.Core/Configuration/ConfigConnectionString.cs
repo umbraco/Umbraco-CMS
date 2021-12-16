@@ -7,18 +7,18 @@ namespace Umbraco.Cms.Core.Configuration
     {
         public string Name { get; }
 
-        public string ConnectionString { get; }
+        public string? ConnectionString { get; }
 
-        public string ProviderName { get; }
+        public string? ProviderName { get; }
 
-        public ConfigConnectionString(string name, string connectionString, string providerName = null)
+        public ConfigConnectionString(string name, string? connectionString, string? providerName = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             ConnectionString = ParseConnectionString(connectionString, ref providerName);
-            ProviderName = providerName;
+            ProviderName = providerName!;
         }
 
-        private static string ParseConnectionString(string connectionString, ref string providerName)
+        private static string? ParseConnectionString(string? connectionString, ref string? providerName)
         {
             if (string.IsNullOrEmpty(connectionString))
             {
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// <returns>
         /// The provider name or <c>null</c> is the connection string is empty.
         /// </returns>
-        public static string ParseProviderName(string connectionString)
+        public static string? ParseProviderName(string? connectionString)
         {
             if (string.IsNullOrEmpty(connectionString))
             {

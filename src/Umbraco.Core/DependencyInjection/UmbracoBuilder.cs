@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
         public ILoggerFactory BuilderLoggerFactory { get; }
 
         /// <inheritdoc />
-        public IHostingEnvironment BuilderHostingEnvironment { get; }
+        public IHostingEnvironment? BuilderHostingEnvironment { get; }
 
         public IProfiler Profiler { get; }
 
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             ILoggerFactory loggerFactory,
             IProfiler profiler,
             AppCaches appCaches,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment? hostingEnvironment)
         {
             Services = services;
             Config = config;

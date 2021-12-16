@@ -22,7 +22,7 @@ namespace Umbraco.Extensions
         /// <param name="merge">A value indicating whether to merge the tags with existing tags instead of replacing them.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
         /// <param name="propertyEditors"></param>
-        public static void AssignTags(this IContentBase content, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string propertyTypeAlias, IEnumerable<string> tags, bool merge = false, string culture = null)
+        public static void AssignTags(this IContentBase content, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string propertyTypeAlias, IEnumerable<string> tags, bool merge = false, string? culture = null)
         {
             content.GetTagProperty(propertyTypeAlias).AssignTags(propertyEditors, dataTypeService, serializer, tags, merge, culture);
         }
@@ -36,7 +36,7 @@ namespace Umbraco.Extensions
         /// <param name="tags">The tags.</param>
         /// <param name="culture">A culture, for multi-lingual properties.</param>
         /// <param name="propertyEditors"></param>
-        public static void RemoveTags(this IContentBase content, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string propertyTypeAlias, IEnumerable<string> tags, string culture = null)
+        public static void RemoveTags(this IContentBase content, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IJsonSerializer serializer, string propertyTypeAlias, IEnumerable<string> tags, string? culture = null)
         {
             content.GetTagProperty(propertyTypeAlias).RemoveTags(propertyEditors, dataTypeService, serializer, tags, culture);
         }

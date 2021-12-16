@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core
         {
             unchecked
             {
-                return 31 * arg1.GetHashCode() + arg2.GetHashCode();
+                return 31 * arg1!.GetHashCode() + arg2!.GetHashCode();
             }
         }
 
@@ -19,9 +19,9 @@ namespace Umbraco.Cms.Core
         {
             unchecked
             {
-                int hash = arg1.GetHashCode();
-                hash = 31 * hash + arg2.GetHashCode();
-                return 31 * hash + arg3.GetHashCode();
+                int hash = arg1!.GetHashCode();
+                hash = 31 * hash + arg2!.GetHashCode();
+                return 31 * hash + arg3!.GetHashCode();
             }
         }
 
@@ -30,10 +30,10 @@ namespace Umbraco.Cms.Core
         {
             unchecked
             {
-                int hash = arg1.GetHashCode();
-                hash = 31 * hash + arg2.GetHashCode();
-                hash = 31 * hash + arg3.GetHashCode();
-                return 31 * hash + arg4.GetHashCode();
+                int hash = arg1!.GetHashCode();
+                hash = 31 * hash + arg2!.GetHashCode();
+                hash = 31 * hash + arg3!.GetHashCode();
+                return 31 * hash + arg4!.GetHashCode();
             }
         }
 
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core
         {
             unchecked
             {
-                return 31 * hashCode + arg.GetHashCode();
+                return 31 * hashCode + arg!.GetHashCode();
             }
         }
     }

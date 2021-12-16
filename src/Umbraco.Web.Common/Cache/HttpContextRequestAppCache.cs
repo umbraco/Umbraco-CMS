@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public override object Get(string key, Func<object> factory)
+        public override object Get(string key, Func<object?> factory)
         {
             //no place to cache so just return the callback result
             if (!TryGetContextItems(out var items))
@@ -242,7 +242,7 @@ namespace Umbraco.Cms.Core.Cache
             }
 
             IFeatureCollection features = httpContext.Features;
-            
+
             lock (httpContext)
             {
                 requestLock = new RequestLock();

@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Configuration.Models.Validation
         /// <param name="validationDescription">Description of validation appended to message if validation fails.</param>
         /// <param name="message">A message to output if the value does not match.</param>
         /// <returns>True if valid, false if not.</returns>
-        public bool ValidateOptionalEntry(string configPath, ValidatableEntryBase value, string validationDescription, out string message)
+        public bool ValidateOptionalEntry(string configPath, ValidatableEntryBase? value, string validationDescription, out string message)
         {
             if (value != null && !value.IsValid())
             {

@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core
             return ValueToName.Values.ToArray();
         }
 
-        public static string GetName(T value)
+        public static string? GetName(T value)
         {
             return ValueToName.TryGetValue(value, out var name) ? name : null;
         }

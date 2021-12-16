@@ -223,9 +223,9 @@ namespace Umbraco.Extensions
         /// <param name="coll">The coll.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> coll) where T : class
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> coll) where T : class
         {
-            return coll.Where(x => x != null);
+            return coll.Where(x => x != null)!;
         }
 
         public static IEnumerable<TBase> ForAllThatAre<TBase, TActual>(this IEnumerable<TBase> sequence, Action<TActual> projection)

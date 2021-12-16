@@ -9,21 +9,21 @@ namespace Umbraco.Cms.Core.ContentApps
     {
         private const int Weight = -180;
 
-        private ContentApp _contentTypeApp;
+        private ContentApp? _contentTypeApp;
 
-        public ContentApp GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
+        public ContentApp? GetContentAppFor(object source, IEnumerable<IReadOnlyUserGroup> userGroups)
         {
             switch (source)
             {
                 case IContentType _:
-                    return _contentTypeApp ?? (_contentTypeApp = new ContentApp()
+                    return _contentTypeApp ??= new ContentApp()
                     {
                         Alias = "listView",
                         Name = "List view",
                         Icon = "icon-list",
                         View = "views/documentTypes/views/listview/listview.html",
                         Weight = Weight
-                    });
+                    };
                 default:
                     return null;
             }

@@ -33,7 +33,7 @@ namespace Umbraco.Extensions
             string culture = null,
             string segment = null,
             Fallback fallback = default,
-            object defaultValue = default)
+            object? defaultValue = default)
             => content.Value(PublishedValueFallback, alias, culture, segment, fallback, defaultValue);
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the value of a property.
         /// </summary>
-        public static TValue ValueFor<TModel, TValue>(this TModel model, Expression<Func<TModel, TValue>> property, string culture = null, string segment = null, Fallback fallback = default, TValue defaultValue = default)
+        public static TValue ValueFor<TModel, TValue>(this TModel model, Expression<Func<TModel, TValue>> property, string? culture = null, string? segment = null, Fallback fallback = default, TValue defaultValue = default)
             where TModel : IPublishedElement =>
             model.ValueFor(PublishedValueFallback, property, culture, segment, fallback);
     }

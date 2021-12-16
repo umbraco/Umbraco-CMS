@@ -17,23 +17,23 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly ILogger<TypeFinder> _logger;
         private readonly IAssemblyProvider _assemblyProvider;
-        private volatile HashSet<Assembly> _localFilteredAssemblyCache;
+        private volatile HashSet<Assembly>? _localFilteredAssemblyCache;
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
         private static readonly ConcurrentDictionary<string, Type> s_typeNamesCache = new ConcurrentDictionary<string, Type>();
 
-        private readonly ITypeFinderConfig _typeFinderConfig;
+        private readonly ITypeFinderConfig? _typeFinderConfig;
         // used for benchmark tests
         internal bool QueryWithReferencingAssemblies { get; set; } = true;
 
-        public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig typeFinderConfig = null)
+        public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, ITypeFinderConfig? typeFinderConfig = null)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _assemblyProvider = assemblyProvider;
             _typeFinderConfig = typeFinderConfig;
         }
 
-        private string[] _assembliesAcceptingLoadExceptions = null;
+        private string[]? _assembliesAcceptingLoadExceptions = null;
 
         private string[] AssembliesAcceptingLoadExceptions
         {
@@ -99,8 +99,8 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="exclusionFilter"></param>
         /// <returns></returns>
         private IEnumerable<Assembly> GetFilteredAssemblies(
-            IEnumerable<Assembly> excludeFromResults = null,
-            string[] exclusionFilter = null)
+            IEnumerable<Assembly>? excludeFromResults = null,
+            string[]? exclusionFilter = null)
         {
             if (excludeFromResults == null)
                 excludeFromResults = new HashSet<Assembly>();
@@ -195,7 +195,7 @@ namespace Umbraco.Cms.Core.Composing
         public IEnumerable<Type> FindClassesOfTypeWithAttribute(
             Type assignTypeFrom,
             Type attributeType,
-            IEnumerable<Assembly> assemblies = null,
+            IEnumerable<Assembly>? assemblies = null,
             bool onlyConcreteClasses = true)
         {
             var assemblyList = (assemblies ?? AssembliesToScan).ToList();
@@ -212,7 +212,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="assemblies"></param>
         /// <param name="onlyConcreteClasses"></param>
         /// <returns></returns>
-        public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly> assemblies = null, bool onlyConcreteClasses = true)
+        public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly>? assemblies = null, bool onlyConcreteClasses = true)
         {
             var assemblyList = (assemblies ?? AssembliesToScan).ToList();
 
@@ -228,7 +228,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <returns></returns>
         public IEnumerable<Type> FindClassesWithAttribute(
             Type attributeType,
-            IEnumerable<Assembly> assemblies = null,
+            IEnumerable<Assembly>? assemblies = null,
             bool onlyConcreteClasses = true)
         {
             var assemblyList = (assemblies ?? AssembliesToScan).ToList();
@@ -308,7 +308,7 @@ namespace Umbraco.Cms.Core.Composing
             {
                 var assembly = stack.Pop();
 
-                IReadOnlyList<Type> assemblyTypes = null;
+                IReadOnlyList<Type>? assemblyTypes = null;
                 if (assembly != attributeType.Assembly || attributeAssemblyIsCandidate)
                 {
                     // get all assembly types that can be assigned to baseType
@@ -362,7 +362,7 @@ namespace Umbraco.Cms.Core.Composing
             Type baseType,
             IEnumerable<Assembly> assemblies,
             bool onlyConcreteClasses,
-            Func<Type, bool> additionalFilter = null)
+            Func<Type, bool>? additionalFilter = null)
         {
             var candidateAssemblies = new HashSet<Assembly>(assemblies);
             var baseTypeAssemblyIsCandidate = candidateAssemblies.Contains(baseType.Assembly);
@@ -383,7 +383,7 @@ namespace Umbraco.Cms.Core.Composing
                 var assembly = stack.Pop();
 
                 // get all assembly types that can be assigned to baseType
-                IReadOnlyList<Type> assemblyTypes = null;
+                IReadOnlyList<Type>? assemblyTypes = null;
                 if (assembly != baseType.Assembly || baseTypeAssemblyIsCandidate)
                 {
                     try

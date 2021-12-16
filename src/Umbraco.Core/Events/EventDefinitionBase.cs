@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Events
 {
     public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDefinitionBase>
     {
-        protected EventDefinitionBase(object sender, object args, string eventName = null)
+        protected EventDefinitionBase(object sender, object args, string? eventName = null)
         {
             Sender = sender ?? throw new ArgumentNullException(nameof(sender));
             Args = args ?? throw new ArgumentNullException(nameof(args));
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Events
 
         public object Sender { get; }
         public object Args { get; }
-        public string EventName { get; }
+        public string? EventName { get; }
 
         public abstract void RaiseEvent();
 

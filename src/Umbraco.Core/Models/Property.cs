@@ -241,7 +241,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Gets the value.
         /// </summary>
-        public object GetValue(string culture = null, string segment = null, bool published = false)
+        public object GetValue(string culture = null, string? segment = null, bool published = false)
         {
             // ensure null or whitespace are nulls
             culture = culture.NullOrWhiteSpaceAsNull();
@@ -340,7 +340,7 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Sets a value.
         /// </summary>
-        public void SetValue(object value, string culture = null, string segment = null)
+        public void SetValue(object value, string? culture = null, string? segment = null)
         {
             culture = culture.NullOrWhiteSpaceAsNull();
             segment = segment.NullOrWhiteSpaceAsNull();

@@ -75,7 +75,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="T">The type to convert to</typeparam>
         /// <param name="input">The input.</param>
         /// <returns>The <see cref="Attempt{T}"/></returns>
-        public static Attempt<T> TryConvertTo<T>(this object input)
+        public static Attempt<T> TryConvertTo<T>(this object? input)
         {
             Attempt<object> result = TryConvertTo(input, typeof(T));
 

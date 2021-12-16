@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Install.Models
     [DataContract(Name = "result", Namespace = "")]
     public class InstallProgressResultModel
     {
-        public InstallProgressResultModel(bool processComplete, string stepCompleted, string nextStep, string view = null, object viewModel = null)
+        public InstallProgressResultModel(bool processComplete, string stepCompleted, string nextStep, string? view = null, object? viewModel = null)
         {
             ProcessComplete = processComplete;
             StepCompleted = stepCompleted;
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Install.Models
         /// The UI view to show when this step executes, by default no views are shown for the completion of a step unless explicitly specified.
         /// </summary>
         [DataMember(Name = "view")]
-        public string View { get; private set; }
+        public string? View { get; private set; }
 
         [DataMember(Name = "complete")]
         public bool ProcessComplete { get; set; }
@@ -37,6 +37,6 @@ namespace Umbraco.Cms.Core.Install.Models
         /// The view model to return to the UI if this step is returning a view (optional)
         /// </summary>
         [DataMember(Name = "model")]
-        public object ViewModel { get; private set; }
+        public object? ViewModel { get; private set; }
     }
 }

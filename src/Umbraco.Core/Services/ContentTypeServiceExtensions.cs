@@ -47,8 +47,8 @@ namespace Umbraco.Extensions
         public static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
             IContentTypeComposition source,
             IContentTypeComposition[] allContentTypes,
-            string[] filterContentTypes = null,
-            string[] filterPropertyTypes = null,
+            string[]? filterContentTypes = null,
+            string[]? filterPropertyTypes = null,
             bool isElement = false)
         {
             filterContentTypes = filterContentTypes == null

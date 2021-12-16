@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         }
 
         // determines whether a property has value
-        public override bool HasValue(string culture = null, string segment = null)
+        public override bool HasValue(string culture = null, string? segment = null)
         {
             _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return vvalue.InterValue;
         }
 
-        public override object GetSourceValue(string culture = null, string segment = null)
+        public override object GetSourceValue(string culture = null, string? segment = null)
         {
             _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
@@ -208,7 +208,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
         }
 
-        public override object GetValue(string culture = null, string segment = null)
+        public override object GetValue(string culture = null, string? segment = null)
         {
             _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
@@ -229,7 +229,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             return value;
         }
 
-        public override object GetXPathValue(string culture = null, string segment = null)
+        public override object GetXPathValue(string culture = null, string? segment = null)
         {
             _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 

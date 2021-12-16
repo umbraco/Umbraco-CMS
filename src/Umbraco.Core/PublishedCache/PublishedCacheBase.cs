@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         public bool HasById(int contentId)
             => HasById(PreviewDefault, contentId);
 
-        public abstract IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null);
+        public abstract IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null);
 
         public IEnumerable<IPublishedContent> GetAtRoot(string culture = null)
         {

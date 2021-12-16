@@ -35,14 +35,14 @@ namespace Umbraco.Cms.Core.Cache
         private IAppPolicyCache InnerCache { get; }
 
         /// <inheritdoc />
-        public object Get(string key)
+        public object? Get(string key)
         {
             var item = InnerCache.Get(key);
             return CheckCloneableAndTracksChanges(item);
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory)
+        public object? Get(string key, Func<object?> factory)
         {
             var cached = InnerCache.Get(key, () =>
             {
@@ -55,21 +55,21 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public IEnumerable<object> SearchByKey(string keyStartsWith)
+        public IEnumerable<object?> SearchByKey(string keyStartsWith)
         {
             return InnerCache.SearchByKey(keyStartsWith)
                 .Select(CheckCloneableAndTracksChanges);
         }
 
         /// <inheritdoc />
-        public IEnumerable<object> SearchByRegex(string regex)
+        public IEnumerable<object?> SearchByRegex(string regex)
         {
             return InnerCache.SearchByRegex(regex)
                 .Select(CheckCloneableAndTracksChanges);
         }
 
         /// <inheritdoc />
-        public object Get(string key, Func<object> factory, TimeSpan? timeout, bool isSliding = false, string[] dependentFiles = null)
+        public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
         {
             var cached = InnerCache.Get(key, () =>
             {
@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc />
-        public void Insert(string key, Func<object> factory, TimeSpan? timeout = null, bool isSliding = false, string[] dependentFiles = null)
+        public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
         {
             InnerCache.Insert(key, () =>
             {
@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Core.Cache
             InnerCache.ClearByRegex(regex);
         }
 
-        private static object CheckCloneableAndTracksChanges(object input)
+        private static object? CheckCloneableAndTracksChanges(object? input)
         {
             if (input is IDeepCloneable cloneable)
             {

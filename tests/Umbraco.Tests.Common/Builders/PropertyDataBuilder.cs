@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             return this;
         }
 
-        public PropertyDataBuilder WithPropertyData(string alias, object value, string culture = null, string segment = null)
+        public PropertyDataBuilder WithPropertyData(string alias, object value, string? culture = null, string? segment = null)
             => WithPropertyData(alias, new PropertyData
             {
                 Culture = culture ?? string.Empty,

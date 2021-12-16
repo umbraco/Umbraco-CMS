@@ -7,7 +7,7 @@ namespace Umbraco.Extensions
 {
     public static class ModelsBuilderConfigExtensions
     {
-        private static string _modelsDirectoryAbsolute = null;
+        private static string? _modelsDirectoryAbsolute = null;
 
         public static string ModelsDirectoryAbsolute(this ModelsBuilderSettings modelsBuilderConfig, IHostingEnvironment hostingEnvironment)
         {

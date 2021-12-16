@@ -112,19 +112,19 @@ namespace Umbraco.Cms.Core.Models
         /// Gets the value of a Property
         /// </summary>
         /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
+        object GetValue(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false);
 
         /// <summary>
         /// Gets the typed value of a Property
         /// </summary>
         /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
+        TValue GetValue<TValue>(string propertyTypeAlias, string? culture = null, string? segment = null, bool published = false);
 
         /// <summary>
         /// Sets the (edited) value of a Property
         /// </summary>
         /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
-        void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null);
+        void SetValue(string propertyTypeAlias, object value, string? culture = null, string? segment = null);
 
     }
 }

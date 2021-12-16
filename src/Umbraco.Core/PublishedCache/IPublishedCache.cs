@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// <param name="culture">A culture.</param>
         /// <returns>The contents.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        IEnumerable<IPublishedContent> GetAtRoot(bool preview, string culture = null);
+        IEnumerable<IPublishedContent> GetAtRoot(bool preview, string? culture = null);
 
         /// <summary>
         /// Gets contents at root.

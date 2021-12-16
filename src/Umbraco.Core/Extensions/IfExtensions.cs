@@ -42,11 +42,9 @@ namespace Umbraco.Extensions
         /// <param name="action">The action.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns></returns>
-        public static TResult IfNotNull<TResult, TItem>(this TItem item, Func<TItem, TResult> action, TResult defaultValue = default(TResult))
+        public static TResult? IfNotNull<TResult, TItem>(this TItem? item, Func<TItem, TResult> action, TResult? defaultValue = default(TResult))
             where TItem : class
-        {
-            return item != null ? action(item) : defaultValue;
-        }
+            => item != null ? action(item) : defaultValue;
 
         /// <summary>
         /// Checks if the value is null, if it is it returns the value specified, otherwise returns the non-null value
@@ -55,11 +53,8 @@ namespace Umbraco.Extensions
         /// <param name="item"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public static TItem IfNull<TItem>(this TItem item, Func<TItem, TItem> action)
+        public static TItem IfNull<TItem>(this TItem? item, Func<TItem, TItem> action)
             where TItem : class
-        {
-            return item ?? action(item);
-        }
-
+            => item ?? action(item!);
     }
 }

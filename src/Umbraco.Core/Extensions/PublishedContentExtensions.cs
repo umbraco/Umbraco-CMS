@@ -25,18 +25,23 @@ namespace Umbraco.Extensions
         /// <param name="content">The content item.</param>
         /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
-        public static string Name(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static string? Name(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
             // invariant has invariant value (whatever the requested culture)
             if (!content.ContentType.VariesByCulture())
-                return content.Cultures.TryGetValue("", out var invariantInfos) ? invariantInfos.Name : null;
+                return content.Cultures.TryGetValue(string.Empty, out var invariantInfos) ? invariantInfos.Name : null;
 
             // handle context culture for variant
             if (culture == null)
-                culture = variationContextAccessor?.VariationContext?.Culture ?? "";
+                culture = variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
 
             // get
-            return culture != "" && content.Cultures.TryGetValue(culture, out var infos) ? infos.Name : null;
+            return culture != string.Empty && content.Cultures.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
 
         #endregion
@@ -49,8 +54,13 @@ namespace Umbraco.Extensions
         /// <param name="content">The content item.</param>
         /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to get the URL segment for. If null is used the current culture is used (Default is null).</param>
-        public static string UrlSegment(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static string? UrlSegment(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
             // invariant has invariant value (whatever the requested culture)
             if (!content.ContentType.VariesByCulture())
                 return content.Cultures.TryGetValue("", out var invariantInfos) ? invariantInfos.UrlSegment : null;
@@ -71,8 +81,15 @@ namespace Umbraco.Extensions
         /// Determines whether the content has a culture.
         /// </summary>
         /// <remarks>Culture is case-insensitive.</remarks>
-        public static bool HasCulture(this IPublishedContent content, string culture)
-            => content.Cultures.ContainsKey(culture ?? string.Empty);
+        public static bool HasCulture(this IPublishedContent content, string? culture)
+        {
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            return content.Cultures.ContainsKey(culture ?? string.Empty);
+        }
 
         /// <summary>
         /// Determines whether the content is invariant, or has a culture.
@@ -87,7 +104,7 @@ namespace Umbraco.Extensions
         /// <param name="contents">The content items.</param>
         /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null).</param>
-        internal static IEnumerable<T> WhereIsInvariantOrHasCulture<T>(this IEnumerable<T> contents, IVariationContextAccessor variationContextAccessor, string culture = null)
+        internal static IEnumerable<T> WhereIsInvariantOrHasCulture<T>(this IEnumerable<T> contents, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             if (contents == null) throw new ArgumentNullException(nameof(contents));
@@ -104,7 +121,7 @@ namespace Umbraco.Extensions
         /// <param name="content">The content item.</param>
         /// <param name="variationContextAccessor"></param>
         /// <param name="culture">The specific culture to get the name for. If null is used the current culture is used (Default is null).</param>
-        public static DateTime CultureDate(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static DateTime CultureDate(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             // invariant has invariant value (whatever the requested culture)
             if (!content.ContentType.VariesByCulture())
@@ -196,7 +213,7 @@ namespace Umbraco.Extensions
         /// <param name="fallback">Optional fallback strategy.</param>
         /// <returns>A value indicating whether the content has a value for the property identified by the alias.</returns>
         /// <remarks>Returns true if HasValue is true, or a fallback strategy can provide a value.</remarks>
-        public static bool HasValue(this IPublishedContent content, IPublishedValueFallback publishedValueFallback, string alias, string culture = null, string segment = null, Fallback fallback = default)
+        public static bool HasValue(this IPublishedContent content, IPublishedValueFallback publishedValueFallback, string alias, string? culture = null, string? segment = null, Fallback fallback = default)
         {
             var property = content.GetProperty(alias);
 
@@ -219,7 +236,7 @@ namespace Umbraco.Extensions
         /// <param name="fallback">Optional fallback strategy.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
-        public static object Value(this IPublishedContent content, IPublishedValueFallback publishedValueFallback, string alias, string culture = null, string segment = null, Fallback fallback = default, object defaultValue = default)
+        public static object? Value(this IPublishedContent content, IPublishedValueFallback publishedValueFallback, string alias, string? culture = null, string? segment = null, Fallback fallback = default, object? defaultValue = default)
         {
             var property = content.GetProperty(alias);
 
@@ -248,7 +265,7 @@ namespace Umbraco.Extensions
         /// <param name="fallback">Optional fallback strategy.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
-        public static T Value<T>(this IPublishedContent content, IPublishedValueFallback publishedValueFallback, string alias, string culture = null, string segment = null, Fallback fallback = default, T defaultValue = default)
+        public static T? Value<T>(this IPublishedContent content, IPublishedValueFallback publishedValueFallback, string alias, string? culture = null, string? segment = null, Fallback fallback = default, T? defaultValue = default)
         {
             var property = content.GetProperty(alias);
 
@@ -612,7 +629,7 @@ namespace Umbraco.Extensions
             return content.AncestorsOrSelf<T>(maxLevel).FirstOrDefault();
         }
 
-        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
+        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool>? func)
         {
             var ancestorsOrSelf = content.EnumerateAncestors(orSelf);
             return func == null ? ancestorsOrSelf : ancestorsOrSelf.Where(func);
@@ -705,7 +722,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
         /// </remarks>
-        public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IEnumerable<IPublishedContent> parentNodes, IVariationContextAccessor variationContextAccessor, string docTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IEnumerable<IPublishedContent> parentNodes, IVariationContextAccessor variationContextAccessor, string docTypeAlias, string? culture = null)
         {
             return parentNodes.SelectMany(x => x.DescendantsOrSelfOfType(variationContextAccessor, docTypeAlias, culture));
         }
@@ -720,7 +737,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
         /// </remarks>
-        public static IEnumerable<T> DescendantsOrSelf<T>(this IEnumerable<IPublishedContent> parentNodes, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<T> DescendantsOrSelf<T>(this IEnumerable<IPublishedContent> parentNodes, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return parentNodes.SelectMany(x => x.DescendantsOrSelf<T>(variationContextAccessor, culture));
@@ -746,120 +763,120 @@ namespace Umbraco.Extensions
         // - the relative order of siblings is the order in which they occur in the children property of their parent node.
         // - children and descendants occur before following siblings.
 
-        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return content.DescendantsOrSelf(variationContextAccessor, false, null, culture);
         }
 
-        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string culture = null)
+        public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
         {
             return content.DescendantsOrSelf(variationContextAccessor, false, p => p.Level >= level, culture);
         }
 
-        public static IEnumerable<IPublishedContent> DescendantsOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.DescendantsOrSelf(variationContextAccessor, false, p => p.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
 
-        public static IEnumerable<T> Descendants<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<T> Descendants<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Descendants(variationContextAccessor, culture).OfType<T>();
         }
 
-        public static IEnumerable<T> Descendants<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string culture = null)
+        public static IEnumerable<T> Descendants<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Descendants(variationContextAccessor, level, culture).OfType<T>();
         }
 
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return content.DescendantsOrSelf(variationContextAccessor, true, null, culture);
         }
 
-        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
         {
             return content.DescendantsOrSelf(variationContextAccessor, true, p => p.Level >= level, culture);
         }
 
-        public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> DescendantsOrSelfOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string ?culture = null)
         {
             return content.DescendantsOrSelf(variationContextAccessor, true, p => p.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
 
-        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.DescendantsOrSelf(variationContextAccessor, culture).OfType<T>();
         }
 
-        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string culture = null)
+        public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.DescendantsOrSelf(variationContextAccessor, level, culture).OfType<T>();
         }
 
-        public static IPublishedContent Descendant(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IPublishedContent Descendant(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return content.Children(variationContextAccessor, culture).FirstOrDefault();
         }
 
-        public static IPublishedContent Descendant(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string culture = null)
+        public static IPublishedContent Descendant(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
         {
             return content.EnumerateDescendants(variationContextAccessor, false, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent DescendantOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string culture = null)
+        public static IPublishedContent DescendantOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.EnumerateDescendants(variationContextAccessor, false, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
-        public static T Descendant<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static T? Descendant<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.EnumerateDescendants(variationContextAccessor, false, culture).FirstOrDefault(x => x is T) as T;
         }
 
-        public static T Descendant<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string culture = null)
+        public static T? Descendant<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Descendant(variationContextAccessor, level, culture) as T;
         }
 
-        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return content;
         }
 
-        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string culture = null)
+        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
         {
             return content.EnumerateDescendants(variationContextAccessor, true, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent DescendantOrSelfOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string culture = null)
+        public static IPublishedContent DescendantOrSelfOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.EnumerateDescendants(variationContextAccessor, true, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
 
-        public static T DescendantOrSelf<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static T? DescendantOrSelf<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.EnumerateDescendants(variationContextAccessor, true, culture).FirstOrDefault(x => x is T) as T;
         }
 
-        public static T DescendantOrSelf<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string culture = null)
+        public static T? DescendantOrSelf<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.DescendantOrSelf(variationContextAccessor, level, culture) as T;
         }
 
-        internal static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, bool orSelf, Func<IPublishedContent, bool> func, string culture = null)
+        internal static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, bool orSelf, Func<IPublishedContent, bool>? func, string? culture = null)
         {
             return content.EnumerateDescendants(variationContextAccessor, orSelf, culture).Where(x => func == null || func(x));
         }
 
-        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, bool orSelf, string culture = null)
+        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, bool orSelf, string? culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (orSelf) yield return content;
@@ -868,7 +885,7 @@ namespace Umbraco.Extensions
                 yield return desc;
         }
 
-        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        internal static IEnumerable<IPublishedContent> EnumerateDescendants(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             yield return content;
 
@@ -903,7 +920,7 @@ namespace Umbraco.Extensions
         /// However, if an empty string is specified only invariant children are returned.
         /// </para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             // handle context culture for variant
             if (culture == null)
@@ -926,7 +943,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// <para>Children are sorted by their sortOrder.</para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<IPublishedContent, bool> predicate, string culture = null)
+        public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<IPublishedContent, bool> predicate, string? culture = null)
         {
             return content.Children(variationContextAccessor, culture).Where(predicate);
         }
@@ -939,7 +956,7 @@ namespace Umbraco.Extensions
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <param name="contentTypeAlias">The content type alias.</param>
         /// <returns>The children of the content, of any of the specified types.</returns>
-        public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> ChildrenOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.Children(variationContextAccessor, x => x.ContentType.Alias.InvariantEquals(contentTypeAlias), culture);
         }
@@ -955,13 +972,13 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// <para>Children are sorted by their sortOrder.</para>
         /// </remarks>
-        public static IEnumerable<T> Children<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<T> Children<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Children(variationContextAccessor, culture).OfType<T>();
         }
 
-        public static IPublishedContent FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IPublishedContent FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return content.Children(variationContextAccessor, culture).FirstOrDefault();
         }
@@ -969,28 +986,28 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the first child of the content, of a given content type.
         /// </summary>
-        public static IPublishedContent FirstChildOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string culture = null)
+        public static IPublishedContent FirstChildOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.ChildrenOfType(variationContextAccessor, contentTypeAlias, culture).FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<IPublishedContent, bool> predicate, string culture = null)
+        public static IPublishedContent FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<IPublishedContent, bool> predicate, string? culture = null)
         {
             return content.Children(variationContextAccessor, predicate, culture).FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Guid uniqueId, string culture = null)
+        public static IPublishedContent FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Guid uniqueId, string? culture = null)
         {
             return content.Children(variationContextAccessor, x => x.Key == uniqueId, culture).FirstOrDefault();
         }
 
-        public static T FirstChild<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static T FirstChild<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Children<T>(variationContextAccessor, culture).FirstOrDefault();
         }
 
-        public static T FirstChild<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<T, bool> predicate, string culture = null)
+        public static T FirstChild<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<T, bool> predicate, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Children<T>(variationContextAccessor, culture).FirstOrDefault(predicate);
@@ -1008,7 +1025,7 @@ namespace Umbraco.Extensions
         /// <typeparam name="T">The content type.</typeparam>
         /// <param name="content">The content.</param>
         /// <returns>The parent of content, of the given content type, else null.</returns>
-        public static T Parent<T>(this IPublishedContent content)
+        public static T? Parent<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
@@ -1030,7 +1047,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         ///   <para>Note that in V7 this method also return the content node self.</para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent> Siblings(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<IPublishedContent> Siblings(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return SiblingsAndSelf(content, publishedSnapshot, variationContextAccessor, culture).Where(x => x.Id != content.Id);
         }
@@ -1047,7 +1064,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         ///   <para>Note that in V7 this method also return the content node self.</para>
         /// </remarks>
-        public static IEnumerable<IPublishedContent> SiblingsOfType(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> SiblingsOfType(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return SiblingsAndSelfOfType(content, publishedSnapshot, variationContextAccessor, contentTypeAlias, culture).Where(x => x.Id != content.Id);
         }
@@ -1064,7 +1081,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         ///   <para>Note that in V7 this method also return the content node self.</para>
         /// </remarks>
-        public static IEnumerable<T> Siblings<T>(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<T> Siblings<T>(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return SiblingsAndSelf<T>(content, publishedSnapshot, variationContextAccessor, culture).Where(x => x.Id != content.Id);
@@ -1078,7 +1095,7 @@ namespace Umbraco.Extensions
         /// <param name="variationContextAccessor">Variation context accessor.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>The siblings of the content including the node itself.</returns>
-        public static IEnumerable<IPublishedContent> SiblingsAndSelf(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<IPublishedContent> SiblingsAndSelf(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return content.Parent != null
                 ? content.Parent.Children(variationContextAccessor, culture)
@@ -1094,7 +1111,7 @@ namespace Umbraco.Extensions
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <param name="contentTypeAlias">The content type alias.</param>
         /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
-        public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string culture = null)
+        public static IEnumerable<IPublishedContent> SiblingsAndSelfOfType(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.Parent != null
                 ? content.Parent.ChildrenOfType(variationContextAccessor, contentTypeAlias, culture)
@@ -1110,7 +1127,7 @@ namespace Umbraco.Extensions
         /// <param name="variationContextAccessor">Variation context accessor.</param>
         /// <param name="culture">The specific culture to filter for. If null is used the current culture is used. (Default is null)</param>
         /// <returns>The siblings of the content including the node itself, of the given content type.</returns>
-        public static IEnumerable<T> SiblingsAndSelf<T>(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string culture = null)
+        public static IEnumerable<T> SiblingsAndSelf<T>(this IPublishedContent content, IPublishedSnapshot publishedSnapshot, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Parent != null
@@ -1158,13 +1175,13 @@ namespace Umbraco.Extensions
 
         #region Writer and creator
 
-        public static string GetCreatorName(this IPublishedContent content, IUserService userService)
+        public static string? GetCreatorName(this IPublishedContent content, IUserService userService)
         {
             var user = userService.GetProfileById(content.CreatorId);
             return user?.Name;
         }
 
-        public static string GetWriterName(this IPublishedContent content, IUserService userService)
+        public static string? GetWriterName(this IPublishedContent content, IUserService userService)
         {
             var user = userService.GetProfileById(content.WriterId);
             return user?.Name;
@@ -1186,7 +1203,7 @@ namespace Umbraco.Extensions
         /// if any. In addition, when the content type is multi-lingual, this is the url for the
         /// specified culture. Otherwise, it is the invariant url.</para>
         /// </remarks>
-        public static string Url(this IPublishedContent content, IPublishedUrlProvider publishedUrlProvider, string culture = null, UrlMode mode = UrlMode.Default)
+        public static string Url(this IPublishedContent content, IPublishedUrlProvider publishedUrlProvider, string? culture = null, UrlMode mode = UrlMode.Default)
         {
             if (publishedUrlProvider == null)
                 throw new InvalidOperationException("Cannot resolve a Url when Current.UmbracoContext.UrlProvider is null.");
@@ -1223,7 +1240,7 @@ namespace Umbraco.Extensions
         public static DataTable ChildrenAsTable(this IPublishedContent content,
             IVariationContextAccessor variationContextAccessor, IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
-            IPublishedUrlProvider publishedUrlProvider, string contentTypeAliasFilter = "", string culture = null)
+            IPublishedUrlProvider publishedUrlProvider, string contentTypeAliasFilter = "", string? culture = null)
             => GenerateDataTable(content, variationContextAccessor, contentTypeService, mediaTypeService, memberTypeService, publishedUrlProvider, contentTypeAliasFilter, culture);
 
         /// <summary>
@@ -1241,7 +1258,7 @@ namespace Umbraco.Extensions
         private static DataTable GenerateDataTable(IPublishedContent content,
             IVariationContextAccessor variationContextAccessor, IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService,
-            IPublishedUrlProvider publishedUrlProvider, string contentTypeAliasFilter = "", string culture = null)
+            IPublishedUrlProvider publishedUrlProvider, string contentTypeAliasFilter = "", string? culture = null)
         {
             var firstNode = contentTypeAliasFilter.IsNullOrWhiteSpace()
                                 ? content.Children(variationContextAccessor, culture).Any()
@@ -1271,7 +1288,7 @@ namespace Umbraco.Extensions
                                 continue; //skip this one, it doesn't match the filter
                         }
 
-                        var standardVals = new Dictionary<string, object>
+                        var standardVals = new Dictionary<string, object?>
                             {
                                 { "Id", n.Id },
                                 { "NodeName", n.Name(variationContextAccessor) },
@@ -1283,7 +1300,7 @@ namespace Umbraco.Extensions
                                 { "Url", n.Url(publishedUrlProvider) }
                             };
 
-                        var userVals = new Dictionary<string, object>();
+                        var userVals = new Dictionary<string, object?>();
                         foreach (var p in from IPublishedProperty p in n.Properties where p.GetSourceValue() != null select p)
                         {
                             // probably want the "object value" of the property here...
@@ -1302,7 +1319,7 @@ namespace Umbraco.Extensions
 
         #region PropertyAliasesAndNames
 
-        private static Func<IContentTypeService, IMediaTypeService, IMemberTypeService, string, Dictionary<string, string>> _getPropertyAliasesAndNames;
+        private static Func<IContentTypeService, IMediaTypeService, IMemberTypeService, string, Dictionary<string, string>>? _getPropertyAliasesAndNames;
 
         /// <summary>
         /// This is used only for unit tests to set the delegate to look up aliases/names dictionary of a content type

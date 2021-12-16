@@ -17,12 +17,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the application virtual path.
         /// </summary>
-        public string ApplicationVirtualPath { get; set; }
+        public string? ApplicationVirtualPath { get; set; }
 
         /// <summary>
         /// Gets or sets a value for the location of temporary files.
         /// </summary>
-        [DefaultValue(StaticLocalTempStorageLocation)] 
+        [DefaultValue(StaticLocalTempStorageLocation)]
         public LocalTempStorage LocalTempStorageLocation { get; set; } = Enum<LocalTempStorage>.Parse(StaticLocalTempStorageLocation);
 
         /// <summary>

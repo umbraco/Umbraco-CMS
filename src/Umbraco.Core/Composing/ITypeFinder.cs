@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Composing
         IEnumerable<Type> FindClassesOfTypeWithAttribute(
             Type assignTypeFrom,
             Type attributeType,
-            IEnumerable<Assembly> assemblies = null,
+            IEnumerable<Assembly>? assemblies = null,
             bool onlyConcreteClasses = true);
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <param name="assemblies"></param>
         /// <param name="onlyConcreteClasses"></param>
         /// <returns></returns>
-        IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly> assemblies = null, bool onlyConcreteClasses = true);
+        IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly>? assemblies = null, bool onlyConcreteClasses = true);
 
         /// <summary>
         /// Finds any classes with the attribute.
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <returns></returns>
         IEnumerable<Type> FindClassesWithAttribute(
             Type attributeType,
-            IEnumerable<Assembly> assemblies,
+            IEnumerable<Assembly>? assemblies,
             bool onlyConcreteClasses);
     }
 }
