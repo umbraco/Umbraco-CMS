@@ -83,7 +83,6 @@
     <key alias="translate">Allow access to translate a node</key>
     <key alias="update">Allow access to save a node</key>
     <key alias="createblueprint">Allow access to create a Content Template</key>
-    <key alias="notify">Allow access to setup notifications for content nodes</key>
   </area>
   <area alias="apps">
     <key alias="umbContent">Content</key>

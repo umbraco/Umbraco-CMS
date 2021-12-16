@@ -242,7 +242,12 @@ namespace Umbraco.Web.Trees
 
             if (EmailSender.CanSendRequiredEmail)
             {
-                AddActionNode<ActionNotify>(item, menu, true, opensDialog: true);
+	            menu.Items.Add(new MenuItem("notify", Services.TextService)
+	            {
+	                Icon = "megaphone",
+	                SeparatorBefore = true,
+	                OpensDialog = true
+	            });
             }
 
             if((item is DocumentEntitySlim documentEntity && documentEntity.IsContainer) == false)
