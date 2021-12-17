@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             var packageSchema = schemaDtos.First();
-            var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(schemaDtos.First().Value));
+            var packageDefinition = _xmlParser.ToPackageDefinition(XElement.Parse(packageSchema.Value));
             packageDefinition.Id = packageSchema.Id;
             packageDefinition.Name = packageSchema.Name;
             packageDefinition.PackageId = packageSchema.PackageId;
@@ -268,7 +268,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     }
                 }
 
-
                 var directoryName =
                     _hostingEnvironment.MapPathWebRoot(
                         Path.Combine(_mediaFolderPath, definition.Name.Replace(' ', '_')));
@@ -285,9 +284,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     File.Delete(finalPackagePath);
                 }
 
-                if (File.Exists(finalPackagePath.Replace("zip", ".xml")))
+                if (File.Exists(finalPackagePath.Replace("zip", "xml")))
                 {
-                    File.Delete(finalPackagePath.Replace("zip", ".xml"));
+                    File.Delete(finalPackagePath.Replace("zip", "xml"));
                 }
 
                 File.Move(tempPackagePath, finalPackagePath);
@@ -638,7 +637,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 }
             }
         }
-
 
         private Dictionary<string, Stream> PackageMedia(PackageDefinition definition, XElement root)
         {
