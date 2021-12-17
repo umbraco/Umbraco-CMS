@@ -6,7 +6,7 @@ namespace Umbraco.Core.Collections
     ///     Collection that can be both a queue and a stack.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class StackQueue<T?>
+    public class StackQueue<T>
     {
         private readonly LinkedList<T?> _linkedList = new ();
 
