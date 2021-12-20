@@ -2219,7 +2219,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <!-- The following keys get these tokens passed in:
 	    0: Comma delimitted list of failed folder paths
   	-->
-    <key alias="umbracoApplicationUrlCheckResult">The 'umbracoApplicationUrl' option is %0% set in your umbracoSettings.config file.</key>
+    <key alias="umbracoApplicationUrlCheckResultTrue"><![CDATA[The 'umbracoApplicationUrl' option is set to <strong>%0%</strong> in your umbracoSettings.config file.]]></key>
+    <key alias="umbracoApplicationUrlCheckResultFalse">The 'umbracoApplicationUrl' option is not set in your umbracoSettings.config file.</key>
     <key alias="umbracoApplicationUrlConfigureButton">Set Umbraco application URL in Config</key>
     <key alias="umbracoApplicationUrlConfigureDescription">Adds a value to the 'umbracoApplicationUrl' option of umbracoSettings.config to prevent configuring insecure endpoint as the hostname of your Umbraco application.</key>
     <key alias="umbracoApplicationUrlConfigureSuccess"><![CDATA[The value of 'umbracoApplicationUrl' is now set to <strong>%0%</strong> in your umbracoSettings.config file.]]></key>

@@ -52,19 +52,27 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
 
         private HealthCheckStatus CheckUmbracoApplicationUrl()
         {
-            var urlConfigured = !_settings.WebRouting.UmbracoApplicationUrl.IsNullOrWhiteSpace();
+            var url = _settings.WebRouting.UmbracoApplicationUrl;
+
+            string resultMessage;
+            StatusResultType resultType;
             var actions = new List<HealthCheckAction>();
 
-            string resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResult", new[] { urlConfigured ? string.Empty : "not" });
-            StatusResultType resultType = urlConfigured ? StatusResultType.Success : StatusResultType.Warning;
-
-            if (urlConfigured == false)
+            if (url.IsNullOrWhiteSpace())
             {
+                resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultFalse");
+                resultType = StatusResultType.Warning;
+
                 actions.Add(new HealthCheckAction(SetApplicationUrlAction, Id)
                 {
                     Name = _textService.Localize("healthcheck", "umbracoApplicationUrlConfigureButton"),
                     Description = _textService.Localize("healthcheck", "umbracoApplicationUrlConfigureDescription")
                 });
+            }
+            else
+            {
+                resultMessage = _textService.Localize("healthcheck", "umbracoApplicationUrlCheckResultTrue", new[] { url });
+                resultType = StatusResultType.Success;
             }
 
             return new HealthCheckStatus(resultMessage)
