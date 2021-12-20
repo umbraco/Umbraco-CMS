@@ -9,6 +9,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Cache
 {
@@ -21,15 +22,26 @@ namespace Umbraco.Web.Cache
         private readonly DistributedCache _distributedCache;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly ILogger _logger;
+        private readonly BatchedDatabaseServerMessenger _serverMessenger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
         /// </summary>
+        [Obsolete("Please use the constructor accepting an instance of IServerMessenger.  This constructor will be removed in a future version.")]
         public DistributedCacheBinder(DistributedCache distributedCache, IUmbracoContextFactory umbracoContextFactory, ILogger logger)
         {
             _distributedCache = distributedCache;
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
+        /// </summary>
+        public DistributedCacheBinder(DistributedCache distributedCache, IUmbracoContextFactory umbracoContextFactory, ILogger logger, IServerMessenger serverMessenger)
+            : this(distributedCache, umbracoContextFactory, logger)
+        {
+            _serverMessenger = serverMessenger as BatchedDatabaseServerMessenger;
         }
 
         // internal for tests
@@ -42,7 +54,6 @@ namespace Umbraco.Web.Cache
 
         private static readonly Lazy<MethodInfo[]> CandidateHandlers = new Lazy<MethodInfo[]>(() =>
         {
-
             return typeof(DistributedCacheBinder)
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .Select(x =>
@@ -66,9 +77,9 @@ namespace Umbraco.Web.Cache
         {
             // Ensure we run with an UmbracoContext, because this may run in a background task,
             // yet developers may be using the 'current' UmbracoContext in the event handlers.
-            using (_umbracoContextFactory.EnsureUmbracoContext())
+            using (var umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext())
             {
-                // When it comes to content types types, a change to any single one will trigger a reload of the content and media caches.
+                // When it comes to content types, a change to any single one will trigger a reload of the content and media caches.
                 // We can reduce the impact of that by grouping the events to invoke just one per type, providing a collection of the individual arguments.
                 var groupedEvents = GetGroupedEventList(events);
                 foreach (var e in groupedEvents)
@@ -84,6 +95,24 @@ namespace Umbraco.Web.Cache
 
                     handler.Invoke(this, new[] { e.Sender, e.Args });
                 }
+
+                // Handled events may be triggering messages to be sent for load balanced servers to refresh their caches.
+                // When the state changes that initiate the events are handled outside of an Umbraco request and rather in a
+                // background task, we'll have ensured an Umbraco context, but using a newly created HttpContext.
+                //
+                // An example of this is when using an Umbraco Deploy content transfer operation
+                // (see: https://github.com/umbraco/Umbraco.Deploy.Issues/issues/90).
+                //
+                // This will be used in the event handlers, and when the methods on BatchedDatabaseServerMessenger are called,
+                // they'll be using this "ensured" HttpContext, populating a batch of message stored in HttpContext.Items.
+                // When the FlushBatch method is called on the end of an Umbraco request (via the event handler wired up in
+                // DatabaseServerRegistrarAndMessengerComponent), this will use the HttpContext associated with the request,
+                // which will be a different one, and so won't have the batch stored in it's HttpContext.Items.
+                //
+                // As such by making an explicit call here, and providing the ensured HttpContext that will have had it's
+                // Items dictionary populated with the batch of messages, we'll make sure the batch is flushed, and the
+                // database instructions written.
+                _serverMessenger?.FlushBatch(umbracoContextReference.UmbracoContext.HttpContext);
             }
         }
 
