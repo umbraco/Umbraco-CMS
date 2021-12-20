@@ -620,20 +620,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                         {
                             new ContentPropertyDisplay()
                             {
-                                Alias = "_umb_id",
-                                View = "idwithguid",
-                                Value = new []
-                                {
-                                    "123",
-                                    "guid"
-                                }
-                            },
-                            new ContentPropertyDisplay()
-                            {
-                                Alias = "_umb_doctype"
-                            },
-                            new ContentPropertyDisplay()
-                            {
                                 Alias = "_umb_login"
                             },
                             new ContentPropertyDisplay()
