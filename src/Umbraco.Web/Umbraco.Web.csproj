@@ -190,6 +190,7 @@
     <Compile Include="HealthCheck\Checks\Config\ProvidedValueValidation.cs" />
     <Compile Include="Editors\TinyMceController.cs" />
     <Compile Include="HealthCheck\Checks\Data\DatabaseIntegrityCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\UmbracoApplicationUrlCheck.cs" />
     <Compile Include="ImageCropperTemplateCoreExtensions.cs" />
     <Compile Include="Install\InstallSteps\TelemetryIdentifierStep.cs" />
     <Compile Include="IUmbracoContextFactory.cs" />
