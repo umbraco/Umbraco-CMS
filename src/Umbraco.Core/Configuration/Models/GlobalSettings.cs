@@ -24,6 +24,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const string StaticUmbracoCssPath = "~/css";
         internal const string StaticUmbracoScriptsPath = "~/scripts";
         internal const string StaticUmbracoMediaPath = "~/media";
+        internal const string StaticUmbracoMediaUrl = "~/media";
         internal const bool StaticInstallMissingDatabase = false;
         internal const bool StaticDisableElectionForSingleServer = false;
         internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
@@ -108,6 +109,13 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         [DefaultValue(StaticUmbracoMediaPath)]
         public string UmbracoMediaPath { get; set; } = StaticUmbracoMediaPath;
+
+
+        /// <summary>
+        /// Gets or sets a value for the Umbraco media url. Starts with "~/".
+        /// </summary>
+        [DefaultValue(StaticUmbracoMediaUrl)]
+        public string UmbracoMediaUrl { get; set; } = StaticUmbracoMediaUrl;
 
         /// <summary>
         /// Gets or sets a value indicating whether to install the database when it is missing.

@@ -384,7 +384,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     "umbracoSettings", new Dictionary<string, object>
                     {
                         {"umbracoPath", _globalSettings.GetBackOfficePath(_hostingEnvironment)},
-                        {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd(Constants.CharArrays.ForwardSlash)},
+                        {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaUrl).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {
                             "imageFileTypes",

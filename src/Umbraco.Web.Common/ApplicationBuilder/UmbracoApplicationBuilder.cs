@@ -1,9 +1,13 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.ImageProcessors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
@@ -22,7 +26,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         {
             AppBuilder = appBuilder ?? throw new ArgumentNullException(nameof(appBuilder));
             ApplicationServices = appBuilder.ApplicationServices;
-            RuntimeState = appBuilder.ApplicationServices.GetRequiredService<IRuntimeState>();            
+            RuntimeState = appBuilder.ApplicationServices.GetRequiredService<IRuntimeState>();
             _umbracoPipelineStartupOptions = ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
         }
 
@@ -87,9 +91,19 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 
             AppBuilder.UseStatusCodePages();
 
-            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.            
+            // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
             AppBuilder.UseImageSharp();
+
+            GlobalSettings globalSettings = AppBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
+            IUmbracoMediaFileProvider umbracoMediaFileProvider = AppBuilder.ApplicationServices.GetRequiredService<IUmbracoMediaFileProvider>();
+
+            AppBuilder.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = umbracoMediaFileProvider,
+                RequestPath = globalSettings.UmbracoMediaUrl.TrimStart("~")
+            });
             AppBuilder.UseStaticFiles();
+
             AppBuilder.UseUmbracoPluginsStaticFiles();
 
             // UseRouting adds endpoint routing middleware, this means that middlewares registered after this one

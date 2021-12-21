@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 GlobalSettings globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
-                var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
+                var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaUrl);
                 return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
             });
 
