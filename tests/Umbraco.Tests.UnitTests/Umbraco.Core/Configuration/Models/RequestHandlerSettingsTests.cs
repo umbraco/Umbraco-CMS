@@ -13,13 +13,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
         {
             var userCollection = new CharItem[]
             {
-                new() { Char = "test", Replacement = "replace" },
-                new() { Char = "test2", Replacement = "replace2" }
+                new () { Char = "test", Replacement = "replace" },
+                new () { Char = "test2", Replacement = "replace2" }
             };
 
 
             var settings = new RequestHandlerSettings { CharCollection = userCollection };
-            var actual = settings.GetCharReplacements().ToList();
+            var actual = settings.CharCollection.ToList();
 
             var expectedCollection = RequestHandlerSettings.DefaultCharCollection.ToList();
             expectedCollection.AddRange(userCollection);
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
             };
 
             var settings = new RequestHandlerSettings { CharCollection = userCollection, EnableDefaultCharReplacements = false };
-            var actual = settings.GetCharReplacements().ToList();
+            var actual = settings.CharCollection.ToList();
 
             Assert.AreEqual(userCollection.Length, actual.Count);
             Assert.That(actual, Is.EquivalentTo(userCollection));
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
             };
 
             var settings = new RequestHandlerSettings { CharCollection = userCollection };
-            var actual = settings.GetCharReplacements().ToList();
+            var actual = settings.CharCollection.ToList();
 
             Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length, actual.Count);
 
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
             };
 
             var settings = new RequestHandlerSettings { CharCollection = userCollection };
-            var actual = settings.GetCharReplacements().ToList();
+            var actual = settings.CharCollection.ToList();
 
             // Add 1 to the length, because we're expecting to only add one new one
             Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length + 1, actual.Count);

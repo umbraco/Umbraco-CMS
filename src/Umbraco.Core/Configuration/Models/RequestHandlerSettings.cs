@@ -75,32 +75,53 @@ namespace Umbraco.Cms.Core.Configuration.Models
         [DefaultValue(StaticEnableDefaultCharReplacements)]
         public bool EnableDefaultCharReplacements { get; set; } = StaticEnableDefaultCharReplacements;
 
+        private IEnumerable<CharItem> _charCollection;
+
         /// <summary>
         /// Add additional character replacements, or override defaults
         /// </summary>
-        public IEnumerable<CharItem> CharCollection { get; set; }
+        public IEnumerable<CharItem> CharCollection
+        {
+            get
+            {
+                // This is pretty ugly, but necessary.
+                // Essentially the config binding will only run properly if we return null the first time this is invoked.
+                // Otherwise whatever we return will just be used and user specific bindings won't overwrite the existing ones.
+                // However the next time this get is invoked, for instance in DefaultShortStringHelper we want to actually run the GetCharReplacements
+                // To make sure that the default bindings is used if configured to do so.
+                // Therefore we set _charCollection to be something, and still return null, to trick dotnet to actually read the config.
+                if (_charCollection is null)
+                {
+                    _charCollection = Enumerable.Empty<CharItem>();
+                    return null;
+                }
+
+                return GetCharReplacements();
+            }
+
+            set => _charCollection = value;
+        }
 
         /// <summary>
         /// Get concatenated user and default character replacements
         /// taking into account <see cref="EnableDefaultCharReplacements"/>
         /// </summary>
-        public IEnumerable<CharItem> GetCharReplacements()
+        private IEnumerable<CharItem> GetCharReplacements()
         {
             // TODO We need to special handle ":", as this character is special in keys
-
             if (!EnableDefaultCharReplacements)
             {
-                return CharCollection;
+                return _charCollection ?? Enumerable.Empty<CharItem>();
             }
 
-            if (CharCollection == null || !CharCollection.Any())
+            if (_charCollection == null || !_charCollection.Any())
             {
                 return DefaultCharCollection;
             }
 
-            foreach (var defaultReplacement in DefaultCharCollection)
+            foreach (CharItem defaultReplacement in DefaultCharCollection)
             {
-                foreach (var userReplacement in CharCollection)
+                foreach (CharItem userReplacement in _charCollection)
                 {
                     if (userReplacement.Char == defaultReplacement.Char)
                     {
@@ -109,7 +130,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
                 }
             }
 
-            var mergedCollections = DefaultCharCollection.Union<CharItem>(CharCollection, new CharacterReplacementEqualityComparer());
+            IEnumerable<CharItem> mergedCollections = DefaultCharCollection.Union<CharItem>(_charCollection, new CharacterReplacementEqualityComparer());
 
             return mergedCollections;
         }
