@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
         [Test]
         public void Given_CharCollection_With_DefaultEnabled_MergesCollection()
         {
-            var userCollection = new CharacterReplacement[]
+            var userCollection = new CharItem[]
             {
                 new() { Char = "test", Replacement = "replace" },
                 new() { Char = "test2", Replacement = "replace2" }
@@ -31,10 +31,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
         [Test]
         public void Given_CharCollection_With_DefaultDisabled_ReturnsUserCollection()
         {
-            var userCollection = new CharacterReplacement[]
+            var userCollection = new CharItem[]
             {
-                new() { Char = "test", Replacement = "replace" },
-                new() { Char = "test2", Replacement = "replace2" }
+                new () { Char = "test", Replacement = "replace" },
+                new () { Char = "test2", Replacement = "replace2" }
             };
 
             var settings = new RequestHandlerSettings { CharCollection = userCollection, EnableDefaultCharReplacements = false };
@@ -47,10 +47,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
         [Test]
         public void Given_CharCollection_That_OverridesDefaultValues_ReturnsReplacements()
         {
-            var userCollection = new CharacterReplacement[]
+            var userCollection = new CharItem[]
             {
-                new() { Char = "%", Replacement = "percent" },
-                new() { Char = ".", Replacement = "dot" }
+                new () { Char = "%", Replacement = "percent" },
+                new () { Char = ".", Replacement = "dot" }
             };
 
             var settings = new RequestHandlerSettings { CharCollection = userCollection };
@@ -58,20 +58,20 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
 
             Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length, actual.Count);
 
-            Assert.That(actual, Has.Exactly(1).Matches<CharacterReplacement>(x => x.Char == "%" && x.Replacement == "percent"));
-            Assert.That(actual, Has.Exactly(1).Matches<CharacterReplacement>(x => x.Char == "." && x.Replacement == "dot"));
-            Assert.That(actual, Has.Exactly(0).Matches<CharacterReplacement>(x => x.Char == "%" && x.Replacement == string.Empty));
-            Assert.That(actual, Has.Exactly(0).Matches<CharacterReplacement>(x => x.Char == "." && x.Replacement == string.Empty));
+            Assert.That(actual, Has.Exactly(1).Matches<CharItem>(x => x.Char == "%" && x.Replacement == "percent"));
+            Assert.That(actual, Has.Exactly(1).Matches<CharItem>(x => x.Char == "." && x.Replacement == "dot"));
+            Assert.That(actual, Has.Exactly(0).Matches<CharItem>(x => x.Char == "%" && x.Replacement == string.Empty));
+            Assert.That(actual, Has.Exactly(0).Matches<CharItem>(x => x.Char == "." && x.Replacement == string.Empty));
         }
 
         [Test]
         public void Given_CharCollection_That_OverridesDefaultValues_And_ContainsNew_ReturnsMergedWithReplacements()
         {
-            var userCollection = new CharacterReplacement[]
+            var userCollection = new CharItem[]
             {
-                new() { Char = "%", Replacement = "percent" },
-                new() { Char = ".", Replacement = "dot" },
-                new() {Char = "new", Replacement = "new"}
+                new () { Char = "%", Replacement = "percent" },
+                new () { Char = ".", Replacement = "dot" },
+                new () { Char = "new", Replacement = "new" }
             };
 
             var settings = new RequestHandlerSettings { CharCollection = userCollection };
@@ -80,11 +80,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
             // Add 1 to the length, because we're expecting to only add one new one
             Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length + 1, actual.Count);
 
-            Assert.That(actual, Has.Exactly(1).Matches<CharacterReplacement>(x => x.Char == "%" && x.Replacement == "percent"));
-            Assert.That(actual, Has.Exactly(1).Matches<CharacterReplacement>(x => x.Char == "." && x.Replacement == "dot"));
-            Assert.That(actual, Has.Exactly(1).Matches<CharacterReplacement>(x => x.Char == "new" && x.Replacement == "new"));
-            Assert.That(actual, Has.Exactly(0).Matches<CharacterReplacement>(x => x.Char == "%" && x.Replacement == string.Empty));
-            Assert.That(actual, Has.Exactly(0).Matches<CharacterReplacement>(x => x.Char == "." && x.Replacement == string.Empty));
+            Assert.That(actual, Has.Exactly(1).Matches<CharItem>(x => x.Char == "%" && x.Replacement == "percent"));
+            Assert.That(actual, Has.Exactly(1).Matches<CharItem>(x => x.Char == "." && x.Replacement == "dot"));
+            Assert.That(actual, Has.Exactly(1).Matches<CharItem>(x => x.Char == "new" && x.Replacement == "new"));
+            Assert.That(actual, Has.Exactly(0).Matches<CharItem>(x => x.Char == "%" && x.Replacement == string.Empty));
+            Assert.That(actual, Has.Exactly(0).Matches<CharItem>(x => x.Char == "." && x.Replacement == string.Empty));
         }
     }
 }
