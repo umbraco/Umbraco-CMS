@@ -27,6 +27,8 @@ using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 using Umbraco.Web.Editors.Filters;
 using Microsoft.Owin.Security;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Editors
 {
@@ -40,12 +42,23 @@ namespace Umbraco.Web.Editors
     [DisableBrowserCache]
     public class AuthenticationController : UmbracoApiController
     {
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
-        public AuthenticationController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        public AuthenticationController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IUmbracoSettingsSection umbracoSettingsSection)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper, Current.Mapper)
         {
+            _umbracoSettingsSection = umbracoSettingsSection;
         }
 
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager => _userManager
@@ -552,8 +565,8 @@ namespace Umbraco.Web.Editors
                     r = code
                 });
 
-            // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = Current.RuntimeState.ApplicationUrl;
+            // Construct full URL using configured application URL (which will fall back to current request)
+            var applicationUri = ApplicationUrlHelper.GetApplicationUriUncached(http.Request, _umbracoSettingsSection);
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }
