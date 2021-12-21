@@ -268,6 +268,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             // TO 9.2.0
             To<AddUserGroup2NodeTable>("{0571C395-8F0B-44E9-8E3F-47BDD08D817B}");
             To<AddDefaultForNotificationsToggle>("{AD3D3B7F-8E74-45A4-85DB-7FFAD57F9243}");
+            To<MovePackageXMLToDb>("{A2F22F17-5870-4179-8A8D-2362AA4A0A5F}");
         }
     }
 }
