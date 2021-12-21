@@ -11,7 +11,7 @@
       <PackageReference Include="NJsonSchema" Version="10.5.2" />
       <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
       <PackageReference Include="Umbraco.Deploy.Core" Version="9.2.0" />
-      <PackageReference Include="Umbraco.Forms.Core" Version="9.2.0-rc001" />
+      <PackageReference Include="Umbraco.Forms.Core" Version="9.2.0" />
     </ItemGroup>
 
     <ItemGroup>
