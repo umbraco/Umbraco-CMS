@@ -17,6 +17,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -27,6 +28,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -46,9 +48,21 @@ namespace Umbraco.Web.Editors
     [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController
     {
-        public UsersController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        private readonly IUmbracoSettingsSection _umbracoSettingsSection;
+
+        public UsersController(
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger logger,
+            IRuntimeState runtimeState,
+            UmbracoHelper umbracoHelper,
+            IUmbracoSettingsSection umbracoSettingsSection)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
+            _umbracoSettingsSection = umbracoSettingsSection;
         }
 
         /// <summary>
@@ -390,7 +404,7 @@ namespace Umbraco.Web.Editors
             user = CheckUniqueEmail(userSave.Email, u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
 
             var userMgr = TryGetOwinContext().Result.GetBackOfficeUserManager();
-            
+
             if (!EmailSender.CanSendRequiredEmail && !userMgr.HasSendingUserInviteEventHandler)
             {
                 throw new HttpResponseException(
@@ -462,12 +476,12 @@ namespace Umbraco.Web.Editors
                         Email = userSave.Email,
                         Username = userSave.Username
                     };
-                }                
+                }
             }
             else
             {
                 //send the email
-                await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);                
+                await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);
             }
 
             display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", "resendInviteHeader"), Services.TextService.Localize("speechBubbles", "resendInviteSuccess", new[] { user.Name }));
@@ -525,9 +539,9 @@ namespace Umbraco.Web.Editors
                     invite = inviteToken
                 });
 
-            // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = RuntimeState.ApplicationUrl;
-            var inviteUri = new Uri(applicationUri, action);
+            // Construct full URL will use the value in settings if specified, otherwise will use the current request URL
+            var requestUrl = ApplicationUrlHelper.GetApplicationUriUncached(http.Request, _umbracoSettingsSection);
+            var inviteUri = new Uri(requestUrl, action);
 
             var emailSubject = Services.TextService.Localize("user", "inviteEmailCopySubject",
                 //Ensure the culture of the found user is used for the email!
@@ -622,7 +636,7 @@ namespace Umbraco.Web.Editors
             if (Current.Configs.Settings().Security.UsernameIsEmail && found.Username == found.Email && userSave.Username != userSave.Email)
             {
                 userSave.Username = userSave.Email;
-            }          
+            }
 
             if (hasErrors)
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
@@ -647,13 +661,13 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="changingPasswordModel"></param>
         /// <returns></returns>
         public async Task<ModelWithNotifications<string>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
         {
-            changingPasswordModel = changingPasswordModel ?? throw new ArgumentNullException(nameof(changingPasswordModel));            
+            changingPasswordModel = changingPasswordModel ?? throw new ArgumentNullException(nameof(changingPasswordModel));
 
             if (ModelState.IsValid == false)
             {
