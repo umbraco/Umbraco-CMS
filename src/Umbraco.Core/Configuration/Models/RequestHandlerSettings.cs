@@ -108,7 +108,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         private IEnumerable<CharItem> GetCharReplacements()
         {
-            // TODO We need to special handle ":", as this character is special in keys
             if (!EnableDefaultCharReplacements)
             {
                 return _charCollection ?? Enumerable.Empty<CharItem>();
