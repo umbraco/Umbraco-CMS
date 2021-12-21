@@ -173,8 +173,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 var result = _umbracoDatabase.Insert(dto);
                 var decimalResult = result.SafeCast<decimal>();
                 definition.Id = decimal.ToInt32(decimalResult);
-
-                return true;
             }
 
             // Save snapshot locally, we do this to the updated packagePath
