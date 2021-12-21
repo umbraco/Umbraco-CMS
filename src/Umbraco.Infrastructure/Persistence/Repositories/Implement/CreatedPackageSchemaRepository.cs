@@ -167,9 +167,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     PackageId = Guid.NewGuid()
                 };
 
-                // Set the definitionIds
+                // Set the ids, we have to save in database first to get the Id
                 definition.PackageId = dto.PackageId;
-                ExportPackage(definition);
                 var result = _umbracoDatabase.Insert(dto);
                 var decimalResult = result.SafeCast<decimal>();
                 definition.Id = decimal.ToInt32(decimalResult);
