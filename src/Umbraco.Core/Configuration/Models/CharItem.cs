@@ -1,6 +1,8 @@
+using Umbraco.Cms.Core.Configuration.UmbracoSettings;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
-    public class CharItem
+    public class CharItem : IChar
     {
         /// <summary>
         /// The character to replace

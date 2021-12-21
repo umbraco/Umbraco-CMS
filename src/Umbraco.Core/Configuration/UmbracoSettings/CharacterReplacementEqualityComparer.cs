@@ -3,9 +3,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
 {
-    public class CharacterReplacementEqualityComparer : IEqualityComparer<CharItem>
+    public class CharacterReplacementEqualityComparer : IEqualityComparer<IChar>
     {
-        public bool Equals(CharItem x, CharItem y)
+        public bool Equals(IChar x, IChar y)
         {
             if (ReferenceEquals(x, y))
             {
@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
             return x.Char == y.Char && x.Replacement == y.Replacement;
         }
 
-        public int GetHashCode(CharItem obj)
+        public int GetHashCode(IChar obj)
         {
             unchecked
             {

@@ -78,13 +78,13 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Add additional character replacements, or override defaults
         /// </summary>
-        public CharItem[] CharCollection { get; set; }
+        public IEnumerable<IChar> CharCollection { get; set; }
 
         /// <summary>
         /// Get concatenated user and default character replacements
         /// taking into account <see cref="EnableDefaultCharReplacements"/>
         /// </summary>
-        public IEnumerable<CharItem> GetCharReplacements()
+        public IEnumerable<IChar> GetCharReplacements()
         {
             // TODO We need to special handle ":", as this character is special in keys
 
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
                 }
             }
 
-            var mergedCollections = DefaultCharCollection.Union(CharCollection, new CharacterReplacementEqualityComparer());
+            var mergedCollections = DefaultCharCollection.Union<IChar>(CharCollection, new CharacterReplacementEqualityComparer());
 
             return mergedCollections;
         }
