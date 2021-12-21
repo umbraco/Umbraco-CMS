@@ -1,9 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Extensions
@@ -106,6 +109,22 @@ namespace Umbraco.Extensions
 
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Gets the application URI, will use the one specified in settings if present
+        /// </summary>
+        public static Uri GetApplicationUri(this HttpRequest request, WebRoutingSettings routingSettings)
+        {
+            if (string.IsNullOrEmpty(routingSettings.UmbracoApplicationUrl))
+            {
+                var requestUri = new Uri(request.GetDisplayUrl());
+
+                // Create a new URI with the relative uri as /, this ensures that only the base path is returned.
+                return new Uri(requestUri, "/");
+            }
+
+            return new Uri(routingSettings.UmbracoApplicationUrl);
         }
     }
 }
