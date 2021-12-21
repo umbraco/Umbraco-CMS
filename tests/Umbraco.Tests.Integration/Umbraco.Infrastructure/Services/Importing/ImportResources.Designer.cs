@@ -72,7 +72,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importin
         ///  &lt;/info&gt;
         ///  &lt;Documents&gt;
         ///    &lt;DocumentSet importMode=&quot;root&quot;&gt;
-        ///      &lt;NewType id=&quot;1148&quot; parentID=&quot;-1&quot; level=&quot;1&quot; creatorID=&quot;0&quot; sortOrder=&quot;9&quot; createDate=&quot;2013-07-23T12:06:07&quot; updateDate=&quot;2013-07-23T15:56:37&quot; nodeName=&quot;DoIt&quot; urlName=&quot;doit&quot; path=&quot;-1,1148&quot; isDoc=&quot;&quot; nodeType=&quot;1134&quot; creatorName=&quot;admin&quot; writerName=&quot;admin&quot; writerID=&quot;0&quot; template=&quot;1133&quot; nodeTy [rest of string was truncated]&quot;;.
+        ///      &lt;NewType key=&quot;9c9b55d0-2fbf-4f12-afea-023bd7b2519d&quot; id=&quot;1148&quot; parentID=&quot;-1&quot; level=&quot;1&quot; creatorID=&quot;0&quot; sortOrder=&quot;9&quot; createDate=&quot;2013-07-23T12:06:07&quot; updateDate=&quot;2013-07-23T15:56:37&quot; nodeName=&quot;DoIt&quot; urlName=&quot;doit&quot; path=&quot;-1,1148&quot; isDoc=&quot;&quot; nodeType=&quot;1134&quot; creatorName=&quot;admin&quot; writerName= [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CheckboxList_Content_Package {
             get {
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importin
         ///  &lt;/info&gt;
         ///  &lt;Documents&gt;
         ///    &lt;DocumentSet importMode=&quot;root&quot;&gt;
-        ///      &lt;umbHomePage id=&quot;1068&quot; parentID=&quot;-1&quot; level=&quot;1&quot; creatorID=&quot;0&quot; sortOrder=&quot;0&quot; createDate=&quot;2014-11-26T12:52:35&quot; updateDate=&quot;2014-11-26T12:52:36&quot; nodeName=&quot;Home&quot; urlName=&quot;home&quot; path=&quot;-1,1068&quot; isDoc=&quot;&quot; nodeType=&quot;1056&quot; creatorName=&quot;Morten Christensen&quot; writerName=&quot;Morten Christensen&quot;  [rest of string was truncated]&quot;;.
+        ///      &lt;umbHomePage key=&quot;9c9b55d0-2fbf-4f12-afea-023bd7b2519d&quot; id=&quot;1068&quot; parentID=&quot;-1&quot; level=&quot;1&quot; creatorID=&quot;0&quot; sortOrder=&quot;0&quot; createDate=&quot;2014-11-26T12:52:35&quot; updateDate=&quot;2014-11-26T12:52:36&quot; nodeName=&quot;Home&quot; urlName=&quot;home&quot; path=&quot;-1,1068&quot; isDoc=&quot;&quot; nodeType=&quot;1056&quot; creatorName=&quot;Morten Ch [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CompositionsTestPackage {
             get {
@@ -124,15 +124,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importin
         ///  &lt;files /&gt;
         ///  &lt;info&gt;
         ///    &lt;package&gt;
-        ///      &lt;name&gt;Dictionary-Package&lt;/name&gt;      
+        ///      &lt;name&gt;Dictionary-Package&lt;/name&gt;
         ///    &lt;/package&gt;
         ///  &lt;/info&gt;
         ///  &lt;DictionaryItems&gt;
-        ///    &lt;DictionaryItem Key=&quot;Parent&quot;&gt;
+        ///    &lt;DictionaryItem Key=&quot;28f2e02a-8c66-4fcd-85e3-8524d551c0d3&quot; Name=&quot;Parent&quot;&gt;
         ///      &lt;Value LanguageId=&quot;2&quot; LanguageCultureAlias=&quot;nb-NO&quot;&gt;&lt;![CDATA[ForelderVerdi]]&gt;&lt;/Value&gt;
         ///      &lt;Value LanguageId=&quot;3&quot; LanguageCultureAlias=&quot;en-GB&quot;&gt;&lt;![CDATA[ParentValue]]&gt;&lt;/Value&gt;
-        ///      &lt;DictionaryItem Key=&quot;Child&quot;&gt;
-        ///        &lt;Value LanguageId=&quot;2&quot; LanguageCultureAlias=&quot;nb-NO&quot;&gt;&lt;![CDATA[BarnV [rest of string was truncated]&quot;;.
+        ///      &lt;DictionaryItem Key=&quot;e7dba0a9-d517-4ba4-8e18-2764d392c611&quot; Name=&quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Dictionary_Package {
             get {
@@ -240,6 +239,33 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importin
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;DocumentType&gt;
+        ///  &lt;Info&gt;
+        ///    &lt;Name&gt;test&lt;/Name&gt;
+        ///    &lt;Key&gt;150ead17-d359-42a2-ac33-6504cc52ced1&lt;/Key&gt;
+        ///    &lt;Alias&gt;test&lt;/Alias&gt;
+        ///    &lt;Icon&gt;folder.gif&lt;/Icon&gt;
+        ///    &lt;Thumbnail&gt;folder.png&lt;/Thumbnail&gt;
+        ///    &lt;Description&gt;
+        ///    &lt;/Description&gt;
+        ///    &lt;AllowAtRoot&gt;False&lt;/AllowAtRoot&gt;
+        ///    &lt;AllowedTemplates&gt;
+        ///      &lt;Template&gt;test&lt;/Template&gt;
+        ///    &lt;/AllowedTemplates&gt;
+        ///    &lt;DefaultTemplate&gt;test&lt;/DefaultTemplate&gt;
+        ///  &lt;/Info&gt;
+        ///  &lt;Structure&gt;
+        ///    &lt;DocumentType&gt;test&lt;/DocumentType&gt;
+        ///  &lt;/Str [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SingleDocType_WithCleanupPolicy {
+            get {
+                return ResourceManager.GetString("SingleDocType_WithCleanupPolicy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
         ///&lt;umbPackage&gt;
         ///  &lt;info&gt;
@@ -249,8 +275,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importin
         ///  &lt;/info&gt;
         ///  &lt;Documents&gt;
         ///    &lt;DocumentSet importMode=&quot;root&quot;&gt;
-        ///      &lt;Homepage id=&quot;1072&quot; parentID=&quot;-1&quot; level=&quot;1&quot; creatorID=&quot;0&quot; sortOrder=&quot;0&quot; createDate=&quot;2013-02-17T09:04:39&quot; updateDate=&quot;2013-02-17T09:10:47&quot; nodeName=&quot;Home&quot; urlName=&quot;home&quot; path=&quot;-1,1072&quot; isDoc=&quot;&quot; nodeType=&quot;1062&quot; creatorName=&quot;admin&quot; writerName=&quot;admin&quot; writerID=&quot;0&quot; template=&quot;1049&quot;&gt;
-        ///        &lt;slide [rest of string was truncated]&quot;;.
+        ///      &lt;Homepage key=&quot;9c9b55d0-2fbf-4f12-afea-023bd7b2519d&quot; id=&quot;1072&quot; parentID=&quot;-1&quot; level=&quot;1&quot; creatorID=&quot;0&quot; sortOrder=&quot;0&quot; createDate=&quot;2013-02-17T09:04:39&quot; updateDate=&quot;2013-02-17T09:10:47&quot; nodeName=&quot;Home&quot; urlName=&quot;home&quot; path=&quot;-1,1072&quot; isDoc=&quot;&quot; nodeType=&quot;1062&quot; creatorName=&quot;admin&quot; writerName=&quot;admin&quot; wr [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string StandardMvc_Package {
             get {

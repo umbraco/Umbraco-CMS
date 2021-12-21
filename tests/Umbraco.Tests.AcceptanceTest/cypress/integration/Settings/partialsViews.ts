@@ -26,7 +26,7 @@ context('Partial Views', () => {
         openPartialViewsCreatePanel();
 
         cy.umbracoContextMenuAction("action-create").click();
-        cy.get('.menu-label').first().click(); // TODO: Fucked we cant use something like cy.umbracoContextMenuAction("action-mediaType").click();
+        cy.get('.menu-label localize[key="create_newEmptyPartialView"]').click();
 
         //Type name
         cy.umbracoEditorHeaderName(name);
@@ -73,7 +73,7 @@ context('Partial Views', () => {
         openPartialViewsCreatePanel();
 
         cy.umbracoContextMenuAction("action-create").click();
-        cy.get('.menu-label').first().click();
+        cy.get('.menu-label localize[key="create_newEmptyPartialView"]').click();
 
         // The test would fail intermittently, most likely because the editor didn't have time to load
         // This should ensure that the editor is loaded and the test should no longer fail unexpectedly.

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -59,7 +59,7 @@ namespace Umbraco.Extensions
         /// <param name="entityIds"></param>
         public static void RemoveUserGroupPermissions(this IUserService userService, int groupId, params int[] entityIds)
         {
-            userService.ReplaceUserGroupPermissions(groupId, new char[] {}, entityIds);
+            userService.ReplaceUserGroupPermissions(groupId, null, entityIds);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Umbraco.Extensions
         /// <param name="groupId"></param>
         public static void RemoveUserGroupPermissions(this IUserService userService, int groupId)
         {
-            userService.ReplaceUserGroupPermissions(groupId, new char[] { });
+            userService.ReplaceUserGroupPermissions(groupId, null);
         }
 
 

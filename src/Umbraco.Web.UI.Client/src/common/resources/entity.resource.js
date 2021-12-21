@@ -127,6 +127,39 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve url for id:' + id);
         },
 
+        getUrlsByIds: function(ids, type, culture) {
+          var query = `type=${type}&culture=${culture || ""}`;
+
+          return umbRequestHelper.resourcePromise(
+             $http.post(
+                 umbRequestHelper.getApiUrl(
+                     "entityApiBaseUrl",
+                     "GetUrlsByIds",
+                     query),
+                 {
+                     ids: ids
+                 }),
+             'Failed to retrieve url map for ids ' + ids);
+        },
+
+        /**
+         * @deprecated use getUrlsByIds instead.
+         */
+        getUrlsByUdis: function(udis, culture) {
+          var query = "culture=" + (culture || "");
+
+          return umbRequestHelper.resourcePromise(
+             $http.post(
+                 umbRequestHelper.getApiUrl(
+                     "entityApiBaseUrl",
+                     "GetUrlsByUdis",
+                     query),
+                 {
+                     udis: udis
+                 }),
+             'Failed to retrieve url map for udis ' + udis);
+        },
+
         getUrlByUdi: function (udi, culture) {
 
             if (!udi) {

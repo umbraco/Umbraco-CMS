@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Infrastructure.Logging.Serilog;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Logging.Serilog
@@ -27,13 +28,14 @@ namespace Umbraco.Cms.Core.Logging.Serilog
         public static SerilogLogger CreateWithDefaultConfiguration(
             IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            out UmbracoFileConfiguration umbracoFileConfig)
         {
-            var loggerConfig = new LoggerConfiguration()
-                .MinimalConfiguration(hostingEnvironment, loggingConfiguration, configuration)
+            var serilogConfig = new LoggerConfiguration()
+                .MinimalConfiguration(hostingEnvironment, loggingConfiguration, configuration, out umbracoFileConfig)
                 .ReadFrom.Configuration(configuration);
 
-            return new SerilogLogger(loggerConfig);
+            return new SerilogLogger(serilogConfig);
         }
 
         /// <summary>

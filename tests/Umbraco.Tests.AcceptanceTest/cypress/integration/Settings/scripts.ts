@@ -23,7 +23,10 @@ context('Scripts', () => {
     cy.umbracoTreeItem("settings", ["Scripts"]).rightclick();
 
     cy.umbracoContextMenuAction("action-create").click();
-    cy.get('.menu-label').first().click(); // TODO: Fucked we cant use something like cy.umbracoContextMenuAction("action-mediaType").click();
+    cy.get('.menu-label localize[key="create_newJavascriptFile"]').click();
+    //We have to wait here till everything is loaded, or worker will throw error
+    cy.intercept('/umbraco/lib/ace-builds/src-min-noconflict/worker-javascript.js').as('aceWorker');
+    cy.wait('@aceWorker');
 
     //Type name
     cy.umbracoEditorHeaderName(name);
@@ -33,6 +36,8 @@ context('Scripts', () => {
 
     //Assert
     cy.umbracoSuccessNotification().should('be.visible');
+
+
     cy.umbracoScriptExists(fileName).should('be.true');
 
 

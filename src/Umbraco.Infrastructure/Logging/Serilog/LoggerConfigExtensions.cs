@@ -31,7 +31,8 @@ namespace Umbraco.Extensions
             this LoggerConfiguration logConfig,
             IHostingEnvironment hostingEnvironment,
             ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            out UmbracoFileConfiguration umbFileConfiguration)
         {
             global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
@@ -53,6 +54,8 @@ namespace Umbraco.Extensions
 
             //This is not optimal, but seems to be the only way if we do not make an Serilog.Sink.UmbracoFile sink all the way.
             var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
+
+            umbFileConfiguration = umbracoFileConfiguration;
 
             logConfig.WriteTo.UmbracoFile(
                 path : umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),

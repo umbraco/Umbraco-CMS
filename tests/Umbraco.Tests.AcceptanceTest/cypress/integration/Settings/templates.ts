@@ -68,7 +68,9 @@ context('Templates', () => {
         // Open partial view
         cy.umbracoTreeItem("settings", ["Templates", name]).click();
         // Edit
-        cy.get('.ace_text-input').type(edit, {force:true} );
+        cy.get('.ace_content').type(edit);
+        cy.get('.ace_content').contains(edit).should('be.visible');
+        cy.get('.btn-success').should('be.visible')
 
         // Navigate away
         cy.umbracoSection('content');
@@ -101,7 +103,9 @@ context('Templates', () => {
         // Open partial view
         cy.umbracoTreeItem("settings", ["Templates", name]).click();
         // Edit
-        cy.get('.ace_text-input').type(edit, {force:true} );
+        cy.get('.ace_content').type(edit);
+        cy.get('.ace_content').contains(edit).should('be.visible');
+        cy.get('.btn-success').should('be.visible')
 
         // Navigate away
         cy.umbracoSection('content');
@@ -136,7 +140,7 @@ context('Templates', () => {
         // Insert macro
         cy.umbracoButtonByLabelKey('general_insert').click();
         cy.get('.umb-insert-code-box__title').contains('Macro').click();
-        cy.get('.umb-card-grid-item').contains(name).click();
+        cy.get(`.umb-card-grid-item[title='${name}']`).click('bottom');
 
         // Assert
         cy.get('.ace_content').contains('@await Umbraco.RenderMacroAsync("' + name + '")').should('exist');

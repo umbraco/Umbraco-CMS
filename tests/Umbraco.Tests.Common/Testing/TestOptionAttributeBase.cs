@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 using Umbraco.Cms.Core.Exceptions;
 
 namespace Umbraco.Cms.Tests.Common.Testing
 {
     public abstract class TestOptionAttributeBase : Attribute
     {
+        [Obsolete("This is not used anymore - Test classes are found using nunit helpers")]
         public static readonly List<Assembly> ScanAssemblies = new List<Assembly>();
 
         public static TOptions GetTestOptions<TOptions>(MethodInfo method)
@@ -29,26 +31,8 @@ namespace Umbraco.Cms.Tests.Common.Testing
             where TOptions : TestOptionAttributeBase, new()
         {
             TestContext.TestAdapter test = TestContext.CurrentContext.Test;
-            var typeName = test.ClassName;
             var methodName = test.MethodName;
-
-            // This will only get types from whatever is already loaded in the app domain.
-            var type = Type.GetType(typeName, false);
-            if (type == null)
-            {
-                // automatically add the executing and calling assemblies to the list to scan for this type
-                var scanAssemblies = ScanAssemblies.Union(new[] { Assembly.GetExecutingAssembly(), Assembly.GetCallingAssembly() }).ToList();
-
-                type = scanAssemblies
-                    .Select(assembly => assembly.GetType(typeName, false))
-                    .FirstOrDefault(x => x != null);
-                if (type == null)
-                {
-                    throw new PanicException($"Could not resolve the running test fixture from type name {typeName}.\n" +
-                                             $"To use base classes from Umbraco.Tests, add your test assembly to TestOptionAttributeBase.ScanAssemblies");
-                }
-            }
-
+            var type = TestExecutionContext.CurrentContext.TestObject.GetType();
             MethodInfo methodInfo = type.GetMethod(methodName); // what about overloads?
             TOptions options = GetTestOptions<TOptions>(methodInfo);
             return options;

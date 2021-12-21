@@ -25,7 +25,10 @@ function logViewerResource($q, $http, umbRequestHelper) {
 
         getNumberOfErrors: (startDate, endDate) => 
             request('GET', 'GetNumberOfErrors', '?startDate=' + startDate + '&endDate=' + endDate, 'Failed to retrieve number of errors in logs'),    
-
+      
+        getLogLevels: () =>
+            request('GET', 'GetLogLevels', null, 'Failed to retrieve log levels'),
+        
         getLogLevel: () =>
             request('GET', 'GetLogLevel', null, 'Failed to retrieve log level'),        
 

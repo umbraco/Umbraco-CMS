@@ -31,7 +31,7 @@ angular.module("umbraco.directives")
                     propertyAlias: '@',
                     accept: '@',
                     maxFileSize: '@',
-
+ 
                     compact: '@',
                     hideDropzone: '@',
                     acceptedMediatypes: '=',
@@ -42,9 +42,10 @@ angular.module("umbraco.directives")
                 },
                 link: function(scope, element, attrs) {
                     scope.queue = [];
-                    scope.done = [];
-                    scope.rejected = [];
+                    scope.totalQueued = 0;
                     scope.currentFile = undefined;
+                    scope.processed = [];
+                    scope.totalMessages = 0;
 
                     function _filterFile(file) {
                         var ignoreFileNames = ['Thumbs.db'];
@@ -65,51 +66,50 @@ angular.module("umbraco.directives")
                     function _filesQueued(files, event) {
                         //Push into the queue
                         Utilities.forEach(files, file => {
-                                if (_filterFile(file) === true) {
-
-                                if (file.$error) {
-                                    scope.rejected.push(file);
-                                } else {
-                                    scope.queue.push(file);
-                                }
+                            if (_filterFile(file) === true) {
+                                file.messages = [];
+                                scope.queue.push(file);
                             }
                         });
 
-                        //when queue is done, kick the uploader
-                        if (!scope.working) {
-                            // Upload not allowed
-                            if (!scope.acceptedMediatypes || !scope.acceptedMediatypes.length) {
-                                files.map(file => {
-                                    file.uploadStatus = "error";
-                                    file.serverErrorMessage = "File type is not allowed here";
-                                    scope.rejected.push(file);
-                                });
-                                scope.queue = [];
-                            }
-                            // If we have Accepted Media Types, we will ask to choose Media Type, if Choose Media Type returns false, it only had one choice and therefor no reason to
-                            if (scope.acceptedMediatypes && _requestChooseMediaTypeDialog() === false) {
-                                scope.contentTypeAlias = "umbracoAutoSelect";
-
-                                _processQueueItem();
-                            }
+                        // Upload not allowed
+                        if (!scope.acceptedMediatypes || !scope.acceptedMediatypes.length) {
+                            files.map(file => {
+                                file.messages.push({message: "File type is not allowed here", type: "Error"});
+                            });
                         }
+
+                        // If we have Accepted Media Types, we will ask to choose Media Type, if Choose Media Type returns false, it only had one choice and therefor no reason to
+                        if (scope.acceptedMediatypes && _requestChooseMediaTypeDialog() === false) {
+                            scope.contentTypeAlias = "umbracoAutoSelect";
+                        }
+
+                        // Add the processed length, as we might be uploading in stages
+                        scope.totalQueued = scope.queue.length + scope.processed.length;
+
+                        _processQueueItems();                        
                     }
 
-                    function _processQueueItem() {
-                        if (scope.queue.length > 0) {
+                    function _processQueueItems() {
+                        // if we have processed all files, either by successful
+                        // upload, or attending to all messages, we deem the
+                        // action complete, else continue processing files
+                        scope.totalMessages = scope.processed.filter(e => e.messages.length > 0).length;
+                        if (scope.totalQueued === scope.processed.length) {
+                          if (scope.totalMessages === 0) {
+                                if (scope.filesUploaded) {
+                                    //queue is empty, trigger the done action
+                                    scope.filesUploaded(scope.done);
+                                }
+                                //auto-clear the done queue after 3 secs
+                                var currentLength = scope.processed.length;
+                                $timeout(function() {
+                                    scope.processed.splice(0, currentLength);
+                                }, 3000);
+                            }
+                        } else {
                             scope.currentFile = scope.queue.shift();
                             _upload(scope.currentFile);
-                        } else if (scope.done.length > 0) {
-                            if (scope.filesUploaded) {
-                                //queue is empty, trigger the done action
-                                scope.filesUploaded(scope.done);
-                            }
-
-                            //auto-clear the done queue after 3 secs
-                            var currentLength = scope.done.length;
-                            $timeout(function() {
-                                scope.done.splice(0, currentLength);
-                            }, 3000);
                         }
                     }
 
@@ -134,55 +134,36 @@ angular.module("umbraco.directives")
                                   var progressPercentage = parseInt(100.0 * evt.loaded / evt.total, 10);
                                   // set percentage property on file
                                   file.uploadProgress = progressPercentage;
-                                  // set uploading status on file
-                                  file.uploadStatus = "uploading";
                                 }
                             })
-                            .success(function(data, status, headers, config) {
-                                if (data.notifications && data.notifications.length > 0) {
-                                    // set error status on file
-                                    file.uploadStatus = "error";
-                                    // Throw message back to user with the cause of the error
-                                    file.serverErrorMessage = data.notifications[0].message;
-                                    // Put the file in the rejected pool
-                                    scope.rejected.push(file);
-                                } else {
-                                    // set done status on file
-                                    file.uploadStatus = "done";
-                                    file.uploadProgress = 100;
-                                    // set date/time for when done - used for sorting
-                                    file.doneDate = new Date();
-                                    // Put the file in the done pool
-                                    scope.done.push(file);
-                                }
+                            .success(function (data, status, headers, config) {
+                                // Set server messages
+                                file.messages = data.notifications;
+                                scope.processed.push(file);
+                                //after processing, test if everything is done
                                 scope.currentFile = undefined;
-                                //after processing, test if everthing is done
-                                _processQueueItem();
+                                _processQueueItems();
                             })
                             .error(function(evt, status, headers, config) {
-                                // set status done
-                                file.uploadStatus = "error";
                                 //if the service returns a detailed error
                                 if (evt.InnerException) {
-                                    file.serverErrorMessage = evt.InnerException.ExceptionMessage;
+                                    file.messages.push({ message: evt.InnerException.ExceptionMessage, type: "Error" });
                                     //Check if its the common "too large file" exception
                                     if (evt.InnerException.StackTrace &&
                                         evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
-                                        file.serverErrorMessage = "File too large to upload";
+                                        file.messages.push({ message: "File too large to upload", type: "Error" });
                                     }
                                 } else if (evt.Message) {
-                                    file.serverErrorMessage = evt.Message;
-                                } else if (evt && typeof evt === 'string') {
-                                    file.serverErrorMessage = evt;
+                                    file.messages.push({message: evt.Message, type: "Error"});
+                                } else if (evt && typeof evt === "string") {
+                                    file.messages.push({message: evt, type: "Error"});
                                 }
                                 // If file not found, server will return a 404 and display this message
                                 if (status === 404) {
-                                    file.serverErrorMessage = "File not found";
+                                    file.messages.push({message: "File not found", type: "Error"});
                                 }
-                                //after processing, test if everthing is done
-                                scope.rejected.push(file);
                                 scope.currentFile = undefined;
-                                _processQueueItem();
+                                _processQueueItems();
                             });
                     }
 
@@ -224,16 +205,14 @@ angular.module("umbraco.directives")
                                 availableItems: filteredMediaTypes,
                                 submit: function (model) {
                                     scope.contentTypeAlias = model.selectedItem.alias;
-                                    _processQueueItem();
+                                    _processQueueItems();
 
                                     overlayService.close();
                                 },
                                 close: function () {
 
                                     scope.queue.map(function (file) {
-                                        file.uploadStatus = "error";
-                                        file.serverErrorMessage = "No files uploaded, no mediatype selected";
-                                        scope.rejected.push(file);
+                                        file.messages.push({message:"No files uploaded, no mediatype selected", type: "Error"});
                                     });
                                     scope.queue = [];
 
@@ -245,14 +224,26 @@ angular.module("umbraco.directives")
                             overlayService.open(dialog);
                         });
 
-                        return true;// yes, we did open the choose-media dialog, therefor we return true.
+                        return true; // yes, we did open the choose-media dialog, therefore we return true.
+                    }
+
+                    scope.dismissMessages = function (file) {
+                        file.messages = [];
+                        _processQueueItems();
+                    }
+
+                    scope.dismissAllMessages = function () {
+                      Utilities.forEach(scope.processed, file => {
+                        file.messages = [];
+                      });
+                      _processQueueItems();
                     }
 
                     scope.handleFiles = function(files, event, invalidFiles) {
                         const allFiles = [...files, ...invalidFiles];
 
                         // add unique key for each files to use in ng-repeats
-                        allFiles.forEach(file => {
+                        Utilities.forEach(allFiles, file => {
                             file.key = String.CreateGuid();
                         });
 
