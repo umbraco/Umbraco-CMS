@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         {
             var requestHandlerSettings = new RequestHandlerSettings()
             {
-                CharCollection = Array.Empty<CharacterReplacement>(),
+                CharCollection = Array.Empty<CharItem>(),
                 EnableDefaultCharReplacements = false,
                 ConvertUrlsToAscii = "false"
             };
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         {
             var requestHandlerSettings = new RequestHandlerSettings()
             {
-                CharCollection = Array.Empty<CharacterReplacement>(),
+                CharCollection = Array.Empty<CharItem>(),
                 EnableDefaultCharReplacements = false,
                 ConvertUrlsToAscii = "false"
             };
@@ -342,7 +342,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         {
             var requestHandlerSettings = new RequestHandlerSettings()
             {
-                CharCollection = Array.Empty<CharacterReplacement>(),
+                CharCollection = Array.Empty<CharItem>(),
                 EnableDefaultCharReplacements = false,
                 ConvertUrlsToAscii = "false"
             };

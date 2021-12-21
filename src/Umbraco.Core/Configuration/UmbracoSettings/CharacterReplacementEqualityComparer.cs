@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
 {
-    public class CharacterReplacementEqualityComparer : IEqualityComparer<CharacterReplacement>
+    public class CharacterReplacementEqualityComparer : IEqualityComparer<CharItem>
     {
-        public bool Equals(CharacterReplacement x, CharacterReplacement y)
+        public bool Equals(CharItem x, CharItem y)
         {
             if (ReferenceEquals(x, y))
             {
@@ -29,7 +30,7 @@ namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
             return x.Char == y.Char && x.Replacement == y.Replacement;
         }
 
-        public int GetHashCode(CharacterReplacement obj)
+        public int GetHashCode(CharItem obj)
         {
             unchecked
             {

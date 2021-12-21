@@ -1,6 +1,6 @@
-namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
+namespace Umbraco.Cms.Core.Configuration.Models
 {
-    public class CharacterReplacement
+    public class CharItem
     {
         /// <summary>
         /// The character to replace
