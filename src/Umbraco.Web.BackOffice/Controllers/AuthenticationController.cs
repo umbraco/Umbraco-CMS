@@ -679,7 +679,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            Uri applicationUri = _httpContextAccessor.HttpContext?.Request.GetApplicationUri(_webRoutingSettings);
+            Uri applicationUri = _httpContextAccessor.GetRequiredHttpContext().Request.GetApplicationUri(_webRoutingSettings);
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }

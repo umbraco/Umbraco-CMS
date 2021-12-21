@@ -116,6 +116,16 @@ namespace Umbraco.Extensions
         /// </summary>
         public static Uri GetApplicationUri(this HttpRequest request, WebRoutingSettings routingSettings)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            if (routingSettings == null)
+            {
+                throw new ArgumentNullException(nameof(routingSettings));
+            }
+
             if (string.IsNullOrEmpty(routingSettings.UmbracoApplicationUrl))
             {
                 var requestUri = new Uri(request.GetDisplayUrl());
