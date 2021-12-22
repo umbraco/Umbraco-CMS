@@ -19,8 +19,6 @@ namespace Umbraco.Cms.Web.BackOffice.Services
         public bool HasConflictingRoutes()
         {
             var controllers = _typeLoader.GetTypes<UmbracoApiControllerBase>().ToList();
-            // var pluginControllers = _typeLoader.GetTypes<PluginController>().ToList();
-            // controllers.AddRange(pluginControllers);
             foreach (Type controller in controllers)
             {
                 if (controllers.Count(x => x.Name == controller.Name) > 1)
