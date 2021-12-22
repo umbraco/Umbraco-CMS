@@ -1,7 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Configuration.UmbracoSettings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
 {
@@ -18,8 +18,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
             };
 
 
-            var settings = new RequestHandlerSettings { CharCollection = userCollection };
-            var actual = settings.CharCollection.ToList();
+            var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
+            var actual = settings.GetCharReplacements().ToList();
 
             var expectedCollection = RequestHandlerSettings.DefaultCharCollection.ToList();
             expectedCollection.AddRange(userCollection);
@@ -37,8 +37,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
                 new () { Char = "test2", Replacement = "replace2" }
             };
 
-            var settings = new RequestHandlerSettings { CharCollection = userCollection, EnableDefaultCharReplacements = false };
-            var actual = settings.CharCollection.ToList();
+            var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection, EnableDefaultCharReplacements = false };
+            var actual = settings.GetCharReplacements().ToList();
 
             Assert.AreEqual(userCollection.Length, actual.Count);
             Assert.That(actual, Is.EquivalentTo(userCollection));
@@ -53,8 +53,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
                 new () { Char = ".", Replacement = "dot" }
             };
 
-            var settings = new RequestHandlerSettings { CharCollection = userCollection };
-            var actual = settings.CharCollection.ToList();
+            var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
+            var actual = settings.GetCharReplacements().ToList();
 
             Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length, actual.Count);
 
@@ -74,8 +74,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
                 new () { Char = "new", Replacement = "new" }
             };
 
-            var settings = new RequestHandlerSettings { CharCollection = userCollection };
-            var actual = settings.CharCollection.ToList();
+            var settings = new RequestHandlerSettings { UserDefinedCharCollection = userCollection };
+            var actual = settings.GetCharReplacements().ToList();
 
             // Add 1 to the length, because we're expecting to only add one new one
             Assert.AreEqual(RequestHandlerSettings.DefaultCharCollection.Length + 1, actual.Count);

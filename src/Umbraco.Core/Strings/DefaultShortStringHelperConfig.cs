@@ -61,16 +61,7 @@ namespace Umbraco.Cms.Core.Strings
         /// <returns>The short string helper.</returns>
         public DefaultShortStringHelperConfig WithDefault(RequestHandlerSettings requestHandlerSettings)
         {
-            // CharCollection could potentially be null if not invoked first by the framework, for instance in tests, so ensure that it's initialized.
-            IEnumerable<IChar> charCollection = requestHandlerSettings.CharCollection;
-            if (charCollection is null)
-            {
-                charCollection = requestHandlerSettings.CharCollection;
-                if (charCollection is null)
-                {
-                    throw new ArgumentNullException(nameof(requestHandlerSettings.CharCollection));
-                }
-            }
+            IEnumerable<IChar> charCollection = requestHandlerSettings.GetCharReplacements();
 
             UrlReplaceCharacters = charCollection
                 .Where(x => string.IsNullOrEmpty(x.Char) == false)
