@@ -18,7 +18,7 @@
     <key alias="emptyRecycleBin">Opróżnij kosz</key>
     <key alias="enable">Aktywuj</key>
     <key alias="exportDocumentType">Eksportuj typ dokumentu</key>
-    <key alias="importDocumentType">Importuj typ dokumentu</key>
+    <key alias="importdocumenttype">Importuj typ dokumentu</key>
     <key alias="importPackage">Importuj zbiór</key>
     <key alias="liveEdit">Edytuj na stronie</key>
     <key alias="logout">Wyjście</key>

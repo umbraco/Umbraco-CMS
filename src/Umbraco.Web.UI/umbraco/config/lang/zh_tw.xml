@@ -16,7 +16,7 @@
     <key alias="disable">禁用</key>
     <key alias="emptyRecycleBin">清空回收站</key>
     <key alias="exportDocumentType">匯出文檔類型</key>
-    <key alias="importDocumentType">導入文檔類型</key>
+    <key alias="importdocumenttype">導入文檔類型</key>
     <key alias="importPackage">導入擴展包</key>
     <key alias="liveEdit">即時編輯模式</key>
     <key alias="logout">退出</key>

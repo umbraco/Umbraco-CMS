@@ -16,7 +16,7 @@
     <key alias="disable">無効</key>
     <key alias="emptyRecycleBin">ごみ箱を空にする</key>
     <key alias="exportDocumentType">ドキュメントタイプの書出</key>
-    <key alias="importDocumentType">ドキュメントタイプの読込</key>
+    <key alias="importdocumenttype">ドキュメントタイプの読込</key>
     <key alias="importPackage">パッケージの読み込み</key>
     <key alias="liveEdit">ライブ編集</key>
     <key alias="logout">ログアウト</key>
