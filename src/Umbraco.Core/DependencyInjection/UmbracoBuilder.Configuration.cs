@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {
@@ -78,23 +79,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<LegacyPasswordMigrationSettings>()
                 .AddUmbracoOptions<PackageMigrationSettings>();
 
-            builder.Services.Configure<RequestHandlerSettings>(options =>
-            {
-                var userDefinedReplacements = new List<CharItem>();
-                IEnumerable<IConfigurationSection> config = builder.Config
-                    .GetSection(
-                        $"{Constants.Configuration.ConfigRequestHandler}:{nameof(RequestHandlerSettings.CharCollection)}")
-                    .GetChildren();
-
-                foreach (IConfigurationSection section in config)
-                {
-                    var @char = section.GetValue<string>(nameof(CharItem.Char));
-                    var replacement = section.GetValue<string>(nameof(CharItem.Replacement));
-                    userDefinedReplacements.Add(new CharItem { Char = @char, Replacement = replacement });
-                }
-
-                options.UserDefinedCharCollection = userDefinedReplacements;
-            });
+            builder.Services.Configure<RequestHandlerSettings>(options => options.MergeReplacements(builder.Config));
 
             return builder;
         }
