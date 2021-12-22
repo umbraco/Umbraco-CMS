@@ -124,11 +124,11 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
 
             // Check if we have multiple controllers with the same name.
-            if (_conflictingRouteService.HasConflictingRoutes())
+            if (_conflictingRouteService.HasConflictingRoutes(out string controllerName))
             {
                 Level = RuntimeLevel.BootFailed;
                 Reason = RuntimeLevelReason.BootFailedOnException;
-                BootFailedException = new BootFailedException("Conflicting routes, you cannot have multiple controllers with the same name");
+                BootFailedException = new BootFailedException($"Conflicting routes, you cannot have multiple controllers with the same name: {controllerName}");
 
                 return;
             }

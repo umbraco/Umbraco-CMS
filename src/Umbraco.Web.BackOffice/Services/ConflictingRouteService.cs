@@ -16,17 +16,19 @@ namespace Umbraco.Cms.Web.BackOffice.Services
         public ConflictingRouteService(TypeLoader typeLoader) => _typeLoader = typeLoader;
 
         /// <inheritdoc/>
-        public bool HasConflictingRoutes()
+        public bool HasConflictingRoutes(out string controllerName)
         {
             var controllers = _typeLoader.GetTypes<UmbracoApiControllerBase>().ToList();
             foreach (Type controller in controllers)
             {
                 if (controllers.Count(x => x.Name == controller.Name) > 1)
                 {
+                    controllerName = controller.Name;
                     return true;
                 }
             }
 
+            controllerName = string.Empty;
             return false;
         }
     }
