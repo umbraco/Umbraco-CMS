@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Culture and Hostnames</key>
+    <key alias="assigndomain">Culture and Hostnames</key>
     <key alias="auditTrail">Audit Trail</key>
     <key alias="browse">Browse Node</key>
     <key alias="changeDocType">Change Document Type</key>
