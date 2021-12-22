@@ -83,9 +83,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _conflictingRouteService = conflictingRouteService;
         }
 
-
-
-
         /// <inheritdoc />
         public Version Version => _umbracoVersion.Version;
 
