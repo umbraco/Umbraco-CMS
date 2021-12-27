@@ -107,5 +107,17 @@ namespace Umbraco.Cms.Core.DependencyInjection
             builder.UrlProviders().Append<T>();
             return builder;
         }
+
+        /// <summary>
+        /// Remove a section.
+        /// </summary>
+        /// <typeparam name="T">The type of the section.</typeparam>
+        /// <param name="builder">The builder.</param>
+        public static IUmbracoBuilder RemoveSection<T>(this IUmbracoBuilder builder)
+            where T : class, ISection
+        {
+            builder.Sections().Remove<T>();
+            return builder;
+        }
     }
 }
