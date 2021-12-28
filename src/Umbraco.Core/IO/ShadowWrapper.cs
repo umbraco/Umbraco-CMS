@@ -1,14 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO
 {
-    internal class ShadowWrapper : IFileSystem
+    internal class ShadowWrapper : IFileSystem, IFileProviderFactory
     {
         private static readonly string ShadowFsPath = Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs";
 
@@ -220,5 +221,12 @@ namespace Umbraco.Cms.Core.IO
         {
             FileSystem.AddFile(path, physicalPath, overrideIfExists, copy);
         }
+
+        /// <inheritdoc />
+        public IFileProvider Create() => _innerFileSystem switch
+        {
+            IFileProviderFactory fileProviderFactory => fileProviderFactory.Create(),
+            var fileSystem => new FileSystemFileProvider(fileSystem)
+        };
     }
 }

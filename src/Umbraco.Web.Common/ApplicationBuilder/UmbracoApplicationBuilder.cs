@@ -6,8 +6,8 @@ using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.ImageProcessors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
@@ -31,7 +31,9 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         }
 
         public IServiceProvider ApplicationServices { get; }
+
         public IRuntimeState RuntimeState { get; }
+
         public IApplicationBuilder AppBuilder { get; }
 
         /// <inheritdoc />
@@ -82,9 +84,8 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         }
 
         /// <summary>
-        /// Registers the default required middleware to run Umbraco
+        /// Registers the default required middleware to run Umbraco.
         /// </summary>
-        /// <param name="umbracoApplicationBuilderContext"></param>
         public void RegisterDefaultRequiredMiddleware()
         {
             UseUmbracoCoreMiddleware();
@@ -94,14 +95,19 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
             // Important we handle image manipulations before the static files, otherwise the querystring is just ignored.
             AppBuilder.UseImageSharp();
 
+            // Get media file provider and request path/URL
+            IFileProvider mediaFileProvider = AppBuilder.ApplicationServices.GetRequiredService<MediaFileManager>().CreateFileProvider();
+
             GlobalSettings globalSettings = AppBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
-            IUmbracoMediaFileProvider umbracoMediaFileProvider = AppBuilder.ApplicationServices.GetRequiredService<IUmbracoMediaFileProvider>();
+            IHostingEnvironment hostingEnvironment = AppBuilder.ApplicationServices.GetService<IHostingEnvironment>();
+            string mediaRequestPath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaUrl);
 
             AppBuilder.UseStaticFiles(new StaticFileOptions()
             {
-                FileProvider = umbracoMediaFileProvider,
-                RequestPath = globalSettings.UmbracoMediaUrl.TrimStart("~")
+                FileProvider = mediaFileProvider,
+                RequestPath = mediaRequestPath
             });
+
             AppBuilder.UseStaticFiles();
 
             AppBuilder.UseUmbracoPluginsStaticFiles();

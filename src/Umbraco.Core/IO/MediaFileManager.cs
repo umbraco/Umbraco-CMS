@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -22,13 +22,22 @@ namespace Umbraco.Cms.Core.IO
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IServiceProvider _serviceProvider;
         private MediaUrlGeneratorCollection _mediaUrlGenerators;
-        private readonly ContentSettings _contentSettings;
 
-        /// <summary>
-        /// Gets the media filesystem.
-        /// </summary>
-        public IFileSystem FileSystem { get; }
+        public MediaFileManager(
+            IFileSystem fileSystem,
+            IMediaPathScheme mediaPathScheme,
+            ILogger<MediaFileManager> logger,
+            IShortStringHelper shortStringHelper,
+            IServiceProvider serviceProvider)
+        {
+            _mediaPathScheme = mediaPathScheme;
+            _logger = logger;
+            _shortStringHelper = shortStringHelper;
+            _serviceProvider = serviceProvider;
+            FileSystem = fileSystem;
+        }
 
+        [Obsolete("Use the ctr that doesn't include unused parameters.")]
         public MediaFileManager(
             IFileSystem fileSystem,
             IMediaPathScheme mediaPathScheme,
@@ -36,14 +45,25 @@ namespace Umbraco.Cms.Core.IO
             IShortStringHelper shortStringHelper,
             IServiceProvider serviceProvider,
             IOptions<ContentSettings> contentSettings)
+            : this(fileSystem, mediaPathScheme, logger, shortStringHelper, serviceProvider)
+        { }
+
+        /// <summary>
+        /// Gets the media filesystem.
+        /// </summary>
+        public IFileSystem FileSystem { get; }
+
+        /// <summary>
+        /// Create an <see cref="IFileProvider" /> instance for the media file system.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IFileProvider" /> for the media file system.
+        /// </returns>
+        public IFileProvider CreateFileProvider() => FileSystem switch
         {
-            _mediaPathScheme = mediaPathScheme;
-            _logger = logger;
-            _shortStringHelper = shortStringHelper;
-            _serviceProvider = serviceProvider;
-            _contentSettings = contentSettings.Value;
-            FileSystem = fileSystem;
-        }
+            IFileProviderFactory fileProviderFactory => fileProviderFactory.Create(),
+            var fileSystem => new FileSystemFileProvider(fileSystem)
+        };
 
         /// <summary>
         /// Delete media files.
