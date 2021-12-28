@@ -273,7 +273,7 @@ namespace Umbraco.Cms.Core.IO
                 return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
 
             // unchanged - what else?
-            return path;
+            return path.TrimStart(Constants.CharArrays.ForwardSlash);
         }
 
         /// <summary>
@@ -288,7 +288,7 @@ namespace Umbraco.Cms.Core.IO
         public string GetFullPath(string path)
         {
             // normalize
-            var opath = path;
+            var originalPath = path;
             path = EnsureDirectorySeparatorChar(path);
 
             // FIXME: this part should go!
@@ -321,7 +321,7 @@ namespace Umbraco.Cms.Core.IO
 
             // nothing prevents us to reach the file, security-wise, yet it is outside
             // this filesystem's root - throw
-            throw new UnauthorizedAccessException($"File original: [{opath}] full: [{path}] is outside this filesystem's root.");
+            throw new UnauthorizedAccessException($"File original: [{originalPath}] full: [{path}] is outside this filesystem's root.");
         }
 
         /// <summary>
