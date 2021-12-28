@@ -24,7 +24,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const string StaticUmbracoCssPath = "~/css";
         internal const string StaticUmbracoScriptsPath = "~/scripts";
         internal const string StaticUmbracoMediaPath = "~/media";
-        internal const string StaticUmbracoMediaUrl = "~/media";
         internal const bool StaticInstallMissingDatabase = false;
         internal const bool StaticDisableElectionForSingleServer = false;
         internal const string StaticNoNodesViewPath = "~/umbraco/UmbracoWebsite/NoNodes.cshtml";
@@ -32,21 +31,19 @@ namespace Umbraco.Cms.Core.Configuration.Models
         internal const bool StaticSanitizeTinyMce = false;
 
         /// <summary>
-        /// Gets or sets a value for the reserved URLs.
-        /// It must end with a comma
+        /// Gets or sets a value for the reserved URLs (must end with a comma).
         /// </summary>
         [DefaultValue(StaticReservedUrls)]
         public string ReservedUrls { get; set; } = StaticReservedUrls;
 
         /// <summary>
-        /// Gets or sets a value for the reserved paths.
-        /// It must end with a comma
+        /// Gets or sets a value for the reserved paths (must end with a comma).
         /// </summary>
         [DefaultValue(StaticReservedPaths)]
         public string ReservedPaths { get; set; } = StaticReservedPaths;
 
         /// <summary>
-        /// Gets or sets a value for the timeout
+        /// Gets or sets a value for the back-office login timeout.
         /// </summary>
         [DefaultValue(StaticTimeOut)]
         public TimeSpan TimeOut { get; set; } = TimeSpan.Parse(StaticTimeOut);
@@ -110,12 +107,10 @@ namespace Umbraco.Cms.Core.Configuration.Models
         [DefaultValue(StaticUmbracoMediaPath)]
         public string UmbracoMediaPath { get; set; } = StaticUmbracoMediaPath;
 
-
         /// <summary>
-        /// Gets or sets a value for the Umbraco media url. Starts with "~/".
+        /// Gets or sets a value for the Umbraco media URL (falls back to <see cref="UmbracoMediaPath" /> when empty).
         /// </summary>
-        [DefaultValue(StaticUmbracoMediaUrl)]
-        public string UmbracoMediaUrl { get; set; } = StaticUmbracoMediaUrl;
+        public string UmbracoMediaUrl { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to install the database when it is missing.
@@ -139,6 +134,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         public string MainDomLock { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Gets or sets the telemetry ID.
+        /// </summary>
         public string Id { get; set; } = string.Empty;
 
         /// <summary>
@@ -172,18 +170,18 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         public bool IsPickupDirectoryLocationConfigured => !string.IsNullOrWhiteSpace(Smtp?.PickupDirectoryLocation);
 
-        /// Gets a value indicating whether TinyMCE scripting sanitization should be applied
+        /// <summary>
+        /// Gets a value indicating whether TinyMCE scripting sanitization should be applied.
         /// </summary>
         [DefaultValue(StaticSanitizeTinyMce)]
         public bool SanitizeTinyMce => StaticSanitizeTinyMce;
 
         /// <summary>
-        /// An int value representing the time in milliseconds to lock the database for a write operation
+        /// Gets a value representing the time in milliseconds to lock the database for a write operation.
         /// </summary>
         /// <remarks>
-        /// The default value is 5000 milliseconds
+        /// The default value is 5000 milliseconds.
         /// </remarks>
-        /// <value>The timeout in milliseconds.</value>
         [DefaultValue(StaticSqlWriteLockTimeOut)]
         public TimeSpan SqlWriteLockTimeOut { get; } = TimeSpan.Parse(StaticSqlWriteLockTimeOut);
     }
