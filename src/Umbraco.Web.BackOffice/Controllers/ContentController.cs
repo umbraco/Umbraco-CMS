@@ -820,7 +820,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
                 defaultCulture);
 
-            bool isBlueprint = contentItem.PersistedContent.Blueprint;
+            //get the updated model
+            var display = mapToDisplay(contentItem.PersistedContent);
+            bool isBlueprint = display.IsBlueprint;
 
             var contentSavedHeader = isBlueprint ? "editBlueprintSavedHeader" : "editContentSavedHeader";
             var contentSavedText = isBlueprint ? "editBlueprintSavedText" : "editContentSavedText";
@@ -919,9 +921,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            //get the updated model
-            var display = mapToDisplay(contentItem.PersistedContent);
 
             //merge the tracked success messages with the outgoing model
             display.Notifications.AddRange(globalNotifications.Notifications);
