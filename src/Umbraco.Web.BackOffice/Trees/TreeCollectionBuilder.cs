@@ -80,5 +80,11 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 _trees.Remove(tree);
             }
         }
+
+        public void RemoveTreeControllers(IEnumerable<Type> controllerTypes)
+        {
+            foreach (var controllerType in controllerTypes)
+                RemoveTreeController(controllerType);
+        }
     }
 }
