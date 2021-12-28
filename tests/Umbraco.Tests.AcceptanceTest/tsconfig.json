@@ -14,7 +14,8 @@
         "target": "es5",
 
         "types": [
-            "cypress"
+            "cypress",
+            "cypress-file-upload"
         ],
         "lib": [
             "es5",
