@@ -58,11 +58,23 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 AddTreeController(controllerType);
         }
 
-        public void RemoveTreeController<T>() => RemoveTreeController(typeof(T));
-
-        public void RemoveTreeController(Type type)
+        public void RemoveTree(Tree treeDefinition)
         {
-            var tree = _trees.FirstOrDefault(it => it.TreeControllerType == type);
+            if (treeDefinition == null)
+                throw new ArgumentNullException(nameof(treeDefinition));
+            _trees.Remove(treeDefinition);
+        }
+
+        public void RemoveTreeController<TController>()
+            where TController : TreeControllerBase
+            => RemoveTreeController(typeof(TController));
+
+        public void RemoveTreeController(Type controllerType)
+        {
+            if (!typeof(TreeControllerBase).IsAssignableFrom(controllerType))
+                throw new ArgumentException($"Type {controllerType} does not inherit from {typeof(TreeControllerBase).FullName}.");
+
+            var tree = _trees.FirstOrDefault(x => x.TreeControllerType == controllerType);
             if (tree != null)
             {
                 _trees.Remove(tree);
