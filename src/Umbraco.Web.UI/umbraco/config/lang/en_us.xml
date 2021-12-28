@@ -1545,8 +1545,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="editContentPublishedText">and is visible on the website</key>
     <key alias="editMultiContentPublishedText">%0% documents published and visible on the website</key>
     <key alias="editVariantPublishedText">%0% published and visible on the website</key>
-    <key alias="editMultiVariantPublishedText">%0% documents published for languages %1% and visible on the website
-    </key>
+    <key alias="editMultiVariantPublishedText">%0% documents published for languages %1% and visible on the website</key>
+    <key alias="editBlueprintSavedHeader">Content Template saved</key>
+    <key alias="editBlueprintSavedText">Changes have been successfully saved</key>
     <key alias="editContentSavedHeader">Content saved</key>
     <key alias="editContentSavedText">Remember to publish to make changes visible</key>
     <key alias="editContentScheduledSavedText">A schedule for publishing has been updated</key>
