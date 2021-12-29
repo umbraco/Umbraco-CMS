@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core.Composing;
@@ -41,9 +39,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         /// <inheritdoc />
         public override string ToString()
-        {
-            return Crops != null ? (Crops.Any() ? JsonConvert.SerializeObject(this) : Src) : string.Empty;
-        }
+            => HasCrops() || HasFocalPoint() ? JsonConvert.SerializeObject(this, Formatting.None) : Src;
 
         /// <inheritdoc />
         public string ToHtmlString() => Src;
@@ -134,13 +130,19 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// </summary>
         /// <returns></returns>
         public bool HasFocalPoint()
-            => FocalPoint != null && (FocalPoint.Left != 0.5m || FocalPoint.Top != 0.5m);
+            => FocalPoint is ImageCropperFocalPoint focalPoint && (focalPoint.Left != 0.5m || focalPoint.Top != 0.5m);
+
+        /// <summary>
+        /// Determines whether the value has crops.
+        /// </summary>
+        public bool HasCrops()
+            => Crops is IEnumerable<ImageCropperCrop> crops && crops.Any();
 
         /// <summary>
         /// Determines whether the value has a specified crop.
         /// </summary>
         public bool HasCrop(string alias)
-            => Crops != null && Crops.Any(x => x.Alias == alias);
+            => Crops is IEnumerable<ImageCropperCrop> crops && crops.Any(x => x.Alias == alias);
 
         /// <summary>
         /// Determines whether the value has a source image.
