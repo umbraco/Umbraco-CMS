@@ -9,6 +9,7 @@
 
     'lib/moment/moment.min.js',
     'lib/flatpickr/flatpickr.min.js',
+    'lib/flatpickr/plugins/predefined-ranges.js',
 
     'lib/animejs/anime.min.js',
 

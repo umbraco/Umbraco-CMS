@@ -19,7 +19,25 @@
             time_24hr: false,
             mode: "range",
             maxDate: "today",
-            conjunction: " to "
+            conjunction: " to ",
+            mode: 'range',
+            plugins: umbFlatpickrPlugins,
+            ranges: {
+              'Today': [moment(), moment()],
+              'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+              'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+              'This Month': [
+                moment().startOf('month'),
+                moment().endOf('month')
+              ],
+              'Last Month': [
+                moment().subtract(1, 'month').startOf('month'),
+                moment().subtract(1, 'month').endOf('month')
+              ]
+            },
+            rangesOnly: false, // only show the ranges menu unless the custom range button is selected
+            rangesAllowCustom: true, // adds a Custom Range button to show the calendar
+            rangesCustomLabel: 'Custom Range' // customize the label for the custom range button
         };
 
         // ChartJS Options - for count/overview of log distribution
@@ -92,29 +110,29 @@
                 // Fallback to some defaults if error from API response
                 function () {
                     vm.searches = [
-                        {
-                            "name": "Find all logs where the Level is NOT Verbose and NOT Debug",
-                            "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
+                    {
+                        "name": "Find all logs where the Level is NOT Verbose and NOT Debug",
+                        "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
                     },
-                        {
-                            "name": "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
-                            "query": "Has(@Exception)"
+                    {
+                        "name": "Find all logs that has an exception property (Warning, Error & Fatal with Exceptions)",
+                        "query": "Has(@Exception)"
                     },
-                        {
-                            "name": "Find all logs that have the property 'Duration'",
-                            "query": "Has(Duration)"
+                    {
+                        "name": "Find all logs that have the property 'Duration'",
+                        "query": "Has(Duration)"
                     },
-                        {
-                            "name": "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
-                            "query": "Has(Duration) and Duration > 1000"
+                    {
+                        "name": "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
+                        "query": "Has(Duration) and Duration > 1000"
                     },
-                        {
-                            "name": "Find all logs that are from the namespace 'Umbraco.Core'",
-                            "query": "StartsWith(SourceContext, 'Umbraco.Core')"
+                    {
+                        "name": "Find all logs that are from the namespace 'Umbraco.Core'",
+                        "query": "StartsWith(SourceContext, 'Umbraco.Core')"
                     },
-                        {
-                            "name": "Find all logs that use a specific log message template",
-                            "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
+                    {
+                        "name": "Find all logs that use a specific log message template",
+                        "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
                     }
                 ]
                 });
@@ -189,6 +207,8 @@
         }
 
         function dateRangeChange(selectedDates, dateStr, instance) {
+
+            console.log("dateRangeChange", selectedDates, dateStr, instance);
 
             if (selectedDates.length > 0) {
 
