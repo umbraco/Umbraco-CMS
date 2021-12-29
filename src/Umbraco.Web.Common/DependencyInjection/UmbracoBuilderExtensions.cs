@@ -109,7 +109,6 @@ namespace Umbraco.Extensions
             var appCaches = AppCaches.Create(requestCache);
 
             services.ConfigureOptions<ConfigureKestrelServerOptions>();
-            services.ConfigureOptions<ConfigureIISServerOptions>();
             services.ConfigureOptions<ConfigureFormOptions>();
 
             IProfiler profiler = GetWebProfiler(config);
