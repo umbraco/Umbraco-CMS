@@ -12,7 +12,10 @@ namespace Umbraco.Cms.Web.Common.Security
         public void Configure(KestrelServerOptions options)
         {
             // convert from KB to bytes, 52428800 bytes is the same as in the IIS settings
-            options.Limits.MaxRequestBodySize = _runtimeSettings.Value.MaxRequestLength.HasValue ? _runtimeSettings.Value.MaxRequestLength.Value * 1024 : 52428800;
+            if (_runtimeSettings.Value.MaxRequestLength.HasValue)
+            {
+                options.Limits.MaxRequestBodySize = _runtimeSettings.Value.MaxRequestLength.Value * 1024;
+            }
         }
     }
 }
