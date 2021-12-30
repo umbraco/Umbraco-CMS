@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Web;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
@@ -16,14 +17,14 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
     /// </summary>
     [JsonConverter(typeof(NoTypeConverterJsonConverter<ImageCropperValue>))]
     [TypeConverter(typeof(ImageCropperValueTypeConverter))]
-    [DataContract(Name="imageCropDataSet")]
+    [DataContract(Name = "imageCropDataSet")]
     public class ImageCropperValue : IHtmlString, IEquatable<ImageCropperValue>
     {
         /// <summary>
         /// Gets or sets the value source image.
         /// </summary>
-        [DataMember(Name="src")]
-        public string Src { get; set;}
+        [DataMember(Name = "src")]
+        public string Src { get; set; }
 
         /// <summary>
         /// Gets or sets the value focal point.
@@ -181,6 +182,51 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             };
         }
 
+        /// <summary>
+        /// Removes redundant crop data/default focal point.
+        /// </summary>
+        /// <param name="value">The image cropper value.</param>
+        /// <returns>
+        /// The cleaned up value.
+        /// </returns>
+        public static void Prune(JObject value)
+        {
+            if (value is null) throw new ArgumentNullException(nameof(value));
+
+            if (value.TryGetValue("crops", out var crops))
+            {
+                if (crops.HasValues)
+                {
+                    foreach (var crop in crops.Values<JObject>().ToList())
+                    {
+                        if (crop.TryGetValue("coordinates", out var coordinates) == false || coordinates.HasValues == false)
+                        {
+                            // Remove crop without coordinates
+                            crop.Remove();
+                            continue;
+                        }
+
+                        // Width/height are already stored in the crop configuration
+                        crop.Remove("width");
+                        crop.Remove("height");
+                    }
+                }
+
+                if (crops.HasValues == false)
+                {
+                    // Remove empty crops
+                    value.Remove("crops");
+                }
+            }
+
+            if (value.TryGetValue("focalPoint", out var focalPoint) &&
+                (focalPoint.HasValues == false || (focalPoint.Value<decimal>("top") == 0.5m && focalPoint.Value<decimal>("left") == 0.5m)))
+            {
+                // Remove empty/default focal point
+                value.Remove("focalPoint");
+            }
+        }
+
         #region IEquatable
 
         /// <inheritdoc />
@@ -214,8 +260,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 // properties are, practically, readonly
                 // ReSharper disable NonReadonlyMemberInGetHashCode
                 var hashCode = Src?.GetHashCode() ?? 0;
-                hashCode = (hashCode*397) ^ (FocalPoint?.GetHashCode() ?? 0);
-                hashCode = (hashCode*397) ^ (Crops?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (FocalPoint?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (Crops?.GetHashCode() ?? 0);
                 return hashCode;
                 // ReSharper restore NonReadonlyMemberInGetHashCode
             }
@@ -260,7 +306,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 {
                     // properties are, practically, readonly
                     // ReSharper disable NonReadonlyMemberInGetHashCode
-                    return (Left.GetHashCode()*397) ^ Top.GetHashCode();
+                    return (Left.GetHashCode() * 397) ^ Top.GetHashCode();
                     // ReSharper restore NonReadonlyMemberInGetHashCode
                 }
             }
@@ -314,9 +360,9 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     // properties are, practically, readonly
                     // ReSharper disable NonReadonlyMemberInGetHashCode
                     var hashCode = Alias?.GetHashCode() ?? 0;
-                    hashCode = (hashCode*397) ^ Width;
-                    hashCode = (hashCode*397) ^ Height;
-                    hashCode = (hashCode*397) ^ (Coordinates?.GetHashCode() ?? 0);
+                    hashCode = (hashCode * 397) ^ Width;
+                    hashCode = (hashCode * 397) ^ Height;
+                    hashCode = (hashCode * 397) ^ (Coordinates?.GetHashCode() ?? 0);
                     return hashCode;
                     // ReSharper restore NonReadonlyMemberInGetHashCode
                 }
@@ -341,7 +387,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             public decimal Y2 { get; set; }
 
             #region IEquatable
-            
+
             /// <inheritdoc />
             public bool Equals(ImageCropperCropCoordinates other)
                 => ReferenceEquals(this, other) || Equals(this, other);
@@ -371,9 +417,9 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     // properties are, practically, readonly
                     // ReSharper disable NonReadonlyMemberInGetHashCode
                     var hashCode = X1.GetHashCode();
-                    hashCode = (hashCode*397) ^ Y1.GetHashCode();
-                    hashCode = (hashCode*397) ^ X2.GetHashCode();
-                    hashCode = (hashCode*397) ^ Y2.GetHashCode();
+                    hashCode = (hashCode * 397) ^ Y1.GetHashCode();
+                    hashCode = (hashCode * 397) ^ X2.GetHashCode();
+                    hashCode = (hashCode * 397) ^ Y2.GetHashCode();
                     return hashCode;
                     // ReSharper restore NonReadonlyMemberInGetHashCode
                 }

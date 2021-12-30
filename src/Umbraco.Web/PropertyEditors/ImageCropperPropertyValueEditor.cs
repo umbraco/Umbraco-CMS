@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -98,35 +97,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 // Clean up redundant/default data
-                if (editorJson.TryGetValue("crops", out var crops))
-                {
-                    foreach (var crop in crops.Values<JObject>().ToList())
-                    {
-                        if (crop.TryGetValue("coordinates", out var coordinates) == false || coordinates.HasValues == false)
-                        {
-                            // Remove crop without coordinates
-                            crop.Remove();
-                            continue;
-                        }
-
-                        // Width/height are already stored in the crop configuration
-                        crop.Remove("width");
-                        crop.Remove("height");
-                    }
-
-                    if (crops.HasValues == false)
-                    {
-                        // Remove empty crops
-                        editorJson.Remove("crops");
-                    }
-                }
-
-                if (editorJson.TryGetValue("focalPoint", out var focalPoint) &&
-                    (focalPoint.HasValues == false || (focalPoint.Value<decimal>("top") == 0.5m && focalPoint.Value<decimal>("left") == 0.5m)))
-                {
-                    // Remove empty/default focal point
-                    editorJson.Remove("focalPoint");
-                }
+                ImageCropperValue.Prune(editorJson);
             }
             else
             {
