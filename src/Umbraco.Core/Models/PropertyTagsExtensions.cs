@@ -72,7 +72,7 @@ namespace Umbraco.Core.Models
                         break;
 
                     case TagsStorageType.Json:
-                        property.SetValue(JsonConvert.SerializeObject(currentTags.Union(trimmedTags).ToArray()), culture); // json array
+                        property.SetValue(JsonConvert.SerializeObject(currentTags.Union(trimmedTags).ToArray(), Formatting.None), culture); // json array
                         break;
                 }
             }
@@ -85,7 +85,7 @@ namespace Umbraco.Core.Models
                         break;
 
                     case TagsStorageType.Json:
-                        property.SetValue(JsonConvert.SerializeObject(trimmedTags), culture); // json array
+                        property.SetValue(JsonConvert.SerializeObject(trimmedTags, Formatting.None), culture); // json array
                         break;
                 }
             }
@@ -125,7 +125,7 @@ namespace Umbraco.Core.Models
                     break;
 
                 case TagsStorageType.Json:
-                    property.SetValue(JsonConvert.SerializeObject(currentTags.Except(trimmedTags).ToArray()), culture); // json array
+                    property.SetValue(JsonConvert.SerializeObject(currentTags.Except(trimmedTags).ToArray(), Formatting.None), culture); // json array
                     break;
             }
         }
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Models
                 case TagsStorageType.Json:
                     try
                     {
-                        return JsonConvert.DeserializeObject<JArray>(value).Select(x => x.ToString().Trim());
+                        return JsonConvert.DeserializeObject<JArray>(value).Select(x => x.ToString(Formatting.None).Trim());
                     }
                     catch (JsonException)
                     {
