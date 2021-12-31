@@ -62,12 +62,12 @@ namespace Umbraco.Core.PropertyEditors
                 {
                     // Remove keys from published value & any nested properties
                     var publishedValue = cultureVal.PublishedValue is JToken jsonPublishedValue ? jsonPublishedValue.ToString(Formatting.None) : cultureVal.PublishedValue?.ToString();
-                    var updatedPublishedVal = _formatPropertyValue(publishedValue, onlyMissingKeys);
+                    var updatedPublishedVal = _formatPropertyValue(publishedValue, onlyMissingKeys).NullOrWhiteSpaceAsNull();
                     cultureVal.PublishedValue = updatedPublishedVal;
 
                     // Remove keys from edited/draft value & any nested properties
                     var editedValue = cultureVal.EditedValue is JToken jsonEditedValue ? jsonEditedValue.ToString(Formatting.None) : cultureVal.EditedValue?.ToString();
-                    var updatedEditedVal = _formatPropertyValue(editedValue, onlyMissingKeys);
+                    var updatedEditedVal = _formatPropertyValue(editedValue, onlyMissingKeys).NullOrWhiteSpaceAsNull();
                     cultureVal.EditedValue = updatedEditedVal;
                 }
             }

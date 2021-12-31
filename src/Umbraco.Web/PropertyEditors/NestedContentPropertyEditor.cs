@@ -103,7 +103,7 @@ namespace Umbraco.Web.PropertyEditors
                 var rows = _nestedContentValues.GetPropertyValues(propertyValue);
 
                 if (rows.Count == 0)
-                    return string.Empty;
+                    return null;
 
                 foreach (var row in rows.ToList())
                 {
@@ -229,7 +229,7 @@ namespace Umbraco.Web.PropertyEditors
                 var rows = _nestedContentValues.GetPropertyValues(editorValue.Value);
 
                 if (rows.Count == 0)
-                    return string.Empty;
+                    return null;
 
                 foreach (var row in rows.ToList())
                 {
