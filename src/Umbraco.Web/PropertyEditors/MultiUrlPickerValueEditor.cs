@@ -130,16 +130,19 @@ namespace Umbraco.Web.PropertyEditors
         public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             var value = editorValue.Value?.ToString();
-
             if (string.IsNullOrEmpty(value))
             {
-                return string.Empty;
+                return null;
             }
 
             try
             {
+                var links = JsonConvert.DeserializeObject<List<LinkDisplay>>(value);
+                if (links.Count == 0)
+                    return null;
+
                 return JsonConvert.SerializeObject(
-                    from link in JsonConvert.DeserializeObject<List<LinkDisplay>>(value)
+                    from link in links
                     select new MultiUrlPickerValueEditor.LinkDto
                     {
                         Name = link.Name,
