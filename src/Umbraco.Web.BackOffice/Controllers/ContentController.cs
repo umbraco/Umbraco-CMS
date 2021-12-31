@@ -1053,8 +1053,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
             if (saveResult.Success)
             {
-                bool isBlueprint = contentItem.PersistedContent.Blueprint;
-
                 if (variantCount > 1)
                 {
                     var variantErrors = ModelState.GetVariantsWithErrors(cultureForInvariantErrors);
