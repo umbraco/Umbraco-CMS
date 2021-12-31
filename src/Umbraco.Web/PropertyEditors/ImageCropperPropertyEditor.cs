@@ -251,7 +251,7 @@ namespace Umbraco.Web.PropertyEditors
                                 crops = config == null ? Array.Empty<ImageCropperConfiguration.Crop>() : config.Crops
                             };
 
-                            property.SetValue(JsonConvert.SerializeObject(json), pvalue.Culture, pvalue.Segment);
+                            property.SetValue(JsonConvert.SerializeObject(json, Formatting.None), pvalue.Culture, pvalue.Segment);
                         }
                         else
                         {

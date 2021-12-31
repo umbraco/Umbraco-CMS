@@ -134,7 +134,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                 }
 
-                return JsonConvert.SerializeObject(rows).ToXmlString<string>();
+                return JsonConvert.SerializeObject(rows, Formatting.None).ToXmlString<string>();
             }
 
             #endregion
@@ -254,8 +254,9 @@ namespace Umbraco.Web.PropertyEditors
                 }
 
                 // return json
-                return JsonConvert.SerializeObject(rows);
+                return JsonConvert.SerializeObject(rows, Formatting.None);
             }
+
             #endregion
 
             public IEnumerable<UmbracoEntityReference> GetReferences(object value)

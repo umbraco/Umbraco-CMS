@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors
 
             var values = json.Select(item => item.Value<string>()).ToArray();
 
-            return JsonConvert.SerializeObject(values);
+            return JsonConvert.SerializeObject(values, Formatting.None);
         }
     }
 }

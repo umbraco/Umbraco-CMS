@@ -123,6 +123,7 @@ namespace Umbraco.Web.PropertyEditors
 
         private static readonly JsonSerializerSettings LinkDisplayJsonSerializerSettings = new JsonSerializerSettings
         {
+            Formatting = Formatting.None,
             NullValueHandling = NullValueHandling.Ignore
         };
 
@@ -146,8 +147,8 @@ namespace Umbraco.Web.PropertyEditors
                         Target = link.Target,
                         Udi = link.Udi,
                         Url = link.Udi == null ? link.Url : null, // only save the URL for external links
-                    }, LinkDisplayJsonSerializerSettings
-                    );
+                    },
+                    LinkDisplayJsonSerializerSettings);
             }
             catch (Exception ex)
             {
