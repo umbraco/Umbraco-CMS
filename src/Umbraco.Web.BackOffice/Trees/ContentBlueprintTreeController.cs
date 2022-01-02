@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (id == Constants.System.RootString)
             {
                 //get all blueprint content types
-                var contentTypeAliases = entities.Select(x => ((IContentEntitySlim) x).ContentTypeAlias).Distinct();
+                var contentTypeAliases = entities.Select(x => ((IContentEntitySlim)x).ContentTypeAlias).Distinct();
                 //get the ids
                 var contentTypeIds = _contentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
 
@@ -112,11 +112,11 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var ct = _contentTypeService.Get(intId);
             if (ct == null) return nodes;
 
-            var blueprintsForDocType = entities.Where(x => ct.Alias == ((IContentEntitySlim) x).ContentTypeAlias);
+            var blueprintsForDocType = entities.Where(x => ct.Alias == ((IContentEntitySlim)x).ContentTypeAlias);
             nodes.AddRange(blueprintsForDocType
                 .Select(entity =>
                 {
-                    var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-blueprint", false);
+                    var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, Constants.Icons.Blueprint, false);
                     treeNode.Path = $"-1,{ct.Id},{entity.Id}";
                     return treeNode;
                 }));
@@ -135,6 +135,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
+
             var cte = _entityService.Get(int.Parse(id, CultureInfo.InvariantCulture), UmbracoObjectTypes.DocumentType);
             //only refresh & create if it's a content type
             if (cte != null)
