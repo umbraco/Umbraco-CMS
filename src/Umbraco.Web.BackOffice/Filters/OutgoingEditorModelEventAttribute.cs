@@ -84,9 +84,6 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                             case IEnumerable<Tab<IDashboardSlim>> dashboards:
                                 _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
                                 break;
-                            case ContentTypeBasic[] children:
-                                _eventAggregator.Publish(new SendingAllowedChildrenNotification(children, umbracoContext));
-                                break;
                         }
                     }
                 }

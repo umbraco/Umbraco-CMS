@@ -22,7 +22,6 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Packaging;
-using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -452,12 +451,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
         /// <param name="contentId"></param>
-        [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
-        public ContentTypeBasic[] GetAllowedChildren(int contentId)
+        public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
-                return Array.Empty<ContentTypeBasic>();
+                return Enumerable.Empty<ContentTypeBasic>();
 
             IEnumerable<IContentType> types;
             if (contentId == Constants.System.Root)
@@ -469,13 +467,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var contentItem = _contentService.GetById(contentId);
                 if (contentItem == null)
                 {
-                    return Array.Empty<ContentTypeBasic>();
+                    return Enumerable.Empty<ContentTypeBasic>();
                 }
 
                 var contentType = _contentTypeBaseServiceProvider.GetContentTypeOf(contentItem);
                 var ids = contentType.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
 
-                if (ids.Any() == false) return Array.Empty<ContentTypeBasic>();
+                if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
                 types = _contentTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
             }
@@ -500,7 +498,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            return basics.OrderBy(c => contentId == Constants.System.Root ? c.Name : string.Empty).ToArray();
+            return basics.OrderBy(c => contentId == Constants.System.Root ? c.Name : string.Empty);
         }
 
         /// <summary>
