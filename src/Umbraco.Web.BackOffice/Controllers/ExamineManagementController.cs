@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public ActionResult<SearchResults> GetSearchResults(string searcherName, string query, int pageIndex = 0, int pageSize = 20)
         {
-            query = query.Trim();
+            query = query?.Trim();
 
             if (query.IsNullOrWhiteSpace())
             {
