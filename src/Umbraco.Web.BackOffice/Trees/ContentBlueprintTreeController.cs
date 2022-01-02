@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                 //now get the entities ... it's a bit round about but still smaller queries than getting all document types
                 var docTypeEntities = contentTypeIds.Length == 0
-                    ? new IUmbracoEntity[0]
+                    ? new IEntitySlim[0]
                     : _entityService.GetAll(UmbracoObjectTypes.DocumentType, contentTypeIds).ToArray();
 
                 nodes.AddRange(docTypeEntities
