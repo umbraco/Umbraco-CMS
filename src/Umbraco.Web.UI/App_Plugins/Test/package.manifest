@@ -1,0 +1,13 @@
+{
+    "contentApps": [
+        {
+            "name": "Translator",
+            "alias": "test",
+            "icon": "icon-umb-translation",
+            "view": "/App_Plugins/Test/testView.html",
+            "show": [
+                "+dictionary/*"
+            ]
+        }
+    ]
+}
