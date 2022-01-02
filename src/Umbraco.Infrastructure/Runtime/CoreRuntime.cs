@@ -1,9 +1,9 @@
 using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -13,7 +13,9 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
+using ComponentCollection = Umbraco.Cms.Core.Composing.ComponentCollection;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
 {
@@ -29,6 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IServiceProvider _serviceProvider;
         private CancellationToken _cancellationToken;
 
         /// <summary>
@@ -44,7 +47,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IUmbracoDatabaseFactory databaseFactory,
             IEventAggregator eventAggregator,
             IHostingEnvironment hostingEnvironment,
-            IUmbracoVersion umbracoVersion)
+            IUmbracoVersion umbracoVersion,
+            IServiceProvider serviceProvider)
         {
             State = state;
             _loggerFactory = loggerFactory;
@@ -56,7 +60,38 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
             _umbracoVersion = umbracoVersion;
+            _serviceProvider = serviceProvider;
             _logger = _loggerFactory.CreateLogger<CoreRuntime>();
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete]
+        public CoreRuntime(
+            ILoggerFactory loggerFactory,
+            IRuntimeState state,
+            ComponentCollection components,
+            IApplicationShutdownRegistry applicationShutdownRegistry,
+            IProfilingLogger profilingLogger,
+            IMainDom mainDom,
+            IUmbracoDatabaseFactory databaseFactory,
+            IEventAggregator eventAggregator,
+            IHostingEnvironment hostingEnvironment,
+            IUmbracoVersion umbracoVersion
+            ):this(
+            loggerFactory,
+            state,
+            components,
+            applicationShutdownRegistry,
+            profilingLogger,
+            mainDom,
+            databaseFactory,
+            eventAggregator,
+            hostingEnvironment,
+            umbracoVersion,
+            null
+            )
+        {
+
         }
 
         /// <summary>
@@ -76,6 +111,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         {
             _cancellationToken = cancellationToken;
             StaticApplicationLogging.Initialize(_loggerFactory);
+            StaticServiceProvider.Instance = _serviceProvider;
 
             AppDomain.CurrentDomain.UnhandledException += (_, args) =>
             {
@@ -97,6 +133,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
             AcquireMainDom();
 
+            // TODO (V10): Remove this obsoleted notification publish.
             await _eventAggregator.PublishAsync(new UmbracoApplicationMainDomAcquiredNotification(), cancellationToken);
 
             // notify for unattended install
@@ -135,6 +172,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     break;
             }
 
+            // TODO (V10): Remove this obsoleted notification publish.
             await _eventAggregator.PublishAsync(new UmbracoApplicationComponentsInstallingNotification(State.Level), cancellationToken);
 
             // create & initialize the components

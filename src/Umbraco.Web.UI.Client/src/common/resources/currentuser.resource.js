@@ -51,7 +51,6 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
                         [{ permissionToCheck: permission }, { nodeId: id }])),
                 'Failed to check permission for item ' + id);
         },
-
         getCurrentUserLinkedLogins: function () {
 
             return umbRequestHelper.resourcePromise(
@@ -60,6 +59,14 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
                         "currentUserApiBaseUrl",
                         "GetCurrentUserLinkedLogins")),
                 'Server call failed for getting current users linked logins');
+        },
+        getUserData: function () {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "currentUserApiBaseUrl",
+                "GetUserData")),
+            'Server call failed for getting current user data');
         },
 
         saveTourStatus: function (tourStatus) {

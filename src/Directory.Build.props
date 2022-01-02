@@ -1,9 +1,12 @@
 ﻿<Project>
+  <!-- Enable multi-level merging -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
   <PropertyGroup>
-    <Version>9.0.0</Version>
-    <AssemblyVersion>9.0.0</AssemblyVersion>
-    <InformationalVersion>9.0.0</InformationalVersion>
-    <FileVersion>9.0.0</FileVersion>
+    <Version>9.2.0</Version>
+    <AssemblyVersion>9.2.0</AssemblyVersion>
+    <InformationalVersion>9.2.0-rc</InformationalVersion>
+    <FileVersion>9.2.0</FileVersion>
     <LangVersion Condition="'$(LangVersion)' == ''">9.0</LangVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Company>Umbraco CMS</Company>
@@ -36,6 +39,4 @@
   <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
-
 </Project>
-

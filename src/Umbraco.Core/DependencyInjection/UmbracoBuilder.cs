@@ -38,6 +38,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
@@ -162,6 +163,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique(factory => factory.GetRequiredService<AppCaches>().RequestCache);
             Services.AddUnique<IProfilingLogger, ProfilingLogger>();
             Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
+            Services.AddUnique<IEntryAssemblyMetadata, EntryAssemblyMetadata>();
 
             this.AddAllCoreCollectionBuilders();
             this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
@@ -179,6 +181,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<UriUtility>();
 
             Services.AddUnique<IDashboardService, DashboardService>();
+            Services.AddUnique<IUserDataService, UserDataService>();
 
             // will be injected in controllers when needed to invoke rest endpoints on Our
             Services.AddUnique<IInstallationService, InstallationService>();

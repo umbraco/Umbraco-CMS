@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Smidge;
+using Smidge.Cache;
 using Smidge.FileProcessors;
 using Smidge.InMemory;
 using Smidge.Nuglify;
@@ -123,10 +124,6 @@ namespace Umbraco.Extensions
                 config,
                 profiler);
 
-            // adds the umbraco startup filter which will call UseUmbraco early on before
-            // other start filters are applied (depending on the ordering of IStartupFilters in DI).
-            services.AddTransient<IStartupFilter, UmbracoApplicationServicesCapture>();
-
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory, profiler, appCaches, tempHostingEnvironment);
         }
 
@@ -180,6 +177,7 @@ namespace Umbraco.Extensions
             builder.Services.AddHostedService<HealthCheckNotifier>();
             builder.Services.AddHostedService<KeepAlive>();
             builder.Services.AddHostedService<LogScrubber>();
+            builder.Services.AddHostedService<ContentVersionCleanup>();
             builder.Services.AddHostedService<ScheduledPublishing>();
             builder.Services.AddHostedService<TempFileCleanup>();
             builder.Services.AddHostedService<InstructionProcessTask>();
@@ -277,7 +275,10 @@ namespace Umbraco.Extensions
                         new[] { "/App_Plugins/**/*.js", "/App_Plugins/**/*.css" }));
             });
 
+            builder.Services.AddUnique<ICacheBuster, UmbracoSmidgeConfigCacheBuster>();
             builder.Services.AddSmidge(builder.Config.GetSection(Constants.Configuration.ConfigRuntimeMinification));
+            // Replace the Smidge request helper, in order to discourage the use of brotli since it's super slow
+            builder.Services.AddUnique<IRequestHelper, SmidgeRequestHelper>();
             builder.Services.AddSmidgeNuglify();
             builder.Services.AddSmidgeInMemory(false); // it will be enabled based on config/cachebuster
 
@@ -352,6 +353,7 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<ContentModelBinder>();
 
             builder.Services.AddSingleton<IUmbracoHelperAccessor, UmbracoHelperAccessor>();
+            builder.Services.AddSingleton<IScopedServiceProvider, ScopedServiceProvider>();
             builder.Services.AddScoped<UmbracoHelper>();
             builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
 

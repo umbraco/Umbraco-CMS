@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +17,8 @@ namespace Umbraco.Cms.Core.Cache
         /// Gets the internal items dictionary, for tests only!
         /// </summary>
         private readonly ConcurrentDictionary<string, Lazy<object>> _items = new ConcurrentDictionary<string, Lazy<object>>();
+
+        public IEnumerable<string> Keys => _items.Keys;
 
         public int Count => _items.Count;
 

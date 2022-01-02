@@ -525,6 +525,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var user = await _userManager.FindByIdAsync(((int) userDisplay.Id).ToString());
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
+            // Use info from SMTP Settings if configured, otherwise set fromEmail as fallback
+            var senderEmail = !string.IsNullOrEmpty(_globalSettings.Smtp?.From) ? _globalSettings.Smtp.From : fromEmail;
+
             var inviteToken = string.Format("{0}{1}{2}",
                 (int)userDisplay.Id,
                 WebUtility.UrlEncode("|"),
@@ -550,14 +553,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var emailBody = _localizedTextService.Localize("user","inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
                 UmbracoUserExtensions.GetUserCulture(to.Language, _localizedTextService, _globalSettings),
-                new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
+                new[] { userDisplay.Name, from, message, inviteUri.ToString(), senderEmail });
 
             // This needs to be in the correct mailto format including the name, else
             // the name cannot be captured in the email sending notification.
             // i.e. "Some Person" <hello@example.com>
             var toMailBoxAddress = new MailboxAddress(to.Name, to.Email);
 
-            var mailMessage = new EmailMessage(fromEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
+            var mailMessage = new EmailMessage(senderEmail, toMailBoxAddress.ToString(), emailSubject, emailBody, true);
 
             await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.UserInvite, true);
         }

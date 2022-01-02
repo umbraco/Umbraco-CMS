@@ -1,17 +1,21 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 
 namespace Umbraco.Cms.Core
 {
     public class PublishedContentQueryAccessor : IPublishedContentQueryAccessor
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IScopedServiceProvider _scopedServiceProvider;
 
-        public PublishedContentQueryAccessor(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+        [Obsolete("Please use alternative constructor")]
+        public PublishedContentQueryAccessor(IServiceProvider serviceProvider) => _scopedServiceProvider = serviceProvider.GetRequiredService<IScopedServiceProvider>();
+
+        public PublishedContentQueryAccessor(IScopedServiceProvider scopedServiceProvider) => _scopedServiceProvider = scopedServiceProvider;
 
         public bool TryGetValue(out IPublishedContentQuery publishedContentQuery)
         {
-            publishedContentQuery = _serviceProvider.GetRequiredService<IPublishedContentQuery>();
+            publishedContentQuery = _scopedServiceProvider.ServiceProvider?.GetService<IPublishedContentQuery>();
 
             return publishedContentQuery is not null;
         }

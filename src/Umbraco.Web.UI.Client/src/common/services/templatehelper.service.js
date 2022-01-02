@@ -16,7 +16,7 @@
                 partialViewName = parentId + "/" + partialViewName;
             }
 
-            return "@Html.Partial(\"" + partialViewName + "\")";
+            return "@await Html.PartialAsync(\"" + partialViewName + "\")";
         }
 
         function getQuerySnippet(queryExpression) {

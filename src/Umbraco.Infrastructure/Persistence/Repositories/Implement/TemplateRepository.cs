@@ -29,15 +29,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly IIOHelper _ioHelper;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IFileSystem _viewsFileSystem;
-        private readonly ViewHelper _viewHelper;
+        private readonly IViewHelper _viewHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TemplateRepository> logger, FileSystems fileSystems,  IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TemplateRepository> logger, FileSystems fileSystems,  IIOHelper ioHelper, IShortStringHelper shortStringHelper, IViewHelper viewHelper)
             : base(scopeAccessor, cache, logger)
         {
             _ioHelper = ioHelper;
             _shortStringHelper = shortStringHelper;
             _viewsFileSystem = fileSystems.MvcViewsFileSystem;
-            _viewHelper = new ViewHelper(_viewsFileSystem);
+            _viewHelper = viewHelper;
         }
 
         protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy() =>
@@ -131,6 +131,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var list = new List<string>
             {
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2Node + " WHERE nodeId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
                 "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion + " SET templateId = NULL WHERE templateId = @id",
                 "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.DocumentType + " WHERE templateNodeId = @id",

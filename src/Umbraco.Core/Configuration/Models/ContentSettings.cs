@@ -219,6 +219,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
         [DefaultValue(StaticLoginLogoImage)]
         public string LoginLogoImage { get; set; } = StaticLoginLogoImage;
 
-
+        /// <summary>
+        /// Get or sets the model representing the global content version cleanup policy
+        /// </summary>
+        public ContentVersionCleanupPolicySettings ContentVersionCleanupPolicy { get; set; } = new ContentVersionCleanupPolicySettings();
     }
 }
