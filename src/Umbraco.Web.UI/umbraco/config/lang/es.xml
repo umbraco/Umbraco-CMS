@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Administrar dominios</key>
+    <key alias="assigndomain">Administrar dominios</key>
     <key alias="auditTrail">Historial</key>
     <key alias="browse">Nodo de Exploración</key>
     <key alias="changeDocType">Cambiar tipo de documento</key>

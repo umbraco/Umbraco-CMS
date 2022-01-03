@@ -5,7 +5,7 @@
     <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">נהל שמות מתחם</key>
+    <key alias="assigndomain">נהל שמות מתחם</key>
     <key alias="auditTrail">מעקב ביקורות</key>
     <key alias="browse">צפה בתוכן</key>
     <key alias="copy">העתק</key>

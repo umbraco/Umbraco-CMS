@@ -60,7 +60,7 @@
     <key alias="other">Ostatní</key>
   </area>
   <area alias="actionDescriptions">
-    <key alias="assignDomain">Povolit přístup k přiřazování kultury a názvů hostitelů</key>
+    <key alias="assigndomain">Povolit přístup k přiřazování kultury a názvů hostitelů</key>
     <key alias="auditTrail">Povolit přístup k zobrazení protokolu historie uzlu</key>
     <key alias="browse">Povolit přístup k zobrazení uzlu</key>
     <key alias="changeDocType">Povolit přístup ke změně typu dokumentu daného uzlu</key>
