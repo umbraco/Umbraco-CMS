@@ -5,7 +5,7 @@
     <link>https://www.method4.co.uk/</link>
   </creator>
   <area alias="actions">
-    <key alias="assignDomain">Diwylliannau ac Enwau Gwesteia</key>
+    <key alias="assigndomain">Diwylliannau ac Enwau Gwesteia</key>
     <key alias="auditTrail">Trywydd Archwilio</key>
     <key alias="browse">Dewis Nod</key>
     <key alias="changeDocType">Newid Math o Ddogfen</key>
