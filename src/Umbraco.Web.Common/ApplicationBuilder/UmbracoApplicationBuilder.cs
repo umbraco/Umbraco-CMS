@@ -97,16 +97,19 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 
             // Get media file provider and request path/URL
             IFileProvider mediaFileProvider = AppBuilder.ApplicationServices.GetRequiredService<MediaFileManager>().CreateFileProvider();
-
-            GlobalSettings globalSettings = AppBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
-            IHostingEnvironment hostingEnvironment = AppBuilder.ApplicationServices.GetService<IHostingEnvironment>();
-            string mediaRequestPath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaUrl);
-
-            AppBuilder.UseStaticFiles(new StaticFileOptions()
+            if (mediaFileProvider is not null)
             {
-                FileProvider = mediaFileProvider,
-                RequestPath = mediaRequestPath
-            });
+                GlobalSettings globalSettings = AppBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                IHostingEnvironment hostingEnvironment = AppBuilder.ApplicationServices.GetService<IHostingEnvironment>();
+                string mediaRequestPath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaUrl);
+
+                // Configure custom file provider for media
+                AppBuilder.UseStaticFiles(new StaticFileOptions()
+                {
+                    FileProvider = mediaFileProvider,
+                    RequestPath = mediaRequestPath
+                });
+            }
 
             AppBuilder.UseStaticFiles();
 

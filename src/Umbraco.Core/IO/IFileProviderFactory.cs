@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.IO
         /// Creates a new <see cref="IFileProvider" /> instance.
         /// </summary>
         /// <returns>
-        /// The newly created <see cref="IFileProvider" /> instance.
+        /// The newly created <see cref="IFileProvider" /> instance (or <c>null</c> if not supported).
         /// </returns>
         IFileProvider Create();
     }

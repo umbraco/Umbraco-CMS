@@ -79,7 +79,7 @@ namespace Umbraco.Extensions
             builder.Services.AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ImageSharpConfigurationOptions>();
 
             // Add FileSystemImageProvider before default provider
-            builder.Services.Insert(0, ServiceDescriptor.Singleton<IImageProvider, FileSystemImageProvider>());
+            builder.Services.Insert(0, ServiceDescriptor.Singleton<IImageProvider, MediaFileManagerImageProvider>());
 
             return builder.Services;
         }

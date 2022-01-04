@@ -57,12 +57,12 @@ namespace Umbraco.Cms.Core.IO
         /// Create an <see cref="IFileProvider" /> instance for the media file system.
         /// </summary>
         /// <returns>
-        /// The <see cref="IFileProvider" /> for the media file system.
+        /// The <see cref="IFileProvider" /> for the media file system (or <c>null</c> if not supported).
         /// </returns>
         public IFileProvider CreateFileProvider() => FileSystem switch
         {
             IFileProviderFactory fileProviderFactory => fileProviderFactory.Create(),
-            var fileSystem => new FileSystemFileProvider(fileSystem)
+            _ => null
         };
 
         /// <summary>

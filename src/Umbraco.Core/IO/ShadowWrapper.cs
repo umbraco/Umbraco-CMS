@@ -226,7 +226,7 @@ namespace Umbraco.Cms.Core.IO
         public IFileProvider Create() => _innerFileSystem switch
         {
             IFileProviderFactory fileProviderFactory => fileProviderFactory.Create(),
-            var fileSystem => new FileSystemFileProvider(fileSystem)
+            _ => null
         };
     }
 }

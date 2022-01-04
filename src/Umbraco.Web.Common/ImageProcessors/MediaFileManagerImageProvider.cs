@@ -14,7 +14,7 @@ using Umbraco.Cms.Core.IO;
 namespace Umbraco.Cms.Web.Common.ImageProcessors
 {
     /// <inheritdoc />
-    public class FileSystemImageProvider : IImageProvider
+    public class MediaFileManagerImageProvider : IImageProvider
     {
         private readonly IFileProvider _fileProvider;
         private string _rootPath;
@@ -26,13 +26,13 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
         private Func<HttpContext, bool> _match;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileSystemImageProvider" /> class.
+        /// Initializes a new instance of the <see cref="MediaFileManagerImageProvider" /> class.
         /// </summary>
         /// <param name="mediaFileManager">The media file manager.</param>
         /// <param name="hostingEnvironment">The hosting environment.</param>
         /// <param name="globalSettings">The global settings options.</param>
         /// <param name="formatUtilities">The format utilities.</param>
-        public FileSystemImageProvider(MediaFileManager mediaFileManager, IHostingEnvironment hostingEnvironment, IOptionsMonitor<GlobalSettings> globalSettings, FormatUtilities formatUtilities)
+        public MediaFileManagerImageProvider(MediaFileManager mediaFileManager, IHostingEnvironment hostingEnvironment, IOptionsMonitor<GlobalSettings> globalSettings, FormatUtilities formatUtilities)
         {
             _fileProvider = mediaFileManager.CreateFileProvider();
 
@@ -56,16 +56,17 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
             => _rootPath = hostingEnvironment.ToAbsolute(options.UmbracoMediaUrl);
 
         private bool IsMatch(HttpContext context)
-            => context.Request.Path.StartsWithSegments(_rootPath, StringComparison.InvariantCultureIgnoreCase);
+            => _fileProvider is not null && context.Request.Path.StartsWithSegments(_rootPath, StringComparison.InvariantCultureIgnoreCase);
 
         /// <inheritdoc />
         public bool IsValidRequest(HttpContext context)
-            => _formatUtilities.GetExtensionFromUri(context.Request.GetDisplayUrl()) != null;
+            => _fileProvider is not null && _formatUtilities.GetExtensionFromUri(context.Request.GetDisplayUrl()) is not null;
 
         /// <inheritdoc />
         public Task<IImageResolver> GetAsync(HttpContext context)
         {
-            if (context.Request.Path.StartsWithSegments(_rootPath, StringComparison.InvariantCultureIgnoreCase, out PathString subpath) == false ||
+            if (_fileProvider is null ||
+                context.Request.Path.StartsWithSegments(_rootPath, StringComparison.InvariantCultureIgnoreCase, out PathString subpath) == false ||
                 _fileProvider.GetFileInfo(subpath) is not IFileInfo fileInfo ||
                 fileInfo.Exists == false)
             {
