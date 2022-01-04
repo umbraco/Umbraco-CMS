@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
+    [Obsolete("This class is obsolete, as this does not configure your Maximum request length")]
     public class ConfigureIISServerOptions
     {
         private readonly IOptions<RuntimeSettings> _runtimeSettings;
