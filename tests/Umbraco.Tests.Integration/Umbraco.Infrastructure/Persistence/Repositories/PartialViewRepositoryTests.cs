@@ -86,15 +86,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.AreEqual("path-2\\test-path-3.cshtml".Replace("\\", $"{Path.DirectorySeparatorChar}"), partialView.Path);
                 Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
 
-                partialView = new PartialView(PartialViewType.PartialView, "\\test-path-4.cshtml") { Content = "// partialView" };
-                Assert.Throws<UnauthorizedAccessException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+                partialView = new PartialView(PartialViewType.PartialView, "..\\test-path-4.cshtml") { Content = "// partialView" };
+                Assert.Throws<UnauthorizedAccessException>(() =>
                     repository.Save(partialView));
 
                 partialView = (PartialView)repository.Get("missing.cshtml");
                 Assert.IsNull(partialView);
 
                 // fixed in 7.3 - 7.2.8 used to...
-                Assert.Throws<UnauthorizedAccessException>(() => partialView = (PartialView)repository.Get("\\test-path-4.cshtml"));
+                Assert.Throws<UnauthorizedAccessException>(() => partialView = (PartialView)repository.Get("..\\test-path-4.cshtml"));
                 Assert.Throws<UnauthorizedAccessException>(() => partialView = (PartialView)repository.Get("../../packages.config"));
             }
         }
