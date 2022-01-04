@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _macroService = macroService;
             _contentTypeService = contentTypeService;
             _xmlParser = new PackageDefinitionXmlParser();
-            _mediaFolderPath = mediaFolderPath ?? Path.Combine(globalSettings.Value.UmbracoMediaPath,  Constants.SystemDirectories.CreatedPackages);
+            _mediaFolderPath = mediaFolderPath ?? Path.Combine(globalSettings.Value.UmbracoMediaPhysicalRootPath,  Constants.SystemDirectories.CreatedPackages);
             _tempFolderPath =
                 tempFolderPath ?? Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "PackageFiles";
         }

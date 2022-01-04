@@ -102,15 +102,18 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public string UmbracoScriptsPath { get; set; } = StaticUmbracoScriptsPath;
 
         /// <summary>
-        /// Gets or sets a value for the Umbraco media path.
+        /// Gets or sets a value for the Umbraco media request path.
         /// </summary>
         [DefaultValue(StaticUmbracoMediaPath)]
         public string UmbracoMediaPath { get; set; } = StaticUmbracoMediaPath;
 
         /// <summary>
-        /// Gets or sets a value for the Umbraco media URL (falls back to <see cref="UmbracoMediaPath" /> when empty).
+        /// Gets or sets a value for the physical Umbraco media root path (falls back to <see cref="UmbracoMediaPath" /> when empty).
         /// </summary>
-        public string UmbracoMediaUrl { get; set; }
+        /// <remarks>
+        /// If the value is a virtual path, it's resolved relative to the webroot.
+        /// </remarks>
+        public string UmbracoMediaPhysicalRootPath { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to install the database when it is missing.

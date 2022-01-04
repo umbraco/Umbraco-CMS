@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Web.Common.ImageProcessors
         }
 
         private void GlobalSettingsOnChange(GlobalSettings options, IHostingEnvironment hostingEnvironment)
-            => _rootPath = hostingEnvironment.ToAbsolute(options.UmbracoMediaUrl);
+            => _rootPath = hostingEnvironment.ToAbsolute(options.UmbracoMediaPath);
 
         private bool IsMatch(HttpContext context)
             => _fileProvider is not null && context.Request.Path.StartsWithSegments(_rootPath, StringComparison.InvariantCultureIgnoreCase);

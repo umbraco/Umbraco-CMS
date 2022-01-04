@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
             {
                 GlobalSettings globalSettings = AppBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
                 IHostingEnvironment hostingEnvironment = AppBuilder.ApplicationServices.GetService<IHostingEnvironment>();
-                string mediaRequestPath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaUrl);
+                string mediaRequestPath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
 
                 // Configure custom file provider for media
                 AppBuilder.UseStaticFiles(new StaticFileOptions()

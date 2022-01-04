@@ -56,9 +56,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .AddUmbracoOptions<ExceptionFilterSettings>()
                 .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
                 {
-                    if (string.IsNullOrEmpty(options.UmbracoMediaUrl))
+                    if (string.IsNullOrEmpty(options.UmbracoMediaPhysicalRootPath))
                     {
-                        options.UmbracoMediaUrl = options.UmbracoMediaPath;
+                        options.UmbracoMediaPhysicalRootPath = options.UmbracoMediaPath;
                     }
                 }))
                 .AddUmbracoOptions<HealthChecksSettings>()
