@@ -108,6 +108,7 @@ namespace Umbraco.Extensions
             var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
             var appCaches = AppCaches.Create(requestCache);
 
+            services.ConfigureOptions<ConfigureIISServerOptions>();
             services.ConfigureOptions<ConfigureKestrelServerOptions>();
             services.ConfigureOptions<ConfigureFormOptions>();
 
