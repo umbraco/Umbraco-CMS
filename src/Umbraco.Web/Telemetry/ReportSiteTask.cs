@@ -1,14 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Net.Http;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Telemetry;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web.Telemetry
@@ -17,14 +14,19 @@ namespace Umbraco.Web.Telemetry
     {
         private readonly IProfilingLogger _logger;
         private static HttpClient _httpClient;
-        private readonly IUmbracoSettingsSection _settings;
+        private readonly ITelemetryService _telemetryService;
 
-        public ReportSiteTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayBeforeWeStart, int howOftenWeRepeat, IProfilingLogger logger, IUmbracoSettingsSection settings)
+        public ReportSiteTask(
+            IBackgroundTaskRunner<RecurringTaskBase> runner,
+            int delayBeforeWeStart,
+            int howOftenWeRepeat,
+            IProfilingLogger logger,
+            ITelemetryService telemetryService)
             : base(runner, delayBeforeWeStart, howOftenWeRepeat)
         {
             _logger = logger;
             _httpClient = new HttpClient();
-            _settings = settings;
+            _telemetryService = telemetryService;
         }
 
         /// <summary>
@@ -34,12 +36,9 @@ namespace Umbraco.Web.Telemetry
         /// <returns>A value indicating whether to repeat the task.</returns>
         public override async Task<bool> PerformRunAsync(CancellationToken token)
         {
-            // Try & get a value stored in umbracoSettings.config on the backoffice XML element ID attribute
-            var backofficeIdentifierRaw = _settings.BackOffice.Id;
-
             // Parse as a GUID & verify its a GUID and not some random string
             // In case of users may have messed or decided to empty the file contents or put in something random
-            if (Guid.TryParse(backofficeIdentifierRaw, out var telemetrySiteIdentifier) == false)
+            if (_telemetryService.TryGetTelemetryReportData(out var telemetryReportData) is false)
             {
                 // Some users may have decided to mess with the XML attribute and put in something else
                 // Stop repeating this task (no need to keep checking)
@@ -61,8 +60,7 @@ namespace Umbraco.Web.Telemetry
 
                 using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
                 {
-                    var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = UmbracoVersion.SemanticVersion.ToSemanticString() };
-                    request.Content = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
+                    request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
 
                     // Set a low timeout - no need to use a larger default timeout for this POST request
                     _httpClient.Timeout = new TimeSpan(0, 0, 1);
@@ -86,15 +84,5 @@ namespace Umbraco.Web.Telemetry
         }
 
         public override bool IsAsync => true;
-
-        [DataContract]
-        private class TelemetryReportData
-        {
-            [DataMember(Name = "id")]
-            public Guid Id { get; set; }
-
-            [DataMember(Name = "version")]
-            public string Version { get; set; }
-        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Newtonsoft.Json;
 using Umbraco.Core.PropertyEditors;
 
@@ -9,6 +10,28 @@ namespace Umbraco.Core.Manifest
     /// </summary>
     public class PackageManifest
     {
+        private string _packageName;
+
+        [JsonProperty("name")]
+        public string PackageName
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(_packageName) is false)
+                {
+                    return _packageName;
+                }
+
+                if (string.IsNullOrWhiteSpace(Source) is false)
+                {
+                    _packageName = Path.GetFileName(Path.GetDirectoryName(Source));
+                }
+
+                return _packageName;
+            }
+            set => _packageName = value;
+        }
+
         /// <summary>
         /// Gets the source path of the manifest.
         /// </summary>
@@ -66,5 +89,17 @@ namespace Umbraco.Core.Manifest
         /// </summary>
         [JsonProperty("sections")]
         public ManifestSection[] Sections { get; set; } = Array.Empty<ManifestSection>();
+
+        /// <summary>
+        /// Gets or sets the version of the package
+        /// </summary>
+        [JsonProperty("version")]
+        public string Version { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether telemetry is allowed
+        /// </summary>
+        [JsonProperty("allowPackageTelemetry")]
+        public bool AllowPackageTelemetry { get; set; } = true;
     }
 }
