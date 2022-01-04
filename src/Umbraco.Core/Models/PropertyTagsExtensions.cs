@@ -162,7 +162,7 @@ namespace Umbraco.Core.Models
                 case TagsStorageType.Json:
                     try
                     {
-                        return JsonConvert.DeserializeObject<JArray>(value).Select(x => x.ToString(Formatting.None).Trim());
+                        return JsonConvert.DeserializeObject<string[]>(value).Select(x => x.Trim());
                     }
                     catch (JsonException)
                     {
