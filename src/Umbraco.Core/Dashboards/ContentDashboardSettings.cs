@@ -2,7 +2,7 @@
 
 namespace Umbraco.Core.Dashboards
 {
-    public class ContentDashboardSettings: IContentDashboardSettings
+    public class ContentDashboardSettings : IContentDashboardSettings
     {
         private const string DefaultContentDashboardPath = "cms";
 
@@ -30,5 +30,14 @@ namespace Umbraco.Core.Dashboards
             ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ContentDashboardPath)
                 ? ConfigurationManager.AppSettings[Constants.AppSettings.ContentDashboardPath]
                 : DefaultContentDashboardPath;
+
+        /// <summary>
+        /// Gets the allowed addresses to retrieve data for the content dashboard.
+        /// </summary>
+        /// <value>The URLs.</value>
+        public string ContentDashboardUrlAllowlist =>
+            ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ContentDashboardUrlAllowlist)
+                ? ConfigurationManager.AppSettings[Constants.AppSettings.ContentDashboardUrlAllowlist]
+                : null;
     }
 }

@@ -17,9 +17,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Services;
+using System.Web.Http;
 
 namespace Umbraco.Web.Editors
 {
@@ -60,6 +60,13 @@ namespace Umbraco.Web.Editors
             var language = user.Language;
             var version = UmbracoVersion.SemanticVersion.ToSemanticString();
             var isAdmin = user.IsAdmin();
+
+            if(!IsAllowedUrl(baseUrl))
+            {
+                var errorMsg = $"The following URL is not listed in the allowlist for ContentDashboardUrl in the Web.config: {baseUrl}";
+                Logger.Error<DashboardController>(errorMsg);
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, errorMsg));
+            }
 
             var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}",
                 baseUrl,
@@ -103,6 +110,13 @@ namespace Umbraco.Web.Editors
 
         public async Task<HttpResponseMessage> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
+            if(!IsAllowedUrl(baseUrl))
+            {
+                var errorMsg = $"The following URL is not listed in the allowlist for ContentDashboardUrl in the Web.config: {baseUrl}";
+                Logger.Error<DashboardController>(errorMsg);
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, errorMsg));
+            }
+
             var url = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
             var key = "umbraco-dynamic-dashboard-css-" + section;
 
@@ -144,6 +158,13 @@ namespace Umbraco.Web.Editors
 
         public async Task<HttpResponseMessage> GetRemoteXml(string site, string url)
         {
+            if(!IsAllowedUrl(url))
+            {
+                var errorMsg = $"The following URL is not listed in the allowlist for ContentDashboardUrl in the Web.config: {url}";
+                Logger.Error<DashboardController>(errorMsg);
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, errorMsg));
+            }
+
             // This is used in place of the old feedproxy.config
             // Which was used to grab data from our.umbraco.com, umbraco.com or umbraco.tv
             // for certain dashboards or the help drawer
@@ -227,6 +248,18 @@ namespace Umbraco.Web.Editors
                     View = y.View
                 })
             }).ToList();
+        }
+
+        private bool IsAllowedUrl(string url)
+        {
+            if (string.IsNullOrEmpty(_dashboardSettings.ContentDashboardUrlAllowlist) || _dashboardSettings.ContentDashboardUrlAllowlist.Contains(url))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

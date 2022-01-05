@@ -121,6 +121,11 @@ namespace Umbraco.Core
             public const string ContentDashboardPath = "Umbraco.Core.ContentDashboardPath";
 
             /// <summary>
+            /// A list of allowed addresses to fetch content for the content dashboard.
+            /// </summary>
+            public const string ContentDashboardUrlAllowlist = "Umbraco.Core.ContentDashboardUrl-Allowlist";
+
+            /// <summary>
             /// TODO: FILL ME IN
             /// </summary>
             public const string DisableElectionForSingleServer = "Umbraco.Core.DisableElectionForSingleServer";
