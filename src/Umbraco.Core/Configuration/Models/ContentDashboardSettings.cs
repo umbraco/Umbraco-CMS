@@ -1,6 +1,12 @@
-﻿
-namespace Umbraco.Cms.Core.Configuration
+
+using System.ComponentModel;
+
+namespace Umbraco.Cms.Core.Configuration.Models
 {
+    /// <summary>
+    /// Typed configuration options for content dashboard settings.
+    /// </summary>
+    [UmbracoOptions(Constants.Configuration.ConfigContentDashboard)]
     public class ContentDashboardSettings
     {
         private const string DefaultContentDashboardPath = "cms";
@@ -18,6 +24,13 @@ namespace Umbraco.Cms.Core.Configuration
         /// Gets the path to use when constructing the URL for retrieving data for the content dashboard.
         /// </summary>
         /// <value>The URL path.</value>
-        public string ContentDashboardPath  { get; set; } = DefaultContentDashboardPath;
+        [DefaultValue(DefaultContentDashboardPath)]
+        public string ContentDashboardPath { get; set; } = DefaultContentDashboardPath;
+
+        /// <summary>
+        /// Gets the allowed addresses to retrieve data for the content dashboard.
+        /// </summary>
+        /// <value>The URLs.</value>
+        public string[] ContentDashboardUrlAllowlist { get; set; }
     }
 }
