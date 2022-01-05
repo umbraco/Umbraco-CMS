@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.Web;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 
@@ -11,7 +12,7 @@ namespace Umbraco.Web.WebApi
     {
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            actionContext.ControllerContext.Configuration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
+            actionContext.ControllerContext.Configuration.IncludeErrorDetailPolicy = HttpContext.Current.IsDebuggingEnabled ? IncludeErrorDetailPolicy.Always : IncludeErrorDetailPolicy.Default;
         }
     }
 }
