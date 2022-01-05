@@ -1,4 +1,3 @@
-
 using System.ComponentModel;
 
 namespace Umbraco.Cms.Core.Configuration.Models
