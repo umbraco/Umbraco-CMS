@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -52,18 +51,6 @@ namespace Umbraco.Cms.Core.IO
         /// Gets the media filesystem.
         /// </summary>
         public IFileSystem FileSystem { get; }
-
-        /// <summary>
-        /// Create an <see cref="IFileProvider" /> instance for the media file system.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="IFileProvider" /> for the media file system (or <c>null</c> if not supported).
-        /// </returns>
-        public IFileProvider CreateFileProvider() => FileSystem switch
-        {
-            IFileProviderFactory fileProviderFactory => fileProviderFactory.Create(),
-            _ => null
-        };
 
         /// <summary>
         /// Delete media files.

@@ -98,8 +98,8 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
             AppBuilder.UseImageSharp();
 
             // Get media file provider and request path/URL
-            IFileProvider mediaFileProvider = AppBuilder.ApplicationServices.GetRequiredService<MediaFileManager>().CreateFileProvider();
-            if (mediaFileProvider is not null)
+            var mediaFileManager = AppBuilder.ApplicationServices.GetRequiredService<MediaFileManager>();
+            if (mediaFileManager.FileSystem.TryCreateFileProvider(out IFileProvider mediaFileProvider))
             {
                 GlobalSettings globalSettings = AppBuilder.ApplicationServices.GetRequiredService<IOptions<GlobalSettings>>().Value;
                 IHostingEnvironment hostingEnvironment = AppBuilder.ApplicationServices.GetService<IHostingEnvironment>();
