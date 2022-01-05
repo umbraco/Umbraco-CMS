@@ -252,6 +252,7 @@ namespace Umbraco.Web.Editors
 
         private bool IsAllowedUrl(string url)
         {
+            // No addresses specified indicates that any URL is allowed
             if (string.IsNullOrEmpty(_dashboardSettings.ContentDashboardUrlAllowlist) || _dashboardSettings.ContentDashboardUrlAllowlist.Contains(url))
             {
                 return true;
