@@ -10,7 +10,6 @@ using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Middleware;
 using SixLabors.ImageSharp.Web.Processors;
-using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -77,9 +76,6 @@ namespace Umbraco.Extensions
 
             // Configure middleware to use the registered/shared ImageSharp configuration
             builder.Services.AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ImageSharpConfigurationOptions>();
-
-            // Add FileSystemImageProvider before default provider
-            builder.Services.Insert(0, ServiceDescriptor.Singleton<IImageProvider, MediaFileManagerImageProvider>());
 
             return builder.Services;
         }

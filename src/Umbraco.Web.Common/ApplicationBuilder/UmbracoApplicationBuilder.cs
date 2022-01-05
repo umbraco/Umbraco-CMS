@@ -1,14 +1,16 @@
 using System;
+using Dazinator.Extensions.FileProviders.PrependBasePath;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
@@ -104,11 +106,8 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
                 string mediaRequestPath = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
 
                 // Configure custom file provider for media
-                AppBuilder.UseStaticFiles(new StaticFileOptions()
-                {
-                    FileProvider = mediaFileProvider,
-                    RequestPath = mediaRequestPath
-                });
+                IWebHostEnvironment webHostEnvironment = AppBuilder.ApplicationServices.GetService<IWebHostEnvironment>();
+                webHostEnvironment.WebRootFileProvider = webHostEnvironment.WebRootFileProvider.ConcatComposite(new PrependBasePathFileProvider(mediaRequestPath, mediaFileProvider));
             }
 
             AppBuilder.UseStaticFiles();
