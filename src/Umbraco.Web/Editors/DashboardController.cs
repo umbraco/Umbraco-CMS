@@ -250,6 +250,7 @@ namespace Umbraco.Web.Editors
             }).ToList();
         }
 
+        // Checks if the passed URL is part of the configured allowlist of addresses
         private bool IsAllowedUrl(string url)
         {
             // No addresses specified indicates that any URL is allowed
