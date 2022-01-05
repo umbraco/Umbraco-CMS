@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,9 +9,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
@@ -40,7 +43,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IDashboardService _dashboardService;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IOptions<ContentDashboardSettings> _dashboardSettings;
+        private readonly ContentDashboardSettings _dashboardSettings;
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
@@ -60,12 +63,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _dashboardService = dashboardService;
             _umbracoVersion = umbracoVersion;
             _shortStringHelper = shortStringHelper;
-            _dashboardSettings = dashboardSettings;
+            _dashboardSettings = dashboardSettings.Value;
         }
 
         //we have just one instance of HttpClient shared for the entire application
         private static readonly HttpClient HttpClient = new HttpClient();
 
+        // TODO(V10) : change return type to Task<ActionResult<JObject>> and consider removing baseUrl as parameter
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.com/")
@@ -76,9 +80,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild();
             var isAdmin = user.IsAdmin();
 
+            if (!IsAllowedUrl(baseUrl))
+            {
+                var errorMsg = $"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}";
+                _logger.LogError(errorMsg);
+                HttpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+                // Hacking the response - can't set the HttpContext.Response.Body, so instead returning the error as JSON
+                var errorJson = JsonConvert.SerializeObject(new { Error = errorMsg });
+                return JObject.Parse(errorJson);
+            }
+
             var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}",
                 baseUrl,
-                _dashboardSettings.Value.ContentDashboardPath,
+                _dashboardSettings.ContentDashboardPath,
                 section,
                 allowedSections,
                 language,
@@ -116,8 +131,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return result;
         }
 
+        // TODO(V10) : consider removing baseUrl as parameter
         public async Task<IActionResult> GetRemoteDashboardCss(string section, string baseUrl = "https://dashboard.umbraco.org/")
         {
+            if (!IsAllowedUrl(baseUrl))
+            {
+                var errorMsg = $"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {baseUrl}";
+                _logger.LogError(errorMsg);
+                return BadRequest(errorMsg);
+            }
+
             var url = string.Format(baseUrl + "css/dashboard.css?section={0}", section);
             var key = "umbraco-dynamic-dashboard-css-" + section;
 
@@ -152,12 +175,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
 
-            return Content(result,"text/css", Encoding.UTF8);
+            return Content(result, "text/css", Encoding.UTF8);
 
         }
 
         public async Task<IActionResult> GetRemoteXml(string site, string url)
         {
+            if (!IsAllowedUrl(url))
+            {
+                var errorMsg = $"The following URL is not listed in the setting 'Umbraco:CMS:ContentDashboard:ContentDashboardUrlAllowlist' in configuration: {url}";
+                _logger.LogError(errorMsg);
+                return BadRequest(errorMsg);
+            }
+
             // This is used in place of the old feedproxy.config
             // Which was used to grab data from our.umbraco.com, umbraco.com or umbraco.tv
             // for certain dashboards or the help drawer
@@ -214,7 +244,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
             }
 
-            return Content(result,"text/xml", Encoding.UTF8);
+            return Content(result, "text/xml", Encoding.UTF8);
 
         }
 
@@ -239,6 +269,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     View = y.View
                 })
             }).ToList();
+        }
+
+        // Checks if the passed URL is part of the configured allowlist of addresses
+        private bool IsAllowedUrl(string url)
+        {
+            // No addresses specified indicates that any URL is allowed
+            if (_dashboardSettings.ContentDashboardUrlAllowlist is null || _dashboardSettings.ContentDashboardUrlAllowlist.Contains(url, StringComparer.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
