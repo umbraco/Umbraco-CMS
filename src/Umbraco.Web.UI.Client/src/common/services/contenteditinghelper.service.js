@@ -508,6 +508,39 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
 
         /**
          * @ngdoc method
+         * @name umbraco.services.contentEditingHelper#getPermissionsForContent
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns a object with permissions for user.
+         */
+        getPermissionsForContent: function () {
+
+          let currentNodePermissions = null;
+
+          //Just ensure we do have an editorState
+          if (editorState.current) {
+            //Fetch current node allowed actions for the current user
+            //This is the current node & not each individual child node in the list
+            var currentUserPermissions = editorState.current.allowedActions;
+
+            //Create a nicer model rather than the funky & hard to remember permissions strings
+            currentNodePermissions = {
+              "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
+              "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
+              "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
+              "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M
+              "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
+              "canUnpublish": _.contains(currentUserPermissions, 'Z') //Magic Char = Z
+            };
+          }
+
+          return currentNodePermissions;
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.contentEditingHelper#reBindChangedProperties
          * @methodOf umbraco.services.contentEditingHelper
          * @function

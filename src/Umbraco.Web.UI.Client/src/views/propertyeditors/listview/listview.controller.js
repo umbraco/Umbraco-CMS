@@ -1,4 +1,4 @@
-function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper, eventsService) {
+function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, contentEditingHelper, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper, eventsService) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -67,28 +67,8 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     $scope.createAllowedButtonSingleWithBlueprints = false;
     $scope.createAllowedButtonMultiWithBlueprints = false;
 
-
     //when this is null, we don't check permissions
-    $scope.currentNodePermissions = null;
-
-    if ($scope.entityType === "content") {
-        //Just ensure we do have an editorState
-        if (editorState.current) {
-            //Fetch current node allowed actions for the current user
-            //This is the current node & not each individual child node in the list
-            var currentUserPermissions = editorState.current.allowedActions;
-
-            //Create a nicer model rather than the funky & hard to remember permissions strings
-            $scope.currentNodePermissions = {
-                "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
-                "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
-                "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-                "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M
-                "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-                "canUnpublish": _.contains(currentUserPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
-            };
-        }
-    }
+    $scope.currentNodePermissions = $scope.entityType === "content" ? contentEditingHelper.getPermissionsForContent() : null;
 
     //when this is null, we don't check permissions
     $scope.buttonPermissions = null;
