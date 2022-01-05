@@ -67,7 +67,7 @@ namespace Umbraco.Core.Manifest
         /// <summary>
         /// Gets all manifests.
         /// </summary>
-        private IEnumerable<PackageManifest> GetManifests()
+        internal IEnumerable<PackageManifest> GetManifests()
         {
             var manifests = new List<PackageManifest>();
 
