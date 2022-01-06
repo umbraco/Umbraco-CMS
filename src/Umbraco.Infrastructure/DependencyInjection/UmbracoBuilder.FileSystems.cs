@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 ILogger<PhysicalFileSystem> logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
                 GlobalSettings globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
-                var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
+                var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPhysicalRootPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
                 return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
             });

@@ -74,6 +74,7 @@ namespace Umbraco.Extensions
                 .Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = builder.BuilderHostingEnvironment.MapPathContentRoot(imagingSettings.Cache.CacheFolder))
                 .AddProcessor<CropWebProcessor>();
 
+            // Configure middleware to use the registered/shared ImageSharp configuration
             builder.Services.AddTransient<IConfigureOptions<ImageSharpMiddlewareOptions>, ImageSharpConfigurationOptions>();
 
             return builder.Services;
