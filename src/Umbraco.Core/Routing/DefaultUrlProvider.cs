@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Routing
     /// <summary>
     ///     Provides urls.
     /// </summary>
-    public class DefaultUrlProvider : IUrlProvider
+    public partial class DefaultUrlProvider : IUrlProvider
     {
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
@@ -139,9 +139,7 @@ namespace Umbraco.Cms.Core.Routing
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                _logger.LogDebug(
-                    "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.",
-                    id);
+                LogPageNotFoundByNodeId(id);
                 return null;
             }
 
@@ -163,6 +161,11 @@ namespace Umbraco.Cms.Core.Routing
             return null;
         }
 
+        [LoggerMessage(
+        EventId = 22,
+        Level = LogLevel.Debug,
+        Message = "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.")]
+        public partial void LogPageNotFoundByNodeId(int nodeId);
         #endregion
 
         #region Utilities

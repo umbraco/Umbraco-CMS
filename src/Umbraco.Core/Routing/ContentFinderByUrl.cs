@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Routing
     /// <remarks>
     /// <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice URL of a document.</para>
     /// </remarks>
-    public class ContentFinderByUrl : IContentFinder
+    public partial class ContentFinderByUrl : IContentFinder
     {
         private readonly ILogger<ContentFinderByUrl> _logger;
 
@@ -70,13 +70,13 @@ namespace Umbraco.Cms.Core.Routing
                 throw new System.ArgumentNullException(nameof(docreq));
             }
 
-            _logger.LogDebug("Test route {Route}", route);
+            LogTestRoute(route);
 
             IPublishedContent node = umbracoContext.Content.GetByRoute(umbracoContext.InPreviewMode, route, culture: docreq.Culture);
             if (node != null)
             {
                 docreq.SetPublishedContent(node);
-                _logger.LogDebug("Got content, id={NodeId}", node.Id);
+                LogContentFound(node.Id);
             }
             else
             {
@@ -85,5 +85,18 @@ namespace Umbraco.Cms.Core.Routing
 
             return node;
         }
+
+        [LoggerMessage(
+         EventId = 15,
+         Level = LogLevel.Debug,
+         Message = "Test route {Route}")]
+        public partial void LogTestRoute(string route);
+
+        [LoggerMessage(
+         EventId = 16,
+         Level = LogLevel.Debug,
+         Message = "Got content, id={NodeId}")]
+        public partial void LogContentFound(int nodeId);
+
     }
 }

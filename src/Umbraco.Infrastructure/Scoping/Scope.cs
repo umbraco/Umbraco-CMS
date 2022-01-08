@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Scoping
     ///     Implements <see cref="IScope" />.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope : IScope
+    internal partial class Scope : IScope
     {
         private readonly bool _autoComplete;
         private readonly CoreDebugSettings _coreDebugSettings;
@@ -94,8 +94,7 @@ namespace Umbraco.Cms.Core.Scoping
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
 #endif
-            logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8),
-                Thread.CurrentThread.ManagedThreadId);
+            LogBeginScope(InstanceId.ToString("N").Substring(0, 8), Thread.CurrentThread.ManagedThreadId);
 
             if (detachable)
             {
@@ -1194,5 +1193,11 @@ namespace Umbraco.Cms.Core.Scoping
             ReadLock,
             WriteLock
         }
+
+        [LoggerMessage(
+          EventId = 3,
+          Level = LogLevel.Trace,
+          Message = "Create {InstanceId} on thread {ThreadId}")]
+        public partial void LogBeginScope(string instanceId, int threadId);
     }
 }

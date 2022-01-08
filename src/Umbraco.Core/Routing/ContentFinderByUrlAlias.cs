@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Routing
     /// <para>Handles <c>/just/about/anything</c> where <c>/just/about/anything</c> is contained in the <c>umbracoUrlAlias</c> property of a document.</para>
     /// <para>The alias is the full path to the document. There can be more than one alias, separated by commas.</para>
     /// </remarks>
-    public class ContentFinderByUrlAlias : IContentFinder
+    public partial class ContentFinderByUrlAlias : IContentFinder
     {
         private readonly IPublishedValueFallback _publishedValueFallback;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -62,7 +62,7 @@ namespace Umbraco.Cms.Core.Routing
                 if (node != null)
                 {
                     frequest.SetPublishedContent(node);
-                    _logger.LogDebug("Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}", frequest.Uri.AbsolutePath, node.Id);
+                    LogContentAliasFound(frequest.Uri.AbsolutePath, node.Id);
                 }
             }
 
@@ -146,5 +146,11 @@ namespace Umbraco.Cms.Core.Routing
 
             return null;
         }
+
+        [LoggerMessage(
+         EventId = 17,
+         Level = LogLevel.Debug,
+         Message = "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}")]
+        public partial void LogContentAliasFound(string uriAbsolutePath, int nodeId);
     }
 }

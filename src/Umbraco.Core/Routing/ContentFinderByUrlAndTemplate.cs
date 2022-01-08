@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Routing
     /// <para>Handles <c>/foo/bar/template</c> where <c>/foo/bar</c> is the nice URL of a document, and <c>template</c> a template alias.</para>
     /// <para>If successful, then the template of the document request is also assigned.</para>
     /// </remarks>
-    public class ContentFinderByUrlAndTemplate : ContentFinderByUrl
+    public partial class ContentFinderByUrlAndTemplate : ContentFinderByUrl
     {
         private readonly ILogger<ContentFinderByUrlAndTemplate> _logger;
         private readonly IFileService _fileService;
@@ -73,11 +73,11 @@ namespace Umbraco.Cms.Core.Routing
 
             if (template == null)
             {
-                _logger.LogDebug("Not a valid template: '{TemplateAlias}'", templateAlias);
+                LogNotValidTemplate(templateAlias);
                 return false;
             }
 
-            _logger.LogDebug("Valid template: '{TemplateAlias}'", templateAlias);
+            LogValidTemplate(templateAlias);
 
             // look for node corresponding to the rest of the route
             var route = frequest.Domain != null ? (frequest.Domain.ContentId + path) : path;
@@ -85,14 +85,14 @@ namespace Umbraco.Cms.Core.Routing
 
             if (node == null)
             {
-                _logger.LogDebug("Not a valid route to node: '{Route}'", route);
+                LogNotValidRouteToNode(route);
                 return false;
             }
 
             // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
             if (!node.IsAllowedTemplate(_contentTypeService, _webRoutingSettings, template.Id))
             {
-                _logger.LogWarning("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
+                LogNotAllowedTemplate(template.Alias, node.Id);
                 frequest.SetPublishedContent(null); // clear
                 return false;
             }
@@ -101,5 +101,31 @@ namespace Umbraco.Cms.Core.Routing
             frequest.SetTemplate(template);
             return true;
         }
+
+        [LoggerMessage(
+         EventId = 18,
+         Level = LogLevel.Debug,
+         Message = "Not a valid template: '{TemplateAlias}'")]
+        public partial void LogNotValidTemplate(string templateAlias);
+
+        [LoggerMessage(
+         EventId = 19,
+         Level = LogLevel.Debug,
+         Message = "Valid template: '{TemplateAlias}'")]
+        public partial void LogValidTemplate(string templateAlias);
+
+
+        [LoggerMessage(
+         EventId = 20,
+         Level = LogLevel.Debug,
+         Message = "Not a valid route to node: '{Route}'")]
+        public partial void LogNotValidRouteToNode(string route);
+
+
+        [LoggerMessage(
+         EventId = 21,
+         Level = LogLevel.Warning,
+         Message = "Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.")]
+        public partial void LogNotAllowedTemplate(string templateAlias,int nodeId);
     }
 }

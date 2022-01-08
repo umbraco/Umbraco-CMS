@@ -1,13 +1,13 @@
 using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-
+using MicrosoftLogLevel = Microsoft.Extensions.Logging.LogLevel;
 namespace Umbraco.Cms.Core.Logging
 {
     /// <summary>
     /// Starts the timer and invokes a  callback upon disposal. Provides a simple way of timing an operation by wrapping it in a <code>using</code> (C#) statement.
     /// </summary>
-	public class DisposableTimer : DisposableObjectSlim
+	public partial class DisposableTimer : DisposableObjectSlim
     {
         private readonly ILogger _logger;
         private readonly LogLevel _level;
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Logging
                     case LogLevel.Debug:
                         if (startMessageArgs == null)
                         {
-                            logger.LogDebug("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                            LogDebugStartTimer(startMessage, _timingId);
                         }
                         else
                         {
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.Logging
                     case LogLevel.Information:
                         if (startMessageArgs == null)
                         {
-                            logger.LogInformation("{StartMessage} [Timing {TimingId}]", startMessage, _timingId);
+                            LogInformationStartTimer(startMessage, _timingId);
                         }
                         else
                         {
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Core.Logging
                         case LogLevel.Debug:
                             if (_endMessageArgs == null)
                             {
-                                _logger.LogDebug("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
+                                LogDebugEndTimer(_endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                             }
                             else
                             {
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Core.Logging
                         case LogLevel.Information:
                             if (_endMessageArgs == null)
                             {
-                                _logger.LogInformation("{EndMessage} ({Duration}ms) [Timing {TimingId}]", _endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
+                                LogInformationEndTimer(_endMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                             }
                             else
                             {
@@ -170,5 +170,29 @@ namespace Umbraco.Cms.Core.Logging
                 }
             }
         }
+
+        [LoggerMessage(
+          EventId = 4,
+          Level = MicrosoftLogLevel.Information,
+          Message = "{StartMessage} [Timing {TimingId}]")]
+        public partial void LogInformationStartTimer(string startMessage, string timingId);
+
+        [LoggerMessage(
+          EventId = 5,
+          Level = MicrosoftLogLevel.Debug,
+          Message = "{StartMessage} [Timing {TimingId}]")]
+        public partial void LogDebugStartTimer(string startMessage, string timingId);
+
+        [LoggerMessage(
+          EventId = 6,
+          Level = MicrosoftLogLevel.Debug,
+          Message = "{EndMessage} ({Duration}ms) [Timing {TimingId}]")]
+        public partial void LogDebugEndTimer(string endMessage, double duration, string timingId);
+
+        [LoggerMessage(
+          EventId = 7,
+          Level = MicrosoftLogLevel.Information,
+          Message = "{EndMessage} ({Duration}ms) [Timing {TimingId}]")]
+        public partial void LogInformationEndTimer(string endMessage, double duration, string timingId);
     }
 }

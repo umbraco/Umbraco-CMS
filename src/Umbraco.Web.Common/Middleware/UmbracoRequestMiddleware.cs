@@ -24,6 +24,7 @@ using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Extensions;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Umbraco.Cms.Web.Common.Middleware
 {
@@ -39,7 +40,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
     /// This is responsible for creating and assigning an <see cref="IUmbracoContext"/>
     /// </para>
     /// </remarks>
-    public class UmbracoRequestMiddleware : IMiddleware
+    public partial class UmbracoRequestMiddleware : IMiddleware
     {
         private readonly ILogger<UmbracoRequestMiddleware> _logger;
 
@@ -129,7 +130,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             {
                 // Verbose log start of every request
                 LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
-                _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
+                LogBeginRequest(httpRequestId, pathAndQuery);
 
                 try
                 {
@@ -159,7 +160,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 // Verbose log end of every request (in v8 we didn't log the end request of ALL requests, only the front-end which was
                 // strange since we always logged the beginning, so now we just log start/end of all requests)
                 LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
-                _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, pathAndQuery, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
+                LogEndRequest(httpRequestId, pathAndQuery, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
 
                 try
                 {
@@ -241,5 +242,18 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 _publishedSnapshotServiceEventHandler.Initialize();
                 return true;
             });
+
+
+        [LoggerMessage(
+        EventId = 1,
+        Level = LogLevel.Trace,
+        Message = "Begin request [{HttpRequestId}]: {RequestUrl}")]
+        public partial void LogBeginRequest(Guid httpRequestId, string requestUrl);
+
+        [LoggerMessage(
+        EventId = 2,
+        Level = LogLevel.Trace,
+        Message = "End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)")]
+        public partial void LogEndRequest(Guid httpRequestId, string requestUrl, double requestDuration);
     }
 }

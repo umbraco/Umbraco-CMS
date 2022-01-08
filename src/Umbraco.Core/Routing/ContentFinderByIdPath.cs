@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Routing
     /// <remarks>
     /// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
     /// </remarks>
-    public class ContentFinderByIdPath : IContentFinder
+    public partial class ContentFinderByIdPath : IContentFinder
     {
         private readonly ILogger<ContentFinderByIdPath> _logger;
         private readonly IRequestAccessor _requestAccessor;
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Routing
 
                 if (nodeId > 0)
                 {
-                    _logger.LogDebug("Id={NodeId}", nodeId);
+                    LogNodeId(nodeId);
                     node = umbracoContext.Content.GetById(nodeId);
 
                     if (node != null)
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Routing
                         }
 
                         frequest.SetPublishedContent(node);
-                        _logger.LogDebug("Found node with id={PublishedContentId}", node.Id);
+                        LogFoundNodeId(node.Id);
                     }
                     else
                     {
@@ -100,5 +100,17 @@ namespace Umbraco.Cms.Core.Routing
 
             return node != null;
         }
+
+        [LoggerMessage(
+          EventId = 10,
+          Level = LogLevel.Debug,
+          Message = "Id={NodeId}")]
+        public partial void LogNodeId(int nodeId);
+
+        [LoggerMessage(
+          EventId = 11,
+          Level = LogLevel.Debug,
+          Message = "Found node with id={PublishedContentId}")]
+        public partial void LogFoundNodeId(int nodeId);
     }
 }

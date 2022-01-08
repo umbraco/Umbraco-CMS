@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Routing
     /// <remarks>
     /// <para>Assigns a permanent redirect notification to the request.</para>
     /// </remarks>
-    public class ContentFinderByRedirectUrl : IContentFinder
+    public partial class ContentFinderByRedirectUrl : IContentFinder
     {
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly ILogger<ContentFinderByRedirectUrl> _logger;
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Routing
 
             if (redirectUrl == null)
             {
-                _logger.LogDebug("No match for route: {Route}", route);
+                LogNoRouteMatch(route);
                 return false;
             }
 
@@ -66,14 +66,14 @@ namespace Umbraco.Cms.Core.Routing
             var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
             if (url.StartsWith("#"))
             {
-                _logger.LogDebug("Route {Route} matches content {ContentId} which has no URL.", route, redirectUrl.ContentId);
+                LogRouteMatchedNoUrl( route, redirectUrl.ContentId);
                 return false;
             }
 
             // Appending any querystring from the incoming request to the redirect URL
             url = string.IsNullOrEmpty(frequest.Uri.Query) ? url : url + frequest.Uri.Query;
 
-            _logger.LogDebug("Route {Route} matches content {ContentId} with URL '{Url}', redirecting.", route, content.Id, url);
+            LogRouteMatchedRedirecting(route, content.Id, url);
 
             frequest
                 .SetRedirectPermanent(url)
@@ -88,5 +88,24 @@ namespace Umbraco.Cms.Core.Routing
 
             return true;
         }
+
+
+        [LoggerMessage(
+          EventId = 12,
+          Level = LogLevel.Debug,
+          Message = "No match for route: {Route}")]
+        public partial void LogNoRouteMatch(string route);
+
+        [LoggerMessage(
+          EventId = 13,
+          Level = LogLevel.Debug,
+          Message = "Route {Route} matches content {ContentId} which has no URL.")]
+        public partial void LogRouteMatchedNoUrl(string route, int contentId);
+
+        [LoggerMessage(
+          EventId = 14,
+          Level = LogLevel.Debug,
+          Message = "Route {Route} matches content {ContentId} with URL '{Url}', redirecting.")]
+        public partial void LogRouteMatchedRedirecting(string route, int contentId, string url);
     }
 }
