@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Routing
     /// <summary>
     /// Provides an implementation of <see cref="IContentFinder"/> that runs the legacy 404 logic.
     /// </summary>
-    public class ContentFinderByConfigured404 : IContentLastChanceFinder
+    public partial class ContentFinderByConfigured404 : IContentLastChanceFinder
     {
         private readonly ILogger<ContentFinderByConfigured404> _logger;
         private readonly IEntityService _entityService;
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Routing
 
             if (error404.HasValue)
             {
-                _logger.LogDebug("Got id={ErrorNodeId}.", error404.Value);
+                LogErrorNodeFound(error404.Value);
 
                 content = umbracoContext.Content.GetById(error404.Value);
 
@@ -123,5 +123,11 @@ namespace Umbraco.Cms.Core.Routing
 
             return content != null;
         }
+
+        [LoggerMessage(
+           EventId = 48,
+           Level = LogLevel.Debug,
+           Message = "Got id={ErrorNodeId}.")]
+        public partial void LogErrorNodeFound(int errorNodeId);
     }
 }

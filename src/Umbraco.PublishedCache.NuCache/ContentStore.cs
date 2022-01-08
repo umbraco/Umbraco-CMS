@@ -608,7 +608,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 throw new ArgumentException("Kit content cannot have children.", nameof(kit));
             // ReSharper restore LocalizableElement
 
-            _logger.LogDebug("Set content ID: {KitNodeId}", kit.Node.Id);
+            LogContentIdSet(kit.Node.Id);
 
             // get existing
             _contentNodes.TryGetValue(kit.Node.Id, out var link);
@@ -654,6 +654,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             return true;
         }
+
+        [LoggerMessage(
+           EventId = 50,
+           Level = LogLevel.Debug,
+           Message = "Set content ID: {KitNodeId}")]
+        public partial void LogContentIdSet(int kitNodeId);
 
         private void ClearRootLocked()
         {
@@ -727,7 +733,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     previousNode = null; // there is no previous sibling
                 }
 
-                _logger.LogDebug("Set {thisNodeId} with parent {thisNodeParentContentId}", thisNode.Id, thisNode.ParentContentId);
+                LogParentContentIdSet(thisNode.Id, thisNode.ParentContentId);
                 SetValueLocked(_contentNodes, thisNode.Id, thisNode);
 
                 // if we are initializing from the database source ensure the local db is updated
@@ -751,6 +757,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             return ok;
         }
+
+        [LoggerMessage(
+           EventId = 51,
+           Level = LogLevel.Debug,
+           Message = "Set {thisNodeId} with parent {thisNodeParentContentId}")]
+        public partial void LogParentContentIdSet(int thisNodeId,int thisNodeParentContentId);
 
         /// <summary>
         /// Set all data for a collection of <see cref="ContentNodeKit"/>
@@ -784,7 +796,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     ok = false;
                     continue; // skip that one
                 }
-                _logger.LogDebug("Set {kitNodeId} with parent {kitNodeParentContentId}", kit.Node.Id, kit.Node.ParentContentId);
+                LogParentContentIdSet(kit.Node.Id, kit.Node.ParentContentId);
                 SetValueLocked(_contentNodes, kit.Node.Id, kit.Node);
 
                 if (_localDb != null) RegisterChange(kit.Node.Id, kit);
@@ -873,7 +885,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             if (link?.Value == null) return false;
 
             var content = link.Value;
-            _logger.LogDebug("Clear content ID: {ContentId}", content.Id);
+            LogClearContentId(content.Id);
 
             // clear the entire branch
             ClearBranchLocked(content);
@@ -883,6 +895,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             return true;
         }
+
+        [LoggerMessage(
+           EventId = 52,
+           Level = LogLevel.Debug,
+           Message = "Clear content ID: {ContentId}")]
+        public partial void LogClearContentId(int contentId);
 
         private void ClearBranchLocked(int id)
         {
@@ -1690,15 +1708,20 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             {
                 if (_gen < 0) return;
 #if DEBUG
-                _logger.LogDebug("Dispose snapshot ({Snapshot})", _genRef?.GenObj.Count.ToString() ?? "live");
+                LogDisposeSnapshot(_genRef?.GenObj.Count.ToString() ?? "live");
 #endif
                 _gen = -1;
                 if (_genRef != null)
                     Interlocked.Decrement(ref _genRef.GenObj.Count);
                 GC.SuppressFinalize(this);
             }
-        }
 
+            [LoggerMessage(
+              EventId = 53,
+              Level = LogLevel.Debug,
+              Message = "Dispose snapshot ({Snapshot})")]
+            public partial void LogDisposeSnapshot(string snapshot);
+        }
         #endregion
     }
 }

@@ -4,10 +4,11 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
+using MicrosoftLogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Umbraco.Cms.Core.Templates
 {
-    public sealed class HtmlUrlParser
+    public sealed partial class HtmlUrlParser
     {
         private readonly ContentSettings _contentSettings;
         private readonly ILogger<HtmlUrlParser> _logger;
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Core.Templates
             {
                 // find all relative URLs (ie. URLs that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
-                _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer.Stopwatch.ElapsedMilliseconds, tags.Count);
+                LogUrlRegexResult(timer.Stopwatch.ElapsedMilliseconds, tags.Count);
                 foreach (Match tag in tags)
                 {
                     var url = "";
@@ -64,5 +65,11 @@ namespace Umbraco.Cms.Core.Templates
 
             return text;
         }
+
+        [LoggerMessage(
+           EventId = 46,
+           Level = MicrosoftLogLevel.Debug,
+           Message = "After regex: {Duration} matched: {TagsCount}")]
+        public partial void LogUrlRegexResult(long duration, int tagsCount);
     }
 }
