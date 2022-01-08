@@ -151,6 +151,6 @@ namespace Umbraco.Cms.Core.Routing
          EventId = 17,
          Level = LogLevel.Debug,
          Message = "Path '{UriAbsolutePath}' is an alias for id={PublishedContentId}")]
-        public partial void LogContentAliasFound(string uriAbsolutePath, int nodeId);
+        public partial void LogContentAliasFound(string uriAbsolutePath, int publishedContentId);
     }
 }

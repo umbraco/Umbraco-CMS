@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     /// This class's logic is based on the <see cref="SnapDictionary{TKey, TValue}"/> class but has been slightly modified to suit these purposes.
     /// </para>
     /// </remarks>
-    public class ContentStore
+    public partial class ContentStore
     {
         // this class is an extended version of SnapDictionary
         // most of the snapshots management code, etc is an exact copy
@@ -1579,7 +1579,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region Classes
 
-        public class Snapshot : IDisposable
+        public partial class Snapshot : IDisposable
         {
             private readonly ContentStore _store;
             private readonly GenRef _genRef;

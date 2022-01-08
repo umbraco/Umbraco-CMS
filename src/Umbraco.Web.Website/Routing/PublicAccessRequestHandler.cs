@@ -16,7 +16,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Routing
 {
-    public class PublicAccessRequestHandler : IPublicAccessRequestHandler
+    public partial class PublicAccessRequestHandler : IPublicAccessRequestHandler
     {
         private readonly ILogger<PublicAccessRequestHandler> _logger;
         private readonly IPublicAccessService _publicAccessService;

@@ -40,13 +40,13 @@ namespace Umbraco.Cms.Core.Logging
            EventId = 8,
            Level = MicrosoftLogLevel.Debug,
            Message = "Begin: {ProfileName}")]
-        public partial void LogStartStep(string name);
+        public partial void LogStartStep(string profileName);
 
         [LoggerMessage(
            EventId = 9,
            Level = MicrosoftLogLevel.Information,
            Message = "End {ProfileName} ({ProfileDuration}ms)")]
-        public partial void LogEndStep(string name, long duration);
+        public partial void LogEndStep(string profileName, long profileDuration);
 
         // a lightweight disposable timer
         private class LightDisposableTimer : DisposableObjectSlim

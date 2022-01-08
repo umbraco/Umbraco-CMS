@@ -111,6 +111,6 @@ namespace Umbraco.Cms.Core.Routing
           EventId = 11,
           Level = LogLevel.Debug,
           Message = "Found node with id={PublishedContentId}")]
-        public partial void LogFoundNodeId(int nodeId);
+        public partial void LogFoundNodeId(int publishedContentId);
     }
 }

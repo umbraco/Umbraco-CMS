@@ -351,7 +351,7 @@ namespace Umbraco.Cms.Core.Routing
         EventId = 25,
         Level = LogLevel.Debug,
         Message = "{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}")]
-        public partial void LogDomainFound(string tracePrefix, string domain, int rootId, string culture);
+        public partial void LogDomainFound(string tracePrefix, string domain, int rootContentId, string culture);
 
         [LoggerMessage(
         EventId = 26,
