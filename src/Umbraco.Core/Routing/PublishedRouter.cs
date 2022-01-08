@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Umbraco.Cms.Core.Routing
 {
@@ -22,7 +23,7 @@ namespace Umbraco.Cms.Core.Routing
     /// <summary>
     /// Provides the default <see cref="IPublishedRouter"/> implementation.
     /// </summary>
-    public class PublishedRouter : IPublishedRouter
+    public partial class PublishedRouter : IPublishedRouter
     {
         private readonly WebRoutingSettings _webRoutingSettings;
         private readonly ContentFinderCollection _contentFinders;
@@ -165,7 +166,7 @@ namespace Umbraco.Cms.Core.Routing
             // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
             if (!builder.HasPublishedContent())
             {
-                _logger.LogDebug("FindPublishedContentAndTemplate: Path={UriAbsolutePath}", builder.Uri.AbsolutePath);
+                LogFindPublishedContentAndTemplate(builder.Uri.AbsolutePath);
 
                 // run the document finders
                 foundContentByFinders = FindPublishedContent(builder);
@@ -198,6 +199,12 @@ namespace Umbraco.Cms.Core.Routing
             // we don't take care of anything so if the content has changed, it's up to the user
             // to find out the appropriate template
         }
+
+        [LoggerMessage(
+        EventId = 23,
+        Level = LogLevel.Debug,
+        Message = "FindPublishedContentAndTemplate: Path={UriAbsolutePath}")]
+        public partial void LogFindPublishedContentAndTemplate(string uriAbsolutePath);
 
         /// <summary>
         /// This method finalizes/builds the PCR with the values assigned.
@@ -269,7 +276,7 @@ namespace Umbraco.Cms.Core.Routing
             const string tracePrefix = "FindDomain: ";
 
             // note - we are not handling schemes nor ports here.
-            _logger.LogDebug("{TracePrefix}Uri={RequestUri}", tracePrefix, request.Uri);
+            LogFindDomain(tracePrefix, request.Uri);
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             IDomainCache domainsCache = umbracoContext.PublishedSnapshot.Domains;
             var domains = domainsCache.GetAll(includeWildcards: false).ToList();
@@ -310,7 +317,7 @@ namespace Umbraco.Cms.Core.Routing
             if (domainAndUri != null)
             {
                 // matching an existing domain
-                _logger.LogDebug("{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}", tracePrefix, domainAndUri.Name, domainAndUri.ContentId, domainAndUri.Culture);
+                LogDomainFound(tracePrefix, domainAndUri.Name, domainAndUri.ContentId, domainAndUri.Culture);
 
                 request.SetDomain(domainAndUri);
 
@@ -324,15 +331,39 @@ namespace Umbraco.Cms.Core.Routing
             else
             {
                 // not matching any existing domain
-                _logger.LogDebug("{TracePrefix}Matches no domain", tracePrefix);
+                LogDomainNotFound(tracePrefix);
 
                 request.SetCulture(defaultCulture ?? CultureInfo.CurrentUICulture.Name);
             }
 
-            _logger.LogDebug("{TracePrefix}Culture={CultureName}", tracePrefix, request.Culture);
+            LogDomainCulture(tracePrefix, request.Culture);
 
             return request.Domain != null;
         }
+
+        [LoggerMessage(
+        EventId = 24,
+        Level = LogLevel.Debug,
+        Message = "{TracePrefix}Uri={RequestUri}")]
+        public partial void LogFindDomain(string tracePrefix, Uri requestUri);
+
+        [LoggerMessage(
+        EventId = 25,
+        Level = LogLevel.Debug,
+        Message = "{TracePrefix}Matches domain={Domain}, rootId={RootContentId}, culture={Culture}")]
+        public partial void LogDomainFound(string tracePrefix, string domain, int rootId, string culture);
+
+        [LoggerMessage(
+        EventId = 26,
+        Level = LogLevel.Debug,
+        Message = "{TracePrefix}Matches no domain")]
+        public partial void LogDomainNotFound(string tracePrefix);
+
+        [LoggerMessage(
+        EventId = 27,
+        Level = LogLevel.Debug,
+        Message = "{TracePrefix}Culture={CultureName}")]
+        public partial void LogDomainCulture(string tracePrefix, string cultureName);
 
         /// <summary>
         /// Looks for wildcard domains in the path and updates <c>Culture</c> accordingly.
@@ -347,7 +378,7 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             var nodePath = request.PublishedContent.Path;
-            _logger.LogDebug("{TracePrefix}Path={NodePath}", tracePrefix, nodePath);
+            LogHandleWildcardDomains(tracePrefix, nodePath);
             var rootNodeId = request.Domain != null ? request.Domain.ContentId : (int?)null;
             var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
             Domain domain = DomainUtilities.FindWildcardDomainInPath(umbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
@@ -356,13 +387,31 @@ namespace Umbraco.Cms.Core.Routing
             if (domain != null)
             {
                 request.SetCulture(domain.Culture);
-                _logger.LogDebug("{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}", tracePrefix, domain.ContentId, request.Culture);
+                LogFoundWildcardDomain( tracePrefix, domain.ContentId, request.Culture);
             }
             else
             {
-                _logger.LogDebug("{TracePrefix}No match.", tracePrefix);
+                LogNotFoundWildcardDomain( tracePrefix);
             }
         }
+
+        [LoggerMessage(
+        EventId = 28,
+        Level = LogLevel.Debug,
+        Message = "{TracePrefix}Path={NodePath}")]
+        public partial void LogHandleWildcardDomains(string tracePrefix, string nodePath);
+
+        [LoggerMessage(
+        EventId = 29,
+        Level = LogLevel.Debug,
+        Message = "{TracePrefix}Got domain on node {DomainContentId}, set culture to {CultureName}")]
+        public partial void LogFoundWildcardDomain(string tracePrefix, int domainContentId,string cultureName);
+
+        [LoggerMessage(
+        EventId = 30,
+        Level = LogLevel.Debug,
+        Message = "{TracePrefix}No match.")]
+        public partial void LogNotFoundWildcardDomain(string tracePrefix);
 
         internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo directory, string alias, string[] extensions)
         {
@@ -402,14 +451,12 @@ namespace Umbraco.Cms.Core.Routing
                 // iterate but return on first one that finds it
                 var found = _contentFinders.Any(finder =>
                 {
-                    _logger.LogDebug("Finder {ContentFinderType}", finder.GetType().FullName);
+                    LogExecutingContentFinder(finder.GetType().FullName);
                     return finder.TryFindContent(request);
                 });
-
-                _logger.LogDebug(
-                    "Found? {Found}, Content: {PublishedContentId}, Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, StatusCode: {StatusCode}",
+                LogExecutedContentFinder(
                     found,
-                    request.HasPublishedContent() ? request.PublishedContent.Id : "NULL",
+                    request.HasPublishedContent() ? request.PublishedContent.Id.ToString() : "NULL",
                     request.HasTemplate() ? request.Template?.Alias : "NULL",
                     request.HasDomain() ? request.Domain.ToString() : "NULL",
                     request.Culture ?? "NULL",
@@ -418,6 +465,18 @@ namespace Umbraco.Cms.Core.Routing
                 return found;
             }
         }
+
+        [LoggerMessage(
+           EventId = 31,
+           Level = LogLevel.Debug,
+           Message = "Finder {ContentFinderType}")]
+        public partial void LogExecutingContentFinder(string contentFinderType);
+
+        [LoggerMessage(
+           EventId = 32,
+           Level = LogLevel.Debug,
+           Message = "Found? {Found}, Content: {PublishedContentId}, Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, StatusCode: {StatusCode}")]
+        public partial void LogExecutedContentFinder(bool found, string publishedContentId, string templateAlias, string domain, string culture, int? statusCode);
 
         /// <summary>
         /// Handles the published content (if any).
@@ -525,16 +584,12 @@ namespace Umbraco.Cms.Core.Routing
             if (valid == false)
             {
                 // bad redirect - log and display the current page (legacy behavior)
-                _logger.LogDebug(
-                    "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: value is not an int nor a GuidUdi.",
-                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
+                LogFailedToInternalRedirectInvalidId(request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
             }
 
             if (internalRedirectNode == null)
             {
-                _logger.LogDebug(
-                    "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: no such published document.",
-                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
+                LogFailedToInternalRedirectNoDocumentById(request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
             }
             else if (internalRedirectId == request.PublishedContent.Id)
             {
@@ -556,11 +611,29 @@ namespace Umbraco.Cms.Core.Routing
                 }
 
                 redirect = true;
-                _logger.LogDebug("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
+                LogInternalRedirecting(internalRedirectId);
             }
 
             return redirect;
         }
+
+        [LoggerMessage(
+           EventId = 33,
+           Level = LogLevel.Debug,
+           Message = "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: value is not an int nor a GuidUdi.")]
+        public partial void LogFailedToInternalRedirectInvalidId(object internalRedirectId);
+
+        [LoggerMessage(
+           EventId = 34,
+           Level = LogLevel.Debug,
+           Message = "FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: no such published document.")]
+        public partial void LogFailedToInternalRedirectNoDocumentById(object internalRedirectId);
+
+        [LoggerMessage(
+           EventId = 35,
+           Level = LogLevel.Debug,
+           Message = "FollowInternalRedirects: Redirecting to id ={InternalRedirectId}")]
+        public partial void LogInternalRedirecting(int internalRedirectId);
 
         /// <summary>
         /// Finds a template for the current node, if any.
@@ -608,11 +681,11 @@ namespace Umbraco.Cms.Core.Routing
                 request.SetTemplate(template);
                 if (template != null)
                 {
-                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                    LogTemplateFound(template.Id, template.Alias);
                 }
                 else
                 {
-                    _logger.LogWarning("FindTemplate: Could not find template with id {TemplateId}", templateId);
+                    LogTemplateNotFound(templateId);
                 }
             }
             else
@@ -627,7 +700,7 @@ namespace Umbraco.Cms.Core.Routing
                     _logger.LogDebug("FindTemplate: Has a template already, but also an alternative template.");
                 }
 
-                _logger.LogDebug("FindTemplate: Look for alternative template alias={AltTemplate}", altTemplate);
+                LogFindingAlternativeTemplateByAlias(altTemplate);
 
                 // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
                 if (request.PublishedContent.IsAllowedTemplate(
@@ -643,22 +716,22 @@ namespace Umbraco.Cms.Core.Routing
                     if (template != null)
                     {
                         request.SetTemplate(template);
-                        _logger.LogDebug("FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                        LogFoundAlternativeTemplateByAlias(template.Id, template.Alias);
                     }
                     else
                     {
-                        _logger.LogDebug("FindTemplate: The alternative template with alias={AltTemplate} does not exist, ignoring.", altTemplate);
+                        LogNotFoundAlternativeTemplateByAlias(altTemplate);
                     }
                 }
                 else
                 {
-                    _logger.LogWarning("FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.", altTemplate, request.PublishedContent.Id);
+                    LogNotAllowedAlternativeTemplateByAlias(altTemplate, request.PublishedContent.Id);
 
                     // no allowed, back to default
                     var templateId = request.PublishedContent.TemplateId;
                     ITemplate template = GetTemplate(templateId);
                     request.SetTemplate(template);
-                    _logger.LogDebug("FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+                    LogFallbackToDefaultTempate(template.Id, template.Alias);
                 }
             }
 
@@ -677,6 +750,48 @@ namespace Umbraco.Cms.Core.Routing
             }
         }
 
+        [LoggerMessage(
+           EventId = 36,
+           Level = LogLevel.Debug,
+           Message = "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}")]
+        public partial void LogTemplateFound(int templateId, string templateAlias);
+
+        [LoggerMessage(
+           EventId = 37,
+           Level = LogLevel.Debug,
+           Message = "FindTemplate: Could not find template with id {TemplateId}")]
+        public partial void LogTemplateNotFound(int? templateId);
+
+        [LoggerMessage(
+           EventId = 39,
+           Level = LogLevel.Debug,
+           Message = "FindTemplate: Look for alternative template alias={AltTemplate}")]
+        public partial void LogFindingAlternativeTemplateByAlias(string altTemplate);
+
+        [LoggerMessage(
+           EventId = 40,
+           Level = LogLevel.Debug,
+           Message = "FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}")]
+        public partial void LogFoundAlternativeTemplateByAlias(int templateId, string templateAlias);
+
+        [LoggerMessage(
+           EventId = 41,
+           Level = LogLevel.Debug,
+           Message = "FindTemplate: The alternative template with alias={AltTemplate} does not exist, ignoring.")]
+        public partial void LogNotFoundAlternativeTemplateByAlias(string altTemplate);
+
+        [LoggerMessage(
+           EventId = 42,
+           Level = LogLevel.Warning,
+           Message = "FindTemplate: Alternative template {TemplateAlias} is not allowed on node {NodeId}, ignoring.")]
+        public partial void LogNotAllowedAlternativeTemplateByAlias(string templateAlias, int nodeId);
+
+        [LoggerMessage(
+           EventId = 43,
+           Level = LogLevel.Debug,
+           Message = "FindTemplate: Running with template id={TemplateId} alias={TemplateAlias}")]
+        public partial void LogFallbackToDefaultTempate(int templateId, string templateAlias);
+
         private ITemplate GetTemplate(int? templateId)
         {
             if (templateId.HasValue == false || templateId.Value == default)
@@ -685,7 +800,7 @@ namespace Umbraco.Cms.Core.Routing
                 return null;
             }
 
-            _logger.LogDebug("GetTemplateModel: Get template id={TemplateId}", templateId);
+            LogRetrievingTemplate(templateId);
 
             if (templateId == null)
             {
@@ -698,9 +813,21 @@ namespace Umbraco.Cms.Core.Routing
                 throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");
             }
 
-            _logger.LogDebug("GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}", template.Id, template.Alias);
+            LogRetrievedTemplate(template.Id, template.Alias);
             return template;
         }
+
+        [LoggerMessage(
+           EventId = 44,
+           Level = LogLevel.Debug,
+           Message = "GetTemplateModel: Get template id={TemplateId}")]
+        public partial void LogRetrievingTemplate(int? templateId);
+
+        [LoggerMessage(
+           EventId = 45,
+           Level = LogLevel.Debug,
+           Message = "GetTemplateModel: Got template id={TemplateId} alias={TemplateAlias}")]
+        public partial void LogRetrievedTemplate(int templateId, string templateAlias);
 
         /// <summary>
         /// Follows external redirection through <c>umbracoRedirect</c> document property.
