@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Web.Common.Controllers
     /// </summary>
     [ModelBindingException]
     [PublishedRequestFilter]
-    public class RenderController : UmbracoPageController, IRenderController
+    public partial class RenderController : UmbracoPageController, IRenderController
     {
         private readonly ILogger<RenderController> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
@@ -60,8 +60,7 @@ namespace Umbraco.Cms.Web.Common.Controllers
         {
             IPublishedRequest pcr = UmbracoRouteValues.PublishedRequest;
 
-            _logger.LogDebug(
-                "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}",
+            LogExecutingAction(
                 pcr.PublishedContent?.Id ?? -1,
                 pcr.ResponseStatusCode,
                 pcr.Culture);
@@ -101,6 +100,12 @@ namespace Umbraco.Cms.Web.Common.Controllers
                     break;
             }
         }
+
+        [LoggerMessage(
+          EventId = 55,
+          Level = LogLevel.Debug,
+          Message = "Response status: Content={Content}, StatusCode={ResponseStatusCode}, Culture={Culture}")]
+        public partial void LogExecutingAction(int? content, int? responseStatusCode, string culture);
 
         private PublishedContentNotFoundResult GetNoTemplateResult(IPublishedRequest pcr)
         {

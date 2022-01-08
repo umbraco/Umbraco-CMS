@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             PublicAccessStatus publicAccessStatus = PublicAccessStatus.AccessAccepted;
             do
             {
-                _logger.LogDebug(nameof(RewriteForPublishedContentAccessAsync) + ": Loop {LoopCounter}", i);
+                LogRewriteLoopCount(i);
 
 
                 IPublishedContent publishedContent = routeValues.PublishedRequest?.PublishedContent;
@@ -122,7 +122,11 @@ namespace Umbraco.Cms.Web.Website.Routing
             return routeValues;
         }
 
-
+        [LoggerMessage(
+          EventId = 58,
+          Level = LogLevel.Debug,
+          Message = "RewriteForPublishedContentAccessAsync : Loop {LoopCounter}")]
+        public partial void LogRewriteLoopCount(int loopCounter);
 
         private async Task<UmbracoRouteValues> SetPublishedContentAsOtherPageAsync(HttpContext httpContext, IPublishedRequest publishedRequest, int pageId)
         {

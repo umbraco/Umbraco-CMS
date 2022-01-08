@@ -20,10 +20,11 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
+using MicrosoftLogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Umbraco.Cms.Web.Common.Macros
 {
-    public class MacroRenderer : IMacroRenderer
+    public partial class MacroRenderer : IMacroRenderer
     {
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<MacroRenderer> _logger;
@@ -129,7 +130,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             if (macroContent == null)
                 return null;
 
-            _logger.LogDebug("Macro content loaded from cache '{MacroCacheId}'", model.CacheIdentifier);
+            LogMacroContentCacheHit(model.CacheIdentifier);
 
             // ensure that the source has not changed
             // note: does not handle dependencies, and never has
@@ -151,6 +152,12 @@ namespace Umbraco.Cms.Web.Common.Macros
 
             return macroContent;
         }
+
+        [LoggerMessage(
+          EventId = 56,
+          Level = MicrosoftLogLevel.Debug,
+          Message = "Macro content loaded from cache '{MacroCacheId}'")]
+        public partial void LogMacroContentCacheHit(string macroCacheId);
 
         // stores macro content into the cache
         private async Task AddMacroContentToCacheAsync(MacroModel model, MacroContent macroContent)
@@ -186,8 +193,14 @@ namespace Umbraco.Cms.Web.Common.Macros
                 new TimeSpan(0, 0, model.CacheDuration)
                 );
 
-            _logger.LogDebug("Macro content saved to cache '{MacroCacheId}'", model.CacheIdentifier);
+            LogMacroContentCacheStore(model.CacheIdentifier);
         }
+
+        [LoggerMessage(
+          EventId = 57,
+          Level = MicrosoftLogLevel.Debug,
+          Message = "Macro content saved to cache '{MacroCacheId}'")]
+        public partial void LogMacroContentCacheStore(string macroCacheId);
 
         // gets the macro source file name
         // null if the macro is not file-based, or not supported
