@@ -1674,6 +1674,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       weggooien?
     </key>
     <key alias="addTab">Tabblad toevoegen</key>
+    <key alias="historyCleanupHeading">Geschiedenis opschonen</key>
+    <key alias="historyCleanupDescription">Overschrijf de standaard geschiedenis opschonen instellingen.</key>
+    <key alias="historyCleanupKeepAllVersionsNewerThanDays">Bewaar alle versies nieuwer dan dagen</key>
+    <key alias="historyCleanupKeepLatestVersionPerDayForDays">Bewaar de laatste versie per dag voor dagen</key>
+    <key alias="historyCleanupPreventCleanup">Voorkom opschonen</key>
+    <key alias="historyCleanupGloballyDisabled">Geschiedenis opschonen is globaal uitgeschakeld. Deze instellingen worden pas van kracht nadat ze zijn ingeschakeld.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Taal toevoegen</key>
