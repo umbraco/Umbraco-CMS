@@ -171,7 +171,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddSingleton<UmbracoRequestPaths>();
 
-            Services.AddUnique<InstallStatusTracker>();
+            Services.AddSingleton<InstallStatusTracker>();
 
             // by default, register a noop factory
             Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
@@ -179,7 +179,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
             Services.AddSingleton(f => f.GetRequiredService<ICultureDictionaryFactory>().CreateDictionary());
 
-            Services.AddUnique<UriUtility>();
+            Services.AddSingleton<UriUtility>();
 
             Services.AddUnique<IDashboardService, DashboardService>();
             Services.AddUnique<IUserDataService, UserDataService>();
@@ -194,14 +194,14 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
             Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
 
-            Services.AddUnique<HtmlLocalLinkParser>();
-            Services.AddUnique<HtmlImageSourceParser>();
-            Services.AddUnique<HtmlUrlParser>();
+            Services.AddSingleton<HtmlLocalLinkParser>();
+            Services.AddSingleton<HtmlImageSourceParser>();
+            Services.AddSingleton<HtmlUrlParser>();
 
             // register properties fallback
             Services.AddUnique<IPublishedValueFallback, PublishedValueFallback>();
 
-            Services.AddUnique<UmbracoFeatures>();
+            Services.AddSingleton<UmbracoFeatures>();
 
             // register published router
             Services.AddUnique<IPublishedRouter, PublishedRouter>();
@@ -226,13 +226,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // let's use an hybrid accessor that can fall back to a ThreadStatic context.
             Services.AddUnique<IUmbracoContextAccessor, HybridUmbracoContextAccessor>();
 
-            Services.AddUnique<LegacyPasswordSecurity>();
-            Services.AddUnique<UserEditorAuthorizationHelper>();
-            Services.AddUnique<ContentPermissions>();
-            Services.AddUnique<MediaPermissions>();
+            Services.AddSingleton<LegacyPasswordSecurity>();
+            Services.AddSingleton<UserEditorAuthorizationHelper>();
+            Services.AddSingleton<ContentPermissions>();
+            Services.AddSingleton<MediaPermissions>();
 
-            Services.AddUnique<PropertyEditorCollection>();
-            Services.AddUnique<ParameterEditorCollection>();
+            Services.AddSingleton<PropertyEditorCollection>();
+            Services.AddSingleton<ParameterEditorCollection>();
 
             // register a server registrar, by default it's the db registrar
             Services.AddUnique<IServerRoleAccessor>(f =>
