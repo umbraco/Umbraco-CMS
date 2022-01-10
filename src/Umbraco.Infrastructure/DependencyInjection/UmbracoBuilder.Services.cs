@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         internal static IUmbracoBuilder AddServices(this IUmbracoBuilder builder)
         {
             // register the service context
-            builder.Services.AddUnique<ServiceContext>();
+            builder.Services.AddSingleton<ServiceContext>();
 
             // register the special idk map
             builder.Services.AddUnique<IIdKeyMap, IdKeyMap>();
@@ -74,11 +74,11 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
-            builder.Services.AddUnique<ConflictingPackageData>();
-            builder.Services.AddUnique<CompiledPackageXmlParser>();
+            builder.Services.AddSingleton<ConflictingPackageData>();
+            builder.Services.AddSingleton<CompiledPackageXmlParser>();
             builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
             builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
-            builder.Services.AddUnique<PackageDataInstallation>();
+            builder.Services.AddSingleton<PackageDataInstallation>();
             builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
 
             return builder;

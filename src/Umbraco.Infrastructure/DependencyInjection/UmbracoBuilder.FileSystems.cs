@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         internal static IUmbracoBuilder AddFileSystems(this IUmbracoBuilder builder)
         {
             // register FileSystems, which manages all filesystems
-            builder.Services.AddUnique<FileSystems>();
+            builder.Services.AddSingleton<FileSystems>();
 
             // register the scheme for media paths
             builder.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
