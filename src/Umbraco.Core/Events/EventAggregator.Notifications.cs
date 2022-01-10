@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Core.Events
         /// Some things worth knowing about MediatR.
         /// <list type="number">
         /// <item>All handlers are by default registered with transient lifetime, but can easily depend on services with state.</item>
-        /// <item>Both the Mediatr instance and its handler resolver are registered scoped and as such it is always possible to depend on scoped services in a handler.</item>
+        /// <item>Both the Mediatr instance and its handler resolver are registered transient and as such it is always possible to depend on scoped services in a handler.</item>
         /// </list>
         /// </para>
         ///
@@ -109,9 +109,9 @@ namespace Umbraco.Cms.Core.Events
         /// </para>
         ///
         /// <para>
-        /// Moving forwards it probably makes more sense to register EventAggregator scoped but doing so now would mean an awful lot of service location to avoid breaking changes.
+        /// Moving forwards it probably makes more sense to register EventAggregator transient but doing so now would mean an awful lot of service location to avoid breaking changes.
         /// <br/>
-        /// For v9 we can do the next best thing which is to create a scope for each published notification, thus enabling the transient handlers to take a dependency on a scoped service.
+        /// For now we can do the next best thing which is to create a scope for each published notification, thus enabling the transient handlers to take a dependency on a scoped service.
         /// </para>
         ///
         /// <para>
