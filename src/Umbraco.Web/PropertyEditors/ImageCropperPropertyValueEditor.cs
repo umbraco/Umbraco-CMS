@@ -190,6 +190,10 @@ namespace Umbraco.Web.PropertyEditors
             {
                 src = val,
                 crops = crops
+            }, new JsonSerializerSettings()
+            {
+                Formatting = Formatting.None,
+                NullValueHandling = NullValueHandling.Ignore
             });
         }
     }

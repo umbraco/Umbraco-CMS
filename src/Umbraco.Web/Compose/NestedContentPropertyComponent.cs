@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.Compose
@@ -47,7 +43,7 @@ namespace Umbraco.Web.Compose
 
             UpdateNestedContentKeysRecursively(complexEditorValue, onlyMissingKeys, createGuid);
 
-            return complexEditorValue.ToString();
+            return complexEditorValue.ToString(Formatting.None);
         }
 
         private void UpdateNestedContentKeysRecursively(JToken json, bool onlyMissingKeys, Func<Guid> createGuid)
@@ -80,7 +76,7 @@ namespace Umbraco.Web.Compose
                         var parsed = JToken.Parse(propVal);
                         UpdateNestedContentKeysRecursively(parsed, onlyMissingKeys, createGuid);
                         // set the value to the updated one
-                        prop.Value = parsed.ToString();
+                        prop.Value = parsed.ToString(Formatting.None);
                     }
                 }
             }
