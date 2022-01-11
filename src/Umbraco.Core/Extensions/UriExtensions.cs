@@ -154,7 +154,7 @@ namespace Umbraco.Extensions
             return new Uri(baseUri.GetLeftPart(UriPartial.Authority) + uri.GetSafeAbsolutePath() + uri.GetSafeQuery());
         }
 
-        static string GetSafeQuery(this Uri uri)
+        static string? GetSafeQuery(this Uri uri)
         {
             if (uri.IsAbsoluteUri)
                 return uri.Query;

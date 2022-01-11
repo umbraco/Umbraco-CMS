@@ -9,11 +9,11 @@ namespace Umbraco.Extensions
 {
     public static class NameValueCollectionExtensions
     {
-        public static IEnumerable<KeyValuePair<string, string>> AsEnumerable(this NameValueCollection nvc)
+        public static IEnumerable<KeyValuePair<string?, string?>> AsEnumerable(this NameValueCollection nvc)
         {
-            foreach (string key in nvc.AllKeys)
+            foreach (string? key in nvc.AllKeys)
             {
-                yield return new KeyValuePair<string, string>(key, nvc[key]);
+                yield return new KeyValuePair<string?, string?>(key, nvc[key]);
             }
         }
 
@@ -22,7 +22,7 @@ namespace Umbraco.Extensions
             return collection.Keys.Cast<object>().Any(k => (string) k == key);
         }
 
-        public static T GetValue<T>(this NameValueCollection collection, string key, T defaultIfNotFound)
+        public static T? GetValue<T>(this NameValueCollection collection, string key, T defaultIfNotFound)
         {
             if (collection.ContainsKey(key) == false)
             {
@@ -37,7 +37,7 @@ namespace Umbraco.Extensions
 
             var result = val.TryConvertTo<T>();
 
-            return result.Success ? result.Result : defaultIfNotFound;
+            return result.Success.HasValue && result.Success.Value ? result.Result : defaultIfNotFound;
         }
     }
 }

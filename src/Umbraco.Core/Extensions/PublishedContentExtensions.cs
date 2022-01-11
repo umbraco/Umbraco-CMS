@@ -523,7 +523,7 @@ namespace Umbraco.Extensions
         /// <param name="maxLevel">The level.</param>
         /// <returns>The nearest (in down-top order) ancestor of the content, at a level lesser or equal to the specified level.</returns>
         /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
-        public static IPublishedContent Ancestor(this IPublishedContent content, int maxLevel)
+        public static IPublishedContent? Ancestor(this IPublishedContent content, int maxLevel)
         {
             return content.EnumerateAncestors(false).FirstOrDefault(x => x.Level <= maxLevel);
         }
@@ -535,7 +535,7 @@ namespace Umbraco.Extensions
         /// <param name="contentTypeAlias">The content type alias.</param>
         /// <returns>The nearest (in down-top order) ancestor of the content, of the specified content type.</returns>
         /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
-        public static IPublishedContent Ancestor(this IPublishedContent content, string contentTypeAlias)
+        public static IPublishedContent? Ancestor(this IPublishedContent content, string contentTypeAlias)
         {
             return content.EnumerateAncestors(false).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
@@ -547,7 +547,7 @@ namespace Umbraco.Extensions
         /// <param name="content">The content.</param>
         /// <returns>The nearest (in down-top order) ancestor of the content, of the specified content type.</returns>
         /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
-        public static T Ancestor<T>(this IPublishedContent content)
+        public static T? Ancestor<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.Ancestors<T>().FirstOrDefault();
@@ -562,7 +562,7 @@ namespace Umbraco.Extensions
         /// <returns>The ancestor of the content, at the specified level and of the specified content type.</returns>
         /// <remarks>Does not consider the content itself. If the ancestor at the specified level is
         /// not of the specified type, returns <c>null</c>.</remarks>
-        public static T Ancestor<T>(this IPublishedContent content, int maxLevel)
+        public static T? Ancestor<T>(this IPublishedContent content, int maxLevel)
             where T : class, IPublishedContent
         {
             return content.Ancestors<T>(maxLevel).FirstOrDefault();
@@ -586,7 +586,7 @@ namespace Umbraco.Extensions
         /// <param name="maxLevel">The level.</param>
         /// <returns>The content or its nearest (in down-top order) ancestor, at a level lesser or equal to the specified level.</returns>
         /// <remarks>May or may not return the content itself depending on its level. May return <c>null</c>.</remarks>
-        public static IPublishedContent AncestorOrSelf(this IPublishedContent content, int maxLevel)
+        public static IPublishedContent? AncestorOrSelf(this IPublishedContent content, int maxLevel)
         {
             return content.EnumerateAncestors(true).FirstOrDefault(x => x.Level <= maxLevel);
         }
@@ -598,7 +598,7 @@ namespace Umbraco.Extensions
         /// <param name="contentTypeAlias">The content type.</param>
         /// <returns>The content or its nearest (in down-top order) ancestor, of the specified content type.</returns>
         /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
-        public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
+        public static IPublishedContent? AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
             return content.EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
@@ -610,7 +610,7 @@ namespace Umbraco.Extensions
         /// <param name="content">The content.</param>
         /// <returns>The content or its nearest (in down-top order) ancestor, of the specified content type.</returns>
         /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
-        public static T AncestorOrSelf<T>(this IPublishedContent content)
+        public static T? AncestorOrSelf<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.AncestorsOrSelf<T>().FirstOrDefault();
@@ -623,7 +623,7 @@ namespace Umbraco.Extensions
         /// <param name="content">The content.</param>
         /// <param name="maxLevel">The level.</param>
         /// <returns></returns>
-        public static T AncestorOrSelf<T>(this IPublishedContent content, int maxLevel)
+        public static T? AncestorOrSelf<T>(this IPublishedContent content, int maxLevel)
             where T : class, IPublishedContent
         {
             return content.AncestorsOrSelf<T>(maxLevel).FirstOrDefault();
@@ -817,17 +817,17 @@ namespace Umbraco.Extensions
             return content.DescendantsOrSelf(variationContextAccessor, level, culture).OfType<T>();
         }
 
-        public static IPublishedContent Descendant(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static IPublishedContent? Descendant(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return content.Children(variationContextAccessor, culture).FirstOrDefault();
         }
 
-        public static IPublishedContent Descendant(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
+        public static IPublishedContent? Descendant(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
         {
             return content.EnumerateDescendants(variationContextAccessor, false, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent DescendantOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
+        public static IPublishedContent? DescendantOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.EnumerateDescendants(variationContextAccessor, false, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
@@ -849,12 +849,12 @@ namespace Umbraco.Extensions
             return content;
         }
 
-        public static IPublishedContent DescendantOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
+        public static IPublishedContent? DescendantOrSelf(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, int level, string? culture = null)
         {
             return content.EnumerateDescendants(variationContextAccessor, true, culture).FirstOrDefault(x => x.Level == level);
         }
 
-        public static IPublishedContent DescendantOrSelfOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
+        public static IPublishedContent? DescendantOrSelfOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.EnumerateDescendants(variationContextAccessor, true, culture).FirstOrDefault(x => x.ContentType.Alias.InvariantEquals(contentTypeAlias));
         }
@@ -978,7 +978,7 @@ namespace Umbraco.Extensions
             return content.Children(variationContextAccessor, culture).OfType<T>();
         }
 
-        public static IPublishedContent FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static IPublishedContent? FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
         {
             return content.Children(variationContextAccessor, culture).FirstOrDefault();
         }
@@ -986,28 +986,28 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the first child of the content, of a given content type.
         /// </summary>
-        public static IPublishedContent FirstChildOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
+        public static IPublishedContent? FirstChildOfType(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string contentTypeAlias, string? culture = null)
         {
             return content.ChildrenOfType(variationContextAccessor, contentTypeAlias, culture).FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<IPublishedContent, bool> predicate, string? culture = null)
+        public static IPublishedContent? FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<IPublishedContent, bool> predicate, string? culture = null)
         {
             return content.Children(variationContextAccessor, predicate, culture).FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Guid uniqueId, string? culture = null)
+        public static IPublishedContent? FirstChild(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Guid uniqueId, string? culture = null)
         {
             return content.Children(variationContextAccessor, x => x.Key == uniqueId, culture).FirstOrDefault();
         }
 
-        public static T FirstChild<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
+        public static T? FirstChild<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Children<T>(variationContextAccessor, culture).FirstOrDefault();
         }
 
-        public static T FirstChild<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<T, bool> predicate, string? culture = null)
+        public static T? FirstChild<T>(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, Func<T, bool> predicate, string? culture = null)
             where T : class, IPublishedContent
         {
             return content.Children<T>(variationContextAccessor, culture).FirstOrDefault(predicate);
@@ -1149,7 +1149,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// This is the same as calling <see cref="Umbraco.Web.PublishedContentExtensions.AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c> set to 1.
         /// </remarks>
-        public static IPublishedContent Root(this IPublishedContent content)
+        public static IPublishedContent? Root(this IPublishedContent content)
         {
             return content.AncestorOrSelf(1);
         }
@@ -1165,7 +1165,7 @@ namespace Umbraco.Extensions
         /// <remarks>
         /// This is the same as calling <see cref="Umbraco.Web.PublishedContentExtensions.AncestorOrSelf{T}(IPublishedContent, int)" /> with <c>maxLevel</c> set to 1.
         /// </remarks>
-        public static T Root<T>(this IPublishedContent content)
+        public static T? Root<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.AncestorOrSelf<T>(1);

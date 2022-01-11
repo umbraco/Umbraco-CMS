@@ -53,8 +53,9 @@ namespace Umbraco.Extensions
         /// If there is an item in the dictionary with the key, it will keep trying to update it until it can
         /// </remarks>
         public static bool TryUpdate<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key, Func<TValue, TValue> updateFactory)
+            where TKey : notnull
         {
-            TValue curValue;
+            TValue? curValue;
             while (dict.TryGetValue(key, out curValue))
             {
                 if (dict.TryUpdate(key, updateFactory(curValue), curValue))
@@ -80,8 +81,9 @@ namespace Umbraco.Extensions
         /// WARNING: If the value changes after we've retrieved it, then the item will not be updated
         /// </remarks>
         public static bool TryUpdateOptimisitic<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> dict, TKey key, Func<TValue, TValue> updateFactory)
+            where TKey : notnull
         {
-            TValue curValue;
+            TValue? curValue;
             if (!dict.TryGetValue(key, out curValue))
                 return false;
             dict.TryUpdate(key, updateFactory(curValue), curValue);
@@ -96,11 +98,12 @@ namespace Umbraco.Extensions
         /// <param name="d"></param>
         /// <returns></returns>
         public static IDictionary<TKeyOut, TValOut> ConvertTo<TKeyOut, TValOut>(this IDictionary d)
+            where TKeyOut : notnull
         {
             var result = new Dictionary<TKeyOut, TValOut>();
             foreach (DictionaryEntry v in d)
             {
-                result.Add((TKeyOut)v.Key, (TValOut)v.Value);
+                result.Add((TKeyOut)v.Key, (TValOut)v.Value!);
             }
             return result;
         }
@@ -115,11 +118,12 @@ namespace Umbraco.Extensions
         /// <param name="valConverter"></param>
         /// <returns></returns>
         public static IDictionary<TKeyOut, TValOut> ConvertTo<TKeyOut, TValOut>(this IDictionary d, Func<object, TKeyOut> keyConverter, Func<object, TValOut> valConverter)
+            where TKeyOut : notnull
         {
             var result = new Dictionary<TKeyOut, TValOut>();
             foreach (DictionaryEntry v in d)
             {
-                result.Add(keyConverter(v.Key), valConverter(v.Value));
+                result.Add(keyConverter(v.Key), valConverter(v.Value!));
             }
             return result;
         }
@@ -205,7 +209,7 @@ namespace Umbraco.Extensions
         /// <param name="d"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static string GetValueAsString<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key)
+        public static string? GetValueAsString<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key)
             => d.ContainsKey(key) ? d[key]!.ToString() : string.Empty;
 
         /// <summary>
@@ -215,7 +219,7 @@ namespace Umbraco.Extensions
         /// <param name="key"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static string GetValueAsString<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key, string defaultValue)
+        public static string? GetValueAsString<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key, string defaultValue)
         {
             if (d.ContainsKey(key))
             {
@@ -269,12 +273,13 @@ namespace Umbraco.Extensions
         /// <param name="defaultValue">The default value.</param>
         /// <typeparam name="TValue">The type</typeparam>
         /// <returns>The entry</returns>
-        public static TValue GetValueIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key, TValue defaultValue)
+        public static TValue GetValueIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string? key, TValue
+            defaultValue)
         {
             key = dictionary.Keys.FirstOrDefault(i => i.InvariantEquals(key));
 
             return key.IsNullOrWhiteSpace() == false
-                       ? dictionary[key]
+                       ? dictionary[key!]
                        : defaultValue;
         }
 
@@ -282,6 +287,7 @@ namespace Umbraco.Extensions
             this IEnumerable<TInput> enumerable,
             Func<TInput, TKey> syncKeySelector,
             Func<TInput, Task<TValue>> asyncValueSelector)
+        where TKey : notnull
         {
             Dictionary<TKey,TValue> dictionary = new Dictionary<TKey, TValue>();
 

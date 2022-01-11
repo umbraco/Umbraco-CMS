@@ -39,7 +39,7 @@ namespace Umbraco.Extensions
             yield return item;
         }
 
-        public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T> source, int groupSize)
+        public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T>? source, int groupSize)
         {
             if (source == null)
                 throw new ArgumentNullException("source");
@@ -49,7 +49,7 @@ namespace Umbraco.Extensions
 
             // following code derived from MoreLinq and does not allocate bazillions of tuples
 
-            T[] temp = null;
+            T[]? temp = null;
             var count = 0;
 
             foreach (var item in source)
@@ -234,9 +234,8 @@ namespace Umbraco.Extensions
             return sequence.Select(
                 x =>
                 {
-                    if (x is TActual)
+                    if (x is TActual casted)
                     {
-                        var casted = x as TActual;
                         projection.Invoke(casted);
                     }
                     return x;
@@ -342,7 +341,7 @@ namespace Umbraco.Extensions
         // this is to support filtering with multiple types
         public static IEnumerable<T> OfTypes<T>(this IEnumerable<T> contents, params Type[] types)
         {
-            return contents.Where(x => types.Contains(x.GetType()));
+            return contents.Where(x => types.Contains(x?.GetType()));
         }
 
         public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> source)

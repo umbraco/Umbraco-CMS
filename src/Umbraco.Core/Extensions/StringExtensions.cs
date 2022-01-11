@@ -43,7 +43,7 @@ namespace Umbraco.Extensions
         {
             var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => int.TryParse(x, NumberStyles.Integer, CultureInfo.InvariantCulture, out var output) ? Attempt<int>.Succeed(output) : Attempt<int>.Fail())
-                .Where(x => x.Success)
+                .Where(x => x.Success ?? false)
                 .Select(x=>x.Result)
                 .Reverse()
                 .ToArray();
@@ -393,7 +393,7 @@ namespace Umbraco.Extensions
         /// <returns>The enum try parse.</returns>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "By Design")]
         [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "2#", Justification = "By Design")]
-        public static bool EnumTryParse<T>(this string strType, bool ignoreCase, out T result)
+        public static bool EnumTryParse<T>(this string strType, bool ignoreCase, out T? result)
         {
             try
             {
@@ -498,7 +498,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
-        public static string FromUrlBase64(this string input)
+        public static string? FromUrlBase64(this string input)
         {
             if (input == null) throw new ArgumentNullException(nameof(input));
 
@@ -522,9 +522,9 @@ namespace Umbraco.Extensions
         /// <param name="format">The format.</param>
         /// <param name="args">The args.</param>
         /// <returns></returns>
-        public static string InvariantFormat(this string format, params object[] args)
+        public static string InvariantFormat(this string? format, params object?[] args)
         {
-            return String.Format(CultureInfo.InvariantCulture, format, args);
+            return string.Format(CultureInfo.InvariantCulture, format ?? string.Empty, args);
         }
 
         /// <summary>
@@ -548,7 +548,7 @@ namespace Umbraco.Extensions
         /// <param name="compare">The compare.</param>
         /// <param name="compareTo">The compare to.</param>
         /// <returns></returns>
-        public static bool InvariantEquals(this string compare, string compareTo)
+        public static bool InvariantEquals(this string compare, string? compareTo)
         {
             return String.Equals(compare, compareTo, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -590,9 +590,9 @@ namespace Umbraco.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="val"></param>
         /// <returns></returns>
-        public static T ParseInto<T>(this string val)
+        public static T? ParseInto<T>(this string val)
         {
-            return (T)val.ParseInto(typeof(T));
+            return (T?)val.ParseInto(typeof(T));
         }
 
         /// <summary>
@@ -601,7 +601,7 @@ namespace Umbraco.Extensions
         /// <param name="val"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static object ParseInto(this string val, Type type)
+        public static object? ParseInto(this string val, Type type)
         {
             if (string.IsNullOrEmpty(val) == false)
             {
@@ -641,10 +641,15 @@ namespace Umbraco.Extensions
         /// <param name="str">Refers to itself</param>
         /// <param name="hashType">String with the hash type.  See remarks section of the CryptoConfig Class in MSDN docs for a list of possible values.</param>
         /// <returns>The hashed string</returns>
-        private static string GenerateHash(this string str, string hashType)
+        private static string GenerateHash(this string str, string? hashType)
         {
+            HashAlgorithm? hasher = null;
             //create an instance of the correct hashing provider based on the type passed in
-            var hasher = HashAlgorithm.Create(hashType);
+            if (hashType is not null)
+            {
+                hasher = HashAlgorithm.Create(hashType);
+            }
+
             if (hasher == null) throw new InvalidOperationException("No hashing type found by name " + hashType);
             using (hasher)
             {
@@ -1184,7 +1189,7 @@ namespace Umbraco.Extensions
             {
                 algorithm.TransformBlock(namespaceBytes, 0, namespaceBytes.Length, null, 0);
                 algorithm.TransformFinalBlock(nameBytes, 0, nameBytes.Length);
-                hash = algorithm.Hash;
+                hash = algorithm.Hash!;
             }
 
             // most bytes from the hash are copied straight to the bytes of the new GUID (steps 5-7, 9, 11-12)
@@ -1221,7 +1226,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Turns an null-or-whitespace string into a null string.
         /// </summary>
-        public static string NullOrWhiteSpaceAsNull(this string text)
+        public static string? NullOrWhiteSpaceAsNull(this string text)
             => string.IsNullOrWhiteSpace(text) ? null : text;
 
 
@@ -1236,7 +1241,7 @@ namespace Umbraco.Extensions
             return string.IsNullOrWhiteSpace(path) == false
                    && path.IndexOfAny(Path.GetInvalidPathChars().ToArray()) == -1
                    && Path.IsPathRooted(path)
-                   && Path.GetPathRoot(path).Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
+                   && Path.GetPathRoot(path)?.Equals(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) == false;
         }
 
         // FORMAT STRINGS

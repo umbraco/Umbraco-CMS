@@ -17,9 +17,9 @@ namespace Umbraco.Cms.Core
         /// <typeparam name="TResult">The type of the attempted operation result.</typeparam>
         /// <param name="result">The result of the attempt.</param>
         /// <returns>The successful attempt.</returns>
-        public static Attempt<TResult> Succeed<TResult>(TResult result)
+        public static Attempt<TResult?> Succeed<TResult>(TResult? result)
         {
-            return Attempt<TResult>.Succeed(result);
+            return Attempt<TResult?>.Succeed(result);
         }
 
         /// <summary>

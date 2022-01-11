@@ -13,7 +13,7 @@ namespace Umbraco.Extensions
 {
     public static class ClaimsIdentityExtensions
     {
-        public static T GetUserId<T>(this IIdentity identity)
+        public static T? GetUserId<T>(this IIdentity identity)
         {
             var strId = identity.GetUserId();
             var converted = strId.TryConvertTo<T>();
@@ -27,11 +27,11 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The string value of the user id if found otherwise null
         /// </returns>
-        public static string GetUserId(this IIdentity identity)
+        public static string? GetUserId(this IIdentity identity)
         {
             if (identity == null) throw new ArgumentNullException(nameof(identity));
 
-            string userId = null;
+            string? userId = null;
             if (identity is ClaimsIdentity claimsIdentity)
             {
                 userId = claimsIdentity.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -48,11 +48,11 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The string value of the user name if found otherwise null
         /// </returns>
-        public static string GetUserName(this IIdentity identity)
+        public static string? GetUserName(this IIdentity identity)
         {
             if (identity == null) throw new ArgumentNullException(nameof(identity));
 
-            string username = null;
+            string? username = null;
             if (identity is ClaimsIdentity claimsIdentity)
             {
                 username = claimsIdentity.FindFirstValue(ClaimTypes.Name)
@@ -70,7 +70,7 @@ namespace Umbraco.Extensions
         /// <returns>
         /// The string value of the claim if found otherwise null
         /// </returns>
-        public static string FindFirstValue(this ClaimsIdentity identity, string claimType)
+        public static string? FindFirstValue(this ClaimsIdentity identity, string claimType)
         {
             if (identity == null) throw new ArgumentNullException(nameof(identity));
 
@@ -100,7 +100,7 @@ namespace Umbraco.Extensions
         /// <param name="identity"></param>
         /// <param name="verifiedIdentity">Verified identity wrapped in a ClaimsIdentity with BackOfficeAuthentication type</param>
         /// <returns>True if ClaimsIdentity</returns>
-        public static bool VerifyBackOfficeIdentity(this ClaimsIdentity identity, out ClaimsIdentity verifiedIdentity)
+        public static bool VerifyBackOfficeIdentity(this ClaimsIdentity identity, out ClaimsIdentity? verifiedIdentity)
         {
             if (identity is null)
             {
@@ -119,7 +119,7 @@ namespace Umbraco.Extensions
                 }
             }
 
-            verifiedIdentity =  identity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType ? identity : new ClaimsIdentity(identity.Claims, Constants.Security.BackOfficeAuthenticationType);
+            verifiedIdentity = identity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType ? identity : new ClaimsIdentity(identity.Claims, Constants.Security.BackOfficeAuthenticationType);
             return true;
         }
 
@@ -294,35 +294,44 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="identity"></param>
         /// <returns>User ID as integer</returns>
-        public static int GetId(this ClaimsIdentity identity) => int.Parse(identity.FindFirstValue(ClaimTypes.NameIdentifier), CultureInfo.InvariantCulture);
+        public static int? GetId(this ClaimsIdentity identity)
+        {
+            var firstValue = identity.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (firstValue is not null)
+            {
+                int.Parse(firstValue, CultureInfo.InvariantCulture);
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Get the real name belonging to the user from a ClaimsIdentity
         /// </summary>
         /// <param name="identity"></param>
         /// <returns>Real name of the user</returns>
-        public static string GetRealName(this ClaimsIdentity identity) => identity.FindFirstValue(ClaimTypes.GivenName);
+        public static string? GetRealName(this ClaimsIdentity identity) => identity.FindFirstValue(ClaimTypes.GivenName);
 
         /// <summary>
         /// Get the username of the user from a ClaimsIdentity
         /// </summary>
         /// <param name="identity"></param>
         /// <returns>Username of the user</returns>
-        public static string GetUsername(this ClaimsIdentity identity) => identity.FindFirstValue(ClaimTypes.Name);
+        public static string? GetUsername(this ClaimsIdentity identity) => identity.FindFirstValue(ClaimTypes.Name);
 
         /// <summary>
         /// Get the culture string from a ClaimsIdentity
         /// </summary>
         /// <param name="identity"></param>
         /// <returns>Culture string</returns>
-        public static string GetCultureString(this ClaimsIdentity identity) => identity.FindFirstValue(ClaimTypes.Locality);
+        public static string? GetCultureString(this ClaimsIdentity identity) => identity.FindFirstValue(ClaimTypes.Locality);
 
         /// <summary>
         /// Get the security stamp from a ClaimsIdentity
         /// </summary>
         /// <param name="identity"></param>
         /// <returns>Security stamp</returns>
-        public static string GetSecurityStamp(this ClaimsIdentity identity) => identity.FindFirstValue(Constants.Security.SecurityStampClaimType);
+        public static string? GetSecurityStamp(this ClaimsIdentity identity) => identity.FindFirstValue(Constants.Security.SecurityStampClaimType);
 
         /// <summary>
         /// Get the roles assigned to a user from a ClaimsIdentity
@@ -336,17 +345,20 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds or updates and existing claim.
         /// </summary>
-        public static void AddOrUpdateClaim(this ClaimsIdentity identity, Claim claim)
+        public static void AddOrUpdateClaim(this ClaimsIdentity identity, Claim? claim)
         {
             if (identity == null)
             {
                 throw new ArgumentNullException(nameof(identity));
             }
 
-            Claim existingClaim = identity.Claims.FirstOrDefault(x => x.Type == claim.Type);
-            identity.TryRemoveClaim(existingClaim);
+            if (claim is not null)
+            {
+                Claim? existingClaim = identity.Claims.FirstOrDefault(x => x.Type == claim.Type);
+                identity.TryRemoveClaim(existingClaim);
 
-            identity.AddClaim(claim);
+                identity.AddClaim(claim);
+            }
         }
     }
 }

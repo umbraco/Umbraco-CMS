@@ -15,11 +15,11 @@ namespace Umbraco.Extensions
 
         public static Task WaitOneAsync(this WaitHandle handle, int millisecondsTimeout = Timeout.Infinite)
         {
-            var tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object?>();
             var callbackHandleInitLock = new object();
             lock (callbackHandleInitLock)
             {
-                RegisteredWaitHandle callbackHandle = null;
+                RegisteredWaitHandle? callbackHandle = null;
                 // ReSharper disable once RedundantAssignment
                 callbackHandle = ThreadPool.RegisterWaitForSingleObject(
                     handle,
@@ -34,7 +34,7 @@ namespace Umbraco.Extensions
                         {
                             // ReSharper disable once PossibleNullReferenceException
                             // ReSharper disable once AccessToModifiedClosure
-                            callbackHandle.Unregister(null);
+                            callbackHandle?.Unregister(null);
                         }
                     },
                     /*state:*/ null,
