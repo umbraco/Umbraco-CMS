@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +44,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
-        private readonly PublishedSnapshotServiceEventHandler _publishedSnapshotServiceEventHandler;
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
@@ -55,10 +53,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private SmidgeOptions _smidgeOptions;
         private readonly WebProfiler _profiler;
-
-        private static bool s_cacheInitialized;
-        private static bool s_cacheInitializedFlag = false;
-        private static object s_cacheInitializedLock = new object();
 
 #pragma warning disable IDE0044 // Add readonly modifier
         private static bool s_firstBackOfficeRequest;
@@ -73,7 +67,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
             ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
-            PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
             IEventAggregator eventAggregator,
             IProfiler profiler,
             IHostingEnvironment hostingEnvironment,
@@ -87,7 +80,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
             _requestCache = requestCache;
-            _publishedSnapshotServiceEventHandler = publishedSnapshotServiceEventHandler;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
             _umbracoRequestPaths = umbracoRequestPaths;
@@ -116,8 +108,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
             // Profiling start needs to be one of the first things that happens.
             // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
             _profiler?.UmbracoApplicationBeginRequest(context, _runtimeState.Level);
-
-            EnsureContentCacheInitialized();
 
             _variationContextAccessor.VariationContext ??= new VariationContext(_defaultCultureAccessor.DefaultCulture);
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
@@ -230,18 +220,5 @@ namespace Umbraco.Cms.Web.Common.Middleware
             IHttpScopeReference httpScopeReference = request.HttpContext.RequestServices.GetRequiredService<IHttpScopeReference>();
             httpScopeReference.Register();
         }
-
-        /// <summary>
-        /// Initializes the content cache one time
-        /// </summary>
-        private void EnsureContentCacheInitialized() => LazyInitializer.EnsureInitialized(
-            ref s_cacheInitialized,
-            ref s_cacheInitializedFlag,
-            ref s_cacheInitializedLock,
-            () =>
-            {
-                _publishedSnapshotServiceEventHandler.Initialize();
-                return true;
-            });
     }
 }

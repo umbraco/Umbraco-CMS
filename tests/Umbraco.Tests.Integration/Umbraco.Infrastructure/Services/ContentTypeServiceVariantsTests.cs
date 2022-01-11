@@ -40,14 +40,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
-        protected override void BeforeHostStart(IHost host)
-        {
-            base.BeforeHostStart(host);
-
-            // Ensure that the events are bound on each test
-            PublishedSnapshotServiceEventHandler eventBinder = host.Services.GetRequiredService<PublishedSnapshotServiceEventHandler>();
-            eventBinder.Initialize();
-        }
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
@@ -57,8 +49,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             {
                 options.NuCacheSerializerType = NuCacheSerializerType.JSON;
             });
-
-
         }
 
         private void AssertJsonStartsWith(int id, string expected)
